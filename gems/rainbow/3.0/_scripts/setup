@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+set -v
+
+RBS_DIR=$(cd $(dirname $0)/..; pwd)
+
+if [ ! -d $RBS_DIR/_src ]; then
+  git clone https://github.com/sickill/rainbow.git $RBS_DIR/_src
+fi
+cd $RBS_DIR/_src
+git checkout v3.0.0

@@ -1,0 +1,71 @@
+module Rainbow
+  class Presenter < String
+    # Sets color of this text.
+    def color: (*Symbol values) -> instance
+
+    alias foreground color
+
+    alias fg color
+
+    # Sets background color of this text.
+    def background: (*Symbol values) -> instance
+
+    alias bg background
+
+    # Resets terminal to default colors/backgrounds.
+    #
+    # It shouldn't be needed to use this method because all methods
+    # append terminal reset code to end of string.
+    def reset: () -> instance
+
+    # Turns on bright/bold for this text.
+    def bright: () -> instance
+
+    alias bold bright
+
+    # Turns on faint/dark for this text (not well supported by terminal
+    # emulators).
+    def faint: () -> instance
+
+    # Turns on italic style for this text (not well supported by terminal
+    # emulators).
+    def italic: () -> instance
+
+    # Turns on underline decoration for this text.
+    def underline: () -> instance
+
+    # Turns on blinking attribute for this text (not well supported by terminal
+    # emulators).
+    def blink: () -> instance
+
+    # Inverses current foreground/background colors.
+    def inverse: () -> instance
+
+    # Hides this text (set its color to the same as background).
+    def hide: () -> instance
+
+    def black: () -> instance
+
+    def red: () -> instance
+
+    def green: () -> instance
+
+    def yellow: () -> instance
+
+    def blue: () -> instance
+
+    def magenta: () -> instance
+
+    def cyan: () -> instance
+
+    def white: () -> instance
+
+    # We take care of X11 color method call here.
+    # Such as #aqua, #ghostwhite.
+    def method_missing: (untyped method_name, *untyped args) -> untyped
+
+    def respond_to_missing?: (untyped method_name, *untyped args) -> bool
+
+    def wrap_with_sgr: (untyped codes) -> instance
+  end
+end
