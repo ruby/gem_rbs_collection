@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+set -v
+
+RBS_DIR=$(cd $(dirname $0)/..; pwd)
+REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
+
+bundle exec rbs --repo $REPO_DIR -r listen:3.2 validate 
+
+cd ${RBS_DIR}/_test
+bundle exec steep check
