@@ -1,7 +1,11 @@
 require "retryable"
 
 Retryable.retryable do
-  # ...
+  puts "foo"
+end
+
+Retryable.retryable(tries: 3, on: ArgumentError) do
+  puts "foo"
 end
 
 Retryable.configuration
