@@ -13,16 +13,16 @@ module Retryable
                     | :tries
 
     type options = {
-      contexts: Hash[Symbol, options],
-      ensure: ^(Integer) -> void,
-      exception_cb: ^(Exception) -> void,
-      log_method: ^(Integer, Exception) -> void,
-      matching: (String | Regexp) | Array[String | Regexp],
-      not: _Exception | Array[_Exception],
-      on: _Exception | Array[_Exception],
-      sleep: real | (^(real) -> void),
-      sleep_method: ^(real) -> void,
-      tries: Integer
+      contexts: Hash[Symbol, options] | nil,
+      ensure: (^(Integer) -> void) | nil,
+      exception_cb: (^(Exception) -> void) | nil,
+      log_method: (^(Integer, Exception?) -> void) | nil,
+      matching: (String | Regexp) | Array[String | Regexp] | nil,
+      not: _Exception | Array[_Exception] | nil,
+      on: _Exception | Array[_Exception] | nil,
+      sleep: real | (^(real) -> void) | nil,
+      sleep_method: (^(real) -> void) | nil,
+      tries: Integer | nil
     }
 
     VALID_OPTION_KEYS: Array[option_key]
@@ -30,7 +30,7 @@ module Retryable
     attr_accessor contexts: Hash[Symbol, options]
     attr_accessor ensure: ^(Integer) -> void
     attr_accessor exception_cb: ^(Exception) -> void
-    attr_accessor log_method: ^(Integer, Exception) -> void
+    attr_accessor log_method: ^(Integer, Exception?) -> void
     attr_accessor matching: (String | Regexp) | Array[String | Regexp]
     attr_accessor not: _Exception | Array[_Exception]
     attr_accessor on: _Exception | Array[_Exception]

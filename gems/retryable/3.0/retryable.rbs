@@ -4,7 +4,7 @@ module Retryable
 
   # A Retryable configuration object. Must act like a hash and return sensible
   # values for all Retryable configuration options. See Retryable::Configuration.
-  attr_writer configuration: Configuration
+  def self.configuration=: (Configuration) -> void
 
   # Call this method to modify defaults in your initializers.
   #
@@ -31,11 +31,11 @@ module Retryable
   def self.enable: () -> void
   def self.disable: () -> void
 
-  def self.with_context: [X] (Symbol context_key, ?Configuration::options options) { () -> X } -> X
+  def self.with_context: [X] (Symbol context_key, ?Configuration::options options) ?{ (Integer, Exception?) -> X } -> X?
 
   alias self.retryable_with_context self.with_context
 
-  def self.retryable: [X] (?Configuration::options options) { (Integer, Exception) -> X } -> X?
+  def self.retryable: [X] (?Configuration::options options) ?{ (Integer, Exception?) -> X } -> X?
 
   private
 
