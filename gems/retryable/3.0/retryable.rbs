@@ -1,0 +1,45 @@
+# Runs a code block, and retries it when an exception occurs. It's great when working with flakey webservices (for example).
+module Retryable
+  extend Forwardable
+
+  # A Retryable configuration object. Must act like a hash and return sensible
+  # values for all Retryable configuration options. See Retryable::Configuration.
+  def self.configuration=: (Configuration) -> void
+
+  # Call this method to modify defaults in your initializers.
+  #
+  # @example
+  #   Retryable.configure do |config|
+  #     config.contexts     = {}
+  #     config.ensure       = proc {}
+  #     config.exception_cb = proc {}
+  #     config.log_method   = proc {}
+  #     config.matching     = /.*/
+  #     config.not          = []
+  #     config.on           = StandardError
+  #     config.sleep        = 1
+  #     config.sleep_method = ->(seconds) { Kernel.sleep(seconds) }
+  #     config.tries        = 2
+  #   end
+  def self.configure: () { (Configuration) -> void } -> void
+
+  # The configuration object.
+  # @see Retryable.configure
+  def self.configuration: () -> Configuration
+
+  def self.enabled?: () -> bool
+  def self.enable: () -> void
+  def self.disable: () -> void
+
+  def self.with_context: [X] (Symbol context_key, ?Configuration::options options) ?{ (Integer, Exception?) -> X } -> X?
+
+  alias self.retryable_with_context self.with_context
+
+  def self.retryable: [X] (?Configuration::options options) ?{ (Integer, Exception?) -> X } -> X?
+
+  private
+
+  def self.check_for_invalid_options: (Configuration::options custom_options, Configuration::options default_options) -> void
+
+  def self.matches?: (String message, Array[String | Regexp] candidates) -> bool
+end
