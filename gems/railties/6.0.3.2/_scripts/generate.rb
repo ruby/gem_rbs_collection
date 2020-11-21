@@ -190,6 +190,14 @@ def generate2!(name)
   generated_rbs_path.write(rbs)
 
   sh!({ 'ONLY' => name }, 'ruby', bin('postprocess.rb'), '-rlogger', '-rmutex_m', '-Iassets/sig', '-Isig', 'assets/')
+
+  # Add license of rails/rails
+  # https://github.com/rails/rails/blob/master/MIT-LICENSE
+  generated_rbs_path.write(<<~COMMENT + RAILS_CODE_DIR.join('MIT-LICENSE').read.gsub(/^/, '#') + "\n" + generated_rbs_path.read)
+    # The generated code is based on Ruby on Rails source code
+    # You can find the license of Ruby on Rails from following.
+
+  COMMENT
 end
 
 def main(name)
