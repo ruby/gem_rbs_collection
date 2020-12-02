@@ -35,6 +35,8 @@ module ActiveRecord
 
     def reload: () -> untyped
 
+    private
+
     def clear_aggregation_cache: () -> untyped
 
     def init_internals: () -> untyped
@@ -237,6 +239,8 @@ module ActiveRecord
       #
       def composed_of: (untyped part_id, ?::Hash[untyped, untyped] options) -> untyped
 
+      private
+
       def reader_method: (untyped name, untyped class_name, untyped mapping, untyped allow_nil, untyped constructor) -> untyped
 
       def writer_method: (untyped name, untyped class_name, untyped mapping, untyped allow_nil, untyped converter) -> untyped
@@ -260,6 +264,8 @@ module ActiveRecord
 
     def create!: (?untyped? attributes) { () -> untyped } -> untyped
 
+    private
+
     def exec_queries: () { (untyped) -> untyped } -> untyped
   end
 end
@@ -279,6 +285,8 @@ module ActiveRecord
       def aliased_table_for: (untyped table_name, untyped aliased_name, untyped type_caster) -> untyped
 
       attr_reader aliases: untyped
+
+      private
 
       def truncate: (untyped name) -> untyped
     end
@@ -458,6 +466,8 @@ module ActiveRecord
 
       def create!: (?::Hash[untyped, untyped] attributes) { () -> untyped } -> untyped
 
+      private
+
       def find_target: () -> untyped
 
       # The scope for this association.
@@ -541,6 +551,8 @@ module ActiveRecord
 
       def self.get_bind_values: (untyped owner, untyped chain) -> untyped
 
+      private
+
       attr_reader value_transformation: untyped
 
       def join: (untyped table, untyped constraint) -> untyped
@@ -594,6 +606,8 @@ module ActiveRecord
 
       def target_changed?: () -> untyped
 
+      private
+
       def replace: (untyped record) -> untyped
 
       def update_counters: (untyped by) -> untyped
@@ -627,6 +641,8 @@ module ActiveRecord
       def klass: () -> untyped
 
       def target_changed?: () -> untyped
+
+      private
 
       def replace_keys: (untyped record) -> untyped
 
@@ -749,6 +765,8 @@ module ActiveRecord::Associations::Builder
     def through_model: () -> untyped
 
     def middle_reflection: (untyped join_model) -> untyped
+
+    private
 
     def middle_options: (untyped join_model) -> untyped
 
@@ -938,6 +956,8 @@ module ActiveRecord
       def null_scope?: () -> untyped
 
       def find_from_target?: () -> untyped
+
+      private
 
       # We have some records loaded from the database (persisted) and some that are
       # in-memory (memory). The same record may be represented in the persisted array
@@ -1667,6 +1687,8 @@ module ActiveRecord
 
       def reset_scope: () -> untyped
 
+      private
+
       def find_nth_with_limit: (untyped index, untyped limit) -> untyped
 
       def find_nth_from_last: (untyped index) -> untyped
@@ -1703,6 +1725,8 @@ module ActiveRecord
       def handle_dependency: () -> untyped
 
       def insert_record: (untyped record, ?bool validate, ?bool raise) -> untyped
+
+      private
 
       # Returns the number of records in this collection.
       #
@@ -1755,6 +1779,8 @@ module ActiveRecord
       def concat: (*untyped records) -> untyped
 
       def insert_record: (untyped record, ?bool validate, ?bool raise) -> (nil | untyped)
+
+      private
 
       def concat_records: (untyped records) -> untyped
 
@@ -1812,6 +1838,8 @@ module ActiveRecord
 
       def delete: (?untyped method) -> untyped
 
+      private
+
       def replace: (untyped record, ?bool save) -> untyped
 
       # The reason that the save param for replace is false, if for create (not just build),
@@ -1837,6 +1865,8 @@ module ActiveRecord
       # = Active Record Has One Through Association
       # nodoc:
       include ThroughAssociation
+
+      private
 
       def replace: (untyped record, ?bool save) -> untyped
 
@@ -1868,6 +1898,8 @@ module ActiveRecord
         def tables=: (untyped tables) -> untyped
 
         def readonly?: () -> untyped
+
+        private
 
         def append_constraints: (untyped join, untyped constraints) -> untyped
       end
@@ -1983,6 +2015,8 @@ module ActiveRecord
 
       attr_reader join_type: untyped
 
+      private
+
       attr_reader alias_tracker: untyped
 
       def explicit_selections: (untyped root_column_aliases, untyped result_set) -> untyped
@@ -2024,6 +2058,8 @@ module ActiveRecord
         def records_by_owner: () -> untyped
 
         def preloaded_records: () -> untyped
+
+        private
 
         attr_reader owners: untyped
 
@@ -2079,6 +2115,8 @@ module ActiveRecord
         def preloaded_records: () -> untyped
 
         def records_by_owner: () -> untyped
+
+        private
 
         def source_preloaders: () -> untyped
 
@@ -2178,6 +2216,8 @@ module ActiveRecord
       #   [ :books, { author: :avatar } ]
       def preload: (untyped records, untyped associations, ?untyped? preload_scope) -> untyped
 
+      private
+
       # Loads all the given data into +records+ for the +association+.
       def preloaders_on: (untyped association, untyped records, untyped scope, ?bool polymorphic_parent) -> untyped
 
@@ -2211,6 +2251,8 @@ module ActiveRecord
 
         def records_by_owner: () -> untyped
 
+        private
+
         attr_reader owners: untyped
 
         attr_reader reflection: untyped
@@ -2240,6 +2282,8 @@ module ActiveRecord
       # Foo.has_one :bar
       def force_reload_reader: () -> untyped
 
+      private
+
       def scope_for_create: () -> untyped
 
       def find_target: () -> untyped
@@ -2256,6 +2300,8 @@ end
 module ActiveRecord
   module Associations
     module ThroughAssociation
+      private
+
       def through_reflection: () -> untyped
 
       def through_association: () -> untyped
@@ -2407,6 +2453,8 @@ module ActiveRecord
     def initialize_dup: () -> untyped
 
     def reload: () -> untyped
+
+    private
 
     # Clears out the association cache.
     def clear_association_cache: () -> untyped
@@ -3966,6 +4014,8 @@ module ActiveRecord
   module AttributeAssignment
     include ActiveModel::AttributeAssignment
 
+    private
+
     def _assign_attributes: (untyped attributes) -> untyped
 
     # Assign any deferred nested attributes after the base attributes have been set.
@@ -4022,6 +4072,8 @@ module ActiveRecord
       # used to ensure that class macros are idempotent.
       def decorate_matching_attribute_types: (untyped matcher, untyped decorator_name) { () -> untyped } -> untyped
 
+      private
+
       def load_schema!: () -> untyped
     end
 
@@ -4031,6 +4083,8 @@ module ActiveRecord
       def merge: (*untyped args) -> TypeDecorator
 
       def apply: (untyped name, untyped `type`) -> untyped
+
+      private
 
       def decorators_for: (untyped name, untyped `type`) -> untyped
 
@@ -4092,6 +4146,8 @@ module ActiveRecord
       #   task.attributes_before_type_cast
       #   # => {"id"=>nil, "title"=>nil, "is_done"=>true, "completed_on"=>"2012-10-21", "created_at"=>nil, "updated_at"=>nil}
       def attributes_before_type_cast: () -> untyped
+
+      private
 
       # Dispatch target for <tt>*_before_type_cast</tt> attribute methods.
       def attribute_before_type_cast: (untyped attribute_name) -> untyped
@@ -4208,6 +4264,8 @@ module ActiveRecord
       # values about to be saved).
       def attributes_in_database: () -> untyped
 
+      private
+
       def mutations_from_database: () -> untyped
 
       def mutations_before_last_save: () -> untyped
@@ -4252,6 +4310,8 @@ module ActiveRecord
       # Returns the primary key column's value from the database.
       def id_in_database: () -> untyped
 
+      private
+
       def attribute_method?: (untyped attr_name) -> untyped
 
       module ClassMethods
@@ -4291,6 +4351,8 @@ module ActiveRecord
         #   Project.primary_key # => "foo_id"
         def primary_key=: (untyped value) -> untyped
 
+        private
+
         def suppress_composite_primary_key: (untyped pk) -> untyped
       end
     end
@@ -4304,6 +4366,8 @@ module ActiveRecord
 
       def query_attribute: (untyped attr_name) -> (::FalseClass | untyped)
 
+      private
+
       # Dispatch target for <tt>*?</tt> attribute methods.
       def attribute?: (untyped attribute_name) -> untyped
     end
@@ -4316,6 +4380,8 @@ module ActiveRecord
       extend ActiveSupport::Concern
 
       module ClassMethods
+        private
+
         def define_method_attribute: (untyped name) -> untyped
       end
 
@@ -4384,6 +4450,8 @@ module ActiveRecord
         #   end
         def serialize: (untyped attr_name, ?untyped class_name_or_coder) -> untyped
 
+        private
+
         def type_incompatible_with_serialize?: (untyped `type`, untyped class_name) -> untyped
       end
     end
@@ -4399,6 +4467,8 @@ module ActiveRecord
 
         def cast: (untyped value) -> (nil | untyped)
 
+        private
+
         def convert_time_to_time_zone: (untyped value) -> (nil | untyped)
 
         def set_time_zone_without_conversion: (untyped value) -> untyped
@@ -4409,6 +4479,8 @@ module ActiveRecord
       extend ActiveSupport::Concern
 
       module ClassMethods
+        private
+
         def inherited: (untyped subclass) -> untyped
 
         def create_time_zone_conversion_attribute?: (untyped name, untyped cast_type) -> untyped
@@ -4423,6 +4495,8 @@ module ActiveRecord
       extend ActiveSupport::Concern
 
       module ClassMethods
+        private
+
         def define_method_attribute=: (untyped name) -> untyped
       end
 
@@ -4432,6 +4506,8 @@ module ActiveRecord
       def write_attribute: (untyped attr_name, untyped value) -> untyped
 
       def _write_attribute: (untyped attr_name, untyped value) -> untyped
+
+      private
 
       def write_attribute_without_type_cast: (untyped attr_name, untyped value) -> untyped
 
@@ -4699,6 +4775,8 @@ module ActiveRecord
     #   end
     def accessed_fields: () -> untyped
 
+    private
+
     def attribute_method?: (untyped attr_name) -> untyped
 
     def attributes_with_values: (untyped attribute_names) -> untyped
@@ -4941,6 +5019,8 @@ module ActiveRecord
 
       def load_schema!: () -> untyped
 
+      private
+
       NO_DEFAULT_PROVIDED: untyped
 
       def define_default_attribute: (untyped name, untyped value, untyped `type`, from_user: untyped from_user) -> untyped
@@ -5086,6 +5166,8 @@ module ActiveRecord
     end
 
     module ClassMethods
+      private
+
       def define_non_cyclic_method: (untyped name) { () -> untyped } -> (nil | untyped)
 
       # Adds validation and save callbacks for the association as specified by
@@ -5131,6 +5213,8 @@ module ActiveRecord
     # Returns whether or not this record has been changed in any way (including whether
     # any of its nested autosave associations are likewise changed)
     def changed_for_autosave?: () -> untyped
+
+    private
 
     # Returns the record for an association collection that should be validated
     # or saved. If +autosave+ is +false+ only new records will be returned,
@@ -5844,6 +5928,8 @@ module ActiveRecord
 
     def increment!: (untyped attribute, ?::Integer by, ?touch: untyped? touch) -> untyped
 
+    private
+
     def create_or_update: () -> untyped
 
     def _create_record: () -> untyped
@@ -5878,6 +5964,8 @@ module ActiveRecord
       def load: (untyped yaml) -> untyped
 
       def assert_valid_value: (untyped obj, action: untyped action) -> untyped
+
+      private
 
       def check_arity_of_constructor: () -> untyped
     end
@@ -6011,6 +6099,8 @@ module ActiveRecord
         # becomes available within +timeout+ seconds,
         def poll: (?untyped? timeout) -> untyped
 
+        private
+
         def internal_poll: (untyped timeout) -> untyped
 
         def synchronize: () { () -> untyped } -> untyped
@@ -6068,6 +6158,8 @@ module ActiveRecord
         # :nodoc:
         include BiasableQueue
 
+        private
+
         def internal_poll: (untyped timeout) -> untyped
       end
 
@@ -6085,6 +6177,8 @@ module ActiveRecord
         def initialize: (untyped pool, untyped frequency) -> untyped
 
         def self.register_pool: (untyped pool, untyped frequency) -> untyped
+
+        private
 
         def self.spawn_thread: (untyped frequency) -> untyped
 
@@ -6249,6 +6343,8 @@ module ActiveRecord
       #
       #    ActiveRecord::Base.connection_pool.stat # => { size: 15, connections: 1, busy: 1, dead: 0, idle: 0, waiting: 0, checkout_timeout: 5 }
       def stat: () -> untyped
+
+      private
 
       # -
       # this is unfortunately not concurrent
@@ -6423,6 +6519,8 @@ module ActiveRecord
       # When a connection is established or removed, we invalidate the cache.
       def retrieve_connection_pool: (untyped spec_name) -> untyped
 
+      private
+
       def owner_to_pool: () -> untyped
 
       def pool_from_any_process_for: (untyped spec_name) -> untyped
@@ -6474,6 +6572,8 @@ module ActiveRecord
       # Returns maximum number of joins in a single query.
       def joins_per_query: () -> 256
 
+      private
+
       def bind_params_length: () -> 65535
     end
   end
@@ -6488,7 +6588,11 @@ module ActiveRecord
       # Converts an arel AST to SQL
       def to_sql: (untyped arel_or_sql_string, ?untyped binds) -> untyped
 
+      private
+
       def to_sql_and_binds: (untyped arel_or_sql_string, ?untyped binds) -> untyped
+
+      public
 
       def cacheable_query: (untyped klass, untyped arel) -> ::Array[untyped]
 
@@ -6706,6 +6810,8 @@ module ActiveRecord
 
       def with_yaml_fallback: (untyped value) -> untyped
 
+      private
+
       def execute_batch: (untyped statements, ?untyped? name) -> untyped
 
       DEFAULT_INSERT_VALUE: untyped
@@ -6783,6 +6889,8 @@ module ActiveRecord
       def clear_query_cache: () -> untyped
 
       def select_all: (untyped arel, ?untyped? name, ?untyped binds, ?preparable: untyped? preparable) -> untyped
+
+      private
 
       def cache_sql: (untyped sql, untyped name, untyped binds) { () -> untyped } -> untyped
 
@@ -6880,6 +6988,8 @@ module ActiveRecord
       #   "#{column_name} NULLS LAST"
       COLUMN_NAME_WITH_ORDER: untyped
 
+      private
+
       def type_casted_binds: (untyped binds) -> untyped
 
       def lookup_cast_type: (untyped sql_type) -> untyped
@@ -6915,6 +7025,8 @@ module ActiveRecord
         def initialize: (untyped conn) -> untyped
 
         def accept: (untyped o) -> untyped
+
+        private
 
         def visit_AlterTable: (untyped o) -> untyped
 
@@ -7037,6 +7149,8 @@ module ActiveRecord
 
       def initialize: (untyped table, untyped name, ?bool unique, ?untyped columns, ?comment: untyped? comment, ?using: untyped? using, ?type: untyped? `type`, ?where: untyped? where, ?opclasses: ::Hash[untyped, untyped] opclasses, ?orders: ::Hash[untyped, untyped] orders, ?lengths: ::Hash[untyped, untyped] lengths) -> untyped
 
+      private
+
       def concise_options: (untyped options) -> untyped
     end
 
@@ -7099,6 +7213,8 @@ module ActiveRecord
 
       def defined_for?: (?to_table: untyped? to_table, **untyped options) -> untyped
 
+      private
+
       def default_primary_key: () -> "id"
     end
 
@@ -7107,6 +7223,8 @@ module ActiveRecord
       def initialize: (untyped name, ?type: ::Symbol `type`, ?foreign_key: bool foreign_key, ?index: bool index, ?polymorphic: bool polymorphic, **untyped options) -> untyped
 
       def add_to: (untyped table) -> untyped
+
+      private
 
       attr_reader name: untyped
 
@@ -7145,7 +7263,11 @@ module ActiveRecord
       def primary_key: (untyped name, ?::Symbol `type`, **untyped options) -> untyped
 
       module ClassMethods
+        private
+
         def define_column_methods: (*untyped column_types) -> untyped
+
+        public
       end
     end
 
@@ -7295,6 +7417,8 @@ module ActiveRecord
       alias belongs_to references
 
       def new_column_definition: (untyped name, untyped `type`, **untyped options) -> untyped
+
+      private
 
       def create_column_definition: (untyped name, untyped `type`, untyped options) -> ColumnDefinition[untyped]
 
@@ -7518,6 +7642,8 @@ module ActiveRecord
       # :nodoc:
       # :nodoc:
       def self.create: (untyped connection, untyped options) -> untyped
+
+      private
 
       def column_spec: (untyped column) -> ::Array[untyped]
 
@@ -8437,6 +8563,8 @@ module ActiveRecord
 
       def create_schema_dumper: (untyped options) -> untyped
 
+      private
+
       def column_options_keys: () -> ::Array[:limit | :precision | :scale | :default | :null | :collation | :comment]
 
       def add_index_sort_order: (untyped quoted_columns, **untyped options) -> untyped
@@ -8635,6 +8763,8 @@ module ActiveRecord
       def open_transactions: () -> untyped
 
       def current_transaction: () -> untyped
+
+      private
 
       NULL_TRANSACTION: untyped
 
@@ -8931,7 +9061,11 @@ module ActiveRecord
 
       def case_insensitive_comparison: (untyped attribute, untyped value) -> untyped
 
+      private
+
       def can_perform_case_insensitive_comparison_for?: (untyped column) -> ::TrueClass
+
+      public
 
       # Check the connection back in to the connection pool
       def close: () -> untyped
@@ -8947,6 +9081,8 @@ module ActiveRecord
       def database_version: () -> untyped
 
       def check_version: () -> nil
+
+      private
 
       def type_map: () -> untyped
 
@@ -8995,6 +9131,8 @@ module ActiveRecord
       NATIVE_DATABASE_TYPES: ::Hash[untyped, untyped]
 
       class StatementPool < ConnectionAdapters::StatementPool
+        private
+
         def dealloc: (untyped stmt) -> untyped
       end
 
@@ -9147,7 +9285,11 @@ module ActiveRecord
 
       def case_sensitive_comparison: (untyped attribute, untyped value) -> untyped
 
+      private
+
       def can_perform_case_insensitive_comparison_for?: (untyped column) -> untyped
+
+      public
 
       def columns_for_distinct: (untyped columns, untyped orders) -> untyped
 
@@ -9158,6 +9300,8 @@ module ActiveRecord
       def build_insert_sql: (untyped insert) -> untyped
 
       def check_version: () -> untyped
+
+      private
 
       def initialize_type_map: (?untyped m) -> untyped
 
@@ -9229,6 +9373,8 @@ module ActiveRecord
       class MysqlString < ActiveModel::Type::String
         # :nodoc:
         def serialize: (untyped value) -> untyped
+
+        private
 
         def cast_value: (untyped value) -> untyped
       end
@@ -9330,6 +9476,8 @@ module ActiveRecord
         # Converts the given URL to a full connection hash.
         def to_hash: () -> untyped
 
+        private
+
         attr_reader uri: untyped
 
         def uri_parser: () -> untyped
@@ -9391,6 +9539,8 @@ module ActiveRecord
         #   # => { "host" => "localhost", "database" => "foo", "adapter" => "sqlite3" }
         #
         def spec: (untyped config) -> ConnectionSpecification
+
+        private
 
         # Returns fully resolved connection, accepts hash, string or symbol.
         # Always returns a hash.
@@ -9504,6 +9654,8 @@ module ActiveRecord
 
         alias exec_update exec_delete
 
+        private
+
         def execute_batch: (untyped statements, ?untyped? name) -> untyped
 
         def default_insert_value: (untyped column) -> untyped
@@ -9547,6 +9699,8 @@ module ActiveRecord
         # This is an exercise in Ruby hyperrealism :).
         def pp: (untyped result, untyped elapsed) -> untyped
 
+        private
+
         def compute_column_widths: (untyped result) -> untyped
 
         def build_separator: (untyped widths) -> untyped
@@ -9584,6 +9738,8 @@ module ActiveRecord
 
         COLUMN_NAME_WITH_ORDER: untyped
 
+        private
+
         def _type_cast: (untyped value) -> untyped
       end
     end
@@ -9594,6 +9750,8 @@ module ActiveRecord
   module ConnectionAdapters
     module MySQL
       class SchemaCreation < AbstractAdapter::SchemaCreation
+        private
+
         def visit_DropForeignKey: (untyped name) -> ::String
 
         def visit_AddColumnDefinition: (untyped o) -> untyped
@@ -9624,6 +9782,8 @@ module ActiveRecord
 
         def new_column_definition: (untyped name, untyped `type`, **untyped options) -> untyped
 
+        private
+
         def aliased_types: (untyped name, untyped fallback) -> untyped
 
         def integer_like_primary_key_type: (untyped `type`, untyped options) -> untyped
@@ -9640,6 +9800,8 @@ module ActiveRecord
   module ConnectionAdapters
     module MySQL
       class SchemaDumper < ConnectionAdapters::SchemaDumper
+        private
+
         def prepare_column_options: (untyped column) -> untyped
 
         def column_spec_for_primary_key: (untyped column) -> untyped
@@ -9684,6 +9846,8 @@ module ActiveRecord
         def type_to_sql: (untyped `type`, ?unsigned: untyped? unsigned, ?size: untyped size, ?scale: untyped? scale, ?precision: untyped? precision, ?limit: untyped? limit) -> untyped
 
         def table_alias_length: () -> 256
+
+        private
 
         CHARSETS_OF_4BYTES_MAXLEN: ::Array[untyped]
 
@@ -9787,6 +9951,8 @@ module ActiveRecord
 
       def discard!: () -> untyped
 
+      private
+
       def connect: () -> untyped
 
       def configure_connection: () -> untyped
@@ -9848,7 +10014,11 @@ module ActiveRecord
 
         alias exec_update exec_delete
 
+        private
+
         def sql_for_insert: (untyped sql, untyped pk, untyped binds) -> untyped
+
+        public
 
         def exec_insert: (untyped sql, ?untyped? name, ?untyped binds, ?untyped? pk, ?untyped? sequence_name) -> untyped
 
@@ -9862,6 +10032,8 @@ module ActiveRecord
 
         # Aborts a transaction.
         def exec_rollback_db_transaction: () -> untyped
+
+        private
 
         def execute_batch: (untyped statements, ?untyped? name) -> untyped
 
@@ -9937,6 +10109,8 @@ module ActiveRecord
 
           def force_equality?: (untyped value) -> untyped
 
+          private
+
           def type_cast_array: (untyped value, untyped method) -> untyped
         end
       end
@@ -9965,6 +10139,8 @@ module ActiveRecord
             def binary?: () -> untyped
 
             def hex?: () -> untyped
+
+            private
 
             attr_reader value: untyped
           end
@@ -10073,6 +10249,8 @@ module ActiveRecord
           # :nodoc:
           def `type`: () -> :enum
 
+          private
+
           def cast_value: (untyped value) -> untyped
         end
       end
@@ -10102,6 +10280,8 @@ module ActiveRecord
           # the keys change between the two hashes, and they would not be marked
           # as equal.
           def changed_in_place?: (untyped raw_old_value, untyped new_value) -> untyped
+
+          private
 
           HstorePair: untyped
 
@@ -10154,6 +10334,8 @@ module ActiveRecord
           def cast: (untyped value) -> untyped
 
           def serialize: (untyped value) -> untyped
+
+          private
 
           def number_for_point: (untyped number) -> untyped
         end
@@ -10217,6 +10399,8 @@ module ActiveRecord
 
           def type_cast_for_schema: (untyped value) -> untyped
 
+          private
+
           def number_for_point: (untyped number) -> untyped
 
           def build_point: (untyped x, untyped y) -> ActiveRecord::Point[untyped]
@@ -10252,6 +10436,8 @@ module ActiveRecord
           def map: (untyped value) { (untyped) -> untyped } -> untyped
 
           def force_equality?: (untyped value) -> untyped
+
+          private
 
           def type_cast_single: (untyped value) -> untyped
 
@@ -10302,6 +10488,8 @@ module ActiveRecord
 
           def query_conditions_for_initial_load: () -> untyped
 
+          private
+
           def register_mapped_type: (untyped row) -> untyped
 
           def register_enum_type: (untyped row) -> untyped
@@ -10339,6 +10527,8 @@ module ActiveRecord
           alias serialize deserialize
 
           def `type`: () -> :uuid
+
+          private
 
           def cast_value: (untyped value) -> untyped
         end
@@ -10446,6 +10636,8 @@ module ActiveRecord
 
         COLUMN_NAME_WITH_ORDER: untyped
 
+        private
+
         def lookup_cast_type: (untyped sql_type) -> untyped
 
         def _quote: (untyped value) -> untyped
@@ -10482,6 +10674,8 @@ module ActiveRecord
   module ConnectionAdapters
     module PostgreSQL
       class SchemaCreation < AbstractAdapter::SchemaCreation
+        private
+
         def visit_AlterTable: (untyped o) -> untyped
 
         def visit_AddForeignKey: (untyped o) -> untyped
@@ -10554,6 +10748,8 @@ module ActiveRecord
 
         def initialize: () -> untyped
 
+        private
+
         def integer_like_primary_key_type: (untyped `type`, untyped options) -> untyped
       end
 
@@ -10576,6 +10772,8 @@ module ActiveRecord
   module ConnectionAdapters
     module PostgreSQL
       class SchemaDumper < ConnectionAdapters::SchemaDumper
+        private
+
         def extensions: (untyped stream) -> untyped
 
         def prepare_column_options: (untyped column) -> untyped
@@ -10744,6 +10942,8 @@ module ActiveRecord
         # The +options+ hash accepts the same keys as SchemaStatements#add_foreign_key.
         def validate_foreign_key: (untyped from_table, ?untyped? to_table, **untyped options) -> (nil | untyped)
 
+        private
+
         def schema_creation: () -> PostgreSQL::SchemaCreation
 
         def create_table_definition: (*untyped args, **untyped options) -> PostgreSQL::TableDefinition
@@ -10833,10 +11033,15 @@ module ActiveRecord
 
         def parts: () -> untyped
 
+        private
+
         def unquote: (untyped part) -> untyped
       end
 
       module Utils
+        # :nodoc:
+        extend ::ActiveRecord::ConnectionAdapters::PostgreSQL::Utils
+
         # Returns an instance of <tt>ActiveRecord::ConnectionAdapters::PostgreSQL::Name</tt>
         # extracted from +string+.
         # +schema+ is +nil+ if not specified in +string+.
@@ -10955,6 +11160,8 @@ module ActiveRecord
 
         def []=: (untyped sql, untyped key) -> untyped
 
+        private
+
         def dealloc: (untyped key) -> untyped
 
         def connection_active?: () -> untyped
@@ -11040,6 +11247,8 @@ module ActiveRecord
       def build_insert_sql: (untyped insert) -> untyped
 
       def check_version: () -> untyped
+
+      private
 
       # See https://www.postgresql.org/docs/current/static/errcodes-appendix.html
       VALUE_LIMIT_VIOLATION: ::String
@@ -11204,6 +11413,8 @@ module ActiveRecord
 
       def marshal_load: (untyped array) -> untyped
 
+      private
+
       def prepare_data_sources: () -> untyped
     end
   end
@@ -11255,6 +11466,8 @@ module ActiveRecord
         def commit_db_transaction: () -> untyped
 
         def exec_rollback_db_transaction: () -> untyped
+
+        private
 
         def execute_batch: (untyped statements, ?untyped? name) -> untyped
 
@@ -11318,6 +11531,8 @@ module ActiveRecord
 
         COLUMN_NAME_WITH_ORDER: untyped
 
+        private
+
         def _type_cast: (untyped value) -> untyped
       end
     end
@@ -11328,6 +11543,8 @@ module ActiveRecord
   module ConnectionAdapters
     module SQLite3
       class SchemaCreation < AbstractAdapter::SchemaCreation
+        private
+
         def add_column_options!: (untyped sql, untyped options) -> untyped
       end
     end
@@ -11342,6 +11559,8 @@ module ActiveRecord
 
         alias belongs_to references
 
+        private
+
         def integer_like_primary_key_type: (untyped `type`, untyped options) -> :primary_key
       end
     end
@@ -11352,6 +11571,8 @@ module ActiveRecord
   module ConnectionAdapters
     module SQLite3
       class SchemaDumper < ConnectionAdapters::SchemaDumper
+        private
+
         def default_primary_key?: (untyped column) -> untyped
 
         def explicit_primary_key_default?: (untyped column) -> untyped
@@ -11373,6 +11594,8 @@ module ActiveRecord
         def remove_foreign_key: (untyped from_table, ?untyped? to_table, **untyped options) -> untyped
 
         def create_schema_dumper: (untyped options) -> untyped
+
+        private
 
         def schema_creation: () -> SQLite3::SchemaCreation
 
@@ -11416,6 +11639,8 @@ module ActiveRecord
       def self.represent_boolean_as_integer=: (untyped value) -> untyped
 
       class StatementPool < ConnectionAdapters::StatementPool
+        private
+
         def dealloc: (untyped stmt) -> untyped
       end
 
@@ -11516,6 +11741,8 @@ module ActiveRecord
 
       def check_version: () -> untyped
 
+      private
+
       # See https://www.sqlite.org/limits.html,
       # the default value is 999 when not configured.
       def bind_params_length: () -> 999
@@ -11555,6 +11782,8 @@ module ActiveRecord
       def configure_connection: () -> untyped
 
       class SQLite3Integer < ActiveModel::Type::Integer
+        private
+
         def _limit: () -> untyped
       end
     end
@@ -11584,6 +11813,8 @@ module ActiveRecord
       def clear: () -> untyped
 
       def delete: (untyped key) -> untyped
+
+      private
 
       def cache: () -> untyped
 
@@ -11740,6 +11971,8 @@ module ActiveRecord
 
     def clear_cache!: () -> untyped
 
+    private
+
     def swap_connection_handler: (untyped handler) { () -> untyped } -> untyped
   end
 end
@@ -11813,6 +12046,8 @@ module ActiveRecord
       def type_caster: () -> TypeCaster::Map
 
       def _internal?: () -> ::FalseClass
+
+      private
 
       def cached_find_by_statement: (untyped key) { () -> untyped } -> untyped
 
@@ -11915,6 +12150,8 @@ module ActiveRecord
 
     # Returns a hash of the given methods with their names as keys and returned values as values.
     def slice: (*untyped methods) -> untyped
+
+    private
 
     # +Array#flatten+ will call +#to_ary+ (recursively) on each of the elements of
     # the array, and then rescues from the possible +NoMethodError+. If those elements are
@@ -12061,6 +12298,8 @@ module ActiveRecord
       def decrement_counter: (untyped counter_name, untyped id, ?touch: untyped? touch) -> untyped
     end
 
+    private
+
     def _create_record: (?untyped attribute_names) -> untyped
 
     def destroy_row: () -> untyped
@@ -12188,6 +12427,8 @@ module ActiveRecord
       # will return its value.
       def migrations_paths: () -> untyped
 
+      private
+
       def build_url_hash: (untyped url) -> untyped
 
       def build_config: (untyped original_config, untyped url) -> untyped
@@ -12256,6 +12497,8 @@ module ActiveRecord
 
     def first: () -> ::Array[untyped]
 
+    private
+
     def env_with_configs: (?untyped? env) -> untyped
 
     def build_configs: (untyped configs) -> untyped
@@ -12301,6 +12544,8 @@ end
 
 module ActiveRecord
   module DynamicMatchers
+    private
+
     def respond_to_missing?: (untyped name, untyped _) -> untyped
 
     def method_missing: (untyped name, *untyped arguments) { () -> untyped } -> untyped
@@ -12327,6 +12572,8 @@ module ActiveRecord
       def valid?: () -> untyped
 
       def define: () -> untyped
+
+      private
 
       def body: () -> ::String
 
@@ -12374,6 +12621,8 @@ module ActiveRecord
 
       def assert_valid_value: (untyped value) -> untyped
 
+      private
+
       attr_reader name: untyped
 
       attr_reader mapping: untyped
@@ -12382,6 +12631,8 @@ module ActiveRecord
     end
 
     def enum: (untyped definitions) -> untyped
+
+    private
 
     def _enum_methods_module: () -> untyped
 
@@ -12733,6 +12984,8 @@ module ActiveRecord
 
     def exec_explain: (untyped queries) -> untyped
 
+    private
+
     def render_bind: (untyped attr) -> ::Array[untyped]
   end
 end
@@ -12799,6 +13052,8 @@ module ActiveRecord
       def each: () { () -> untyped } -> untyped
 
       def model_class: () -> untyped
+
+      private
 
       def rows: () -> untyped
 
@@ -12870,6 +13125,8 @@ module ActiveRecord
 
       def to_hash: () -> untyped
 
+      private
+
       def model_metadata: () -> untyped
 
       def model_class: () -> untyped
@@ -12906,6 +13163,8 @@ module ActiveRecord
       def to_hash: () -> untyped
 
       def model_metadata: () -> untyped
+
+      private
 
       def build_table_rows_from: (untyped table_name, untyped fixtures, untyped config) -> untyped
     end
@@ -13341,6 +13600,8 @@ module ActiveRecord
 
       def []: (untyped fs_name) -> untyped
 
+      private
+
       def insert_class: (untyped class_names, untyped name, untyped klass) -> untyped
 
       def default_fixture_model: (untyped fs_name, untyped config) -> untyped
@@ -13372,6 +13633,8 @@ module ActiveRecord
 
     # Superclass for the evaluation contexts used by ERB fixtures.
     def self.context_class: () -> untyped
+
+    private
 
     def self.read_and_insert: (untyped fixtures_directory, untyped fixture_files, untyped class_names, untyped connection) -> untyped
 
@@ -13575,6 +13838,8 @@ module ActiveRecord
       # MyApp::Business::Account would appear as MyApp::Business::AccountSubclass.
       def compute_type: (untyped type_name) -> untyped
 
+      private
+
       # Called by +instantiate+ to decide which class to use for a new
       # record instance. For single-table inheritance, we check the record
       # for a +type+ column and return the corresponding class.
@@ -13592,6 +13857,8 @@ module ActiveRecord
     end
 
     def initialize_dup: (untyped other) -> untyped
+
+    private
 
     def initialize_internals_callback: () -> untyped
 
@@ -13638,6 +13905,8 @@ module ActiveRecord
 
     def map_key_with_value: () { (untyped, untyped) -> untyped } -> untyped
 
+    private
+
     def find_unique_index_for: (untyped unique_by) -> untyped
 
     def unique_indexes: () -> untyped
@@ -13667,6 +13936,8 @@ module ActiveRecord
       def conflict_target: () -> untyped
 
       def updatable_columns: () -> untyped
+
+      private
 
       attr_reader connection: untyped
 
@@ -13763,6 +14034,8 @@ module ActiveRecord
 
       def collection_cache_key: (?untyped collection, ?::Symbol timestamp_column) -> untyped
     end
+
+    private
 
     # Detects if the value before type cast
     # can be used to generate a cache_version.
@@ -13880,6 +14153,8 @@ module ActiveRecord
 
       def locking_enabled?: () -> untyped
 
+      private
+
       def _create_record: (?untyped attribute_names) -> untyped
 
       def _touch_row: (untyped attribute_names, untyped time) -> untyped
@@ -13908,6 +14183,8 @@ module ActiveRecord
         # Make sure the lock version column gets updated when counters are
         # updated.
         def update_counters: (untyped id, untyped counters) -> untyped
+
+        private
 
         # We need to apply this decorator here, rather than on module inclusion. The closure
         # created by the matcher would otherwise evaluate for `ActiveRecord::Base`, not the
@@ -14015,6 +14292,8 @@ module ActiveRecord
 
     def sql: (untyped event) -> (nil | untyped)
 
+    private
+
     def type_casted_binds: (untyped casted_binds) -> untyped
 
     def render_bind: (untyped attr, untyped value) -> ::Array[untyped]
@@ -14097,6 +14376,8 @@ module ActiveRecord
 
         def write: () { () -> untyped } -> untyped
 
+        private
+
         def read_from_primary: () { () -> untyped } -> untyped
 
         def read_from_replica: () { () -> untyped } -> untyped
@@ -14157,6 +14438,8 @@ module ActiveRecord
       # Middleware that determines which database connection to use in a multiple
       # database application.
       def call: (untyped env) -> untyped
+
+      private
 
       def select_database: (untyped request) { () -> untyped } -> untyped
 
@@ -14241,6 +14524,8 @@ module ActiveRecord
 
       def replay: (untyped migration) -> untyped
 
+      private
+
       module StraightReversions
       end
 
@@ -14315,6 +14600,8 @@ module ActiveRecord
 
         def add_timestamps: (untyped table_name, **untyped options) -> untyped
 
+        private
+
         def compatible_table_definition: (untyped t) -> untyped
 
         def command_recorder: () -> untyped
@@ -14345,6 +14632,8 @@ module ActiveRecord
 
         alias add_belongs_to add_reference
 
+        private
+
         def compatible_table_definition: (untyped t) -> untyped
       end
 
@@ -14367,6 +14656,8 @@ module ActiveRecord
 
         def remove_index: (untyped table_name, ?::Hash[untyped, untyped] options) -> untyped
 
+        private
+
         def compatible_table_definition: (untyped t) -> untyped
 
         def index_name_for_remove: (untyped table_name, ?::Hash[untyped, untyped] options) -> untyped
@@ -14378,6 +14669,8 @@ end
 module ActiveRecord
   class Migration
     module JoinTable
+      private
+
       def find_join_table_name: (untyped table_1, untyped table_2, ?::Hash[untyped, untyped] options) -> untyped
 
       def join_table_name: (untyped table_1, untyped table_2) -> untyped
@@ -14867,6 +15160,8 @@ module ActiveRecord
 
       def call: (untyped env) -> untyped
 
+      private
+
       def connection: () -> untyped
     end
 
@@ -15041,6 +15336,8 @@ module ActiveRecord
 
     def table_name_options: (?untyped config) -> { table_name_prefix: untyped, table_name_suffix: untyped }
 
+    private
+
     def execute_block: () { () -> untyped } -> untyped
 
     def command_recorder: () -> CommandRecorder
@@ -15062,6 +15359,8 @@ module ActiveRecord
     def basename: () -> untyped
 
     def mtime: () -> untyped
+
+    private
 
     def migration: () -> untyped
 
@@ -15118,6 +15417,8 @@ module ActiveRecord
 
     def last_stored_environment: () -> (nil | untyped)
 
+    private
+
     def migration_files: () -> untyped
 
     def parse_migration_filename: (untyped filename) -> untyped
@@ -15152,6 +15453,8 @@ module ActiveRecord
     def migrated: () -> untyped
 
     def load_migrated: () -> untyped
+
+    private
 
     # Used for running a specific migration.
     def run_without_lock: () -> untyped
@@ -15394,6 +15697,8 @@ module ActiveRecord
       def reset_column_information: () -> untyped
 
       def initialize_load_schema_monitor: () -> untyped
+
+      private
 
       def inherited: (untyped child_class) -> untyped
 
@@ -15738,6 +16043,8 @@ module ActiveRecord
       #   accepts_nested_attributes_for :avatar, :posts, allow_destroy: true
       def accepts_nested_attributes_for: (*untyped attr_names) -> untyped
 
+      private
+
       # Generates a writer method for this association. Serves as a point for
       # accessing the objects in the association. For example, this method
       # could generate the following:
@@ -15758,6 +16065,8 @@ module ActiveRecord
     #
     # See ActionView::Helpers::FormHelper::fields_for for more info.
     def _destroy: () -> untyped
+
+    private
 
     # Attribute hash keys that should not be assigned as normal attributes.
     # These hash keys are nested attributes implementation details.
@@ -15870,6 +16179,8 @@ module ActiveRecord
 
     def self.applied_to?: (untyped klass) -> untyped
 
+    private
+
     def self.klasses: () -> untyped
 
     # Returns +true+ if the class has +no_touching+ set, +false+ otherwise.
@@ -15915,6 +16226,8 @@ module ActiveRecord
     def exists?: (?::Symbol _conditions) -> ::FalseClass
 
     def or: (untyped other) -> untyped
+
+    private
 
     def exec_queries: () -> untyped
   end
@@ -16219,6 +16532,8 @@ module ActiveRecord
       def _update_record: (untyped values, untyped constraints) -> untyped
 
       def _delete_record: (untyped constraints) -> untyped
+
+      private
 
       # Given a class, an attributes hash, +instantiate_instance_of+ returns a
       # new instance of the class. Accepts only keys as strings.
@@ -16535,6 +16850,8 @@ module ActiveRecord
     #
     def touch: (*untyped names, ?time: untyped? time) -> untyped
 
+    private
+
     # A hook to be overridden by association modules.
     def destroy_associations: () -> nil
 
@@ -16667,6 +16984,8 @@ module ActiveRecord
         def log_process_action: (untyped payload) -> untyped
       end
 
+      private
+
       def process_action: (untyped action, *untyped args) -> untyped
 
       def cleanup_view_runtime: () -> untyped
@@ -16702,6 +17021,8 @@ module ActiveRecord
     def self.add_reflection: (untyped ar, untyped name, untyped reflection) -> untyped
 
     def self.add_aggregate_reflection: (untyped ar, untyped name, untyped reflection) -> untyped
+
+    private
 
     def self.reflection_class_for: (untyped macro) -> untyped
 
@@ -16849,6 +17170,8 @@ module ActiveRecord
 
       def actual_source_reflection: () -> untyped
 
+      private
+
       def predicate_builder: (untyped table) -> PredicateBuilder
 
       def primary_key: (untyped klass) -> untyped
@@ -16903,6 +17226,8 @@ module ActiveRecord
       def ==: (untyped other_aggregation) -> untyped
 
       def scope_for: (untyped relation, ?untyped? owner) -> untyped
+
+      private
 
       def derive_class_name: () -> untyped
     end
@@ -17012,6 +17337,8 @@ module ActiveRecord
 
       def extensions: () -> untyped
 
+      private
+
       def calculate_constructable: (untyped macro, untyped options) -> ::TrueClass
 
       # Attempts to find the inverse association name automatically.
@@ -17065,6 +17392,8 @@ module ActiveRecord
 
       def association_class: () -> untyped
 
+      private
+
       def calculate_constructable: (untyped macro, untyped options) -> untyped
     end
 
@@ -17079,6 +17408,8 @@ module ActiveRecord
       def join_primary_key: (?untyped? klass) -> untyped
 
       def join_foreign_key: () -> untyped
+
+      private
 
       def can_find_inverse_of_automatically?: (untyped _) -> untyped
 
@@ -17198,6 +17529,8 @@ module ActiveRecord
 
       def actual_source_reflection: () -> untyped
 
+      private
+
       attr_reader delegate_reflection: untyped
 
       def collect_join_reflections: (untyped seed) -> untyped
@@ -17213,6 +17546,8 @@ module ActiveRecord
       def join_scopes: (untyped table, untyped predicate_builder) -> untyped
 
       def constraints: () -> untyped
+
+      private
 
       def source_type_scope: () -> untyped
     end
@@ -17444,6 +17779,8 @@ module ActiveRecord
     # other processes are modifying the database.
     def in_batches: (?error_on_ignore: untyped? error_on_ignore, ?load: bool load, ?finish: untyped? finish, ?start: untyped? start, ?of: ::Integer of) { (untyped) -> untyped } -> (BatchEnumerator | untyped)
 
+    private
+
     def apply_limits: (untyped relation, untyped start, untyped finish) -> untyped
 
     def apply_start_limit: (untyped relation, untyped start) -> untyped
@@ -17615,6 +17952,8 @@ module ActiveRecord
     #   Person.joins(:companies).ids # SELECT people.id FROM people INNER JOIN companies ON companies.person_id = people.id
     def ids: () -> untyped
 
+    private
+
     def has_include?: (untyped column_name) -> untyped
 
     def perform_calculation: (untyped operation, untyped column_name) -> untyped
@@ -17663,6 +18002,8 @@ module ActiveRecord
 
       def include_relation_methods: (untyped delegate) -> untyped
 
+      private
+
       def generated_relation_methods: () -> untyped
     end
 
@@ -17684,6 +18025,8 @@ module ActiveRecord
         def name: () -> untyped
       end
 
+      private
+
       def method_missing: (untyped method, *untyped args) { () -> untyped } -> untyped
     end
 
@@ -17691,8 +18034,12 @@ module ActiveRecord
       # :nodoc:
       def create: (untyped klass, *untyped args, **untyped kwargs) -> untyped
 
+      private
+
       def relation_class_for: (untyped klass) -> untyped
     end
+
+    private
 
     def respond_to_missing?: (untyped method, untyped _) -> untyped
   end
@@ -17941,6 +18288,8 @@ module ActiveRecord
 
     def raise_record_not_found_exception!: (?untyped? ids, ?untyped? result_size, ?untyped? expected_size, ?untyped key, ?untyped? not_found_ids) -> untyped
 
+    private
+
     def offset_index: () -> untyped
 
     def construct_relation_for_exists: (untyped conditions) -> untyped
@@ -18035,6 +18384,8 @@ module ActiveRecord
 
       def merge: () -> untyped
 
+      private
+
       def merge_preloads: () -> (nil | untyped)
 
       def merge_joins: () -> (nil | untyped)
@@ -18060,6 +18411,8 @@ module ActiveRecord
 
       def call: (untyped attribute, untyped value) -> untyped
 
+      private
+
       attr_reader predicate_builder: untyped
 
       module NullPredicate
@@ -18077,6 +18430,8 @@ module ActiveRecord
       def initialize: (untyped associated_table, untyped value) -> untyped
 
       def queries: () -> ::Array[::Hash[untyped, untyped]]
+
+      private
 
       attr_reader associated_table: untyped
 
@@ -18099,6 +18454,8 @@ module ActiveRecord
 
       def call: (untyped attribute, untyped value) -> untyped
 
+      private
+
       attr_reader predicate_builder: untyped
     end
   end
@@ -18112,6 +18469,8 @@ module ActiveRecord
 
       def call: (untyped attribute, untyped value) -> untyped
 
+      private
+
       attr_reader predicate_builder: untyped
     end
   end
@@ -18124,6 +18483,8 @@ module ActiveRecord
       def initialize: (untyped associated_table, untyped values) -> untyped
 
       def queries: () -> untyped
+
+      private
 
       attr_reader associated_table: untyped
 
@@ -18155,6 +18516,8 @@ module ActiveRecord
       def initialize: (untyped predicate_builder) -> untyped
 
       def call: (untyped attribute, untyped value) -> untyped
+
+      private
 
       attr_reader predicate_builder: untyped
     end
@@ -18197,6 +18560,8 @@ module ActiveRecord
 
     def expand_from_hash: (untyped attributes) -> (::Array["1=0"] | untyped)
 
+    private
+
     attr_reader table: untyped
 
     def convert_dot_notation_to_hash: (untyped attributes) -> untyped
@@ -18220,6 +18585,8 @@ module ActiveRecord
       def infinite?: () -> untyped
 
       def unboundable?: () -> untyped
+
+      private
 
       def infinity?: (untyped value) -> untyped
     end
@@ -18260,6 +18627,8 @@ module ActiveRecord
       #    User.where.not(name: %w(Ko1 Nobu))
       #    # SELECT * FROM users WHERE name NOT IN ('Ko1', 'Nobu')
       def not: (untyped opts, *untyped rest) -> untyped
+
+      private
 
       def not_behaves_as_nor?: (untyped opts) -> (::FalseClass | untyped)
     end
@@ -18918,6 +19287,8 @@ module ActiveRecord
 
     def build_subquery: (untyped subquery_alias, untyped select_value) -> untyped
 
+    private
+
     def assert_mutability!: () -> untyped
 
     def build_arel: (untyped aliases) -> untyped
@@ -19052,6 +19423,8 @@ module ActiveRecord
     #   Post.order('id asc').only(:where, :order) # uses the specified order
     def only: (*untyped onlies) -> untyped
 
+    private
+
     def relation_with: (untyped values) -> untyped
   end
 end
@@ -19085,6 +19458,8 @@ module ActiveRecord
 
       def referenced_columns: () -> untyped
 
+      private
+
       def equalities: (untyped predicates) -> untyped
 
       def predicates_unreferenced_by: (untyped other) -> untyped
@@ -19115,6 +19490,8 @@ module ActiveRecord
       def initialize: (untyped klass, untyped predicate_builder) -> untyped
 
       def build: (untyped opts, untyped other) -> WhereClause
+
+      private
 
       attr_reader klass: untyped
 
@@ -19370,7 +19747,11 @@ module ActiveRecord
     #   Product.where("name like ?", "%Game%").cache_key(:last_reviewed_at)
     def cache_key: (?::Symbol timestamp_column) -> untyped
 
+    private
+
     def compute_cache_key: (?::Symbol timestamp_column) -> untyped
+
+    public
 
     # Returns a cache version that can be used together with the cache key to form
     # a recyclable caching scheme. The cache version is built with the number of records
@@ -19384,7 +19765,11 @@ module ActiveRecord
     #    SELECT COUNT(*), MAX("products"."updated_at") FROM "products" WHERE (name like '%Cosmic Encounter%')
     def cache_version: (?::Symbol timestamp_column) -> untyped
 
+    private
+
     def compute_cache_version: (untyped timestamp_column) -> untyped
+
+    public
 
     # Returns a cache key along with the version.
     def cache_key_with_version: () -> untyped
@@ -19581,6 +19966,8 @@ module ActiveRecord
 
     def null_relation?: () -> untyped
 
+    private
+
     def already_in_scope?: () -> untyped
 
     def _deprecated_spawn: (untyped name) -> untyped
@@ -19686,6 +20073,8 @@ module ActiveRecord
     def cast_values: (?::Hash[untyped, untyped] type_overrides) -> untyped
 
     def initialize_copy: (untyped other) -> untyped
+
+    private
 
     def column_type: (untyped name, ?::Hash[untyped, untyped] type_overrides) -> untyped
 
@@ -19798,6 +20187,8 @@ module ActiveRecord
 
       def disallow_raw_sql!: (untyped args, ?permit: untyped permit) -> (nil | untyped)
 
+      private
+
       def replace_bind_variables: (untyped statement, untyped values) -> untyped
 
       def replace_bind_variable: (untyped value, ?untyped c) -> untyped
@@ -19862,6 +20253,8 @@ end
 module ActiveRecord
   class SchemaDumper
     def self.dump: (?untyped connection, ?untyped stream, ?untyped config) -> untyped
+
+    private
 
     def self.generate_options: (untyped config) -> { table_name_prefix: untyped, table_name_suffix: untyped }
 
@@ -19961,6 +20354,8 @@ module ActiveRecord
         def scope_attributes?: () -> untyped
 
         def before_remove_const: () -> untyped
+
+        private
 
         def default_scope: (?untyped? scope) { () -> untyped } -> untyped
 
@@ -20110,6 +20505,8 @@ module ActiveRecord
         #   Article.featured.titles
         def scope: (untyped name, untyped body) { () -> untyped } -> untyped
 
+        private
+
         def valid_scope_name?: (untyped name) -> untyped
       end
     end
@@ -20177,6 +20574,8 @@ module ActiveRecord
 
       # Sets the +value+ for a given +scope_type+ and +model+.
       def set_value_for: (untyped scope_type, untyped model, untyped value) -> untyped
+
+      private
 
       def raise_invalid_scope_type!: (untyped scope_type) -> untyped
     end
@@ -20281,6 +20680,8 @@ module ActiveRecord
     def execute: (untyped params, untyped connection) { () -> untyped } -> untyped
 
     def self.unsupported_value?: (untyped value) -> untyped
+
+    private
 
     attr_reader query_builder: untyped
 
@@ -20393,6 +20794,8 @@ module ActiveRecord
 
       def stored_attributes: () -> untyped
     end
+
+    private
 
     def read_store_attribute: (untyped store_attribute, untyped key) -> untyped
 
@@ -20509,6 +20912,8 @@ module ActiveRecord
 
     def predicate_builder: () -> untyped
 
+    private
+
     attr_reader klass: untyped
 
     attr_reader types: untyped
@@ -20557,6 +20962,8 @@ module ActiveRecord
     #
     #   DatabaseTasks.create_current('production')
     module DatabaseTasks
+      extend ::ActiveRecord::Tasks::DatabaseTasks
+
       attr_writer current_config: untyped
 
       attr_writer db_dir: untyped
@@ -20613,7 +21020,11 @@ module ActiveRecord
 
       def drop_current: (?untyped environment) -> untyped
 
+      private
+
       def truncate_tables: (untyped configuration) -> untyped
+
+      public
 
       def truncate_all: (?untyped environment) -> untyped
 
@@ -20671,6 +21082,8 @@ module ActiveRecord
       #   ActiveRecord::Tasks::DatabaseTasks.dump_schema_cache(ActiveRecord::Base.connection, "tmp/schema_dump.yaml")
       def dump_schema_cache: (untyped conn, untyped filename) -> untyped
 
+      private
+
       def verbose?: () -> untyped
 
       def class_for_adapter: (untyped adapter) -> untyped
@@ -20708,6 +21121,8 @@ module ActiveRecord
       def structure_dump: (untyped filename, untyped extra_flags) -> untyped
 
       def structure_load: (untyped filename, untyped extra_flags) -> untyped
+
+      private
 
       attr_reader configuration: untyped
 
@@ -20751,6 +21166,8 @@ module ActiveRecord
 
       def structure_load: (untyped filename, untyped extra_flags) -> untyped
 
+      private
+
       attr_reader configuration: untyped
 
       def encoding: () -> untyped
@@ -20784,6 +21201,8 @@ module ActiveRecord
       def structure_dump: (untyped filename, untyped extra_flags) -> untyped
 
       def structure_load: (untyped filename, untyped extra_flags) -> untyped
+
+      private
 
       attr_reader configuration: untyped
 
@@ -20837,6 +21256,8 @@ module ActiveRecord
     def teardown_fixtures: () -> untyped
 
     def enlist_fixture_connections: () -> untyped
+
+    private
 
     # Shares the writing connection pool with connections on
     # other handlers.
@@ -20911,12 +21332,16 @@ module ActiveRecord
 
       def current_time_from_proper_timezone: () -> untyped
 
+      private
+
       def timestamp_attributes_for_create: () -> ::Array["created_at" | "created_on"]
 
       def timestamp_attributes_for_update: () -> ::Array["updated_at" | "updated_on"]
 
       def reload_schema_from_cache: () -> untyped
     end
+
+    private
 
     def _create_record: () -> untyped
 
@@ -20950,6 +21375,8 @@ module ActiveRecord
     def touch_later: (*untyped names) -> untyped
 
     def touch: (*untyped names, ?time: untyped? time) -> untyped
+
+    private
 
     def surreptitiously_touch: (untyped attrs) -> untyped
 
@@ -21202,6 +21629,8 @@ module ActiveRecord
 
       def after_rollback_without_transaction_enrollment: (*untyped args) { () -> untyped } -> untyped
 
+      private
+
       def set_options_for_callbacks!: (untyped args, ?::Hash[untyped, untyped] enforced_options) -> untyped
 
       def assert_valid_transaction_action: (untyped actions) -> untyped
@@ -21233,6 +21662,8 @@ module ActiveRecord
     def with_transaction_returning_status: () { () -> untyped } -> untyped
 
     def trigger_transactional_callbacks?: () -> untyped
+
+    private
 
     attr_reader _committed_already_called: untyped
 
@@ -21294,6 +21725,8 @@ module ActiveRecord
     class AdapterSpecificRegistry < ActiveModel::Type::Registry
       def add_modifier: (untyped options, untyped klass, **untyped args) -> untyped
 
+      private
+
       def registration_klass: () -> untyped
 
       def find_registration: (untyped symbol, *untyped args, **untyped kwargs) -> untyped
@@ -21320,6 +21753,8 @@ module ActiveRecord
 
       def priority_except_adapter: () -> untyped
 
+      private
+
       def matches_adapter?: (?adapter: untyped? adapter) -> untyped
 
       def conflicts_with?: (untyped other) -> untyped
@@ -21337,6 +21772,8 @@ module ActiveRecord
       def matches?: (*untyped args, **untyped kwargs) -> untyped
 
       def priority: () -> untyped
+
+      private
 
       attr_reader options: untyped
 
@@ -21386,6 +21823,8 @@ module ActiveRecord
       def key?: (untyped key) -> untyped
 
       def keys: () -> untyped
+
+      private
 
       def perform_fetch: (untyped `type`, *untyped args) { () -> untyped } -> untyped
     end
@@ -21448,6 +21887,8 @@ module ActiveRecord
 
       def force_equality?: (untyped value) -> untyped
 
+      private
+
       def default_value?: (untyped value) -> untyped
 
       def encoded: (untyped value) -> untyped
@@ -21493,6 +21934,8 @@ module ActiveRecord
 
       def clear: () -> untyped
 
+      private
+
       def perform_fetch: (untyped lookup_key, *untyped args) { (untyped, untyped) -> untyped } -> untyped
     end
   end
@@ -21501,6 +21944,8 @@ end
 module ActiveRecord
   module Type
     class UnsignedInteger < ActiveModel::Type::Integer
+      private
+
       def max_value: () -> untyped
 
       def min_value: () -> 0
@@ -21525,6 +21970,8 @@ module ActiveRecord
     def self.lookup: (*untyped args, ?adapter: untyped adapter, **untyped kwargs) -> untyped
 
     def self.default_value: () -> untyped
+
+    private
 
     def self.current_adapter_name: () -> untyped
 
@@ -21556,6 +22003,8 @@ module ActiveRecord
 
       def type_for_attribute: (untyped attr_name) -> untyped
 
+      private
+
       attr_reader table_name: untyped
     end
   end
@@ -21568,6 +22017,8 @@ module ActiveRecord
       def initialize: (untyped types) -> untyped
 
       def type_cast_for_database: (untyped attr_name, untyped value) -> untyped
+
+      private
 
       attr_reader types: untyped
     end
@@ -21602,6 +22053,8 @@ module ActiveRecord
     class AssociatedValidator < ActiveModel::EachValidator
       # nodoc:
       def validate_each: (untyped record, untyped attribute, untyped value) -> untyped
+
+      private
 
       def valid_object?: (untyped record) -> untyped
     end
@@ -21734,6 +22187,8 @@ module ActiveRecord
       def initialize: (untyped options) -> untyped
 
       def validate_each: (untyped record, untyped attribute, untyped value) -> untyped
+
+      private
 
       # The check for an existing value should be run from a class that
       # isn't abstract. This means working down from the current class
@@ -21933,6 +22388,8 @@ module ActiveRecord
 
     alias validate valid?
 
+    private
+
     def default_validation_context: () -> untyped
 
     def raise_validation_error: () -> untyped
@@ -22071,6 +22528,8 @@ module Arel
 
       def value: () -> ::Array[untyped]
 
+      private
+
       attr_reader left: untyped
 
       attr_reader right: untyped
@@ -22113,6 +22572,8 @@ module Arel
       def add_bind: (untyped bind) -> untyped
 
       def value: () -> untyped
+
+      private
 
       attr_reader quoter: untyped
 
@@ -23211,6 +23672,8 @@ module Arel
 
     def concat: (untyped other) -> Nodes::Concat
 
+    private
+
     def grouping_any: (untyped method_id, untyped others, *untyped extras) -> Nodes::Grouping
 
     def grouping_all: (untyped method_id, untyped others, *untyped extras) -> Nodes::Grouping
@@ -23316,6 +23779,8 @@ module Arel
 
     def comment: (*untyped values) -> untyped
 
+    private
+
     def collapse: (untyped exprs) -> untyped
   end
 end
@@ -23371,6 +23836,8 @@ module Arel
     def type_cast_for_database: (untyped attribute_name, untyped value) -> untyped
 
     def able_to_type_cast?: () -> untyped
+
+    private
 
     attr_reader type_caster: untyped
   end
@@ -23431,6 +23898,8 @@ module Arel
   module Visitors
     class DepthFirst < Arel::Visitors::Visitor
       def initialize: (?untyped? block) -> untyped
+
+      private
 
       def visit: (untyped o, ?untyped? _) -> untyped
 
@@ -23665,6 +24134,8 @@ module Arel
 
       def accept: (untyped object, untyped collector) -> untyped
 
+      private
+
       def visit_Arel_Nodes_Ordering: (untyped o) -> untyped
 
       def visit_Arel_Nodes_TableAlias: (untyped o) -> untyped
@@ -23870,6 +24341,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class IBM_DB < Arel::Visitors::ToSql
+      private
+
       def visit_Arel_Nodes_SelectCore: (untyped o, untyped collector) -> untyped
 
       def visit_Arel_Nodes_OptimizerHints: (untyped o, untyped collector) -> untyped
@@ -23887,6 +24360,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class Informix < Arel::Visitors::ToSql
+      private
+
       def visit_Arel_Nodes_SelectStatement: (untyped o, untyped collector) -> untyped
 
       def visit_Arel_Nodes_SelectCore: (untyped o, untyped collector) -> untyped
@@ -23909,6 +24384,8 @@ module Arel
       end
 
       def initialize: () -> untyped
+
+      private
 
       def visit_Arel_Nodes_IsNotDistinctFrom: (untyped o, untyped collector) -> untyped
 
@@ -23946,6 +24423,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class MySQL < Arel::Visitors::ToSql
+      private
+
       def visit_Arel_Nodes_Bin: (untyped o, untyped collector) -> untyped
 
       def visit_Arel_Nodes_UnqualifiedColumn: (untyped o, untyped collector) -> untyped
@@ -23981,6 +24460,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class Oracle < Arel::Visitors::ToSql
+      private
+
       def visit_Arel_Nodes_SelectStatement: (untyped o, untyped collector) -> untyped
 
       def visit_Arel_Nodes_Limit: (untyped o, untyped collector) -> untyped
@@ -24010,6 +24491,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class Oracle12 < Arel::Visitors::ToSql
+      private
+
       def visit_Arel_Nodes_SelectStatement: (untyped o, untyped collector) -> untyped
 
       def visit_Arel_Nodes_SelectOptions: (untyped o, untyped collector) -> untyped
@@ -24033,6 +24516,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class PostgreSQL < Arel::Visitors::ToSql
+      private
+
       def visit_Arel_Nodes_Matches: (untyped o, untyped collector) -> untyped
 
       def visit_Arel_Nodes_DoesNotMatch: (untyped o, untyped collector) -> untyped
@@ -24073,6 +24558,8 @@ module Arel
   # :nodoc: all
   module Visitors
     class SQLite < Arel::Visitors::ToSql
+      private
+
       # Locks are not supported in SQLite
       def visit_Arel_Nodes_Lock: (untyped o, untyped collector) -> untyped
 
@@ -24100,6 +24587,8 @@ module Arel
       def initialize: (untyped connection) -> untyped
 
       def compile: (untyped node, ?untyped collector) -> untyped
+
+      private
 
       def visit_Arel_Nodes_DeleteStatement: (untyped o, untyped collector) -> untyped
 
@@ -24384,6 +24873,8 @@ module Arel
 
       def accept: (untyped object, ?untyped? collector) -> untyped
 
+      private
+
       attr_reader dispatch: untyped
 
       def self.dispatch_cache: () -> untyped
@@ -24400,6 +24891,8 @@ module Arel
   module Visitors
     class WhereSql < Arel::Visitors::ToSql
       def initialize: (untyped inner_visitor, *untyped args) { () -> untyped } -> untyped
+
+      private
 
       def visit_Arel_Nodes_SelectCore: (untyped o, untyped collector) -> untyped
     end
@@ -24446,6 +24939,8 @@ module ActiveRecord
       # FIXME: Change this file to a symlink once RubyGems 2.5.0 is required.
       def create_application_record: () -> untyped
 
+      private
+
       def application_record_file_name: () -> untyped
     end
   end
@@ -24455,6 +24950,8 @@ module ActiveRecord
   module Generators
     class MigrationGenerator < Base
       def create_migration_file: () -> untyped
+
+      private
 
       attr_reader migration_action: untyped
 
@@ -24493,6 +24990,8 @@ module ActiveRecord
         def next_migration_number: (untyped dirname) -> untyped
       end
 
+      private
+
       def primary_key_type: () -> untyped
 
       def db_migrate_path: () -> untyped
@@ -24513,6 +25012,8 @@ module ActiveRecord
       def create_model_file: () -> untyped
 
       def create_module_file: () -> (nil | untyped)
+
+      private
 
       def attributes_with_index: () -> untyped
 

@@ -3,8 +3,6 @@
 #   ruby generate.rb all
 #   ruby generate.rb actionpack
 
-require 'bundler/inline'
-
 require 'pathname'
 require 'open3'
 
@@ -32,6 +30,12 @@ def patch!(name, rbs)
 
     # XXX: I guess add-type-params.rb resolves this
     rbs.gsub!('-> Parameter', '-> Parameter[untyped]') || raise('it looks unnecessary')
+
+    rbs.gsub!(<<~RUBY.gsub(/^/, '  '), '')
+      module Live
+        def new_controller_thread: () { () -> untyped } -> untyped
+      end
+    RUBY
   when 'railties'
     rbs.gsub!(
       'class NonSymbolAccessDeprecatedHash < HashWithIndifferentAccess',

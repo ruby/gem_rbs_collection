@@ -37,6 +37,8 @@ module ActiveModel
 
       def marshal_load: (untyped values) -> untyped
 
+      private
+
       attr_reader user_provided_value: untyped
     end
   end
@@ -103,6 +105,8 @@ module ActiveModel
     def encode_with: (untyped coder) -> untyped
 
     def original_value_for_database: () -> untyped
+
+    private
 
     attr_reader original_attribute: untyped
 
@@ -197,6 +201,8 @@ module ActiveModel
     def assign_attributes: (untyped new_attributes) -> (nil | untyped)
 
     alias attributes= assign_attributes
+
+    private
 
     def _assign_attributes: (untyped attributes) -> untyped
 
@@ -484,6 +490,8 @@ module ActiveModel
       #   person.name_short? # => NoMethodError
       def undefine_attribute_methods: () -> untyped
 
+      private
+
       def generated_attribute_methods: () -> untyped
 
       def instance_method_already_implemented?: (untyped method_name) -> untyped
@@ -557,6 +565,8 @@ module ActiveModel
 
     def respond_to?: (untyped method, ?bool include_private_methods) -> untyped
 
+    private
+
     def attribute_method?: (untyped attr_name) -> untyped
 
     # Returns a struct representing the matching attribute method.
@@ -621,6 +631,8 @@ module ActiveModel
 
     def force_change: (untyped attr_name) -> untyped
 
+    private
+
     attr_reader attributes: untyped
 
     attr_reader forced_changes: untyped
@@ -647,6 +659,8 @@ module ActiveModel
     def force_change: (untyped attr_name) -> untyped
 
     def finalize_changes: () -> untyped
+
+    private
 
     attr_reader finalized_changes: untyped
 
@@ -721,6 +735,8 @@ module ActiveModel
 
     def materialize: () -> untyped
 
+    private
+
     attr_reader types: untyped
 
     attr_reader values: untyped
@@ -746,6 +762,8 @@ module ActiveModel
       def encode: (untyped attribute_set, untyped coder) -> untyped
 
       def decode: (untyped coder) -> untyped
+
+      private
 
       attr_reader default_types: untyped
     end
@@ -796,6 +814,8 @@ module ActiveModel
 
     attr_reader attributes: untyped
 
+    private
+
     def initialized_attributes: () -> untyped
   end
 end
@@ -822,6 +842,8 @@ module ActiveModel
       #   Person.attribute_names
       #   # => ["name", "age"]
       def attribute_names: () -> untyped
+
+      private
 
       def define_method_attribute=: (untyped name) -> untyped
 
@@ -860,6 +882,8 @@ module ActiveModel
     #   person.attribute_names
     #   # => ["name", "age"]
     def attribute_names: () -> untyped
+
+    private
 
     def write_attribute: (untyped attr_name, untyped value) -> untyped
 
@@ -970,6 +994,8 @@ module ActiveModel
     # NOTE: +method_name+ passed to define_model_callbacks must not end with
     # <tt>!</tt>, <tt>?</tt> or <tt>=</tt>.
     def define_model_callbacks: (*untyped callbacks) -> untyped
+
+    private
 
     def _define_before_model_callback: (untyped klass, untyped callback) -> untyped
 
@@ -1250,6 +1276,8 @@ module ActiveModel
     def previous_changes: () -> untyped
 
     def attribute_changed_in_place?: (untyped attr_name) -> untyped
+
+    private
 
     def clear_attribute_change: (untyped attr_name) -> untyped
 
@@ -1619,6 +1647,8 @@ module ActiveModel
 
     def init_with: (untyped coder) -> untyped
 
+    private
+
     def normalize_message: (untyped attribute, untyped message, untyped options) -> untyped
 
     def normalize_detail: (untyped message, untyped options) -> untyped
@@ -1686,6 +1716,8 @@ module ActiveModel
   end
 
   module ForbiddenAttributesProtection
+    private
+
     def sanitize_for_mass_assignment: (untyped attributes) -> untyped
 
     alias sanitize_forbidden_attributes sanitize_for_mass_assignment
@@ -1784,6 +1816,8 @@ module ActiveModel
       # If localization is used, the strings should be localized for the current
       # locale. If no error is present, the method should return an empty array.
       def test_errors_aref: () -> untyped
+
+      private
 
       def model: () -> untyped
 
@@ -1934,6 +1968,8 @@ module ActiveModel
     #
     # Specify +options+ with additional translating options.
     def human: (?::Hash[untyped, untyped] options) -> untyped
+
+    private
 
     def _singularize: (untyped string) -> untyped
   end
@@ -2220,6 +2256,8 @@ module ActiveModel
     #   # => {"name" => "Napoleon", "notes" => [{"title"=>"Battle of Austerlitz"}]}
     def serializable_hash: (?untyped? options) -> untyped
 
+    private
+
     # Hook method defining how an attribute value should be retrieved for
     # serialization. By default this is assumed to be an instance named after
     # the attribute. Override this method in subclasses should you need to
@@ -2408,6 +2446,8 @@ end
 module ActiveModel
   module Type
     class BigInteger < Integer
+      private
+
       def max_value: () -> untyped
     end
   end
@@ -2463,6 +2503,8 @@ module ActiveModel
 
       def serialize: (untyped value) -> untyped
 
+      private
+
       def cast_value: (untyped value) -> untyped
     end
   end
@@ -2477,6 +2519,8 @@ module ActiveModel
       def `type`: () -> :date
 
       def type_cast_for_schema: (untyped value) -> untyped
+
+      private
 
       def cast_value: (untyped value) -> untyped
 
@@ -2503,6 +2547,8 @@ module ActiveModel
 
       def `type`: () -> :datetime
 
+      private
+
       def cast_value: (untyped value) -> (untyped | nil)
 
       # '0.123456' -> 123456
@@ -2528,6 +2574,8 @@ module ActiveModel
 
       def type_cast_for_schema: (untyped value) -> untyped
 
+      private
+
       def cast_value: (untyped value) -> untyped
 
       def convert_float_to_big_decimal: (untyped value) -> untyped
@@ -2548,6 +2596,8 @@ module ActiveModel
       def `type`: () -> :float
 
       def type_cast_for_schema: (untyped value) -> ("::Float::NAN" | untyped)
+
+      private
 
       def cast_value: (untyped value) -> untyped
     end
@@ -2592,6 +2642,8 @@ module ActiveModel
 
         def changed?: (untyped old_value, untyped _new_value, untyped new_value_before_type_cast) -> untyped
 
+        private
+
         def number_to_non_number?: (untyped old_value, untyped new_value_before_type_cast) -> untyped
 
         def non_numeric_string?: (untyped value) -> untyped
@@ -2614,6 +2666,8 @@ module ActiveModel
         def type_cast_for_schema: (untyped value) -> untyped
 
         def user_input_in_time_zone: (untyped value) -> untyped
+
+        private
 
         def new_time: (untyped year, untyped mon, untyped mday, untyped hour, untyped min, untyped sec, untyped microsec, ?untyped? offset) -> (nil | untyped)
 
@@ -2647,6 +2701,8 @@ module ActiveModel
 
       def serialize: (untyped value) -> untyped
 
+      private
+
       def cast_value: (untyped value) -> untyped
     end
   end
@@ -2669,6 +2725,8 @@ module ActiveModel
       def deserialize: (untyped value) -> (nil | untyped)
 
       def serialize: (untyped value) -> (nil | untyped)
+
+      private
 
       attr_reader range: untyped
 
@@ -2695,6 +2753,8 @@ module ActiveModel
 
       def lookup: (untyped symbol, *untyped args, **untyped kwargs) -> untyped
 
+      private
+
       attr_reader registrations: untyped
 
       def registration_klass: () -> untyped
@@ -2710,6 +2770,8 @@ module ActiveModel
 
       def matches?: (untyped type_name, *untyped args, **untyped kwargs) -> untyped
 
+      private
+
       attr_reader name: untyped
 
       attr_reader block: untyped
@@ -2722,6 +2784,8 @@ module ActiveModel
     class String < ImmutableString
       # :nodoc:
       def changed_in_place?: (untyped raw_old_value, untyped new_value) -> untyped
+
+      private
 
       def cast_value: (untyped value) -> untyped
     end
@@ -2739,6 +2803,8 @@ module ActiveModel
       def `type`: () -> :time
 
       def user_input_in_time_zone: (untyped value) -> (nil | untyped)
+
+      private
 
       def cast_value: (untyped value) -> (untyped | nil)
     end
@@ -2826,6 +2892,8 @@ module ActiveModel
 
       def assert_valid_value: () -> nil
 
+      private
+
       def cast_value: (untyped value) -> untyped
     end
   end
@@ -2880,6 +2948,8 @@ module ActiveModel
       def initialize: (untyped options) -> untyped
 
       def validate_each: (untyped record, untyped attribute, untyped value) -> untyped
+
+      private
 
       def setup!: (untyped klass) -> untyped
 
@@ -3010,6 +3080,8 @@ module ActiveModel
         def after_validation: (*untyped args) { () -> untyped } -> untyped
       end
 
+      private
+
       # Overwrite run validations to include callbacks.
       def run_validations!: () -> untyped
     end
@@ -3023,6 +3095,8 @@ module ActiveModel
       ERROR_MESSAGE: ::String
 
       def check_validity!: () -> untyped
+
+      private
 
       def include?: (untyped record, untyped value) -> untyped
 
@@ -3045,6 +3119,8 @@ module ActiveModel
       def initialize: (untyped options) -> untyped
 
       def validate_each: (untyped record, untyped attribute, untyped value) -> untyped
+
+      private
 
       def setup!: (untyped klass) -> untyped
 
@@ -3140,6 +3216,8 @@ module ActiveModel
 
       def check_validity!: () -> untyped
 
+      private
+
       def option_call: (untyped record, untyped name) -> untyped
 
       def record_error: (untyped record, untyped attribute, untyped name, untyped value) -> untyped
@@ -3210,6 +3288,8 @@ end
 module ActiveModel
   module Validations
     module HelperMethods
+      private
+
       def _merge_attributes: (untyped attr_names) -> untyped
     end
   end
@@ -3269,6 +3349,8 @@ module ActiveModel
       def check_validity!: () -> untyped
 
       def validate_each: (untyped record, untyped attribute, untyped value) -> untyped
+
+      private
 
       def skip_nil_check?: (untyped key) -> untyped
     end
@@ -3345,6 +3427,8 @@ module ActiveModel
       def check_validity!: () -> untyped
 
       def validate_each: (untyped record, untyped attr_name, untyped value) -> (nil | untyped)
+
+      private
 
       def is_number?: (untyped raw_value) -> untyped
 
@@ -3574,6 +3658,8 @@ module ActiveModel
       #   person.valid?
       #   # => ActiveModel::StrictValidationFailed: Name can't be blank
       def validates!: (*untyped attributes) -> untyped
+
+      private
 
       # When creating custom validators, it might be useful to be able to specify
       # additional default keys. This can be done by overwriting this method.
@@ -4037,6 +4123,8 @@ module ActiveModel
     #   end
     alias read_attribute_for_validation send
 
+    private
+
     def run_validations!: () -> untyped
 
     def raise_validation_error: () -> untyped
@@ -4207,6 +4295,8 @@ module ActiveModel
     # and call this block for each attribute being validated. +validates_each+ uses this validator.
     # nodoc:
     def initialize: (untyped options) { () -> untyped } -> untyped
+
+    private
 
     def validate_each: (untyped record, untyped attribute, untyped value) -> untyped
   end

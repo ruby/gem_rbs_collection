@@ -77,6 +77,8 @@ module ActiveSupport
     #   variants.any?(:desktop, :watch)    # => false
     def any?: (*untyped candidates) -> untyped
 
+    private
+
     def respond_to_missing?: (untyped name, ?bool include_private) -> untyped
 
     def method_missing: (untyped name, *untyped args) -> untyped
@@ -143,6 +145,8 @@ module ActiveSupport
     # need to see entire filepaths in the backtrace that you had already
     # filtered out.
     def remove_filters!: () -> untyped
+
+    private
 
     FORMATTED_GEMS_PATTERN: untyped
 
@@ -237,6 +241,8 @@ module ActiveSupport
 
       def delete_matched: (untyped matcher, ?untyped? options) -> untyped
 
+      private
+
       def read_entry: (untyped key, **untyped options) -> untyped
 
       def write_entry: (untyped key, untyped entry, **untyped options) -> (::FalseClass | ::TrueClass)
@@ -283,6 +289,8 @@ module ActiveSupport
     # an in-memory cache inside of a block.
     class MemCacheStore < Store
       module LocalCacheWithRaw
+        private
+
         def write_entry: (untyped key, untyped entry, **untyped options) -> untyped
       end
 
@@ -321,6 +329,8 @@ module ActiveSupport
 
       # Get the statistics from the memcached servers.
       def stats: () -> untyped
+
+      private
 
       # Read an entry from the cache.
       def read_entry: (untyped key, **untyped options) -> untyped
@@ -393,6 +403,8 @@ module ActiveSupport
 
       def synchronize: () { () -> untyped } -> untyped
 
+      private
+
       PER_ENTRY_OVERHEAD: ::Integer
 
       def cached_size: (untyped key, untyped entry) -> untyped
@@ -430,6 +442,8 @@ module ActiveSupport
       def decrement: (untyped name, ?::Integer amount, ?untyped? options) -> nil
 
       def delete_matched: (untyped matcher, ?untyped? options) -> nil
+
+      private
 
       def read_entry: (untyped key, **untyped options) -> nil
 
@@ -477,12 +491,16 @@ module ActiveSupport
       def self.supports_cache_versioning?: () -> ::TrueClass
 
       module LocalCacheWithRaw
+        private
+
         def write_entry: (untyped key, untyped entry, **untyped options) -> untyped
 
         def write_multi_entries: (untyped entries, **untyped options) -> untyped
       end
 
       def self.build_redis: (?url: untyped? url, ?redis: untyped? redis, **untyped redis_options) -> untyped
+
+      private
 
       def self.build_redis_distributed_client: (urls: untyped urls, **untyped redis_options) -> untyped
 
@@ -683,6 +701,8 @@ module ActiveSupport
 
         def decrement: (untyped name, ?::Integer amount, **untyped options) -> untyped
 
+        private
+
         def read_entry: (untyped key, **untyped options) -> untyped
 
         def read_multi_entries: (untyped keys, **untyped options) -> untyped
@@ -784,6 +804,8 @@ module ActiveSupport
     # The +key+ argument can also respond to +cache_key+ or +to_param+.
     def self.expand_cache_key: (untyped key, ?untyped? namespace) -> untyped
 
+    private
+
     def self.retrieve_cache_key: (untyped key) -> untyped
 
     # Obtains the specified cache store class, given the name of the +store+.
@@ -838,6 +860,8 @@ module ActiveSupport
       attr_reader options: untyped
 
       alias silence? silence
+
+      private
 
       def self.retrieve_pool_options: (untyped options) -> untyped
 
@@ -1169,6 +1193,8 @@ module ActiveSupport
       # serialize entries to protect against accidental cache modifications.
       def dup_value!: () -> untyped
 
+      private
+
       def compress!: (untyped compress_threshold) -> untyped
 
       def compressed?: () -> untyped
@@ -1261,6 +1287,8 @@ module ActiveSupport
     # as possible that we were here.
     def run_callbacks: (untyped kind) { () -> untyped } -> untyped
 
+    private
+
     # A hook invoked every time a before callback is halted.
     # This can be overridden in ActiveSupport::Callbacks implementors in order
     # to provide better debugging/logging.
@@ -1331,6 +1359,8 @@ module ActiveSupport
       def apply: (untyped callback_sequence) -> untyped
 
       def current_scopes: () -> untyped
+
+      private
 
       def check_conditionals: (untyped conditionals) -> untyped
 
@@ -1436,6 +1466,8 @@ module ActiveSupport
       def `prepend`: (*untyped callbacks) -> untyped
 
       attr_reader chain: untyped
+
+      private
 
       def append_one: (untyped callback) -> untyped
 
@@ -1806,6 +1838,8 @@ module ActiveSupport
       # to proceed.
       def yield_shares: (?block_share: bool block_share, ?compatible: untyped compatible, ?purpose: untyped? purpose) { () -> untyped } -> untyped
 
+      private
+
       # Must be called within synchronize
       def busy_for_exclusive?: (untyped purpose) -> untyped
 
@@ -1835,6 +1869,8 @@ module ActiveSupport
       def config: () -> untyped
 
       def configure: () { (untyped) -> untyped } -> untyped
+
+      private
 
       def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) { () -> untyped } -> untyped
     end
@@ -2717,6 +2753,8 @@ module DateAndTime
     #   today.prev_occurring(:thursday)  # => Thu, 07 Dec 2017
     def prev_occurring: (untyped day_of_week) -> untyped
 
+    private
+
     def first_hour: (untyped date_or_time) -> untyped
 
     def last_hour: (untyped date_or_time) -> untyped
@@ -2750,6 +2788,8 @@ module DateAndTime
     #   Time.utc(2000).in_time_zone('Alaska') # => Fri, 31 Dec 1999 15:00:00 AKST -09:00
     #   Date.new(2000).in_time_zone('Alaska') # => Sat, 01 Jan 2000 00:00:00 AKST -09:00
     def in_time_zone: (?untyped zone) -> untyped
+
+    private
 
     def time_with_zone: (untyped time, untyped zone) -> untyped
   end
@@ -2974,6 +3014,8 @@ class DateTime
 
   # Returns the fraction of a second as nanoseconds
   def nsec: () -> untyped
+
+  private
 
   def offset_in_seconds: () -> untyped
 
@@ -3251,6 +3293,8 @@ module ActiveSupport
 
     def to_h: () -> untyped
 
+    private
+
     def normalize_keys: (untyped params) -> untyped
 
     def deep_to_h: (untyped value) -> untyped
@@ -3311,6 +3355,8 @@ class Hash[unchecked out K, unchecked out V]
   # This includes the values from the root hash and from all
   # nested hashes and arrays.
   def deep_transform_values!: () { () -> untyped } -> untyped
+
+  private
 
   # support methods for deep transforming nested hashes and arrays
   def _deep_transform_values_in_object: (untyped object) { (untyped) -> untyped } -> untyped
@@ -3441,6 +3487,8 @@ class Hash[unchecked out K, unchecked out V]
   # nested hashes and arrays.
   def deep_symbolize_keys!: () -> untyped
 
+  private
+
   # support methods for deep transforming nested hashes and arrays
   def _deep_transform_keys_in_object: (untyped object) { (untyped) -> untyped } -> untyped
 
@@ -3539,7 +3587,7 @@ module Kernel
   # A shortcut to define a toplevel concern, not within a module.
   #
   # See Module::Concerning for more.
-  def concern: (untyped topic) { () -> untyped } -> untyped
+  def self?.concern: (untyped topic) { () -> untyped } -> untyped
 end
 
 module Kernel
@@ -3551,15 +3599,15 @@ module Kernel
   #   end
   #
   #   noisy_call # warning voiced
-  def silence_warnings: () { () -> untyped } -> untyped
+  def self?.silence_warnings: () { () -> untyped } -> untyped
 
   # Sets $VERBOSE to +true+ for the duration of the block and back to its
   # original value afterwards.
-  def enable_warnings: () { () -> untyped } -> untyped
+  def self?.enable_warnings: () { () -> untyped } -> untyped
 
   # Sets $VERBOSE for the duration of the block and back to its original
   # value afterwards.
-  def with_warnings: (untyped flag) { () -> untyped } -> untyped
+  def self?.with_warnings: (untyped flag) { () -> untyped } -> untyped
 
   # Blocks and ignores any exception passed as argument if raised within the block.
   #
@@ -3569,7 +3617,7 @@ module Kernel
   #   end
   #
   #   puts 'This code gets executed and nothing related to ZeroDivisionError was seen'
-  def suppress: (*untyped exception_classes) { () -> untyped } -> untyped
+  def self?.suppress: (*untyped exception_classes) { () -> untyped } -> untyped
 end
 
 module Kernel
@@ -3652,6 +3700,8 @@ class Module
   alias attr_internal attr_internal_accessor
 
   attr_accessor attr_internal_naming_format: untyped
+
+  private
 
   def attr_internal_ivar_name: (untyped attr) -> untyped
 
@@ -5162,6 +5212,8 @@ module ActiveSupport
 
     def step: (?::Integer n) { () -> untyped } -> untyped
 
+    private
+
     def ensure_iteration_allowed: () -> untyped
   end
 end
@@ -5756,11 +5808,11 @@ class ERB
     #
     #   puts html_escape('is a > 0 & a < 10?')
     #   # => is a &gt; 0 &amp; a &lt; 10?
-    def html_escape: (untyped s) -> untyped
+    def self?.html_escape: (untyped s) -> untyped
 
     alias h html_escape
 
-    def unwrapped_html_escape: (untyped s) -> untyped
+    def self?.unwrapped_html_escape: (untyped s) -> untyped
 
     # A utility method for escaping HTML without affecting existing escaped entities.
     #
@@ -5769,7 +5821,7 @@ class ERB
     #
     #   html_escape_once('&lt;&lt; Accept & Checkout')
     #   # => "&lt;&lt; Accept &amp; Checkout"
-    def html_escape_once: (untyped s) -> untyped
+    def self?.html_escape_once: (untyped s) -> untyped
 
     # A utility method for escaping HTML entities in JSON strings. Specifically, the
     # &, > and < characters are replaced with their equivalent unicode escaped form -
@@ -5826,7 +5878,7 @@ class ERB
     # is recommended that you always apply this helper (other libraries, such as the
     # JSON gem, do not provide this kind of protection by default; also some gems
     # might override +to_json+ to bypass Active Support's encoder).
-    def json_escape: (untyped s) -> untyped
+    def self?.json_escape: (untyped s) -> untyped
   end
 end
 
@@ -5887,6 +5939,8 @@ module ActiveSupport
     def to_param: () -> untyped
 
     def encode_with: (untyped coder) -> untyped
+
+    private
 
     def html_escape_interpolated_argument: (untyped arg) -> untyped
 
@@ -6355,6 +6409,8 @@ module ActiveSupport
 
     def self.clear_all: () -> untyped
 
+    private
+
     def self.generated_attribute_methods: () -> untyped
 
     def self.current_instances: () -> untyped
@@ -6485,6 +6541,8 @@ module ActiveSupport
 
       def self.take_over: (enable_reloading: untyped enable_reloading) -> untyped
 
+      private
+
       def self.setup_autoloaders: (untyped enable_reloading) -> untyped
 
       def self.autoload_once?: (untyped autoload_path) -> untyped
@@ -6500,6 +6558,10 @@ end
 
 module ActiveSupport
   module Dependencies
+    # nodoc:
+    # nodoc:
+    extend ::ActiveSupport::Dependencies
+
     UNBOUND_METHOD_MODULE_NAME: untyped
 
     # Execute the supplied block without interference from any
@@ -6544,6 +6606,8 @@ module ActiveSupport
       # Add a set of modules to the watch stack, remembering the initial
       # constants.
       def watch_namespaces: (untyped namespaces) -> untyped
+
+      private
 
       def pop_modules: (untyped modules) -> untyped
     end
@@ -6605,6 +6669,8 @@ module ActiveSupport
       # Returns +true+ if the constant was not previously marked for unloading,
       # +false+ otherwise.
       def unloadable: (untyped const_desc) -> untyped
+
+      private
 
       def load: (untyped file, ?bool wrap) -> untyped
 
@@ -6744,6 +6810,8 @@ module ActiveSupport
 
     def log: (untyped message) -> untyped
 
+    private
+
     # Returns the original name of a class or module even if `name` has been
     # overridden.
     def real_mod_name: (untyped mod) -> untyped
@@ -6801,6 +6869,8 @@ module ActiveSupport
       #     # custom stuff
       #   }
       def behavior=: (untyped behavior) -> untyped
+
+      private
 
       def arity_coerce: (untyped behavior) -> untyped
     end
@@ -6922,6 +6992,8 @@ module ActiveSupport
       # logs rely on it for diagnostics.
       def inspect: () -> untyped
 
+      private
+
       def method_missing: (untyped called, *untyped args) { () -> untyped } -> untyped
     end
 
@@ -6938,6 +7010,8 @@ module ActiveSupport
     #   # => "#<Object:0x007fb9b34c34b0>"
     class DeprecatedObjectProxy < DeprecationProxy
       def initialize: (untyped object, untyped message, ?untyped deprecator) -> untyped
+
+      private
 
       def target: () -> untyped
 
@@ -6979,6 +7053,8 @@ module ActiveSupport
     class DeprecatedInstanceVariableProxy < DeprecationProxy
       def initialize: (untyped `instance`, untyped method, ?::String var, ?untyped deprecator) -> untyped
 
+      private
+
       def target: () -> untyped
 
       def warn: (untyped callstack, untyped called, untyped args) -> untyped
@@ -7017,6 +7093,8 @@ module ActiveSupport
       #   PLANETS.class # => Array
       def `class`: () -> untyped
 
+      private
+
       def target: () -> untyped
 
       def const_missing: (untyped name) -> untyped
@@ -7054,6 +7132,8 @@ module ActiveSupport
       def silence: () { () -> untyped } -> untyped
 
       def deprecation_warning: (untyped deprecated_method_name, ?untyped? message, ?untyped? caller_backtrace) -> untyped
+
+      private
 
       # Outputs a deprecation warning message
       #
@@ -7118,6 +7198,8 @@ module ActiveSupport
     # This is the only method that is not thread safe, but is only ever called
     # during the eager loading phase.
     def self.store_inherited: (untyped klass, untyped descendant) -> untyped
+
+    private
 
     def self.accumulate_descendants: (untyped klass, untyped acc) -> untyped
 
@@ -7207,6 +7289,8 @@ module ActiveSupport
 
       def parse!: () -> untyped
 
+      private
+
       def finished?: () -> untyped
 
       # Parses number which can be a float with either comma or period.
@@ -7231,6 +7315,8 @@ module ActiveSupport
 
       # Builds and returns output string.
       def serialize: () -> ("PT0S" | ::String)
+
+      private
 
       # Return pair of duration's parts and whole duration sign.
       # Parts are summarized (as they can become repetitive due to addition, etc).
@@ -7268,6 +7354,8 @@ module ActiveSupport
       def /: (untyped other) -> untyped
 
       def %: (untyped other) -> untyped
+
+      private
 
       def calculate: (untyped op, untyped other) -> untyped
 
@@ -7324,6 +7412,8 @@ module ActiveSupport
     #   ActiveSupport::Duration.build(2716146).parts  # => {:months=>1, :days=>1}
     #
     def self.build: (untyped value) -> untyped
+
+    private
 
     def self.calculate_total_seconds: (untyped parts) -> untyped
 
@@ -7448,6 +7538,8 @@ module ActiveSupport
 
     def config: () -> untyped
 
+    private
+
     def options: () -> untyped
 
     def deserialize: (untyped config) -> untyped
@@ -7485,6 +7577,8 @@ module ActiveSupport
     def write: (untyped contents) -> untyped
 
     def change: () { () -> untyped } -> untyped
+
+    private
 
     def writing: (untyped contents) { (untyped) -> untyped } -> untyped
 
@@ -7540,6 +7634,8 @@ module ActiveSupport
 
     def execute_if_updated: () { () -> untyped } -> untyped
 
+    private
+
     def boot!: () -> untyped
 
     def shutdown!: () -> untyped
@@ -7566,6 +7662,8 @@ module ActiveSupport
 
       # Filters out directories which are descendants of others in the collection (stable).
       def filter_out_descendants: (untyped dirs) -> untyped
+
+      private
 
       def ascendant_of?: (untyped base, untyped other) -> untyped
     end
@@ -7636,6 +7734,8 @@ module ActiveSupport
     # Where possible, prefer +wrap+.
     def complete!: () -> untyped
 
+    private
+
     def hook_state: () -> untyped
   end
 end
@@ -7695,6 +7795,8 @@ module ActiveSupport
 
     # Execute the block given if updated.
     def execute_if_updated: () { () -> untyped } -> untyped
+
+    private
 
     def watched: () -> untyped
 
@@ -8027,6 +8129,8 @@ module ActiveSupport
     # Convert to a regular hash with string keys.
     def to_hash: () -> untyped
 
+    private
+
     def convert_key: (untyped key) -> untyped
 
     def convert_value: (untyped value, ?::Hash[untyped, untyped] options) -> untyped
@@ -8066,6 +8170,8 @@ end
 
 module ActiveSupport
   module Inflector
+    extend ::ActiveSupport::Inflector
+
     # A singleton instance of this class is yielded by Inflector.inflections,
     # which can then be used to specify additional inflection rules. If passed
     # an optional locale, rules for other languages can be specified. The
@@ -8095,6 +8201,8 @@ module ActiveSupport
         def add: (untyped words) -> untyped
 
         def uncountable?: (untyped str) -> untyped
+
+        private
 
         def to_regex: (untyped string) -> ::Regexp
       end
@@ -8217,6 +8325,8 @@ module ActiveSupport
       #   clear :plurals
       def clear: (?::Symbol scope) -> untyped
 
+      private
+
       def define_acronym_regex_patterns: () -> untyped
     end
 
@@ -8244,6 +8354,8 @@ module ActiveSupport
   # require it for your application or wish to define rules for languages other
   # than English, please correct or add them yourself (explained below).
   module Inflector
+    extend ::ActiveSupport::Inflector
+
     # Returns the plural form of the word in the string.
     #
     # If passed an optional +locale+ parameter, the word will be
@@ -8477,6 +8589,8 @@ module ActiveSupport
     #   ordinalize(-1021) # => "-1021st"
     def ordinalize: (untyped number) -> untyped
 
+    private
+
     # Mounts a regular expression, returned as a string to ease interpolation,
     # that will match part by part the given constant.
     #
@@ -8609,6 +8723,8 @@ module ActiveSupport
     #   end
     def self.parse_error: () -> untyped
 
+    private
+
     def self.convert_dates_from: (untyped data) -> untyped
   end
 end
@@ -8632,6 +8748,8 @@ module ActiveSupport
 
         # Encode the given object into a JSON string
         def encode: (untyped value) -> untyped
+
+        private
 
         # Rails does more escaping than the JSON gem natively does (we
         # escape \u2028 and \u2029 and optionally >, <, & to work around
@@ -8748,6 +8866,8 @@ module ActiveSupport
     def on_load: (untyped name, ?::Hash[untyped, untyped] options) { () -> untyped } -> untyped
 
     def run_load_hooks: (untyped name, ?untyped base) -> untyped
+
+    private
 
     def with_execution_control: (untyped name, untyped block, untyped once) { () -> untyped } -> untyped
 
@@ -8913,6 +9033,8 @@ module ActiveSupport
     def start: (untyped name, untyped id, untyped payload) -> untyped
 
     def finish: (untyped name, untyped id, untyped payload) -> untyped
+
+    private
 
     def color: (untyped text, untyped color, ?bool bold) -> (untyped | ::String)
   end
@@ -9101,6 +9223,8 @@ module ActiveSupport
     # Given a cipher, returns the key length of the cipher to help generate the key of desired size
     def self.key_len: (?untyped cipher) -> untyped
 
+    private
+
     def _encrypt: (untyped value, **untyped metadata_options) -> untyped
 
     def _decrypt: (untyped encrypted_message, untyped purpose) -> untyped
@@ -9270,6 +9394,8 @@ module ActiveSupport
     #   verifier.generate 'a private message' # => "BAhJIhRwcml2YXRlLW1lc3NhZ2UGOgZFVA==--e2d724331ebdee96a10fb99b089508d1c72bd772"
     def generate: (untyped value, ?purpose: untyped? purpose, ?expires_in: untyped? expires_in, ?expires_at: untyped? expires_at) -> ::String
 
+    private
+
     def encode: (untyped data) -> untyped
 
     def decode: (untyped data) -> untyped
@@ -9290,6 +9416,8 @@ module ActiveSupport
       def self.wrap: (untyped message, ?purpose: untyped? purpose, ?expires_in: untyped? expires_in, ?expires_at: untyped? expires_at) -> untyped
 
       def self.verify: (untyped message, untyped purpose) -> untyped
+
+      private
 
       def self.pick_expiry: (untyped expires_at, untyped expires_in) -> untyped
 
@@ -9337,6 +9465,8 @@ module ActiveSupport
 
         def decrypt_and_verify: (*untyped args, ?on_rotation: untyped? on_rotation, **untyped options) -> untyped
 
+        private
+
         def build_rotation: (?untyped secret, ?untyped sign_secret, untyped options) -> untyped
       end
 
@@ -9345,8 +9475,12 @@ module ActiveSupport
 
         def verified: (*untyped args, ?on_rotation: untyped? on_rotation, **untyped options) -> untyped
 
+        private
+
         def build_rotation: (?untyped secret, untyped options) -> untyped
       end
+
+      private
 
       def run_rotations: (untyped on_rotation) { (untyped) -> untyped } -> untyped
     end
@@ -9490,6 +9624,8 @@ module ActiveSupport
 
       def as_json: (?untyped? options) -> untyped
 
+      private
+
       def chars: (untyped string) -> untyped
     end
   end
@@ -9498,6 +9634,8 @@ end
 module ActiveSupport
   module Multibyte
     module Unicode
+      extend ::ActiveSupport::Multibyte::Unicode
+
       # A list of all available normalization forms.
       # See https://www.unicode.org/reports/tr15/tr15-29.html for more
       # information about normalization.
@@ -9549,6 +9687,8 @@ module ActiveSupport
       #   the following: <tt>:c</tt>, <tt>:kc</tt>, <tt>:d</tt>, or <tt>:kd</tt>.
       #   Default is ActiveSupport::Multibyte::Unicode.default_normalization_form.
       def normalize: (untyped string, ?untyped? form) -> untyped
+
+      private
 
       def recode_windows1252_chars: (untyped string) -> untyped
     end
@@ -9656,6 +9796,8 @@ module ActiveSupport
 
           def finish: (untyped name, untyped id, untyped payload) -> untyped
 
+          private
+
           def build_event: (untyped name, untyped id, untyped payload) -> ActiveSupport::Notifications::Event
         end
 
@@ -9701,6 +9843,8 @@ module ActiveSupport
       def finish: (untyped name, untyped payload) -> untyped
 
       def finish_with_state: (untyped listeners_state, untyped name, untyped payload) -> untyped
+
+      private
 
       def unique_id: () -> untyped
     end
@@ -9759,6 +9903,8 @@ module ActiveSupport
       def <<: (untyped event) -> untyped
 
       def parent_of?: (untyped event) -> untyped
+
+      private
 
       def now: () -> untyped
 
@@ -10010,6 +10156,8 @@ module ActiveSupport
 
       def execute: () -> untyped
 
+      private
+
       def options: () -> untyped
 
       def format_options: () -> untyped
@@ -10034,6 +10182,8 @@ module ActiveSupport
     class NumberToCurrencyConverter < NumberConverter
       def convert: () -> untyped
 
+      private
+
       def options: () -> untyped
 
       def i18n_opts: () -> untyped
@@ -10047,6 +10197,8 @@ module ActiveSupport
       DEFAULT_DELIMITER_REGEX: untyped
 
       def convert: () -> untyped
+
+      private
 
       def parts: () -> untyped
 
@@ -10064,6 +10216,8 @@ module ActiveSupport
       INVERTED_DECIMAL_UNITS: untyped
 
       def convert: () -> untyped
+
+      private
 
       def format: () -> untyped
 
@@ -10083,6 +10237,8 @@ module ActiveSupport
       STORAGE_UNITS: ::Array[untyped]
 
       def convert: () -> untyped
+
+      private
 
       def conversion_format: () -> untyped
 
@@ -10113,6 +10269,8 @@ module ActiveSupport
       # nodoc:
       def convert: () -> untyped
 
+      private
+
       def convert_to_phone_number: (untyped number) -> untyped
 
       def convert_with_area_code: (untyped number) -> untyped
@@ -10137,6 +10295,8 @@ module ActiveSupport
     class NumberToRoundedConverter < NumberConverter
       def convert: () -> untyped
 
+      private
+
       def strip_insignificant_zeros: () -> untyped
 
       def format_number: (untyped number) -> untyped
@@ -10156,6 +10316,8 @@ module ActiveSupport
 
       def digit_count: (untyped number) -> (1 | untyped)
 
+      private
+
       def round_without_significant: (untyped number) -> untyped
 
       def round_significant: (untyped number) -> (0 | untyped)
@@ -10174,6 +10336,8 @@ end
 module ActiveSupport
   module NumberHelper
     extend ActiveSupport::Autoload
+
+    extend ::ActiveSupport::NumberHelper
 
     # Formats a +number+ into a phone number (US by default e.g., (555)
     # 123-9876). You can customize the format in the +options+ hash.
@@ -10526,6 +10690,8 @@ module ActiveSupport
   class OptionMerger
     def initialize: (untyped context, untyped options) -> untyped
 
+    private
+
     def method_missing: (untyped method, *untyped arguments) { () -> untyped } -> untyped
 
     def invoke_method: (untyped method, untyped arguments, untyped options) { () -> untyped } -> untyped
@@ -10656,6 +10822,8 @@ module ActiveSupport
     # Returns filtered value for given key. For +Proc+ filters, third block argument is not populated.
     def filter_param: (untyped key, untyped value) -> untyped
 
+    private
+
     def compiled_filter: () -> untyped
 
     class CompiledFilter
@@ -10717,6 +10885,8 @@ module ActiveSupport
     def self.extended: (untyped object) -> untyped
 
     def `instance`: () -> untyped
+
+    private
 
     def method_missing: (untyped name, *untyped args) { () -> untyped } -> untyped
   end
@@ -10858,6 +11028,8 @@ module ActiveSupport
 
       def handler_for_rescue: (untyped exception, ?object: untyped object) -> untyped
 
+      private
+
       def find_rescue_handler: (untyped exception) -> untyped
 
       def constantize_rescue_handler_class: (untyped class_or_name) -> untyped
@@ -10877,13 +11049,13 @@ module ActiveSupport
     #
     # The values compared should be of fixed length, such as strings
     # that have already been processed by HMAC. Raises in case of length mismatch.
-    def fixed_length_secure_compare: (untyped a, untyped b) -> untyped
+    def self?.fixed_length_secure_compare: (untyped a, untyped b) -> untyped
 
     # Constant time string comparison, for variable length strings.
     #
     # The values are first processed by SHA256, so that we don't leak length info
     # via timing attacks.
-    def secure_compare: (untyped a, untyped b) -> untyped
+    def self?.secure_compare: (untyped a, untyped b) -> untyped
   end
 end
 
@@ -10904,6 +11076,8 @@ module ActiveSupport
   #   vehicle.car?   # => true
   #   vehicle.bike?  # => false
   class StringInquirer < String
+    private
+
     def respond_to_missing?: (untyped method_name, ?bool include_private) -> untyped
 
     def method_missing: (untyped method_name, *untyped arguments) -> untyped
@@ -10946,6 +11120,8 @@ module ActiveSupport
     def self.method_added: (untyped event) -> untyped
 
     def self.subscribers: () -> untyped
+
+    private
 
     attr_reader subscriber: untyped
 
@@ -11425,6 +11601,8 @@ end
 module ActiveSupport
   module Testing
     module MethodCallAssertions
+      private
+
       def assert_called: (untyped object, untyped method_name, ?untyped? message, ?returns: untyped? returns, ?times: ::Integer times) { () -> untyped } -> untyped
 
       def assert_called_with: (untyped object, untyped method_name, untyped args, ?returns: untyped? returns) { () -> untyped } -> untyped
@@ -11474,6 +11652,8 @@ module ActiveSupport
 
       def shutdown: () -> untyped
 
+      private
+
       def add_setup_exception: (untyped result, untyped setup_exception) -> untyped
     end
   end
@@ -11515,6 +11695,8 @@ end
 module ActiveSupport
   module Testing
     module Stream
+      private
+
       def silence_stream: (untyped stream) { () -> untyped } -> untyped
 
       def quietly: () { () -> untyped } -> untyped
@@ -11533,6 +11715,8 @@ module ActiveSupport
       attr_writer tagged_logger: untyped
 
       def before_setup: () -> untyped
+
+      private
 
       def tagged_logger: () -> untyped
     end
@@ -11558,6 +11742,8 @@ module ActiveSupport
       def unstub_all!: () -> untyped
 
       def stubbing: (untyped object, untyped method_name) -> untyped
+
+      private
 
       def unstub_object: (untyped stub) -> untyped
     end
@@ -11648,6 +11834,8 @@ module ActiveSupport
       #   end
       #   Time.current # => Sun, 09 Jul 2017 15:34:50 EST -05:00
       def freeze_time: () { () -> untyped } -> untyped
+
+      private
 
       def simple_stubs: () -> untyped
     end
@@ -12033,6 +12221,8 @@ module ActiveSupport
     # TimeWithZone with the existing +time_zone+.
     def method_missing: (untyped sym, *untyped args) { () -> untyped } -> untyped
 
+    private
+
     def get_period_and_ensure_valid_local_time: (untyped period) -> untyped
 
     def transfer_time_values_to_utc_constructor: (untyped time) -> untyped
@@ -12110,6 +12300,8 @@ module ActiveSupport
     def self.country_zones: (untyped country_code) -> untyped
 
     def self.clear: () -> untyped
+
+    private
 
     def self.load_country_zones: (untyped code) -> untyped
 
@@ -12292,6 +12484,9 @@ end
 
 module ActiveSupport
   module XmlMini_JDOM
+    # nodoc:
+    extend ::ActiveSupport::XmlMini_JDOM
+
     CONTENT_KEY: ::String
 
     NODE_TYPE_NAMES: ::Array[untyped]
@@ -12300,6 +12495,8 @@ module ActiveSupport
     # data::
     #   XML Document string or IO to parse
     def parse: (untyped data) -> untyped
+
+    private
 
     # Convert an XML element and merge into the hash
     #
@@ -12361,6 +12558,9 @@ end
 
 module ActiveSupport
   module XmlMini_LibXML
+    # nodoc:
+    extend ::ActiveSupport::XmlMini_LibXML
+
     # Parse an XML Document string or IO into a simple hash using libxml.
     # data::
     #   XML Document string or IO to parse
@@ -12392,6 +12592,9 @@ end
 
 module ActiveSupport
   module XmlMini_LibXMLSAX
+    # nodoc:
+    extend ::ActiveSupport::XmlMini_LibXMLSAX
+
     # Class that will build the hash while the XML document
     # is being parsed using SAX events.
     class HashBuilder
@@ -12426,6 +12629,9 @@ end
 
 module ActiveSupport
   module XmlMini_Nokogiri
+    # nodoc:
+    extend ::ActiveSupport::XmlMini_Nokogiri
+
     # Parse an XML Document string or IO into a simple hash using libxml / nokogiri.
     # data::
     #   XML Document string or IO to parse
@@ -12454,6 +12660,9 @@ end
 
 module ActiveSupport
   module XmlMini_NokogiriSAX
+    # nodoc:
+    extend ::ActiveSupport::XmlMini_NokogiriSAX
+
     # Class that will build the hash while the XML document
     # is being parsed using SAX events.
     class HashBuilder < Nokogiri::XML::SAX::Document
@@ -12488,6 +12697,9 @@ end
 
 module ActiveSupport
   module XmlMini_REXML
+    # nodoc:
+    extend ::ActiveSupport::XmlMini_REXML
+
     CONTENT_KEY: ::String
 
     # Parse an XML Document string or IO into a simple hash.
@@ -12498,6 +12710,8 @@ module ActiveSupport
     # data::
     #   XML Document string or IO to parse
     def parse: (untyped data) -> untyped
+
+    private
 
     # Convert an XML element and merge into the hash
     #
@@ -12556,6 +12770,8 @@ module ActiveSupport
   #   gem 'libxml-ruby', '=0.9.7'
   #   XmlMini.backend = 'LibXML'
   module XmlMini
+    extend ::ActiveSupport::XmlMini
+
     module FileLike
       # This module decorates files deserialized using Hash.from_xml with
       # the <tt>original_filename</tt> and <tt>content_type</tt> methods.
@@ -12592,6 +12808,8 @@ module ActiveSupport
 
     def rename_key: (untyped key, ?::Hash[untyped, untyped] options) -> untyped
 
+    private
+
     def _dasherize: (untyped key) -> ::String
 
     # TODO: Add support for other encodings
@@ -12626,8 +12844,6 @@ class Object
   #   Benchmark.ms { User.all }
   #   # => 0.074
   def self.ms: () { () -> untyped } -> untyped
-
-  alias orig_sum sum
 
   def unescape: (untyped str, ?untyped escaped) -> untyped
 end

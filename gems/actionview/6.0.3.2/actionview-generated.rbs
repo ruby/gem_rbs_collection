@@ -258,6 +258,8 @@ module ActionView
 
     def clear_cache: () -> untyped
 
+    private
+
     def dirs_to_watch: () -> untyped
 
     def all_view_paths: () -> untyped
@@ -341,6 +343,8 @@ module ActionView
 
       def dependencies: () -> untyped
 
+      private
+
       attr_reader name: untyped
 
       attr_reader template: untyped
@@ -378,6 +382,8 @@ module ActionView
 
     # Create a dependency tree for template named +name+.
     def self.tree: (untyped name, untyped finder, ?bool partial, ?::Hash[untyped, untyped] seen) -> untyped
+
+    private
 
     def self.find_template: (untyped finder, untyped name, untyped prefixes, untyped partial, untyped keys) -> untyped
 
@@ -453,6 +459,8 @@ module ActionView
     # if that's the key it's waiting for.
     def append!: (untyped key, untyped value) -> untyped
 
+    private
+
     def inside_fiber?: () -> untyped
   end
 end
@@ -491,6 +499,8 @@ module ActionView
       def error_wrapping: (untyped html_tag) -> untyped
 
       def error_message: () -> untyped
+
+      private
 
       def object_has_errors?: () -> untyped
 
@@ -816,6 +826,8 @@ module ActionView
       #   audio_tag("sound.wav", "sound.mid")
       #   # => <audio><source src="/audios/sound.wav" /><source src="/audios/sound.mid" /></audio>
       def audio_tag: (*untyped sources) -> untyped
+
+      private
 
       def multiple_sources_tag_builder: (untyped `type`, untyped sources) { (untyped) -> untyped } -> untyped
 
@@ -1305,6 +1317,8 @@ module ActionView
 
         def initialize: (untyped xml) -> untyped
 
+        private
+
         # Delegate to xml builder, first wrapping the element in an xhtml
         # namespaced div element if the method and arguments indicate
         # that an xhtml_block? is desired.
@@ -1531,6 +1545,8 @@ module ActionView
       def cache_fragment_name: (?::Hash[untyped, untyped] name, ?digest_path: untyped? digest_path, ?virtual_path: untyped? virtual_path, ?skip_digest: untyped? skip_digest) -> untyped
 
       def digest_path_from_template: (untyped template) -> untyped
+
+      private
 
       def fragment_name_with_digest: (untyped name, untyped virtual_path, untyped digest_path) -> untyped
 
@@ -2367,6 +2383,8 @@ module ActionView
       #   # => <time datetime="2010-11-04T17:55:45+01:00"><span>Right now</span></time>
       def time_tag: (untyped date_or_time, *untyped args) { () -> untyped } -> untyped
 
+      private
+
       def normalize_distance_of_time_argument_to_time: (untyped value) -> untyped
     end
 
@@ -2399,6 +2417,8 @@ module ActionView
       def select_month: () -> untyped
 
       def select_year: () -> untyped
+
+      private
 
       # If the day is hidden, the day should be set to the 1st so all month and year choices are
       # valid. Otherwise, February 31st or February 29th, 2011 can be selected, which are invalid.
@@ -3008,7 +3028,11 @@ module ActionView
       #   <% end %>
       def form_for: (untyped record, ?::Hash[untyped, untyped] options) { () -> untyped } -> untyped
 
+      private
+
       def apply_form_for_options!: (untyped record, untyped object, untyped options) -> untyped
+
+      public
 
       # Creates a form tag based on mixing URLs, scopes, or models.
       #
@@ -3979,6 +4003,8 @@ module ActionView
       # * Accepts same options as range_field_tag
       def range_field: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) -> untyped
 
+      private
+
       def html_options_for_form_with: (?untyped? url_for_options, ?untyped? model, ?skip_enforcing_utf8: untyped? skip_enforcing_utf8, ?local: untyped local, ?html: ::Hash[untyped, untyped] html, **untyped options) -> untyped
 
       def instantiate_builder: (untyped record_name, untyped record_object, untyped options) -> untyped
@@ -4559,6 +4585,8 @@ module ActionView
       def button: (?untyped? value, ?::Hash[untyped, untyped] options) { () -> untyped } -> untyped
 
       def emitted_hidden_id?: () -> untyped
+
+      private
 
       def objectify_options: (untyped options) -> untyped
 
@@ -5238,6 +5266,8 @@ module ActionView
       # In the rare case you don't want this hidden field, you can pass the
       # <tt>include_hidden: false</tt> option to the helper method.
       def collection_check_boxes: (untyped object, untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) { () -> untyped } -> untyped
+
+      private
 
       def option_html_attributes: (untyped element) -> untyped
 
@@ -6009,6 +6039,8 @@ module ActionView
       # to customize the tag.
       def utf8_enforcer_tag: () -> untyped
 
+      private
+
       def html_options_for_form: (untyped url_for_options, untyped options) -> untyped
 
       def extra_tags_for_form: (untyped html_options) -> untyped
@@ -6467,6 +6499,8 @@ module ActionView
       #
       def number_to_human: (untyped number, ?::Hash[untyped, untyped] options) -> untyped
 
+      private
+
       def delegate_number_helper_method: (untyped method, untyped number, untyped options) -> (nil | untyped)
 
       def escape_unsafe_options: (untyped options) -> untyped
@@ -6797,6 +6831,8 @@ module ActionView
 
         def tag_option: (untyped key, untyped value, untyped escape) -> ::String
 
+        private
+
         def prefix_tag_option: (untyped prefix, untyped key, untyped value, untyped escape) -> untyped
 
         def respond_to_missing?: (*untyped args) -> ::TrueClass
@@ -6979,6 +7015,8 @@ module ActionView
       #   # => "&lt;&lt; Accept &amp; Checkout"
       def escape_once: (untyped html) -> untyped
 
+      private
+
       def tag_builder: () -> untyped
     end
   end
@@ -7008,6 +7046,8 @@ module ActionView
 
         # This is what child classes implement.
         def render: () -> untyped
+
+        private
 
         def value: () -> untyped
 
@@ -7059,6 +7099,8 @@ module ActionView
 
         def render: () -> untyped
 
+        private
+
         def checked?: (untyped value) -> untyped
 
         def hidden_field_for_checkbox: (untyped options) -> untyped
@@ -7093,6 +7135,8 @@ module ActionView
         end
 
         def render: () { () -> untyped } -> untyped
+
+        private
 
         def render_component: (untyped builder) -> untyped
 
@@ -7129,6 +7173,8 @@ module ActionView
 
         def initialize: (untyped object_name, untyped method_name, untyped template_object, untyped collection, untyped value_method, untyped text_method, untyped options, untyped html_options) -> untyped
 
+        private
+
         def instantiate_builder: (untyped builder_class, untyped item, untyped value, untyped text, untyped html_options) -> untyped
 
         # Generate default options for collection helpers, such as :checked and
@@ -7164,6 +7210,8 @@ module ActionView
 
         def render: () { () -> untyped } -> untyped
 
+        private
+
         def render_component: (untyped builder) -> untyped
       end
     end
@@ -7192,6 +7240,8 @@ module ActionView
         # :nodoc:
         def render: () -> untyped
 
+        private
+
         def validate_color_string: (untyped string) -> untyped
       end
     end
@@ -7202,6 +7252,8 @@ module ActionView
   module Helpers
     module Tags
       class DateField < DatetimeField
+        private
+
         def format_date: (untyped value) -> untyped
       end
     end
@@ -7219,6 +7271,8 @@ module ActionView
         def render: () -> untyped
 
         def self.select_type: () -> untyped
+
+        private
 
         def select_type: () -> untyped
 
@@ -7238,6 +7292,8 @@ module ActionView
         # :nodoc:
         def render: () -> untyped
 
+        private
+
         def format_date: (untyped value) -> untyped
 
         def datetime_value: (untyped value) -> untyped
@@ -7251,6 +7307,8 @@ module ActionView
     module Tags
       class DatetimeLocalField < DatetimeField
         def self.field_type: () -> untyped
+
+        private
 
         def format_date: (untyped value) -> untyped
       end
@@ -7327,6 +7385,8 @@ module ActionView
 
         def render: () { () -> untyped } -> untyped
 
+        private
+
         def render_component: (untyped builder) -> untyped
       end
     end
@@ -7337,6 +7397,8 @@ module ActionView
   module Helpers
     module Tags
       class MonthField < DatetimeField
+        private
+
         def format_date: (untyped value) -> untyped
       end
     end
@@ -7391,6 +7453,8 @@ module ActionView
 
         def render: () -> untyped
 
+        private
+
         def checked?: (untyped value) -> untyped
       end
     end
@@ -7427,6 +7491,8 @@ module ActionView
         def initialize: (untyped object_name, untyped method_name, untyped template_object, untyped choices, untyped options, untyped html_options) { () -> untyped } -> untyped
 
         def render: () -> untyped
+
+        private
 
         # Grouped choices look like this:
         #
@@ -7473,6 +7539,8 @@ module ActionView
 
         def self.field_type: () -> untyped
 
+        private
+
         def field_type: () -> untyped
       end
     end
@@ -7483,6 +7551,8 @@ module ActionView
   module Helpers
     module Tags
       class TimeField < DatetimeField
+        private
+
         def format_date: (untyped value) -> untyped
       end
     end
@@ -7522,6 +7592,8 @@ module ActionView
 
         def translate: () -> untyped
 
+        private
+
         attr_reader object_name: untyped
 
         attr_reader method_and_value: untyped
@@ -7551,6 +7623,8 @@ module ActionView
   module Helpers
     module Tags
       class WeekField < DatetimeField
+        private
+
         def format_date: (untyped value) -> untyped
       end
     end
@@ -7880,12 +7954,16 @@ module ActionView
 
         def to_s: () -> untyped
 
+        private
+
         def next_index: () -> untyped
 
         def previous_index: () -> untyped
 
         def step_index: (untyped n) -> untyped
       end
+
+      private
 
       # The cycle helpers need to store the cycles in a place that is
       # guaranteed to be reset every time a page is rendered, so it
@@ -7962,6 +8040,8 @@ module ActionView
       def localize: (untyped object, **untyped options) -> untyped
 
       alias l localize
+
+      private
 
       def scope_key_by_partial: (untyped key) -> untyped
 
@@ -8402,6 +8482,8 @@ module ActionView
       #
       def current_page?: (untyped options, ?check_parameters: bool check_parameters) -> (::FalseClass | untyped)
 
+      private
+
       def convert_options_to_data_attributes: (untyped options, untyped html_options) -> untyped
 
       def link_to_remote_options?: (untyped options) -> untyped
@@ -8703,6 +8785,8 @@ module ActionView
       def inherited: (untyped klass) -> untyped
 
       module LayoutConditions
+        private
+
         # Determines whether the current action has a layout definition by
         # checking the action name against the :only and :except conditions
         # set by the <tt>layout</tt> method.
@@ -8734,6 +8818,8 @@ module ActionView
 
       def _write_layout_method: () -> untyped
 
+      private
+
       # If no layout is supplied, look for a template named the return
       # value of this method.
       #
@@ -8753,6 +8839,8 @@ module ActionView
     # for that action or set the <tt>action_has_layout</tt> attribute
     # to false before rendering.
     def action_has_layout?: () -> untyped
+
+    private
 
     def _conditional_layout?: () -> ::TrueClass
 
@@ -8801,6 +8889,8 @@ module ActionView
     def start: (untyped name, untyped id, untyped payload) -> untyped
 
     def logger: () -> untyped
+
+    private
 
     EMPTY: ::String
 
@@ -8870,6 +8960,8 @@ module ActionView
       # Temporary skip passing the details_key forward.
       def disable_cache: () { () -> untyped } -> untyped
 
+      private
+
       def _set_detail: (untyped key, untyped value) -> untyped
     end
 
@@ -8898,6 +8990,8 @@ module ActionView
       # Adds fallbacks to the view paths. Useful in cases when you are rendering
       # a :file.
       def with_fallbacks: () { () -> untyped } -> untyped
+
+      private
 
       # Whenever setting view paths, makes a copy so that we can manipulate them in
       # instance objects as we wish.
@@ -8929,7 +9023,11 @@ module ActionView
 
     def with_prepended_formats: (untyped formats) -> untyped
 
+    private
+
     def initialize_details: (untyped target, untyped details) -> untyped
+
+    public
 
     # Override formats= to expand ["*/*"] values and automatically
     # add :html as fallback to :js.
@@ -8989,6 +9087,8 @@ module ActionView
     def exists?: (untyped path, untyped prefixes, *untyped args) -> untyped
 
     def find_all_with_query: (untyped query) -> (untyped | ::Array[untyped])
+
+    private
 
     def _find_all: (untyped path, untyped prefixes, untyped args) -> (untyped | ::Array[untyped])
 
@@ -9055,6 +9155,8 @@ module ActionView
   #     end
   #   end
   module RecordIdentifier
+    extend ::ActionView::RecordIdentifier
+
     extend ModelNaming
 
     include ModelNaming
@@ -9085,6 +9187,8 @@ module ActionView
     #   dom_id(Post.find(45), :edit) # => "edit_post_45"
     #   dom_id(Post.new, :custom)    # => "custom_post"
     def dom_id: (untyped record, ?untyped? prefix) -> untyped
+
+    private
 
     def record_key_for_dom_id: (untyped record) -> untyped
   end
@@ -9134,6 +9238,8 @@ module ActionView
       EMPTY_SPACER: untyped
     end
 
+    private
+
     def extract_details: (untyped options) -> untyped
 
     def instrument: (untyped name, **untyped options) { (untyped) -> untyped } -> untyped
@@ -9150,6 +9256,8 @@ module ActionView
   module CollectionCaching
     # :nodoc:
     extend ActiveSupport::Concern
+
+    private
 
     def cache_collection_render: (untyped instrumentation_payload, untyped view, untyped template) { () -> untyped } -> untyped
 
@@ -9454,6 +9562,8 @@ module ActionView
 
     def render: (untyped context, untyped options, untyped block) -> untyped
 
+    private
+
     def render_collection: (untyped view, untyped template) -> untyped
 
     def render_partial: (untyped view, untyped template) -> untyped
@@ -9563,11 +9673,15 @@ module ActionView
 
       def each: () { () -> untyped } -> untyped
 
+      private
+
       # This is the same logging logic as in ShowExceptions middleware.
       def log_error: (untyped exception) -> (nil | untyped)
     end
 
     def render_template: (untyped view, untyped template, ?untyped? layout_name, ?::Hash[untyped, untyped] locals) -> (::Array[untyped] | untyped)
+
+    private
 
     def delayed_render: (untyped buffer, untyped template, untyped layout, untyped view, untyped locals) -> untyped
   end
@@ -9577,6 +9691,8 @@ module ActionView
   class TemplateRenderer < AbstractRenderer
     # nodoc:
     def render: (untyped context, untyped options) -> untyped
+
+    private
 
     # Determine the template to be rendered using the given options.
     def determine_template: (untyped options) -> untyped
@@ -9653,6 +9769,8 @@ module ActionView
     def view_renderer: () -> untyped
 
     def render_to_body: (?::Hash[untyped, untyped] options) -> untyped
+
+    private
 
     # Find and render a template based on the options given.
     def _render_template: (untyped options) -> untyped
@@ -9747,6 +9865,8 @@ module ActionView
 
     def url_options: () -> untyped
 
+    private
+
     def _routes_context: () -> untyped
 
     def optimize_routes_generation?: () -> untyped
@@ -9803,6 +9923,8 @@ module ActionView
 
       def annotated_source_code: () -> untyped
 
+      private
+
       def source_location: () -> untyped
 
       def formatted_code_for: (untyped source_code, untyped line_counter, untyped indent) -> untyped
@@ -9828,6 +9950,8 @@ module ActionView
     class Builder
       def call: (untyped template, untyped source) -> untyped
 
+      private
+
       def require_engine: () -> untyped
     end
   end
@@ -9842,6 +9966,8 @@ module ActionView
           def initialize: (untyped input, ?::Hash[untyped, untyped] properties) -> untyped
 
           def evaluate: (untyped action_view_erb_handler_context) -> untyped
+
+          private
 
           def add_text: (untyped text) -> (nil | untyped)
 
@@ -9873,6 +9999,8 @@ module ActionView
         def handles_encoding?: () -> ::TrueClass
 
         def call: (untyped template, untyped source) -> untyped
+
+        private
 
         def valid_encoding: (untyped string, untyped encoding) -> untyped
       end
@@ -10046,6 +10174,8 @@ module ActionView
 
       def size: () -> untyped
 
+      private
+
       def canonical_no_templates: (untyped templates) -> untyped
     end
 
@@ -10061,6 +10191,8 @@ module ActionView
     alias find_all_anywhere find_all
 
     def find_all_with_query: (untyped query) -> untyped
+
+    private
 
     def _find_all: (untyped name, untyped prefix, untyped partial, untyped details, untyped key, untyped locals) -> untyped
 
@@ -10086,6 +10218,8 @@ module ActionView
     def initialize: (?untyped? pattern) -> untyped
 
     def clear_cache: () -> untyped
+
+    private
 
     def _find_all: (untyped name, untyped prefix, untyped partial, untyped details, untyped key, untyped locals) -> untyped
 
@@ -10131,6 +10265,8 @@ module ActionView
     # An Optimized resolver for Rails' most common case.
     # nodoc:
     def initialize: (untyped path) -> untyped
+
+    private
 
     def find_template_paths_from_details: (untyped path, untyped details) -> untyped
 
@@ -10306,6 +10442,8 @@ module ActionView
 
     def marshal_load: (untyped array) -> untyped
 
+    private
+
     # Compile a template. This method ensures a template is compiled
     # just once and removes the source after it is compiled.
     def compile!: (untyped view) -> (nil | untyped)
@@ -10410,6 +10548,8 @@ module ActionView
 
         def new: () -> untyped
 
+        private
+
         def include_helper_modules!: () -> untyped
       end
 
@@ -10435,6 +10575,8 @@ module ActionView
 
         def view_rendered?: (untyped view, untyped expected_locals) -> untyped
       end
+
+      private
 
       # Need to experiment if this priority is the best one: rendered => output_buffer
       def document_root_element: () -> untyped
@@ -10486,6 +10628,8 @@ module ActionView
 
     def to_s: () -> untyped
 
+    private
+
     def query: (untyped path, untyped exts, untyped _, untyped locals, cache: untyped cache) -> untyped
   end
 
@@ -10499,6 +10643,8 @@ module ActionView
     def initialize: (untyped source, untyped identifer, untyped handler, untyped options) -> untyped
 
     def bind_locals: (untyped locals) -> untyped
+
+    private
 
     def build_template: (untyped locals) -> Template
   end
@@ -10519,6 +10665,8 @@ module ActionView
       def _view_paths=: (untyped paths) -> untyped
 
       def _prefixes: () -> untyped
+
+      private
 
       # Override this method in your controller if you want to change paths prefixes for finding views.
       # Prefixes defined here will still be added to parents' <tt>._prefixes</tt>.

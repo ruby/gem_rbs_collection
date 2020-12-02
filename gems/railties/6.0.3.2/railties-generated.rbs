@@ -38,6 +38,8 @@ end
 class RDoc::Generator::API < RDoc::Generator::SDoc
   def generate_class_tree_level: (untyped classes, ?::Hash[untyped, untyped] visited) -> untyped
 
+  private
+
   def build_core_ext_subtree: (untyped classes, untyped visited) -> untyped
 
   def core_extension?: (untyped klass) -> untyped
@@ -84,6 +86,9 @@ end
 
 module Rails
   module AppLoader
+    # :nodoc:
+    extend ::Rails::AppLoader
+
     RUBY: untyped
 
     EXECUTABLES: ::Array[untyped]
@@ -101,6 +106,8 @@ module Rails
     def self.invoke_from_app_generator: (untyped method) -> untyped
 
     def self.app_generator: () -> untyped
+
+    private
 
     def self.generator_options: () -> untyped
   end
@@ -247,6 +254,8 @@ module Rails
         def respond_to_missing?: (untyped symbol) -> ::TrueClass
       end
 
+      private
+
       def default_credentials_content_path: () -> untyped
 
       def default_credentials_key_path: () -> untyped
@@ -268,6 +277,8 @@ module Rails
       def initialize: (untyped app, untyped config, untyped paths) -> untyped
 
       def build_stack: () -> untyped
+
+      private
 
       def load_rack_cache: () -> (nil | untyped)
 
@@ -323,6 +334,8 @@ module Rails
       def initialize: () -> untyped
 
       def reload!: () -> untyped
+
+      private
 
       def updater: () -> untyped
 
@@ -618,6 +631,8 @@ module Rails
 
     def validate_secret_key_base: (untyped secret_key_base) -> untyped
 
+    private
+
     def generate_development_secret: () -> untyped
 
     def build_request: (untyped env) -> untyped
@@ -630,6 +645,8 @@ module Rails
 
       def []=: (untyped key, untyped value) -> untyped
 
+      private
+
       def convert_key: (untyped key) -> untyped
 
       def convert_value: (untyped value, ?::Hash[untyped, untyped] options) -> untyped
@@ -638,6 +655,8 @@ module Rails
 end
 
 class Rails::ApplicationController < ActionController::Base
+  private
+
   def require_local!: () -> untyped
 
   def local_request?: () -> untyped
@@ -689,6 +708,8 @@ class CodeStatistics
 
   def to_s: () -> untyped
 
+  private
+
   def calculate_statistics: () -> untyped
 
   def calculate_directory_statistics: (untyped directory, ?untyped pattern) -> untyped
@@ -732,6 +753,8 @@ class CodeStatisticsCalculator
   def add_by_file_path: (untyped file_path) -> untyped
 
   def add_by_io: (untyped io, untyped file_type) -> untyped
+
+  private
 
   def file_type: (untyped file_path) -> untyped
 end
@@ -814,6 +837,8 @@ module Rails
       # would return <tt>rails/test</tt>.
       def self.default_command_root: () -> untyped
 
+      private
+
       # Allow the command method to be called perform.
       def self.create_command: (untyped meth) -> untyped
 
@@ -841,6 +866,8 @@ module Rails
         # Track all command subclasses.
         def subclasses: () -> untyped
 
+        private
+
         # Prints a list of generators.
         def print_list: (untyped base, untyped namespaces) -> (nil | untyped)
 
@@ -866,6 +893,8 @@ module Rails
       # nodoc:
       extend ActiveSupport::Concern
 
+      private
+
       def extract_environment_option_from_argument: (?default_environment: untyped default_environment) -> untyped
 
       def acceptable_environment: (?untyped? env) -> untyped
@@ -879,6 +908,8 @@ module Rails
   module Command
     module Helpers
       module Editor
+        private
+
         def ensure_editor_available: (command: untyped command) -> untyped
 
         def catch_editing_exceptions: () { () -> untyped } -> untyped
@@ -891,6 +922,8 @@ module Rails
   module Command
     module Spellchecker
       def self.suggest: (untyped word, from: untyped from) -> untyped
+
+      private
 
       def self.levenshtein_distance: (untyped str1, untyped str2) -> untyped
     end
@@ -918,6 +951,8 @@ module Rails
     def self.root: () -> untyped
 
     def self.print_commands: () -> untyped
+
+    private
 
     COMMANDS_IN_USAGE: ::Array[untyped]
 
@@ -1003,6 +1038,8 @@ module Rails
 
       def show: () -> untyped
 
+      private
+
       def credentials: () -> untyped
 
       def ensure_encryption_key_has_been_added: () -> untyped
@@ -1052,6 +1089,8 @@ module Rails
 
     def database: () -> untyped
 
+    private
+
     def configurations: () -> untyped
 
     def find_cmd_and_exec: (untyped commands, *untyped args) -> untyped
@@ -1098,6 +1137,8 @@ module Rails
       def edit: (untyped file_path) -> untyped
 
       def show: (untyped file_path) -> untyped
+
+      private
 
       def ensure_encryption_key_has_been_added: (untyped key_path) -> untyped
 
@@ -1158,6 +1199,8 @@ module Rails
     class NotesCommand < Base
       def perform: () -> untyped
 
+      private
+
       def display_annotations: () -> untyped
 
       def directories: () -> untyped
@@ -1178,6 +1221,8 @@ module Rails
 
       def perform: (?untyped? `type`, *untyped plugin_args) -> untyped
 
+      private
+
       def run_plugin_generator: (untyped plugin_args) -> untyped
     end
   end
@@ -1193,6 +1238,8 @@ module Rails
 
       def self.perform: (untyped task) -> untyped
 
+      private
+
       def self.rake_tasks: () -> untyped
 
       def self.formatted_rake_tasks: () -> untyped
@@ -1206,6 +1253,8 @@ module Rails
   module Command
     class RoutesCommand < Base
       def perform: () -> untyped
+
+      private
 
       def inspector: () -> ActionDispatch::Routing::RoutesInspector
 
@@ -1242,6 +1291,8 @@ module Rails
 
       def show: () -> untyped
 
+      private
+
       def deprecate_in_favor_of_credentials_and_exit: () -> untyped
     end
   end
@@ -1268,6 +1319,8 @@ module Rails
     def default_options: () -> untyped
 
     def served_url: () -> untyped
+
+    private
 
     def setup_dev_caching: () -> untyped
 
@@ -1296,6 +1349,8 @@ module Rails
       def perform: () -> untyped
 
       def server_options: () -> { user_supplied_options: untyped, server: untyped, :log_stdout => untyped, Port: untyped, Host: untyped, DoNotReverseLookup: ::TrueClass, config: untyped, environment: untyped, daemonize: untyped, pid: untyped, caching: untyped, restart_cmd: untyped, early_hints: untyped }
+
+      private
 
       def user_supplied_options: () -> untyped
 
@@ -1468,6 +1523,8 @@ module Rails
     def self.enable_by_file: () -> untyped
 
     def self.enable_by_argument: (untyped caching) -> untyped
+
+    private
 
     def self.create_cache_file: () -> untyped
 
@@ -1963,6 +2020,8 @@ module Rails
 
     def run_tasks_blocks: () -> untyped
 
+    private
+
     def load_config_initializer: (untyped initializer) -> untyped
 
     def with_inline_jobs: () { () -> untyped } -> untyped
@@ -2020,6 +2079,8 @@ module Rails
         def existing_migration: () -> untyped
 
         alias exists? existing_migration
+
+        private
 
         def on_conflict_behavior: () { () -> untyped } -> untyped
 
@@ -2171,6 +2232,8 @@ module Rails
       #   readme "README"
       def readme: (untyped path) -> untyped
 
+      private
+
       def log: (*untyped args) -> untyped
 
       def execute_command: (untyped executor, untyped command, ?::Hash[untyped, untyped] options) -> untyped
@@ -2262,6 +2325,8 @@ module Rails
       def self.add_shared_options_for: (untyped name) -> untyped
 
       def initialize: (*untyped args) -> untyped
+
+      private
 
       def gemfile_entry: (untyped name, *untyped args) -> untyped
 
@@ -2364,6 +2429,8 @@ module Rails
     module AppName
       # :nodoc:
       RESERVED_NAMES: ::Array[untyped]
+
+      private
 
       def app_name: () -> untyped
 
@@ -2543,6 +2610,8 @@ module Rails
 
       def self.inherited: (untyped base) -> untyped
 
+      private
+
       # Check whether the given class names are already taken by user
       # application or Ruby on Rails.
       def class_collisions: (*untyped class_names) -> (nil | untyped)
@@ -2621,6 +2690,8 @@ module Rails
 
       def convert_database_option_for_jruby: () -> untyped
 
+      private
+
       def mysql_socket: () -> untyped
     end
   end
@@ -2638,6 +2709,8 @@ module Erb
   module Generators
     class MailerGenerator < Base
       def copy_view_files: () -> untyped
+
+      private
 
       def formats: () -> ::Array[:text | :html]
 
@@ -2658,6 +2731,8 @@ module Erb
 
       def copy_view_files: () -> untyped
 
+      private
+
       def available_views: () -> ::Array["index" | "edit" | "show" | "new" | "_form"]
     end
   end
@@ -2666,6 +2741,8 @@ end
 module Erb
   module Generators
     class Base < Rails::Generators::NamedBase
+      private
+
       def formats: () -> ::Array[untyped]
 
       def format: () -> :html
@@ -2696,6 +2773,8 @@ module Rails
       def self.parse: (untyped column_definition) -> untyped
 
       def self.reference?: (untyped `type`) -> untyped
+
+      private
 
       # parse possible attribute options like :limit for string/text/binary/integer, :precision/:scale for decimals or :polymorphic for references/belongs_to
       # when declaring options curly brackets should be used
@@ -2816,6 +2895,8 @@ module Rails
 
       def js_template: (untyped source, untyped destination) -> untyped
 
+      private
+
       attr_reader file_name: untyped
 
       def singular_name: () -> untyped
@@ -2896,6 +2977,8 @@ module Rails
     attr_reader options: untyped
 
     def initialize: (untyped generator) -> untyped
+
+    private
 
     def method_missing: (untyped meth, *untyped args) { () -> untyped } -> untyped
   end
@@ -3054,6 +3137,8 @@ module Rails
 
       def self.banner: () -> ::String
 
+      private
+
       # Define file as an alias to create_file for backwards compatibility.
       def file: (*untyped args) { () -> untyped } -> untyped
 
@@ -3076,6 +3161,8 @@ module Rails
       def prepare!: () -> untyped
 
       def self.default_rc_file: () -> untyped
+
+      private
 
       def handle_version_request!: (untyped argument) -> untyped
 
@@ -3102,6 +3189,8 @@ end
 module Rails
   module Generators
     class AssetsGenerator < NamedBase
+      private
+
       def asset_name: () -> untyped
     end
   end
@@ -3113,6 +3202,8 @@ module Rails
       def create_controller_files: () -> untyped
 
       def add_routes: () -> (nil | untyped)
+
+      private
 
       def file_name: () -> untyped
 
@@ -3140,6 +3231,8 @@ module Rails
 
       def add_credentials_file_silently: (?untyped? template) -> untyped
 
+      private
+
       def credentials: () -> ActiveSupport::EncryptedConfiguration
 
       def credentials_template: () -> ::String
@@ -3165,6 +3258,8 @@ module Rails
 
           def edit_gemfile: () -> untyped
 
+          private
+
           def all_database_gems: () -> untyped
 
           def all_database_gems_regex: () -> ::Regexp
@@ -3184,6 +3279,8 @@ module Rails
       # :nodoc:
       def add_encrypted_file_silently: (untyped file_path, untyped key_path, ?untyped template) -> untyped
 
+      private
+
       def encrypted_file_template: () -> ::String
     end
   end
@@ -3201,6 +3298,8 @@ module Rails
 
       def ignore_key_file_silently: (untyped key_path, ?ignore: untyped ignore) -> untyped
 
+      private
+
       def key_ignore: (untyped key_path) -> untyped
     end
   end
@@ -3211,6 +3310,8 @@ module Rails
     class GeneratorGenerator < NamedBase
       def create_generator_files: () -> untyped
 
+      private
+
       def generator_dir: () -> untyped
     end
   end
@@ -3220,6 +3321,8 @@ module Rails
   module Generators
     class HelperGenerator < NamedBase
       def create_helper_files: () -> untyped
+
+      private
 
       def file_name: () -> untyped
     end
@@ -3246,6 +3349,8 @@ module Rails
       def ignore_master_key_file: () -> untyped
 
       def ignore_master_key_file_silently: () -> untyped
+
+      private
 
       def key_file_generator: () -> EncryptionKeyFileGenerator
 
@@ -3352,6 +3457,8 @@ module Rails
 
       def namespaced_name: () -> untyped
 
+      private
+
       def create_dummy_app: (?untyped? path) -> untyped
 
       def engine?: () -> untyped
@@ -3452,6 +3559,8 @@ module Rails
 
       def create_controller_files: () -> untyped
 
+      private
+
       def permitted_params: () -> untyped
 
       def attachments?: (untyped name) -> untyped
@@ -3480,6 +3589,8 @@ module Rails
       def self.included: (untyped base) -> untyped
 
       def initialize: (*untyped args) -> untyped
+
+      private
 
       attr_reader controller_name: untyped
 
@@ -3549,6 +3660,8 @@ module TestUnit
     class GeneratorGenerator < Base
       def create_generator_files: () -> untyped
 
+      private
+
       def generator_path: () -> untyped
     end
   end
@@ -3566,6 +3679,8 @@ module TestUnit
     class IntegrationGenerator < Base
       def create_test_files: () -> untyped
 
+      private
+
       def file_name: () -> untyped
     end
   end
@@ -3575,6 +3690,8 @@ module TestUnit
   module Generators
     class JobGenerator < Base
       def create_test_file: () -> untyped
+
+      private
 
       def file_name: () -> untyped
     end
@@ -3589,6 +3706,8 @@ module TestUnit
       def create_test_files: () -> untyped
 
       def create_preview_files: () -> untyped
+
+      private
 
       def file_name: () -> untyped
     end
@@ -3606,6 +3725,8 @@ module TestUnit
       def create_test_file: () -> untyped
 
       def create_fixture_file: () -> untyped
+
+      private
 
       def yaml_key_value: (untyped key, untyped value) -> untyped
     end
@@ -3632,6 +3753,8 @@ module TestUnit
 
       def fixture_name: () -> untyped
 
+      private
+
       def attributes_string: () -> untyped
 
       def attributes_hash: () -> (::Hash[untyped, untyped] | untyped)
@@ -3647,6 +3770,8 @@ module TestUnit
   module Generators
     class SystemGenerator < Base
       def create_test_files: () -> untyped
+
+      private
 
       def file_name: () -> untyped
     end
@@ -3804,6 +3929,8 @@ module Rails
         #   create_generated_attribute(:string, 'name')
         def create_generated_attribute: (untyped attribute_type, ?::String name, ?untyped? index) -> untyped
 
+        private
+
         def destination_root_is_set?: () -> untyped
 
         def ensure_current_path: () -> untyped
@@ -3894,6 +4021,8 @@ module Rails
     # commands.
     def self.invoke: (untyped namespace, ?untyped args, ?::Hash[untyped, untyped] config) -> untyped
 
+    private
+
     def self.print_list: (untyped base, untyped namespaces) -> untyped
 
     # Try fallbacks for the given base.
@@ -3933,6 +4062,8 @@ class Rails::InfoController < Rails::ApplicationController
   def properties: () -> untyped
 
   def routes: () -> untyped
+
+  private
 
   def match_route: () { (untyped) -> untyped } -> untyped
 
@@ -3993,6 +4124,8 @@ class Rails::MailersController < Rails::ApplicationController
   def index: () -> untyped
 
   def preview: () -> untyped
+
+  private
 
   def show_previews?: () -> untyped
 
@@ -4079,6 +4212,8 @@ module Rails
 
       def load_paths: () -> untyped
 
+      private
+
       def filter_by: () { (untyped) -> untyped } -> untyped
     end
 
@@ -4121,6 +4256,8 @@ module Rails
 
       alias to_a expanded
 
+      private
+
       def files_in: (untyped path) -> untyped
     end
   end
@@ -4137,6 +4274,8 @@ module Rails
       def initialize: (untyped app, ?untyped? taggers) -> untyped
 
       def call: (untyped env) -> untyped
+
+      private
 
       def call_app: (untyped request, untyped env) -> untyped
 
@@ -4169,6 +4308,8 @@ module Rails
         def respond_to?: (*untyped args) -> untyped
 
         def configure: () { () -> untyped } -> untyped
+
+        private
 
         def method_missing: (*untyped args) { () -> untyped } -> untyped
       end
@@ -4228,6 +4369,8 @@ module Rails
       def to_prepare: () { () -> untyped } -> untyped
 
       def respond_to?: (untyped name, ?bool include_private) -> untyped
+
+      private
 
       def method_missing: (untyped name, *untyped args) { () -> untyped } -> untyped
     end
@@ -4374,6 +4517,8 @@ module Rails
     # subclasses of Railtie so we provide the class method here.
     def self.configure: () { () -> untyped } -> untyped
 
+    private
+
     def self.generate_railtie_name: (untyped string) -> untyped
 
     def self.respond_to_missing?: (untyped name, untyped _) -> untyped
@@ -4434,6 +4579,8 @@ module Rails
     def self.write: (untyped contents) -> untyped
 
     def self.read_for_editing: () { () -> untyped } -> untyped
+
+    private
 
     def self.handle_missing_key: () -> untyped
 
@@ -4564,6 +4711,8 @@ module Rails
 
     def relative_path_for: (untyped file) -> untyped
 
+    private
+
     def output_inline?: () -> untyped
 
     def fail_fast?: () -> untyped
@@ -4597,6 +4746,8 @@ module Rails
 
       def self.compose_filter: (untyped runnable, untyped filter) -> untyped
 
+      private
+
       def self.extract_filters: (untyped argv) -> untyped
     end
 
@@ -4609,6 +4760,8 @@ module Rails
       # minitest uses === to find matching filters.
       def ===: (untyped method) -> untyped
 
+      private
+
       def derive_named_filter: (untyped filter) -> untyped
 
       def derive_line_filters: (untyped patterns) -> untyped
@@ -4619,6 +4772,8 @@ module Rails
       def initialize: (untyped runnable, untyped file, untyped line) -> untyped
 
       def ===: (untyped method) -> (nil | untyped)
+
+      private
 
       def definition_for: (untyped method) -> untyped
     end

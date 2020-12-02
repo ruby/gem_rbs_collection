@@ -43,6 +43,8 @@ module ActiveJob
   end
 
   module Arguments
+    extend ::ActiveJob::Arguments
+
     # Serializes a set of arguments. Intrinsic types that can safely be
     # serialized without mutation are returned as-is. Arrays/Hashes are
     # serialized element by element. All other types are serialized using
@@ -54,6 +56,8 @@ module ActiveJob
     # deserialized element by element. All other types are deserialized using
     # GlobalID.
     def deserialize: (untyped arguments) -> untyped
+
+    private
 
     # :nodoc:
     PERMITTED_TYPES: ::Array[untyped]
@@ -75,14 +79,6 @@ module ActiveJob
 
     # :nodoc:
     RESERVED_KEYS: ::Array[untyped]
-
-    def self.ruby2_keywords_hash?: (untyped hash) -> untyped
-
-    def self.ruby2_keywords_hash?: (untyped hash) -> ::FalseClass
-
-    def self.ruby2_keywords_hash: (untyped hash) -> untyped
-
-    def self._ruby2_keywords_hash: (*untyped args) -> untyped
 
     def serialize_argument: (untyped argument) -> untyped
 
@@ -431,6 +427,8 @@ module ActiveJob
     #    end
     def deserialize: (untyped job_data) -> untyped
 
+    private
+
     def serialize_arguments_if_needed: (untyped arguments) -> untyped
 
     def deserialize_arguments_if_needed: () -> untyped
@@ -460,6 +458,8 @@ module ActiveJob
       # Returns an instance of the job class queued with arguments available in
       # Job#arguments.
       def perform_later: (*untyped args) -> untyped
+
+      private
 
       def job_or_instantiate: (*untyped args) -> untyped
     end
@@ -574,6 +574,8 @@ module ActiveJob
     #  end
     def retry_job: (?::Hash[untyped, untyped] options) -> untyped
 
+    private
+
     def determine_delay: (executions: untyped executions, seconds_or_duration_or_algorithm: untyped seconds_or_duration_or_algorithm) -> untyped
 
     def instrument: (untyped name, ?wait: untyped? wait, ?error: untyped? error) { () -> untyped } -> untyped
@@ -631,6 +633,8 @@ module ActiveJob
     # nodoc:
     extend ActiveSupport::Concern
 
+    private
+
     def tag_logger: (*untyped tags) { () -> untyped } -> untyped
 
     def logger_tagged_by_active_job?: () -> untyped
@@ -650,6 +654,8 @@ module ActiveJob
       def retry_stopped: (untyped event) -> untyped
 
       def discard: (untyped event) -> untyped
+
+      private
 
       def queue_name: (untyped event) -> untyped
 
@@ -685,6 +691,8 @@ module ActiveJob
       # is the +:async+ queue. See QueueAdapters for more
       # information.
       def queue_adapter=: (untyped name_or_adapter) -> untyped
+
+      private
 
       def assign_adapter: (untyped adapter_name, untyped queue_adapter) -> untyped
 
@@ -1049,6 +1057,8 @@ module ActiveJob
 
       def enqueue_at: (untyped job, untyped timestamp) -> untyped
 
+      private
+
       def job_to_hash: (untyped job, ?::Hash[untyped, untyped] extras) -> untyped
 
       def perform_or_enqueue: (untyped perform, untyped job, untyped job_data) -> untyped
@@ -1267,6 +1277,8 @@ module ActiveJob
 
       def deserialize: (untyped hash) -> untyped
 
+      private
+
       def klass: () -> untyped
     end
   end
@@ -1280,6 +1292,8 @@ module ActiveJob
 
       def deserialize: (untyped hash) -> untyped
 
+      private
+
       def klass: () -> untyped
     end
   end
@@ -1292,6 +1306,8 @@ module ActiveJob
       def serialize: (untyped duration) -> untyped
 
       def deserialize: (untyped hash) -> untyped
+
+      private
 
       def klass: () -> untyped
     end
@@ -1331,6 +1347,8 @@ module ActiveJob
       # Deserializes an argument from a JSON primitive type.
       def deserialize: (untyped _argument) -> untyped
 
+      private
+
       def klass: () -> untyped
     end
   end
@@ -1343,6 +1361,8 @@ module ActiveJob
       def serialize: (untyped argument) -> untyped
 
       def deserialize: (untyped argument) -> untyped
+
+      private
 
       def klass: () -> untyped
     end
@@ -1357,6 +1377,8 @@ module ActiveJob
 
       def deserialize: (untyped hash) -> untyped
 
+      private
+
       def klass: () -> untyped
     end
   end
@@ -1369,6 +1391,8 @@ module ActiveJob
       def serialize: (untyped time) -> untyped
 
       def deserialize: (untyped hash) -> untyped
+
+      private
 
       def klass: () -> untyped
     end
@@ -1856,6 +1880,8 @@ module ActiveJob
     #   end
     def queue_adapter: () -> untyped
 
+    private
+
     def clear_enqueued_jobs: () -> untyped
 
     def clear_performed_jobs: () -> untyped
@@ -1913,6 +1939,8 @@ module Rails
       def self.default_generator_root: () -> untyped
 
       def create_job_file: () -> untyped
+
+      private
 
       def file_name: () -> untyped
 
