@@ -173,6 +173,10 @@ module ActionView
 
     attr_reader lookup_context: untyped
 
+    attr_accessor config(@_config): untyped
+
+    attr_accessor assigns(@_assigns): untyped
+
     def assign: (untyped new_assigns) -> untyped
 
     def self.build_lookup_context: (untyped context) -> untyped
@@ -1737,6 +1741,18 @@ end
 module ActionView
   module Helpers
     module ControllerHelper
+      # nodoc:
+      # This module keeps all methods and behavior in ActionView
+      # that simply delegates to the controller.
+      # nodoc:
+      attr_accessor controller(@_controller): untyped
+
+      # nodoc:
+      # This module keeps all methods and behavior in ActionView
+      # that simply delegates to the controller.
+      # nodoc:
+      attr_accessor request(@_request): untyped
+
       CONTROLLER_DELEGATES: ::Array[untyped]
 
       def assign_controller: (untyped controller) -> untyped
@@ -2716,6 +2732,8 @@ module ActionView
       include ModelNaming
 
       include RecordIdentifier
+
+      attr_accessor default_form_builder(@_default_form_builder): untyped
 
       # Creates a form that allows the user to create or update the attributes
       # of a specific model object.
@@ -8829,6 +8847,8 @@ module ActionView
     end
 
     def _normalize_options: (untyped options) -> untyped
+
+    attr_writer action_has_layout(@_action_has_layout): untyped
 
     def initialize: () -> untyped
 

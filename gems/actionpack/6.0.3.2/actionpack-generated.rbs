@@ -39,6 +39,18 @@ module AbstractController
   # expected to provide their own +render+ method, since rendering means
   # different things depending on the context.
   class Base
+    #
+    # Returns the body of the HTTP response sent by the controller.
+    attr_accessor response_body(@_response_body): untyped
+
+    #
+    # Returns the name of the action this controller is processing.
+    attr_accessor action_name(@_action_name): untyped
+
+    #
+    # Returns the formats that can be processed by the controller.
+    attr_accessor formats(@_formats): untyped
+
     include ActiveSupport::Configurable
 
     extend ActiveSupport::DescendantsTracker
@@ -2067,6 +2079,8 @@ module ActionController
     extend ActiveSupport::Concern
 
     include AbstractController::Logger
+
+    attr_accessor view_runtime(@_view_runtime): untyped
 
     def process_action: (*untyped args) -> untyped
 
@@ -4205,6 +4219,10 @@ module ActionController
 
     # Delegates to the class' <tt>controller_name</tt>.
     def controller_name: () -> untyped
+
+    attr_accessor response(@_response): untyped
+
+    attr_accessor request(@_request): untyped
 
     def initialize: () -> untyped
 
