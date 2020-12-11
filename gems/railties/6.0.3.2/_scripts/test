@@ -1,0 +1,13 @@
+#!ruby
+
+require 'pathname'
+
+def sh!(*args, **kwargs)
+  system(*args, **kwargs, exception: true)
+end
+
+base = Pathname(__dir__) / '../'
+repo = base.join('../../').to_s
+
+sh!('bundle', 'install', chdir: base.join('_rbs_rails'))
+sh!({ 'RAILS_VERSION' => '6.0.3.2', 'RBS_REPO_DIR' => repo }, 'bundle', 'exec', 'rake', chdir: base.join('_rbs_rails'))
