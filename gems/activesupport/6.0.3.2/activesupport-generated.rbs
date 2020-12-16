@@ -2378,7 +2378,7 @@ end
 class Date
   include DateAndTime::Calculations
 
-  attr_accessor beginning_of_week_default: untyped
+  attr_accessor self.beginning_of_week_default: untyped
 
   # Returns the week start (e.g. :monday) for the current request, if this has been set (via Date.beginning_of_week=).
   # If <tt>Date.beginning_of_week</tt> has not been set for the current request, returns the week start specified in <tt>config.beginning_of_week</tt>.
@@ -3699,7 +3699,7 @@ class Module
 
   alias attr_internal attr_internal_accessor
 
-  attr_accessor attr_internal_naming_format: untyped
+  attr_accessor self.attr_internal_naming_format: untyped
 
   private
 
@@ -6231,7 +6231,7 @@ end
 class Time
   include DateAndTime::Zones
 
-  attr_accessor zone_default: untyped
+  attr_accessor self.zone_default: untyped
 
   # Returns the TimeZone for the current request, if this has been set (via Time.zone=).
   # If <tt>Time.zone</tt> has not been set for the current request, returns the TimeZone specified in <tt>config.time_zone</tt>.
@@ -7720,7 +7720,7 @@ module ActiveSupport
     def self.wrap: () { () -> untyped } -> untyped
 
     # :nodoc:
-    attr_accessor active: untyped
+    attr_accessor self.active: untyped
 
     def self.inherited: (untyped other) -> untyped
 
@@ -8789,19 +8789,19 @@ module ActiveSupport
 
       # If true, use ISO 8601 format for dates and times. Otherwise, fall back
       # to the Active Support legacy format.
-      attr_accessor use_standard_json_time_format: untyped
+      attr_accessor self.use_standard_json_time_format: untyped
 
       # If true, encode >, <, & as escaped unicode sequences (e.g. > as \u003e)
       # as a safety measure.
-      attr_accessor escape_html_entities_in_json: untyped
+      attr_accessor self.escape_html_entities_in_json: untyped
 
       # Sets the precision of encoded time values.
       # Defaults to 3 (equivalent to millisecond precision)
-      attr_accessor time_precision: untyped
+      attr_accessor self.time_precision: untyped
 
       # Sets the encoder used by Rails to encode Ruby objects into JSON strings
       # in +Object#to_json+ and +ActiveSupport::JSON.encode+.
-      attr_accessor json_encoder: untyped
+      attr_accessor self.json_encoder: untyped
     end
   end
 end
@@ -9021,7 +9021,7 @@ module ActiveSupport
 
     def self.logger: () -> untyped
 
-    attr_writer logger: untyped
+    attr_writer self.logger: untyped
 
     def self.log_subscribers: () -> untyped
 
@@ -10083,7 +10083,7 @@ module ActiveSupport
   # to all log subscribers. You can use any queue implementation you want.
   #
   module Notifications
-    attr_accessor notifier: untyped
+    attr_accessor self.notifier: untyped
 
     def self.publish: (untyped name, *untyped args) -> untyped
 
@@ -11123,11 +11123,11 @@ module ActiveSupport
 
     private
 
-    attr_reader subscriber: untyped
+    attr_reader self.subscriber: untyped
 
-    attr_reader notifier: untyped
+    attr_reader self.notifier: untyped
 
-    attr_reader namespace: untyped
+    attr_reader self.namespace: untyped
 
     def self.add_event_subscriber: (untyped event) -> (nil | untyped)
 
