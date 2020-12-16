@@ -2498,27 +2498,6 @@ class Date
 
   # Overrides the default inspect method with a human readable one, e.g., "Mon, 21 Feb 2005"
   def readable_inspect: () -> untyped
-
-  # Converts a Date instance to a Time, where the time is set to the beginning of the day.
-  # The timezone can be either :local or :utc (default :local).
-  #
-  #   date = Date.new(2007, 11, 10)  # => Sat, 10 Nov 2007
-  #
-  #   date.to_time                   # => 2007-11-10 00:00:00 0800
-  #   date.to_time(:local)           # => 2007-11-10 00:00:00 0800
-  #
-  #   date.to_time(:utc)             # => 2007-11-10 00:00:00 UTC
-  #
-  # NOTE: The :local timezone is Ruby's *process* timezone, i.e. ENV['TZ'].
-  #       If the *application's* timezone is needed, then use +in_time_zone+ instead.
-  def to_time: (?::Symbol form) -> untyped
-
-  # Returns a string which represents the time in used time zone as DateTime
-  # defined by XML Schema:
-  #
-  #   date = Date.new(2015, 05, 23)  # => Sat, 23 May 2015
-  #   date.xmlschema                 # => "2015-05-23T00:00:00+04:00"
-  def xmlschema: () -> untyped
 end
 
 class Date
@@ -2945,12 +2924,6 @@ end
 
 class DateTime
   include DateAndTime::Compatibility
-
-  # Either return an instance of +Time+ with the same UTC offset
-  # as +self+ or an instance of +Time+ representing the same time
-  # in the local system timezone depending on the setting of
-  # on the setting of +ActiveSupport.to_time_preserves_timezone+.
-  def to_time: () -> untyped
 end
 
 class DateTime
@@ -3058,26 +3031,6 @@ module Enumerable[unchecked out Elem]
   # doesn't work well https://bugs.ruby-lang.org/issues/13446
   alias _original_sum_with_required_identity sum
 
-  # Calculates a sum from the elements.
-  #
-  #  payments.sum { |p| p.price * p.tax_rate }
-  #  payments.sum(&:price)
-  #
-  # The latter is a shortcut for:
-  #
-  #  payments.inject(0) { |sum, p| sum + p.price }
-  #
-  # It can also calculate the sum without the use of a block.
-  #
-  #  [5, 15, 10].sum # => 30
-  #  ['foo', 'bar'].sum # => "foobar"
-  #  [[1, 2], [3, 1, 5]].sum # => [1, 2, 3, 1, 5]
-  #
-  # The default sum of an empty list is zero. You can override this default:
-  #
-  #  [].sum(Payment.new(0)) { |i| i.amount } # => Payment.new(0)
-  def sum: (?untyped? identity) { () -> untyped } -> untyped
-
   # Convert an enumerable to a hash keying it by the block return value.
   #
   #   people.index_by(&:login)
@@ -3147,9 +3100,6 @@ class Range[out Elem]
 end
 
 class Array[unchecked out Elem]
-  # nodoc:
-  # Array#sum was added in Ruby 2.4 but it only works with Numeric elements.
-  def sum: (?untyped? init) { () -> untyped } -> untyped
 end
 
 class File
@@ -9909,10 +9859,6 @@ module ActiveSupport
       def now: () -> untyped
 
       def now_cpu: () -> untyped
-
-      def now_cpu: () -> 0
-
-      def now_allocations: () -> 0
 
       def now_allocations: () -> untyped
     end
