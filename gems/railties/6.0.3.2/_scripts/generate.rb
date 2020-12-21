@@ -111,6 +111,8 @@ def patch!(name, rbs)
     rbs.gsub!('def sum: (?untyped? init) { () -> untyped } -> untyped', '# def sum: (?untyped? init) { () -> untyped } -> untyped') or raise
     rbs.gsub!('def now_cpu: () -> 0', '# def now_cpu: () -> 0') or raise
     rbs.gsub!('def now_allocations: () -> 0', '# def now_allocations: () -> 0') or raise
+
+    rbs.gsub!('module Tryable', 'module Tryable : BasicObject') or raise
   when 'actionview'
     rbs.gsub!(
       'class CheckBoxBuilder < Builder',
@@ -185,6 +187,9 @@ def patch!(name, rbs)
     rbs.gsub!(
       'def []: (untyped name) -> Attribute',
       'def []: (untyped name) -> ::Arel::Attributes::Attribute')
+
+    rbs.gsub!('module TestDatabases', 'module TestDatabases : BasicObject') or raise
+    rbs.gsub!('module TestFixtures', 'module TestFixtures : BasicObject') or raise
   end
 end
 
