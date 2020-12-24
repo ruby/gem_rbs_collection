@@ -1359,7 +1359,7 @@ module ActiveModel
 
     MESSAGE_OPTIONS: ::Array[untyped]
 
-    attr_accessor i18n_customize_full_message: untyped
+    attr_accessor self.i18n_customize_full_message: untyped
 
     attr_reader messages: untyped
 
@@ -2079,7 +2079,7 @@ module ActiveModel
     # Hence need to put a restriction on password length.
     MAX_PASSWORD_LENGTH_ALLOWED: ::Integer
 
-    attr_accessor min_cost: untyped
+    attr_accessor self.min_cost: untyped
 
     module ClassMethods
       # Adds methods to set and authenticate against a BCrypt password.
@@ -2457,7 +2457,7 @@ module ActiveModel
   module Type
     class Binary < Value
       # :nodoc:
-      def `type`: () -> :binary
+      def type: () -> :binary
 
       def binary?: () -> ::TrueClass
 
@@ -2499,7 +2499,7 @@ module ActiveModel
     class Boolean < Value
       FALSE_VALUES: untyped
 
-      def `type`: () -> :boolean
+      def type: () -> :boolean
 
       def serialize: (untyped value) -> untyped
 
@@ -2516,7 +2516,7 @@ module ActiveModel
       # :nodoc:
       include Helpers::Timezone
 
-      def `type`: () -> :date
+      def type: () -> :date
 
       def type_cast_for_schema: (untyped value) -> untyped
 
@@ -2545,7 +2545,7 @@ module ActiveModel
 
       include Helpers::TimeValue
 
-      def `type`: () -> :datetime
+      def type: () -> :datetime
 
       private
 
@@ -2570,7 +2570,7 @@ module ActiveModel
 
       BIGDECIMAL_PRECISION: ::Integer
 
-      def `type`: () -> :decimal
+      def type: () -> :decimal
 
       def type_cast_for_schema: (untyped value) -> untyped
 
@@ -2593,7 +2593,7 @@ module ActiveModel
       # :nodoc:
       include Helpers::Numeric
 
-      def `type`: () -> :float
+      def type: () -> :float
 
       def type_cast_for_schema: (untyped value) -> ("::Float::NAN" | untyped)
 
@@ -2697,7 +2697,7 @@ module ActiveModel
   module Type
     class ImmutableString < Value
       # :nodoc:
-      def `type`: () -> :string
+      def type: () -> :string
 
       def serialize: (untyped value) -> untyped
 
@@ -2720,7 +2720,7 @@ module ActiveModel
 
       def initialize: () -> untyped
 
-      def `type`: () -> :integer
+      def type: () -> :integer
 
       def deserialize: (untyped value) -> (nil | untyped)
 
@@ -2800,7 +2800,7 @@ module ActiveModel
 
       include Helpers::TimeValue
 
-      def `type`: () -> :time
+      def type: () -> :time
 
       def user_input_in_time_zone: (untyped value) -> (nil | untyped)
 
@@ -2822,7 +2822,7 @@ module ActiveModel
 
       def initialize: (?scale: untyped? scale, ?limit: untyped? limit, ?precision: untyped? precision) -> untyped
 
-      def `type`: () -> nil
+      def type: () -> nil
 
       # Converts a value from database input to the appropriate ruby type. The
       # return value of this method will be returned from
@@ -2901,7 +2901,7 @@ end
 
 module ActiveModel
   module Type
-    attr_accessor registry: untyped
+    attr_accessor self.registry: untyped
 
     # Add a new type to the registry, allowing it to be gotten through ActiveModel::Type#lookup
     def self.register: (untyped type_name, ?untyped? klass, **untyped options) { () -> untyped } -> untyped

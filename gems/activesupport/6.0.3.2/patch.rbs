@@ -5,13 +5,15 @@ class Object
 end
 
 class Time
-  # alias bug: https://github.com/ruby/rbs/issues/458
+  # It is necessary to satisfy alias target.
+  # TODO: Define this method to correct place.
   def xmlschema: (?::Integer fraction_digits) -> ::String
 end
 
 module ActiveSupport
   class TestCase < ::Minitest::Test
-    # alias bug: https://github.com/ruby/rbs/issues/458
+    # It is necessary to satisfy alias target.
+    # TODO: Define this method to correct place.
     def name: () -> untyped
     def assert_raises: (*untyped) -> untyped
     def refute_empty: (*untyped) -> untyped
@@ -27,22 +29,5 @@ module ActiveSupport
     def refute_predicate: (*untyped) -> untyped
     def refute_respond_to: (*untyped) -> untyped
     def refute_same: (*untyped) -> untyped
-  end
-
-  module Notifications
-    class Fanout
-      module Subscribers
-        class AllMessages
-          # alias bug: https://github.com/ruby/rbs/issues/458
-          def ===: (untyped) -> bool
-        end
-      end
-    end
-  end
-
-  class TimeWithZone
-    # alias bug: https://github.com/ruby/rbs/issues/458
-    def <: (untyped) -> bool
-    def >: (untyped) -> bool
   end
 end

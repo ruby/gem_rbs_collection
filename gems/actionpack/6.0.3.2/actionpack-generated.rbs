@@ -55,7 +55,7 @@ module AbstractController
 
     extend ActiveSupport::DescendantsTracker
 
-    attr_reader abstract: untyped
+    attr_reader self.abstract: untyped
 
     alias self.abstract? self.abstract
 
@@ -1624,7 +1624,7 @@ module ActionController
   module Helpers
     extend ActiveSupport::Concern
 
-    attr_accessor helpers_path: untyped
+    attr_accessor self.helpers_path: untyped
 
     include AbstractController::Helpers
 
@@ -2489,7 +2489,7 @@ module ActionController
 
       def initialize: (untyped mimes, ?untyped? variant) -> untyped
 
-      def `any`: (*untyped args) { () -> untyped } -> untyped
+      def any: (*untyped args) { () -> untyped } -> untyped
 
       alias all any
 
@@ -2503,7 +2503,7 @@ module ActionController
         # nodoc:
         def initialize: (?untyped? variant) -> untyped
 
-        def `any`: (*untyped args) { () -> untyped } -> untyped
+        def any: (*untyped args) { () -> untyped } -> untyped
 
         alias all any
 
@@ -2638,7 +2638,7 @@ module ActionController
 
       def model: () -> untyped
 
-      def `include`: () -> untyped
+      def include: () -> untyped
 
       def name: () -> untyped
 
@@ -5363,7 +5363,7 @@ module ActionDispatch
       end
 
       # Returns the parameter parsers.
-      attr_reader parameter_parsers: untyped
+      attr_reader self.parameter_parsers: untyped
 
       module ClassMethods
         # Configure the parameter parser for a given MIME type.
@@ -5461,8 +5461,6 @@ module ActionDispatch
     def self.empty: () -> untyped
 
     def initialize: (untyped env) -> untyped
-
-    def commit_cookie_jar!: () -> nil
 
     PASS_NOT_FOUND: untyped
 
@@ -6083,6 +6081,8 @@ module ActionDispatch
 
       def self.normalize_port: (untyped port, untyped protocol) { (untyped) -> untyped } -> (nil | untyped)
 
+      public
+
       def initialize: () -> untyped
 
       # Returns the complete URL used for this request.
@@ -6505,7 +6505,7 @@ module ActionDispatch
 
         def name: () -> untyped
 
-        def `type`: () -> untyped
+        def type: () -> untyped
 
         def symbol?: () -> ::FalseClass
 
@@ -6531,7 +6531,7 @@ module ActionDispatch
         # :nodoc:
         def literal?: () -> ::TrueClass
 
-        def `type`: () -> :LITERAL
+        def type: () -> :LITERAL
       end
 
       class Dummy < Literal
@@ -6543,12 +6543,12 @@ module ActionDispatch
 
       class Slash < Terminal
         # :nodoc:
-        def `type`: () -> :SLASH
+        def type: () -> :SLASH
       end
 
       class Dot < Terminal
         # :nodoc:
-        def `type`: () -> :DOT
+        def type: () -> :DOT
       end
 
       class Symbol < Terminal
@@ -6565,7 +6565,7 @@ module ActionDispatch
 
         def default_regexp?: () -> untyped
 
-        def `type`: () -> :SYMBOL
+        def type: () -> :SYMBOL
 
         def symbol?: () -> ::TrueClass
       end
@@ -6577,7 +6577,7 @@ module ActionDispatch
 
       class Group < Unary
         # :nodoc:
-        def `type`: () -> :GROUP
+        def type: () -> :GROUP
 
         def group?: () -> ::TrueClass
       end
@@ -6586,7 +6586,7 @@ module ActionDispatch
         # :nodoc:
         def star?: () -> ::TrueClass
 
-        def `type`: () -> :STAR
+        def type: () -> :STAR
 
         def name: () -> untyped
       end
@@ -6604,7 +6604,7 @@ module ActionDispatch
         # :nodoc:
         def cat?: () -> ::TrueClass
 
-        def `type`: () -> :CAT
+        def type: () -> :CAT
       end
 
       class Or < Node
@@ -6613,7 +6613,7 @@ module ActionDispatch
 
         def initialize: (untyped children) -> untyped
 
-        def `type`: () -> :OR
+        def type: () -> :OR
       end
     end
   end
@@ -10599,7 +10599,7 @@ module ActionDispatch
 
       def append: () { () -> untyped } -> untyped
 
-      def `prepend`: () { () -> untyped } -> untyped
+      def prepend: () { () -> untyped } -> untyped
 
       private
 
@@ -11344,7 +11344,7 @@ module ActionDispatch
 
       def initialize: (untyped name) -> untyped
 
-      def `type`: () -> untyped
+      def type: () -> untyped
 
       def options: () -> untyped
 
@@ -11397,7 +11397,7 @@ end
 module ActionDispatch
   module SystemTesting
     class Server
-      attr_accessor silence_puma: untyped
+      attr_accessor self.silence_puma: untyped
 
       def run: () -> untyped
 

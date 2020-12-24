@@ -657,7 +657,7 @@ end
 
 module ActiveRecord::Associations::Builder
   class Association
-    attr_accessor extensions: untyped
+    attr_accessor self.extensions: untyped
 
     VALID_OPTIONS: ::Array[untyped]
 
@@ -1641,7 +1641,7 @@ module ActiveRecord
 
       alias concat <<
 
-      def `prepend`: (*untyped args) -> untyped
+      def prepend: (*untyped args) -> untyped
 
       # Equivalent to +delete_all+. The difference is that returns +self+, instead
       # of an array with the deleted objects, so methods can be chained. See
@@ -6182,6 +6182,8 @@ module ActiveRecord
 
         def self.spawn_thread: (untyped frequency) -> untyped
 
+        public
+
         def run: () -> (nil | untyped)
       end
 
@@ -10125,7 +10127,7 @@ module ActiveRecord
         class Bit < ActiveModel::Type::Value
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :bit
+          def type: () -> :bit
 
           def cast_value: (untyped value) -> untyped
 
@@ -10157,7 +10159,7 @@ module ActiveRecord
         class BitVarying < OID::Bit
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :bit_varying
+          def type: () -> :bit_varying
         end
       end
     end
@@ -10185,7 +10187,7 @@ module ActiveRecord
         class Cidr < ActiveModel::Type::Value
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :cidr
+          def type: () -> :cidr
 
           def type_cast_for_schema: (untyped value) -> untyped
 
@@ -10247,7 +10249,7 @@ module ActiveRecord
         class Enum < ActiveModel::Type::Value
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :enum
+          def type: () -> :enum
 
           private
 
@@ -10267,7 +10269,7 @@ module ActiveRecord
           # :nodoc:
           include ActiveModel::Type::Helpers::Mutable
 
-          def `type`: () -> :hstore
+          def type: () -> :hstore
 
           def deserialize: (untyped value) -> untyped
 
@@ -10299,7 +10301,7 @@ module ActiveRecord
         class Inet < Cidr
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :inet
+          def type: () -> :inet
         end
       end
     end
@@ -10313,7 +10315,7 @@ module ActiveRecord
         class Jsonb < Type::Json
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :jsonb
+          def type: () -> :jsonb
         end
       end
     end
@@ -10329,7 +10331,7 @@ module ActiveRecord
           # :nodoc:
           include ActiveModel::Type::Helpers::Mutable
 
-          def `type`: () -> :point
+          def type: () -> :point
 
           def cast: (untyped value) -> untyped
 
@@ -10351,7 +10353,7 @@ module ActiveRecord
         class Money < ActiveModel::Type::Decimal
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :money
+          def type: () -> :money
 
           def scale: () -> 2
 
@@ -10369,7 +10371,7 @@ module ActiveRecord
         class Oid < Type::UnsignedInteger
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :oid
+          def type: () -> :oid
         end
       end
     end
@@ -10391,7 +10393,7 @@ module ActiveRecord
           # :nodoc:
           include ActiveModel::Type::Helpers::Mutable
 
-          def `type`: () -> :point
+          def type: () -> :point
 
           def cast: (untyped value) -> untyped
 
@@ -10526,7 +10528,7 @@ module ActiveRecord
 
           alias serialize deserialize
 
-          def `type`: () -> :uuid
+          def type: () -> :uuid
 
           private
 
@@ -10572,7 +10574,7 @@ module ActiveRecord
         class Xml < ActiveModel::Type::String
           # :nodoc:
           # :nodoc:
-          def `type`: () -> :xml
+          def type: () -> :xml
 
           def serialize: (untyped value) -> (nil | Data)
 
@@ -12551,7 +12553,7 @@ module ActiveRecord
     def method_missing: (untyped name, *untyped arguments) { () -> untyped } -> untyped
 
     class Method
-      attr_reader matchers: untyped
+      attr_reader self.matchers: untyped
 
       def self.match: (untyped model, untyped name) -> untyped
 
@@ -13642,6 +13644,8 @@ module ActiveRecord
 
     def self.update_all_loaded_fixtures: (untyped fixtures_map) -> untyped
 
+    public
+
     attr_reader table_name: untyped
 
     attr_reader name: untyped
@@ -13665,6 +13669,8 @@ module ActiveRecord
     # Returns a hash of rows to be inserted. The key is the table, the value is
     # a list of rows to insert to that table.
     def table_rows: () -> untyped
+
+    private
 
     def model_class=: (untyped class_name) -> untyped
 
@@ -15165,9 +15171,9 @@ module ActiveRecord
       def connection: () -> untyped
     end
 
-    attr_accessor delegate: untyped
+    attr_accessor self.delegate: untyped
 
-    attr_accessor disable_ddl_transaction: untyped
+    attr_accessor self.disable_ddl_transaction: untyped
 
     def self.nearest_delegate: () -> untyped
 
@@ -15427,7 +15433,7 @@ module ActiveRecord
   end
 
   class Migrator
-    attr_accessor migrations_paths: untyped
+    attr_accessor self.migrations_paths: untyped
 
     # For cases where a table doesn't exist like loading from schema cache
     def self.current_version: () -> untyped
@@ -16182,6 +16188,8 @@ module ActiveRecord
     private
 
     def self.klasses: () -> untyped
+
+    public
 
     # Returns +true+ if the class has +no_touching+ set, +false+ otherwise.
     #
@@ -17027,6 +17035,8 @@ module ActiveRecord
     private
 
     def self.reflection_class_for: (untyped macro) -> untyped
+
+    public
 
     # \Reflection enables the ability to examine the associations and aggregations of
     # Active Record classes and objects. This information, for example,
@@ -20260,7 +20270,11 @@ module ActiveRecord
 
     def self.generate_options: (untyped config) -> { table_name_prefix: untyped, table_name_suffix: untyped }
 
+    public
+
     def dump: (untyped stream) -> untyped
+
+    private
 
     attr_accessor table_name: untyped
 
@@ -20785,7 +20799,7 @@ module ActiveRecord
   module Store
     extend ActiveSupport::Concern
 
-    attr_accessor local_stored_attributes: untyped
+    attr_accessor self.local_stored_attributes: untyped
 
     module ClassMethods
       def store: (untyped store_attribute, ?::Hash[untyped, untyped] options) -> untyped
@@ -20896,7 +20910,7 @@ module ActiveRecord
 
     def arel_attribute: (untyped column_name) -> untyped
 
-    def `type`: (untyped column_name) -> untyped
+    def type: (untyped column_name) -> untyped
 
     def has_column?: (untyped column_name) -> untyped
 
@@ -21218,13 +21232,13 @@ module ActiveRecord
 end
 
 module ActiveRecord
-  module TestDatabases
+  module TestDatabases : BasicObject
     def self.create_and_load_schema: (untyped i, env_name: untyped env_name) -> untyped
   end
 end
 
 module ActiveRecord
-  module TestFixtures
+  module TestFixtures : BasicObject
     extend ActiveSupport::Concern
 
     def before_setup: () -> untyped
@@ -21809,7 +21823,7 @@ module ActiveRecord
   module Type
     class DecimalWithoutScale < ActiveModel::Type::BigInteger
       # :nodoc:
-      def `type`: () -> :decimal
+      def type: () -> :decimal
 
       def type_cast_for_schema: (untyped value) -> untyped
     end
@@ -21850,7 +21864,7 @@ module ActiveRecord
     class Json < ActiveModel::Type::Value
       include ActiveModel::Type::Helpers::Mutable
 
-      def `type`: () -> :json
+      def type: () -> :json
 
       def deserialize: (untyped value) -> untyped
 
@@ -21902,7 +21916,7 @@ module ActiveRecord
   module Type
     class Text < ActiveModel::Type::String
       # :nodoc:
-      def `type`: () -> :text
+      def type: () -> :text
     end
   end
 end
@@ -21957,7 +21971,7 @@ end
 
 module ActiveRecord
   module Type
-    attr_accessor registry: untyped
+    attr_accessor self.registry: untyped
 
     # Add a new type to the registry, allowing it to be referenced as a
     # symbol by {ActiveRecord::Base.attribute}[rdoc-ref:Attributes::ClassMethods#attribute].
@@ -21976,6 +21990,8 @@ module ActiveRecord
     private
 
     def self.current_adapter_name: () -> untyped
+
+    public
 
     BigInteger: untyped
 
@@ -23616,7 +23632,7 @@ module Arel
 
     def between: (untyped other) -> untyped
 
-    def `in`: (untyped other) -> untyped
+    def in: (untyped other) -> untyped
 
     def in_any: (untyped others) -> untyped
 
@@ -23794,7 +23810,7 @@ module Arel
 
     include Arel::FactoryMethods
 
-    attr_accessor engine: untyped
+    attr_accessor self.engine: untyped
 
     attr_accessor name: untyped
 
@@ -23805,7 +23821,7 @@ module Arel
 
     def initialize: (untyped name, ?type_caster: untyped? type_caster, ?as: untyped? as) -> untyped
 
-    def `alias`: (?::String name) -> Nodes::TableAlias
+    def alias: (?::String name) -> Nodes::TableAlias
 
     def from: () -> SelectManager
 

@@ -506,6 +506,8 @@ module ActiveSupport
 
       def self.build_redis_client: (url: untyped url, **untyped redis_options) -> untyped
 
+      public
+
       attr_reader redis_options: untyped
 
       attr_reader max_key_bytesize: untyped
@@ -601,6 +603,8 @@ module ActiveSupport
       def mget_capable?: () -> untyped
 
       def mset_capable?: () -> untyped
+
+      private
 
       def set_redis_capabilities: () -> untyped
 
@@ -812,6 +816,8 @@ module ActiveSupport
     # Raises an error when the store class cannot be found.
     def self.retrieve_store_class: (untyped store) -> untyped
 
+    public
+
     # An abstract cache store class. There are multiple cache store
     # implementations, each having its own additional features. See the classes
     # under the ActiveSupport::Cache module, e.g.
@@ -866,6 +872,8 @@ module ActiveSupport
       def self.retrieve_pool_options: (untyped options) -> untyped
 
       def self.ensure_connection_pool_added!: () -> untyped
+
+      public
 
       # Creates a new cache. The options will be passed to any write method calls
       # except for <tt>:namespace</tt> which can be used to set the global
@@ -1095,6 +1103,8 @@ module ActiveSupport
       #
       # Some implementations may not support this method.
       def clear: (?untyped? options) -> untyped
+
+      private
 
       def key_matcher: (untyped pattern, untyped options) -> untyped
 
@@ -1463,7 +1473,7 @@ module ActiveSupport
 
       def append: (*untyped callbacks) -> untyped
 
-      def `prepend`: (*untyped callbacks) -> untyped
+      def prepend: (*untyped callbacks) -> untyped
 
       attr_reader chain: untyped
 
@@ -2378,7 +2388,7 @@ end
 class Date
   include DateAndTime::Calculations
 
-  attr_accessor beginning_of_week_default: untyped
+  attr_accessor self.beginning_of_week_default: untyped
 
   # Returns the week start (e.g. :monday) for the current request, if this has been set (via Date.beginning_of_week=).
   # If <tt>Date.beginning_of_week</tt> has not been set for the current request, returns the week start specified in <tt>config.beginning_of_week</tt>.
@@ -2498,27 +2508,6 @@ class Date
 
   # Overrides the default inspect method with a human readable one, e.g., "Mon, 21 Feb 2005"
   def readable_inspect: () -> untyped
-
-  # Converts a Date instance to a Time, where the time is set to the beginning of the day.
-  # The timezone can be either :local or :utc (default :local).
-  #
-  #   date = Date.new(2007, 11, 10)  # => Sat, 10 Nov 2007
-  #
-  #   date.to_time                   # => 2007-11-10 00:00:00 0800
-  #   date.to_time(:local)           # => 2007-11-10 00:00:00 0800
-  #
-  #   date.to_time(:utc)             # => 2007-11-10 00:00:00 UTC
-  #
-  # NOTE: The :local timezone is Ruby's *process* timezone, i.e. ENV['TZ'].
-  #       If the *application's* timezone is needed, then use +in_time_zone+ instead.
-  def to_time: (?::Symbol form) -> untyped
-
-  # Returns a string which represents the time in used time zone as DateTime
-  # defined by XML Schema:
-  #
-  #   date = Date.new(2015, 05, 23)  # => Sat, 23 May 2015
-  #   date.xmlschema                 # => "2015-05-23T00:00:00+04:00"
-  def xmlschema: () -> untyped
 end
 
 class Date
@@ -2945,12 +2934,6 @@ end
 
 class DateTime
   include DateAndTime::Compatibility
-
-  # Either return an instance of +Time+ with the same UTC offset
-  # as +self+ or an instance of +Time+ representing the same time
-  # in the local system timezone depending on the setting of
-  # on the setting of +ActiveSupport.to_time_preserves_timezone+.
-  def to_time: () -> untyped
 end
 
 class DateTime
@@ -3058,26 +3041,6 @@ module Enumerable[unchecked out Elem]
   # doesn't work well https://bugs.ruby-lang.org/issues/13446
   alias _original_sum_with_required_identity sum
 
-  # Calculates a sum from the elements.
-  #
-  #  payments.sum { |p| p.price * p.tax_rate }
-  #  payments.sum(&:price)
-  #
-  # The latter is a shortcut for:
-  #
-  #  payments.inject(0) { |sum, p| sum + p.price }
-  #
-  # It can also calculate the sum without the use of a block.
-  #
-  #  [5, 15, 10].sum # => 30
-  #  ['foo', 'bar'].sum # => "foobar"
-  #  [[1, 2], [3, 1, 5]].sum # => [1, 2, 3, 1, 5]
-  #
-  # The default sum of an empty list is zero. You can override this default:
-  #
-  #  [].sum(Payment.new(0)) { |i| i.amount } # => Payment.new(0)
-  def sum: (?untyped? identity) { () -> untyped } -> untyped
-
   # Convert an enumerable to a hash keying it by the block return value.
   #
   #   people.index_by(&:login)
@@ -3147,9 +3110,6 @@ class Range[out Elem]
 end
 
 class Array[unchecked out Elem]
-  # nodoc:
-  # Array#sum was added in Ruby 2.4 but it only works with Numeric elements.
-  def sum: (?untyped? init) { () -> untyped } -> untyped
 end
 
 class File
@@ -3699,7 +3659,7 @@ class Module
 
   alias attr_internal attr_internal_accessor
 
-  attr_accessor attr_internal_naming_format: untyped
+  attr_accessor self.attr_internal_naming_format: untyped
 
   private
 
@@ -5026,7 +4986,7 @@ class Hash[unchecked out K, unchecked out V]
 end
 
 module ActiveSupport
-  module Tryable
+  module Tryable : BasicObject
     # nodoc:
     def try: (?untyped? method_name, *untyped args) { (untyped) -> untyped } -> untyped
 
@@ -5920,7 +5880,7 @@ module ActiveSupport
 
     def insert: (untyped index, untyped value) -> untyped
 
-    def `prepend`: (untyped value) -> untyped
+    def prepend: (untyped value) -> untyped
 
     def replace: (untyped value) -> untyped
 
@@ -6231,7 +6191,7 @@ end
 class Time
   include DateAndTime::Zones
 
-  attr_accessor zone_default: untyped
+  attr_accessor self.zone_default: untyped
 
   # Returns the TimeZone for the current request, if this has been set (via Time.zone=).
   # If <tt>Time.zone</tt> has not been set for the current request, returns the TimeZone specified in <tt>config.time_zone</tt>.
@@ -6392,7 +6352,7 @@ module ActiveSupport
     include ActiveSupport::Callbacks
 
     # Returns singleton instance for this class in this thread. If none exists, one is created.
-    def self.`instance`: () -> untyped
+    def self.instance: () -> untyped
 
     # Declares one or more attributes that will be given both class and instance accessor methods.
     def self.attribute: (*untyped names) -> untyped
@@ -6417,6 +6377,8 @@ module ActiveSupport
 
     def self.method_missing: (untyped name, *untyped args) { () -> untyped } -> untyped
 
+    public
+
     attr_accessor attributes: untyped
 
     def initialize: () -> untyped
@@ -6435,6 +6397,8 @@ module ActiveSupport
 
     # Reset all attributes. Should be called before and after actions, when used as a per-request singleton.
     def reset: () -> untyped
+
+    private
 
     def assign_attributes: (untyped new_attributes) -> untyped
 
@@ -6916,7 +6880,7 @@ module ActiveSupport
 
       module ClassMethods
         # :nodoc:
-        def `include`: (untyped included_module) -> untyped
+        def include: (untyped included_module) -> untyped
 
         def method_added: (untyped method_name) -> untyped
       end
@@ -7091,7 +7055,7 @@ module ActiveSupport
       #   PLANETS_POST_2006 = %w(mercury venus earth mars jupiter saturn uranus neptune)
       #   PLANETS = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('PLANETS', 'PLANETS_POST_2006')
       #   PLANETS.class # => Array
-      def `class`: () -> untyped
+      def class: () -> untyped
 
       private
 
@@ -7202,6 +7166,8 @@ module ActiveSupport
     private
 
     def self.accumulate_descendants: (untyped klass, untyped acc) -> untyped
+
+    public
 
     def inherited: (untyped base) -> untyped
 
@@ -7417,6 +7383,8 @@ module ActiveSupport
 
     def self.calculate_total_seconds: (untyped parts) -> untyped
 
+    public
+
     def initialize: (untyped value, untyped parts) -> untyped
 
     def coerce: (untyped other) -> untyped
@@ -7516,6 +7484,8 @@ module ActiveSupport
     # Build ISO 8601 Duration string for this duration.
     # The +precision+ parameter can be used to limit seconds' precision of duration.
     def iso8601: (?precision: untyped? precision) -> untyped
+
+    private
 
     def sum: (untyped sign, ?untyped time) -> untyped
 
@@ -7720,7 +7690,7 @@ module ActiveSupport
     def self.wrap: () { () -> untyped } -> untyped
 
     # :nodoc:
-    attr_accessor active: untyped
+    attr_accessor self.active: untyped
 
     def self.inherited: (untyped other) -> untyped
 
@@ -8207,7 +8177,7 @@ module ActiveSupport
         def to_regex: (untyped string) -> ::Regexp
       end
 
-      def self.`instance`: (?::Symbol locale) -> untyped
+      def self.instance: (?::Symbol locale) -> untyped
 
       attr_reader plurals: untyped
 
@@ -8789,19 +8759,19 @@ module ActiveSupport
 
       # If true, use ISO 8601 format for dates and times. Otherwise, fall back
       # to the Active Support legacy format.
-      attr_accessor use_standard_json_time_format: untyped
+      attr_accessor self.use_standard_json_time_format: untyped
 
       # If true, encode >, <, & as escaped unicode sequences (e.g. > as \u003e)
       # as a safety measure.
-      attr_accessor escape_html_entities_in_json: untyped
+      attr_accessor self.escape_html_entities_in_json: untyped
 
       # Sets the precision of encoded time values.
       # Defaults to 3 (equivalent to millisecond precision)
-      attr_accessor time_precision: untyped
+      attr_accessor self.time_precision: untyped
 
       # Sets the encoder used by Rails to encode Ruby objects into JSON strings
       # in +Object#to_json+ and +ActiveSupport::JSON.encode+.
-      attr_accessor json_encoder: untyped
+      attr_accessor self.json_encoder: untyped
     end
   end
 end
@@ -9021,7 +8991,7 @@ module ActiveSupport
 
     def self.logger: () -> untyped
 
-    attr_writer logger: untyped
+    attr_writer self.logger: untyped
 
     def self.log_subscribers: () -> untyped
 
@@ -9427,7 +9397,11 @@ module ActiveSupport
 
       def self.decode: (untyped message) -> untyped
 
+      public
+
       def verify: (untyped purpose) -> untyped
+
+      private
 
       def match?: (untyped purpose) -> untyped
 
@@ -9910,10 +9884,6 @@ module ActiveSupport
 
       def now_cpu: () -> untyped
 
-      def now_cpu: () -> 0
-
-      def now_allocations: () -> 0
-
       def now_allocations: () -> untyped
     end
   end
@@ -10083,7 +10053,7 @@ module ActiveSupport
   # to all log subscribers. You can use any queue implementation you want.
   #
   module Notifications
-    attr_accessor notifier: untyped
+    attr_accessor self.notifier: untyped
 
     def self.publish: (untyped name, *untyped args) -> untyped
 
@@ -10884,7 +10854,7 @@ module ActiveSupport
   module PerThreadRegistry
     def self.extended: (untyped object) -> untyped
 
-    def `instance`: () -> untyped
+    def instance: () -> untyped
 
     private
 
@@ -11123,11 +11093,11 @@ module ActiveSupport
 
     private
 
-    attr_reader subscriber: untyped
+    attr_reader self.subscriber: untyped
 
-    attr_reader notifier: untyped
+    attr_reader self.notifier: untyped
 
-    attr_reader namespace: untyped
+    attr_reader self.namespace: untyped
 
     def self.add_event_subscriber: (untyped event) -> (nil | untyped)
 
@@ -11141,6 +11111,8 @@ module ActiveSupport
 
     def self.pattern_subscribed?: (untyped pattern) -> untyped
 
+    public
+
     attr_reader patterns: untyped
 
     def initialize: () -> untyped
@@ -11148,6 +11120,8 @@ module ActiveSupport
     def start: (untyped name, untyped id, untyped payload) -> untyped
 
     def finish: (untyped name, untyped id, untyped payload) -> untyped
+
+    private
 
     def event_stack: () -> untyped
   end
@@ -12307,6 +12281,8 @@ module ActiveSupport
 
     def self.zones_map: () -> untyped
 
+    public
+
     include Comparable
 
     attr_reader name: untyped
@@ -12470,6 +12446,8 @@ module ActiveSupport
     def init_with: (untyped coder) -> untyped
 
     def encode_with: (untyped coder) -> untyped
+
+    private
 
     def parts_to_time: (untyped parts, untyped now) -> (nil | untyped)
 
@@ -12844,6 +12822,8 @@ class Object
   #   Benchmark.ms { User.all }
   #   # => 0.074
   def self.ms: () { () -> untyped } -> untyped
+
+  public
 
   def unescape: (untyped str, ?untyped escaped) -> untyped
 end

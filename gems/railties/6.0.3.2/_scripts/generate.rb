@@ -36,6 +36,9 @@ def patch!(name, rbs)
         def new_controller_thread: () { () -> untyped } -> untyped
       end
     RUBY
+
+    # to avoid DuplicatedMethodDefinitionError
+    rbs.gsub!('def commit_cookie_jar!: () -> nil', '# def commit_cookie_jar!: () -> nil') || raise
   when 'railties'
     rbs.gsub!(
       'class NonSymbolAccessDeprecatedHash < HashWithIndifferentAccess',
@@ -93,6 +96,23 @@ def patch!(name, rbs)
       class HashWithIndifferentAccess[T, U] < ActiveSupport::HashWithIndifferentAccess[T, U]
       end
     RBS
+
+    # to avoid DuplicatedMethodDefinitionError
+    rbs.gsub!('def to_time: (?::Symbol form) -> untyped', '# def to_time: (?::Symbol form) -> untyped') or raise
+    rbs.gsub!('def xmlschema: () -> untyped', '# def xmlschema: () -> untyped') or raise
+    rbs.gsub!(<<-RBS.chomp, '') or raise
+  # Either return an instance of +Time+ with the same UTC offset
+  # as +self+ or an instance of +Time+ representing the same time
+  # in the local system timezone depending on the setting of
+  # on the setting of +ActiveSupport.to_time_preserves_timezone+.
+  def to_time: () -> untyped
+    RBS
+    rbs.gsub!('def sum: (?untyped? identity) { () -> untyped } -> untyped', '# def sum: (?untyped? identity) { () -> untyped } -> untyped') or raise
+    rbs.gsub!('def sum: (?untyped? init) { () -> untyped } -> untyped', '# def sum: (?untyped? init) { () -> untyped } -> untyped') or raise
+    rbs.gsub!('def now_cpu: () -> 0', '# def now_cpu: () -> 0') or raise
+    rbs.gsub!('def now_allocations: () -> 0', '# def now_allocations: () -> 0') or raise
+
+    rbs.gsub!('module Tryable', 'module Tryable : BasicObject') or raise
   when 'actionview'
     rbs.gsub!(
       'class CheckBoxBuilder < Builder',
@@ -167,6 +187,9 @@ def patch!(name, rbs)
     rbs.gsub!(
       'def []: (untyped name) -> Attribute',
       'def []: (untyped name) -> ::Arel::Attributes::Attribute')
+
+    rbs.gsub!('module TestDatabases', 'module TestDatabases : BasicObject') or raise
+    rbs.gsub!('module TestFixtures', 'module TestFixtures : BasicObject') or raise
   end
 end
 
