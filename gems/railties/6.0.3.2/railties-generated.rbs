@@ -422,7 +422,7 @@ module Rails
   class Application < Engine
     def self.inherited: (untyped base) -> untyped
 
-    def self.`instance`: () -> untyped
+    def self.instance: () -> untyped
 
     def self.create: (?::Hash[untyped, untyped] initial_variable_values) { () -> untyped } -> untyped
 
@@ -847,6 +847,8 @@ module Rails
       def self.relative_command_path: () -> untyped
 
       def self.namespaced_commands: () -> untyped
+
+      public
 
       def help: () -> untyped
     end
@@ -2780,6 +2782,8 @@ module Rails
       # when declaring options curly brackets should be used
       def self.parse_type_and_options: (untyped `type`) -> untyped
 
+      public
+
       def initialize: (untyped name, ?untyped? `type`, ?bool index_type, ?::Hash[untyped, untyped] attr_options) -> untyped
 
       def field_type: () -> untyped
@@ -4303,7 +4307,7 @@ module Rails
       module ClassMethods
         def inherited: (untyped base) -> untyped
 
-        def `instance`: () -> untyped
+        def instance: () -> untyped
 
         def respond_to?: (*untyped args) -> untyped
 
@@ -4510,7 +4514,7 @@ module Rails
 
     # Since Rails::Railtie cannot be instantiated, any methods that call
     # +instance+ are intended to be called only on subclasses of a Railtie.
-    def self.`instance`: () -> untyped
+    def self.instance: () -> untyped
 
     # Allows you to configure the railtie. This is the same method seen in
     # Railtie::Configurable, but this module is no longer required for all
@@ -4532,6 +4536,8 @@ module Rails
     # `#each_registered_block(type, &block)`
     def self.register_block_for: (untyped `type`) { () -> untyped } -> untyped
 
+    public
+
     def initialize: () -> untyped
 
     def configure: () { () -> untyped } -> untyped
@@ -4550,6 +4556,8 @@ module Rails
     def run_runner_blocks: (untyped app) -> untyped
 
     def run_tasks_blocks: (untyped app) -> untyped
+
+    private
 
     # run `&block` in every registered block in `#register_block_for`
     def each_registered_block: (untyped `type`) { () -> untyped } -> untyped
