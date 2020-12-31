@@ -15,7 +15,7 @@ end
 def sh!(*cmd, **kwargs)
   puts(cmd.join(' '))
   Open3.capture2(*cmd, **kwargs).then do |out, status|
-    raise unless status.success?
+    raise out unless status.success?
 
     out
   end
