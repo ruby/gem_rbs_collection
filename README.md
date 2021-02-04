@@ -1,4 +1,4 @@
-# gem_rbs: A collection of RBS for gems
+# gem_rbs_collection: A collection of RBS for gems
 
 RBS is a standard type signature syntax for Ruby programs.
 This is a community managed collection of RBS files for gems which ships without RBS.
@@ -9,7 +9,7 @@ This is a community managed collection of RBS files for gems which ships without
 
 ```
 # Add new submodule inside your project
-$ git submodule add https://github.com/ruby/gem_rbs.git vendor/rbs/gem_rbs
+$ git submodule add https://github.com/ruby/gem_rbs_collection.git vendor/rbs/gem_rbs_collection
 ```
 
 ### Using gem RBS from `rbs` command
@@ -17,7 +17,7 @@ $ git submodule add https://github.com/ruby/gem_rbs.git vendor/rbs/gem_rbs
 Specify the path with `--repo` option and use `-r` option to require RBS of a library.
 
 ```
-$ rbs --repo vendor/rbs/gem_rbs/gems -r redis list
+$ rbs --repo vendor/rbs/gem_rbs_collection/gems -r redis list
 ```
 
 ### Using gem RBS from Steep
@@ -26,7 +26,7 @@ Steep uses `Steepfile` to configure library RBSs to load.
 
 ```rb
 target(:lib) do
-  repo_path "vendor/rbs/gem_rbs/gems"
+  repo_path "vendor/rbs/gem_rbs_collection/gems"
   library "redis"
 end
 ```
@@ -38,7 +38,7 @@ end
 You can load RBS files through directory path.
 
 ```
-$ rbs -I vendor/rbs/gem_rbs/gems/redis/4.2 list
+$ rbs -I vendor/rbs/gem_rbs_collection/gems/redis/4.2 list
 ```
 
 If you load RBS files with directory path, it loads everything in the directory.
@@ -143,7 +143,7 @@ I have been testing with [Steep](https://github.com/soutaro/steep).
 Add a `Steepfile` in `_test` directory and write test scripts.
 Then you can run `steep test` to type check the test scripts.
 
-See existing gems for examples, like [redis/4.2](https://github.com/ruby/gem_rbs/tree/main/gems/redis/4.2/_test) or [listen/3.2](https://github.com/ruby/gem_rbs/tree/main/gems/listen/3.2/_test).
+See existing gems for examples, like [redis/4.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/redis/4.2/_test) or [listen/3.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/listen/3.2/_test).
 
 
 
