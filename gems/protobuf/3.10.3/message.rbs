@@ -1,0 +1,165 @@
+module Protobuf
+  class Message
+    module Fields
+      ACCESSOR_SUFFIXES: untyped
+
+      def self.extended: (Module other) -> void
+
+      # Define an optional field.
+      #
+      def optional: (untyped type_class, untyped name, untyped tag, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Define a repeated field.
+      #
+      def repeated: (untyped type_class, untyped name, untyped tag, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Define a required field.
+      #
+      def required: (untyped type_class, untyped name, untyped tag, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Define a map field.
+      #
+      def map: (untyped key_type_class, untyped value_type_class, untyped name, untyped tag, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Define an extension range.
+      #
+      def extensions: (untyped range) -> untyped
+
+      #
+      # Field Access Methods
+      #
+      def all_fields: () -> untyped
+
+      def extension_fields: () -> untyped
+
+      def extension_ranges: () -> untyped
+
+      def required_field_tags: () -> untyped
+
+      def extension_tag?: (untyped tag) -> untyped
+
+      def field_store: () -> untyped
+
+      def fields: () -> untyped
+
+      def field_tag?: (untyped tag, ?bool allow_extension) -> untyped
+
+      def get_extension_field: (untyped name_or_tag) -> untyped
+
+      def get_field: (untyped name_or_tag, ?bool allow_extension) -> untyped
+
+      def define_field: (untyped rule, untyped type_class, untyped fully_qualified_field_name, untyped tag, untyped options) -> untyped
+
+      def remove_existing_accessors: (untyped accessor) -> untyped
+
+      def raise_if_tag_collision: (untyped tag, untyped field_name) -> untyped
+
+      def raise_if_name_collision: (untyped field_name) -> untyped
+
+      def inherit_fields!: (untyped subclass) -> untyped
+
+      alias get_ext_field_by_name get_extension_field
+      alias get_ext_field_by_tag get_extension_field
+      alias get_field_by_name get_field
+      alias get_field_by_tag get_field
+    end
+
+    module Serialization
+      interface _Readable
+        def read: (Integer size) -> String?
+      end
+
+      module ClassMethods
+        def decode: (String bytes) -> instance
+
+        def decode_from: (_Readable stream) -> instance
+
+        # Create a new object with the given values and return the encoded bytes.
+        def encode: (?::Hash[untyped, untyped] fields) -> String
+      end
+
+      # Decode the given non-stream bytes into this message.
+      #
+      def decode: (String bytes) -> self
+
+      # Decode the given stream into this message.
+      #
+      def decode_from: (_Readable stream) -> self
+
+      # Encode this message
+      #
+      def encode: () -> String
+
+      # Encode this message to the given stream.
+      #
+      def encode_to: (_Stream stream) -> String
+
+      interface _Stream
+        def <<: (String) -> self
+      end
+
+      def set_field_bytes: (untyped tag, untyped bytes) -> untyped
+    end
+
+    extend Fields
+    include Serialization
+    extend Serialization::ClassMethods
+
+    def clear!: () -> self
+
+    def clone: () -> self
+
+    def dup: () -> self
+
+    # Iterate over every field, invoking the given block
+    #
+    def each_field: () { (Symbol, untyped) -> void } -> void
+                  | () -> Enumerable[[Symbol, untyped]]
+
+    def each_field_for_serialization: () { (Symbol, untyped) -> void } -> void
+
+    def field?: (Symbol) -> bool
+
+    alias respond_to_has? field?
+
+    alias has_field? field?
+
+    def inspect: () -> String
+
+    def respond_to_has_and_present?: (Symbol) -> bool
+
+    # Return a hash-representation of the given fields for this message type.
+    def to_hash: () -> Hash[Symbol, untyped]
+
+    def to_hash_with_string_keys: () -> Hash[String, untyped]
+
+    def to_json: (*untyped) -> String
+
+    # Return a hash-representation of the given fields for this message type that
+    # is safe to convert to JSON.
+    def to_json_hash: () -> Hash[Symbol, untyped]
+
+    def to_proto: () -> self
+
+    def ==: (untyped) -> bool
+
+    def []: (Symbol) -> untyped
+
+    def []=: (Symbol, untyped) -> untyped
+
+    def set_field: (Symbol name, untyped value, untyped ignore_nil_for_repeated, ?untyped field) -> void
+
+    alias to_hash_value to_hash
+    alias to_json_hash_value to_json_hash
+    alias to_proto_hash to_hash
+    alias responds_to_has? respond_to_has?
+    alias respond_to_and_has? respond_to_has?
+    alias responds_to_and_has? respond_to_has?
+    alias respond_to_has_present? respond_to_has_and_present?
+    alias respond_to_and_has_present? respond_to_has_and_present?
+    alias respond_to_and_has_and_present? respond_to_has_and_present?
+    alias responds_to_has_present? respond_to_has_and_present?
+    alias responds_to_and_has_present? respond_to_has_and_present?
+    alias responds_to_and_has_and_present? respond_to_has_and_present?
+  end
+end

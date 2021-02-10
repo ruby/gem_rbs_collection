@@ -1,0 +1,23 @@
+module Protobuf
+  module Optionable
+    interface _OptionName
+      def to_s: () -> String
+    end
+
+    module ClassMethods
+      def get_option: (_OptionName name) -> untyped
+
+      def get_option!: (untyped name) -> untyped
+
+      private
+
+      def set_option: (_OptionName name, ?untyped value) -> untyped
+    end
+
+    def get_option: (_OptionName name) -> untyped
+
+    def get_option!: (untyped name) -> untyped
+
+    def self.inject: (Module base_class, ?bool extend_class) { () -> Class } -> void
+  end
+end

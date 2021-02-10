@@ -1,0 +1,229 @@
+module Protobuf
+  class Enum
+    def self.aliases_allowed?: () -> bool
+
+    include Optionable
+    extend Optionable::ClassMethods
+
+    # Public: Get all integer tags defined by this enum.
+    #
+    # Examples
+    #
+    #   class StateMachine < ::Protobuf::Enum
+    #     set_option :allow_alias
+    #     define :ON, 1
+    #     define :STARTED, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine.all_tags #=> [ 1, 2 ]
+    #
+    # Returns an array of unique integers.
+    #
+    def self.all_tags: () -> Array[Integer]
+
+    # Internal: DSL method to create a new Enum. The given name will
+    # become a constant for this Enum pointing to the new instance.
+    #
+    # Examples
+    #
+    #   class StateMachine < ::Protobuf::Enum
+    #     define :ON, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine::ON  #=> #<StateMachine::ON=1>
+    #   StateMachine::OFF #=> #<StateMachine::OFF=2>
+    #
+    # Returns nothing.
+    #
+    def self.define: (Symbol name, Integer tag) -> void
+
+    # Internal: A mapping of enum number -> enums defined
+    # used for speeding up our internal enum methods.
+    def self.mapped_enums: () -> Hash[Integer, instance]
+
+    attr_reader self.enums: Array[instance]
+
+    # Public: Get an array of Enum objects with the given tag.
+    #
+    # tag - An object that responds to to_i.
+    #
+    # Examples
+    #
+    #   class StateMachine < ::Protobuf::Enum
+    #     set_option :allow_alias
+    #     define :ON, 1
+    #     define :STARTED, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine.enums_for_tag(1) #=> [ #<StateMachine::ON=1>, #<StateMachine::STARTED=1> ]
+    #   StateMachine.enums_for_tag(2) #=> [ #<StateMachine::OFF=2> ]
+    #
+    # Returns an array with zero or more Enum objects or nil.
+    #
+    def self.enums_for_tag: (Integer tag) -> Array[instance]
+
+    # Public: Get the Enum associated with the given name.
+    #
+    # name - A string-like object. Case-sensitive.
+    #
+    # Example
+    #
+    #   class StateMachine < ::Protobuf::Enum
+    #     define :ON, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine.enum_for_name(:ON)  # => #<StateMachine::ON=1>
+    #   StateMachine.enum_for_name("ON") # => #<StateMachine::ON=1>
+    #   StateMachine.enum_for_name(:on)  # => nil
+    #   StateMachine.enum_for_name(:FOO) # => nil
+    #
+    # Returns the Enum object with the given name or nil.
+    #
+    def self.enum_for_name: (Symbol | String name) -> instance?
+
+    # Public: Get the Enum object corresponding to the given tag.
+    #
+    # tag - An object that responds to to_i.
+    #
+    # Returns an Enum object or nil. If the tag corresponds to multiple
+    #   Enums, the first enum defined will be returned.
+    #
+    def self.enum_for_tag: (int tag) -> instance?
+
+    def self.enum_for_tag_integer: (int tag) -> instance?
+
+    # Public: Get an Enum by a variety of type-checking mechanisms.
+    #
+    # candidate - An Enum, Numeric, String, or Symbol object.
+    #
+    # Example
+    #
+    #   class StateMachine < ::Protobuf::Enum
+    #     set_option :allow_alias
+    #     define :ON, 1
+    #     define :STARTED, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine.fetch(StateMachine::ON)  # => #<StateMachine::ON=1>
+    #   StateMachine.fetch(:ON)               # => #<StateMachine::ON=1>
+    #   StateMachine.fetch("STARTED")         # => #<StateMachine::STARTED=1>
+    #   StateMachine.fetch(1)                 # => [ #<StateMachine::ON=1>, #<StateMachine::STARTED=1> ]
+    #
+    # Returns an Enum object or nil.
+    #
+    def self.fetch: (instance | String | Symbol | Integer candidate) -> instance?
+
+    # Public: Get the Symbol name associated with the given number.
+    #
+    # number - An object that responds to to_i.
+    #
+    # Examples
+    #
+    #   # Without aliases
+    #   class StateMachine < ::Protobuf::Enum
+    #     define :ON, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine.name_for_tag(1) # => :ON
+    #   StateMachine.name_for_tag(2) # => :OFF
+    #   StateMachine.name_for_tag(3) # => nil
+    #
+    #   # With aliases
+    #   class StateMachine < ::Protobuf::Enum
+    #     set_option :allow_alias
+    #     define :STARTED, 1
+    #     define :ON, 1
+    #     define :OFF, 2
+    #   end
+    #
+    #   StateMachine.name_for_tag(1) # => :STARTED
+    #   StateMachine.name_for_tag(2) # => :OFF
+    #
+    # Returns the symbol name of the enum constant given it's associated tag or nil.
+    #   If the given tag has multiple names associated (due to allow_alias)
+    #   the first defined name will be returned.
+    #
+    def self.name_for_tag: (Integer tag) -> Symbol?
+
+    # Public: Check if the given tag is defined by this Enum.
+    #
+    # number - An object that responds to to_i.
+    #
+    # Returns a boolean.
+    #
+    def self.valid_tag?: (Integer tag) -> bool
+
+    # Public: [DEPRECATED] Return a hash of Enum objects keyed
+    # by their :name.
+    #
+    def self.values: () -> Hash[Symbol, instance]
+
+    attr_reader parent_class: Class
+
+    attr_reader name: Symbol
+
+    attr_reader tag: Integer
+
+    def initialize: (Class parent_class, Symbol name, Integer tag) -> void
+
+    # Custom equality method since otherwise identical values from different
+    # enums will be considered equal by Integer's equality method (or
+    # Fixnum's on Ruby < 2.4.0).
+    #
+    def ==: (untyped other) -> bool
+
+    # Overriding the class so ActiveRecord/Arel visitor will visit the enum as an
+    # Integer.
+    #
+    def `class`: () -> singleton(Integer)
+
+    # Protobuf::Enum delegates methods to Fixnum, which has a custom hash equality method (`eql?`)
+    # This causes enum values to be equivalent when using `==`, `===`, `equals?`, but not `eql?`**:
+    #
+    #   2.3.7 :002 > ::Test::EnumTestType::ZERO.eql?(::Test::EnumTestType::ZERO)
+    #    => false
+    #
+    # However, they are equilvalent to their tag value:
+    #
+    #   2.3.7 :002 > ::Test::EnumTestType::ZERO.eql?(::Test::EnumTestType::ZERO.tag)
+    #    => true
+    #
+    # **The implementation changed in Ruby 2.5, so this only affects Ruby versions less than v2.4.
+    #
+    # Use the hash equality implementation from Object#eql?, which is equivalent to == instead.
+    #
+    def eql?: (untyped other) -> bool
+
+    def inspect: () -> ::String
+
+    def to_int: () -> Integer
+
+    # This fixes a reflection bug in JrJackson RubyAnySerializer that does not
+    # render Protobuf enums correctly because to_json is not defined. It takes
+    # any number of arguments to support the JSON gem trying to pass an argument.
+    # NB: This method is required to return a string and not an integer.
+    #
+    def to_json: () -> untyped
+
+    def to_s: (?::Symbol format) -> String
+
+    # Re-implement `try` in order to fix the problem where
+    # the underlying fixnum doesn't respond to all methods (e.g. name or tag).
+    # If we respond to the first argument, `__send__` the args. Otherwise,
+    # delegate the `try` call to the underlying vlaue fixnum.
+    #
+    def try: [A] () { (self) -> A } -> A
+           | (Symbol, *untyped args) { (untyped) -> untyped } -> untyped
+
+    alias to_i tag
+    alias to_has_value tag
+    alias to_json_hash_value tag
+    alias value to_i
+  end
+end
