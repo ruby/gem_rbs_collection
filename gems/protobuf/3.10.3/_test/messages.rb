@@ -1,4 +1,6 @@
 module Messages
+  ::Protobuf::Optionable.inject(self) { ::Google::Protobuf::FileOptions }
+
   class User < Protobuf::Message; end
   class Address < Protobuf::Message; end
 
