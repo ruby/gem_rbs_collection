@@ -1,0 +1,19 @@
+module Messages
+  class User < Protobuf::Message
+    attr_accessor first_name (): String?
+    attr_accessor last_name (): String?
+    attr_accessor address (): Address?
+    attr_accessor is_active (): bool
+
+    def initialize: (?first_name: String?, ?last_name: String?, ?address: Address?, ?is_active: bool) -> void
+  end
+
+  class Address < Protobuf::Message
+    attr_accessor street (): String?
+    attr_accessor city (): String?
+    attr_accessor state (): Enum::States
+    attr_accessor zip_code: Integer
+
+    def initialize: (?street: String?, ?city: String?, ?state: Enum::States?, ?zip_code: Integer) -> void
+  end
+end
