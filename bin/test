@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+
+require "pathname"
+require "optparse"
+require "open3"
+
+@verbose = false
+@repo_root = Pathname(__dir__) + "../gems"
+@repos = []
+
+OptionParser.new do |opts|
+  opts.on("--root=PATH", "Specify repository root") do |path|
+    @repo_root = Pathname(path)
+  end
+  opts.on("--repo=PATH", "Add more repositories") do |path|
+    @repos << Pathname(path)
+  end
+  opts.on("-v", "--verbose", "Print more messages") do @verbose = true end
+end.parse!(ARGV)
+
+dirs = ARGV.map {|path| Pathname(path) }
+# if dirs.empty?
+#   (Pathname(__dir__) + "../gems").children.flat_map(&:children).each do |path|
+#     if path.directory?
+#       unless path.basename.to_s.start_with?(".")
+#         dirs << path.relative_path_from(Pathname.pwd)
+#       end
+#     end
+#   end
+# end
+
+def putv(message)
+  if @verbose
+    message.each_line do |line|
+      print "> #{line}"
+    end
+  end
+end
+
+failed = false
+
+dirs.each do |dir|
+  test_path = dir + "_scripts/test"
+  case
+  when !test_path.file?
+    puts "Skipping: cannot find test script at `#{test_path}`..."
+  when !test_path.executable?
+    puts "Skipping: `#{test_path}` is not executable..."
+  else
+    puts "Detected test script: #{test_path}"
+
+    env = {
+      "REPO_ROOT" => @repo_root.to_s,
+      "REPOS" => @repos.join(File::PATH_SEPARATOR),
+      "RBS_DIR" => dir.to_s
+    }
+    stdout, status = Open3.capture2(env, test_path.to_s)
+
+    putv(stdout)
+
+    if status.success?
+      puts " => Success 💪"
+    else
+      puts " => Failure 🚨"
+      failed = true
+    end
+  end
+end

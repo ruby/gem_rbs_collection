@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require "pathname"
+require "optparse"
+require "open3"
+
+@repo_root = Pathname(__dir__) + "../gems"
+@repos = []
+@rbs_dir = Pathname.pwd
+
+OptionParser.new do |opts|
+  opts.on("--root=PATH", "Specify repository root given through `$REPO_ROOT`.") do |path|
+    @repo_root = Pathname(path)
+  end
+  opts.on("--repo=PATH", "Add more repositories given through `$REPOS`.") do |path|
+    @repos << Pathname(path)
+  end
+  opts.on("--rbs=PATH", "Specify `$RBS_DIR`, defaults to current dir.")
+
+  opts.banner = <<BANNER
+Usage: #{$0} [OPTIONS] COMMAND...
+
+  Execute given `COMMAND` with environment variables.
+
+Environment variables given to the command:
+
+  $REPO_ROOT: Path to the root of this repository.
+  $REPOS: Paths to other repositories separated by `#{File::PATH_SEPARATOR}`.
+  $RBS_DIR: Current directory.
+
+Options:
+BANNER
+end.parse!(ARGV)
+
+env = {
+  "REPO_ROOT" => @repo_root.to_s,
+  "REPOS" => @repos.join(File::PATH_SEPARATOR),
+  "RBS_DIR" => @rbs_dir.to_s
+}
+
+system(env, *ARGV)
+exit $?.exitstatus
