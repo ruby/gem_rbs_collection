@@ -46,6 +46,8 @@ module ActiveRecord
     def errors: () -> untyped
     def []: (Symbol) -> untyped
     def []=: (Symbol, untyped) -> untyped
+
+    extend Sanitization::ClassMethods
   end
 end
 
@@ -88,6 +90,8 @@ interface _ActiveRecord_Relation[Model]
   def delete_all: () -> untyped
   def update_all: (*untyped) -> untyped
   def each: () { (Model) -> void } -> self
+  def select: (*Symbol | String) -> self
+            | () { (Model) -> boolish } -> Array[Model]
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation]
@@ -127,6 +131,8 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation]
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
   def update_all: (*untyped) -> untyped
+  def select: (*Symbol | String) -> Relation
+            | () { (Model) -> boolish } -> Array[Model]
 end
 
 # https://github.com/rails/rails/blob/fbe2433be6e052a1acac63c7faf287c52ed3c5ba/activerecord/lib/arel/nodes/unary.rb
