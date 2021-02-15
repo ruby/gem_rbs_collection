@@ -1537,7 +1537,7 @@ module ActiveSupport
       #   an argument.
       # * <tt>:prepend</tt> - If +true+, the callback will be prepended to the
       #   existing chain rather than appended.
-      def set_callback: (untyped name, *untyped filter_list) { () -> untyped } -> untyped
+      def set_callback: (untyped name, *untyped filter_list) ?{ () -> untyped } -> untyped
 
       # Skip a previously set callback. Like +set_callback+, <tt>:if</tt> or
       # <tt>:unless</tt> options may be passed in order to control when the
@@ -1549,7 +1549,7 @@ module ActiveSupport
       #
       # An <tt>ArgumentError</tt> will be raised if the callback has not
       # already been set (unless the <tt>:raise</tt> option is set to <tt>false</tt>).
-      def skip_callback: (untyped name, *untyped filter_list) { () -> untyped } -> untyped
+      def skip_callback: (untyped name, *untyped filter_list) ?{ () -> untyped } -> untyped
 
       # Remove all set callbacks for the given event.
       def reset_callbacks: (untyped name) -> untyped
@@ -1882,7 +1882,7 @@ module ActiveSupport
 
       private
 
-      def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) { () -> untyped } -> untyped
+      def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> untyped
     end
 
     # Reads and writes attributes from a configuration <tt>OrderedHash</tt>.
@@ -3294,10 +3294,10 @@ class Hash[unchecked out K, unchecked out V]
   #   h2 = { b: 250, c: { c1: 200 } }
   #   h1.deep_merge(h2) { |key, this_val, other_val| this_val + other_val }
   #   # => { a: 100, b: 450, c: { c1: 300 } }
-  def deep_merge: (untyped other_hash) { () -> untyped } -> untyped
+  def deep_merge: (untyped other_hash) ?{ () -> untyped } -> untyped
 
   # Same as +deep_merge+, but modifies +self+.
-  def deep_merge!: (untyped other_hash) { () -> untyped } -> untyped
+  def deep_merge!: (untyped other_hash) ?{ () -> untyped } -> untyped
 end
 
 class Hash[unchecked out K, unchecked out V]
@@ -7042,7 +7042,7 @@ module ActiveSupport
     #        (Backtrace information(trim non-ascii characters))
     #        ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
     class DeprecatedConstantProxy < Module
-      def self.new: (*untyped args, **untyped kwargs) { () -> untyped } -> untyped
+      def self.new: (*untyped args, **untyped kwargs) ?{ () -> untyped } -> untyped
 
       def initialize: (untyped old_const, untyped new_const, ?untyped deprecator, ?message: ::String message) -> untyped
 
@@ -8019,7 +8019,7 @@ module ActiveSupport
     #   hash.fetch_values('a', 'b') # => ["x", "y"]
     #   hash.fetch_values('a', 'c') { |key| 'z' } # => ["x", "z"]
     #   hash.fetch_values('a', 'c') # => KeyError: key not found: "c"
-    def fetch_values: (*untyped indices) { () -> untyped } -> untyped
+    def fetch_values: (*untyped indices) ?{ () -> untyped } -> untyped
 
     # Returns a shallow copy of the hash.
     #
@@ -8034,7 +8034,7 @@ module ActiveSupport
     # This method has the same semantics of +update+, except it does not
     # modify the receiver but rather returns a new hash with indifferent
     # access with the result of the merge.
-    def merge: (untyped hash) { () -> untyped } -> untyped
+    def merge: (untyped hash) ?{ () -> untyped } -> untyped
 
     # Like +merge+ but the other way around: Merges the receiver into the
     # argument and returns a new hash with indifferent access as result:
@@ -8080,15 +8080,15 @@ module ActiveSupport
 
     def to_options!: () -> untyped
 
-    def select: (*untyped args) { () -> untyped } -> untyped
+    def select: (*untyped args) ?{ () -> untyped } -> untyped
 
-    def reject: (*untyped args) { () -> untyped } -> untyped
+    def reject: (*untyped args) ?{ () -> untyped } -> untyped
 
-    def transform_values: (*untyped args) { () -> untyped } -> untyped
+    def transform_values: (*untyped args) ?{ () -> untyped } -> untyped
 
-    def transform_keys: (*untyped args) { () -> untyped } -> untyped
+    def transform_keys: (*untyped args) ?{ () -> untyped } -> untyped
 
-    def transform_keys!: () { (untyped) -> untyped } -> untyped
+    def transform_keys!: () ?{ (untyped) -> untyped } -> untyped
 
     def slice: (*untyped keys) -> untyped
 
@@ -11744,7 +11744,7 @@ module ActiveSupport
       #     User.create.created_at # => Sun, 10 Nov 2013 15:34:49 EST -05:00
       #   end
       #   Time.current # => Sat, 09 Nov 2013 15:34:49 EST -05:00
-      def travel: (untyped duration) { () -> untyped } -> untyped
+      def travel: (untyped duration) ?{ () -> untyped } -> untyped
 
       # Changes current time to the given time by stubbing +Time.now+,
       # +Date.today+, and +DateTime.now+ to return the time or date passed into this method.
@@ -11777,7 +11777,7 @@ module ActiveSupport
       #     Time.current # => Wed, 24 Nov 2004 01:04:44 EST -05:00
       #   end
       #   Time.current # => Sat, 09 Nov 2013 15:34:49 EST -05:00
-      def travel_to: (untyped date_or_time) { () -> untyped } -> untyped
+      def travel_to: (untyped date_or_time) ?{ () -> untyped } -> untyped
 
       # Returns the current time back to its original state, by removing the stubs added by
       # +travel+, +travel_to+, and +freeze_time+.
@@ -11807,7 +11807,7 @@ module ActiveSupport
       #     User.create.created_at # => Sun, 09 Jul 2017 15:34:49 EST -05:00
       #   end
       #   Time.current # => Sun, 09 Jul 2017 15:34:50 EST -05:00
-      def freeze_time: () { () -> untyped } -> untyped
+      def freeze_time: () ?{ () -> untyped } -> untyped
 
       private
 
