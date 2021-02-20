@@ -80,6 +80,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def find_by: (*untyped) -> Model?
   def find_by!: (*untyped) -> Model
   def find: (PrimaryKey id) -> Model
+          | (Array[PrimaryKey]) -> Array[Model]
+          | (*PrimaryKey) -> Array[Model]
   def first: () -> Model
            | (Integer count) -> Array[Model]
   def last: () -> Model
@@ -122,6 +124,8 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def find_by: (*untyped) -> Model?
   def find_by!: (*untyped) -> Model
   def find: (PrimaryKey id) -> Model
+          | (Array[PrimaryKey]) -> Array[Model]
+          | (*PrimaryKey) -> Array[Model]
   def first: () -> Model
            | (Integer count) -> Array[Model]
   def last: () -> Model
