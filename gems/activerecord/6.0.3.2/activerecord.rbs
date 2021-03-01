@@ -51,9 +51,9 @@ module ActiveRecord
   end
 end
 
-interface _ActiveRecord_Relation[Model]
+interface _ActiveRecord_Relation[Model, PrimaryKey]
   def all: () -> self
-  def ids: () -> Array[Integer]
+  def ids: () -> Array[PrimaryKey]
   def none: () -> self
   def pluck: (Symbol | String column) -> Array[untyped]
            | (*Symbol | String columns) -> Array[Array[untyped]]
@@ -79,7 +79,9 @@ interface _ActiveRecord_Relation[Model]
              | (Hash[untyped, untyped]) -> self
   def find_by: (*untyped) -> Model?
   def find_by!: (*untyped) -> Model
-  def find: (Integer id) -> Model
+  def find: (PrimaryKey id) -> Model
+          | (Array[PrimaryKey]) -> Array[Model]
+          | (*PrimaryKey) -> Array[Model]
   def first: () -> Model
            | (Integer count) -> Array[Model]
   def last: () -> Model
@@ -94,9 +96,9 @@ interface _ActiveRecord_Relation[Model]
             | () { (Model) -> boolish } -> Array[Model]
 end
 
-interface _ActiveRecord_Relation_ClassMethods[Model, Relation]
+interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def all: () -> Relation
-  def ids: () -> Array[Integer]
+  def ids: () -> Array[PrimaryKey]
   def none: () -> Relation
   def pluck: (Symbol | String column) -> Array[untyped]
            | (*Symbol | String columns) -> Array[Array[untyped]]
@@ -121,7 +123,9 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation]
              | (Hash[untyped, untyped]) -> self
   def find_by: (*untyped) -> Model?
   def find_by!: (*untyped) -> Model
-  def find: (Integer id) -> Model
+  def find: (PrimaryKey id) -> Model
+          | (Array[PrimaryKey]) -> Array[Model]
+          | (*PrimaryKey) -> Array[Model]
   def first: () -> Model
            | (Integer count) -> Array[Model]
   def last: () -> Model
