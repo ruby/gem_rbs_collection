@@ -8,7 +8,7 @@ require "open3"
 @repos = []
 @rbs_dir = Pathname.pwd
 
-OptionParser.new do |opts|
+parser = OptionParser.new do |opts|
   opts.on("--root=PATH", "Specify repository root given through `$REPO_ROOT`.") do |path|
     @repo_root = Pathname(path)
   end
@@ -30,7 +30,13 @@ Environment variables given to the command:
 
 Options:
 BANNER
-end.parse!(ARGV)
+end
+parser.parse!(ARGV)
+
+if ARGV.empty?
+  puts parser.help
+  exit
+end
 
 env = {
   "REPO_ROOT" => @repo_root.to_s,
