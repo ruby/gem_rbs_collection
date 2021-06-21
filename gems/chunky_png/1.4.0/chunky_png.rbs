@@ -107,7 +107,7 @@ module ChunkyPNG
 
     # Checks whether 2 points are identical.
     # @return [true, false] <tt>true</tt> iff the x and y coordinates match
-    def eql?: (instance other) -> bool
+    def eql?: (untyped other) -> bool
 
     alias == eql?
 
@@ -163,7 +163,7 @@ module ChunkyPNG
     # Checks whether 2 dimensions are identical.
     # @param [ChunkyPNG::Dimension] other The dimension to compare with.
     # @return [true, false] <tt>true</tt> iff width and height match.
-    def eql?: (instance other) -> bool
+    def eql?: (untyped other) -> bool
 
     alias == eql?
 
@@ -238,12 +238,12 @@ module ChunkyPNG
     # Iterates over all the points in this vector
     # @yield [ChunkyPNG::Point] The points in the correct order.
     # @return [void]
-    def each: () { () -> untyped } -> void
+    def each: () { (ChunkyPNG::Point point) -> void } -> void
 
     # Comparison between two vectors for quality.
     # @param [ChunkyPNG::Vector] other The vector to compare with.
     # @return [true, false] true if the list of points are identical
-    def eql?: (instance other) -> bool
+    def eql?: (untyped other) -> bool
 
     alias == eql?
 
@@ -468,7 +468,7 @@ module ChunkyPNG
     # @yield [chunk] Yields the chunks in this datastream, one by one in the correct order.
     # @yieldparam [ChunkyPNG::Chunk::Base] chunk A chunk in this datastream.
     # @see ChunkyPNG::Datastream#chunks
-    def each_chunk: () { (ChunkyPNG::Chunk::Base) -> ChunkyPNG::Chunk::Base? } -> nil
+    def each_chunk: () { (ChunkyPNG::Chunk::Base) -> void } -> nil
 
     # Returns an enumerator instance for this datastream's chunks.
     # @return [Enumerable::Enumerator] An enumerator for the :each_chunk method.
