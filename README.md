@@ -143,7 +143,7 @@ The drawback of runtime testing is that you need to set up dependencies -- serve
 I have been testing with [Steep](https://github.com/soutaro/steep).
 
 Add a `Steepfile` in `_test` directory and write test scripts.
-Then you can run `steep test` to type check the test scripts.
+Then you can run `steep check` to type check the test scripts.
 
 See existing gems for examples, like [redis/4.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/redis/4.2/_test) or [listen/3.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/listen/3.2/_test).
 
