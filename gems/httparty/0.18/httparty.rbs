@@ -493,7 +493,7 @@ module HTTParty
 
     attr_reader path:  (URI::Generic | untyped)
 
-    def initialize: (Net::HTTPRequest http_method,  (URI::Generic | untyped) path, ?Hash[untyped, untyped] o) -> instance
+    def initialize: (singleton(Net::HTTPRequest) http_method,  (URI::Generic | untyped) path, ?Hash[untyped, untyped] o) -> void
 
     def path=: ( (URI::Generic | untyped) uri) -> void
 
@@ -673,4 +673,7 @@ module HTTParty
 
     def self.normalize_keys: (Object key, Object value) -> Array[untyped]
   end
+end
+
+class SimpleDelegator
 end
