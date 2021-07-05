@@ -60,7 +60,7 @@ end
 
 # this goes in your initializer
 Sidekiq.configure_server do |config|
-  config.death_handlers << lambda do |job, ex|
+  config.death_handlers << -> (job, ex) do
     puts "Error!"
   end
 end
