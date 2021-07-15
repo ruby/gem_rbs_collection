@@ -198,7 +198,8 @@ module Rack
         def initialize: (Persisted store, Request req) -> void
         def id: -> ((Cookie::Base64::Marshal | Integer | String | bool)?)
         def options: -> String?
-        def each: -> Enumerator[untyped, untyped]
+        def each: { ([String, untyped]) -> void } -> void
+                | -> Enumerator[untyped, untyped]
         def []: (String key) -> nil
         def dig: (untyped key, *untyped keys) -> untyped
         def fetch: (untyped key, ?Object default) -> Object
@@ -1026,7 +1027,7 @@ module Rack
   end
 
   class Server
-    def self.start: (?nil options) -> untyped
+    def self.start: (?untyped options) -> untyped
     attr_writer options: {config: String?}
     def initialize: (?nil options) -> void
     def options: -> ({config: (Array[bot] | Integer | String)?, environment: (Array[bot] | Integer | String)?, pid: (Array[bot] | Integer | String)?, Port: (Array[bot] | Integer | String)?, Host: (Array[bot] | Integer | String)?, AccessLog: (Array[bot] | Integer | String)?})
@@ -1287,7 +1288,8 @@ module Rack
         include Enumerable[MimePart]
 
         def initialize: (Proc | String tempfile) -> void
-        def each: { (BufferPart | TempfilePart) -> nil } -> (Array[BufferPart | TempfilePart])
+        def each: { (MimePart) -> void } -> void
+                  | -> Enumerator[MimePart, untyped]
         def on_mime_head: (Integer mime_index, untyped head, String? filename, untyped content_type, String? name) -> nil
         def on_mime_body: (Integer mime_index, untyped content) -> String
         def on_mime_finish: (untyped mime_index) -> nil
