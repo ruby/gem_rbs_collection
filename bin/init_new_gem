@@ -1,0 +1,85 @@
+#!ruby
+
+require 'pathname'
+
+def help
+  puts <<~HELP
+    Generate a boilerplate for a new gem RBS.
+
+    Usage: bin/init_new_gem GEM_NAME
+  HELP
+end
+
+def normalize_github_url(str)
+  case str
+  when /\A\s*\z/
+    nil
+  when %r!\A[^/]+/[^/]+\z!
+    "https://github.com/#{str}.git"
+  when /\.git\z/
+    str
+  else
+    "#{str}.git"
+  end
+end
+
+def put(path, content)
+  puts "create #{path}"
+  path.dirname.mkpath unless path.dirname.directory?
+  path.write(content)
+end
+
+def sh!(*cmd)
+  puts "execute #{cmd.join(' ')}"
+  system(*cmd, exception: true)
+end
+
+if ARGV.size != 1 || %w[--help -h help].include?(ARGV[0])
+  help
+  exit 1
+end
+
+gem_name = ARGV[0]
+
+begin
+  puts "Gem version you want to add (MAJOR.MINOR is recommended. e.g. 4.2):"
+  print '> '
+end while (version = $stdin.gets.chomp).empty?
+
+puts "GitHub Repository as USER/REPO (default: skip adding git submodule)"
+print '> '
+git_repo = normalize_github_url($stdin.gets.chomp)
+
+base = Pathname("gems/#{gem_name}/#{version}")
+
+put base / "#{gem_name}.rbs", <<~RBS
+  # Write the type definition here!
+RBS
+put base / "_test/Steepfile", <<~RUBY
+  target :test do
+    check "."
+    signature '.'
+
+    repo_path "../../../"
+    library "#{gem_name}"
+
+    typing_options :strict
+  end
+RUBY
+put base / "_test/test.rb", <<~RUBY
+  # Write Ruby code to test the RBS.
+  # It is type checked by `steep check` command.
+
+  require "#{gem_name}"
+RUBY
+
+if git_repo
+  sh! 'git', 'submodule', 'add', git_repo, base.join('_src').to_s
+end
+
+puts
+puts <<~MESSAGE
+  The boilerplate for #{gem_name} gem has been generated.
+  Start writing the RBS! We recommend to use `rbs prototype` or `typeprof` command.
+  See the README.md for more information.
+MESSAGE
