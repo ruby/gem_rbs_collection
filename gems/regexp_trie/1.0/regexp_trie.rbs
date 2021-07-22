@@ -1,0 +1,22 @@
+class RegexpTrie
+  VERSION: ::String
+
+  type strings = Array[strings] | String
+
+  def self.union: (*strings strings, ?option: untyped) -> Regexp
+
+  def initialize: (*strings strings) -> void
+
+  def add: (String str) -> untyped
+
+  def to_source: () -> String
+
+  # @return [Regexp]
+  def to_regexp: (?untyped option) -> Regexp
+
+  private
+
+  type entry = Hash[String, entry] & { end: nil }
+
+  def build: (Hash[String, entry] entry) -> String?
+end
