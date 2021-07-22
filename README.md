@@ -53,7 +53,7 @@ This is different from when loading RBS files with lbrary name that ignores dire
 Adding RBS files for a gem can be done with 4 steps.
 
 1. Set up environment
-2. Make a directory
+2. Generate a boilerplate
 3. Write RBS files
 4. Write tests
 
@@ -66,15 +66,12 @@ It runs `bundle install` with `--gemfile` option for the case the working copy i
 
 `bin/rbs` would also help to run the commands with correct `--gemfile` option.
 
-### Make a directory
+### Generate a boilerplate
 
-`mkdir -p gems/[gem]/[version]` works fine.
+Execute `bin/init_new_gem GEM_NAME`.
+This script generates an empty RBS to `gems/GEM_NAME/VERSION/GEM_NAME.rbs`, and makes `_test` directory to test the gem.
 
 Specify the _major_ and _minor_ version you are using would be great for most cases.
-
-```
-$ mkdir -p gems/redis/4.2
-```
 
 We recommend adding `_scripts`, `_test`, and `_src` directories.
 We assume `_scripts/test` script runs test of the gem, `_test` directory contains files for testing, and `_src` is a git submodule for the source code of the version of the gem.
