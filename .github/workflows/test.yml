@@ -1,0 +1,19 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  syntax_check:
+    runs-on: ubuntu-latest
+    container:
+      image: rubylang/ruby:3.0-focal
+    steps:
+    - uses: actions/checkout@v2
+    - name: 'Install dependencies'
+      run: 'gem install rbs'
+    - name: 'Test syntax check'
+      run: 'rbs parse gems/**/*.rbs'
