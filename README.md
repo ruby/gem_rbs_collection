@@ -124,17 +124,6 @@ You can test your code with the following steps.
 1. Write a Ruby program which uses the gem code
 2. Confirm the consistency between the program and RBS
 
-#### Using RBS runtime testing
-
-`rbs` gem provides a feature to insert runtime checks.
-You can write a Ruby program and let the code run with runtime checks.
-
-```
-$ rbs --repo ../../.. -r redis test --target Redis _tests/test.rb
-```
-
-The drawback of runtime testing is that you need to set up dependencies -- servers, libraries, and data.
-
 #### Using Steep
 
 I have been testing with [Steep](https://github.com/soutaro/steep).
