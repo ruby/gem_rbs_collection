@@ -5938,7 +5938,7 @@ class Time
   def self.days_in_year: (?untyped year) -> untyped
 
   # Returns <tt>Time.zone.now</tt> when <tt>Time.zone</tt> or <tt>config.time_zone</tt> are set, otherwise just returns <tt>Time.now</tt>.
-  def self.current: () -> untyped
+  def self.current: () -> ActiveSupport::TimeWithZone # strictly `(ActiveSupport::TimeWithZone | Time)` but it's inconvenient
 
   # Layers additional behavior on Time.at so that ActiveSupport::TimeWithZone and DateTime
   # instances can be used when called with a single argument
@@ -6160,7 +6160,7 @@ class Time
 
   # Returns the TimeZone for the current request, if this has been set (via Time.zone=).
   # If <tt>Time.zone</tt> has not been set for the current request, returns the TimeZone specified in <tt>config.time_zone</tt>.
-  def self.zone: () -> untyped
+  def self.zone: () -> ActiveSupport::TimeZone # strictly `ActiveSupport::TimeWithZone?` but it's inconvenient
 
   # Sets <tt>Time.zone</tt> to a TimeZone object for the current request/thread.
   #
@@ -12378,7 +12378,7 @@ module ActiveSupport
     #
     #   Time.zone = 'Hawaii'  # => "Hawaii"
     #   Time.zone.now         # => Wed, 23 Jan 2008 20:24:27 HST -10:00
-    def now: () -> untyped
+    def now: () -> ActiveSupport::TimeWithZone
 
     # Returns the current date in this time zone.
     def today: () -> untyped
