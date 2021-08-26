@@ -53,7 +53,7 @@ This is different from when loading RBS files with lbrary name that ignores dire
 Adding RBS files for a gem can be done with 4 steps.
 
 1. Set up environment
-2. Make a directory
+2. Generate a boilerplate
 3. Write RBS files
 4. Write tests
 
@@ -66,15 +66,12 @@ It runs `bundle install` with `--gemfile` option for the case the working copy i
 
 `bin/rbs` would also help to run the commands with correct `--gemfile` option.
 
-### Make a directory
+### Generate a boilerplate
 
-`mkdir -p gems/[gem]/[version]` works fine.
+Execute `bin/init_new_gem GEM_NAME`.
+This script generates an empty RBS to `gems/GEM_NAME/VERSION/GEM_NAME.rbs`, and makes `_test` directory to test the gem.
 
 Specify the _major_ and _minor_ version you are using would be great for most cases.
-
-```
-$ mkdir -p gems/redis/4.2
-```
 
 We recommend adding `_scripts`, `_test`, and `_src` directories.
 We assume `_scripts/test` script runs test of the gem, `_test` directory contains files for testing, and `_src` is a git submodule for the source code of the version of the gem.
@@ -127,23 +124,12 @@ You can test your code with the following steps.
 1. Write a Ruby program which uses the gem code
 2. Confirm the consistency between the program and RBS
 
-#### Using RBS runtime testing
-
-`rbs` gem provides a feature to insert runtime checks.
-You can write a Ruby program and let the code run with runtime checks.
-
-```
-$ rbs --repo ../../.. -r redis test --target Redis _tests/test.rb
-```
-
-The drawback of runtime testing is that you need to set up dependencies -- servers, libraries, and data.
-
 #### Using Steep
 
 I have been testing with [Steep](https://github.com/soutaro/steep).
 
 Add a `Steepfile` in `_test` directory and write test scripts.
-Then you can run `steep test` to type check the test scripts.
+Then you can run `steep check` to type check the test scripts.
 
 See existing gems for examples, like [redis/4.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/redis/4.2/_test) or [listen/3.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/listen/3.2/_test).
 

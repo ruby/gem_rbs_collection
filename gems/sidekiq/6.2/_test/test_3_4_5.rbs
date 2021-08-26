@@ -1,0 +1,44 @@
+class LessRetryableWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class NonRetryableWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class NoDeathWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class WorkerWithCustomRetry
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  extend Sidekiq::Worker::Options::ClassMethods
+  def perform: () -> void
+end
+
+class FailingWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  extend Sidekiq::Worker::Options::ClassMethods
+  def perform: () -> void
+end
+
+class ImportantWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class YourWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+$stdout: IO
