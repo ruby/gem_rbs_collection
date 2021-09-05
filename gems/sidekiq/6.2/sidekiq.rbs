@@ -473,6 +473,10 @@ module Sidekiq
             | (String match, ?Integer count) -> Enumerator[Sidekiq::SortedEntry, void]
 
     def clear: () -> Integer
+
+    # Sidekiq::SortedSet#each is not defined actually. It is defined in the subclass.
+    # But it is necessary to satisfy Enumerable module's constraint.
+    def each: () { (Sidekiq::SortedEntry) -> void } -> void
   end
 
   class JobSet < SortedSet
@@ -634,7 +638,7 @@ module Sidekiq
 
       def initialize_copy: (untyped copy) -> untyped
 
-      def each: () { () -> untyped } -> untyped
+      def each: () { (untyped) -> untyped } -> untyped
 
       def initialize: () ?{ (instance chain) -> void } -> void
 
