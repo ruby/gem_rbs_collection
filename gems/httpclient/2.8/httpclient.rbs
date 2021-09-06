@@ -224,13 +224,17 @@
 #   ruby -rhttpclient -e 'p HTTPClient.head(ARGV.shift).header["last-modified"]' http://dev.ctor.org/
 #
 class HTTPClient
-  type query = Array[Hash[String, _ToS | _Reader]]
+  type query = Hash[String, _ToS | _Reader]
              | Array[[String, _ToS | _Reader]]
+             | String
+             | _Reader
   type header = Hash[String, _ToS]
               | Array[[String, _ToS]]
   type body = Hash[String, _ToS | _Reader]
             | Array[[String, _ToS | _Reader]]
             | Array[Hash[String, _ToS | _Reader]]
+            | String
+            | _Reader
 
   module DelegateMethods
     def get_content: (
