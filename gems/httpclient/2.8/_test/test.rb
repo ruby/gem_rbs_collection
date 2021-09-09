@@ -1,7 +1,7 @@
 require "httpclient"
 
 client = HTTPClient.new
-res = client.get("http://example.com")
+res = client.get("http://example.com", query: {"q" => "v"})
 if res.status == 200
   puts res.body
 end
