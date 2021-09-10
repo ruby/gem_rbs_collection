@@ -1,5 +1,43 @@
 module ActiveRecord
   class Base
+    # puts ActiveRecord::Base.singleton_class.ancestors.map(&:to_s).select { |s| /ClassMethods$/.match?(s) }.map{ |s| "extend ::#{s}" }.sort
+    extend ::ActiveModel::AttributeMethods::ClassMethods
+    extend ::ActiveModel::Conversion::ClassMethods
+    extend ::ActiveModel::SecurePassword::ClassMethods
+    extend ::ActiveModel::Validations::Callbacks::ClassMethods
+    extend ::ActiveModel::Validations::ClassMethods
+    extend ::ActiveRecord::Associations::ClassMethods
+    extend ::ActiveRecord::AttributeMethods::ClassMethods
+    extend ::ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods
+    extend ::ActiveRecord::AttributeMethods::Read::ClassMethods
+    extend ::ActiveRecord::AttributeMethods::Serialization::ClassMethods
+    extend ::ActiveRecord::AttributeMethods::TimeZoneConversion::ClassMethods
+    extend ::ActiveRecord::AttributeMethods::Write::ClassMethods
+    extend ::ActiveRecord::Attributes::ClassMethods
+    extend ::ActiveRecord::AutosaveAssociation::ClassMethods
+    extend ::ActiveRecord::Core::ClassMethods
+    extend ::ActiveRecord::CounterCache::ClassMethods
+    extend ::ActiveRecord::Inheritance::ClassMethods
+    extend ::ActiveRecord::Integration::ClassMethods
+    extend ::ActiveRecord::Locking::Optimistic::ClassMethods
+    extend ::ActiveRecord::ModelSchema::ClassMethods
+    extend ::ActiveRecord::NestedAttributes::ClassMethods
+    extend ::ActiveRecord::NoTouching::ClassMethods
+    extend ::ActiveRecord::Persistence::ClassMethods
+    extend ::ActiveRecord::ReadonlyAttributes::ClassMethods
+    extend ::ActiveRecord::Reflection::ClassMethods
+    extend ::ActiveRecord::Sanitization::ClassMethods
+    extend ::ActiveRecord::Scoping::ClassMethods
+    extend ::ActiveRecord::Scoping::Default::ClassMethods
+    extend ::ActiveRecord::Scoping::Named::ClassMethods
+    extend ::ActiveRecord::SecureToken::ClassMethods
+    extend ::ActiveRecord::Store::ClassMethods
+    extend ::ActiveRecord::Suppressor::ClassMethods
+    extend ::ActiveRecord::Timestamp::ClassMethods
+    extend ::ActiveRecord::Transactions::ClassMethods
+    extend ::ActiveRecord::Validations::ClassMethods
+    extend ::ActiveSupport::Callbacks::ClassMethods
+
     def self.abstract_class=: (bool) -> void
     def self.scope: (Symbol, ^(*untyped) -> untyped ) -> void
                   | (Symbol) { (*untyped) -> untyped } -> void
@@ -48,8 +86,6 @@ module ActiveRecord
     def errors: () -> untyped
     def []: (Symbol) -> untyped
     def []=: (Symbol, untyped) -> untyped
-
-    extend Sanitization::ClassMethods
   end
 end
 
