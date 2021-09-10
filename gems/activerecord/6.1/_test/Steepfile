@@ -1,3 +1,5 @@
+D = Steep::Diagnostic
+
 target :test do
   signature "."
   check "."
@@ -12,6 +14,7 @@ target :test do
   library "singleton"
   library "tsort"
   library "rack"
+  library "time"
 
   library "activerecord:6.1.4.1"
   library "activesupport:6.1.4.1"
@@ -21,5 +24,5 @@ target :test do
   library "actionview:6.1.4.1"
   library "railties:6.1.4.1"
 
-  typing_options :strict
+  configure_code_diagnostics(D::Ruby.strict)
 end
