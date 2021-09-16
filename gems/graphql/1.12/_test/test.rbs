@@ -1,0 +1,66 @@
+module GraphQL
+  class Schema
+    class Object < Member
+    end
+  end
+end
+
+module Types
+  class BaseArgument < GraphQL::Schema::Argument
+  end
+
+  class BaseConnection
+    include GraphQL::Types::Relay::ConnectionBehaviors
+  end
+
+  class BaseEdge
+    include GraphQL::Types::Relay::EdgeBehaviors
+  end
+
+  class BaseEnum < GraphQL::Schema::Enum
+  end
+
+  class BaseField < GraphQL::Schema::Field
+  end
+
+  class BaseInputObject < GraphQL::Schema::InputObject
+  end
+
+  module BaseInterface
+    include GraphQL::Schema::Interface
+    # see graphql/schema/interface.rb def included
+    extend GraphQL::Schema::Interface::DefinitionMethods
+  end
+
+  class BaseObject < GraphQL::Schema::Object
+  end
+
+  class BaseScalar < GraphQL::Schema::Scalar
+  end
+
+  class BaseUnion < GraphQL::Schema::Union
+  end
+
+  module NodeType
+    include GraphQL::Types::Relay::NodeBehaviors
+    include BaseInterface
+  end
+
+  class QueryType < BaseObject
+    include GraphQL::Types::Relay::HasNodesField
+    include GraphQL::Types::Relay::HasNodeField
+
+    def ping: -> untyped
+  end
+end
+
+module Mutations
+  class BaseMutation < GraphQL::Schema::RelayClassicMutation
+  end
+
+  class Ping < BaseMutation
+  end
+end
+
+class MySchema < GraphQL::Schema
+end
