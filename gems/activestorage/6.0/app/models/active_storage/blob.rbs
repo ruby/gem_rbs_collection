@@ -133,7 +133,7 @@ class ActiveStorage::Blob < ActiveRecord::Base
   # The tempfile is automatically closed and unlinked after the given block is executed.
   #
   # Raises ActiveStorage::IntegrityError if the downloaded data does not match the blob's checksum.
-  def open: (?tmpdir: untyped? tmpdir) { () -> untyped } -> untyped
+  def open: (?tmpdir: untyped? tmpdir) { (Tempfile) -> untyped } -> untyped
 
   # Deletes the files on the service associated with the blob. This should only be done if the blob is going to be
   # deleted as well or you will essentially have a dead reference. It's recommended to use #purge and #purge_later
