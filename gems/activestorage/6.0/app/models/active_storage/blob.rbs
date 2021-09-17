@@ -117,7 +117,8 @@ class ActiveStorage::Blob < ActiveRecord::Base
 
   # Downloads the file associated with this blob. If no block is given, the entire file is read into memory and returned.
   # That'll use a lot of RAM for very large files. If a block is given, then the download is streamed and yielded in chunks.
-  def download: () { () -> untyped } -> untyped
+  def download: () { (String) -> void } -> void
+              | () -> String
 
   # Downloads the blob to a tempfile on disk. Yields the tempfile.
   #
