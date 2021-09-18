@@ -7,7 +7,7 @@ module ActiveStorage
     module ClassMethods
       # Specifies the relation between a single attachment and the model.
       #
-      #   class User < ApplicationRecord
+      #   class User < ActiveRecord::Base
       #     has_one_attached :avatar
       #   end
       #
@@ -29,31 +29,11 @@ module ActiveStorage
       #
       # If the +:dependent+ option isn't set, the attachment will be purged
       # (i.e. destroyed) whenever the record is destroyed.
-      #
-      # If you need the attachment to use a service which differs from the globally configured one,
-      # pass the +:service+ option. For instance:
-      #
-      #   class User < ActiveRecord::Base
-      #     has_one_attached :avatar, service: :s3
-      #   end
-      #
-      # If you need to enable +strict_loading+ to prevent lazy loading of attachment,
-      # pass the +:strict_loading+ option. You can do:
-      #
-      #   class User < ApplicationRecord
-      #     has_one_attached :avatar, strict_loading: true
-      #   end
-      #
-      def has_one_attached: (
-        (::String | ::Symbol) name,
-        ?dependent: ::Symbol dependent,
-        ?service: (::String | ::Symbol| nil) service,
-        ?strict_loading: bool strict_loading
-      ) -> void
+      def has_one_attached: ((::String | ::Symbol) name, ?dependent: ::Symbol dependent) -> void
 
       # Specifies the relation between multiple attachments and the model.
       #
-      #   class Gallery < ApplicationRecord
+      #   class Gallery < ActiveRecord::Base
       #     has_many_attached :photos
       #   end
       #
@@ -75,27 +55,7 @@ module ActiveStorage
       #
       # If the +:dependent+ option isn't set, all the attachments will be purged
       # (i.e. destroyed) whenever the record is destroyed.
-      #
-      # If you need the attachment to use a service which differs from the globally configured one,
-      # pass the +:service+ option. For instance:
-      #
-      #   class Gallery < ActiveRecord::Base
-      #     has_many_attached :photos, service: :s3
-      #   end
-      #
-      # If you need to enable +strict_loading+ to prevent lazy loading of attachments,
-      # pass the +:strict_loading+ option. You can do:
-      #
-      #   class Gallery < ApplicationRecord
-      #     has_many_attached :photos, strict_loading: true
-      #   end
-      #
-      def has_many_attached: (
-        (::String | ::Symbol) name,
-        ?dependent: ::Symbol dependent,
-        ?service: (::String | ::Symbol| nil) service,
-        ?strict_loading: bool strict_loading
-      ) -> void
+      def has_many_attached: ((::String | ::Symbol) name, ?dependent: ::Symbol dependent) -> void
     end
 
     def attachment_changes: () -> void
