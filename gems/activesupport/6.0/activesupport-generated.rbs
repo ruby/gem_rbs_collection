@@ -3533,14 +3533,14 @@ class Integer
   # Returns a Duration instance matching the number of months provided.
   #
   #   2.months # => 2 months
-  def months: () -> untyped
+  def months: () -> ::ActiveSupport::Duration
 
   alias month months
 
   # Returns a Duration instance matching the number of years provided.
   #
   #   2.years # => 2 years
-  def years: () -> untyped
+  def years: () -> ::ActiveSupport::Duration
 
   alias year years
 end
@@ -4518,42 +4518,42 @@ class Numeric
   # Returns a Duration instance matching the number of seconds provided.
   #
   #   2.seconds # => 2 seconds
-  def seconds: () -> untyped
+  def seconds: () -> ::ActiveSupport::Duration
 
   alias second seconds
 
   # Returns a Duration instance matching the number of minutes provided.
   #
   #   2.minutes # => 2 minutes
-  def minutes: () -> untyped
+  def minutes: () -> ::ActiveSupport::Duration
 
   alias minute minutes
 
   # Returns a Duration instance matching the number of hours provided.
   #
   #   2.hours # => 2 hours
-  def hours: () -> untyped
+  def hours: () -> ::ActiveSupport::Duration
 
   alias hour hours
 
   # Returns a Duration instance matching the number of days provided.
   #
   #   2.days # => 2 days
-  def days: () -> untyped
+  def days: () -> ::ActiveSupport::Duration
 
   alias day days
 
   # Returns a Duration instance matching the number of weeks provided.
   #
   #   2.weeks # => 2 weeks
-  def weeks: () -> untyped
+  def weeks: () -> ::ActiveSupport::Duration
 
   alias week weeks
 
   # Returns a Duration instance matching the number of fortnights provided.
   #
   #   2.fortnights # => 4 weeks
-  def fortnights: () -> untyped
+  def fortnights: () -> ::ActiveSupport::Duration
 
   alias fortnight fortnights
 
@@ -7424,7 +7424,7 @@ module ActiveSupport
 
     # Calculates a new Time or Date that is as far in the future
     # as this Duration represents.
-    def since: (?untyped time) -> untyped
+    def since: (?untyped time) -> ::ActiveSupport::TimeWithZone
 
     alias from_now since
 
@@ -7432,7 +7432,7 @@ module ActiveSupport
 
     # Calculates a new Time or Date that is as far in the past
     # as this Duration represents.
-    def ago: (?untyped time) -> untyped
+    def ago: (?untyped time) -> ::ActiveSupport::TimeWithZone
 
     alias until ago
 
@@ -12000,7 +12000,7 @@ module ActiveSupport
     #
     #   now + 24.hours      # => Mon, 03 Nov 2014 00:26:28 EST -05:00
     #   now + 1.day         # => Mon, 03 Nov 2014 01:26:28 EST -05:00
-    def +: (untyped other) -> untyped
+    def +: ((Time | TimeWithZone | Numeric | Duration) other) -> TimeWithZone
 
     alias since +
 
@@ -12030,7 +12030,8 @@ module ActiveSupport
     #
     #   Time.zone.now - 1.day.ago # => 86399.999967
     #
-    def -: (untyped other) -> untyped
+    def -: ((TimeWithZone | Time) other) -> Float
+         | ((Numeric | Duration) other) -> TimeWithZone
 
     # Subtracts an interval of time from the current object's time and returns
     # the result as a new TimeWithZone object.
@@ -12049,7 +12050,7 @@ module ActiveSupport
     #
     #   now.ago(24.hours)   # => Sun, 02 Nov 2014 01:26:28 EDT -04:00
     #   now.ago(1.day)      # => Sun, 02 Nov 2014 00:26:28 EDT -04:00
-    def ago: (untyped other) -> untyped
+    def ago: (untyped other) -> TimeWithZone
 
     # Returns a new +ActiveSupport::TimeWithZone+ where one or more of the elements have
     # been changed according to the +options+ parameter. The time options (<tt>:hour</tt>,
@@ -12068,7 +12069,7 @@ module ActiveSupport
     #   t.change(min: 30)          # => Fri, 14 Apr 2017 11:30:00 EST -05:00
     #   t.change(offset: "-10:00") # => Fri, 14 Apr 2017 11:45:15 HST -10:00
     #   t.change(zone: "Hawaii")   # => Fri, 14 Apr 2017 11:45:15 HST -10:00
-    def change: (untyped options) -> untyped
+    def change: (untyped options) -> TimeWithZone
 
     # Uses Date to provide precise Time calculations for years, months, and days
     # according to the proleptic Gregorian calendar. The result is returned as a
@@ -12091,7 +12092,7 @@ module ActiveSupport
     #   now.advance(weeks: 1)   # => Sun, 09 Nov 2014 01:26:28 EST -05:00
     #   now.advance(months: 1)  # => Tue, 02 Dec 2014 01:26:28 EST -05:00
     #   now.advance(years: 1)   # => Mon, 02 Nov 2015 01:26:28 EST -05:00
-    def advance: (untyped options) -> untyped
+    def advance: (untyped options) -> TimeWithZone
 
     # Returns Array of parts of Time in sequence of
     # [seconds, minutes, hours, day, month, year, weekday, yearday, dst?, zone].
