@@ -2776,7 +2776,8 @@ module DateAndTime
     #
     #   Time.utc(2000).in_time_zone('Alaska') # => Fri, 31 Dec 1999 15:00:00 AKST -09:00
     #   Date.new(2000).in_time_zone('Alaska') # => Sat, 01 Jan 2000 00:00:00 AKST -09:00
-    def in_time_zone: (?untyped zone) -> untyped
+    def in_time_zone: (?(ActiveSupport::TimeZone | String) zone) -> ::ActiveSupport::TimeWithZone
+                    | (false? zone) -> ::Time
 
     private
 
@@ -5913,7 +5914,8 @@ end
 class String
   # Converts String to a TimeWithZone in the current zone if Time.zone or Time.zone_default
   # is set, otherwise converts String to a Time via String#to_time
-  def in_time_zone: (?untyped zone) -> untyped
+  def in_time_zone: (?(ActiveSupport::TimeZone | String) zone) -> ::ActiveSupport::TimeWithZone
+                  | (false? zone) -> ::Time
 end
 
 class Time
@@ -11848,7 +11850,8 @@ module ActiveSupport
     def period: () -> untyped
 
     # Returns the simultaneous time in <tt>Time.zone</tt>, or the specified zone.
-    def in_time_zone: (?untyped new_zone) -> untyped
+    def in_time_zone: (?(ActiveSupport::TimeZone | String) new_zone) -> ::ActiveSupport::TimeWithZone
+                    | (false? zone) -> ::Time
 
     # Returns a <tt>Time</tt> instance of the simultaneous time in the system timezone.
     def localtime: (?untyped? utc_offset) -> untyped
