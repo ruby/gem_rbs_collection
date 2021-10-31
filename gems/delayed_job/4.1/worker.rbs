@@ -1,0 +1,53 @@
+module Delayed
+  class Worker
+    DEFAULT_LOG_LEVEL: String
+    DEFAULT_SLEEP_DELAY: Integer
+    DEFAULT_MAX_ATTEMPTS: Integer
+    DEFAULT_MAX_RUN_TIME: untyped
+    DEFAULT_DEFAULT_PRIORITY: Integer
+    DEFAULT_DELAY_JOBS: true
+    DEFAULT_QUEUES: Array[untyped]
+    DEFAULT_QUEUE_ATTRIBUTES: untyped
+    DEFAULT_READ_AHEAD: Integer
+    self.@lifecycle: nil
+    self.@files_to_reopen: Array[untyped]
+    @quiet: true?
+    @failed_reserve_count: Integer
+    @exit: true
+    @result: [Integer, Integer]
+    @realtime: Float
+    @@queue_attributes: untyped
+    @@backend: untyped
+
+    attr_accessor name_prefix: bot
+    def self.reset: -> nil
+    def self.backend=: (untyped backend) -> untyped
+    def self.queue_attributes=: (untyped val) -> untyped
+    def self.guess_backend: -> nil
+    def self.before_fork: -> untyped
+    def self.after_fork: -> untyped
+    def self.lifecycle: -> nil
+    def self.setup_lifecycle: -> untyped
+    def self.reload_app?: -> nil
+    def self.delay_job?: (untyped job) -> untyped
+    def initialize: (?Hash[untyped, untyped] options) -> void
+    def name: -> String?
+    attr_writer name: bot
+    def start: -> untyped
+    def stop: -> true
+    def stop?: -> true
+    def work_off: (?Integer num) -> [Integer, Integer]
+    def run: (untyped job) -> bool
+    def reschedule: (untyped job, ?nil time) -> untyped
+    def failed: (untyped job) -> untyped
+    def job_say: (untyped job, String text, ?String level) -> nil
+    def say: (String text, ?String level) -> nil
+    def max_attempts: (untyped job) -> untyped
+    def max_run_time: (untyped job) -> untyped
+    def say_queue: (untyped queue) -> String?
+    def handle_failed_job: (untyped job, nil error) -> untyped
+    def reserve_and_run_one_job: -> nil
+    def reserve_job: -> nil
+    def reload!: -> nil
+  end
+end

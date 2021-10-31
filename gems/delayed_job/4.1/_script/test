@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+set -v
+
+RBS_DIR=$(cd $(dirname $0)/..; pwd)
+REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
+GEM=delayed_job:4.1
+
+bundle exec rbs --repo $REPO_DIR -r $GEM validate
+
+cd ${RBS_DIR}/_test
+bundle exec steep check
