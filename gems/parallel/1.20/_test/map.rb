@@ -6,9 +6,9 @@ puts Parallel.map(['a','b','c'], in_threads: 2) { |item| item * 3 }.at(0)
 
 puts Parallel.map(['a','b','c'], progress: 'Running...') { |item| item * 4 }.at(0)
 
-puts Parallel.map(['a','b','c'], start: ->(item, index) { puts "Start: #{item * (index + 1)}" }) { |item| item * 5 }.at(0)
+puts Parallel.map(['a','b','c'], start: ->(item, index) { puts "Start: #{(_ = item) * (index + 1)}" }) { |item| item * 5 }.at(0)
 
-puts Parallel.map(['a','b','c'], finish: ->(item, index, result) { puts "Finish: #{item * (index + 1)}, #{result.inspect}" }) { |item| item * 6 }.at(0)
+puts Parallel.map(['a','b','c'], finish: ->(item, index, result) { puts "Finish: #{(_ = item) * (index + 1)}, #{(_ = result).inspect}" }) { |item| item * 6 }.at(0)
 
 puts Parallel.map('a'..'c') { |item| item * 2 }.at(0)
 

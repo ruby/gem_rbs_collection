@@ -6,9 +6,9 @@ Parallel.each(['a','b','c'], in_threads: 2) { |item| puts item * 3 }
 
 Parallel.each(['a','b','c'], progress: 'Running...') { |item| puts item * 4 }
 
-Parallel.each(['a','b','c'], start: ->(item, index) { puts "Start: #{item * (index + 1)}" }) { |item| puts item * 5 }
+Parallel.each(['a','b','c'], start: ->(item, index) { puts "Start: #{(_ = item) * (index + 1)}" }) { |item| puts item * 5 }
 
-Parallel.each(['a','b','c'], finish: ->(item, index, result) { puts "Finish: #{item * (index + 1)}, #{result.inspect}" }) { |item| item * 6 }
+Parallel.each(['a','b','c'], finish: ->(item, index, result) { puts "Finish: #{(_ = item) * (index + 1)}, #{(_ = result).inspect}" }) { |item| item * 6 }
 
 Parallel.each('a'..'c') { |item| puts item * 7 }
 
