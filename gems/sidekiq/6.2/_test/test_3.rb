@@ -7,7 +7,7 @@ end
 class LessRetryableWorker
   include Sidekiq::Worker
   sidekiq_options retry: 5 # Only five retries and then to the Dead Job Queue
-  
+
   def perform
   end
 end
@@ -52,7 +52,7 @@ class FailingWorker
   sidekiq_retries_exhausted do |msg, ex|
     Sidekiq.logger.warn "Failed #{msg['class']} with #{msg['args']}: #{msg['error_message']}"
   end
-  
+
   def perform
     raise "or I don't work"
   end
