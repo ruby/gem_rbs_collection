@@ -5,7 +5,7 @@ require "zengin_code"
 
 ZenginCode::Bank.all # => { '0001' => <#ZenginCode::Bank code, name, kana, hira, roma ... >, .... }
 
-bank = ZenginCode::Bank["0001"]
+bank = ZenginCode::Bank["0001"] or raise
 
 puts bank.code
 puts bank.name
