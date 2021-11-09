@@ -17,3 +17,23 @@ jobs:
       run: 'gem install rbs'
     - name: 'Test syntax check'
       run: 'rbs parse gems/**/*.rbs'
+  test_on_changed_gems:
+    runs-on: ubuntu-latest
+    container:
+      image: rubylang/ruby:3.0-focal
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - name: 'Install dependencies'
+      run: 'bundle install --frozen'
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v11.5
+    - name: 'Run test on changed gems'
+      run: |
+        CHANGED_GEMS="$(echo ${{ steps.changed-files.outputs.all_modified_files }} | ruby -e 'puts gets.split.filter_map{_1[%r!^(gems/[^/]+/[^/]+/)!, 1]}.uniq.join(%q! !)')"
+        echo "Changed gems: ${CHANGED_GEMS}"
+        if [ -n "${CHANGED_GEMS}" ]; then
+          bin/test $CHANGED_GEMS
+        fi
