@@ -35,5 +35,5 @@ jobs:
         CHANGED_GEMS="$(echo ${{ steps.changed-files.outputs.all_modified_files }} | ruby -e 'puts gets.split.filter_map{_1[%r!^(gems/[^/]+/[^/]+/)!, 1]}.uniq.join(%q! !)')"
         echo "Changed gems: ${CHANGED_GEMS}"
         if [ -n "${CHANGED_GEMS}" ]; then
-          bin/test $CHANGED_GEMS
+          bin/test $CHANGED_GEMS --verbose
         fi
