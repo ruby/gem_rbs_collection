@@ -1,9 +1,0 @@
-file 'apis_s3_2006-03-01_api-2.json' do
-  sh "curl -o apis_s3_2006-03-01_api-2.json https://raw.githubusercontent.com/aws/aws-sdk-ruby/version-3/apis/s3/2006-03-01/api-2.json"
-end
-
-file '2006-03-01_api-2.rbs' => ['apis_s3_2006-03-01_api-2.json', 'aws_client_types_generator.rb'] do
-  ruby "aws_client_types_generator.rb apis_s3_2006-03-01_api-2.json > 2006-03-01_api-2.rbs"
-end
-
-task default: '2006-03-01_api-2.rbs'
