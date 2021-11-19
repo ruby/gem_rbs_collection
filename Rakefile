@@ -1,4 +1,8 @@
-file 'tmp/apis_s3_2006-03-01_api-2.json' do
+file 'tmp' do
+  sh "mkdir -p tmp"
+end
+
+file 'tmp/apis_s3_2006-03-01_api-2.json' => ['tmp'] do
   sh "curl -o tmp/apis_s3_2006-03-01_api-2.json https://raw.githubusercontent.com/aws/aws-sdk-ruby/version-3/apis/s3/2006-03-01/api-2.json"
 end
 
