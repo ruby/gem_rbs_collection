@@ -1,6 +1,8 @@
 require "aws-sdk-s3"
 
-client = Aws::S3::Client.new
+client = Aws::S3::Client.new(
+  region: 'ap-test-1'
+)
 resp = client.list_buckets
 resp.buckets.each do |bucket|
   bucket.name.upcase
