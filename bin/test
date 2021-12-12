@@ -6,6 +6,7 @@ require "open3"
 
 @verbose = false
 @repo_root = Pathname(__dir__) + "../gems"
+@root_gemfile = Pathname(__dir__) + '../Gemfile'
 @repos = []
 
 OptionParser.new do |opts|
@@ -52,7 +53,8 @@ dirs.each do |dir|
     env = {
       "REPO_ROOT" => @repo_root.to_s,
       "REPOS" => @repos.join(File::PATH_SEPARATOR),
-      "RBS_DIR" => dir.to_s
+      "RBS_DIR" => dir.to_s,
+      "ROOT_GEMFILE" => @root_gemfile.to_s,
     }
     stdout, status = Open3.capture2(env, test_path.to_s)
 
