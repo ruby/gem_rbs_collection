@@ -2,7 +2,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-bundle exec rbs --repo $REPO_ROOT -r forwardable -r retryable:3.0 validate --silent
-
 cd ${RBS_DIR}/_test
-bundle exec steep check --with-expectations
+
+env BUNDLE_GEMFILE="${ROOT_GEMFILE}" bundle exec rbs collection install
+env BUNDLE_GEMFILE="${ROOT_GEMFILE}" bundle exec rbs validate --silent
+env BUNDLE_GEMFILE="${ROOT_GEMFILE}" bundle exec steep check --with-expectations
