@@ -1,7 +1,7 @@
 #! /usr/bin/env ruby
 
 # see also aws-sdk-ruby/Rakefile
-$REPO_ROOT = "#{File.dirname(__FILE__)}/gems/aws-sdk-core/3/_src"
+$REPO_ROOT = "#{File.dirname(__FILE__)}/_src"
 $GEMS_DIR = "#{$REPO_ROOT}/gems"
 $CORE_LIB = "#{$REPO_ROOT}/gems/aws-sdk-core/lib"
 
