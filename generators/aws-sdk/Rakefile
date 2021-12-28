@@ -5,6 +5,11 @@ gems = {
     api_url: "https://raw.githubusercontent.com/aws/aws-sdk-ruby/version-3/apis/s3/2006-03-01/api-2.json",
     tmp_file: "tmp/apis_s3_2006-03-01_api-2.json",
     rbs_path: "#{root}/gems/aws-sdk-s3/1/2006-03-01_api-2.rbs",
+  },
+  'aws-sdk-sqs' => {
+    api_url: "https://raw.githubusercontent.com/aws/aws-sdk-ruby/version-3/apis/sqs/2012-11-05/api-2.json",
+    tmp_file: "tmp/apis_sqs_2012-11-05_api-2.json",
+    rbs_path: "#{root}/gems/aws-sdk-sqs/1/2012-11-05_api-2.rbs",
   }
 }
 
@@ -16,6 +21,7 @@ gems.each do |gem, config|
   end
 
   file rbs_path => [tmp_file, 'aws_client_types_generator.rb'] do
+    mkdir_p File.dirname(rbs_path)
     ruby "aws_client_types_generator.rb #{tmp_file} > #{rbs_path}"
   end  
 
