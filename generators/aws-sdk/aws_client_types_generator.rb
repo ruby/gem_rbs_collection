@@ -119,8 +119,6 @@ class AwsClientTypesGenerator
     COMMENT
     io.puts
     io.puts "module Aws"
-    io.puts "  class EmptyStructure"
-    io.puts "  end"
     io.puts "  module #{@api["metadata"]["serviceId"].tr(' ', '')}"
     io.puts "    class Client"
     io.puts "      def self.new: (#{client_options.join(", ")}) -> instance"
