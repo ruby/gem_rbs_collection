@@ -109,6 +109,15 @@ class AwsClientTypesGenerator
   end
 
   def write(io)
+    io.puts <<~COMMENT
+    # WARNING ABOUT GENERATED CODE
+    #
+    # This file is generated. See the generator README.md for more information:
+    # https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk/README.md
+    #
+    # WARNING ABOUT GENERATED CODE
+    COMMENT
+    io.puts
     io.puts "module Aws"
     io.puts "  class EmptyStructure"
     io.puts "  end"
