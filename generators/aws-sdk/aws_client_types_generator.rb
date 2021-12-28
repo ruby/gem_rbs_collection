@@ -1,8 +1,28 @@
 #! /usr/bin/env ruby
 
+# see also aws-sdk-ruby/Rakefile
+$REPO_ROOT = "#{File.dirname(__FILE__)}/_src"
+$GEMS_DIR = "#{$REPO_ROOT}/gems"
+$CORE_LIB = "#{$REPO_ROOT}/gems/aws-sdk-core/lib"
+
+$:.unshift("#{$REPO_ROOT}/build_tools")
+$:.unshift("#{$REPO_ROOT}/build_tools/aws-sdk-code-generator/lib")
+Dir["#{$GEMS_DIR}/*"].each do |dir|
+  $:.unshift("#{dir}/lib")
+end
+
+require 'build_tools'
+require 'aws-sdk-core'
 require 'aws-sdk-code-generator'
 require 'json'
 require 'rbs'
+
+# Minimal Hack
+class AwsSdkCodeGenerator::Views::ClientClass
+  def render
+    self
+  end
+end
 
 using Module.new {
   refine String do
@@ -43,12 +63,67 @@ class AwsClientTypesGenerator
     @api.dig("shapes", name, "type") == "structure"
   end
 
+  def service_id
+    @api.dig("metadata", "serviceId").tr(' ', '')
+  end
+
+  def identifier
+    service_id.downcase
+  end
+
+  def client_options
+    require "aws-sdk-#{identifier}"
+    client_class = Aws.const_get(service_id)::Client
+    public_options = client_class.plugins.map(&:options).flatten.select(&:documented?)
+    # see also aws-sdk-ruby/build_tools/aws-sdk-code-generator/lib/aws-sdk-code-generator/client_constructor.rb
+    ordered_public_options = public_options.sort_by.with_index do |opt, i|
+      [opt.required ? 'a' : 'b', opt.name, i]
+    end
+    buffer = ordered_public_options.map do |opt|
+      type = case opt.name
+        when :retry_mode
+          '("legacy" | "standard" | "adaptive")'
+        when :retry_jitter
+          "(:none | :equal | :full | ^(Integer) -> Integer)"
+        when :endpoint, :credentials, :log_formatter, :client_side_monitoring_publisher, :logger
+          # TODO: Just not supported yet
+          "untyped"
+        else
+          case opt.doc_type
+          when "Boolean"
+            "bool"
+          when nil
+            raise opt.inspect
+          else
+            opt.doc_type.to_s
+          end
+        end
+      [opt.name, "?#{opt.name}: #{type}#{opt.required ? "" : "?"}", opt.doc_type]
+    end
+    # Find duplicated key
+    grouped = buffer.group_by { |name, rbs| name }
+    grouped.transform_values(&:count).find_all { |name, v| 1 < v }.each do |name,|
+      warn("Duprecate client option: `#{grouped[name].map { |g| g.values_at(0, 2) }}`", uplevel: 0)
+    end
+    buffer.uniq { |b| b[0] }.map { |b| b[1] }
+  end
+
   def write(io)
+    io.puts <<~COMMENT
+    # WARNING ABOUT GENERATED CODE
+    #
+    # This file is generated. See the generator README.md for more information:
+    # https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk/README.md
+    #
+    # WARNING ABOUT GENERATED CODE
+    COMMENT
+    io.puts
     io.puts "module Aws"
     io.puts "  class EmptyStructure"
     io.puts "  end"
     io.puts "  module #{@api["metadata"]["serviceId"].tr(' ', '')}"
     io.puts "    class Client"
+    io.puts "      def self.new: (#{client_options.join(", ")}) -> instance"
     @api["operations"].each do |key, body|
       input = body.dig("input", "shape")&.then { |i| shape_to_kwargs(i, allow_opt: true, types_prefix: true) }
       output = body.dig("output", "shape")&.then { |o| types(o) } || "Aws::EmptyStructure"

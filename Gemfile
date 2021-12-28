@@ -4,4 +4,8 @@ gem "rbs"
 gem "steep"
 gem "minitest"
 gem "rake"
-gem "aws-sdk-code-generator"
+
+# for aws-sdk
+gem "jmespath"
+gem "kramdown"
+gem "mustache"
