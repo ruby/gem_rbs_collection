@@ -3,11 +3,11 @@ module Aws
   end
   module S3
     class Client
-      def self.new: (?credentials: untyped, ?region: String, ?access_key_id: String?, ?active_endpoint_cache: bool?, ?adaptive_retry_wait_to_fill: bool?, ?client_side_monitoring: bool?, ?client_side_monitoring_client_id: String?, ?client_side_monitoring_host: String?, ?client_side_monitoring_port: Integer?, ?client_side_monitoring_publisher: untyped?, ?compute_checksums: bool?, ?convert_params: bool?, ?correct_clock_skew: bool?, ?disable_host_prefix_injection: bool?, ?endpoint: untyped?, ?endpoint_cache_max_entries: Integer?, ?endpoint_cache_max_threads: Integer?, ?endpoint_cache_poll_interval: Integer?, ?endpoint_discovery: bool?, ?event_stream_handler: Proc?, ?follow_redirects: bool?, ?force_path_style: bool?, ?http_continue_timeout: Integer?, ?http_idle_timeout: Integer?, ?http_open_timeout: Integer?, ?http_proxy: String?, ?http_read_timeout: Integer?, ?http_wire_trace: bool?, ?input_event_stream_handler: Proc?, ?log_formatter: untyped?, ?log_level: Symbol?, ?logger: untyped?, ?max_attempts: Integer?, ?on_chunk_sent: Proc?, ?output_event_stream_handler: Proc?, ?profile: String?, ?raise_response_errors: bool?, ?require_https_for_sse_cpk: bool?, ?retry_backoff: Proc?, ?retry_base_delay: Float?, ?retry_jitter: (:none | :equal | :full | ^(Integer) -> Integer)?, ?retry_limit: Integer?, ?retry_max_delay: Integer?, ?retry_mode: ("legacy" | "standard" | "adaptive")?, ?s3_disable_multiregion_access_points: bool?, ?s3_us_east_1_regional_endpoint: String?, ?s3_use_arn_region: bool?, ?secret_access_key: String?, ?session_token: String?, ?ssl_ca_bundle: String?, ?ssl_ca_directory: String?, ?ssl_ca_store: String?, ?ssl_verify_peer: bool?, ?stub_responses: bool?, ?use_accelerate_endpoint: bool?, ?use_dualstack_endpoint: bool?, ?use_fips_endpoint: bool?, ?validate_params: bool?) -> instance
+      def self.new: (?credentials: untyped, ?region: String, ?access_key_id: String?, ?active_endpoint_cache: bool?, ?adaptive_retry_wait_to_fill: bool?, ?client_side_monitoring: bool?, ?client_side_monitoring_client_id: String?, ?client_side_monitoring_host: String?, ?client_side_monitoring_port: Integer?, ?client_side_monitoring_publisher: untyped?, ?compute_checksums: bool?, ?convert_params: bool?, ?correct_clock_skew: bool?, ?defaults_mode: String?, ?disable_host_prefix_injection: bool?, ?endpoint: untyped?, ?endpoint_cache_max_entries: Integer?, ?endpoint_cache_max_threads: Integer?, ?endpoint_cache_poll_interval: Integer?, ?endpoint_discovery: bool?, ?event_stream_handler: Proc?, ?follow_redirects: bool?, ?force_path_style: bool?, ?http_continue_timeout: Integer?, ?http_idle_timeout: Integer?, ?http_open_timeout: Integer?, ?http_proxy: String?, ?http_read_timeout: Integer?, ?http_wire_trace: bool?, ?input_event_stream_handler: Proc?, ?log_formatter: untyped?, ?log_level: Symbol?, ?logger: untyped?, ?max_attempts: Integer?, ?on_chunk_sent: Proc?, ?output_event_stream_handler: Proc?, ?profile: String?, ?raise_response_errors: bool?, ?require_https_for_sse_cpk: bool?, ?retry_backoff: Proc?, ?retry_base_delay: Float?, ?retry_jitter: (:none | :equal | :full | ^(Integer) -> Integer)?, ?retry_limit: Integer?, ?retry_max_delay: Integer?, ?retry_mode: ("legacy" | "standard" | "adaptive")?, ?s3_disable_multiregion_access_points: bool?, ?s3_us_east_1_regional_endpoint: String?, ?s3_use_arn_region: bool?, ?secret_access_key: String?, ?session_token: String?, ?ssl_ca_bundle: String?, ?ssl_ca_directory: String?, ?ssl_ca_store: String?, ?ssl_timeout: Float?, ?ssl_verify_peer: bool?, ?stub_responses: bool?, ?use_accelerate_endpoint: bool?, ?use_dualstack_endpoint: bool?, ?use_fips_endpoint: bool?, ?validate_params: bool?) -> instance
       def abort_multipart_upload: (bucket: Types::bucket_name, key: Types::object_key, upload_id: Types::multipart_upload_id, ?request_payer: Types::request_payer, ?expected_bucket_owner: Types::account_id) -> Types::AbortMultipartUploadOutput
       def complete_multipart_upload: (bucket: Types::bucket_name, key: Types::object_key, ?multipart_upload: Types::CompletedMultipartUpload, upload_id: Types::multipart_upload_id, ?request_payer: Types::request_payer, ?expected_bucket_owner: Types::account_id) -> Types::CompleteMultipartUploadOutput
       def copy_object: (?acl: Types::object_canned_acl, bucket: Types::bucket_name, ?cache_control: Types::cache_control, ?content_disposition: Types::content_disposition, ?content_encoding: Types::content_encoding, ?content_language: Types::content_language, ?content_type: Types::content_type, copy_source: Types::copy_source, ?copy_source_if_match: Types::copy_source_if_match, ?copy_source_if_modified_since: Types::copy_source_if_modified_since, ?copy_source_if_none_match: Types::copy_source_if_none_match, ?copy_source_if_unmodified_since: Types::copy_source_if_unmodified_since, ?expires: Types::expires, ?grant_full_control: Types::grant_full_control, ?grant_read: Types::grant_read, ?grant_read_acp: Types::grant_read_acp, ?grant_write_acp: Types::grant_write_acp, key: Types::object_key, ?metadata: Types::metadata, ?metadata_directive: Types::metadata_directive, ?tagging_directive: Types::tagging_directive, ?server_side_encryption: Types::server_side_encryption, ?storage_class: Types::storage_class, ?website_redirect_location: Types::website_redirect_location, ?sse_customer_algorithm: Types::sse_customer_algorithm, ?sse_customer_key: Types::sse_customer_key, ?sse_customer_key_md5: Types::sse_customer_key_md5, ?ssekms_key_id: Types::ssekms_key_id, ?ssekms_encryption_context: Types::ssekms_encryption_context, ?bucket_key_enabled: Types::bucket_key_enabled, ?copy_source_sse_customer_algorithm: Types::copy_source_sse_customer_algorithm, ?copy_source_sse_customer_key: Types::copy_source_sse_customer_key, ?copy_source_sse_customer_key_md5: Types::copy_source_sse_customer_key_md5, ?request_payer: Types::request_payer, ?tagging: Types::tagging_header, ?object_lock_mode: Types::object_lock_mode, ?object_lock_retain_until_date: Types::object_lock_retain_until_date, ?object_lock_legal_hold_status: Types::object_lock_legal_hold_status, ?expected_bucket_owner: Types::account_id, ?expected_source_bucket_owner: Types::account_id) -> Types::CopyObjectOutput
-      def create_bucket: (?acl: Types::bucket_canned_acl, bucket: Types::bucket_name, ?create_bucket_configuration: Types::CreateBucketConfiguration, ?grant_full_control: Types::grant_full_control, ?grant_read: Types::grant_read, ?grant_read_acp: Types::grant_read_acp, ?grant_write: Types::grant_write, ?grant_write_acp: Types::grant_write_acp, ?object_lock_enabled_for_bucket: Types::object_lock_enabled_for_bucket) -> Types::CreateBucketOutput
+      def create_bucket: (?acl: Types::bucket_canned_acl, bucket: Types::bucket_name, ?create_bucket_configuration: Types::CreateBucketConfiguration, ?grant_full_control: Types::grant_full_control, ?grant_read: Types::grant_read, ?grant_read_acp: Types::grant_read_acp, ?grant_write: Types::grant_write, ?grant_write_acp: Types::grant_write_acp, ?object_lock_enabled_for_bucket: Types::object_lock_enabled_for_bucket, ?object_ownership: Types::object_ownership) -> Types::CreateBucketOutput
       def create_multipart_upload: (?acl: Types::object_canned_acl, bucket: Types::bucket_name, ?cache_control: Types::cache_control, ?content_disposition: Types::content_disposition, ?content_encoding: Types::content_encoding, ?content_language: Types::content_language, ?content_type: Types::content_type, ?expires: Types::expires, ?grant_full_control: Types::grant_full_control, ?grant_read: Types::grant_read, ?grant_read_acp: Types::grant_read_acp, ?grant_write_acp: Types::grant_write_acp, key: Types::object_key, ?metadata: Types::metadata, ?server_side_encryption: Types::server_side_encryption, ?storage_class: Types::storage_class, ?website_redirect_location: Types::website_redirect_location, ?sse_customer_algorithm: Types::sse_customer_algorithm, ?sse_customer_key: Types::sse_customer_key, ?sse_customer_key_md5: Types::sse_customer_key_md5, ?ssekms_key_id: Types::ssekms_key_id, ?ssekms_encryption_context: Types::ssekms_encryption_context, ?bucket_key_enabled: Types::bucket_key_enabled, ?request_payer: Types::request_payer, ?tagging: Types::tagging_header, ?object_lock_mode: Types::object_lock_mode, ?object_lock_retain_until_date: Types::object_lock_retain_until_date, ?object_lock_legal_hold_status: Types::object_lock_legal_hold_status, ?expected_bucket_owner: Types::account_id) -> Types::CreateMultipartUploadOutput
       def delete_bucket: (bucket: Types::bucket_name, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
       def delete_bucket_analytics_configuration: (bucket: Types::bucket_name, id: Types::analytics_id, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
@@ -80,7 +80,7 @@ module Aws
       def put_bucket_logging: (bucket: Types::bucket_name, bucket_logging_status: Types::BucketLoggingStatus, ?content_md5: Types::content_md5, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
       def put_bucket_metrics_configuration: (bucket: Types::bucket_name, id: Types::metrics_id, metrics_configuration: Types::MetricsConfiguration, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
       def put_bucket_notification: (bucket: Types::bucket_name, ?content_md5: Types::content_md5, notification_configuration: Types::NotificationConfigurationDeprecated, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
-      def put_bucket_notification_configuration: (bucket: Types::bucket_name, notification_configuration: Types::NotificationConfiguration, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
+      def put_bucket_notification_configuration: (bucket: Types::bucket_name, notification_configuration: Types::NotificationConfiguration, ?expected_bucket_owner: Types::account_id, ?skip_destination_validation: Types::skip_validation) -> Aws::EmptyStructure
       def put_bucket_ownership_controls: (bucket: Types::bucket_name, ?content_md5: Types::content_md5, ?expected_bucket_owner: Types::account_id, ownership_controls: Types::OwnershipControls) -> Aws::EmptyStructure
       def put_bucket_policy: (bucket: Types::bucket_name, ?content_md5: Types::content_md5, ?confirm_remove_self_bucket_access: Types::confirm_remove_self_bucket_access, policy: Types::policy, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
       def put_bucket_replication: (bucket: Types::bucket_name, ?content_md5: Types::content_md5, replication_configuration: Types::ReplicationConfiguration, ?token: Types::object_lock_token, ?expected_bucket_owner: Types::account_id) -> Aws::EmptyStructure
@@ -219,7 +219,7 @@ module Aws
       type cloud_function = ::String
       class CloudFunctionConfiguration
         attr_accessor id: ::String
-        attr_accessor event: ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold")
+        attr_accessor event: ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold" | "s3:ObjectRestore:Delete" | "s3:LifecycleTransition" | "s3:IntelligentTiering" | "s3:ObjectAcl:Put" | "s3:LifecycleExpiration:*" | "s3:LifecycleExpiration:Delete" | "s3:LifecycleExpiration:DeleteMarkerCreated" | "s3:ObjectTagging:*" | "s3:ObjectTagging:Put" | "s3:ObjectTagging:Delete")
         attr_accessor events: ::Array[event]
         attr_accessor cloud_function: ::String
         attr_accessor invocation_role: ::String
@@ -310,7 +310,7 @@ module Aws
         attr_accessor metadata_directive: ("COPY" | "REPLACE")
         attr_accessor tagging_directive: ("COPY" | "REPLACE")
         attr_accessor server_side_encryption: ("AES256" | "aws:kms")
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor website_redirect_location: ::String
         attr_accessor sse_customer_algorithm: ::String
         attr_accessor sse_customer_key: ::String
@@ -363,6 +363,7 @@ module Aws
         attr_accessor grant_write: ::String
         attr_accessor grant_write_acp: ::String
         attr_accessor object_lock_enabled_for_bucket: bool
+        attr_accessor object_ownership: ("BucketOwnerPreferred" | "ObjectWriter" | "BucketOwnerEnforced")
       end
       class CreateMultipartUploadOutput
         attr_accessor abort_date: ::Time
@@ -394,7 +395,7 @@ module Aws
         attr_accessor key: ::String
         attr_accessor metadata: ::Hash[metadata_key, metadata_value]
         attr_accessor server_side_encryption: ("AES256" | "aws:kms")
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor website_redirect_location: ::String
         attr_accessor sse_customer_algorithm: ::String
         attr_accessor sse_customer_key: ::String
@@ -543,7 +544,7 @@ module Aws
       class Destination
         attr_accessor bucket: ::String
         attr_accessor account: ::String
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor access_control_translation: AccessControlTranslation
         attr_accessor encryption_configuration: EncryptionConfiguration
         attr_accessor replication_time: ReplicationTime
@@ -577,7 +578,9 @@ module Aws
       end
       type error_message = ::String
       type errors = ::Array[Error]
-      type event = ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold")
+      type event = ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold" | "s3:ObjectRestore:Delete" | "s3:LifecycleTransition" | "s3:IntelligentTiering" | "s3:ObjectAcl:Put" | "s3:LifecycleExpiration:*" | "s3:LifecycleExpiration:Delete" | "s3:LifecycleExpiration:DeleteMarkerCreated" | "s3:ObjectTagging:*" | "s3:ObjectTagging:Put" | "s3:ObjectTagging:Delete")
+      class EventBridgeConfiguration
+      end
       type event_list = ::Array[event]
       class ExistingObjectReplication
         attr_accessor status: ("Enabled" | "Disabled")
@@ -807,7 +810,7 @@ module Aws
         attr_accessor sse_customer_key_md5: ::String
         attr_accessor ssekms_key_id: ::String
         attr_accessor bucket_key_enabled: bool
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor request_charged: ("requester")
         attr_accessor replication_status: ("COMPLETE" | "PENDING" | "FAILED" | "REPLICA")
         attr_accessor parts_count: ::Integer
@@ -925,7 +928,7 @@ module Aws
         attr_accessor sse_customer_key_md5: ::String
         attr_accessor ssekms_key_id: ::String
         attr_accessor bucket_key_enabled: bool
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor request_charged: ("requester")
         attr_accessor replication_status: ("COMPLETE" | "PENDING" | "FAILED" | "REPLICA")
         attr_accessor parts_count: ::Integer
@@ -1073,10 +1076,14 @@ module Aws
       class LifecycleRuleAndOperator
         attr_accessor prefix: ::String
         attr_accessor tags: ::Array[Tag]
+        attr_accessor object_size_greater_than: ::Integer
+        attr_accessor object_size_less_than: ::Integer
       end
       class LifecycleRuleFilter
         attr_accessor prefix: ::String
         attr_accessor tag: Tag
+        attr_accessor object_size_greater_than: ::Integer
+        attr_accessor object_size_less_than: ::Integer
         attr_accessor and: LifecycleRuleAndOperator
       end
       type lifecycle_rules = ::Array[LifecycleRule]
@@ -1237,7 +1244,7 @@ module Aws
         attr_accessor parts: ::Array[Part]
         attr_accessor initiator: Initiator
         attr_accessor owner: Owner
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor request_charged: ("requester")
       end
       class ListPartsRequest
@@ -1301,7 +1308,7 @@ module Aws
         attr_accessor upload_id: ::String
         attr_accessor key: ::String
         attr_accessor initiated: ::Time
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor owner: Owner
         attr_accessor initiator: Initiator
       end
@@ -1315,16 +1322,19 @@ module Aws
       type next_version_id_marker = ::String
       class NoncurrentVersionExpiration
         attr_accessor noncurrent_days: ::Integer
+        attr_accessor newer_noncurrent_versions: ::Integer
       end
       class NoncurrentVersionTransition
         attr_accessor noncurrent_days: ::Integer
-        attr_accessor storage_class: ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE")
+        attr_accessor storage_class: ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "GLACIER_IR")
+        attr_accessor newer_noncurrent_versions: ::Integer
       end
       type noncurrent_version_transition_list = ::Array[NoncurrentVersionTransition]
       class NotificationConfiguration
         attr_accessor topic_configurations: ::Array[TopicConfiguration]
         attr_accessor queue_configurations: ::Array[QueueConfiguration]
         attr_accessor lambda_function_configurations: ::Array[LambdaFunctionConfiguration]
+        attr_accessor event_bridge_configuration: EventBridgeConfiguration
       end
       class NotificationConfigurationDeprecated
         attr_accessor topic_configuration: TopicConfigurationDeprecated
@@ -1340,7 +1350,7 @@ module Aws
         attr_accessor last_modified: ::Time
         attr_accessor etag: ::String
         attr_accessor size: ::Integer
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor owner: Owner
       end
       type object_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read" | "aws-exec-read" | "bucket-owner-read" | "bucket-owner-full-control")
@@ -1372,8 +1382,10 @@ module Aws
         attr_accessor default_retention: DefaultRetention
       end
       type object_lock_token = ::String
-      type object_ownership = ("BucketOwnerPreferred" | "ObjectWriter")
-      type object_storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS")
+      type object_ownership = ("BucketOwnerPreferred" | "ObjectWriter" | "BucketOwnerEnforced")
+      type object_size_greater_than_bytes = ::Integer
+      type object_size_less_than_bytes = ::Integer
+      type object_storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
       class ObjectVersion
         attr_accessor etag: ::String
         attr_accessor size: ::Integer
@@ -1403,7 +1415,7 @@ module Aws
         attr_accessor rules: ::Array[OwnershipControlsRule]
       end
       class OwnershipControlsRule
-        attr_accessor object_ownership: ("BucketOwnerPreferred" | "ObjectWriter")
+        attr_accessor object_ownership: ("BucketOwnerPreferred" | "ObjectWriter" | "BucketOwnerEnforced")
       end
       type ownership_controls_rules = ::Array[OwnershipControlsRule]
       class ParquetInput
@@ -1514,6 +1526,7 @@ module Aws
         attr_accessor bucket: ::String
         attr_accessor notification_configuration: NotificationConfiguration
         attr_accessor expected_bucket_owner: ::String
+        attr_accessor skip_destination_validation: bool
       end
       class PutBucketNotificationRequest
         attr_accessor bucket: ::String
@@ -1638,7 +1651,7 @@ module Aws
         attr_accessor key: ::String
         attr_accessor metadata: ::Hash[metadata_key, metadata_value]
         attr_accessor server_side_encryption: ("AES256" | "aws:kms")
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor website_redirect_location: ::String
         attr_accessor sse_customer_algorithm: ::String
         attr_accessor sse_customer_key: ::String
@@ -1693,7 +1706,7 @@ module Aws
       end
       class QueueConfigurationDeprecated
         attr_accessor id: ::String
-        attr_accessor event: ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold")
+        attr_accessor event: ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold" | "s3:ObjectRestore:Delete" | "s3:LifecycleTransition" | "s3:IntelligentTiering" | "s3:ObjectAcl:Put" | "s3:LifecycleExpiration:*" | "s3:LifecycleExpiration:Delete" | "s3:LifecycleExpiration:DeleteMarkerCreated" | "s3:ObjectTagging:*" | "s3:ObjectTagging:Put" | "s3:ObjectTagging:Delete")
         attr_accessor events: ::Array[event]
         attr_accessor queue: ::String
       end
@@ -1828,7 +1841,7 @@ module Aws
         attr_accessor access_control_list: ::Array[Grant]
         attr_accessor tagging: Tagging
         attr_accessor user_metadata: ::Array[MetadataEntry]
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
       end
       type sse_customer_algorithm = ::String
       type sse_customer_key = ::String
@@ -1889,6 +1902,7 @@ module Aws
       type server_side_encryption_rules = ::Array[ServerSideEncryptionRule]
       type setting = bool
       type size = ::Integer
+      type skip_validation = bool
       class SourceSelectionCriteria
         attr_accessor sse_kms_encrypted_objects: SseKmsEncryptedObjects
         attr_accessor replica_modifications: ReplicaModifications
@@ -1907,7 +1921,7 @@ module Aws
       class StatsEvent
         attr_accessor details: Stats
       end
-      type storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+      type storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
       class StorageClassAnalysis
         attr_accessor data_export: StorageClassAnalysisDataExport
       end
@@ -1952,17 +1966,17 @@ module Aws
       class TopicConfigurationDeprecated
         attr_accessor id: ::String
         attr_accessor events: ::Array[event]
-        attr_accessor event: ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold")
+        attr_accessor event: ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold" | "s3:ObjectRestore:Delete" | "s3:LifecycleTransition" | "s3:IntelligentTiering" | "s3:ObjectAcl:Put" | "s3:LifecycleExpiration:*" | "s3:LifecycleExpiration:Delete" | "s3:LifecycleExpiration:DeleteMarkerCreated" | "s3:ObjectTagging:*" | "s3:ObjectTagging:Put" | "s3:ObjectTagging:Delete")
         attr_accessor topic: ::String
       end
       type topic_configuration_list = ::Array[TopicConfiguration]
       class Transition
         attr_accessor date: ::Time
         attr_accessor days: ::Integer
-        attr_accessor storage_class: ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE")
+        attr_accessor storage_class: ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "GLACIER_IR")
       end
       type transition_list = ::Array[Transition]
-      type transition_storage_class = ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE")
+      type transition_storage_class = ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "GLACIER_IR")
       type type_ = ("CanonicalUser" | "AmazonCustomerByEmail" | "Group")
       type uri = ::String
       type upload_id_marker = ::String
@@ -2022,6 +2036,7 @@ module Aws
       end
       type user_metadata = ::Array[MetadataEntry]
       type value = ::String
+      type version_count = ::Integer
       type version_id_marker = ::String
       class VersioningConfiguration
         attr_accessor mfa_delete: ("Enabled" | "Disabled")
@@ -2067,7 +2082,7 @@ module Aws
         attr_accessor sse_customer_algorithm: ::String
         attr_accessor ssekms_key_id: ::String
         attr_accessor sse_customer_key_md5: ::String
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor tag_count: ::Integer
         attr_accessor version_id: ::String
         attr_accessor bucket_key_enabled: bool
@@ -2080,7 +2095,7 @@ module Aws
       class BucketAlreadyOwnedByYou < RuntimeError
       end
       class InvalidObjectState < RuntimeError
-        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS")
+        attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
         attr_accessor access_tier: ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
       end
       class NoSuchBucket < RuntimeError
