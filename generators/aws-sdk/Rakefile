@@ -1,17 +1,29 @@
 root = File.expand_path("../..")
 
+gems = {
+  'aws-sdk-s3' => {
+    api_url: "https://raw.githubusercontent.com/aws/aws-sdk-ruby/version-3/apis/s3/2006-03-01/api-2.json",
+    tmp_file: "tmp/apis_s3_2006-03-01_api-2.json",
+    rbs_path: "#{root}/gems/aws-sdk-s3/1/2006-03-01_api-2.rbs",
+  }
+}
+
+gems.each do |gem, config|
+  config => { api_url:, tmp_file:, rbs_path: }
+
+  file tmp_file => ['tmp'] do
+    sh "curl -o #{tmp_file} #{api_url}"
+  end
+
+  file rbs_path => [tmp_file, 'aws_client_types_generator.rb'] do
+    ruby "aws_client_types_generator.rb #{tmp_file} > #{rbs_path}"
+  end  
+
+  task gem => rbs_path
+end
+
 file 'tmp' do
   sh "mkdir -p tmp"
 end
 
-file 'tmp/apis_s3_2006-03-01_api-2.json' => ['tmp'] do
-  sh "curl -o tmp/apis_s3_2006-03-01_api-2.json https://raw.githubusercontent.com/aws/aws-sdk-ruby/version-3/apis/s3/2006-03-01/api-2.json"
-end
-
-file "#{root}/gems/aws-sdk-s3/1/2006-03-01_api-2.rbs" => ['tmp/apis_s3_2006-03-01_api-2.json', 'aws_client_types_generator.rb'] do
-  ruby "aws_client_types_generator.rb tmp/apis_s3_2006-03-01_api-2.json > #{root}/gems/aws-sdk-s3/1/2006-03-01_api-2.rbs"
-end
-
-task :aws => [
-  "#{root}/gems/aws-sdk-s3/1/2006-03-01_api-2.rbs"
-]
+task :aws => gems.keys
