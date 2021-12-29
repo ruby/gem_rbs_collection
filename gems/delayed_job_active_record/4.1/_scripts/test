@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Exit command with non-zero status code, Output logs of every command executed, Treat unset variables as an error when substituting.
+set -eou pipefail
+# Internal Field Separator - Linux shell variable
+IFS=$'
+	'
+# Print shell input lines
+set -v
+
+# Set RBS_DIR variable to change directory to execute type checks using `steep check`
+RBS_DIR=$(cd $(dirname $0)/..; pwd)
+# Set REPO_DIR variable to validate RBS files added to the corresponding folder
+REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
+GEM=delayed_job_active_record:4.1
+# Validate RBS files, using the bundler environment present
+bundle exec rbs --repo $REPO_DIR \
+  -r date -r logger -r monitor -r mutex_m -r singleton -r rack -r time -r tsort \
+  -r actionpack -r actionview -r activemodel -r activerecord -r activesupport -r railties \
+  -r $GEM validate --silent
+
+cd ${RBS_DIR}/_test
+# Run type checks
+bundle exec steep check
