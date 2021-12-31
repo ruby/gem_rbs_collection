@@ -1,0 +1,26 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+
+  repo_path "../../../"
+  library "delayed_job_active_record:4.1"
+
+  library 'date'
+  library 'logger'
+  library 'monitor'
+  library 'mutex_m'
+  library 'singleton'
+  library 'rack'
+  library 'time'
+  library 'tsort'
+
+  library 'actionpack'
+  library 'actionview'
+  library 'activemodel'
+  library 'activerecord'
+  library 'activesupport'
+  library 'railties'
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end
