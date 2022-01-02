@@ -169,7 +169,7 @@ class AwsClientTypesGenerator
       end
     when "integer", "long"
       "::Integer"
-    when "double"
+    when "float", "double"
       "::Float"
     when "timestamp"
       case shape_body["timestampFormat"]
