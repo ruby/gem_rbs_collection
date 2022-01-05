@@ -14,3 +14,35 @@ attributes = client.get_queue_attributes(
 attributes.attributes.each do |key, value|
   puts "#{key}: #{value}"
 end
+
+resp = client.send_message_batch(
+  queue_url: "String", # required
+  entries: [ # required
+    {
+      id: "String", # required
+      message_body: "String", # required
+      delay_seconds: 1,
+      message_attributes: {
+        "String" => {
+          string_value: "String",
+          binary_value: "data",
+          string_list_values: ["String"],
+          binary_list_values: ["data"],
+          data_type: "String", # required
+        },
+      },
+      message_system_attributes: {
+        "AWSTraceHeader" => {
+          string_value: "String",
+          binary_value: "data",
+          string_list_values: ["String"],
+          binary_list_values: ["data"],
+          data_type: "String", # required
+        },
+      },
+      message_deduplication_id: "String",
+      message_group_id: "String",
+    },
+  ],
+)
+resp.successful[0].id.upcase
