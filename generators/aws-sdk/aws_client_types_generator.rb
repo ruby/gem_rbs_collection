@@ -356,22 +356,25 @@ class AwsClientTypesGenerator
     end
     io.puts "    end"
     io.puts "    module Types"
-    io.puts "      # inputs"
-    input_shapes.each do |shape|
-      if !shape.request
-        shape.rbs_as_input&.then { io.puts(_1) }
+    @api.fetch("shapes").each do |key, _body|
+      fetch_shapes(key).each do |shape|
+        case shape.kind
+        when :input
+          if !shape.request
+            shape.rbs_as_input&.then { io.puts(_1) }
+          end
+        when :output
+          shape.rbs_as_output&.then { io.puts(_1) }
+        end
       end
-    end
-    io.puts "      # outputs"
-    output_shapes.each do |shape|
-      shape.rbs_as_output&.then { io.puts(_1) }
     end
     io.puts "    end"
     io.puts "    module Errors"
-    exception_shapes.tap do |shapes|
-      next if shapes.empty?
-      shapes.each do |shape|
-        shape.rbs_as_exception&.then { io.puts(_1) }
+    @api.fetch("shapes").each do |key, _body|
+      fetch_shapes(key).each do |shape|
+        if shape.exception?
+          shape.rbs_as_exception&.then { io.puts(_1) }
+        end
       end
     end
     io.puts "    end"

@@ -107,348 +107,112 @@ module Aws
       def write_get_object_response: (request_route: Types::request_route, request_token: Types::request_token, ?body: Types::body, ?status_code: Types::get_object_response_status_code, ?error_code: Types::error_code, ?error_message: Types::error_message, ?accept_ranges: Types::accept_ranges, ?cache_control: Types::cache_control, ?content_disposition: Types::content_disposition, ?content_encoding: Types::content_encoding, ?content_language: Types::content_language, ?content_length: Types::content_length, ?content_range: Types::content_range, ?content_type: Types::content_type, ?delete_marker: Types::delete_marker, ?etag: Types::etag, ?expires: Types::expires, ?expiration: Types::expiration, ?last_modified: Types::last_modified, ?missing_meta: Types::missing_meta, ?metadata: Types::metadata, ?object_lock_mode: Types::object_lock_mode, ?object_lock_legal_hold_status: Types::object_lock_legal_hold_status, ?object_lock_retain_until_date: Types::object_lock_retain_until_date, ?parts_count: Types::parts_count, ?replication_status: Types::replication_status, ?request_charged: Types::request_charged, ?restore: Types::restore, ?server_side_encryption: Types::server_side_encryption, ?sse_customer_algorithm: Types::sse_customer_algorithm, ?ssekms_key_id: Types::ssekms_key_id, ?sse_customer_key_md5: Types::sse_customer_key_md5, ?storage_class: Types::storage_class, ?tag_count: Types::tag_count, ?version_id: Types::object_version_id, ?bucket_key_enabled: Types::bucket_key_enabled) -> Aws::EmptyStructure
     end
     module Types
-      # inputs
-      type bucket_name = ::String
-      type object_key = ::String
-      type multipart_upload_id = ::String
-      type request_payer = ("requester")
-      type account_id = ::String
-      type request_charged = ("requester")
-      type completed_multipart_upload = { parts: completed_part_list? }
-      type completed_part_list = ::Array[completed_part]
-      type completed_part = { etag: etag?, part_number: part_number? }
-      type etag = ::String
-      type part_number = ::Integer
-      type expiration = ::String
-      type server_side_encryption = ("AES256" | "aws:kms")
-      type object_version_id = ::String
-      type ssekms_key_id = ::String
-      type bucket_key_enabled = bool
-      type object_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read" | "aws-exec-read" | "bucket-owner-read" | "bucket-owner-full-control")
-      type cache_control = ::String
-      type content_disposition = ::String
-      type content_encoding = ::String
-      type content_language = ::String
-      type content_type = ::String
-      type copy_source = ::String
-      type copy_source_if_match = ::String
-      type copy_source_if_modified_since = ::Time
-      type copy_source_if_none_match = ::String
-      type copy_source_if_unmodified_since = ::Time
-      type expires = ::Time
-      type grant_full_control = ::String
-      type grant_read = ::String
-      type grant_read_acp = ::String
-      type grant_write_acp = ::String
-      type metadata = ::Hash[metadata_key, metadata_value]
-      type metadata_key = ::String
-      type metadata_value = ::String
-      type metadata_directive = ("COPY" | "REPLACE")
-      type tagging_directive = ("COPY" | "REPLACE")
-      type storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
-      type website_redirect_location = ::String
-      type sse_customer_algorithm = ::String
-      type sse_customer_key = ::String
-      type sse_customer_key_md5 = ::String
-      type ssekms_encryption_context = ::String
-      type copy_source_sse_customer_algorithm = ::String
-      type copy_source_sse_customer_key = ::String
-      type copy_source_sse_customer_key_md5 = ::String
-      type tagging_header = ::String
-      type object_lock_mode = ("GOVERNANCE" | "COMPLIANCE")
-      type object_lock_retain_until_date = ::Time
-      type object_lock_legal_hold_status = ("ON" | "OFF")
-      type last_modified = ::Time
-      type bucket_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read")
-      type create_bucket_configuration = { location_constraint: bucket_location_constraint? }
-      type bucket_location_constraint = ("af-south-1" | "ap-east-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-northeast-3" | "ap-south-1" | "ap-southeast-1" | "ap-southeast-2" | "ca-central-1" | "cn-north-1" | "cn-northwest-1" | "EU" | "eu-central-1" | "eu-north-1" | "eu-south-1" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "me-south-1" | "sa-east-1" | "us-east-2" | "us-gov-east-1" | "us-gov-west-1" | "us-west-1" | "us-west-2")
-      type grant_write = ::String
-      type object_lock_enabled_for_bucket = bool
-      type object_ownership = ("BucketOwnerPreferred" | "ObjectWriter" | "BucketOwnerEnforced")
-      type analytics_id = ::String
-      type intelligent_tiering_id = ::String
-      type inventory_id = ::String
-      type metrics_id = ::String
-      type mfa = ::String
-      type bypass_governance_retention = bool
-      type delete_marker = bool
-      type delete = { objects: object_identifier_list, quiet: quiet? }
-      type object_identifier_list = ::Array[object_identifier]
-      type object_identifier = { key: object_key, version_id: object_version_id? }
-      type quiet = bool
-      type bucket_accelerate_status = ("Enabled" | "Suspended")
-      type owner = { display_name: display_name?, id: id? }
-      type display_name = ::String
-      type id = ::String
-      type grants = ::Array[grant]
-      type grant = { grantee: grantee?, permission: permission? }
-      type grantee = { display_name: display_name?, email_address: email_address?, id: id?, type: type_, uri: uri? }
-      type email_address = ::String
-      type type_ = ("CanonicalUser" | "AmazonCustomerByEmail" | "Group")
-      type uri = ::String
-      type permission = ("FULL_CONTROL" | "WRITE" | "WRITE_ACP" | "READ" | "READ_ACP")
-      type analytics_configuration = { id: analytics_id, filter: analytics_filter?, storage_class_analysis: storage_class_analysis }
-      type analytics_filter = { prefix: prefix?, tag: tag?, and: analytics_and_operator? }
-      type prefix = ::String
-      type tag = { key: object_key, value: value }
-      type value = ::String
-      type analytics_and_operator = { prefix: prefix?, tags: tag_set? }
-      type tag_set = ::Array[tag]
-      type storage_class_analysis = { data_export: storage_class_analysis_data_export? }
-      type storage_class_analysis_data_export = { output_schema_version: storage_class_analysis_schema_version, destination: analytics_export_destination }
-      type storage_class_analysis_schema_version = ("V_1")
-      type analytics_export_destination = { s3_bucket_destination: analytics_s3_bucket_destination }
-      type analytics_s3_bucket_destination = { format: analytics_s3_export_file_format, bucket_account_id: account_id?, bucket: bucket_name, prefix: prefix? }
-      type analytics_s3_export_file_format = ("CSV")
-      type cors_rules = ::Array[cors_rule]
-      type cors_rule = { id: id?, allowed_headers: allowed_headers?, allowed_methods: allowed_methods, allowed_origins: allowed_origins, expose_headers: expose_headers?, max_age_seconds: max_age_seconds? }
-      type allowed_headers = ::Array[allowed_header]
-      type allowed_header = ::String
-      type allowed_methods = ::Array[allowed_method]
-      type allowed_method = ::String
-      type allowed_origins = ::Array[allowed_origin]
-      type allowed_origin = ::String
-      type expose_headers = ::Array[expose_header]
-      type expose_header = ::String
-      type max_age_seconds = ::Integer
-      type server_side_encryption_configuration = { rules: server_side_encryption_rules }
-      type server_side_encryption_rules = ::Array[server_side_encryption_rule]
-      type server_side_encryption_rule = { apply_server_side_encryption_by_default: server_side_encryption_by_default?, bucket_key_enabled: bucket_key_enabled? }
-      type server_side_encryption_by_default = { sse_algorithm: server_side_encryption, kms_master_key_id: ssekms_key_id? }
-      type intelligent_tiering_configuration = { id: intelligent_tiering_id, filter: intelligent_tiering_filter?, status: intelligent_tiering_status, tierings: tiering_list }
-      type intelligent_tiering_filter = { prefix: prefix?, tag: tag?, and: intelligent_tiering_and_operator? }
-      type intelligent_tiering_and_operator = { prefix: prefix?, tags: tag_set? }
-      type intelligent_tiering_status = ("Enabled" | "Disabled")
-      type tiering_list = ::Array[tiering]
-      type tiering = { days: intelligent_tiering_days, access_tier: intelligent_tiering_access_tier }
-      type intelligent_tiering_days = ::Integer
-      type intelligent_tiering_access_tier = ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
-      type inventory_configuration = { destination: inventory_destination, is_enabled: is_enabled, filter: inventory_filter?, id: inventory_id, included_object_versions: inventory_included_object_versions, optional_fields: inventory_optional_fields?, schedule: inventory_schedule }
-      type inventory_destination = { s3_bucket_destination: inventory_s3_bucket_destination }
-      type inventory_s3_bucket_destination = { account_id: account_id?, bucket: bucket_name, format: inventory_format, prefix: prefix?, encryption: inventory_encryption? }
-      type inventory_format = ("CSV" | "ORC" | "Parquet")
-      type inventory_encryption = { sses3: sses3?, ssekms: ssekms? }
-      type sses3 = ::Hash[untyped, untyped]
-      type ssekms = { key_id: ssekms_key_id }
-      type is_enabled = bool
-      type inventory_filter = { prefix: prefix }
-      type inventory_included_object_versions = ("All" | "Current")
-      type inventory_optional_fields = ::Array[inventory_optional_field]
-      type inventory_optional_field = ("Size" | "LastModifiedDate" | "StorageClass" | "ETag" | "IsMultipartUploaded" | "ReplicationStatus" | "EncryptionStatus" | "ObjectLockRetainUntilDate" | "ObjectLockMode" | "ObjectLockLegalHoldStatus" | "IntelligentTieringAccessTier" | "BucketKeyStatus")
-      type inventory_schedule = { frequency: inventory_frequency }
-      type inventory_frequency = ("Daily" | "Weekly")
-      type rules = ::Array[rule]
-      type rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix, status: expiration_status, transition: transition?, noncurrent_version_transition: noncurrent_version_transition?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
-      type lifecycle_expiration = { date: date?, days: days?, expired_object_delete_marker: expired_object_delete_marker? }
-      type date = ::Time
-      type days = ::Integer
-      type expired_object_delete_marker = bool
-      type expiration_status = ("Enabled" | "Disabled")
-      type transition = { date: date?, days: days?, storage_class: transition_storage_class? }
-      type transition_storage_class = ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "GLACIER_IR")
-      type noncurrent_version_transition = { noncurrent_days: days?, storage_class: transition_storage_class?, newer_noncurrent_versions: version_count? }
-      type version_count = ::Integer
-      type noncurrent_version_expiration = { noncurrent_days: days?, newer_noncurrent_versions: version_count? }
+      type abort_date = ::Time
+      class AbortIncompleteMultipartUpload
+        attr_accessor days_after_initiation: days_after_initiation
+      end
       type abort_incomplete_multipart_upload = { days_after_initiation: days_after_initiation? }
-      type days_after_initiation = ::Integer
-      type lifecycle_rules = ::Array[lifecycle_rule]
-      type lifecycle_rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix?, filter: lifecycle_rule_filter?, status: expiration_status, transitions: transition_list?, noncurrent_version_transitions: noncurrent_version_transition_list?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
-      type lifecycle_rule_filter = { prefix: prefix?, tag: tag?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes?, and: lifecycle_rule_and_operator? }
-      type object_size_greater_than_bytes = ::Integer
-      type object_size_less_than_bytes = ::Integer
-      type lifecycle_rule_and_operator = { prefix: prefix?, tags: tag_set?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes? }
-      type transition_list = ::Array[transition]
-      type noncurrent_version_transition_list = ::Array[noncurrent_version_transition]
-      type logging_enabled = { target_bucket: target_bucket, target_grants: target_grants?, target_prefix: target_prefix }
-      type target_bucket = ::String
-      type target_grants = ::Array[target_grant]
-      type target_grant = { grantee: grantee?, permission: bucket_logs_permission? }
-      type bucket_logs_permission = ("FULL_CONTROL" | "READ" | "WRITE")
-      type target_prefix = ::String
-      type metrics_configuration = { id: metrics_id, filter: metrics_filter? }
-      type metrics_filter = { prefix: prefix?, tag: tag?, access_point_arn: access_point_arn?, and: metrics_and_operator? }
-      type access_point_arn = ::String
-      type metrics_and_operator = { prefix: prefix?, tags: tag_set?, access_point_arn: access_point_arn? }
-      type notification_configuration_deprecated = { topic_configuration: topic_configuration_deprecated?, queue_configuration: queue_configuration_deprecated?, cloud_function_configuration: cloud_function_configuration? }
-      type topic_configuration_deprecated = { id: notification_id?, events: event_list?, event: event?, topic: topic_arn? }
-      type notification_id = ::String
-      type event_list = ::Array[event]
-      type event = ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold" | "s3:ObjectRestore:Delete" | "s3:LifecycleTransition" | "s3:IntelligentTiering" | "s3:ObjectAcl:Put" | "s3:LifecycleExpiration:*" | "s3:LifecycleExpiration:Delete" | "s3:LifecycleExpiration:DeleteMarkerCreated" | "s3:ObjectTagging:*" | "s3:ObjectTagging:Put" | "s3:ObjectTagging:Delete")
-      type topic_arn = ::String
-      type queue_configuration_deprecated = { id: notification_id?, event: event?, events: event_list?, queue: queue_arn? }
-      type queue_arn = ::String
-      type cloud_function_configuration = { id: notification_id?, event: event?, events: event_list?, cloud_function: cloud_function?, invocation_role: cloud_function_invocation_role? }
-      type cloud_function = ::String
-      type cloud_function_invocation_role = ::String
-      type notification_configuration = { topic_configurations: topic_configuration_list?, queue_configurations: queue_configuration_list?, lambda_function_configurations: lambda_function_configuration_list?, event_bridge_configuration: event_bridge_configuration? }
-      type topic_configuration_list = ::Array[topic_configuration]
-      type topic_configuration = { id: notification_id?, topic_arn: topic_arn, events: event_list, filter: notification_configuration_filter? }
-      type notification_configuration_filter = { key: s3_key_filter? }
-      type s3_key_filter = { filter_rules: filter_rule_list? }
-      type filter_rule_list = ::Array[filter_rule]
-      type filter_rule = { name: filter_rule_name?, value: filter_rule_value? }
-      type filter_rule_name = ("prefix" | "suffix")
-      type filter_rule_value = ::String
-      type queue_configuration_list = ::Array[queue_configuration]
-      type queue_configuration = { id: notification_id?, queue_arn: queue_arn, events: event_list, filter: notification_configuration_filter? }
-      type lambda_function_configuration_list = ::Array[lambda_function_configuration]
-      type lambda_function_configuration = { id: notification_id?, lambda_function_arn: lambda_function_arn, events: event_list, filter: notification_configuration_filter? }
-      type lambda_function_arn = ::String
-      type event_bridge_configuration = ::Hash[untyped, untyped]
-      type ownership_controls = { rules: ownership_controls_rules }
-      type ownership_controls_rules = ::Array[ownership_controls_rule]
-      type ownership_controls_rule = { object_ownership: object_ownership }
-      type policy = ::String
-      type replication_configuration = { role: role, rules: replication_rules }
-      type role = ::String
-      type replication_rules = ::Array[replication_rule]
-      type replication_rule = { id: id?, priority: priority?, prefix: prefix?, filter: replication_rule_filter?, status: replication_rule_status, source_selection_criteria: source_selection_criteria?, existing_object_replication: existing_object_replication?, destination: destination, delete_marker_replication: delete_marker_replication? }
-      type priority = ::Integer
-      type replication_rule_filter = { prefix: prefix?, tag: tag?, and: replication_rule_and_operator? }
-      type replication_rule_and_operator = { prefix: prefix?, tags: tag_set? }
-      type replication_rule_status = ("Enabled" | "Disabled")
-      type source_selection_criteria = { sse_kms_encrypted_objects: sse_kms_encrypted_objects?, replica_modifications: replica_modifications? }
-      type sse_kms_encrypted_objects = { status: sse_kms_encrypted_objects_status }
-      type sse_kms_encrypted_objects_status = ("Enabled" | "Disabled")
-      type replica_modifications = { status: replica_modifications_status }
-      type replica_modifications_status = ("Enabled" | "Disabled")
-      type existing_object_replication = { status: existing_object_replication_status }
-      type existing_object_replication_status = ("Enabled" | "Disabled")
-      type destination = { bucket: bucket_name, account: account_id?, storage_class: storage_class?, access_control_translation: access_control_translation?, encryption_configuration: encryption_configuration?, replication_time: replication_time?, metrics: metrics? }
-      type access_control_translation = { owner: owner_override }
-      type owner_override = ("Destination")
-      type encryption_configuration = { replica_kms_key_id: replica_kms_key_id? }
-      type replica_kms_key_id = ::String
-      type replication_time = { status: replication_time_status, time: replication_time_value }
-      type replication_time_status = ("Enabled" | "Disabled")
-      type replication_time_value = { minutes: minutes? }
-      type minutes = ::Integer
-      type metrics = { status: metrics_status, event_threshold: replication_time_value? }
-      type metrics_status = ("Enabled" | "Disabled")
-      type delete_marker_replication = { status: delete_marker_replication_status? }
-      type delete_marker_replication_status = ("Enabled" | "Disabled")
-      type payer = ("Requester" | "BucketOwner")
-      type bucket_versioning_status = ("Enabled" | "Suspended")
-      type redirect_all_requests_to = { host_name: host_name, protocol: protocol? }
-      type host_name = ::String
-      type protocol = ("http" | "https")
-      type index_document = { suffix: suffix }
-      type suffix = ::String
-      type error_document = { key: object_key }
-      type routing_rules = ::Array[routing_rule]
-      type routing_rule = { condition: condition?, redirect: redirect }
-      type condition = { http_error_code_returned_equals: http_error_code_returned_equals?, key_prefix_equals: key_prefix_equals? }
-      type http_error_code_returned_equals = ::String
-      type key_prefix_equals = ::String
-      type redirect = { host_name: host_name?, http_redirect_code: http_redirect_code?, protocol: protocol?, replace_key_prefix_with: replace_key_prefix_with?, replace_key_with: replace_key_with? }
-      type http_redirect_code = ::String
-      type replace_key_prefix_with = ::String
-      type replace_key_with = ::String
-      type if_match = ::String
-      type if_modified_since = ::Time
-      type if_none_match = ::String
-      type if_unmodified_since = ::Time
-      type range = ::String
-      type response_cache_control = ::String
-      type response_content_disposition = ::String
-      type response_content_encoding = ::String
-      type response_content_language = ::String
-      type response_content_type = ::String
-      type response_expires = ::Time
-      type body = ::IO
-      type accept_ranges = ::String
-      type restore = ::String
-      type content_length = ::Integer
-      type missing_meta = ::Integer
-      type content_range = ::String
-      type replication_status = ("COMPLETE" | "PENDING" | "FAILED" | "REPLICA")
-      type parts_count = ::Integer
-      type tag_count = ::Integer
-      type object_lock_legal_hold = { status: object_lock_legal_hold_status? }
-      type object_lock_configuration = { object_lock_enabled: object_lock_enabled?, rule: object_lock_rule? }
-      type object_lock_enabled = ("Enabled")
-      type object_lock_rule = { default_retention: default_retention? }
-      type default_retention = { mode: object_lock_retention_mode?, days: days?, years: years? }
-      type object_lock_retention_mode = ("GOVERNANCE" | "COMPLIANCE")
-      type years = ::Integer
-      type object_lock_retention = { mode: object_lock_retention_mode?, retain_until_date: date? }
-      type public_access_block_configuration = { block_public_acls: setting?, ignore_public_acls: setting?, block_public_policy: setting?, restrict_public_buckets: setting? }
-      type setting = bool
-      type token = ::String
-      type delimiter = ::String
-      type encoding_type = ("url")
-      type key_marker = ::String
-      type max_uploads = ::Integer
-      type upload_id_marker = ::String
-      type max_keys = ::Integer
-      type version_id_marker = ::String
-      type marker = ::String
-      type fetch_owner = bool
-      type start_after = ::String
-      type max_parts = ::Integer
-      type part_number_marker = ::Integer
-      type accelerate_configuration = { status: bucket_accelerate_status? }
-      type access_control_policy = { grants: grants?, owner: owner? }
-      type content_md5 = ::String
-      type cors_configuration = { cors_rules: cors_rules }
-      type lifecycle_configuration = { rules: rules }
-      type bucket_lifecycle_configuration = { rules: lifecycle_rules }
-      type bucket_logging_status = { logging_enabled: logging_enabled? }
-      type skip_validation = bool
-      type confirm_remove_self_bucket_access = bool
-      type object_lock_token = ::String
-      type request_payment_configuration = { payer: payer }
-      type tagging = { tag_set: tag_set }
-      type versioning_configuration = { mfa_delete: mfa_delete?, status: bucket_versioning_status? }
-      type mfa_delete = ("Enabled" | "Disabled")
-      type website_configuration = { error_document: error_document?, index_document: index_document?, redirect_all_requests_to: redirect_all_requests_to?, routing_rules: routing_rules? }
-      type restore_request = { days: days?, glacier_job_parameters: glacier_job_parameters?, type: restore_request_type?, tier: tier?, description: description?, select_parameters: select_parameters?, output_location: output_location? }
-      type glacier_job_parameters = { tier: tier }
-      type tier = ("Standard" | "Bulk" | "Expedited")
-      type restore_request_type = ("SELECT")
-      type description = ::String
-      type select_parameters = { input_serialization: input_serialization, expression_type: expression_type, expression: expression, output_serialization: output_serialization }
-      type input_serialization = { csv: csv_input?, compression_type: compression_type?, json: json_input?, parquet: parquet_input? }
-      type csv_input = { file_header_info: file_header_info?, comments: comments?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character?, allow_quoted_record_delimiter: allow_quoted_record_delimiter? }
-      type file_header_info = ("USE" | "IGNORE" | "NONE")
-      type comments = ::String
-      type quote_escape_character = ::String
-      type record_delimiter = ::String
-      type field_delimiter = ::String
-      type quote_character = ::String
-      type allow_quoted_record_delimiter = bool
-      type compression_type = ("NONE" | "GZIP" | "BZIP2")
-      type json_input = { type: json_type? }
-      type json_type = ("DOCUMENT" | "LINES")
-      type parquet_input = ::Hash[untyped, untyped]
-      type expression_type = ("SQL")
-      type expression = ::String
-      type output_serialization = { csv: csv_output?, json: json_output? }
-      type csv_output = { quote_fields: quote_fields?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character? }
-      type quote_fields = ("ALWAYS" | "ASNEEDED")
-      type json_output = { record_delimiter: record_delimiter? }
-      type output_location = { s3: s3_location? }
-      type s3_location = { bucket_name: bucket_name, prefix: location_prefix, encryption: encryption?, canned_acl: object_canned_acl?, access_control_list: grants?, tagging: tagging?, user_metadata: user_metadata?, storage_class: storage_class? }
-      type location_prefix = ::String
-      type encryption = { encryption_type: server_side_encryption, kms_key_id: ssekms_key_id?, kms_context: kms_context? }
-      type kms_context = ::String
-      type user_metadata = ::Array[metadata_entry]
-      type metadata_entry = { name: metadata_key?, value: metadata_value? }
-      type request_progress = { enabled: enable_request_progress? }
-      type enable_request_progress = bool
-      type scan_range = { start: start?, end: end_? }
-      type start = ::Integer
-      type end_ = ::Integer
-      type copy_source_range = ::String
-      type request_route = ::String
-      type request_token = ::String
-      type get_object_response_status_code = ::Integer
-      type error_code = ::String
-      type error_message = ::String
-      # outputs
       class AbortMultipartUploadOutput
         attr_accessor request_charged: request_charged
       end
+      type abort_rule_id = ::String
+      type accelerate_configuration = { status: bucket_accelerate_status? }
+      type accept_ranges = ::String
+      type access_control_policy = { grants: grants?, owner: owner? }
+      class AccessControlTranslation
+        attr_accessor owner: owner_override
+      end
+      type access_control_translation = { owner: owner_override }
+      type access_point_arn = ::String
+      type account_id = ::String
+      type allow_quoted_record_delimiter = bool
+      type allowed_header = ::String
+      type allowed_headers = ::Array[allowed_header]
+      type allowed_method = ::String
+      type allowed_methods = ::Array[allowed_method]
+      type allowed_origin = ::String
+      type allowed_origins = ::Array[allowed_origin]
+      class AnalyticsAndOperator
+        attr_accessor prefix: prefix
+        attr_accessor tags: tag_set
+      end
+      type analytics_and_operator = { prefix: prefix?, tags: tag_set? }
+      class AnalyticsConfiguration
+        attr_accessor id: analytics_id
+        attr_accessor filter: AnalyticsFilter
+        attr_accessor storage_class_analysis: StorageClassAnalysis
+      end
+      type analytics_configuration = { id: analytics_id, filter: analytics_filter?, storage_class_analysis: storage_class_analysis }
+      type analytics_configuration_list = ::Array[AnalyticsConfiguration]
+      class AnalyticsExportDestination
+        attr_accessor s3_bucket_destination: AnalyticsS3BucketDestination
+      end
+      type analytics_export_destination = { s3_bucket_destination: analytics_s3_bucket_destination }
+      class AnalyticsFilter
+        attr_accessor prefix: prefix
+        attr_accessor tag: Tag
+        attr_accessor and: AnalyticsAndOperator
+      end
+      type analytics_filter = { prefix: prefix?, tag: tag?, and: analytics_and_operator? }
+      type analytics_id = ::String
+      class AnalyticsS3BucketDestination
+        attr_accessor format: analytics_s3_export_file_format
+        attr_accessor bucket_account_id: account_id
+        attr_accessor bucket: bucket_name
+        attr_accessor prefix: prefix
+      end
+      type analytics_s3_bucket_destination = { format: analytics_s3_export_file_format, bucket_account_id: account_id?, bucket: bucket_name, prefix: prefix? }
+      type analytics_s3_export_file_format = ("CSV")
+      type archive_status = ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
+      type body = ::IO
+      class Bucket
+        attr_accessor name: bucket_name
+        attr_accessor creation_date: creation_date
+      end
+      type bucket_accelerate_status = ("Enabled" | "Suspended")
+      type bucket_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read")
+      type bucket_key_enabled = bool
+      type bucket_lifecycle_configuration = { rules: lifecycle_rules }
+      type bucket_location_constraint = ("af-south-1" | "ap-east-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-northeast-3" | "ap-south-1" | "ap-southeast-1" | "ap-southeast-2" | "ca-central-1" | "cn-north-1" | "cn-northwest-1" | "EU" | "eu-central-1" | "eu-north-1" | "eu-south-1" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "me-south-1" | "sa-east-1" | "us-east-2" | "us-gov-east-1" | "us-gov-west-1" | "us-west-1" | "us-west-2")
+      type bucket_logging_status = { logging_enabled: logging_enabled? }
+      type bucket_logs_permission = ("FULL_CONTROL" | "READ" | "WRITE")
+      type bucket_name = ::String
+      type bucket_versioning_status = ("Enabled" | "Suspended")
+      type buckets = ::Array[Bucket]
+      type bypass_governance_retention = bool
+      type bytes_processed = ::Integer
+      type bytes_returned = ::Integer
+      type bytes_scanned = ::Integer
+      type cors_configuration = { cors_rules: cors_rules }
+      class CORSRule
+        attr_accessor id: id
+        attr_accessor allowed_headers: allowed_headers
+        attr_accessor allowed_methods: allowed_methods
+        attr_accessor allowed_origins: allowed_origins
+        attr_accessor expose_headers: expose_headers
+        attr_accessor max_age_seconds: max_age_seconds
+      end
+      type cors_rule = { id: id?, allowed_headers: allowed_headers?, allowed_methods: allowed_methods, allowed_origins: allowed_origins, expose_headers: expose_headers?, max_age_seconds: max_age_seconds? }
+      type cors_rules = ::Array[CORSRule]
+      type csv_input = { file_header_info: file_header_info?, comments: comments?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character?, allow_quoted_record_delimiter: allow_quoted_record_delimiter? }
+      type csv_output = { quote_fields: quote_fields?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character? }
+      type cache_control = ::String
+      type cloud_function = ::String
+      class CloudFunctionConfiguration
+        attr_accessor id: notification_id
+        attr_accessor event: event
+        attr_accessor events: event_list
+        attr_accessor cloud_function: cloud_function
+        attr_accessor invocation_role: cloud_function_invocation_role
+      end
+      type cloud_function_configuration = { id: notification_id?, event: event?, events: event_list?, cloud_function: cloud_function?, invocation_role: cloud_function_invocation_role? }
+      type cloud_function_invocation_role = ::String
+      type code = ::String
+      type comments = ::String
+      class CommonPrefix
+        attr_accessor prefix: prefix
+      end
+      type common_prefix_list = ::Array[CommonPrefix]
       class CompleteMultipartUploadOutput
         attr_accessor location: location
         attr_accessor bucket: bucket_name
@@ -461,7 +225,25 @@ module Aws
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      type location = ::String
+      type completed_multipart_upload = { parts: completed_part_list? }
+      type completed_part = { etag: etag?, part_number: part_number? }
+      type completed_part_list = ::Array[completed_part]
+      type compression_type = ("NONE" | "GZIP" | "BZIP2")
+      class Condition
+        attr_accessor http_error_code_returned_equals: http_error_code_returned_equals
+        attr_accessor key_prefix_equals: key_prefix_equals
+      end
+      type condition = { http_error_code_returned_equals: http_error_code_returned_equals?, key_prefix_equals: key_prefix_equals? }
+      type confirm_remove_self_bucket_access = bool
+      type content_disposition = ::String
+      type content_encoding = ::String
+      type content_language = ::String
+      type content_length = ::Integer
+      type content_md5 = ::String
+      type content_range = ::String
+      type content_type = ::String
+      class ContinuationEvent
+      end
       class CopyObjectOutput
         attr_accessor copy_object_result: CopyObjectResult
         attr_accessor expiration: expiration
@@ -479,7 +261,21 @@ module Aws
         attr_accessor etag: etag
         attr_accessor last_modified: last_modified
       end
+      class CopyPartResult
+        attr_accessor etag: etag
+        attr_accessor last_modified: last_modified
+      end
+      type copy_source = ::String
+      type copy_source_if_match = ::String
+      type copy_source_if_modified_since = ::Time
+      type copy_source_if_none_match = ::String
+      type copy_source_if_unmodified_since = ::Time
+      type copy_source_range = ::String
+      type copy_source_sse_customer_algorithm = ::String
+      type copy_source_sse_customer_key = ::String
+      type copy_source_sse_customer_key_md5 = ::String
       type copy_source_version_id = ::String
+      type create_bucket_configuration = { location_constraint: bucket_location_constraint? }
       class CreateBucketOutput
         attr_accessor location: location
       end
@@ -497,8 +293,32 @@ module Aws
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      type abort_date = ::Time
-      type abort_rule_id = ::String
+      type creation_date = ::Time
+      type date = ::Time
+      type days = ::Integer
+      type days_after_initiation = ::Integer
+      class DefaultRetention
+        attr_accessor mode: object_lock_retention_mode
+        attr_accessor days: days
+        attr_accessor years: years
+      end
+      type default_retention = { mode: object_lock_retention_mode?, days: days?, years: years? }
+      type delete = { objects: object_identifier_list, quiet: quiet? }
+      type delete_marker = bool
+      class DeleteMarkerEntry
+        attr_accessor owner: Owner
+        attr_accessor key: object_key
+        attr_accessor version_id: object_version_id
+        attr_accessor is_latest: is_latest
+        attr_accessor last_modified: last_modified
+      end
+      class DeleteMarkerReplication
+        attr_accessor status: delete_marker_replication_status
+      end
+      type delete_marker_replication = { status: delete_marker_replication_status? }
+      type delete_marker_replication_status = ("Enabled" | "Disabled")
+      type delete_marker_version_id = ::String
+      type delete_markers = ::Array[DeleteMarkerEntry]
       class DeleteObjectOutput
         attr_accessor delete_marker: delete_marker
         attr_accessor version_id: object_version_id
@@ -512,380 +332,15 @@ module Aws
         attr_accessor request_charged: request_charged
         attr_accessor errors: errors
       end
-      type deleted_objects = ::Array[DeletedObject]
       class DeletedObject
         attr_accessor key: object_key
         attr_accessor version_id: object_version_id
         attr_accessor delete_marker: delete_marker
         attr_accessor delete_marker_version_id: delete_marker_version_id
       end
-      type delete_marker_version_id = ::String
-      type errors = ::Array[Error]
-      class Error
-        attr_accessor key: object_key
-        attr_accessor version_id: object_version_id
-        attr_accessor code: code
-        attr_accessor message: message
-      end
-      type code = ::String
-      type message = ::String
-      class GetBucketAccelerateConfigurationOutput
-        attr_accessor status: bucket_accelerate_status
-      end
-      class GetBucketAclOutput
-        attr_accessor owner: Owner
-        attr_accessor grants: grants
-      end
-      class Owner
-        attr_accessor display_name: display_name
-        attr_accessor id: id
-      end
-      class Grant
-        attr_accessor grantee: Grantee
-        attr_accessor permission: permission
-      end
-      class Grantee
-        attr_accessor display_name: display_name
-        attr_accessor email_address: email_address
-        attr_accessor id: id
-        attr_accessor type_: type_
-        attr_accessor uri: uri
-      end
-      class GetBucketAnalyticsConfigurationOutput
-        attr_accessor analytics_configuration: AnalyticsConfiguration
-      end
-      class AnalyticsConfiguration
-        attr_accessor id: analytics_id
-        attr_accessor filter: AnalyticsFilter
-        attr_accessor storage_class_analysis: StorageClassAnalysis
-      end
-      class AnalyticsFilter
-        attr_accessor prefix: prefix
-        attr_accessor tag: Tag
-        attr_accessor and: AnalyticsAndOperator
-      end
-      class Tag
-        attr_accessor key: object_key
-        attr_accessor value: value
-      end
-      class AnalyticsAndOperator
-        attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
-      end
-      class StorageClassAnalysis
-        attr_accessor data_export: StorageClassAnalysisDataExport
-      end
-      class StorageClassAnalysisDataExport
-        attr_accessor output_schema_version: storage_class_analysis_schema_version
-        attr_accessor destination: AnalyticsExportDestination
-      end
-      class AnalyticsExportDestination
-        attr_accessor s3_bucket_destination: AnalyticsS3BucketDestination
-      end
-      class AnalyticsS3BucketDestination
-        attr_accessor format: analytics_s3_export_file_format
-        attr_accessor bucket_account_id: account_id
-        attr_accessor bucket: bucket_name
-        attr_accessor prefix: prefix
-      end
-      class GetBucketCorsOutput
-        attr_accessor cors_rules: cors_rules
-      end
-      class CORSRule
-        attr_accessor id: id
-        attr_accessor allowed_headers: allowed_headers
-        attr_accessor allowed_methods: allowed_methods
-        attr_accessor allowed_origins: allowed_origins
-        attr_accessor expose_headers: expose_headers
-        attr_accessor max_age_seconds: max_age_seconds
-      end
-      class GetBucketEncryptionOutput
-        attr_accessor server_side_encryption_configuration: ServerSideEncryptionConfiguration
-      end
-      class ServerSideEncryptionConfiguration
-        attr_accessor rules: server_side_encryption_rules
-      end
-      class ServerSideEncryptionRule
-        attr_accessor apply_server_side_encryption_by_default: ServerSideEncryptionByDefault
-        attr_accessor bucket_key_enabled: bucket_key_enabled
-      end
-      class ServerSideEncryptionByDefault
-        attr_accessor sse_algorithm: server_side_encryption
-        attr_accessor kms_master_key_id: ssekms_key_id
-      end
-      class GetBucketIntelligentTieringConfigurationOutput
-        attr_accessor intelligent_tiering_configuration: IntelligentTieringConfiguration
-      end
-      class IntelligentTieringConfiguration
-        attr_accessor id: intelligent_tiering_id
-        attr_accessor filter: IntelligentTieringFilter
-        attr_accessor status: intelligent_tiering_status
-        attr_accessor tierings: tiering_list
-      end
-      class IntelligentTieringFilter
-        attr_accessor prefix: prefix
-        attr_accessor tag: Tag
-        attr_accessor and: IntelligentTieringAndOperator
-      end
-      class IntelligentTieringAndOperator
-        attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
-      end
-      class Tiering
-        attr_accessor days: intelligent_tiering_days
-        attr_accessor access_tier: intelligent_tiering_access_tier
-      end
-      class GetBucketInventoryConfigurationOutput
-        attr_accessor inventory_configuration: InventoryConfiguration
-      end
-      class InventoryConfiguration
-        attr_accessor destination: InventoryDestination
-        attr_accessor is_enabled: is_enabled
-        attr_accessor filter: InventoryFilter
-        attr_accessor id: inventory_id
-        attr_accessor included_object_versions: inventory_included_object_versions
-        attr_accessor optional_fields: inventory_optional_fields
-        attr_accessor schedule: InventorySchedule
-      end
-      class InventoryDestination
-        attr_accessor s3_bucket_destination: InventoryS3BucketDestination
-      end
-      class InventoryS3BucketDestination
-        attr_accessor account_id: account_id
-        attr_accessor bucket: bucket_name
-        attr_accessor format: inventory_format
-        attr_accessor prefix: prefix
-        attr_accessor encryption: InventoryEncryption
-      end
-      class InventoryEncryption
-        attr_accessor sses3: SSES3
-        attr_accessor ssekms: SSEKMS
-      end
-      class SSES3
-      end
-      class SSEKMS
-        attr_accessor key_id: ssekms_key_id
-      end
-      class InventoryFilter
-        attr_accessor prefix: prefix
-      end
-      class InventorySchedule
-        attr_accessor frequency: inventory_frequency
-      end
-      class GetBucketLifecycleOutput
-        attr_accessor rules: rules
-      end
-      class Rule
-        attr_accessor expiration: LifecycleExpiration
-        attr_accessor id: id
-        attr_accessor prefix: prefix
-        attr_accessor status: expiration_status
-        attr_accessor transition: Transition
-        attr_accessor noncurrent_version_transition: NoncurrentVersionTransition
-        attr_accessor noncurrent_version_expiration: NoncurrentVersionExpiration
-        attr_accessor abort_incomplete_multipart_upload: AbortIncompleteMultipartUpload
-      end
-      class LifecycleExpiration
-        attr_accessor date: date
-        attr_accessor days: days
-        attr_accessor expired_object_delete_marker: expired_object_delete_marker
-      end
-      class Transition
-        attr_accessor date: date
-        attr_accessor days: days
-        attr_accessor storage_class: transition_storage_class
-      end
-      class NoncurrentVersionTransition
-        attr_accessor noncurrent_days: days
-        attr_accessor storage_class: transition_storage_class
-        attr_accessor newer_noncurrent_versions: version_count
-      end
-      class NoncurrentVersionExpiration
-        attr_accessor noncurrent_days: days
-        attr_accessor newer_noncurrent_versions: version_count
-      end
-      class AbortIncompleteMultipartUpload
-        attr_accessor days_after_initiation: days_after_initiation
-      end
-      class GetBucketLifecycleConfigurationOutput
-        attr_accessor rules: lifecycle_rules
-      end
-      class LifecycleRule
-        attr_accessor expiration: LifecycleExpiration
-        attr_accessor id: id
-        attr_accessor prefix: prefix
-        attr_accessor filter: LifecycleRuleFilter
-        attr_accessor status: expiration_status
-        attr_accessor transitions: transition_list
-        attr_accessor noncurrent_version_transitions: noncurrent_version_transition_list
-        attr_accessor noncurrent_version_expiration: NoncurrentVersionExpiration
-        attr_accessor abort_incomplete_multipart_upload: AbortIncompleteMultipartUpload
-      end
-      class LifecycleRuleFilter
-        attr_accessor prefix: prefix
-        attr_accessor tag: Tag
-        attr_accessor object_size_greater_than: object_size_greater_than_bytes
-        attr_accessor object_size_less_than: object_size_less_than_bytes
-        attr_accessor and: LifecycleRuleAndOperator
-      end
-      class LifecycleRuleAndOperator
-        attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
-        attr_accessor object_size_greater_than: object_size_greater_than_bytes
-        attr_accessor object_size_less_than: object_size_less_than_bytes
-      end
-      class GetBucketLocationOutput
-        attr_accessor location_constraint: bucket_location_constraint
-      end
-      class GetBucketLoggingOutput
-        attr_accessor logging_enabled: LoggingEnabled
-      end
-      class LoggingEnabled
-        attr_accessor target_bucket: target_bucket
-        attr_accessor target_grants: target_grants
-        attr_accessor target_prefix: target_prefix
-      end
-      class TargetGrant
-        attr_accessor grantee: Grantee
-        attr_accessor permission: bucket_logs_permission
-      end
-      class GetBucketMetricsConfigurationOutput
-        attr_accessor metrics_configuration: MetricsConfiguration
-      end
-      class MetricsConfiguration
-        attr_accessor id: metrics_id
-        attr_accessor filter: MetricsFilter
-      end
-      class MetricsFilter
-        attr_accessor prefix: prefix
-        attr_accessor tag: Tag
-        attr_accessor access_point_arn: access_point_arn
-        attr_accessor and: MetricsAndOperator
-      end
-      class MetricsAndOperator
-        attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
-        attr_accessor access_point_arn: access_point_arn
-      end
-      class NotificationConfigurationDeprecated
-        attr_accessor topic_configuration: TopicConfigurationDeprecated
-        attr_accessor queue_configuration: QueueConfigurationDeprecated
-        attr_accessor cloud_function_configuration: CloudFunctionConfiguration
-      end
-      class TopicConfigurationDeprecated
-        attr_accessor id: notification_id
-        attr_accessor events: event_list
-        attr_accessor event: event
-        attr_accessor topic: topic_arn
-      end
-      class QueueConfigurationDeprecated
-        attr_accessor id: notification_id
-        attr_accessor event: event
-        attr_accessor events: event_list
-        attr_accessor queue: queue_arn
-      end
-      class CloudFunctionConfiguration
-        attr_accessor id: notification_id
-        attr_accessor event: event
-        attr_accessor events: event_list
-        attr_accessor cloud_function: cloud_function
-        attr_accessor invocation_role: cloud_function_invocation_role
-      end
-      class NotificationConfiguration
-        attr_accessor topic_configurations: topic_configuration_list
-        attr_accessor queue_configurations: queue_configuration_list
-        attr_accessor lambda_function_configurations: lambda_function_configuration_list
-        attr_accessor event_bridge_configuration: EventBridgeConfiguration
-      end
-      class TopicConfiguration
-        attr_accessor id: notification_id
-        attr_accessor topic_arn: topic_arn
-        attr_accessor events: event_list
-        attr_accessor filter: NotificationConfigurationFilter
-      end
-      class NotificationConfigurationFilter
-        attr_accessor key: S3KeyFilter
-      end
-      class S3KeyFilter
-        attr_accessor filter_rules: filter_rule_list
-      end
-      class FilterRule
-        attr_accessor name: filter_rule_name
-        attr_accessor value: filter_rule_value
-      end
-      class QueueConfiguration
-        attr_accessor id: notification_id
-        attr_accessor queue_arn: queue_arn
-        attr_accessor events: event_list
-        attr_accessor filter: NotificationConfigurationFilter
-      end
-      class LambdaFunctionConfiguration
-        attr_accessor id: notification_id
-        attr_accessor lambda_function_arn: lambda_function_arn
-        attr_accessor events: event_list
-        attr_accessor filter: NotificationConfigurationFilter
-      end
-      class EventBridgeConfiguration
-      end
-      class GetBucketOwnershipControlsOutput
-        attr_accessor ownership_controls: OwnershipControls
-      end
-      class OwnershipControls
-        attr_accessor rules: ownership_controls_rules
-      end
-      class OwnershipControlsRule
-        attr_accessor object_ownership: object_ownership
-      end
-      class GetBucketPolicyOutput
-        attr_accessor policy: policy
-      end
-      class GetBucketPolicyStatusOutput
-        attr_accessor policy_status: PolicyStatus
-      end
-      class PolicyStatus
-        attr_accessor is_public: is_public
-      end
-      type is_public = bool
-      class GetBucketReplicationOutput
-        attr_accessor replication_configuration: ReplicationConfiguration
-      end
-      class ReplicationConfiguration
-        attr_accessor role: role
-        attr_accessor rules: replication_rules
-      end
-      class ReplicationRule
-        attr_accessor id: id
-        attr_accessor priority: priority
-        attr_accessor prefix: prefix
-        attr_accessor filter: ReplicationRuleFilter
-        attr_accessor status: replication_rule_status
-        attr_accessor source_selection_criteria: SourceSelectionCriteria
-        attr_accessor existing_object_replication: ExistingObjectReplication
-        attr_accessor destination: Destination
-        attr_accessor delete_marker_replication: DeleteMarkerReplication
-      end
-      class ReplicationRuleFilter
-        attr_accessor prefix: prefix
-        attr_accessor tag: Tag
-        attr_accessor and: ReplicationRuleAndOperator
-      end
-      class ReplicationRuleAndOperator
-        attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
-      end
-      class SourceSelectionCriteria
-        attr_accessor sse_kms_encrypted_objects: SseKmsEncryptedObjects
-        attr_accessor replica_modifications: ReplicaModifications
-      end
-      class SseKmsEncryptedObjects
-        attr_accessor status: sse_kms_encrypted_objects_status
-      end
-      class ReplicaModifications
-        attr_accessor status: replica_modifications_status
-      end
-      class ExistingObjectReplication
-        attr_accessor status: existing_object_replication_status
-      end
+      type deleted_objects = ::Array[DeletedObject]
+      type delimiter = ::String
+      type description = ::String
       class Destination
         attr_accessor bucket: bucket_name
         attr_accessor account: account_id
@@ -895,25 +350,110 @@ module Aws
         attr_accessor replication_time: ReplicationTime
         attr_accessor metrics: Metrics
       end
-      class AccessControlTranslation
-        attr_accessor owner: owner_override
-      end
+      type destination = { bucket: bucket_name, account: account_id?, storage_class: storage_class?, access_control_translation: access_control_translation?, encryption_configuration: encryption_configuration?, replication_time: replication_time?, metrics: metrics? }
+      type display_name = ::String
+      type etag = ::String
+      type email_address = ::String
+      type enable_request_progress = bool
+      type encoding_type = ("url")
+      type encryption = { encryption_type: server_side_encryption, kms_key_id: ssekms_key_id?, kms_context: kms_context? }
       class EncryptionConfiguration
         attr_accessor replica_kms_key_id: replica_kms_key_id
       end
-      class ReplicationTime
-        attr_accessor status: replication_time_status
-        attr_accessor time: ReplicationTimeValue
+      type encryption_configuration = { replica_kms_key_id: replica_kms_key_id? }
+      type end_ = ::Integer
+      class EndEvent
       end
-      class ReplicationTimeValue
-        attr_accessor minutes: minutes
+      class Error
+        attr_accessor key: object_key
+        attr_accessor version_id: object_version_id
+        attr_accessor code: code
+        attr_accessor message: message
       end
-      class Metrics
-        attr_accessor status: metrics_status
-        attr_accessor event_threshold: ReplicationTimeValue
+      type error_code = ::String
+      class ErrorDocument
+        attr_accessor key: object_key
       end
-      class DeleteMarkerReplication
-        attr_accessor status: delete_marker_replication_status
+      type error_document = { key: object_key }
+      type error_message = ::String
+      type errors = ::Array[Error]
+      type event = ("s3:ReducedRedundancyLostObject" | "s3:ObjectCreated:*" | "s3:ObjectCreated:Put" | "s3:ObjectCreated:Post" | "s3:ObjectCreated:Copy" | "s3:ObjectCreated:CompleteMultipartUpload" | "s3:ObjectRemoved:*" | "s3:ObjectRemoved:Delete" | "s3:ObjectRemoved:DeleteMarkerCreated" | "s3:ObjectRestore:*" | "s3:ObjectRestore:Post" | "s3:ObjectRestore:Completed" | "s3:Replication:*" | "s3:Replication:OperationFailedReplication" | "s3:Replication:OperationNotTracked" | "s3:Replication:OperationMissedThreshold" | "s3:Replication:OperationReplicatedAfterThreshold" | "s3:ObjectRestore:Delete" | "s3:LifecycleTransition" | "s3:IntelligentTiering" | "s3:ObjectAcl:Put" | "s3:LifecycleExpiration:*" | "s3:LifecycleExpiration:Delete" | "s3:LifecycleExpiration:DeleteMarkerCreated" | "s3:ObjectTagging:*" | "s3:ObjectTagging:Put" | "s3:ObjectTagging:Delete")
+      class EventBridgeConfiguration
+      end
+      type event_bridge_configuration = ::Hash[untyped, untyped]
+      type event_list = ::Array[event]
+      class ExistingObjectReplication
+        attr_accessor status: existing_object_replication_status
+      end
+      type existing_object_replication = { status: existing_object_replication_status }
+      type existing_object_replication_status = ("Enabled" | "Disabled")
+      type expiration = ::String
+      type expiration_status = ("Enabled" | "Disabled")
+      type expired_object_delete_marker = bool
+      type expires = ::Time
+      type expose_header = ::String
+      type expose_headers = ::Array[expose_header]
+      type expression = ::String
+      type expression_type = ("SQL")
+      type fetch_owner = bool
+      type field_delimiter = ::String
+      type file_header_info = ("USE" | "IGNORE" | "NONE")
+      class FilterRule
+        attr_accessor name: filter_rule_name
+        attr_accessor value: filter_rule_value
+      end
+      type filter_rule = { name: filter_rule_name?, value: filter_rule_value? }
+      type filter_rule_list = ::Array[FilterRule]
+      type filter_rule_name = ("prefix" | "suffix")
+      type filter_rule_value = ::String
+      class GetBucketAccelerateConfigurationOutput
+        attr_accessor status: bucket_accelerate_status
+      end
+      class GetBucketAclOutput
+        attr_accessor owner: Owner
+        attr_accessor grants: grants
+      end
+      class GetBucketAnalyticsConfigurationOutput
+        attr_accessor analytics_configuration: AnalyticsConfiguration
+      end
+      class GetBucketCorsOutput
+        attr_accessor cors_rules: cors_rules
+      end
+      class GetBucketEncryptionOutput
+        attr_accessor server_side_encryption_configuration: ServerSideEncryptionConfiguration
+      end
+      class GetBucketIntelligentTieringConfigurationOutput
+        attr_accessor intelligent_tiering_configuration: IntelligentTieringConfiguration
+      end
+      class GetBucketInventoryConfigurationOutput
+        attr_accessor inventory_configuration: InventoryConfiguration
+      end
+      class GetBucketLifecycleConfigurationOutput
+        attr_accessor rules: lifecycle_rules
+      end
+      class GetBucketLifecycleOutput
+        attr_accessor rules: rules
+      end
+      class GetBucketLocationOutput
+        attr_accessor location_constraint: bucket_location_constraint
+      end
+      class GetBucketLoggingOutput
+        attr_accessor logging_enabled: LoggingEnabled
+      end
+      class GetBucketMetricsConfigurationOutput
+        attr_accessor metrics_configuration: MetricsConfiguration
+      end
+      class GetBucketOwnershipControlsOutput
+        attr_accessor ownership_controls: OwnershipControls
+      end
+      class GetBucketPolicyOutput
+        attr_accessor policy: policy
+      end
+      class GetBucketPolicyStatusOutput
+        attr_accessor policy_status: PolicyStatus
+      end
+      class GetBucketReplicationOutput
+        attr_accessor replication_configuration: ReplicationConfiguration
       end
       class GetBucketRequestPaymentOutput
         attr_accessor payer: payer
@@ -925,37 +465,22 @@ module Aws
         attr_accessor status: bucket_versioning_status
         attr_accessor mfa_delete: mfa_delete_status
       end
-      type mfa_delete_status = ("Enabled" | "Disabled")
       class GetBucketWebsiteOutput
         attr_accessor redirect_all_requests_to: RedirectAllRequestsTo
         attr_accessor index_document: IndexDocument
         attr_accessor error_document: ErrorDocument
         attr_accessor routing_rules: routing_rules
       end
-      class RedirectAllRequestsTo
-        attr_accessor host_name: host_name
-        attr_accessor protocol: protocol
+      class GetObjectAclOutput
+        attr_accessor owner: Owner
+        attr_accessor grants: grants
+        attr_accessor request_charged: request_charged
       end
-      class IndexDocument
-        attr_accessor suffix: suffix
+      class GetObjectLegalHoldOutput
+        attr_accessor legal_hold: ObjectLockLegalHold
       end
-      class ErrorDocument
-        attr_accessor key: object_key
-      end
-      class RoutingRule
-        attr_accessor condition: Condition
-        attr_accessor redirect: Redirect
-      end
-      class Condition
-        attr_accessor http_error_code_returned_equals: http_error_code_returned_equals
-        attr_accessor key_prefix_equals: key_prefix_equals
-      end
-      class Redirect
-        attr_accessor host_name: host_name
-        attr_accessor http_redirect_code: http_redirect_code
-        attr_accessor protocol: protocol
-        attr_accessor replace_key_prefix_with: replace_key_prefix_with
-        attr_accessor replace_key_with: replace_key_with
+      class GetObjectLockConfigurationOutput
+        attr_accessor object_lock_configuration: ObjectLockConfiguration
       end
       class GetObjectOutput
         attr_accessor body: body
@@ -991,38 +516,9 @@ module Aws
         attr_accessor object_lock_retain_until_date: object_lock_retain_until_date
         attr_accessor object_lock_legal_hold_status: object_lock_legal_hold_status
       end
-      class GetObjectAclOutput
-        attr_accessor owner: Owner
-        attr_accessor grants: grants
-        attr_accessor request_charged: request_charged
-      end
-      class GetObjectLegalHoldOutput
-        attr_accessor legal_hold: ObjectLockLegalHold
-      end
-      class ObjectLockLegalHold
-        attr_accessor status: object_lock_legal_hold_status
-      end
-      class GetObjectLockConfigurationOutput
-        attr_accessor object_lock_configuration: ObjectLockConfiguration
-      end
-      class ObjectLockConfiguration
-        attr_accessor object_lock_enabled: object_lock_enabled
-        attr_accessor rule: ObjectLockRule
-      end
-      class ObjectLockRule
-        attr_accessor default_retention: DefaultRetention
-      end
-      class DefaultRetention
-        attr_accessor mode: object_lock_retention_mode
-        attr_accessor days: days
-        attr_accessor years: years
-      end
+      type get_object_response_status_code = ::Integer
       class GetObjectRetentionOutput
         attr_accessor retention: ObjectLockRetention
-      end
-      class ObjectLockRetention
-        attr_accessor mode: object_lock_retention_mode
-        attr_accessor retain_until_date: date
       end
       class GetObjectTaggingOutput
         attr_accessor version_id: object_version_id
@@ -1035,12 +531,26 @@ module Aws
       class GetPublicAccessBlockOutput
         attr_accessor public_access_block_configuration: PublicAccessBlockConfiguration
       end
-      class PublicAccessBlockConfiguration
-        attr_accessor block_public_acls: setting
-        attr_accessor ignore_public_acls: setting
-        attr_accessor block_public_policy: setting
-        attr_accessor restrict_public_buckets: setting
+      type glacier_job_parameters = { tier: tier }
+      class Grant
+        attr_accessor grantee: Grantee
+        attr_accessor permission: permission
       end
+      type grant = { grantee: grantee?, permission: permission? }
+      type grant_full_control = ::String
+      type grant_read = ::String
+      type grant_read_acp = ::String
+      type grant_write = ::String
+      type grant_write_acp = ::String
+      class Grantee
+        attr_accessor display_name: display_name
+        attr_accessor email_address: email_address
+        attr_accessor id: id
+        attr_accessor type_: type_
+        attr_accessor uri: uri
+      end
+      type grantee = { display_name: display_name?, email_address: email_address?, id: id?, type: type_, uri: uri? }
+      type grants = ::Array[Grant]
       class HeadObjectOutput
         attr_accessor delete_marker: delete_marker
         attr_accessor accept_ranges: accept_ranges
@@ -1073,47 +583,173 @@ module Aws
         attr_accessor object_lock_retain_until_date: object_lock_retain_until_date
         attr_accessor object_lock_legal_hold_status: object_lock_legal_hold_status
       end
-      type archive_status = ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
+      type host_name = ::String
+      type http_error_code_returned_equals = ::String
+      type http_redirect_code = ::String
+      type id = ::String
+      type if_match = ::String
+      type if_modified_since = ::Time
+      type if_none_match = ::String
+      type if_unmodified_since = ::Time
+      class IndexDocument
+        attr_accessor suffix: suffix
+      end
+      type index_document = { suffix: suffix }
+      type initiated = ::Time
+      class Initiator
+        attr_accessor id: id
+        attr_accessor display_name: display_name
+      end
+      type input_serialization = { csv: csv_input?, compression_type: compression_type?, json: json_input?, parquet: parquet_input? }
+      type intelligent_tiering_access_tier = ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
+      class IntelligentTieringAndOperator
+        attr_accessor prefix: prefix
+        attr_accessor tags: tag_set
+      end
+      type intelligent_tiering_and_operator = { prefix: prefix?, tags: tag_set? }
+      class IntelligentTieringConfiguration
+        attr_accessor id: intelligent_tiering_id
+        attr_accessor filter: IntelligentTieringFilter
+        attr_accessor status: intelligent_tiering_status
+        attr_accessor tierings: tiering_list
+      end
+      type intelligent_tiering_configuration = { id: intelligent_tiering_id, filter: intelligent_tiering_filter?, status: intelligent_tiering_status, tierings: tiering_list }
+      type intelligent_tiering_configuration_list = ::Array[IntelligentTieringConfiguration]
+      type intelligent_tiering_days = ::Integer
+      class IntelligentTieringFilter
+        attr_accessor prefix: prefix
+        attr_accessor tag: Tag
+        attr_accessor and: IntelligentTieringAndOperator
+      end
+      type intelligent_tiering_filter = { prefix: prefix?, tag: tag?, and: intelligent_tiering_and_operator? }
+      type intelligent_tiering_id = ::String
+      type intelligent_tiering_status = ("Enabled" | "Disabled")
+      class InventoryConfiguration
+        attr_accessor destination: InventoryDestination
+        attr_accessor is_enabled: is_enabled
+        attr_accessor filter: InventoryFilter
+        attr_accessor id: inventory_id
+        attr_accessor included_object_versions: inventory_included_object_versions
+        attr_accessor optional_fields: inventory_optional_fields
+        attr_accessor schedule: InventorySchedule
+      end
+      type inventory_configuration = { destination: inventory_destination, is_enabled: is_enabled, filter: inventory_filter?, id: inventory_id, included_object_versions: inventory_included_object_versions, optional_fields: inventory_optional_fields?, schedule: inventory_schedule }
+      type inventory_configuration_list = ::Array[InventoryConfiguration]
+      class InventoryDestination
+        attr_accessor s3_bucket_destination: InventoryS3BucketDestination
+      end
+      type inventory_destination = { s3_bucket_destination: inventory_s3_bucket_destination }
+      class InventoryEncryption
+        attr_accessor sses3: SSES3
+        attr_accessor ssekms: SSEKMS
+      end
+      type inventory_encryption = { sses3: sses3?, ssekms: ssekms? }
+      class InventoryFilter
+        attr_accessor prefix: prefix
+      end
+      type inventory_filter = { prefix: prefix }
+      type inventory_format = ("CSV" | "ORC" | "Parquet")
+      type inventory_frequency = ("Daily" | "Weekly")
+      type inventory_id = ::String
+      type inventory_included_object_versions = ("All" | "Current")
+      type inventory_optional_field = ("Size" | "LastModifiedDate" | "StorageClass" | "ETag" | "IsMultipartUploaded" | "ReplicationStatus" | "EncryptionStatus" | "ObjectLockRetainUntilDate" | "ObjectLockMode" | "ObjectLockLegalHoldStatus" | "IntelligentTieringAccessTier" | "BucketKeyStatus")
+      type inventory_optional_fields = ::Array[inventory_optional_field]
+      class InventoryS3BucketDestination
+        attr_accessor account_id: account_id
+        attr_accessor bucket: bucket_name
+        attr_accessor format: inventory_format
+        attr_accessor prefix: prefix
+        attr_accessor encryption: InventoryEncryption
+      end
+      type inventory_s3_bucket_destination = { account_id: account_id?, bucket: bucket_name, format: inventory_format, prefix: prefix?, encryption: inventory_encryption? }
+      class InventorySchedule
+        attr_accessor frequency: inventory_frequency
+      end
+      type inventory_schedule = { frequency: inventory_frequency }
+      type is_enabled = bool
+      type is_latest = bool
+      type is_public = bool
+      type is_truncated = bool
+      type json_input = { type: json_type? }
+      type json_output = { record_delimiter: record_delimiter? }
+      type json_type = ("DOCUMENT" | "LINES")
+      type kms_context = ::String
+      type key_count = ::Integer
+      type key_marker = ::String
+      type key_prefix_equals = ::String
+      type lambda_function_arn = ::String
+      class LambdaFunctionConfiguration
+        attr_accessor id: notification_id
+        attr_accessor lambda_function_arn: lambda_function_arn
+        attr_accessor events: event_list
+        attr_accessor filter: NotificationConfigurationFilter
+      end
+      type lambda_function_configuration = { id: notification_id?, lambda_function_arn: lambda_function_arn, events: event_list, filter: notification_configuration_filter? }
+      type lambda_function_configuration_list = ::Array[LambdaFunctionConfiguration]
+      type last_modified = ::Time
+      type lifecycle_configuration = { rules: rules }
+      class LifecycleExpiration
+        attr_accessor date: date
+        attr_accessor days: days
+        attr_accessor expired_object_delete_marker: expired_object_delete_marker
+      end
+      type lifecycle_expiration = { date: date?, days: days?, expired_object_delete_marker: expired_object_delete_marker? }
+      class LifecycleRule
+        attr_accessor expiration: LifecycleExpiration
+        attr_accessor id: id
+        attr_accessor prefix: prefix
+        attr_accessor filter: LifecycleRuleFilter
+        attr_accessor status: expiration_status
+        attr_accessor transitions: transition_list
+        attr_accessor noncurrent_version_transitions: noncurrent_version_transition_list
+        attr_accessor noncurrent_version_expiration: NoncurrentVersionExpiration
+        attr_accessor abort_incomplete_multipart_upload: AbortIncompleteMultipartUpload
+      end
+      type lifecycle_rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix?, filter: lifecycle_rule_filter?, status: expiration_status, transitions: transition_list?, noncurrent_version_transitions: noncurrent_version_transition_list?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
+      class LifecycleRuleAndOperator
+        attr_accessor prefix: prefix
+        attr_accessor tags: tag_set
+        attr_accessor object_size_greater_than: object_size_greater_than_bytes
+        attr_accessor object_size_less_than: object_size_less_than_bytes
+      end
+      type lifecycle_rule_and_operator = { prefix: prefix?, tags: tag_set?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes? }
+      class LifecycleRuleFilter
+        attr_accessor prefix: prefix
+        attr_accessor tag: Tag
+        attr_accessor object_size_greater_than: object_size_greater_than_bytes
+        attr_accessor object_size_less_than: object_size_less_than_bytes
+        attr_accessor and: LifecycleRuleAndOperator
+      end
+      type lifecycle_rule_filter = { prefix: prefix?, tag: tag?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes?, and: lifecycle_rule_and_operator? }
+      type lifecycle_rules = ::Array[LifecycleRule]
       class ListBucketAnalyticsConfigurationsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
         attr_accessor analytics_configuration_list: analytics_configuration_list
       end
-      type is_truncated = bool
-      type next_token = ::String
-      type analytics_configuration_list = ::Array[AnalyticsConfiguration]
       class ListBucketIntelligentTieringConfigurationsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
         attr_accessor intelligent_tiering_configuration_list: intelligent_tiering_configuration_list
       end
-      type intelligent_tiering_configuration_list = ::Array[IntelligentTieringConfiguration]
       class ListBucketInventoryConfigurationsOutput
         attr_accessor continuation_token: token
         attr_accessor inventory_configuration_list: inventory_configuration_list
         attr_accessor is_truncated: is_truncated
         attr_accessor next_continuation_token: next_token
       end
-      type inventory_configuration_list = ::Array[InventoryConfiguration]
       class ListBucketMetricsConfigurationsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
         attr_accessor metrics_configuration_list: metrics_configuration_list
       end
-      type metrics_configuration_list = ::Array[MetricsConfiguration]
       class ListBucketsOutput
         attr_accessor buckets: buckets
         attr_accessor owner: Owner
       end
-      type buckets = ::Array[Bucket]
-      class Bucket
-        attr_accessor name: bucket_name
-        attr_accessor creation_date: creation_date
-      end
-      type creation_date = ::Time
       class ListMultipartUploadsOutput
         attr_accessor bucket: bucket_name
         attr_accessor key_marker: key_marker
@@ -1127,26 +763,6 @@ module Aws
         attr_accessor uploads: multipart_upload_list
         attr_accessor common_prefixes: common_prefix_list
         attr_accessor encoding_type: encoding_type
-      end
-      type next_key_marker = ::String
-      type next_upload_id_marker = ::String
-      type multipart_upload_list = ::Array[MultipartUpload]
-      class MultipartUpload
-        attr_accessor upload_id: multipart_upload_id
-        attr_accessor key: object_key
-        attr_accessor initiated: initiated
-        attr_accessor storage_class: storage_class
-        attr_accessor owner: Owner
-        attr_accessor initiator: Initiator
-      end
-      type initiated = ::Time
-      class Initiator
-        attr_accessor id: id
-        attr_accessor display_name: display_name
-      end
-      type common_prefix_list = ::Array[CommonPrefix]
-      class CommonPrefix
-        attr_accessor prefix: prefix
       end
       class ListObjectVersionsOutput
         attr_accessor is_truncated: is_truncated
@@ -1163,29 +779,6 @@ module Aws
         attr_accessor common_prefixes: common_prefix_list
         attr_accessor encoding_type: encoding_type
       end
-      type next_version_id_marker = ::String
-      type object_version_list = ::Array[ObjectVersion]
-      class ObjectVersion
-        attr_accessor etag: etag
-        attr_accessor size: size
-        attr_accessor storage_class: object_version_storage_class
-        attr_accessor key: object_key
-        attr_accessor version_id: object_version_id
-        attr_accessor is_latest: is_latest
-        attr_accessor last_modified: last_modified
-        attr_accessor owner: Owner
-      end
-      type size = ::Integer
-      type object_version_storage_class = ("STANDARD")
-      type is_latest = bool
-      type delete_markers = ::Array[DeleteMarkerEntry]
-      class DeleteMarkerEntry
-        attr_accessor owner: Owner
-        attr_accessor key: object_key
-        attr_accessor version_id: object_version_id
-        attr_accessor is_latest: is_latest
-        attr_accessor last_modified: last_modified
-      end
       class ListObjectsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor marker: marker
@@ -1198,17 +791,6 @@ module Aws
         attr_accessor common_prefixes: common_prefix_list
         attr_accessor encoding_type: encoding_type
       end
-      type next_marker = ::String
-      type object_list = ::Array[Object]
-      class Object
-        attr_accessor key: object_key
-        attr_accessor last_modified: last_modified
-        attr_accessor etag: etag
-        attr_accessor size: size
-        attr_accessor storage_class: object_storage_class
-        attr_accessor owner: Owner
-      end
-      type object_storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
       class ListObjectsV2Output
         attr_accessor is_truncated: is_truncated
         attr_accessor contents: object_list
@@ -1223,7 +805,6 @@ module Aws
         attr_accessor next_continuation_token: next_token
         attr_accessor start_after: start_after
       end
-      type key_count = ::Integer
       class ListPartsOutput
         attr_accessor abort_date: abort_date
         attr_accessor abort_rule_id: abort_rule_id
@@ -1240,13 +821,217 @@ module Aws
         attr_accessor storage_class: storage_class
         attr_accessor request_charged: request_charged
       end
+      type location = ::String
+      type location_prefix = ::String
+      class LoggingEnabled
+        attr_accessor target_bucket: target_bucket
+        attr_accessor target_grants: target_grants
+        attr_accessor target_prefix: target_prefix
+      end
+      type logging_enabled = { target_bucket: target_bucket, target_grants: target_grants?, target_prefix: target_prefix }
+      type mfa = ::String
+      type mfa_delete = ("Enabled" | "Disabled")
+      type mfa_delete_status = ("Enabled" | "Disabled")
+      type marker = ::String
+      type max_age_seconds = ::Integer
+      type max_keys = ::Integer
+      type max_parts = ::Integer
+      type max_uploads = ::Integer
+      type message = ::String
+      type metadata = ::Hash[metadata_key, metadata_value]
+      type metadata_directive = ("COPY" | "REPLACE")
+      type metadata_entry = { name: metadata_key?, value: metadata_value? }
+      type metadata_key = ::String
+      type metadata_value = ::String
+      class Metrics
+        attr_accessor status: metrics_status
+        attr_accessor event_threshold: ReplicationTimeValue
+      end
+      type metrics = { status: metrics_status, event_threshold: replication_time_value? }
+      class MetricsAndOperator
+        attr_accessor prefix: prefix
+        attr_accessor tags: tag_set
+        attr_accessor access_point_arn: access_point_arn
+      end
+      type metrics_and_operator = { prefix: prefix?, tags: tag_set?, access_point_arn: access_point_arn? }
+      class MetricsConfiguration
+        attr_accessor id: metrics_id
+        attr_accessor filter: MetricsFilter
+      end
+      type metrics_configuration = { id: metrics_id, filter: metrics_filter? }
+      type metrics_configuration_list = ::Array[MetricsConfiguration]
+      class MetricsFilter
+        attr_accessor prefix: prefix
+        attr_accessor tag: Tag
+        attr_accessor access_point_arn: access_point_arn
+        attr_accessor and: MetricsAndOperator
+      end
+      type metrics_filter = { prefix: prefix?, tag: tag?, access_point_arn: access_point_arn?, and: metrics_and_operator? }
+      type metrics_id = ::String
+      type metrics_status = ("Enabled" | "Disabled")
+      type minutes = ::Integer
+      type missing_meta = ::Integer
+      class MultipartUpload
+        attr_accessor upload_id: multipart_upload_id
+        attr_accessor key: object_key
+        attr_accessor initiated: initiated
+        attr_accessor storage_class: storage_class
+        attr_accessor owner: Owner
+        attr_accessor initiator: Initiator
+      end
+      type multipart_upload_id = ::String
+      type multipart_upload_list = ::Array[MultipartUpload]
+      type next_key_marker = ::String
+      type next_marker = ::String
       type next_part_number_marker = ::Integer
-      type parts = ::Array[Part]
+      type next_token = ::String
+      type next_upload_id_marker = ::String
+      type next_version_id_marker = ::String
+      class NoncurrentVersionExpiration
+        attr_accessor noncurrent_days: days
+        attr_accessor newer_noncurrent_versions: version_count
+      end
+      type noncurrent_version_expiration = { noncurrent_days: days?, newer_noncurrent_versions: version_count? }
+      class NoncurrentVersionTransition
+        attr_accessor noncurrent_days: days
+        attr_accessor storage_class: transition_storage_class
+        attr_accessor newer_noncurrent_versions: version_count
+      end
+      type noncurrent_version_transition = { noncurrent_days: days?, storage_class: transition_storage_class?, newer_noncurrent_versions: version_count? }
+      type noncurrent_version_transition_list = ::Array[NoncurrentVersionTransition]
+      class NotificationConfiguration
+        attr_accessor topic_configurations: topic_configuration_list
+        attr_accessor queue_configurations: queue_configuration_list
+        attr_accessor lambda_function_configurations: lambda_function_configuration_list
+        attr_accessor event_bridge_configuration: EventBridgeConfiguration
+      end
+      type notification_configuration = { topic_configurations: topic_configuration_list?, queue_configurations: queue_configuration_list?, lambda_function_configurations: lambda_function_configuration_list?, event_bridge_configuration: event_bridge_configuration? }
+      class NotificationConfigurationDeprecated
+        attr_accessor topic_configuration: TopicConfigurationDeprecated
+        attr_accessor queue_configuration: QueueConfigurationDeprecated
+        attr_accessor cloud_function_configuration: CloudFunctionConfiguration
+      end
+      type notification_configuration_deprecated = { topic_configuration: topic_configuration_deprecated?, queue_configuration: queue_configuration_deprecated?, cloud_function_configuration: cloud_function_configuration? }
+      class NotificationConfigurationFilter
+        attr_accessor key: S3KeyFilter
+      end
+      type notification_configuration_filter = { key: s3_key_filter? }
+      type notification_id = ::String
+      class Object
+        attr_accessor key: object_key
+        attr_accessor last_modified: last_modified
+        attr_accessor etag: etag
+        attr_accessor size: size
+        attr_accessor storage_class: object_storage_class
+        attr_accessor owner: Owner
+      end
+      type object_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read" | "aws-exec-read" | "bucket-owner-read" | "bucket-owner-full-control")
+      type object_identifier = { key: object_key, version_id: object_version_id? }
+      type object_identifier_list = ::Array[object_identifier]
+      type object_key = ::String
+      type object_list = ::Array[Object]
+      class ObjectLockConfiguration
+        attr_accessor object_lock_enabled: object_lock_enabled
+        attr_accessor rule: ObjectLockRule
+      end
+      type object_lock_configuration = { object_lock_enabled: object_lock_enabled?, rule: object_lock_rule? }
+      type object_lock_enabled = ("Enabled")
+      type object_lock_enabled_for_bucket = bool
+      class ObjectLockLegalHold
+        attr_accessor status: object_lock_legal_hold_status
+      end
+      type object_lock_legal_hold = { status: object_lock_legal_hold_status? }
+      type object_lock_legal_hold_status = ("ON" | "OFF")
+      type object_lock_mode = ("GOVERNANCE" | "COMPLIANCE")
+      type object_lock_retain_until_date = ::Time
+      class ObjectLockRetention
+        attr_accessor mode: object_lock_retention_mode
+        attr_accessor retain_until_date: date
+      end
+      type object_lock_retention = { mode: object_lock_retention_mode?, retain_until_date: date? }
+      type object_lock_retention_mode = ("GOVERNANCE" | "COMPLIANCE")
+      class ObjectLockRule
+        attr_accessor default_retention: DefaultRetention
+      end
+      type object_lock_rule = { default_retention: default_retention? }
+      type object_lock_token = ::String
+      type object_ownership = ("BucketOwnerPreferred" | "ObjectWriter" | "BucketOwnerEnforced")
+      type object_size_greater_than_bytes = ::Integer
+      type object_size_less_than_bytes = ::Integer
+      type object_storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
+      class ObjectVersion
+        attr_accessor etag: etag
+        attr_accessor size: size
+        attr_accessor storage_class: object_version_storage_class
+        attr_accessor key: object_key
+        attr_accessor version_id: object_version_id
+        attr_accessor is_latest: is_latest
+        attr_accessor last_modified: last_modified
+        attr_accessor owner: Owner
+      end
+      type object_version_id = ::String
+      type object_version_list = ::Array[ObjectVersion]
+      type object_version_storage_class = ("STANDARD")
+      type output_location = { s3: s3_location? }
+      type output_serialization = { csv: csv_output?, json: json_output? }
+      class Owner
+        attr_accessor display_name: display_name
+        attr_accessor id: id
+      end
+      type owner = { display_name: display_name?, id: id? }
+      type owner_override = ("Destination")
+      class OwnershipControls
+        attr_accessor rules: ownership_controls_rules
+      end
+      type ownership_controls = { rules: ownership_controls_rules }
+      class OwnershipControlsRule
+        attr_accessor object_ownership: object_ownership
+      end
+      type ownership_controls_rule = { object_ownership: object_ownership }
+      type ownership_controls_rules = ::Array[OwnershipControlsRule]
+      type parquet_input = ::Hash[untyped, untyped]
       class Part
         attr_accessor part_number: part_number
         attr_accessor last_modified: last_modified
         attr_accessor etag: etag
         attr_accessor size: size
+      end
+      type part_number = ::Integer
+      type part_number_marker = ::Integer
+      type parts = ::Array[Part]
+      type parts_count = ::Integer
+      type payer = ("Requester" | "BucketOwner")
+      type permission = ("FULL_CONTROL" | "WRITE" | "WRITE_ACP" | "READ" | "READ_ACP")
+      type policy = ::String
+      class PolicyStatus
+        attr_accessor is_public: is_public
+      end
+      type prefix = ::String
+      type priority = ::Integer
+      class Progress
+        attr_accessor bytes_scanned: bytes_scanned
+        attr_accessor bytes_processed: bytes_processed
+        attr_accessor bytes_returned: bytes_returned
+      end
+      class ProgressEvent
+        attr_accessor details: Progress
+      end
+      type protocol = ("http" | "https")
+      class PublicAccessBlockConfiguration
+        attr_accessor block_public_acls: setting
+        attr_accessor ignore_public_acls: setting
+        attr_accessor block_public_policy: setting
+        attr_accessor restrict_public_buckets: setting
+      end
+      type public_access_block_configuration = { block_public_acls: setting?, ignore_public_acls: setting?, block_public_policy: setting?, restrict_public_buckets: setting? }
+      class PutObjectAclOutput
+        attr_accessor request_charged: request_charged
+      end
+      class PutObjectLegalHoldOutput
+        attr_accessor request_charged: request_charged
+      end
+      class PutObjectLockConfigurationOutput
+        attr_accessor request_charged: request_charged
       end
       class PutObjectOutput
         attr_accessor expiration: expiration
@@ -1260,29 +1045,156 @@ module Aws
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      class PutObjectAclOutput
-        attr_accessor request_charged: request_charged
-      end
-      class PutObjectLegalHoldOutput
-        attr_accessor request_charged: request_charged
-      end
-      class PutObjectLockConfigurationOutput
-        attr_accessor request_charged: request_charged
-      end
       class PutObjectRetentionOutput
         attr_accessor request_charged: request_charged
       end
       class PutObjectTaggingOutput
         attr_accessor version_id: object_version_id
       end
+      type queue_arn = ::String
+      class QueueConfiguration
+        attr_accessor id: notification_id
+        attr_accessor queue_arn: queue_arn
+        attr_accessor events: event_list
+        attr_accessor filter: NotificationConfigurationFilter
+      end
+      type queue_configuration = { id: notification_id?, queue_arn: queue_arn, events: event_list, filter: notification_configuration_filter? }
+      class QueueConfigurationDeprecated
+        attr_accessor id: notification_id
+        attr_accessor event: event
+        attr_accessor events: event_list
+        attr_accessor queue: queue_arn
+      end
+      type queue_configuration_deprecated = { id: notification_id?, event: event?, events: event_list?, queue: queue_arn? }
+      type queue_configuration_list = ::Array[QueueConfiguration]
+      type quiet = bool
+      type quote_character = ::String
+      type quote_escape_character = ::String
+      type quote_fields = ("ALWAYS" | "ASNEEDED")
+      type range = ::String
+      type record_delimiter = ::String
+      class RecordsEvent
+        attr_accessor payload: body
+      end
+      class Redirect
+        attr_accessor host_name: host_name
+        attr_accessor http_redirect_code: http_redirect_code
+        attr_accessor protocol: protocol
+        attr_accessor replace_key_prefix_with: replace_key_prefix_with
+        attr_accessor replace_key_with: replace_key_with
+      end
+      type redirect = { host_name: host_name?, http_redirect_code: http_redirect_code?, protocol: protocol?, replace_key_prefix_with: replace_key_prefix_with?, replace_key_with: replace_key_with? }
+      class RedirectAllRequestsTo
+        attr_accessor host_name: host_name
+        attr_accessor protocol: protocol
+      end
+      type redirect_all_requests_to = { host_name: host_name, protocol: protocol? }
+      type replace_key_prefix_with = ::String
+      type replace_key_with = ::String
+      type replica_kms_key_id = ::String
+      class ReplicaModifications
+        attr_accessor status: replica_modifications_status
+      end
+      type replica_modifications = { status: replica_modifications_status }
+      type replica_modifications_status = ("Enabled" | "Disabled")
+      class ReplicationConfiguration
+        attr_accessor role: role
+        attr_accessor rules: replication_rules
+      end
+      type replication_configuration = { role: role, rules: replication_rules }
+      class ReplicationRule
+        attr_accessor id: id
+        attr_accessor priority: priority
+        attr_accessor prefix: prefix
+        attr_accessor filter: ReplicationRuleFilter
+        attr_accessor status: replication_rule_status
+        attr_accessor source_selection_criteria: SourceSelectionCriteria
+        attr_accessor existing_object_replication: ExistingObjectReplication
+        attr_accessor destination: Destination
+        attr_accessor delete_marker_replication: DeleteMarkerReplication
+      end
+      type replication_rule = { id: id?, priority: priority?, prefix: prefix?, filter: replication_rule_filter?, status: replication_rule_status, source_selection_criteria: source_selection_criteria?, existing_object_replication: existing_object_replication?, destination: destination, delete_marker_replication: delete_marker_replication? }
+      class ReplicationRuleAndOperator
+        attr_accessor prefix: prefix
+        attr_accessor tags: tag_set
+      end
+      type replication_rule_and_operator = { prefix: prefix?, tags: tag_set? }
+      class ReplicationRuleFilter
+        attr_accessor prefix: prefix
+        attr_accessor tag: Tag
+        attr_accessor and: ReplicationRuleAndOperator
+      end
+      type replication_rule_filter = { prefix: prefix?, tag: tag?, and: replication_rule_and_operator? }
+      type replication_rule_status = ("Enabled" | "Disabled")
+      type replication_rules = ::Array[ReplicationRule]
+      type replication_status = ("COMPLETE" | "PENDING" | "FAILED" | "REPLICA")
+      class ReplicationTime
+        attr_accessor status: replication_time_status
+        attr_accessor time: ReplicationTimeValue
+      end
+      type replication_time = { status: replication_time_status, time: replication_time_value }
+      type replication_time_status = ("Enabled" | "Disabled")
+      class ReplicationTimeValue
+        attr_accessor minutes: minutes
+      end
+      type replication_time_value = { minutes: minutes? }
+      type request_charged = ("requester")
+      type request_payer = ("requester")
+      type request_payment_configuration = { payer: payer }
+      type request_progress = { enabled: enable_request_progress? }
+      type request_route = ::String
+      type request_token = ::String
+      type response_cache_control = ::String
+      type response_content_disposition = ::String
+      type response_content_encoding = ::String
+      type response_content_language = ::String
+      type response_content_type = ::String
+      type response_expires = ::Time
+      type restore = ::String
       class RestoreObjectOutput
         attr_accessor request_charged: request_charged
         attr_accessor restore_output_path: restore_output_path
       end
       type restore_output_path = ::String
-      class SelectObjectContentOutput
-        attr_accessor payload: SelectObjectContentEventStream
+      type restore_request = { days: days?, glacier_job_parameters: glacier_job_parameters?, type: restore_request_type?, tier: tier?, description: description?, select_parameters: select_parameters?, output_location: output_location? }
+      type restore_request_type = ("SELECT")
+      type role = ::String
+      class RoutingRule
+        attr_accessor condition: Condition
+        attr_accessor redirect: Redirect
       end
+      type routing_rule = { condition: condition?, redirect: redirect }
+      type routing_rules = ::Array[RoutingRule]
+      class Rule
+        attr_accessor expiration: LifecycleExpiration
+        attr_accessor id: id
+        attr_accessor prefix: prefix
+        attr_accessor status: expiration_status
+        attr_accessor transition: Transition
+        attr_accessor noncurrent_version_transition: NoncurrentVersionTransition
+        attr_accessor noncurrent_version_expiration: NoncurrentVersionExpiration
+        attr_accessor abort_incomplete_multipart_upload: AbortIncompleteMultipartUpload
+      end
+      type rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix, status: expiration_status, transition: transition?, noncurrent_version_transition: noncurrent_version_transition?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
+      type rules = ::Array[Rule]
+      class S3KeyFilter
+        attr_accessor filter_rules: filter_rule_list
+      end
+      type s3_key_filter = { filter_rules: filter_rule_list? }
+      type s3_location = { bucket_name: bucket_name, prefix: location_prefix, encryption: encryption?, canned_acl: object_canned_acl?, access_control_list: grants?, tagging: tagging?, user_metadata: user_metadata?, storage_class: storage_class? }
+      type sse_customer_algorithm = ::String
+      type sse_customer_key = ::String
+      type sse_customer_key_md5 = ::String
+      class SSEKMS
+        attr_accessor key_id: ssekms_key_id
+      end
+      type ssekms = { key_id: ssekms_key_id }
+      type ssekms_encryption_context = ::String
+      type ssekms_key_id = ::String
+      class SSES3
+      end
+      type sses3 = ::Hash[untyped, untyped]
+      type scan_range = { start: start?, end: end_? }
       class SelectObjectContentEventStream
         attr_accessor records: RecordsEvent
         attr_accessor stats: StatsEvent
@@ -1290,41 +1202,114 @@ module Aws
         attr_accessor cont: ContinuationEvent
         attr_accessor end_: EndEvent
       end
-      class RecordsEvent
-        attr_accessor payload: body
+      class SelectObjectContentOutput
+        attr_accessor payload: SelectObjectContentEventStream
       end
-      class StatsEvent
-        attr_accessor details: Stats
+      type select_parameters = { input_serialization: input_serialization, expression_type: expression_type, expression: expression, output_serialization: output_serialization }
+      type server_side_encryption = ("AES256" | "aws:kms")
+      class ServerSideEncryptionByDefault
+        attr_accessor sse_algorithm: server_side_encryption
+        attr_accessor kms_master_key_id: ssekms_key_id
       end
+      type server_side_encryption_by_default = { sse_algorithm: server_side_encryption, kms_master_key_id: ssekms_key_id? }
+      class ServerSideEncryptionConfiguration
+        attr_accessor rules: server_side_encryption_rules
+      end
+      type server_side_encryption_configuration = { rules: server_side_encryption_rules }
+      class ServerSideEncryptionRule
+        attr_accessor apply_server_side_encryption_by_default: ServerSideEncryptionByDefault
+        attr_accessor bucket_key_enabled: bucket_key_enabled
+      end
+      type server_side_encryption_rule = { apply_server_side_encryption_by_default: server_side_encryption_by_default?, bucket_key_enabled: bucket_key_enabled? }
+      type server_side_encryption_rules = ::Array[ServerSideEncryptionRule]
+      type setting = bool
+      type size = ::Integer
+      type skip_validation = bool
+      class SourceSelectionCriteria
+        attr_accessor sse_kms_encrypted_objects: SseKmsEncryptedObjects
+        attr_accessor replica_modifications: ReplicaModifications
+      end
+      type source_selection_criteria = { sse_kms_encrypted_objects: sse_kms_encrypted_objects?, replica_modifications: replica_modifications? }
+      class SseKmsEncryptedObjects
+        attr_accessor status: sse_kms_encrypted_objects_status
+      end
+      type sse_kms_encrypted_objects = { status: sse_kms_encrypted_objects_status }
+      type sse_kms_encrypted_objects_status = ("Enabled" | "Disabled")
+      type start = ::Integer
+      type start_after = ::String
       class Stats
         attr_accessor bytes_scanned: bytes_scanned
         attr_accessor bytes_processed: bytes_processed
         attr_accessor bytes_returned: bytes_returned
       end
-      type bytes_scanned = ::Integer
-      type bytes_processed = ::Integer
-      type bytes_returned = ::Integer
-      class ProgressEvent
-        attr_accessor details: Progress
+      class StatsEvent
+        attr_accessor details: Stats
       end
-      class Progress
-        attr_accessor bytes_scanned: bytes_scanned
-        attr_accessor bytes_processed: bytes_processed
-        attr_accessor bytes_returned: bytes_returned
+      type storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
+      class StorageClassAnalysis
+        attr_accessor data_export: StorageClassAnalysisDataExport
       end
-      class ContinuationEvent
+      type storage_class_analysis = { data_export: storage_class_analysis_data_export? }
+      class StorageClassAnalysisDataExport
+        attr_accessor output_schema_version: storage_class_analysis_schema_version
+        attr_accessor destination: AnalyticsExportDestination
       end
-      class EndEvent
+      type storage_class_analysis_data_export = { output_schema_version: storage_class_analysis_schema_version, destination: analytics_export_destination }
+      type storage_class_analysis_schema_version = ("V_1")
+      type suffix = ::String
+      class Tag
+        attr_accessor key: object_key
+        attr_accessor value: value
       end
-      class UploadPartOutput
-        attr_accessor server_side_encryption: server_side_encryption
-        attr_accessor etag: etag
-        attr_accessor sse_customer_algorithm: sse_customer_algorithm
-        attr_accessor sse_customer_key_md5: sse_customer_key_md5
-        attr_accessor ssekms_key_id: ssekms_key_id
-        attr_accessor bucket_key_enabled: bucket_key_enabled
-        attr_accessor request_charged: request_charged
+      type tag = { key: object_key, value: value }
+      type tag_count = ::Integer
+      type tag_set = ::Array[Tag]
+      type tagging = { tag_set: tag_set }
+      type tagging_directive = ("COPY" | "REPLACE")
+      type tagging_header = ::String
+      type target_bucket = ::String
+      class TargetGrant
+        attr_accessor grantee: Grantee
+        attr_accessor permission: bucket_logs_permission
       end
+      type target_grant = { grantee: grantee?, permission: bucket_logs_permission? }
+      type target_grants = ::Array[TargetGrant]
+      type target_prefix = ::String
+      type tier = ("Standard" | "Bulk" | "Expedited")
+      class Tiering
+        attr_accessor days: intelligent_tiering_days
+        attr_accessor access_tier: intelligent_tiering_access_tier
+      end
+      type tiering = { days: intelligent_tiering_days, access_tier: intelligent_tiering_access_tier }
+      type tiering_list = ::Array[Tiering]
+      type token = ::String
+      type topic_arn = ::String
+      class TopicConfiguration
+        attr_accessor id: notification_id
+        attr_accessor topic_arn: topic_arn
+        attr_accessor events: event_list
+        attr_accessor filter: NotificationConfigurationFilter
+      end
+      type topic_configuration = { id: notification_id?, topic_arn: topic_arn, events: event_list, filter: notification_configuration_filter? }
+      class TopicConfigurationDeprecated
+        attr_accessor id: notification_id
+        attr_accessor events: event_list
+        attr_accessor event: event
+        attr_accessor topic: topic_arn
+      end
+      type topic_configuration_deprecated = { id: notification_id?, events: event_list?, event: event?, topic: topic_arn? }
+      type topic_configuration_list = ::Array[TopicConfiguration]
+      class Transition
+        attr_accessor date: date
+        attr_accessor days: days
+        attr_accessor storage_class: transition_storage_class
+      end
+      type transition = { date: date?, days: days?, storage_class: transition_storage_class? }
+      type transition_list = ::Array[Transition]
+      type transition_storage_class = ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "GLACIER_IR")
+      type type_ = ("CanonicalUser" | "AmazonCustomerByEmail" | "Group")
+      type uri = ::String
+      type upload_id_marker = ::String
       class UploadPartCopyOutput
         attr_accessor copy_source_version_id: copy_source_version_id
         attr_accessor copy_part_result: CopyPartResult
@@ -1335,19 +1320,30 @@ module Aws
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      class CopyPartResult
+      class UploadPartOutput
+        attr_accessor server_side_encryption: server_side_encryption
         attr_accessor etag: etag
-        attr_accessor last_modified: last_modified
+        attr_accessor sse_customer_algorithm: sse_customer_algorithm
+        attr_accessor sse_customer_key_md5: sse_customer_key_md5
+        attr_accessor ssekms_key_id: ssekms_key_id
+        attr_accessor bucket_key_enabled: bucket_key_enabled
+        attr_accessor request_charged: request_charged
       end
+      type user_metadata = ::Array[metadata_entry]
+      type value = ::String
+      type version_count = ::Integer
+      type version_id_marker = ::String
+      type versioning_configuration = { mfa_delete: mfa_delete?, status: bucket_versioning_status? }
+      type website_configuration = { error_document: error_document?, index_document: index_document?, redirect_all_requests_to: redirect_all_requests_to?, routing_rules: routing_rules? }
+      type website_redirect_location = ::String
+      type years = ::Integer
     end
     module Errors
-      class StorageClass < ::RuntimeError
-      end
-      class IntelligentTieringAccessTier < ::RuntimeError
-      end
       class BucketAlreadyExists < ::RuntimeError
       end
       class BucketAlreadyOwnedByYou < ::RuntimeError
+      end
+      class IntelligentTieringAccessTier < ::RuntimeError
       end
       class InvalidObjectState < ::RuntimeError
         attr_accessor storage_class: ("STANDARD" | "REDUCED_REDUNDANCY" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "GLACIER" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
@@ -1362,6 +1358,8 @@ module Aws
       class ObjectAlreadyInActiveTierError < ::RuntimeError
       end
       class ObjectNotInActiveTierError < ::RuntimeError
+      end
+      class StorageClass < ::RuntimeError
       end
     end
   end
