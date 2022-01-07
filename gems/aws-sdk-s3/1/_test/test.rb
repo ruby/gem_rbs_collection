@@ -10,11 +10,12 @@ end
 
 begin
   resp = Aws::S3::Client.new.get_object(bucket: 'test', key: 'test')
-  resp.body.read
-rescue Aws::S3::Errors::InvalidObjectState => e
+  resp.body.read # check streaming
+rescue Aws::S3::Errors::InvalidObjectState => e # check Errors
   e.storage_class.downcase
 end
 
+# check simple input
 resp = client.put_object(
   bucket: 'test',
   key: 'test',
@@ -22,21 +23,27 @@ resp = client.put_object(
 )
 resp.etag.tr('', '')
 
-resp = client.complete_multipart_upload(
-  bucket: "examplebucket",
-  key: "bigobject",
-  multipart_upload: {
-    parts: [
+# check CORSRules input and output type
+client.put_bucket_cors(
+  bucket: "BucketName", # required
+  cors_configuration: { # required
+    cors_rules: [ # required
       {
-        etag: "\"d8c2eafd90c266e19ab9dcacc479f8af\"",
-        part_number: 1,
-      },
-      {
-        etag: "\"d8c2eafd90c266e19ab9dcacc479f8af\"",
-        part_number: 2,
+        id: "ID",
+        allowed_headers: ["AllowedHeader"],
+        allowed_methods: ["AllowedMethod"], # required
+        allowed_origins: ["AllowedOrigin"], # required
+        # expose_headers: ["ExposeHeader"], # check option
+        max_age_seconds: 1,
       },
     ],
   },
-  upload_id: "7YPBOJuoFiQ9cz4P3Pe6FIZwO4f7wN93uHsNBEw97pl5eNwzExg0LAT2dUN91cOmrEQHDsP3WA60CEg--",
+  content_md5: "ContentMD5",
+  expected_bucket_owner: "AccountId",
 )
-resp.location.upcase
+resp = client.get_bucket_cors(
+  bucket: "BucketName", # required
+  expected_bucket_owner: "AccountId",
+)
+resp.cors_rules[0].allowed_headers[0].upcase
+

@@ -118,7 +118,7 @@ module Aws
       type abort_rule_id = ::String
       type accelerate_configuration = { status: bucket_accelerate_status? }
       type accept_ranges = ::String
-      type access_control_policy = { grants: grants?, owner: owner? }
+      type access_control_policy = { grants: grants_input?, owner: owner? }
       class AccessControlTranslation
         attr_accessor owner: owner_override
       end
@@ -134,16 +134,16 @@ module Aws
       type allowed_origins = ::Array[allowed_origin]
       class AnalyticsAndOperator
         attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
+        attr_accessor tags: tag_set_output
       end
-      type analytics_and_operator = { prefix: prefix?, tags: tag_set? }
+      type analytics_and_operator = { prefix: prefix?, tags: tag_set_input? }
       class AnalyticsConfiguration
         attr_accessor id: analytics_id
         attr_accessor filter: AnalyticsFilter
         attr_accessor storage_class_analysis: StorageClassAnalysis
       end
       type analytics_configuration = { id: analytics_id, filter: analytics_filter?, storage_class_analysis: storage_class_analysis }
-      type analytics_configuration_list = ::Array[AnalyticsConfiguration]
+      type analytics_configuration_list_output = ::Array[AnalyticsConfiguration]
       class AnalyticsExportDestination
         attr_accessor s3_bucket_destination: AnalyticsS3BucketDestination
       end
@@ -172,7 +172,7 @@ module Aws
       type bucket_accelerate_status = ("Enabled" | "Suspended")
       type bucket_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read")
       type bucket_key_enabled = bool
-      type bucket_lifecycle_configuration = { rules: lifecycle_rules }
+      type bucket_lifecycle_configuration = { rules: lifecycle_rules_input }
       type bucket_location_constraint = ("af-south-1" | "ap-east-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-northeast-3" | "ap-south-1" | "ap-southeast-1" | "ap-southeast-2" | "ca-central-1" | "cn-north-1" | "cn-northwest-1" | "EU" | "eu-central-1" | "eu-north-1" | "eu-south-1" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "me-south-1" | "sa-east-1" | "us-east-2" | "us-gov-east-1" | "us-gov-west-1" | "us-west-1" | "us-west-2")
       type bucket_logging_status = { logging_enabled: logging_enabled? }
       type bucket_logs_permission = ("FULL_CONTROL" | "READ" | "WRITE")
@@ -183,7 +183,7 @@ module Aws
       type bytes_processed = ::Integer
       type bytes_returned = ::Integer
       type bytes_scanned = ::Integer
-      type cors_configuration = { cors_rules: cors_rules }
+      type cors_configuration = { cors_rules: cors_rules_input }
       class CORSRule
         attr_accessor id: id
         attr_accessor allowed_headers: allowed_headers
@@ -193,7 +193,8 @@ module Aws
         attr_accessor max_age_seconds: max_age_seconds
       end
       type cors_rule = { id: id?, allowed_headers: allowed_headers?, allowed_methods: allowed_methods, allowed_origins: allowed_origins, expose_headers: expose_headers?, max_age_seconds: max_age_seconds? }
-      type cors_rules = ::Array[CORSRule]
+      type cors_rules_output = ::Array[CORSRule]
+      type cors_rules_input = ::Array[cors_rule]
       type csv_input = { file_header_info: file_header_info?, comments: comments?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character?, allow_quoted_record_delimiter: allow_quoted_record_delimiter? }
       type csv_output = { quote_fields: quote_fields?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character? }
       type cache_control = ::String
@@ -403,7 +404,8 @@ module Aws
         attr_accessor value: filter_rule_value
       end
       type filter_rule = { name: filter_rule_name?, value: filter_rule_value? }
-      type filter_rule_list = ::Array[FilterRule]
+      type filter_rule_list_output = ::Array[FilterRule]
+      type filter_rule_list_input = ::Array[filter_rule]
       type filter_rule_name = ("prefix" | "suffix")
       type filter_rule_value = ::String
       class GetBucketAccelerateConfigurationOutput
@@ -411,13 +413,13 @@ module Aws
       end
       class GetBucketAclOutput
         attr_accessor owner: Owner
-        attr_accessor grants: grants
+        attr_accessor grants: grants_output
       end
       class GetBucketAnalyticsConfigurationOutput
         attr_accessor analytics_configuration: AnalyticsConfiguration
       end
       class GetBucketCorsOutput
-        attr_accessor cors_rules: cors_rules
+        attr_accessor cors_rules: cors_rules_output
       end
       class GetBucketEncryptionOutput
         attr_accessor server_side_encryption_configuration: ServerSideEncryptionConfiguration
@@ -429,10 +431,10 @@ module Aws
         attr_accessor inventory_configuration: InventoryConfiguration
       end
       class GetBucketLifecycleConfigurationOutput
-        attr_accessor rules: lifecycle_rules
+        attr_accessor rules: lifecycle_rules_output
       end
       class GetBucketLifecycleOutput
-        attr_accessor rules: rules
+        attr_accessor rules: rules_output
       end
       class GetBucketLocationOutput
         attr_accessor location_constraint: bucket_location_constraint
@@ -459,7 +461,7 @@ module Aws
         attr_accessor payer: payer
       end
       class GetBucketTaggingOutput
-        attr_accessor tag_set: tag_set
+        attr_accessor tag_set: tag_set_output
       end
       class GetBucketVersioningOutput
         attr_accessor status: bucket_versioning_status
@@ -469,11 +471,11 @@ module Aws
         attr_accessor redirect_all_requests_to: RedirectAllRequestsTo
         attr_accessor index_document: IndexDocument
         attr_accessor error_document: ErrorDocument
-        attr_accessor routing_rules: routing_rules
+        attr_accessor routing_rules: routing_rules_output
       end
       class GetObjectAclOutput
         attr_accessor owner: Owner
-        attr_accessor grants: grants
+        attr_accessor grants: grants_output
         attr_accessor request_charged: request_charged
       end
       class GetObjectLegalHoldOutput
@@ -522,7 +524,7 @@ module Aws
       end
       class GetObjectTaggingOutput
         attr_accessor version_id: object_version_id
-        attr_accessor tag_set: tag_set
+        attr_accessor tag_set: tag_set_output
       end
       class GetObjectTorrentOutput
         attr_accessor body: body
@@ -550,7 +552,8 @@ module Aws
         attr_accessor uri: uri
       end
       type grantee = { display_name: display_name?, email_address: email_address?, id: id?, type: type_, uri: uri? }
-      type grants = ::Array[Grant]
+      type grants_output = ::Array[Grant]
+      type grants_input = ::Array[grant]
       class HeadObjectOutput
         attr_accessor delete_marker: delete_marker
         attr_accessor accept_ranges: accept_ranges
@@ -604,17 +607,17 @@ module Aws
       type intelligent_tiering_access_tier = ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
       class IntelligentTieringAndOperator
         attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
+        attr_accessor tags: tag_set_output
       end
-      type intelligent_tiering_and_operator = { prefix: prefix?, tags: tag_set? }
+      type intelligent_tiering_and_operator = { prefix: prefix?, tags: tag_set_input? }
       class IntelligentTieringConfiguration
         attr_accessor id: intelligent_tiering_id
         attr_accessor filter: IntelligentTieringFilter
         attr_accessor status: intelligent_tiering_status
-        attr_accessor tierings: tiering_list
+        attr_accessor tierings: tiering_list_output
       end
-      type intelligent_tiering_configuration = { id: intelligent_tiering_id, filter: intelligent_tiering_filter?, status: intelligent_tiering_status, tierings: tiering_list }
-      type intelligent_tiering_configuration_list = ::Array[IntelligentTieringConfiguration]
+      type intelligent_tiering_configuration = { id: intelligent_tiering_id, filter: intelligent_tiering_filter?, status: intelligent_tiering_status, tierings: tiering_list_input }
+      type intelligent_tiering_configuration_list_output = ::Array[IntelligentTieringConfiguration]
       type intelligent_tiering_days = ::Integer
       class IntelligentTieringFilter
         attr_accessor prefix: prefix
@@ -634,7 +637,7 @@ module Aws
         attr_accessor schedule: InventorySchedule
       end
       type inventory_configuration = { destination: inventory_destination, is_enabled: is_enabled, filter: inventory_filter?, id: inventory_id, included_object_versions: inventory_included_object_versions, optional_fields: inventory_optional_fields?, schedule: inventory_schedule }
-      type inventory_configuration_list = ::Array[InventoryConfiguration]
+      type inventory_configuration_list_output = ::Array[InventoryConfiguration]
       class InventoryDestination
         attr_accessor s3_bucket_destination: InventoryS3BucketDestination
       end
@@ -685,9 +688,10 @@ module Aws
         attr_accessor filter: NotificationConfigurationFilter
       end
       type lambda_function_configuration = { id: notification_id?, lambda_function_arn: lambda_function_arn, events: event_list, filter: notification_configuration_filter? }
-      type lambda_function_configuration_list = ::Array[LambdaFunctionConfiguration]
+      type lambda_function_configuration_list_output = ::Array[LambdaFunctionConfiguration]
+      type lambda_function_configuration_list_input = ::Array[lambda_function_configuration]
       type last_modified = ::Time
-      type lifecycle_configuration = { rules: rules }
+      type lifecycle_configuration = { rules: rules_input }
       class LifecycleExpiration
         attr_accessor date: date
         attr_accessor days: days
@@ -700,19 +704,19 @@ module Aws
         attr_accessor prefix: prefix
         attr_accessor filter: LifecycleRuleFilter
         attr_accessor status: expiration_status
-        attr_accessor transitions: transition_list
-        attr_accessor noncurrent_version_transitions: noncurrent_version_transition_list
+        attr_accessor transitions: transition_list_output
+        attr_accessor noncurrent_version_transitions: noncurrent_version_transition_list_output
         attr_accessor noncurrent_version_expiration: NoncurrentVersionExpiration
         attr_accessor abort_incomplete_multipart_upload: AbortIncompleteMultipartUpload
       end
-      type lifecycle_rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix?, filter: lifecycle_rule_filter?, status: expiration_status, transitions: transition_list?, noncurrent_version_transitions: noncurrent_version_transition_list?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
+      type lifecycle_rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix?, filter: lifecycle_rule_filter?, status: expiration_status, transitions: transition_list_input?, noncurrent_version_transitions: noncurrent_version_transition_list_input?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
       class LifecycleRuleAndOperator
         attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
+        attr_accessor tags: tag_set_output
         attr_accessor object_size_greater_than: object_size_greater_than_bytes
         attr_accessor object_size_less_than: object_size_less_than_bytes
       end
-      type lifecycle_rule_and_operator = { prefix: prefix?, tags: tag_set?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes? }
+      type lifecycle_rule_and_operator = { prefix: prefix?, tags: tag_set_input?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes? }
       class LifecycleRuleFilter
         attr_accessor prefix: prefix
         attr_accessor tag: Tag
@@ -721,22 +725,23 @@ module Aws
         attr_accessor and: LifecycleRuleAndOperator
       end
       type lifecycle_rule_filter = { prefix: prefix?, tag: tag?, object_size_greater_than: object_size_greater_than_bytes?, object_size_less_than: object_size_less_than_bytes?, and: lifecycle_rule_and_operator? }
-      type lifecycle_rules = ::Array[LifecycleRule]
+      type lifecycle_rules_output = ::Array[LifecycleRule]
+      type lifecycle_rules_input = ::Array[lifecycle_rule]
       class ListBucketAnalyticsConfigurationsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
-        attr_accessor analytics_configuration_list: analytics_configuration_list
+        attr_accessor analytics_configuration_list: analytics_configuration_list_output
       end
       class ListBucketIntelligentTieringConfigurationsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
-        attr_accessor intelligent_tiering_configuration_list: intelligent_tiering_configuration_list
+        attr_accessor intelligent_tiering_configuration_list: intelligent_tiering_configuration_list_output
       end
       class ListBucketInventoryConfigurationsOutput
         attr_accessor continuation_token: token
-        attr_accessor inventory_configuration_list: inventory_configuration_list
+        attr_accessor inventory_configuration_list: inventory_configuration_list_output
         attr_accessor is_truncated: is_truncated
         attr_accessor next_continuation_token: next_token
       end
@@ -744,7 +749,7 @@ module Aws
         attr_accessor is_truncated: is_truncated
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
-        attr_accessor metrics_configuration_list: metrics_configuration_list
+        attr_accessor metrics_configuration_list: metrics_configuration_list_output
       end
       class ListBucketsOutput
         attr_accessor buckets: buckets
@@ -825,10 +830,10 @@ module Aws
       type location_prefix = ::String
       class LoggingEnabled
         attr_accessor target_bucket: target_bucket
-        attr_accessor target_grants: target_grants
+        attr_accessor target_grants: target_grants_output
         attr_accessor target_prefix: target_prefix
       end
-      type logging_enabled = { target_bucket: target_bucket, target_grants: target_grants?, target_prefix: target_prefix }
+      type logging_enabled = { target_bucket: target_bucket, target_grants: target_grants_input?, target_prefix: target_prefix }
       type mfa = ::String
       type mfa_delete = ("Enabled" | "Disabled")
       type mfa_delete_status = ("Enabled" | "Disabled")
@@ -850,16 +855,16 @@ module Aws
       type metrics = { status: metrics_status, event_threshold: replication_time_value? }
       class MetricsAndOperator
         attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
+        attr_accessor tags: tag_set_output
         attr_accessor access_point_arn: access_point_arn
       end
-      type metrics_and_operator = { prefix: prefix?, tags: tag_set?, access_point_arn: access_point_arn? }
+      type metrics_and_operator = { prefix: prefix?, tags: tag_set_input?, access_point_arn: access_point_arn? }
       class MetricsConfiguration
         attr_accessor id: metrics_id
         attr_accessor filter: MetricsFilter
       end
       type metrics_configuration = { id: metrics_id, filter: metrics_filter? }
-      type metrics_configuration_list = ::Array[MetricsConfiguration]
+      type metrics_configuration_list_output = ::Array[MetricsConfiguration]
       class MetricsFilter
         attr_accessor prefix: prefix
         attr_accessor tag: Tag
@@ -898,14 +903,15 @@ module Aws
         attr_accessor newer_noncurrent_versions: version_count
       end
       type noncurrent_version_transition = { noncurrent_days: days?, storage_class: transition_storage_class?, newer_noncurrent_versions: version_count? }
-      type noncurrent_version_transition_list = ::Array[NoncurrentVersionTransition]
+      type noncurrent_version_transition_list_output = ::Array[NoncurrentVersionTransition]
+      type noncurrent_version_transition_list_input = ::Array[noncurrent_version_transition]
       class NotificationConfiguration
-        attr_accessor topic_configurations: topic_configuration_list
-        attr_accessor queue_configurations: queue_configuration_list
-        attr_accessor lambda_function_configurations: lambda_function_configuration_list
+        attr_accessor topic_configurations: topic_configuration_list_output
+        attr_accessor queue_configurations: queue_configuration_list_output
+        attr_accessor lambda_function_configurations: lambda_function_configuration_list_output
         attr_accessor event_bridge_configuration: EventBridgeConfiguration
       end
-      type notification_configuration = { topic_configurations: topic_configuration_list?, queue_configurations: queue_configuration_list?, lambda_function_configurations: lambda_function_configuration_list?, event_bridge_configuration: event_bridge_configuration? }
+      type notification_configuration = { topic_configurations: topic_configuration_list_input?, queue_configurations: queue_configuration_list_input?, lambda_function_configurations: lambda_function_configuration_list_input?, event_bridge_configuration: event_bridge_configuration? }
       class NotificationConfigurationDeprecated
         attr_accessor topic_configuration: TopicConfigurationDeprecated
         attr_accessor queue_configuration: QueueConfigurationDeprecated
@@ -981,14 +987,15 @@ module Aws
       type owner = { display_name: display_name?, id: id? }
       type owner_override = ("Destination")
       class OwnershipControls
-        attr_accessor rules: ownership_controls_rules
+        attr_accessor rules: ownership_controls_rules_output
       end
-      type ownership_controls = { rules: ownership_controls_rules }
+      type ownership_controls = { rules: ownership_controls_rules_input }
       class OwnershipControlsRule
         attr_accessor object_ownership: object_ownership
       end
       type ownership_controls_rule = { object_ownership: object_ownership }
-      type ownership_controls_rules = ::Array[OwnershipControlsRule]
+      type ownership_controls_rules_output = ::Array[OwnershipControlsRule]
+      type ownership_controls_rules_input = ::Array[ownership_controls_rule]
       type parquet_input = ::Hash[untyped, untyped]
       class Part
         attr_accessor part_number: part_number
@@ -1066,7 +1073,8 @@ module Aws
         attr_accessor queue: queue_arn
       end
       type queue_configuration_deprecated = { id: notification_id?, event: event?, events: event_list?, queue: queue_arn? }
-      type queue_configuration_list = ::Array[QueueConfiguration]
+      type queue_configuration_list_output = ::Array[QueueConfiguration]
+      type queue_configuration_list_input = ::Array[queue_configuration]
       type quiet = bool
       type quote_character = ::String
       type quote_escape_character = ::String
@@ -1099,9 +1107,9 @@ module Aws
       type replica_modifications_status = ("Enabled" | "Disabled")
       class ReplicationConfiguration
         attr_accessor role: role
-        attr_accessor rules: replication_rules
+        attr_accessor rules: replication_rules_output
       end
-      type replication_configuration = { role: role, rules: replication_rules }
+      type replication_configuration = { role: role, rules: replication_rules_input }
       class ReplicationRule
         attr_accessor id: id
         attr_accessor priority: priority
@@ -1116,9 +1124,9 @@ module Aws
       type replication_rule = { id: id?, priority: priority?, prefix: prefix?, filter: replication_rule_filter?, status: replication_rule_status, source_selection_criteria: source_selection_criteria?, existing_object_replication: existing_object_replication?, destination: destination, delete_marker_replication: delete_marker_replication? }
       class ReplicationRuleAndOperator
         attr_accessor prefix: prefix
-        attr_accessor tags: tag_set
+        attr_accessor tags: tag_set_output
       end
-      type replication_rule_and_operator = { prefix: prefix?, tags: tag_set? }
+      type replication_rule_and_operator = { prefix: prefix?, tags: tag_set_input? }
       class ReplicationRuleFilter
         attr_accessor prefix: prefix
         attr_accessor tag: Tag
@@ -1126,7 +1134,8 @@ module Aws
       end
       type replication_rule_filter = { prefix: prefix?, tag: tag?, and: replication_rule_and_operator? }
       type replication_rule_status = ("Enabled" | "Disabled")
-      type replication_rules = ::Array[ReplicationRule]
+      type replication_rules_output = ::Array[ReplicationRule]
+      type replication_rules_input = ::Array[replication_rule]
       type replication_status = ("COMPLETE" | "PENDING" | "FAILED" | "REPLICA")
       class ReplicationTime
         attr_accessor status: replication_time_status
@@ -1164,7 +1173,8 @@ module Aws
         attr_accessor redirect: Redirect
       end
       type routing_rule = { condition: condition?, redirect: redirect }
-      type routing_rules = ::Array[RoutingRule]
+      type routing_rules_output = ::Array[RoutingRule]
+      type routing_rules_input = ::Array[routing_rule]
       class Rule
         attr_accessor expiration: LifecycleExpiration
         attr_accessor id: id
@@ -1176,12 +1186,13 @@ module Aws
         attr_accessor abort_incomplete_multipart_upload: AbortIncompleteMultipartUpload
       end
       type rule = { expiration: lifecycle_expiration?, id: id?, prefix: prefix, status: expiration_status, transition: transition?, noncurrent_version_transition: noncurrent_version_transition?, noncurrent_version_expiration: noncurrent_version_expiration?, abort_incomplete_multipart_upload: abort_incomplete_multipart_upload? }
-      type rules = ::Array[Rule]
+      type rules_output = ::Array[Rule]
+      type rules_input = ::Array[rule]
       class S3KeyFilter
-        attr_accessor filter_rules: filter_rule_list
+        attr_accessor filter_rules: filter_rule_list_output
       end
-      type s3_key_filter = { filter_rules: filter_rule_list? }
-      type s3_location = { bucket_name: bucket_name, prefix: location_prefix, encryption: encryption?, canned_acl: object_canned_acl?, access_control_list: grants?, tagging: tagging?, user_metadata: user_metadata?, storage_class: storage_class? }
+      type s3_key_filter = { filter_rules: filter_rule_list_input? }
+      type s3_location = { bucket_name: bucket_name, prefix: location_prefix, encryption: encryption?, canned_acl: object_canned_acl?, access_control_list: grants_input?, tagging: tagging?, user_metadata: user_metadata?, storage_class: storage_class? }
       type sse_customer_algorithm = ::String
       type sse_customer_key = ::String
       type sse_customer_key_md5 = ::String
@@ -1213,15 +1224,16 @@ module Aws
       end
       type server_side_encryption_by_default = { sse_algorithm: server_side_encryption, kms_master_key_id: ssekms_key_id? }
       class ServerSideEncryptionConfiguration
-        attr_accessor rules: server_side_encryption_rules
+        attr_accessor rules: server_side_encryption_rules_output
       end
-      type server_side_encryption_configuration = { rules: server_side_encryption_rules }
+      type server_side_encryption_configuration = { rules: server_side_encryption_rules_input }
       class ServerSideEncryptionRule
         attr_accessor apply_server_side_encryption_by_default: ServerSideEncryptionByDefault
         attr_accessor bucket_key_enabled: bucket_key_enabled
       end
       type server_side_encryption_rule = { apply_server_side_encryption_by_default: server_side_encryption_by_default?, bucket_key_enabled: bucket_key_enabled? }
-      type server_side_encryption_rules = ::Array[ServerSideEncryptionRule]
+      type server_side_encryption_rules_output = ::Array[ServerSideEncryptionRule]
+      type server_side_encryption_rules_input = ::Array[server_side_encryption_rule]
       type setting = bool
       type size = ::Integer
       type skip_validation = bool
@@ -1263,8 +1275,9 @@ module Aws
       end
       type tag = { key: object_key, value: value }
       type tag_count = ::Integer
-      type tag_set = ::Array[Tag]
-      type tagging = { tag_set: tag_set }
+      type tag_set_output = ::Array[Tag]
+      type tag_set_input = ::Array[tag]
+      type tagging = { tag_set: tag_set_input }
       type tagging_directive = ("COPY" | "REPLACE")
       type tagging_header = ::String
       type target_bucket = ::String
@@ -1273,7 +1286,8 @@ module Aws
         attr_accessor permission: bucket_logs_permission
       end
       type target_grant = { grantee: grantee?, permission: bucket_logs_permission? }
-      type target_grants = ::Array[TargetGrant]
+      type target_grants_output = ::Array[TargetGrant]
+      type target_grants_input = ::Array[target_grant]
       type target_prefix = ::String
       type tier = ("Standard" | "Bulk" | "Expedited")
       class Tiering
@@ -1281,7 +1295,8 @@ module Aws
         attr_accessor access_tier: intelligent_tiering_access_tier
       end
       type tiering = { days: intelligent_tiering_days, access_tier: intelligent_tiering_access_tier }
-      type tiering_list = ::Array[Tiering]
+      type tiering_list_output = ::Array[Tiering]
+      type tiering_list_input = ::Array[tiering]
       type token = ::String
       type topic_arn = ::String
       class TopicConfiguration
@@ -1298,14 +1313,16 @@ module Aws
         attr_accessor topic: topic_arn
       end
       type topic_configuration_deprecated = { id: notification_id?, events: event_list?, event: event?, topic: topic_arn? }
-      type topic_configuration_list = ::Array[TopicConfiguration]
+      type topic_configuration_list_output = ::Array[TopicConfiguration]
+      type topic_configuration_list_input = ::Array[topic_configuration]
       class Transition
         attr_accessor date: date
         attr_accessor days: days
         attr_accessor storage_class: transition_storage_class
       end
       type transition = { date: date?, days: days?, storage_class: transition_storage_class? }
-      type transition_list = ::Array[Transition]
+      type transition_list_output = ::Array[Transition]
+      type transition_list_input = ::Array[transition]
       type transition_storage_class = ("GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "GLACIER_IR")
       type type_ = ("CanonicalUser" | "AmazonCustomerByEmail" | "Group")
       type uri = ::String
@@ -1334,7 +1351,7 @@ module Aws
       type version_count = ::Integer
       type version_id_marker = ::String
       type versioning_configuration = { mfa_delete: mfa_delete?, status: bucket_versioning_status? }
-      type website_configuration = { error_document: error_document?, index_document: index_document?, redirect_all_requests_to: redirect_all_requests_to?, routing_rules: routing_rules? }
+      type website_configuration = { error_document: error_document?, index_document: index_document?, redirect_all_requests_to: redirect_all_requests_to?, routing_rules: routing_rules_input? }
       type website_redirect_location = ::String
       type years = ::Integer
     end

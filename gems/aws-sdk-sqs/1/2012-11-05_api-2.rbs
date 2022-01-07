@@ -24,7 +24,7 @@ module Aws
       def purge_queue: (queue_url: Types::string) -> Aws::EmptyStructure
       def receive_message: (queue_url: Types::string, ?attribute_names: Types::attribute_name_list, ?message_attribute_names: Types::message_attribute_name_list, ?max_number_of_messages: Types::integer, ?visibility_timeout: Types::integer, ?wait_time_seconds: Types::integer, ?receive_request_attempt_id: Types::string) -> Types::ReceiveMessageResult
       def remove_permission: (queue_url: Types::string, label: Types::string) -> Aws::EmptyStructure
-      def send_message: (queue_url: Types::string, message_body: Types::string, ?delay_seconds: Types::integer, ?message_attributes: Types::message_body_attribute_map, ?message_system_attributes: Types::message_body_system_attribute_map, ?message_deduplication_id: Types::string, ?message_group_id: Types::string) -> Types::SendMessageResult
+      def send_message: (queue_url: Types::string, message_body: Types::string, ?delay_seconds: Types::integer, ?message_attributes: Types::message_body_attribute_map_input, ?message_system_attributes: Types::message_body_system_attribute_map, ?message_deduplication_id: Types::string, ?message_group_id: Types::string) -> Types::SendMessageResult
       def send_message_batch: (queue_url: Types::string, entries: Types::send_message_batch_request_entry_list) -> Types::SendMessageBatchResult
       def set_queue_attributes: (queue_url: Types::string, attributes: Types::queue_attribute_map) -> Aws::EmptyStructure
       def tag_queue: (queue_url: Types::string, tags: Types::tag_map) -> Aws::EmptyStructure
@@ -93,7 +93,7 @@ module Aws
         attr_accessor body: string
         attr_accessor attributes: message_system_attribute_map
         attr_accessor md5_of_message_attributes: string
-        attr_accessor message_attributes: message_body_attribute_map
+        attr_accessor message_attributes: message_body_attribute_map_output
       end
       type message_attribute_name = ::String
       type message_attribute_name_list = ::Array[message_attribute_name]
@@ -105,7 +105,8 @@ module Aws
         attr_accessor data_type: string
       end
       type message_attribute_value = { string_value: string?, binary_value: binary?, string_list_values: string_list?, binary_list_values: binary_list?, data_type: string }
-      type message_body_attribute_map = ::Hash[string, MessageAttributeValue]
+      type message_body_attribute_map_output = ::Hash[string, MessageAttributeValue]
+      type message_body_attribute_map_input = ::Hash[string, message_attribute_value]
       type message_body_system_attribute_map = ::Hash[message_system_attribute_name_for_sends, message_system_attribute_value]
       type message_list = ::Array[Message]
       type message_system_attribute_map = ::Hash[message_system_attribute_name, string]
@@ -118,7 +119,7 @@ module Aws
       class ReceiveMessageResult
         attr_accessor messages: message_list
       end
-      type send_message_batch_request_entry = { id: string, message_body: string, delay_seconds: integer?, message_attributes: message_body_attribute_map?, message_system_attributes: message_body_system_attribute_map?, message_deduplication_id: string?, message_group_id: string? }
+      type send_message_batch_request_entry = { id: string, message_body: string, delay_seconds: integer?, message_attributes: message_body_attribute_map_input?, message_system_attributes: message_body_system_attribute_map?, message_deduplication_id: string?, message_group_id: string? }
       type send_message_batch_request_entry_list = ::Array[send_message_batch_request_entry]
       class SendMessageBatchResult
         attr_accessor successful: send_message_batch_result_entry_list

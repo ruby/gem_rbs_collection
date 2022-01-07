@@ -42,12 +42,6 @@ class AwsClientTypesGenerator
       @streaming = streaming
     end
 
-    def assert_input!
-      unless kind == :input
-        raise "#{name} should be input shape"
-      end
-    end
-
     def fetch_body
       generator.api.fetch("shapes").fetch(name)
     end
@@ -66,15 +60,20 @@ class AwsClientTypesGenerator
         end
       params = members.map do |member_name, member_body|
         member_shape_name = member_body["shape"]
-        member_shape = generator.fetch_shapes(member_shape_name).first
-        if from == :types
-          opt_prefix = ""
-          opt_suffix = required&.include?(member_name) ? "" : "?"
-        else
+        member_shapes = generator.fetch_shapes(member_shape_name)
+        case from
+        when :operations
           opt_prefix = required&.include?(member_name) ? "" : "?"
           opt_suffix = ""
+          member_shape = member_shapes.find(&:input?)
+        when :types
+          opt_prefix = ""
+          opt_suffix = required&.include?(member_name) ? "" : "?"
+          member_shape = member_shapes.find(&:input?)
+        else
+          raise from
         end
-        "#{opt_prefix}#{member_name.underscore}: #{type_prefix}#{member_shape.underscore_name}#{opt_suffix}"
+        "#{opt_prefix}#{member_name.underscore}: #{type_prefix}#{member_shape.rbs_underscore_name}#{opt_suffix}"
       end
       params.join(", ")
     end
@@ -83,7 +82,7 @@ class AwsClientTypesGenerator
       if structure? && !input?
         name
       else
-        underscore_name
+        rbs_underscore_name
       end
     end
 
@@ -129,12 +128,42 @@ class AwsClientTypesGenerator
       end
     end
 
-    def underscore_name
-      name.underscore.escape
+    # It supports like following types(e.g. aw-sdk-s3)
+    #   type cors_rules_input = ::Array[cors_rule]
+    #   type cors_rule = { id: id?, ... }
+    #
+    #   type cors_rules_output = ::Array[CORSRule]
+    #   class CORSRule
+    #   end
+    def rbs_underscore_name
+      shape_body = fetch_body
+      case shape_body.fetch("type")
+      when "list"
+        member_shapes = generator.fetch_shapes(shape_body.fetch("member").fetch("shape"))
+        if 1 < member_shapes.length && member_shapes.any? { _1.structure? }
+          rbs_underscore_name_with_kind
+        else
+          rbs_underscore_name_without_kind
+        end
+      when "map"
+        key_shapes = generator.fetch_shapes(shape_body.fetch("key").fetch("shape"))
+        value_shapes = generator.fetch_shapes(shape_body.fetch("value").fetch("shape"))
+        if (1 < key_shapes.length && key_shapes.any?(&:structure?)) || (1 < value_shapes.length && value_shapes.any?(&:structure?))
+          rbs_underscore_name_with_kind
+        else
+          rbs_underscore_name_without_kind
+        end
+      else
+        rbs_underscore_name_without_kind
+      end
     end
 
-    def structure?
-      fetch_body.fetch("type") == "structure"
+    def rbs_underscore_name_with_kind
+      "#{rbs_underscore_name_without_kind}_#{kind}"
+    end
+
+    def rbs_underscore_name_without_kind
+      name.underscore.escape
     end
 
     def rbs_as_input
@@ -149,9 +178,9 @@ class AwsClientTypesGenerator
       else
         to_rbs
       end
-      return if generator.printed[underscore_name]
-      generator.printed[underscore_name] = true
-      "#{INDENT}type #{underscore_name} = #{rbs}"
+      return if generator.printed[rbs_underscore_name]
+      generator.printed[rbs_underscore_name] = true
+      "#{INDENT}type #{rbs_underscore_name} = #{rbs}"
     end
 
     def rbs_as_output
@@ -167,16 +196,16 @@ class AwsClientTypesGenerator
           rbs = if shape.structure?
             shape.name
           else
-            shape.underscore_name
+            shape.rbs_underscore_name
           end
           result << "#{INDENT}  attr_accessor #{member_name.underscore.escape}: #{rbs}\n"
         end
         result << "#{INDENT}end\n"
         result
       else
-        return if generator.printed[underscore_name]
-        generator.printed[underscore_name] = true
-        "#{INDENT}type #{underscore_name} = #{to_rbs}"
+        return if generator.printed[rbs_underscore_name]
+        generator.printed[rbs_underscore_name] = true
+        "#{INDENT}type #{rbs_underscore_name} = #{to_rbs}"
       end
     end
 
@@ -188,10 +217,14 @@ class AwsClientTypesGenerator
       body["members"]&.each do |member_name, member_body|
         shape = generator.fetch_shapes(member_body["shape"]).find(&:exception?)
         raise "#{member_body["shape"]} shape by exception not found" unless shape
-        result << "#{INDENT}  attr_accessor #{member_name.underscore.escape}: #{shape.to_rbs}\n"
+        result << "#{INDENT}  attr_accessor #{member_name.underscore}: #{shape.to_rbs}\n"
       end
       result << "#{INDENT}end\n"
       result
+    end
+
+    def structure?
+      fetch_body.fetch("type") == "structure"
     end
 
     def input? = kind == :input
@@ -316,24 +349,6 @@ class AwsClientTypesGenerator
     @shape_table.fetch(shape_name)
   end
 
-  def input_shapes
-    @shape_table.flat_map do |_shape_name, shapes|
-      shapes.select(&:input?)
-    end
-  end
-
-  def output_shapes
-    @shape_table.flat_map do |_shape_name, shapes|
-      shapes.select(&:output?)
-    end
-  end
-
-  def exception_shapes
-    @shape_table.flat_map do |_shape_name, shapes|
-      shapes.select(&:exception?)
-    end
-  end
-
   def write(io)
     io.puts <<~COMMENT
     # WARNING ABOUT GENERATED CODE
@@ -365,6 +380,10 @@ class AwsClientTypesGenerator
           end
         when :output
           shape.rbs_as_output&.then { io.puts(_1) }
+        when :exception
+          # skip
+        else
+          raise "#{key} is not marked shape"
         end
       end
     end
