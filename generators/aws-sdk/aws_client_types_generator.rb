@@ -11,56 +11,254 @@ Dir["#{$GEMS_DIR}/*"].each do |dir|
   $:.unshift("#{dir}/lib")
 end
 
-require 'build_tools'
 require 'aws-sdk-core'
 require 'aws-sdk-code-generator'
 require 'json'
 require 'rbs'
-
-# Minimal Hack
-class AwsSdkCodeGenerator::Views::ClientClass
-  def render
-    self
-  end
-end
 
 using Module.new {
   refine String do
     def underscore
       AwsSdkCodeGenerator::Underscore.underscore(self)
     end
+
+    def escape
+      RBS::Parser::KEYWORDS.key?(self) ? "#{self}_" : self
+    end
   end
 }
 
 class AwsClientTypesGenerator
+  class Shape
+    INDENT = " " * 6
+
+    attr_reader :name, :kind, :generator, :streaming
+    attr_accessor :request
+    def initialize(name:, kind:, generator:, request:, streaming:)
+      @name = name
+      @kind = kind
+      @generator = generator
+      @request = request
+      @streaming = streaming
+    end
+
+    def fetch_body
+      generator.api.fetch("shapes").fetch(name)
+    end
+
+    def as_keyword_arguments(from:)
+      shape_body = fetch_body
+      members = shape_body["members"]
+      required = shape_body["required"]
+      type_prefix = case from
+        when :operations
+          "Types::"
+        when :types
+          ""
+        else
+          raise from
+        end
+      params = members.map do |member_name, member_body|
+        member_shape_name = member_body["shape"]
+        member_shapes = generator.fetch_shapes(member_shape_name)
+        case from
+        when :operations
+          opt_prefix = required&.include?(member_name) ? "" : "?"
+          opt_suffix = ""
+          member_shape = member_shapes.find(&:input?)
+        when :types
+          opt_prefix = ""
+          opt_suffix = required&.include?(member_name) ? "" : "?"
+          member_shape = member_shapes.find(&:input?)
+        else
+          raise from
+        end
+        "#{opt_prefix}#{member_name.underscore}: #{type_prefix}#{member_shape.rbs_underscore_name}#{opt_suffix}"
+      end
+      params.join(", ")
+    end
+
+    def rbs_name
+      if structure? && !input?
+        name
+      else
+        rbs_underscore_name
+      end
+    end
+
+    def to_rbs
+      shape_body = fetch_body
+      case type = shape_body["type"]
+      when "string"
+        if shape_body["enum"]
+          "(#{shape_body["enum"].map { "\"#{_1}\"" }.join(" | ")})"
+        else
+          "::String"
+        end
+      when "integer", "long"
+        "::Integer"
+      when "float", "double"
+        "::Float"
+      when "timestamp"
+        case shape_body["timestampFormat"]
+        when "iso8601", "rfc822", nil
+          "::Time"
+        else
+          raise [name, shape_body].inspect
+        end
+      when "list"
+        shape = generator.fetch_shapes(shape_body.fetch("member").fetch("shape")).find { |s| s.kind == kind }
+        "::Array[#{shape.rbs_name}]"
+      when "map"
+        key_shape = generator.fetch_shapes(shape_body.fetch("key").fetch("shape")).find { |s| s.kind == kind }
+        value_shape = generator.fetch_shapes(shape_body.fetch("value").fetch("shape")).find { |s| s.kind == kind }
+        "::Hash[#{key_shape.rbs_name}, #{value_shape.rbs_name}]"
+      when "structure"
+        rbs_name
+      when "boolean"
+        "bool"
+      when "blob"
+        if streaming
+          "::IO"
+        else
+          "::String"
+        end
+      else
+        raise "unimplemented shape type #{type} on #{name}"
+      end
+    end
+
+    # It supports like following types(e.g. aw-sdk-s3)
+    #   type cors_rules_input = ::Array[cors_rule]
+    #   type cors_rule = { id: id?, ... }
+    #
+    #   type cors_rules_output = ::Array[CORSRule]
+    #   class CORSRule
+    #   end
+    def rbs_underscore_name
+      shape_body = fetch_body
+      case shape_body.fetch("type")
+      when "list"
+        member_shapes = generator.fetch_shapes(shape_body.fetch("member").fetch("shape"))
+        if 1 < member_shapes.length && member_shapes.any? { _1.structure? }
+          rbs_underscore_name_with_kind
+        else
+          rbs_underscore_name_without_kind
+        end
+      when "map"
+        key_shapes = generator.fetch_shapes(shape_body.fetch("key").fetch("shape"))
+        value_shapes = generator.fetch_shapes(shape_body.fetch("value").fetch("shape"))
+        if (1 < key_shapes.length && key_shapes.any?(&:structure?)) || (1 < value_shapes.length && value_shapes.any?(&:structure?))
+          rbs_underscore_name_with_kind
+        else
+          rbs_underscore_name_without_kind
+        end
+      else
+        rbs_underscore_name_without_kind
+      end
+    end
+
+    def rbs_underscore_name_with_kind
+      "#{rbs_underscore_name_without_kind}_#{kind}"
+    end
+
+    def rbs_underscore_name_without_kind
+      name.underscore.escape
+    end
+
+    def rbs_as_input
+      rbs = if structure?
+        args = as_keyword_arguments(from: :types)
+        if args.empty?
+          # rbs does not supported empty record
+          "::Hash[untyped, untyped]"
+        else
+          "{ #{args} }"
+        end
+      else
+        to_rbs
+      end
+      return if generator.printed[rbs_underscore_name]
+      generator.printed[rbs_underscore_name] = true
+      "#{INDENT}type #{rbs_underscore_name} = #{rbs}"
+    end
+
+    def rbs_as_output
+      body = fetch_body
+      case body.fetch("type")
+      when "structure"
+        return if generator.printed[name]
+        generator.printed[name] = true
+        result = +"#{INDENT}class #{name}\n"
+        body["members"]&.each do |member_name, member_body|
+          shape = generator.fetch_shapes(member_body["shape"]).find(&:output?)
+          raise "#{member_body["shape"]} shape by output not found" unless shape
+          rbs = if shape.structure?
+            shape.name
+          else
+            shape.rbs_underscore_name
+          end
+          result << "#{INDENT}  attr_accessor #{member_name.underscore.escape}: #{rbs}\n"
+        end
+        result << "#{INDENT}end\n"
+        result
+      else
+        return if generator.printed[rbs_underscore_name]
+        generator.printed[rbs_underscore_name] = true
+        "#{INDENT}type #{rbs_underscore_name} = #{to_rbs}"
+      end
+    end
+
+    def rbs_as_exception
+      return if generator.printed[name]
+      generator.printed[name] = true
+      body = fetch_body
+      result = +"#{INDENT}class #{name} < ::RuntimeError\n"
+      body["members"]&.each do |member_name, member_body|
+        shape = generator.fetch_shapes(member_body["shape"]).find(&:exception?)
+        raise "#{member_body["shape"]} shape by exception not found" unless shape
+        result << "#{INDENT}  attr_accessor #{member_name.underscore}: #{shape.to_rbs}\n"
+      end
+      result << "#{INDENT}end\n"
+      result
+    end
+
+    def structure?
+      fetch_body.fetch("type") == "structure"
+    end
+
+    def input? = kind == :input
+    def output? = kind == :output
+    def exception? = kind == :exception
+  end
+
+  attr_reader :shape_table, :api, :printed
+
   def initialize(path)
+    @shape_table = {}
+    @printed = {}
     @api = File.open(path) do |file|
       JSON.parse(file.read)
     end
-  end
-
-  def escape(key)
-    RBS::Parser::KEYWORDS.key?(key) ? "#{key}_" : key
-  end
-
-  def types(name)
-    if RBS::Parser::KEYWORDS.key?(name)
-      name
-    else
-      "Types::#{name}"
+    @api.fetch("operations").each do |_key, body|
+      body.dig("input", "shape")&.tap do |name|
+        walk_as(kind: :input, name: name).tap do |root_shape|
+          root_shape.request = true
+        end
+      end
+      body.dig("output", "shape")&.then do |name|
+        walk_as(kind: :output, name: name)
+      end
+    end
+    @api.fetch("shapes").each do |key, body|
+      if body.fetch("type") == "structure" && body["exception"]
+        walk_as(kind: :exception, name: key)
+      end
     end
   end
 
-  def type(name, types_prefix: false)
-    if structure?(name)
-      name
-    else
-      escape(name.underscore)
-    end.then { types_prefix ? types(_1) : _1 }
-  end
-
-  def structure?(name)
-    @api.dig("shapes", name, "type") == "structure"
+  def inspect
+    "#<AwsClientTypesGenerator:#{object_id}>"
   end
 
   def service_id
@@ -95,7 +293,7 @@ class AwsClientTypesGenerator
           when nil
             raise opt.inspect
           else
-            opt.doc_type.to_s
+            opt.doc_type
           end
         end
       [opt.name, "?#{opt.name}: #{type}#{opt.required ? "" : "?"}", opt.doc_type]
@@ -106,6 +304,49 @@ class AwsClientTypesGenerator
       warn("Duprecate client option: `#{grouped[name].map { |g| g.values_at(0, 2) }}`", uplevel: 0)
     end
     buffer.uniq { |b| b[0] }.map { |b| b[1] }
+  end
+
+  def shape_body(shape_name)
+    @api["shapes"].fetch(shape_name)
+  end
+
+  def walk_as(kind:, name:, streaming: false)
+    root_shape = add_shape(name: name, kind: kind, streaming: streaming)
+    body = shape_body(name)
+    case body.fetch("type")
+    when "structure"
+      body.fetch("members").each do |_member_name, member_body|
+        walk_as(kind: kind, name: member_body.fetch("shape"), streaming: member_body["streaming"])
+      end
+    when "list"
+      walk_as(kind: kind, name: body.fetch("member").fetch("shape"))
+    when "map"
+      walk_as(kind: kind, name: body.fetch("key").fetch("shape"))
+      walk_as(kind: kind, name: body.fetch("value").fetch("shape"))
+    end
+    root_shape
+  end
+
+  def add_shape(name:, kind:, streaming:)
+    new_shape = Shape.new(
+      name: name,
+      kind: kind,
+      generator: self,
+      request: nil,
+      streaming: streaming,
+    )
+    if @shape_table[name]
+      if !@shape_table[name].any? { _1.kind == kind }
+        @shape_table[name] << new_shape
+      end
+    else
+      @shape_table[name] = [new_shape]
+    end
+    new_shape
+  end
+
+  def fetch_shapes(shape_name)
+    @shape_table.fetch(shape_name)
   end
 
   def write(io)
@@ -123,91 +364,41 @@ class AwsClientTypesGenerator
     io.puts "    class Client"
     io.puts "      def self.new: (#{client_options.join(", ")}) -> instance"
     @api["operations"].each do |key, body|
-      input = body.dig("input", "shape")&.then { |i| shape_to_kwargs(i, allow_opt: true, types_prefix: true) }
-      output = body.dig("output", "shape")&.then { |o| types(o) } || "Aws::EmptyStructure"
-      name = body["name"].underscore
-      io.puts "      def #{name}: (#{input}) -> #{output}"
+      name = body.fetch("name").underscore
+      input_shape = body.dig("input", "shape")&.then { fetch_shapes(_1).find(&:input?).as_keyword_arguments(from: :operations) }
+      output_shape = body.dig("output", "shape")&.then { "Types::#{_1}" } || "Aws::EmptyStructure"
+      io.puts "      def #{name}: (#{input_shape}) -> #{output_shape}"
     end
     io.puts "    end"
     io.puts "    module Types"
-    @api["shapes"].each do |key, body|
-      if body["type"] == "structure"
-        next if body["exception"]
-        io.puts "      class #{key}"
-        body["members"]&.each do |member_name, member_body|
-          io.puts "        attr_accessor #{escape(member_name.underscore)}: #{shape_to_rbs_type(member_body["shape"], types_prefix: false)}"
+    @api.fetch("shapes").each do |key, _body|
+      fetch_shapes(key).each do |shape|
+        case shape.kind
+        when :input
+          if !shape.request
+            shape.rbs_as_input&.then { io.puts(_1) }
+          end
+        when :output
+          shape.rbs_as_output&.then { io.puts(_1) }
+        when :exception
+          # skip
+        else
+          raise "#{key} is not marked shape"
         end
-        io.puts "      end"
-      else
-        io.puts "      type #{escape(key.underscore)} = #{shape_to_rbs_type(key, types_prefix: false)}"
       end
     end
     io.puts "    end"
     io.puts "    module Errors"
-    @api["shapes"].each do |key, body|
-      if body["type"] == "structure" && body["exception"]
-        io.puts "      class #{key} < RuntimeError"
-        body["members"]&.each do |member_name, member_body|
-          io.puts "        attr_accessor #{escape(member_name.underscore)}: #{shape_to_rbs_type(member_body["shape"], types_prefix: true)}"
+    @api.fetch("shapes").each do |key, _body|
+      fetch_shapes(key).each do |shape|
+        if shape.exception?
+          shape.rbs_as_exception&.then { io.puts(_1) }
         end
-        io.puts "      end"
       end
     end
     io.puts "    end"
     io.puts "  end"
     io.puts "end"
-  end
-
-  def shape_to_rbs_type(shape_name, types_prefix: false)
-    shape_body = @api["shapes"][shape_name]
-    case type = shape_body["type"]
-    when "string"
-      if shape_body["enum"]
-        "(#{shape_body["enum"].map { "\"#{_1}\"" }.join(" | ")})"
-      else
-        "::String"
-      end
-    when "integer", "long"
-      "::Integer"
-    when "double"
-      "::Float"
-    when "timestamp"
-      case shape_body["timestampFormat"]
-      when "iso8601", "rfc822", nil
-        "::Time"
-      else
-        raise [shape_name, shape_body].inspect
-      end
-    when "list"
-      "::Array[#{type(shape_body["member"]["shape"], types_prefix: types_prefix)}]"
-    when "map"
-      key_type = type(shape_body["key"]["shape"], types_prefix: types_prefix)
-      value_type = type(shape_body["value"]["shape"], types_prefix: types_prefix)
-      "::Hash[#{key_type}, #{value_type}]"
-    when "structure"
-      shape_name
-    when "boolean"
-      "bool"
-    when "blob"
-      "::IO"
-    else
-      raise "unimplemented shape type #{type} on #{shape_name}"
-    end
-  end
-
-  def shape_to_kwargs(shape_name, allow_opt: false, types_prefix: false)
-    shape_body = @api["shapes"].fetch(shape_name)
-    members = shape_body["members"]
-    raise if members.empty?
-    required = shape_body["required"]
-    params = members.map do |member_name, member_body|
-      member_shape_name = member_body["shape"]
-      member_type = type(member_shape_name, types_prefix: types_prefix)
-      prefix = (required && required.include?(member_name)) ? "" : "?"
-      prefix = allow_opt ? prefix : ""
-      "#{prefix}#{member_name.underscore}: #{member_type}"
-    end
-    params.join(", ")
   end
 end
 
