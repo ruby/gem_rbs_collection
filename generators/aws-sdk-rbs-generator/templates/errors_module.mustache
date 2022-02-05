@@ -1,0 +1,17 @@
+{{warning_comment}}
+module Aws
+  module {{service_name}}
+    module Errors
+      class ServiceError < Aws::Errors::ServiceError
+      end
+
+      {{#errors}}
+      class {{name}} < ServiceError
+        {{#members}}
+        def {{method_name}}: () -> {{returns}}
+        {{/members}}
+      end
+      {{/errors}}
+    end
+  end
+end

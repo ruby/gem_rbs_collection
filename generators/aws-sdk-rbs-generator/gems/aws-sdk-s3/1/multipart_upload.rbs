@@ -1,0 +1,60 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ksss/aws-sdk-rbs-generator/blob/main/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module S3
+    class MultipartUpload
+      # identifiers
+
+      def initialize: (bucket_name: String, object_key: String, id: String, client: Client) -> void
+      def bucket_name: () -> String
+      def object_key: () -> String
+      def id: () -> String
+
+      # data_attribute
+
+      def upload_id: () -> Types::multipart_upload_id
+      def key: () -> Types::object_key
+      def initiated: () -> Types::initiated
+      def storage_class: () -> Types::storage_class
+      def owner: () -> Types::Owner
+      def initiator: () -> Types::Initiator
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+
+      # data_method
+
+      def data: () -> Types::MultipartUpload
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+
+      # actions
+
+      def abort: (?request_payer: Types::request_payer, ?expected_bucket_owner: Types::account_id) -> Types::AbortMultipartUploadOutput
+      def complete: (?multipart_upload: Types::completed_multipart_upload, ?request_payer: Types::request_payer, ?expected_bucket_owner: Types::account_id) -> Object
+
+      # associations
+
+      def object: () -> Object
+      def part: (String part_number) -> MultipartUploadPart
+      def parts: (?max_parts: Types::max_parts, ?part_number_marker: Types::part_number_marker, ?request_payer: Types::request_payer, ?expected_bucket_owner: Types::account_id) -> MultipartUploadPart::Collection
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[MultipartUpload]
+      end
+    end
+  end
+end
