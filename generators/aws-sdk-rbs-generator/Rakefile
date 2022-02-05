@@ -10,10 +10,7 @@ Dir["#{GEMS_DIR}/*"].each do |dir|
   $:.unshift("#{dir}/lib")
 end
 
-require "rubocop/rake_task"
 require_relative 'lib/aws-sdk-rbs-generator'
-
-RuboCop::RakeTask.new
 
 task :write do |task, args|
   service_args = args.to_a
