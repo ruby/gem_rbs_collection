@@ -35,7 +35,7 @@ module AwsSdkRbsGenerator
       # WARNING ABOUT GENERATED CODE
       #
       # This file is generated. See the generator README.md for more information:
-      # https://github.com/ksss/aws-sdk-rbs-generator/blob/main/README.md
+      # https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
       #
       # WARNING ABOUT GENERATED CODE
       WARNING_COMMENT
