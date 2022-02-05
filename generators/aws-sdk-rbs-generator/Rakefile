@@ -17,14 +17,14 @@ RuboCop::RakeTask.new
 
 # rake 'write[../gem_rbs_collection/gems,S3,SQS]'
 task :write do |task, args|
-  args.to_a => [target_path, *service_args]
-
+  service_args = args.to_a
   services = AwsSdkRbsGenerator::Services.new
+  target_path = "../../gems"
   dir = File.expand_path(target_path, __dir__)
   puts "Generate signatures to #{dir}"
   service_args.each { |name| services[name].write_files(dir:) }
 end
 
 task :default do
-  Rake::Task['write'].invoke("gems", "S3", "SQS", "EC2", "KMS", "RDS")
+  Rake::Task['write'].invoke("S3")
 end
