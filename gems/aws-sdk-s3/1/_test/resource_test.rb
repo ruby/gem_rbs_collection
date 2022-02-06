@@ -30,7 +30,8 @@ end
 puts '## High level api'
 
 resource = Aws::S3::Resource.new(client: client)
-p resource.bucket('a').wait_until_exists(delay: 1).object('b').delete.version_id.upcase
+# steep v0.46.0 will raise UnexpectedError, 0.47.0 will not.
+# p resource.bucket('a').wait_until_exists(delay: 1).object('b').delete.version_id.upcase
 
 resource.buckets.each do |bucket|
   bucket.objects.find do |object|
