@@ -1,6 +1,10 @@
+require 'aws-sdk-sqs'
+
 client = Aws::SQS::Client.new(
-  region: 'ap-test-1'
+  region: 'ap-test-1',
+  stub_responses: true,
 )
+queue_url = "https://example.com/"
 client.create_queue(queue_name: "test")
 queues = client.list_queues
 queues.queue_urls.each do |url|
@@ -8,7 +12,7 @@ queues.queue_urls.each do |url|
 end
 
 attributes = client.get_queue_attributes(
-  queue_url: "url",
+  queue_url: queue_url,
   attribute_names: [ "All" ]
 )
 attributes.attributes.each do |key, value|
@@ -16,7 +20,7 @@ attributes.attributes.each do |key, value|
 end
 
 resp = client.send_message_batch(
-  queue_url: "String", # required
+  queue_url: queue_url, # required
   entries: [ # required
     {
       id: "String", # required
@@ -45,4 +49,6 @@ resp = client.send_message_batch(
     },
   ],
 )
-resp.successful[0].id.upcase
+resp.successful.each do |s|
+  s.id.upcase
+end
