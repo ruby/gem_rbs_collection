@@ -1,0 +1,70 @@
+{{warning_comment}}
+module Aws
+  module {{service_name}}
+    class {{name}}
+      # identifiers
+
+      def initialize: ({{initialize_arguments}}) -> void
+      {{#identifiers}}
+      def {{method_name}}: ({{arguments}}) -> {{returns}}
+      {{/identifiers}}
+
+      # data_attribute
+
+      {{#data_attributes}}
+      def {{method_name}}: ({{arguments}}) -> {{returns}}
+      {{/data_attributes}}
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      {{#load?}}
+      def load: () -> self
+      alias reload load
+      {{/load?}}
+
+      # data_method
+
+      {{#load_or_shape?}}
+      def data: () -> Types::{{shape}}
+      {{/load_or_shape?}}
+      {{^load_or_shape?}}
+      def data: () -> EmptyStructure
+      {{/load_or_shape?}}
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+      {{#exists_waiters}}
+      def exists?: (?Waiters::waiter_options) -> bool
+      {{/exists_waiters}}
+      {{#waiters}}
+      def {{method_name}}: ({{arguments}}) -> {{returns}}
+      {{/waiters}}
+
+      # actions
+
+      {{#actions}}
+      def {{method_name}}: ({{arguments}}) -> {{returns}}
+      {{/actions}}
+
+      # associations
+
+      {{#associations}}
+      def {{method_name}}: ({{arguments}}) -> {{returns}}
+      {{/associations}}
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[{{name}}]
+        {{#batch_actions}}
+        def {{method_name}}: ({{arguments}}) -> {{returns}}
+        {{/batch_actions}}
+      end
+    end
+  end
+end

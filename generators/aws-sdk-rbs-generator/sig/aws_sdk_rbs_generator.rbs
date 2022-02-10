@@ -1,0 +1,89 @@
+module AwsSdkRbsGenerator
+  VERSION: String
+
+  def self.warning_comment: () -> String
+
+  class MethodSignature
+    def initialize: (method_name: String, arguments: String?, returns: String) -> void
+    attr_reader method_name: String
+    attr_reader arguments: String?
+    attr_reader returns: String
+  end
+
+  class Service
+    attr_reader name: String
+    attr_reader api: Hash[untyped, untyped]
+    attr_reader resources: Hash[untyped, untyped]
+    attr_reader paginators: Hash[untyped, untyped]
+    def initialize: (name: String, api: Hash[untyped, untyped], resources: Hash[untyped, untyped], paginators: Hash[untyped, untyped]) -> void
+  end
+
+  class Services
+    MANIFEST_PATH: String
+    def initialize: (?manifest_path: String) -> void
+    def []: (String) -> Service
+
+    private
+
+    def build_service: (String, Hash[untyped, untyped]) -> Service
+    def manifest: () -> Hash[untyped, untyped]
+    def load_api: (String) -> Hash[untyped, untyped]
+    def load_resources: (String) -> Hash[untyped, untyped]
+    def load_paginators: (String) -> Hash[untyped, untyped]
+    def load_json: (String) -> Hash[untyped, untyped]
+  end
+
+  class ErrorList
+    def initialize: (shape_dictionary: ShapeDictionary) -> void
+  end
+
+  class ShapeDictionary
+    class Shape
+      attr_reader name: String
+      attr_reader kind: (:input | :output | :exception)
+      attr_reader dictionary: ShapeDictionary
+      attr_accessor request: bool
+      attr_reader ref: Hash[untyped, untyped]
+
+      def fetch_body: () -> Hash[untyped, untyped]
+      def as_keyword_arguments: (from: Symbol) -> String
+      def rbs_name: () -> String
+      def rbs_underscore_name: () -> String
+      def rbs_underscore_name_with_kind: () -> String
+      def rbs_underscore_name_without_kind: () -> String
+      def rbs_input_name: () -> String
+      def rbs_output_name: () -> String
+      def rbs_exception_name: () -> String
+      def to_rbs_returns: () -> String
+
+      def class?: () -> bool
+      def alias?: () -> bool
+      def need_name_with_kind?: () -> bool
+      def streaming?: () -> bool
+      def structure?: () -> bool
+      def input?: () -> bool
+      def output?: () -> bool
+      def exception?: () -> bool
+    end
+    include Enumerable[[String, Array[Shape]]]
+    @service: Service
+    attr_reader table: Hash[untyped, untyped]
+    attr_reader api: Hash[untyped, untyped]
+    attr_reader printed: Hash[untyped, untyped]
+    def initialize: (service: Service) -> void
+    def []: (String) -> Array[Shape]
+    def each: () { ([String, Array[Shape]]) -> void } -> self
+  end
+
+  module Views
+    class ResourceClass
+      attr_reader waiters: Array[MethodSignature]
+    end
+
+    class RootResourceClass
+      @service: Service
+      def initialize: (service: Service) -> void
+      def build_source: () -> String
+    end
+  end
+end

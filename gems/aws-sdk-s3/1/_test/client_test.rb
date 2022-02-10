@@ -1,15 +1,19 @@
 require "aws-sdk-s3"
 
 client = Aws::S3::Client.new(
-  region: 'ap-test-1'
+  region: 'ap-test-1',
+  stub_responses: true,
 )
+client.get_object(bucket: 'a', key: 'b').etag.upcase
+client.wait_until(:bucket_exists, { bucket: 'a' })
+
 resp = client.list_buckets
 resp.buckets.each do |bucket|
   bucket.name.upcase
 end
 
 begin
-  resp = Aws::S3::Client.new.get_object(bucket: 'test', key: 'test')
+  resp = Aws::S3::Client.new(stub_responses: true).get_object(bucket: 'test', key: 'test')
   resp.body.read # check streaming
 rescue Aws::S3::Errors::InvalidObjectState => e # check Errors
   e.storage_class.downcase
@@ -45,5 +49,8 @@ resp = client.get_bucket_cors(
   bucket: "BucketName", # required
   expected_bucket_owner: "AccountId",
 )
-resp.cors_rules[0].allowed_headers[0].upcase
-
+resp.cors_rules.each do |cors_rule|
+  cors_rule.allowed_headers.each do |allowed_header|
+    allowed_header.upcase
+  end
+end

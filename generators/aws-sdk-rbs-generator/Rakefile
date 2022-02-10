@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+# see also aws-sdk-ruby/Rakefile
+REPO_ROOT = "#{File.dirname(__FILE__)}/_src"
+GEMS_DIR = "#{REPO_ROOT}/gems"
+CORE_LIB = "#{REPO_ROOT}/gems/aws-sdk-core/lib"
+$:.unshift("#{REPO_ROOT}/build_tools")
+$:.unshift("#{REPO_ROOT}/build_tools/aws-sdk-code-generator/lib")
+Dir["#{GEMS_DIR}/*"].each do |dir|
+  $:.unshift("#{dir}/lib")
+end
+
+require_relative 'lib/aws-sdk-rbs-generator'
+
+task :write do |task, args|
+  service_args = args.to_a
+  services = AwsSdkRbsGenerator::Services.new
+  target_path = "../../gems"
+  dir = File.expand_path(target_path, __dir__)
+  puts "Generate signatures to #{dir}"
+  service_args.each { |name| services[name].write_files(dir:) }
+end
+
+task :default do
+  Rake::Task['write'].invoke("S3", "SQS")
+end
