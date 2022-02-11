@@ -1,0 +1,63 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module EC2
+    class NetworkAcl
+      # identifiers
+
+      def initialize: (id: String, client: Client) -> void
+      def id: () -> String
+
+      # data_attribute
+
+      def associations: () -> Types::network_acl_association_list
+      def entries: () -> Types::network_acl_entry_list
+      def is_default: () -> Types::boolean
+      def tags: () -> Types::tag_list_output
+      def vpc_id: () -> Types::string
+      def owner_id: () -> Types::string
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      def load: () -> self
+      alias reload load
+
+      # data_method
+
+      def data: () -> Types::NetworkAcl
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+
+      # actions
+
+      def create_entry: (?cidr_block: Types::string, ?dry_run: Types::boolean, egress: Types::boolean, ?icmp_type_code: Types::icmp_type_code, ?ipv_6_cidr_block: Types::string, ?port_range: Types::port_range, protocol: Types::string, rule_action: Types::rule_action, rule_number: Types::integer) -> EmptyStructure
+      def create_tags: (?dry_run: Types::boolean, tags: Types::tag_list_input) -> Tag::Collection
+      def delete_tags: (?dry_run: Types::boolean, ?tags: Types::tag_list_input) -> Tag::Collection
+      def delete: (?dry_run: Types::boolean) -> EmptyStructure
+      def delete_entry: (?dry_run: Types::boolean, egress: Types::boolean, rule_number: Types::integer) -> EmptyStructure
+      def replace_association: (association_id: Types::network_acl_association_id, ?dry_run: Types::boolean) -> Types::ReplaceNetworkAclAssociationResult
+      def replace_entry: (?cidr_block: Types::string, ?dry_run: Types::boolean, egress: Types::boolean, ?icmp_type_code: Types::icmp_type_code, ?ipv_6_cidr_block: Types::string, ?port_range: Types::port_range, protocol: Types::string, rule_action: Types::rule_action, rule_number: Types::integer) -> EmptyStructure
+
+      # associations
+
+      def vpc: () -> Vpc?
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[NetworkAcl]
+      end
+    end
+  end
+end

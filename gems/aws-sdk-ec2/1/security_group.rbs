@@ -1,0 +1,63 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module EC2
+    class SecurityGroup
+      # identifiers
+
+      def initialize: (id: String, client: Client) -> void
+      def id: () -> String
+
+      # data_attribute
+
+      def description: () -> Types::string
+      def group_name: () -> Types::string
+      def ip_permissions: () -> Types::ip_permission_list_output
+      def owner_id: () -> Types::string
+      def ip_permissions_egress: () -> Types::ip_permission_list_output
+      def tags: () -> Types::tag_list_output
+      def vpc_id: () -> Types::string
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      def load: () -> self
+      alias reload load
+
+      # data_method
+
+      def data: () -> Types::SecurityGroup
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+
+      # actions
+
+      def authorize_egress: (?dry_run: Types::boolean, ?ip_permissions: Types::ip_permission_list_input, ?tag_specifications: Types::tag_specification_list_input, ?cidr_ip: Types::string, ?from_port: Types::integer, ?ip_protocol: Types::string, ?to_port: Types::integer, ?source_security_group_name: Types::string, ?source_security_group_owner_id: Types::string) -> Types::AuthorizeSecurityGroupEgressResult
+      def authorize_ingress: (?cidr_ip: Types::string, ?from_port: Types::integer, ?group_name: Types::security_group_name, ?ip_permissions: Types::ip_permission_list_input, ?ip_protocol: Types::string, ?source_security_group_name: Types::string, ?source_security_group_owner_id: Types::string, ?to_port: Types::integer, ?dry_run: Types::boolean, ?tag_specifications: Types::tag_specification_list_input) -> Types::AuthorizeSecurityGroupIngressResult
+      def create_tags: (?dry_run: Types::boolean, tags: Types::tag_list_input) -> Tag::Collection
+      def delete_tags: (?dry_run: Types::boolean, ?tags: Types::tag_list_input) -> Tag::Collection
+      def delete: (?group_name: Types::security_group_name, ?dry_run: Types::boolean) -> EmptyStructure
+      def revoke_egress: (?dry_run: Types::boolean, ?ip_permissions: Types::ip_permission_list_input, ?security_group_rule_ids: Types::security_group_rule_id_list, ?cidr_ip: Types::string, ?from_port: Types::integer, ?ip_protocol: Types::string, ?to_port: Types::integer, ?source_security_group_name: Types::string, ?source_security_group_owner_id: Types::string) -> Types::RevokeSecurityGroupEgressResult
+      def revoke_ingress: (?cidr_ip: Types::string, ?from_port: Types::integer, ?group_name: Types::security_group_name, ?ip_permissions: Types::ip_permission_list_input, ?ip_protocol: Types::string, ?source_security_group_name: Types::string, ?source_security_group_owner_id: Types::string, ?to_port: Types::integer, ?dry_run: Types::boolean, ?security_group_rule_ids: Types::security_group_rule_id_list) -> Types::RevokeSecurityGroupIngressResult
+
+      # associations
+
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[SecurityGroup]
+      end
+    end
+  end
+end

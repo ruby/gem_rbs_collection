@@ -1,0 +1,75 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module EC2
+    class Volume
+      # identifiers
+
+      def initialize: (id: String, client: Client) -> void
+      def id: () -> String
+
+      # data_attribute
+
+      def attachments: () -> Types::volume_attachment_list_output
+      def availability_zone: () -> Types::string
+      def create_time: () -> Types::date_time
+      def encrypted: () -> Types::boolean
+      def kms_key_id: () -> Types::string
+      def outpost_arn: () -> Types::string
+      def size: () -> Types::integer
+      def snapshot_id: () -> Types::string
+      def state: () -> Types::volume_state
+      def iops: () -> Types::integer
+      def tags: () -> Types::tag_list_output
+      def volume_type: () -> Types::volume_type
+      def fast_restored: () -> Types::boolean
+      def multi_attach_enabled: () -> Types::boolean
+      def throughput: () -> Types::integer
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      def load: () -> self
+      alias reload load
+
+      # data_method
+
+      def data: () -> Types::Volume
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+
+      # actions
+
+      def attach_to_instance: (device: Types::string, instance_id: Types::instance_id, ?dry_run: Types::boolean) -> Types::VolumeAttachment
+      def create_snapshot: (?description: Types::string, ?outpost_arn: Types::string, ?tag_specifications: Types::tag_specification_list_input, ?dry_run: Types::boolean) -> Snapshot
+      def create_tags: (?dry_run: Types::boolean, tags: Types::tag_list_input) -> Tag::Collection
+      def delete_tags: (?dry_run: Types::boolean, ?tags: Types::tag_list_input) -> Tag::Collection
+      def delete: (?dry_run: Types::boolean) -> EmptyStructure
+      def describe_attribute: (attribute: Types::volume_attribute_name, ?dry_run: Types::boolean) -> Types::DescribeVolumeAttributeResult
+      def describe_status: (?filters: Types::filter_list, ?max_results: Types::integer, ?next_token: Types::string, ?dry_run: Types::boolean) -> Types::DescribeVolumeStatusResult
+      def detach_from_instance: (?device: Types::string, ?force: Types::boolean, ?instance_id: Types::instance_id, ?dry_run: Types::boolean) -> Types::VolumeAttachment
+      def enable_io: (?dry_run: Types::boolean) -> EmptyStructure
+      def modify_attribute: (?auto_enable_io: Types::attribute_boolean_value, ?dry_run: Types::boolean) -> EmptyStructure
+
+      # associations
+
+      def snapshots: (?filters: Types::filter_list, ?max_results: Types::integer, ?next_token: Types::string, ?owner_ids: Types::owner_string_list, ?restorable_by_user_ids: Types::restorable_by_string_list, ?snapshot_ids: Types::snapshot_id_string_list, ?dry_run: Types::boolean) -> Snapshot::Collection
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[Volume]
+      end
+    end
+  end
+end
