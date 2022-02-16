@@ -1,0 +1,88 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module EC2
+    class Vpc
+      # identifiers
+
+      def initialize: (id: String, client: Client) -> void
+      def id: () -> String
+
+      # data_attribute
+
+      def cidr_block: () -> Types::string
+      def dhcp_options_id: () -> Types::string
+      def state: () -> Types::vpc_state
+      def owner_id: () -> Types::string
+      def instance_tenancy: () -> Types::tenancy
+      def ipv_6_cidr_block_association_set: () -> Types::vpc_ipv_6_cidr_block_association_set_output
+      def cidr_block_association_set: () -> Types::vpc_cidr_block_association_set_output
+      def is_default: () -> Types::boolean
+      def tags: () -> Types::tag_list_output
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      def load: () -> self
+      alias reload load
+
+      # data_method
+
+      def data: () -> Types::Vpc
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+      def exists?: (?Waiters::waiter_options) -> bool
+      def wait_until_available: (?Waiters::waiter_options) -> self
+      def wait_until_exists: (?Waiters::waiter_options) -> self
+
+      # actions
+
+      def associate_dhcp_options: (dhcp_options_id: Types::defaulting_dhcp_options_id, ?dry_run: Types::boolean) -> EmptyStructure
+      def attach_classic_link_instance: (?dry_run: Types::boolean, groups: Types::group_id_string_list, instance_id: Types::instance_id) -> Types::AttachClassicLinkVpcResult
+      def attach_internet_gateway: (?dry_run: Types::boolean, internet_gateway_id: Types::internet_gateway_id) -> EmptyStructure
+      def create_network_acl: (?dry_run: Types::boolean, ?tag_specifications: Types::tag_specification_list_input) -> NetworkAcl
+      def create_route_table: (?dry_run: Types::boolean, ?tag_specifications: Types::tag_specification_list_input) -> RouteTable
+      def create_security_group: (description: Types::string, group_name: Types::string, ?tag_specifications: Types::tag_specification_list_input, ?dry_run: Types::boolean) -> SecurityGroup
+      def create_subnet: (?tag_specifications: Types::tag_specification_list_input, ?availability_zone: Types::string, ?availability_zone_id: Types::string, ?cidr_block: Types::string, ?ipv_6_cidr_block: Types::string, ?outpost_arn: Types::string, ?dry_run: Types::boolean, ?ipv_6_native: Types::boolean) -> Subnet
+      def create_tags: (?dry_run: Types::boolean, tags: Types::tag_list_input) -> Tag::Collection
+      def delete_tags: (?dry_run: Types::boolean, ?tags: Types::tag_list_input) -> Tag::Collection
+      def delete: (?dry_run: Types::boolean) -> EmptyStructure
+      def describe_attribute: (attribute: Types::vpc_attribute_name, ?dry_run: Types::boolean) -> Types::DescribeVpcAttributeResult
+      def detach_classic_link_instance: (?dry_run: Types::boolean, instance_id: Types::instance_id) -> Types::DetachClassicLinkVpcResult
+      def detach_internet_gateway: (?dry_run: Types::boolean, internet_gateway_id: Types::internet_gateway_id) -> EmptyStructure
+      def disable_classic_link: (?dry_run: Types::boolean) -> Types::DisableVpcClassicLinkResult
+      def enable_classic_link: (?dry_run: Types::boolean) -> Types::EnableVpcClassicLinkResult
+      def modify_attribute: (?enable_dns_hostnames: Types::attribute_boolean_value, ?enable_dns_support: Types::attribute_boolean_value) -> EmptyStructure
+      def request_vpc_peering_connection: (?dry_run: Types::boolean, ?peer_owner_id: Types::string, ?peer_vpc_id: Types::string, ?peer_region: Types::string, ?tag_specifications: Types::tag_specification_list_input) -> VpcPeeringConnection
+
+      # associations
+
+      def accepted_vpc_peering_connections: (?filters: Types::filter_list, ?dry_run: Types::boolean, ?vpc_peering_connection_ids: Types::vpc_peering_connection_id_list, ?next_token: Types::string, ?max_results: Types::describe_vpc_peering_connections_max_results) -> VpcPeeringConnection::Collection
+      def dhcp_options: () -> DhcpOptions?
+      def instances: (?filters: Types::filter_list, ?instance_ids: Types::instance_id_string_list, ?dry_run: Types::boolean, ?max_results: Types::integer, ?next_token: Types::string) -> Instance::Collection
+      def internet_gateways: (?filters: Types::filter_list, ?dry_run: Types::boolean, ?internet_gateway_ids: Types::internet_gateway_id_list, ?next_token: Types::string, ?max_results: Types::describe_internet_gateways_max_results) -> InternetGateway::Collection
+      def network_acls: (?filters: Types::filter_list, ?dry_run: Types::boolean, ?network_acl_ids: Types::network_acl_id_string_list, ?next_token: Types::string, ?max_results: Types::describe_network_acls_max_results) -> NetworkAcl::Collection
+      def network_interfaces: (?filters: Types::filter_list, ?dry_run: Types::boolean, ?network_interface_ids: Types::network_interface_id_list, ?next_token: Types::string, ?max_results: Types::describe_network_interfaces_max_results) -> NetworkInterface::Collection
+      def requested_vpc_peering_connections: (?filters: Types::filter_list, ?dry_run: Types::boolean, ?vpc_peering_connection_ids: Types::vpc_peering_connection_id_list, ?next_token: Types::string, ?max_results: Types::describe_vpc_peering_connections_max_results) -> VpcPeeringConnection::Collection
+      def route_tables: (?filters: Types::filter_list, ?dry_run: Types::boolean, ?route_table_ids: Types::route_table_id_string_list, ?next_token: Types::string, ?max_results: Types::describe_route_tables_max_results) -> RouteTable::Collection
+      def security_groups: (?filters: Types::filter_list, ?group_ids: Types::group_id_string_list, ?group_names: Types::group_name_string_list, ?dry_run: Types::boolean, ?next_token: Types::string, ?max_results: Types::describe_security_groups_max_results) -> SecurityGroup::Collection
+      def subnets: (?filters: Types::filter_list, ?subnet_ids: Types::subnet_id_string_list, ?dry_run: Types::boolean, ?next_token: Types::string, ?max_results: Types::describe_subnets_max_results) -> Subnet::Collection
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[Vpc]
+      end
+    end
+  end
+end

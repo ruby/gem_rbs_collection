@@ -1,0 +1,61 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module EC2
+    class RouteTable
+      # identifiers
+
+      def initialize: (id: String, client: Client) -> void
+      def id: () -> String
+
+      # data_attribute
+
+      def propagating_vgws: () -> Types::propagating_vgw_list
+      def tags: () -> Types::tag_list_output
+      def vpc_id: () -> Types::string
+      def owner_id: () -> Types::string
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      def load: () -> self
+      alias reload load
+
+      # data_method
+
+      def data: () -> Types::RouteTable
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+
+      # actions
+
+      def associate_with_subnet: (?dry_run: Types::boolean, ?subnet_id: Types::subnet_id, ?gateway_id: Types::route_gateway_id) -> RouteTableAssociation
+      def create_route: (?destination_cidr_block: Types::string, ?destination_ipv_6_cidr_block: Types::string, ?destination_prefix_list_id: Types::prefix_list_resource_id, ?dry_run: Types::boolean, ?vpc_endpoint_id: Types::vpc_endpoint_id, ?egress_only_internet_gateway_id: Types::egress_only_internet_gateway_id, ?gateway_id: Types::route_gateway_id, ?instance_id: Types::instance_id, ?nat_gateway_id: Types::nat_gateway_id, ?transit_gateway_id: Types::transit_gateway_id, ?local_gateway_id: Types::local_gateway_id, ?carrier_gateway_id: Types::carrier_gateway_id, ?network_interface_id: Types::network_interface_id, ?vpc_peering_connection_id: Types::vpc_peering_connection_id, ?core_network_arn: Types::core_network_arn) -> Route
+      def create_tags: (?dry_run: Types::boolean, tags: Types::tag_list_input) -> Tag::Collection
+      def delete_tags: (?dry_run: Types::boolean, ?tags: Types::tag_list_input) -> Tag::Collection
+      def delete: (?dry_run: Types::boolean) -> EmptyStructure
+
+      # associations
+
+      def associations: () -> RouteTableAssociation::Collection
+      def routes: () -> Route::Collection
+      def vpc: () -> Vpc?
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[RouteTable]
+      end
+    end
+  end
+end

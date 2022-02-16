@@ -1,0 +1,86 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module EC2
+    class NetworkInterface
+      # identifiers
+
+      def initialize: (id: String, client: Client) -> void
+      def id: () -> String
+
+      # data_attribute
+
+      def attachment: () -> Types::NetworkInterfaceAttachment
+      def availability_zone: () -> Types::string
+      def description: () -> Types::string
+      def groups: () -> Types::group_identifier_list_output
+      def interface_type: () -> Types::network_interface_type
+      def ipv_6_addresses: () -> Types::network_interface_ipv_6_addresses_list
+      def mac_address: () -> Types::string
+      def outpost_arn: () -> Types::string
+      def owner_id: () -> Types::string
+      def private_dns_name: () -> Types::string
+      def private_ip_address: () -> Types::string
+      def private_ip_addresses: () -> Types::network_interface_private_ip_address_list
+      def ipv_4_prefixes: () -> Types::ipv_4_prefixes_list
+      def ipv_6_prefixes: () -> Types::ipv_6_prefixes_list
+      def requester_id: () -> Types::string
+      def requester_managed: () -> Types::boolean
+      def source_dest_check: () -> Types::boolean
+      def status: () -> Types::network_interface_status
+      def subnet_id: () -> Types::string
+      def tag_set: () -> Types::tag_list_output
+      def vpc_id: () -> Types::string
+      def deny_all_igw_traffic: () -> Types::boolean
+      def ipv_6_native: () -> Types::boolean
+      def ipv_6_address: () -> Types::string
+
+      # client_method
+
+      def client: () -> Client
+
+      # load_method
+
+      def load: () -> self
+      alias reload load
+
+      # data_method
+
+      def data: () -> Types::NetworkInterface
+
+      def data_loaded?: () -> bool
+
+      # waiters
+
+
+      # actions
+
+      def assign_private_ip_addresses: (?allow_reassignment: Types::boolean, ?private_ip_addresses: Types::private_ip_address_string_list, ?secondary_private_ip_address_count: Types::integer, ?ipv_4_prefixes: Types::ip_prefix_list, ?ipv_4_prefix_count: Types::integer) -> Types::AssignPrivateIpAddressesResult
+      def attach: (device_index: Types::integer, ?dry_run: Types::boolean, instance_id: Types::instance_id, ?network_card_index: Types::integer) -> Types::AttachNetworkInterfaceResult
+      def create_tags: (?dry_run: Types::boolean, tags: Types::tag_list_input) -> Tag::Collection
+      def delete_tags: (?dry_run: Types::boolean, ?tags: Types::tag_list_input) -> Tag::Collection
+      def delete: (?dry_run: Types::boolean) -> EmptyStructure
+      def describe_attribute: (?attribute: Types::network_interface_attribute, ?dry_run: Types::boolean) -> Types::DescribeNetworkInterfaceAttributeResult
+      def detach: (?dry_run: Types::boolean, ?force: Types::boolean) -> EmptyStructure
+      def modify_attribute: (?attachment: Types::network_interface_attachment_changes, ?description: Types::attribute_value, ?dry_run: Types::boolean, ?groups: Types::security_group_id_string_list, ?source_dest_check: Types::attribute_boolean_value) -> EmptyStructure
+      def reset_attribute: (?dry_run: Types::boolean, ?source_dest_check: Types::string) -> EmptyStructure
+      def unassign_private_ip_addresses: (?private_ip_addresses: Types::private_ip_address_string_list, ?ipv_4_prefixes: Types::ip_prefix_list) -> EmptyStructure
+
+      # associations
+
+      def association: () -> NetworkInterfaceAssociation?
+      def subnet: () -> Subnet?
+      def vpc: () -> Vpc?
+
+      # batch_actions
+
+      class Collection < ::Aws::Resources::Collection[NetworkInterface]
+      end
+    end
+  end
+end
