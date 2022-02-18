@@ -22,7 +22,7 @@ module AwsSdkRbsGenerator
         @resource = resource
         @service_name = @service.name
         args = @resource.fetch(:identifiers, []).map { |i| "#{i[:name].underscore}: String" }
-        args << "client: Client"
+        args << "?client: Client, **untyped"
         @initialize_arguments = args.join(", ")
         @identifiers = @resource.fetch(:identifiers, []).map do |identifier|
           MethodSignature.new(

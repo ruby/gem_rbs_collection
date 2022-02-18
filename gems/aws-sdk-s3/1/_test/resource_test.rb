@@ -9,6 +9,9 @@ puts '# Resource'
 
 puts '## Low level api'
 
+Aws::S3::Bucket.new(name: 'a', stub_responses: true)
+Aws::S3::Object.new(bucket_name: 'a', key: 'b', stub_responses: true)
+
 # @type var batches: Array[Array[Aws::S3::Object]]
 batches = [[]]
 collection = Aws::S3::Object::Collection.new(batches)
