@@ -2,7 +2,7 @@ require "aws-sdk-s3"
 
 client = Aws::S3::Client.new(
   region: 'ap-test-1',
-  stub_responses: true,
+  stub_responses: { head_object: { content_length: 100 } }
 )
 client.get_object(bucket: 'a', key: 'b').etag.upcase
 client.wait_until(:bucket_exists, { bucket: 'a' })

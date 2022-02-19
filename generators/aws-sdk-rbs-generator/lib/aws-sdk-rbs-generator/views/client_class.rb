@@ -26,7 +26,7 @@ module AwsSdkRbsGenerator
               '("legacy" | "standard" | "adaptive")'
             when :retry_jitter
               "(:none | :equal | :full | ^(Integer) -> Integer)"
-            when :endpoint, :credentials, :log_formatter, :client_side_monitoring_publisher, :logger
+            when :stub_responses, :endpoint, :credentials, :log_formatter, :client_side_monitoring_publisher, :logger
               # TODO: Just not supported yet
               "untyped"
             else
