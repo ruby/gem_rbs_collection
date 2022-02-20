@@ -14,3 +14,7 @@ RBS_DIR=$(cd $(dirname $0)/..; pwd)
 REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
 # Validate RBS files, using the bundler environment present
 bundle exec rbs --repo $REPO_DIR -r aws-sdk-core:3 validate --silent
+
+cd ${RBS_DIR}/_test
+# Run type checks
+bundle exec steep check
