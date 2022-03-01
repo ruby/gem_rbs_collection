@@ -1,7 +1,9 @@
 {{warning_comment}}
 module Aws
   module {{service_name}}
-    class Client
+    class Client < Seahorse::Client::Base
+      include Aws::ClientStubs
+
       def self.new: ({{client_option}}) -> instance
       {{#operations}}
       def {{method_name}}: ({{arguments}}) -> {{returns}}
