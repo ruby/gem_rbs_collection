@@ -1,0 +1,158 @@
+module Sentry
+  attr_accessor self.background_worker: Sentry::BackgroundWorker
+  attr_reader self.session_flusher: Sentry::SessionFlusher
+
+  def self.capture_exception: (::Exception exception, **untyped options) ?{ (?untyped scope) -> untyped } -> untyped
+  def self.capture_message: (String message, **untyped options) ?{ (?untyped scope)  ->  untyped } -> untyped
+  def self.capture_event: (untyped event) -> untyped
+  def self.configure_scope: () ?{ (untyped current_scope) -> untyped }  -> void
+  def self.init: () { (Sentry::Configuration config) -> untyped } -> void
+  def self.set_extras: (*untyped params) -> void
+  def self.set_tags: [A, B] (Hash[A, B] tags_hash) -> void
+  def self.set_user: [A, B] (Hash[A, B] user_hash) -> void
+  def self.set_context: (*untyped args) -> void
+  def self.send_event: (untyped event, ?untyped hint) -> void
+  def self.with_scope: () { (untyped scope) -> untyped } -> untyped
+end
+
+module Sentry
+  class BackgroundWorker
+    include LoggingHelper
+
+    attr_reader max_queue: Integer
+    attr_reader number_of_threads: Integer
+
+    # @deprecated Use Sentry.logger to retrieve the current logger instead.
+    attr_reader logger: untyped
+
+    attr_accessor shutdown_timeout: Integer
+
+    def initialize: (untyped configuration) -> void
+
+    # if you want to monkey-patch this method, please override `_perform` instead
+    def perform: () { () -> untyped } -> untyped
+
+    def shutdown: () -> untyped
+  end
+end
+
+module Sentry
+  class SessionFlusher
+    include LoggingHelper
+
+    FLUSH_INTERVAL: ::Integer
+
+    def initialize: (untyped configuration, untyped client) -> void
+    def flush: () -> void
+    def add_session: (untyped session) -> void
+    def kill: () -> untyped
+  end
+end
+
+module Sentry
+  class Configuration
+    include CustomInspection
+    include LoggingHelper
+
+    attr_accessor app_dirs_pattern: Regexp?
+    attr_reader async: Proc?
+    attr_accessor background_worker_threads: Integer
+    attr_accessor backtrace_cleanup_callback: Proc
+    attr_reader before_breadcrumb: Proc
+    attr_reader before_send: Proc
+    attr_reader breadcrumbs_logger: Array[Symbol]
+    attr_accessor capture_exception_frame_locals: bool
+    attr_accessor max_breadcrumbs: Integer
+    attr_accessor context_lines: Integer?
+    attr_reader environment: String
+    attr_accessor debug: bool
+    attr_reader dsn: String
+    attr_accessor enabled_environments: Array[String]
+    attr_accessor exclude_loggers: Array[String]
+    attr_accessor excluded_exceptions: Array[String]
+    attr_accessor inspect_exception_causes_for_exclusion: bool
+
+    alias inspect_exception_causes_for_exclusion? inspect_exception_causes_for_exclusion
+
+    # You may provide your own LineCache for matching paths with source files.
+    # This may be useful if you need to get source code from places other than the disk.
+    # @see LineCache
+    # @return [LineCache]
+    attr_accessor linecache: untyped
+    attr_accessor logger: untyped
+    attr_accessor project_root: String
+    attr_accessor propagate_traces: bool
+    attr_accessor rack_env_whitelist: Array[String]
+    attr_accessor release: String
+    attr_accessor sample_rate: Float
+    attr_accessor send_modules: bool
+    attr_accessor send_default_pii: bool
+    attr_accessor skip_rake_integration: bool
+
+    # IP ranges for trusted proxies that will be skipped when calculating IP address.
+    attr_accessor trusted_proxies: untyped
+    attr_accessor server_name: String
+
+    # Return a Transport::Configuration object for transport-related configurations.
+    # @return [Transport]
+    attr_reader transport: untyped
+    attr_accessor traces_sample_rate: Float
+    attr_accessor traces_sampler: Proc
+    attr_accessor send_client_reports: bool
+    attr_accessor auto_session_tracking: bool
+
+    # these are not config options
+    # @!visibility private
+    attr_reader errors: untyped
+
+    # these are not config options
+    # @!visibility private
+    attr_reader gem_specs: untyped
+
+    IGNORE_DEFAULT: untyped
+    RACK_ENV_WHITELIST_DEFAULT: Array[untyped]
+    HEROKU_DYNO_METADATA_MESSAGE: String
+    LOG_PREFIX: String
+    MODULE_SEPARATOR: String
+    SKIP_INSPECTION_ATTRIBUTES: ::Array[untyped]
+
+    def initialize: () -> void
+    def dsn=: (untyped value) -> untyped
+    alias server= dsn=
+    def async=: (untyped value) -> untyped
+    def breadcrumbs_logger=: (untyped logger) -> untyped
+    def before_send=: (untyped value) -> untyped
+    def before_breadcrumb=: (untyped value) -> untyped
+    def environment=: (untyped environment) -> untyped
+    def sending_allowed?: () -> untyped
+    def sample_allowed?: () -> boolish
+    def exception_class_allowed?: (untyped exc) -> untyped
+    def enabled_in_current_env?: () -> untyped
+    def tracing_enabled?: () -> untyped
+    def csp_report_uri: () -> String?
+  end
+end
+
+module Sentry
+  module CustomInspection
+    def inspect: () -> String
+  end
+end
+
+module Sentry
+  module LoggingHelper
+    def log_error: (String message, untyped exception, ?debug: bool debug) -> void
+    def log_info: (String message) -> void
+    def log_debug: (String message) -> void
+    def log_warn: (String message) -> void
+  end
+end
+
+module Sentry
+  module Rack
+    class CaptureExceptions
+      def initialize: (untyped app) -> void
+      def call: (untyped env) -> untyped
+    end
+  end
+end
