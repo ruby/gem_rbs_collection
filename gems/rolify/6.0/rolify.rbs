@@ -1,0 +1,69 @@
+module Rolify
+  module Configure
+    def configure: (*String) -> void
+                 | (*String) { (singleton(Rolify)) -> void } -> void
+    def dynamic_shortcuts: () -> bool
+    def dynamic_shortcuts=: (bool) -> bool
+    def orm: () -> String
+    def orm=: (String) -> String
+    def use_mongoid: () -> void
+    def use_dynamic_shortcuts: () -> void
+    def use_defaults: () -> void
+    def remove_role_if_empty=: (bool) -> bool
+    def remove_role_if_empty: () -> bool
+  end
+  extend Configure
+
+  type role_name = (Symbol | String)
+
+  module Role
+    # should be overwrite to return record object
+    def add_role: (role_name role, ?untyped resource) -> untyped
+    alias grant add_role
+
+    def has_role?: (role_name role, ?untyped resource) -> bool
+    def has_strict_role?: (role_name role, untyped resource) -> bool
+    def has_cached_role?: (role_name role, ?untyped resource) -> bool
+    def has_strict_cached_role?: (role_name role, ?untyped resource) -> bool
+    def has_all_roles?: (*untyped) -> bool
+    def has_any_role?: (*untyped) -> bool
+    def only_has_role?: (role_name role, ?untyped resource) -> bool
+    def remove_role: (role_name role, ?untyped resource) -> void
+    alias revoke remove_role
+    def roles_name: () -> Array[untyped]
+  end
+
+  # All method should be overwrite to return model's relation object
+  module Resource
+    module ClassMethods
+      def find_roles: (?role_name, ?untyped) -> untyped
+      def with_role: (role_name, ?untyped) -> untyped
+      alias with_roles with_role
+      alias find_as with_role
+      alias find_multiple_as with_role
+
+      def without_role: (role_name, ?untyped) -> untyped
+      alias without_roles without_role
+      alias except_as without_role
+      alias except_multiple_as without_role
+
+      def applied_roles: (?bool children) -> untyped
+    end
+
+    def applied_roles: () -> untyped
+  end
+
+  def rolify: (?role_cname: String, ?role_join_table_name: String, ?before_add: untyped, ?after_add: untyped, ?before_remove: untyped, ?after_remove: untyped, ?inverse_of: untyped, ?strict: bool) -> void
+  def adapter: () -> untyped
+  def resourcify: (Symbol association_name, role_cname: String, ?role_cname: String, ?dependent: :Symbol) -> void
+  def resource_adapter: () -> untyped
+  def scopify: () -> void
+  def role_class: () -> untyped
+  def self.resource_types: () -> Array[String]
+end
+
+module ActiveRecord
+  class Base
+    extend Rolify
+  end
+end
