@@ -1,0 +1,56 @@
+# How to use
+#
+# If you use Paranoia with `acts_as_paranoid` in some AR classes, you should write rbs file as follows:
+#
+# class Foo < ApplicationRecord
+#   include Paranoia
+#   extend Paranoia::Query
+# end
+#
+module Paranoia
+  module Query
+    def paranoid?: () -> ::TrueClass
+
+    def with_deleted: () -> untyped
+
+    def only_deleted: () -> untyped
+
+    alias deleted only_deleted
+
+    def restore: (untyped id_or_ids, ?::Hash[untyped, untyped] opts) -> untyped
+
+    def after_restore: (* untyped) -> untyped
+    def after_real_destroy: (* untyped) -> untyped
+  end
+
+  def paranoia_destroy: () -> untyped
+
+  alias destroy paranoia_destroy
+
+  def paranoia_destroy!: () -> untyped
+
+  def trigger_transactional_callbacks?: () -> untyped
+
+  def paranoia_delete: () -> untyped
+
+  alias delete paranoia_delete
+
+  def restore!: (?::Hash[untyped, untyped] opts) -> untyped
+
+  alias restore restore!
+
+  def paranoia_destroyed?: () -> untyped
+
+  alias deleted? paranoia_destroyed?
+
+  def really_destroy!: () -> untyped
+
+  VERSION: String
+end
+
+class ActiveRecord::Base
+  def self.acts_as_paranoid: (?::Hash[untyped, untyped] options) -> (nil | untyped)
+
+  def self.paranoid?: () -> ::FalseClass
+  def paranoid?: () -> untyped
+end
