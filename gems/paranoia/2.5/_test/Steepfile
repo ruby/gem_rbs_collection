@@ -1,0 +1,20 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+  library "paranoia:2.5"
+  library "activesupport"
+  library "activerecord"
+  library "activemodel"
+  library "monitor"
+  library "date"
+  library "time"
+  library "singleton"
+  library "logger"
+  library "mutex_m"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end
