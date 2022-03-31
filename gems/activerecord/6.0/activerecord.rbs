@@ -54,6 +54,10 @@ module ActiveRecord
 
     # callbacks
     def self.after_commit: (*untyped) -> void
+    def self.after_create_commit: (*untyped) -> void | ...
+    def self.after_update_commit: (*untyped) -> void | ...
+    def self.after_destroy_commit: (*untyped) -> void | ...
+    def self.after_save_commit: (*untyped) -> void | ...
     def self.after_create: (*untyped) -> void
     def self.after_destroy: (*untyped) -> void
     def self.after_rollback: (*untyped) -> void
@@ -143,6 +147,8 @@ module ActiveRecord
     def self.default_scope_override: () -> untyped
     def self.default_scope_override=: (untyped) -> untyped
     def default_scope_override: () -> untyped
+
+    def self.unscoped: () -> untyped | ...
 
     def self.cache_timestamp_format: () -> untyped
     def self.cache_timestamp_format?: () -> bool
@@ -272,6 +278,10 @@ module ActiveRecord
 
     attr_accessor self.index_nested_attribute_errors: untyped
     def index_nested_attribute_errors: () -> untyped
+
+    private
+
+    def self.default_scope: (?untyped? scope) -> untyped | ...
   end
 end
 
@@ -469,5 +479,15 @@ end
 module ActiveRecord
   class Base
     extend Associations::ClassMethods
+  end
+end
+
+module ActiveRecord
+  module Associations
+    class CollectionProxy
+      def build: (?::Hash[untyped, untyped] attributes) -> untyped | ...
+      def create: (?::Hash[untyped, untyped] attributes) -> untyped | ...
+      def create!: (?::Hash[untyped, untyped] attributes) -> untyped | ...
+    end
   end
 end
