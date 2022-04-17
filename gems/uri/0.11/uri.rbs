@@ -1,0 +1,2028 @@
+module URI
+end
+
+module URI
+  #
+  # RFC6068, the mailto URL scheme.
+  #
+  class MailTo < Generic
+    # include REGEXP
+
+    # A Default port of nil for URI::MailTo.
+    DEFAULT_PORT: nil
+
+    # An Array of the available components for URI::MailTo.
+    COMPONENT: ::Array[:scheme | :to | :headers]
+
+    # ; RFC 6068
+    # hfields      = "?" hfield *( "&" hfield )
+    # hfield       = hfname "=" hfvalue
+    # hfname       = *qchar
+    # hfvalue      = *qchar
+    # qchar        = unreserved / pct-encoded / some-delims
+    # some-delims  = "!" / "$" / "'" / "(" / ")" / "*"
+    #              / "+" / "," / ";" / ":" / "@"
+    #
+    # ; RFC3986
+    # unreserved   = ALPHA / DIGIT / "-" / "." / "_" / "~"
+    # pct-encoded  = "%" HEXDIG HEXDIG
+    HEADER_REGEXP: ::Regexp
+
+    # practical regexp for email address
+    # https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+    EMAIL_REGEXP: ::Regexp
+
+    #
+    # == Description
+    #
+    # Creates a new URI::MailTo object from components, with syntax checking.
+    #
+    # Components can be provided as an Array or Hash. If an Array is used,
+    # the components must be supplied as <code>[to, headers]</code>.
+    #
+    # If a Hash is used, the keys are the component names preceded by colons.
+    #
+    # The headers can be supplied as a pre-encoded string, such as
+    # <code>"subject=subscribe&cc=address"</code>, or as an Array of Arrays
+    # like <code>[['subject', 'subscribe'], ['cc', 'address']]</code>.
+    #
+    # Examples:
+    #
+    #    require 'uri'
+    #
+    #    m1 = URI::MailTo.build(['joe@example.com', 'subject=Ruby'])
+    #    m1.to_s  # => "mailto:joe@example.com?subject=Ruby"
+    #
+    #    m2 = URI::MailTo.build(['john@example.com', [['Subject', 'Ruby'], ['Cc', 'jack@example.com']]])
+    #    m2.to_s  # => "mailto:john@example.com?Subject=Ruby&Cc=jack@example.com"
+    #
+    #    m3 = URI::MailTo.build({:to => 'listman@example.com', :headers => [['subject', 'subscribe']]})
+    #    m3.to_s  # => "mailto:listman@example.com?subject=subscribe"
+    #
+    def self.build: (untyped args) -> untyped
+
+    #
+    # == Description
+    #
+    # Creates a new URI::MailTo object from generic URL components with
+    # no syntax checking.
+    #
+    # This method is usually called from URI::parse, which checks
+    # the validity of each component.
+    #
+    def initialize: (*untyped arg) -> void
+
+    # The primary e-mail address of the URL, as a String.
+    attr_reader to: untyped
+
+    # E-mail headers set by the URL, as an Array of Arrays.
+    attr_reader headers: untyped
+
+    private
+
+    # Checks the to +v+ component.
+    def check_to: (untyped v) -> true
+
+    public
+
+    # Private setter for to +v+.
+    def set_to: (untyped v) -> untyped
+
+    # Setter for to +v+.
+    def to=: (untyped v) -> untyped
+
+    private
+
+    # Checks the headers +v+ component against either
+    # * HEADER_REGEXP
+    def check_headers: (untyped v) -> true
+
+    public
+
+    # Private setter for headers +v+.
+    def set_headers: (untyped v) -> untyped
+
+    # Setter for headers +v+.
+    def headers=: (untyped v) -> untyped
+
+    # Constructs String from URI.
+    def to_s: () -> untyped
+
+    # Returns the RFC822 e-mail text equivalent of the URL, as a String.
+    #
+    # Example:
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("mailto:ruby-list@ruby-lang.org?Subject=subscribe&cc=myaddr")
+    #   uri.to_mailtext
+    #   # => "To: ruby-list@ruby-lang.org\nSubject: subscribe\nCc: myaddr\n\n\n"
+    #
+    def to_mailtext: () -> ::String
+
+    alias to_rfc822text to_mailtext
+  end
+end
+
+module URI
+  #
+  # FTP URI syntax is defined by RFC1738 section 3.2.
+  #
+  # This class will be redesigned because of difference of implementations;
+  # the structure of its path. draft-hoffman-ftp-uri-04 is a draft but it
+  # is a good summary about the de facto spec.
+  # http://tools.ietf.org/html/draft-hoffman-ftp-uri-04
+  #
+  class FTP < Generic
+    # A Default port of 21 for URI::FTP.
+    DEFAULT_PORT: 21
+
+    #
+    # An Array of the available components for URI::FTP.
+    #
+    COMPONENT: ::Array[:scheme | :userinfo | :host | :port | :path | :typecode]
+
+    #
+    # Typecode is "a", "i", or "d".
+    #
+    # * "a" indicates a text file (the FTP command was ASCII)
+    # * "i" indicates a binary file (FTP command IMAGE)
+    # * "d" indicates the contents of a directory should be displayed
+    #
+    TYPECODE: ::Array["a" | "i" | "d"]
+
+    # Typecode prefix ";type=".
+    TYPECODE_PREFIX: ";type="
+
+    def self.new2: (untyped user, untyped password, untyped host, untyped port, untyped path, ?untyped? typecode, ?bool arg_check) -> untyped
+
+    #
+    # == Description
+    #
+    # Creates a new URI::FTP object from components, with syntax checking.
+    #
+    # The components accepted are +userinfo+, +host+, +port+, +path+, and
+    # +typecode+.
+    #
+    # The components should be provided either as an Array, or as a Hash
+    # with keys formed by preceding the component names with a colon.
+    #
+    # If an Array is used, the components must be passed in the
+    # order <code>[userinfo, host, port, path, typecode]</code>.
+    #
+    # If the path supplied is absolute, it will be escaped in order to
+    # make it absolute in the URI.
+    #
+    # Examples:
+    #
+    #     require 'uri'
+    #
+    #     uri1 = URI::FTP.build(['user:password', 'ftp.example.com', nil,
+    #       '/path/file.zip', 'i'])
+    #     uri1.to_s  # => "ftp://user:password@ftp.example.com/%2Fpath/file.zip;type=i"
+    #
+    #     uri2 = URI::FTP.build({:host => 'ftp.example.com',
+    #       :path => 'ruby/src'})
+    #     uri2.to_s  # => "ftp://ftp.example.com/ruby/src"
+    #
+    def self.build: (untyped args) -> untyped
+
+    #
+    # == Description
+    #
+    # Creates a new URI::FTP object from generic URL components with no
+    # syntax checking.
+    #
+    # Unlike build(), this method does not escape the path component as
+    # required by RFC1738; instead it is treated as per RFC2396.
+    #
+    # Arguments are +scheme+, +userinfo+, +host+, +port+, +registry+, +path+,
+    # +opaque+, +query+, and +fragment+, in that order.
+    #
+    def initialize: (untyped scheme, untyped userinfo, untyped host, untyped port, untyped registry, untyped path, untyped opaque, untyped query, untyped fragment, ?untyped? parser, ?bool arg_check) -> void
+
+    # typecode accessor.
+    #
+    # See URI::FTP::COMPONENT.
+    attr_reader typecode: untyped
+
+    private
+
+    # Validates typecode +v+,
+    # returns +true+ or +false+.
+    #
+    def check_typecode: (untyped v) -> untyped
+
+    public
+
+    # Private setter for the typecode +v+.
+    #
+    # See also URI::FTP.typecode=.
+    #
+    def set_typecode: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the typecode +v+
+    # (with validation).
+    #
+    # See also URI::FTP.check_typecode.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("ftp://john@ftp.example.com/my_file.img")
+    #   #=> #<URI::FTP ftp://john@ftp.example.com/my_file.img>
+    #   uri.typecode = "i"
+    #   uri
+    #   #=> #<URI::FTP ftp://john@ftp.example.com/my_file.img;type=i>
+    #
+    def typecode=: (untyped typecode) -> untyped
+
+    def merge: (untyped oth) -> untyped
+
+    # Returns the path from an FTP URI.
+    #
+    # RFC 1738 specifically states that the path for an FTP URI does not
+    # include the / which separates the URI path from the URI host. Example:
+    #
+    # <code>ftp://ftp.example.com/pub/ruby</code>
+    #
+    # The above URI indicates that the client should connect to
+    # ftp.example.com then cd to pub/ruby from the initial login directory.
+    #
+    # If you want to cd to an absolute directory, you must include an
+    # escaped / (%2F) in the path. Example:
+    #
+    # <code>ftp://ftp.example.com/%2Fpub/ruby</code>
+    #
+    # This method will then return "/pub/ruby".
+    #
+    def path: () -> untyped
+
+    # Private setter for the path of the URI::FTP.
+    def set_path: (untyped v) -> untyped
+
+    # Returns a String representation of the URI::FTP.
+    def to_s: () -> untyped
+  end
+end
+
+module URI
+  #
+  # Includes URI::REGEXP::PATTERN
+  #
+  module RFC2396_REGEXP
+    #
+    # Patterns used to parse URI's
+    #
+    module PATTERN
+      # alpha         = lowalpha | upalpha
+      ALPHA: "a-zA-Z"
+
+      # alphanum      = alpha | digit
+      ALNUM: ::String
+
+      # hex           = digit | "A" | "B" | "C" | "D" | "E" | "F" |
+      #                         "a" | "b" | "c" | "d" | "e" | "f"
+      HEX: "a-fA-F\\d"
+
+      # escaped       = "%" hex hex
+      ESCAPED: ::String
+
+      # mark          = "-" | "_" | "." | "!" | "~" | "*" | "'" |
+      #                 "(" | ")"
+      # unreserved    = alphanum | mark
+      UNRESERVED: ::String
+
+      # reserved      = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
+      #                 "$" | ","
+      # reserved      = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
+      #                 "$" | "," | "[" | "]" (RFC 2732)
+      RESERVED: ";/?:@&=+$,\\[\\]"
+
+      # domainlabel   = alphanum | alphanum *( alphanum | "-" ) alphanum
+      DOMLABEL: ::String
+
+      # toplabel      = alpha | alpha *( alphanum | "-" ) alphanum
+      TOPLABEL: ::String
+
+      # hostname      = *( domainlabel "." ) toplabel [ "." ]
+      HOSTNAME: ::String
+    end
+  end
+
+  # Class that parses String's into URI's.
+  #
+  # It contains a Hash set of patterns and Regexp's that match and validate.
+  #
+  class RFC2396_Parser
+    include RFC2396_REGEXP
+
+    #
+    # == Synopsis
+    #
+    #   URI::Parser.new([opts])
+    #
+    # == Args
+    #
+    # The constructor accepts a hash as options for parser.
+    # Keys of options are pattern names of URI components
+    # and values of options are pattern strings.
+    # The constructor generates set of regexps for parsing URIs.
+    #
+    # You can use the following keys:
+    #
+    #   * :ESCAPED (URI::PATTERN::ESCAPED in default)
+    #   * :UNRESERVED (URI::PATTERN::UNRESERVED in default)
+    #   * :DOMLABEL (URI::PATTERN::DOMLABEL in default)
+    #   * :TOPLABEL (URI::PATTERN::TOPLABEL in default)
+    #   * :HOSTNAME (URI::PATTERN::HOSTNAME in default)
+    #
+    # == Examples
+    #
+    #   p = URI::Parser.new(:ESCAPED => "(?:%[a-fA-F0-9]{2}|%u[a-fA-F0-9]{4})")
+    #   u = p.parse("http://example.jp/%uABCD") #=> #<URI::HTTP http://example.jp/%uABCD>
+    #   URI.parse(u.to_s) #=> raises URI::InvalidURIError
+    #
+    #   s = "http://example.com/ABCD"
+    #   u1 = p.parse(s) #=> #<URI::HTTP http://example.com/ABCD>
+    #   u2 = URI.parse(s) #=> #<URI::HTTP http://example.com/ABCD>
+    #   u1 == u2 #=> true
+    #   u1.eql?(u2) #=> false
+    #
+    def initialize: (?::Hash[untyped, untyped] opts) -> void
+
+    # The Hash of patterns.
+    #
+    # See also URI::Parser.initialize_pattern.
+    attr_reader pattern: untyped
+
+    # The Hash of Regexp.
+    #
+    # See also URI::Parser.initialize_regexp.
+    attr_reader regexp: untyped
+
+    # Returns a split URI against +regexp[:ABS_URI]+.
+    def split: (untyped uri) -> untyped
+
+    #
+    # == Args
+    #
+    # +uri+::
+    #    String
+    #
+    # == Description
+    #
+    # Parses +uri+ and constructs either matching URI scheme object
+    # (File, FTP, HTTP, HTTPS, LDAP, LDAPS, or MailTo) or URI::Generic.
+    #
+    # == Usage
+    #
+    #   p = URI::Parser.new
+    #   p.parse("ldap://ldap.example.com/dc=example?user=john")
+    #   #=> #<URI::LDAP ldap://ldap.example.com/dc=example?user=john>
+    #
+    def parse: (untyped uri) -> untyped
+
+    #
+    # == Args
+    #
+    # +uris+::
+    #    an Array of Strings
+    #
+    # == Description
+    #
+    # Attempts to parse and merge a set of URIs.
+    #
+    def join: (*untyped uris) -> untyped
+
+    #
+    # :call-seq:
+    #   extract( str )
+    #   extract( str, schemes )
+    #   extract( str, schemes ) {|item| block }
+    #
+    # == Args
+    #
+    # +str+::
+    #    String to search
+    # +schemes+::
+    #    Patterns to apply to +str+
+    #
+    # == Description
+    #
+    # Attempts to parse and merge a set of URIs.
+    # If no +block+ given, then returns the result,
+    # else it calls +block+ for each element in result.
+    #
+    # See also URI::Parser.make_regexp.
+    #
+    def extract: (untyped str, ?untyped? schemes) { (untyped) -> untyped } -> untyped
+
+    # Returns Regexp that is default +self.regexp[:ABS_URI_REF]+,
+    # unless +schemes+ is provided. Then it is a Regexp.union with +self.pattern[:X_ABS_URI]+.
+    def make_regexp: (?untyped? schemes) -> untyped
+
+    #
+    # :call-seq:
+    #   escape( str )
+    #   escape( str, unsafe )
+    #
+    # == Args
+    #
+    # +str+::
+    #    String to make safe
+    # +unsafe+::
+    #    Regexp to apply. Defaults to +self.regexp[:UNSAFE]+
+    #
+    # == Description
+    #
+    # Constructs a safe String from +str+, removing unsafe characters,
+    # replacing them with codes.
+    #
+    def escape: (untyped str, ?untyped unsafe) -> untyped
+
+    #
+    # :call-seq:
+    #   unescape( str )
+    #   unescape( str, escaped )
+    #
+    # == Args
+    #
+    # +str+::
+    #    String to remove escapes from
+    # +escaped+::
+    #    Regexp to apply. Defaults to +self.regexp[:ESCAPED]+
+    #
+    # == Description
+    #
+    # Removes escapes from +str+.
+    #
+    def unescape: (untyped str, ?untyped escaped) -> untyped
+
+    def inspect: () -> untyped
+
+    private
+
+    # Constructs the default Hash of patterns.
+    def initialize_pattern: (?::Hash[untyped, untyped] opts) -> untyped
+
+    # Constructs the default Hash of Regexp's.
+    def initialize_regexp: (untyped pattern) -> untyped
+
+    def convert_to_uri: (untyped uri) -> untyped
+  end
+end
+
+module URI
+  # The default port for LDAPS URIs is 636, and the scheme is 'ldaps:' rather
+  # than 'ldap:'. Other than that, LDAPS URIs are identical to LDAP URIs;
+  # see URI::LDAP.
+  class LDAPS < LDAP
+    # A Default port of 636 for URI::LDAPS
+    DEFAULT_PORT: 636
+  end
+end
+
+module URI
+  #
+  # The syntax of HTTP URIs is defined in RFC1738 section 3.3.
+  #
+  # Note that the Ruby URI library allows HTTP URLs containing usernames and
+  # passwords. This is not legal as per the RFC, but used to be
+  # supported in Internet Explorer 5 and 6, before the MS04-004 security
+  # update. See <URL:http://support.microsoft.com/kb/834489>.
+  #
+  class HTTP < Generic
+    # A Default port of 80 for URI::HTTP.
+    DEFAULT_PORT: 80
+
+    # An Array of the available components for URI::HTTP.
+    COMPONENT: ::Array[:scheme | :userinfo | :host | :port | :path | :query | :fragment]
+
+    #
+    # == Description
+    #
+    # Creates a new URI::HTTP object from components, with syntax checking.
+    #
+    # The components accepted are userinfo, host, port, path, query, and
+    # fragment.
+    #
+    # The components should be provided either as an Array, or as a Hash
+    # with keys formed by preceding the component names with a colon.
+    #
+    # If an Array is used, the components must be passed in the
+    # order <code>[userinfo, host, port, path, query, fragment]</code>.
+    #
+    # Example:
+    #
+    #     uri = URI::HTTP.build(host: 'www.example.com', path: '/foo/bar')
+    #
+    #     uri = URI::HTTP.build([nil, "www.example.com", nil, "/path",
+    #       "query", 'fragment'])
+    #
+    # Currently, if passed userinfo components this method generates
+    # invalid HTTP URIs as per RFC 1738.
+    #
+    def self.build: (untyped args) -> untyped
+
+    #
+    # == Description
+    #
+    # Returns the full path for an HTTP request, as required by Net::HTTP::Get.
+    #
+    # If the URI contains a query, the full path is URI#path + '?' + URI#query.
+    # Otherwise, the path is simply URI#path.
+    #
+    # Example:
+    #
+    #     uri = URI::HTTP.build(path: '/foo/bar', query: 'test=true')
+    #     uri.request_uri #  => "/foo/bar?test=true"
+    #
+    def request_uri: () -> (nil | untyped)
+
+    #
+    # == Description
+    #
+    # Returns the authority for an HTTP uri, as defined in
+    # https://datatracker.ietf.org/doc/html/rfc3986/#section-3.2.
+    #
+    #
+    # Example:
+    #
+    #     URI::HTTP.build(host: 'www.example.com', path: '/foo/bar').authority #=> "www.example.com"
+    #     URI::HTTP.build(host: 'www.example.com', port: 8000, path: '/foo/bar').authority #=> "www.example.com:8000"
+    #     URI::HTTP.build(host: 'www.example.com', port: 80, path: '/foo/bar').authority #=> "www.example.com"
+    #
+    def authority: () -> untyped
+
+    #
+    # == Description
+    #
+    # Returns the origin for an HTTP uri, as defined in
+    # https://datatracker.ietf.org/doc/html/rfc6454.
+    #
+    #
+    # Example:
+    #
+    #     URI::HTTP.build(host: 'www.example.com', path: '/foo/bar').origin #=> "http://www.example.com"
+    #     URI::HTTP.build(host: 'www.example.com', port: 8000, path: '/foo/bar').origin #=> "http://www.example.com:8000"
+    #     URI::HTTP.build(host: 'www.example.com', port: 80, path: '/foo/bar').origin #=> "http://www.example.com"
+    #     URI::HTTPS.build(host: 'www.example.com', path: '/foo/bar').origin #=> "https://www.example.com"
+    #
+    def origin: () -> ::String
+  end
+end
+
+module URI
+  # The default port for WSS URIs is 443, and the scheme is 'wss:' rather
+  # than 'ws:'. Other than that, WSS URIs are identical to WS URIs;
+  # see URI::WS.
+  class WSS < WS
+    # A Default port of 443 for URI::WSS
+    DEFAULT_PORT: 443
+  end
+end
+
+module URI
+  #
+  # The syntax of WS URIs is defined in RFC6455 section 3.
+  #
+  # Note that the Ruby URI library allows WS URLs containing usernames and
+  # passwords. This is not legal as per the RFC, but used to be
+  # supported in Internet Explorer 5 and 6, before the MS04-004 security
+  # update. See <URL:http://support.microsoft.com/kb/834489>.
+  #
+  class WS < Generic
+    # A Default port of 80 for URI::WS.
+    DEFAULT_PORT: 80
+
+    # An Array of the available components for URI::WS.
+    COMPONENT: ::Array[:scheme | :userinfo | :host | :port | :path | :query]
+
+    #
+    # == Description
+    #
+    # Creates a new URI::WS object from components, with syntax checking.
+    #
+    # The components accepted are userinfo, host, port, path, and query.
+    #
+    # The components should be provided either as an Array, or as a Hash
+    # with keys formed by preceding the component names with a colon.
+    #
+    # If an Array is used, the components must be passed in the
+    # order <code>[userinfo, host, port, path, query]</code>.
+    #
+    # Example:
+    #
+    #     uri = URI::WS.build(host: 'www.example.com', path: '/foo/bar')
+    #
+    #     uri = URI::WS.build([nil, "www.example.com", nil, "/path", "query"])
+    #
+    # Currently, if passed userinfo components this method generates
+    # invalid WS URIs as per RFC 1738.
+    #
+    def self.build: (untyped args) -> untyped
+
+    #
+    # == Description
+    #
+    # Returns the full path for a WS URI, as required by Net::HTTP::Get.
+    #
+    # If the URI contains a query, the full path is URI#path + '?' + URI#query.
+    # Otherwise, the path is simply URI#path.
+    #
+    # Example:
+    #
+    #     uri = URI::WS.build(path: '/foo/bar', query: 'test=true')
+    #     uri.request_uri #  => "/foo/bar?test=true"
+    #
+    def request_uri: () -> (nil | untyped)
+  end
+end
+
+module URI
+  REGEXP: untyped
+
+  Parser: untyped
+
+  RFC3986_PARSER: untyped
+
+  # URI::Parser.new
+  DEFAULT_PARSER: untyped
+
+  module Util
+    # :nodoc:
+    def self?.make_components_hash: (untyped klass, untyped array_hash) -> untyped
+  end
+
+  # include REGEXP
+
+  module Schemes
+  end
+
+  def self.register_scheme: (untyped scheme, untyped klass) -> untyped
+
+  # Returns a Hash of the defined schemes.
+  def self.scheme_list: () -> untyped
+
+  INITIAL_SCHEMES: untyped
+
+  #
+  # Construct a URI instance, using the scheme to detect the appropriate class
+  # from +URI.scheme_list+.
+  #
+  def self.for: (untyped scheme, *untyped arguments, ?default: untyped default) -> untyped
+
+  #
+  # Base class for all URI exceptions.
+  #
+  class Error < StandardError
+  end
+
+  #
+  # Not a URI.
+  #
+  class InvalidURIError < Error
+  end
+
+  #
+  # Not a URI component.
+  #
+  class InvalidComponentError < Error
+  end
+
+  #
+  # URI is valid, bad usage is not.
+  #
+  class BadURIError < Error
+  end
+
+  #
+  # == Synopsis
+  #
+  #   URI::split(uri)
+  #
+  # == Args
+  #
+  # +uri+::
+  #   String with URI.
+  #
+  # == Description
+  #
+  # Splits the string on following parts and returns array with result:
+  #
+  # * Scheme
+  # * Userinfo
+  # * Host
+  # * Port
+  # * Registry
+  # * Path
+  # * Opaque
+  # * Query
+  # * Fragment
+  #
+  # == Usage
+  #
+  #   require 'uri'
+  #
+  #   URI.split("http://www.ruby-lang.org/")
+  #   # => ["http", nil, "www.ruby-lang.org", nil, nil, "/", nil, nil, nil]
+  #
+  def self.split: (untyped uri) -> untyped
+
+  #
+  # == Synopsis
+  #
+  #   URI::parse(uri_str)
+  #
+  # == Args
+  #
+  # +uri_str+::
+  #   String with URI.
+  #
+  # == Description
+  #
+  # Creates one of the URI's subclasses instance from the string.
+  #
+  # == Raises
+  #
+  # URI::InvalidURIError::
+  #   Raised if URI given is not a correct one.
+  #
+  # == Usage
+  #
+  #   require 'uri'
+  #
+  #   uri = URI.parse("http://www.ruby-lang.org/")
+  #   # => #<URI::HTTP http://www.ruby-lang.org/>
+  #   uri.scheme
+  #   # => "http"
+  #   uri.host
+  #   # => "www.ruby-lang.org"
+  #
+  # It's recommended to first ::escape the provided +uri_str+ if there are any
+  # invalid URI characters.
+  #
+  def self.parse: (untyped uri) -> untyped
+
+  #
+  # == Synopsis
+  #
+  #   URI::join(str[, str, ...])
+  #
+  # == Args
+  #
+  # +str+::
+  #   String(s) to work with, will be converted to RFC3986 URIs before merging.
+  #
+  # == Description
+  #
+  # Joins URIs.
+  #
+  # == Usage
+  #
+  #   require 'uri'
+  #
+  #   URI.join("http://example.com/","main.rbx")
+  #   # => #<URI::HTTP http://example.com/main.rbx>
+  #
+  #   URI.join('http://example.com', 'foo')
+  #   # => #<URI::HTTP http://example.com/foo>
+  #
+  #   URI.join('http://example.com', '/foo', '/bar')
+  #   # => #<URI::HTTP http://example.com/bar>
+  #
+  #   URI.join('http://example.com', '/foo', 'bar')
+  #   # => #<URI::HTTP http://example.com/bar>
+  #
+  #   URI.join('http://example.com', '/foo/', 'bar')
+  #   # => #<URI::HTTP http://example.com/foo/bar>
+  #
+  def self.join: (*untyped str) -> untyped
+
+  #
+  # == Synopsis
+  #
+  #   URI::extract(str[, schemes][,&blk])
+  #
+  # == Args
+  #
+  # +str+::
+  #   String to extract URIs from.
+  # +schemes+::
+  #   Limit URI matching to specific schemes.
+  #
+  # == Description
+  #
+  # Extracts URIs from a string. If block given, iterates through all matched URIs.
+  # Returns nil if block given or array with matches.
+  #
+  # == Usage
+  #
+  #   require "uri"
+  #
+  #   URI.extract("text here http://foo.example.org/bla and here mailto:test@example.com and here also.")
+  #   # => ["http://foo.example.com/bla", "mailto:test@example.com"]
+  #
+  def self.extract: (untyped str, ?untyped? schemes) { () -> untyped } -> untyped
+
+  #
+  # == Synopsis
+  #
+  #   URI::regexp([match_schemes])
+  #
+  # == Args
+  #
+  # +match_schemes+::
+  #   Array of schemes. If given, resulting regexp matches to URIs
+  #   whose scheme is one of the match_schemes.
+  #
+  # == Description
+  #
+  # Returns a Regexp object which matches to URI-like strings.
+  # The Regexp object returned by this method includes arbitrary
+  # number of capture group (parentheses).  Never rely on its number.
+  #
+  # == Usage
+  #
+  #   require 'uri'
+  #
+  #   # extract first URI from html_string
+  #   html_string.slice(URI.regexp)
+  #
+  #   # remove ftp URIs
+  #   html_string.sub(URI.regexp(['ftp']), '')
+  #
+  #   # You should not rely on the number of parentheses
+  #   html_string.scan(URI.regexp) do |*matches|
+  #     p $&
+  #   end
+  #
+  def self.regexp: (?untyped? schemes) -> untyped
+
+  TBLENCWWWCOMP_: ::Hash[untyped, untyped]
+
+  TBLDECWWWCOMP_: ::Hash[untyped, untyped]
+
+  # Encodes given +str+ to URL-encoded form data.
+  #
+  # This method doesn't convert *, -, ., 0-9, A-Z, _, a-z, but does convert SP
+  # (ASCII space) to + and converts others to %XX.
+  #
+  # If +enc+ is given, convert +str+ to the encoding before percent encoding.
+  #
+  # This is an implementation of
+  # https://www.w3.org/TR/2013/CR-html5-20130806/forms.html#url-encoded-form-data.
+  #
+  # See URI.decode_www_form_component, URI.encode_www_form.
+  def self.encode_www_form_component: (untyped str, ?untyped? enc) -> untyped
+
+  # Decodes given +str+ of URL-encoded form data.
+  #
+  # This decodes + to SP.
+  #
+  # See URI.encode_www_form_component, URI.decode_www_form.
+  def self.decode_www_form_component: (untyped str, ?untyped enc) -> untyped
+
+  # Generates URL-encoded form data from given +enum+.
+  #
+  # This generates application/x-www-form-urlencoded data defined in HTML5
+  # from given an Enumerable object.
+  #
+  # This internally uses URI.encode_www_form_component(str).
+  #
+  # This method doesn't convert the encoding of given items, so convert them
+  # before calling this method if you want to send data as other than original
+  # encoding or mixed encoding data. (Strings which are encoded in an HTML5
+  # ASCII incompatible encoding are converted to UTF-8.)
+  #
+  # This method doesn't handle files.  When you send a file, use
+  # multipart/form-data.
+  #
+  # This refers https://url.spec.whatwg.org/#concept-urlencoded-serializer
+  #
+  #    URI.encode_www_form([["q", "ruby"], ["lang", "en"]])
+  #    #=> "q=ruby&lang=en"
+  #    URI.encode_www_form("q" => "ruby", "lang" => "en")
+  #    #=> "q=ruby&lang=en"
+  #    URI.encode_www_form("q" => ["ruby", "perl"], "lang" => "en")
+  #    #=> "q=ruby&q=perl&lang=en"
+  #    URI.encode_www_form([["q", "ruby"], ["q", "perl"], ["lang", "en"]])
+  #    #=> "q=ruby&q=perl&lang=en"
+  #
+  # See URI.encode_www_form_component, URI.decode_www_form.
+  def self.encode_www_form: (untyped enum, ?untyped? enc) -> untyped
+
+  # Decodes URL-encoded form data from given +str+.
+  #
+  # This decodes application/x-www-form-urlencoded data
+  # and returns an array of key-value arrays.
+  #
+  # This refers http://url.spec.whatwg.org/#concept-urlencoded-parser,
+  # so this supports only &-separator, and doesn't support ;-separator.
+  #
+  #    ary = URI.decode_www_form("a=1&a=2&b=3")
+  #    ary                   #=> [['a', '1'], ['a', '2'], ['b', '3']]
+  #    ary.assoc('a').last   #=> '1'
+  #    ary.assoc('b').last   #=> '3'
+  #    ary.rassoc('a').last  #=> '2'
+  #    Hash[ary]             #=> {"a"=>"2", "b"=>"3"}
+  #
+  # See URI.decode_www_form_component, URI.encode_www_form.
+  def self.decode_www_form: (untyped str, ?untyped enc, ?separator: ::String separator, ?use__charset_: bool use__charset_, ?isindex: bool isindex) -> untyped
+
+  private
+
+  WEB_ENCODINGS_: ::Hash[::String, "utf-8" | "ibm866" | "iso-8859-2" | "iso-8859-3" | "iso-8859-4" | "iso-8859-5" | "iso-8859-6" | "iso-8859-7" | "iso-8859-8" | "iso-8859-10" | "iso-8859-13" | "iso-8859-14" | "iso-8859-15" | "iso-8859-16" | "koi8-r" | "koi8-u" | "windows-874" | "windows-1250" | "windows-1251" | "windows-1252" | "windows-1253" | "windows-1254" | "windows-1255" | "windows-1256" | "windows-1257" | "windows-1258" | "macCyrillic" | "gbk" | "gb18030" | "big5" | "cp51932" | "cp50221" | "Windows-31J" | "euc-kr" | "utf-16be" | "utf-16le"]
+
+  # :nodoc:
+  # return encoding or nil
+  # http://encoding.spec.whatwg.org/#concept-encoding-get
+  def self.get_encoding: (untyped label) -> untyped
+end
+
+module Kernel
+  #
+  # Returns +uri+ converted to an URI object.
+  #
+  def self?.URI: (untyped uri) -> untyped
+end
+
+module URI
+  #
+  # The "file" URI is defined by RFC8089.
+  #
+  class File < Generic
+    # A Default port of nil for URI::File.
+    DEFAULT_PORT: nil
+
+    #
+    # An Array of the available components for URI::File.
+    #
+    COMPONENT: ::Array[:scheme | :host | :path]
+
+    #
+    # == Description
+    #
+    # Creates a new URI::File object from components, with syntax checking.
+    #
+    # The components accepted are +host+ and +path+.
+    #
+    # The components should be provided either as an Array, or as a Hash
+    # with keys formed by preceding the component names with a colon.
+    #
+    # If an Array is used, the components must be passed in the
+    # order <code>[host, path]</code>.
+    #
+    # Examples:
+    #
+    #     require 'uri'
+    #
+    #     uri1 = URI::File.build(['host.example.com', '/path/file.zip'])
+    #     uri1.to_s  # => "file://host.example.com/path/file.zip"
+    #
+    #     uri2 = URI::File.build({:host => 'host.example.com',
+    #       :path => '/ruby/src'})
+    #     uri2.to_s  # => "file://host.example.com/ruby/src"
+    #
+    def self.build: (untyped args) -> untyped
+
+    # Protected setter for the host component +v+.
+    #
+    # See also URI::Generic.host=.
+    #
+    def set_host: (untyped v) -> untyped
+
+    # do nothing
+    def set_port: (untyped v) -> nil
+
+    # raise InvalidURIError
+    def check_userinfo: (untyped user) -> untyped
+
+    # raise InvalidURIError
+    def check_user: (untyped user) -> untyped
+
+    # raise InvalidURIError
+    def check_password: (untyped user) -> untyped
+
+    # do nothing
+    def set_userinfo: (untyped v) -> nil
+
+    # do nothing
+    def set_user: (untyped v) -> nil
+
+    # do nothing
+    def set_password: (untyped v) -> nil
+  end
+end
+
+module URI
+  #
+  # Base class for all URI classes.
+  # Implements generic URI syntax as per RFC 2396.
+  #
+  class Generic
+    include URI
+
+    #
+    # A Default port of nil for URI::Generic.
+    #
+    DEFAULT_PORT: nil
+
+    #
+    # Returns default port.
+    #
+    def self.default_port: () -> untyped
+
+    #
+    # Returns default port.
+    #
+    def default_port: () -> untyped
+
+    #
+    # An Array of the available components for URI::Generic.
+    #
+    COMPONENT: ::Array[:scheme | :userinfo | :host | :port | :registry | :path | :opaque | :query | :fragment]
+
+    #
+    # Components of the URI in the order.
+    #
+    def self.component: () -> untyped
+
+    USE_REGISTRY: false
+
+    def self.use_registry: () -> untyped
+
+    #
+    # == Synopsis
+    #
+    # See ::new.
+    #
+    # == Description
+    #
+    # At first, tries to create a new URI::Generic instance using
+    # URI::Generic::build. But, if exception URI::InvalidComponentError is raised,
+    # then it does URI::Escape.escape all URI components and tries again.
+    #
+    def self.build2: (untyped args) -> untyped
+
+    #
+    # == Synopsis
+    #
+    # See ::new.
+    #
+    # == Description
+    #
+    # Creates a new URI::Generic instance from components of URI::Generic
+    # with check.  Components are: scheme, userinfo, host, port, registry, path,
+    # opaque, query, and fragment. You can provide arguments either by an Array or a Hash.
+    # See ::new for hash keys to use or for order of array items.
+    #
+    def self.build: (untyped args) -> untyped
+
+    #
+    # == Args
+    #
+    # +scheme+::
+    #   Protocol scheme, i.e. 'http','ftp','mailto' and so on.
+    # +userinfo+::
+    #   User name and password, i.e. 'sdmitry:bla'.
+    # +host+::
+    #   Server host name.
+    # +port+::
+    #   Server port.
+    # +registry+::
+    #   Registry of naming authorities.
+    # +path+::
+    #   Path on server.
+    # +opaque+::
+    #   Opaque part.
+    # +query+::
+    #   Query data.
+    # +fragment+::
+    #   Part of the URI after '#' character.
+    # +parser+::
+    #   Parser for internal use [URI::DEFAULT_PARSER by default].
+    # +arg_check+::
+    #   Check arguments [false by default].
+    #
+    # == Description
+    #
+    # Creates a new URI::Generic instance from ``generic'' components without check.
+    #
+    def initialize: (untyped scheme, untyped userinfo, untyped host, untyped port, untyped registry, untyped path, untyped opaque, untyped query, untyped fragment, ?untyped parser, ?bool arg_check) -> void
+
+    #
+    # Returns the scheme component of the URI.
+    #
+    #   URI("http://foo/bar/baz").scheme #=> "http"
+    #
+    attr_reader scheme: untyped
+
+    # Returns the host component of the URI.
+    #
+    #   URI("http://foo/bar/baz").host #=> "foo"
+    #
+    # It returns nil if no host component exists.
+    #
+    #   URI("mailto:foo@example.org").host #=> nil
+    #
+    # The component does not contain the port number.
+    #
+    #   URI("http://foo:8080/bar/baz").host #=> "foo"
+    #
+    # Since IPv6 addresses are wrapped with brackets in URIs,
+    # this method returns IPv6 addresses wrapped with brackets.
+    # This form is not appropriate to pass to socket methods such as TCPSocket.open.
+    # If unwrapped host names are required, use the #hostname method.
+    #
+    #   URI("http://[::1]/bar/baz").host     #=> "[::1]"
+    #   URI("http://[::1]/bar/baz").hostname #=> "::1"
+    #
+    attr_reader host: untyped
+
+    # Returns the port component of the URI.
+    #
+    #   URI("http://foo/bar/baz").port      #=> 80
+    #   URI("http://foo:8080/bar/baz").port #=> 8080
+    #
+    attr_reader port: untyped
+
+    def registry: () -> nil
+
+    # Returns the path component of the URI.
+    #
+    #   URI("http://foo/bar/baz").path #=> "/bar/baz"
+    #
+    attr_reader path: untyped
+
+    # Returns the query component of the URI.
+    #
+    #   URI("http://foo/bar/baz?search=FooBar").query #=> "search=FooBar"
+    #
+    attr_reader query: untyped
+
+    # Returns the opaque part of the URI.
+    #
+    #   URI("mailto:foo@example.org").opaque #=> "foo@example.org"
+    #   URI("http://foo/bar/baz").opaque     #=> nil
+    #
+    # The portion of the path that does not make use of the slash '/'.
+    # The path typically refers to an absolute path or an opaque part.
+    # (See RFC2396 Section 3 and 5.2.)
+    #
+    attr_reader opaque: untyped
+
+    # Returns the fragment component of the URI.
+    #
+    #   URI("http://foo/bar/baz?search=FooBar#ponies").fragment #=> "ponies"
+    #
+    attr_reader fragment: untyped
+
+    # Returns the parser to be used.
+    #
+    # Unless a URI::Parser is defined, DEFAULT_PARSER is used.
+    #
+    def parser: () -> untyped
+
+    private
+
+    # Replaces self by other URI object.
+    #
+    def replace!: (untyped oth) -> untyped
+
+    public
+
+    #
+    # Components of the URI in the order.
+    #
+    def component: () -> untyped
+
+    private
+
+    #
+    # Checks the scheme +v+ component against the URI::Parser Regexp for :SCHEME.
+    #
+    def check_scheme: (untyped v) -> true
+
+    public
+
+    # Protected setter for the scheme component +v+.
+    #
+    # See also URI::Generic.scheme=.
+    #
+    def set_scheme: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the scheme component +v+
+    # (with validation).
+    #
+    # See also URI::Generic.check_scheme.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com")
+    #   uri.scheme = "https"
+    #   uri.to_s  #=> "https://my.example.com"
+    #
+    def scheme=: (untyped v) -> untyped
+
+    private
+
+    #
+    # Checks the +user+ and +password+.
+    #
+    # If +password+ is not provided, then +user+ is
+    # split, using URI::Generic.split_userinfo, to
+    # pull +user+ and +password.
+    #
+    # See also URI::Generic.check_user, URI::Generic.check_password.
+    #
+    def check_userinfo: (untyped user, ?untyped? password) -> true
+
+    #
+    # Checks the user +v+ component for RFC2396 compliance
+    # and against the URI::Parser Regexp for :USERINFO.
+    #
+    # Can not have a registry or opaque component defined,
+    # with a user component defined.
+    #
+    def check_user: (untyped v) -> (untyped | true)
+
+    #
+    # Checks the password +v+ component for RFC2396 compliance
+    # and against the URI::Parser Regexp for :USERINFO.
+    #
+    # Can not have a registry or opaque component defined,
+    # with a user component defined.
+    #
+    def check_password: (untyped v, ?untyped user) -> (untyped | true)
+
+    public
+
+    #
+    # Sets userinfo, argument is string like 'name:pass'.
+    #
+    def userinfo=: (untyped userinfo) -> (nil | untyped)
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the +user+ component
+    # (with validation).
+    #
+    # See also URI::Generic.check_user.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://john:S3nsit1ve@my.example.com")
+    #   uri.user = "sam"
+    #   uri.to_s  #=> "http://sam:V3ry_S3nsit1ve@my.example.com"
+    #
+    def user=: (untyped user) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the +password+ component
+    # (with validation).
+    #
+    # See also URI::Generic.check_password.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://john:S3nsit1ve@my.example.com")
+    #   uri.password = "V3ry_S3nsit1ve"
+    #   uri.to_s  #=> "http://john:V3ry_S3nsit1ve@my.example.com"
+    #
+    def password=: (untyped password) -> untyped
+
+    # Protected setter for the +user+ component, and +password+ if available
+    # (with validation).
+    #
+    # See also URI::Generic.userinfo=.
+    #
+    def set_userinfo: (untyped user, ?untyped? password) -> ::Array[untyped]
+
+    # Protected setter for the user component +v+.
+    #
+    # See also URI::Generic.user=.
+    #
+    def set_user: (untyped v) -> untyped
+
+    # Protected setter for the password component +v+.
+    #
+    # See also URI::Generic.password=.
+    #
+    def set_password: (untyped v) -> untyped
+
+    private
+
+    # Returns the userinfo +ui+ as <code>[user, password]</code>
+    # if properly formatted as 'user:password'.
+    def split_userinfo: (untyped ui) -> untyped
+
+    # Escapes 'user:password' +v+ based on RFC 1738 section 3.1.
+    def escape_userpass: (untyped v) -> untyped
+
+    public
+
+    # Returns the userinfo, either as 'user' or 'user:password'.
+    def userinfo: () -> untyped
+
+    # Returns the user component.
+    def user: () -> untyped
+
+    # Returns the password component.
+    def password: () -> untyped
+
+    private
+
+    #
+    # Checks the host +v+ component for RFC2396 compliance
+    # and against the URI::Parser Regexp for :HOST.
+    #
+    # Can not have a registry or opaque component defined,
+    # with a host component defined.
+    #
+    def check_host: (untyped v) -> (untyped | true)
+
+    public
+
+    # Protected setter for the host component +v+.
+    #
+    # See also URI::Generic.host=.
+    #
+    def set_host: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the host component +v+
+    # (with validation).
+    #
+    # See also URI::Generic.check_host.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com")
+    #   uri.host = "foo.com"
+    #   uri.to_s  #=> "http://foo.com"
+    #
+    def host=: (untyped v) -> untyped
+
+    # Extract the host part of the URI and unwrap brackets for IPv6 addresses.
+    #
+    # This method is the same as URI::Generic#host except
+    # brackets for IPv6 (and future IP) addresses are removed.
+    #
+    #   uri = URI("http://[::1]/bar")
+    #   uri.hostname      #=> "::1"
+    #   uri.host          #=> "[::1]"
+    #
+    def hostname: () -> untyped
+
+    # Sets the host part of the URI as the argument with brackets for IPv6 addresses.
+    #
+    # This method is the same as URI::Generic#host= except
+    # the argument can be a bare IPv6 address.
+    #
+    #   uri = URI("http://foo/bar")
+    #   uri.hostname = "::1"
+    #   uri.to_s  #=> "http://[::1]/bar"
+    #
+    # If the argument seems to be an IPv6 address,
+    # it is wrapped with brackets.
+    #
+    def hostname=: (untyped v) -> untyped
+
+    private
+
+    #
+    # Checks the port +v+ component for RFC2396 compliance
+    # and against the URI::Parser Regexp for :PORT.
+    #
+    # Can not have a registry or opaque component defined,
+    # with a port component defined.
+    #
+    def check_port: (untyped v) -> (untyped | true)
+
+    public
+
+    # Protected setter for the port component +v+.
+    #
+    # See also URI::Generic.port=.
+    #
+    def set_port: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the port component +v+
+    # (with validation).
+    #
+    # See also URI::Generic.check_port.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com")
+    #   uri.port = 8080
+    #   uri.to_s  #=> "http://my.example.com:8080"
+    #
+    def port=: (untyped v) -> untyped
+
+    private
+
+    def check_registry: (untyped v) -> untyped
+
+    public
+
+    def set_registry: (untyped v) -> untyped
+
+    def registry=: (untyped v) -> untyped
+
+    private
+
+    #
+    # Checks the path +v+ component for RFC2396 compliance
+    # and against the URI::Parser Regexp
+    # for :ABS_PATH and :REL_PATH.
+    #
+    # Can not have a opaque component defined,
+    # with a path component defined.
+    #
+    def check_path: (untyped v) -> true
+
+    public
+
+    # Protected setter for the path component +v+.
+    #
+    # See also URI::Generic.path=.
+    #
+    def set_path: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the path component +v+
+    # (with validation).
+    #
+    # See also URI::Generic.check_path.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com/pub/files")
+    #   uri.path = "/faq/"
+    #   uri.to_s  #=> "http://my.example.com/faq/"
+    #
+    def path=: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the query component +v+.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com/?id=25")
+    #   uri.query = "id=1"
+    #   uri.to_s  #=> "http://my.example.com/?id=1"
+    #
+    def query=: (untyped v) -> untyped
+
+    private
+
+    #
+    # Checks the opaque +v+ component for RFC2396 compliance and
+    # against the URI::Parser Regexp for :OPAQUE.
+    #
+    # Can not have a host, port, user, or path component defined,
+    # with an opaque component defined.
+    #
+    def check_opaque: (untyped v) -> (untyped | true)
+
+    public
+
+    # Protected setter for the opaque component +v+.
+    #
+    # See also URI::Generic.opaque=.
+    #
+    def set_opaque: (untyped v) -> untyped
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the opaque component +v+
+    # (with validation).
+    #
+    # See also URI::Generic.check_opaque.
+    #
+    def opaque=: (untyped v) -> untyped
+
+    #
+    # Checks the fragment +v+ component against the URI::Parser Regexp for :FRAGMENT.
+    #
+    #
+    # == Args
+    #
+    # +v+::
+    #    String
+    #
+    # == Description
+    #
+    # Public setter for the fragment component +v+
+    # (with validation).
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com/?id=25#time=1305212049")
+    #   uri.fragment = "time=1305212086"
+    #   uri.to_s  #=> "http://my.example.com/?id=25#time=1305212086"
+    #
+    def fragment=: (untyped v) -> untyped
+
+    #
+    # Returns true if URI is hierarchical.
+    #
+    # == Description
+    #
+    # URI has components listed in order of decreasing significance from left to right,
+    # see RFC3986 https://tools.ietf.org/html/rfc3986 1.2.3.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com/")
+    #   uri.hierarchical?
+    #   #=> true
+    #   uri = URI.parse("mailto:joe@example.com")
+    #   uri.hierarchical?
+    #   #=> false
+    #
+    def hierarchical?: () -> untyped
+
+    #
+    # Returns true if URI has a scheme (e.g. http:// or https://) specified.
+    #
+    def absolute?: () -> untyped
+
+    alias absolute absolute?
+
+    #
+    # Returns true if URI does not have a scheme (e.g. http:// or https://) specified.
+    #
+    def relative?: () -> untyped
+
+    private
+
+    #
+    # Returns an Array of the path split on '/'.
+    #
+    def split_path: (untyped path) -> untyped
+
+    #
+    # Merges a base path +base+, with relative path +rel+,
+    # returns a modified base path.
+    #
+    def merge_path: (untyped base, untyped rel) -> untyped
+
+    public
+
+    #
+    # == Args
+    #
+    # +oth+::
+    #    URI or String
+    #
+    # == Description
+    #
+    # Destructive form of #merge.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com")
+    #   uri.merge!("/main.rbx?page=1")
+    #   uri.to_s  # => "http://my.example.com/main.rbx?page=1"
+    #
+    def merge!: (untyped oth) -> untyped
+
+    #
+    # == Args
+    #
+    # +oth+::
+    #    URI or String
+    #
+    # == Description
+    #
+    # Merges two URIs.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com")
+    #   uri.merge("/main.rbx?page=1")
+    #   # => "http://my.example.com/main.rbx?page=1"
+    #
+    def merge: (untyped oth) -> untyped
+
+    # merge
+    alias + merge
+
+    private
+
+    # :stopdoc:
+    def route_from_path: (untyped src, untyped dst) -> (::String | untyped | "./")
+
+    # :stopdoc:
+    def route_from0: (untyped oth) -> untyped
+
+    public
+
+    #
+    # == Args
+    #
+    # +oth+::
+    #    URI or String
+    #
+    # == Description
+    #
+    # Calculates relative path from oth to self.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse('http://my.example.com/main.rbx?page=1')
+    #   uri.route_from('http://my.example.com')
+    #   #=> #<URI::Generic /main.rbx?page=1>
+    #
+    def route_from: (untyped oth) -> untyped
+
+    alias - route_from
+
+    #
+    # == Args
+    #
+    # +oth+::
+    #    URI or String
+    #
+    # == Description
+    #
+    # Calculates relative path to oth from self.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse('http://my.example.com')
+    #   uri.route_to('http://my.example.com/main.rbx?page=1')
+    #   #=> #<URI::Generic /main.rbx?page=1>
+    #
+    def route_to: (untyped oth) -> untyped
+
+    #
+    # Returns normalized URI.
+    #
+    #   require 'uri'
+    #
+    #   URI("HTTP://my.EXAMPLE.com").normalize
+    #   #=> #<URI::HTTP http://my.example.com/>
+    #
+    # Normalization here means:
+    #
+    # * scheme and host are converted to lowercase,
+    # * an empty path component is set to "/".
+    #
+    def normalize: () -> untyped
+
+    #
+    # Destructive version of #normalize.
+    #
+    def normalize!: () -> untyped
+
+    #
+    # Constructs String from URI.
+    #
+    def to_s: () -> untyped
+
+    #
+    # Compares two URIs.
+    #
+    def ==: (untyped oth) -> untyped
+
+    def hash: () -> untyped
+
+    def eql?: (untyped oth) -> untyped
+
+    # Returns an Array of the components defined from the COMPONENT Array.
+    def component_ary: () -> untyped
+
+    # == Args
+    #
+    # +components+::
+    #    Multiple Symbol arguments defined in URI::HTTP.
+    #
+    # == Description
+    #
+    # Selects specified components from URI.
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse('http://myuser:mypass@my.example.com/test.rbx')
+    #   uri.select(:userinfo, :host, :path)
+    #   # => ["myuser:mypass", "my.example.com", "/test.rbx"]
+    #
+    def select: (*untyped components) -> untyped
+
+    def inspect: () -> ::String
+
+    #
+    # == Args
+    #
+    # +v+::
+    #    URI or String
+    #
+    # == Description
+    #
+    # Attempts to parse other URI +oth+,
+    # returns [parsed_oth, self].
+    #
+    # == Usage
+    #
+    #   require 'uri'
+    #
+    #   uri = URI.parse("http://my.example.com")
+    #   uri.coerce("http://foo.com")
+    #   #=> [#<URI::HTTP http://foo.com>, #<URI::HTTP http://my.example.com>]
+    #
+    def coerce: (untyped oth) -> untyped
+
+    # Returns a proxy URI.
+    # The proxy URI is obtained from environment variables such as http_proxy,
+    # ftp_proxy, no_proxy, etc.
+    # If there is no proper proxy, nil is returned.
+    #
+    # If the optional parameter +env+ is specified, it is used instead of ENV.
+    #
+    # Note that capitalized variables (HTTP_PROXY, FTP_PROXY, NO_PROXY, etc.)
+    # are examined, too.
+    #
+    # But http_proxy and HTTP_PROXY is treated specially under CGI environment.
+    # It's because HTTP_PROXY may be set by Proxy: header.
+    # So HTTP_PROXY is not used.
+    # http_proxy is not used too if the variable is case insensitive.
+    # CGI_HTTP_PROXY can be used instead.
+    def find_proxy: (?untyped env) -> (nil | untyped)
+
+    def self.use_proxy?: (untyped hostname, untyped addr, untyped port, untyped no_proxy) -> (false | true)
+  end
+end
+
+module URI
+  # :stopdoc:
+  VERSION_CODE: "001100"
+
+  VERSION: untyped
+end
+
+module URI
+  #
+  # LDAP URI SCHEMA (described in RFC2255).
+  # -
+  # ldap://<host>/<dn>[?<attrs>[?<scope>[?<filter>[?<extensions>]]]]
+  # +
+  class LDAP < Generic
+    # A Default port of 389 for URI::LDAP.
+    DEFAULT_PORT: 389
+
+    # An Array of the available components for URI::LDAP.
+    COMPONENT: ::Array[:scheme | :host | :port | :dn | :attributes | :scope | :filter | :extensions]
+
+    # Scopes available for the starting point.
+    #
+    # * SCOPE_BASE - the Base DN
+    # * SCOPE_ONE  - one level under the Base DN, not including the base DN and
+    #   not including any entries under this
+    # * SCOPE_SUB  - subtrees, all entries at all levels
+    #
+    SCOPE: ::Array[untyped]
+
+    #
+    # == Description
+    #
+    # Creates a new URI::LDAP object from components, with syntax checking.
+    #
+    # The components accepted are host, port, dn, attributes,
+    # scope, filter, and extensions.
+    #
+    # The components should be provided either as an Array, or as a Hash
+    # with keys formed by preceding the component names with a colon.
+    #
+    # If an Array is used, the components must be passed in the
+    # order <code>[host, port, dn, attributes, scope, filter, extensions]</code>.
+    #
+    # Example:
+    #
+    #     uri = URI::LDAP.build({:host => 'ldap.example.com',
+    #       :dn => '/dc=example'})
+    #
+    #     uri = URI::LDAP.build(["ldap.example.com", nil,
+    #       "/dc=example;dc=com", "query", nil, nil, nil])
+    #
+    def self.build: (untyped args) -> untyped
+
+    #
+    # == Description
+    #
+    # Creates a new URI::LDAP object from generic URI components as per
+    # RFC 2396. No LDAP-specific syntax checking is performed.
+    #
+    # Arguments are +scheme+, +userinfo+, +host+, +port+, +registry+, +path+,
+    # +opaque+, +query+, and +fragment+, in that order.
+    #
+    # Example:
+    #
+    #     uri = URI::LDAP.new("ldap", nil, "ldap.example.com", nil, nil,
+    #       "/dc=example;dc=com", nil, "query", nil)
+    #
+    # See also URI::Generic.new.
+    #
+    def initialize: (*untyped arg) -> void
+
+    private
+
+    # Private method to cleanup +dn+ from using the +path+ component attribute.
+    def parse_dn: () -> untyped
+
+    # Private method to cleanup +attributes+, +scope+, +filter+, and +extensions+
+    # from using the +query+ component attribute.
+    def parse_query: () -> untyped
+
+    # Private method to assemble +query+ from +attributes+, +scope+, +filter+, and +extensions+.
+    def build_path_query: () -> untyped
+
+    public
+
+    # Returns dn.
+    def dn: () -> untyped
+
+    # Private setter for dn +val+.
+    def set_dn: (untyped val) -> untyped
+
+    # Setter for dn +val+.
+    def dn=: (untyped val) -> untyped
+
+    # Returns attributes.
+    def attributes: () -> untyped
+
+    # Private setter for attributes +val+.
+    def set_attributes: (untyped val) -> untyped
+
+    # Setter for attributes +val+.
+    def attributes=: (untyped val) -> untyped
+
+    # Returns scope.
+    def scope: () -> untyped
+
+    # Private setter for scope +val+.
+    def set_scope: (untyped val) -> untyped
+
+    # Setter for scope +val+.
+    def scope=: (untyped val) -> untyped
+
+    # Returns filter.
+    def filter: () -> untyped
+
+    # Private setter for filter +val+.
+    def set_filter: (untyped val) -> untyped
+
+    # Setter for filter +val+.
+    def filter=: (untyped val) -> untyped
+
+    # Returns extensions.
+    def extensions: () -> untyped
+
+    # Private setter for extensions +val+.
+    def set_extensions: (untyped val) -> untyped
+
+    # Setter for extensions +val+.
+    def extensions=: (untyped val) -> untyped
+
+    # Checks if URI has a path.
+    # For URI::LDAP this will return +false+.
+    def hierarchical?: () -> false
+  end
+end
+
+module URI
+  # The default port for HTTPS URIs is 443, and the scheme is 'https:' rather
+  # than 'http:'. Other than that, HTTPS URIs are identical to HTTP URIs;
+  # see URI::HTTP.
+  class HTTPS < HTTP
+    # A Default port of 443 for URI::HTTPS
+    DEFAULT_PORT: 443
+  end
+end
+
+# frozen_string_literal: false
+module URI
+  class RFC3986_Parser
+    # :nodoc:
+    # URI defined in RFC3986
+    # this regexp is modified not to host is not empty string
+    RFC3986_URI: ::Regexp
+
+    RFC3986_relative_ref: ::Regexp
+
+    attr_reader regexp: untyped
+
+    def initialize: () -> void
+
+    def split: (untyped uri) -> untyped
+
+    def parse: (untyped uri) -> untyped
+
+    def join: (*untyped uris) -> untyped
+
+    def inspect: () -> untyped
+
+    private
+
+    def default_regexp: () -> { SCHEME: ::Regexp, USERINFO: ::Regexp, HOST: ::Regexp, ABS_PATH: ::Regexp, REL_PATH: ::Regexp, QUERY: ::Regexp, FRAGMENT: ::Regexp, OPAQUE: ::Regexp, PORT: ::Regexp }
+
+    def convert_to_uri: (untyped uri) -> untyped
+  end
+end
