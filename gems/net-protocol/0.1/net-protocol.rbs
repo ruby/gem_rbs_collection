@@ -1,0 +1,182 @@
+module Net
+  class Protocol
+    # nodoc: internal use only
+    VERSION: "0.1.3"
+
+    private
+
+    def self.protocol_param: (untyped name, untyped val) -> untyped
+
+    def ssl_socket_connect: (untyped s, untyped timeout) -> untyped
+  end
+
+  class ProtocolError < StandardError
+  end
+
+  class ProtoSyntaxError < ProtocolError
+  end
+
+  class ProtoFatalError < ProtocolError
+  end
+
+  class ProtoUnknownError < ProtocolError
+  end
+
+  class ProtoServerError < ProtocolError
+  end
+
+  class ProtoAuthError < ProtocolError
+  end
+
+  class ProtoCommandError < ProtocolError
+  end
+
+  class ProtoRetriableError < ProtocolError
+  end
+
+  ProtocRetryError: untyped
+
+  class OpenTimeout < Timeout::Error
+  end
+
+  class ReadTimeout < Timeout::Error
+    def initialize: (?untyped? io) -> void
+
+    attr_reader io: untyped
+
+    def message: () -> untyped
+  end
+
+  class WriteTimeout < Timeout::Error
+    def initialize: (?untyped? io) -> void
+
+    attr_reader io: untyped
+
+    def message: () -> untyped
+  end
+
+  class BufferedIO
+    # nodoc: internal use only
+    def initialize: (untyped io, ?read_timeout: ::Integer read_timeout, ?write_timeout: ::Integer write_timeout, ?continue_timeout: untyped? continue_timeout, ?debug_output: untyped? debug_output) -> void
+
+    attr_reader io: untyped
+
+    attr_accessor read_timeout: untyped
+
+    attr_accessor write_timeout: untyped
+
+    attr_accessor continue_timeout: untyped
+
+    attr_accessor debug_output: untyped
+
+    def inspect: () -> ::String
+
+    def eof?: () -> untyped
+
+    def closed?: () -> untyped
+
+    def close: () -> untyped
+
+    def read: (untyped len, ?untyped dest, ?bool ignore_eof) -> untyped
+
+    def read_all: (?untyped dest) -> untyped
+
+    def readuntil: (untyped terminator, ?bool ignore_eof) -> untyped
+
+    def readline: () -> untyped
+
+    private
+
+    BUFSIZE: untyped
+
+    def rbuf_fill: () -> (nil | untyped)
+
+    def rbuf_consume: (untyped len) -> untyped
+
+    public
+
+    def write: (*untyped strs) -> untyped
+
+    alias << write
+
+    def writeline: (untyped str) -> untyped
+
+    private
+
+    def writing: () { () -> untyped } -> untyped
+
+    def write0: (*untyped strs) -> untyped
+
+    def LOG_off: () -> untyped
+
+    def LOG_on: () -> untyped
+
+    def LOG: (untyped msg) -> (nil | untyped)
+  end
+
+  class InternetMessageIO < BufferedIO
+    # nodoc: internal use only
+    def initialize: () -> void
+
+    def each_message_chunk: () { (untyped) -> untyped } -> untyped
+
+    # *library private* (cannot handle 'break')
+    def each_list_item: () { (untyped) -> untyped } -> untyped
+
+    def write_message_0: (untyped src) -> untyped
+
+    def write_message: (untyped src) -> untyped
+
+    def write_message_by_block: () { () -> untyped } -> untyped
+
+    private
+
+    def dot_stuff: (untyped s) -> untyped
+
+    def using_each_crlf_line: () { () -> untyped } -> untyped
+
+    def each_crlf_line: (untyped src) { (untyped) -> untyped } -> untyped
+
+    def buffer_filling: (untyped buf, untyped src) { () -> untyped } -> untyped
+  end
+
+  #
+  # The writer adapter class
+  #
+  class WriteAdapter
+    def initialize: (untyped writer) -> void
+
+    def inspect: () -> ::String
+
+    def write: (untyped str) -> untyped
+
+    alias print write
+
+    def <<: (untyped str) -> untyped
+
+    def puts: (?::String str) -> untyped
+
+    def printf: (*untyped args) -> untyped
+  end
+
+  class ReadAdapter
+    # nodoc: internal use only
+    def initialize: (untyped block) -> void
+
+    def inspect: () -> ::String
+
+    def <<: (untyped str) -> untyped
+
+    private
+
+    # This method is needed because @block must be called by yield,
+    # not Proc#call.  You can see difference when using `break' in
+    # the block.
+    def call_block: (untyped str) { (untyped) -> untyped } -> untyped
+  end
+
+  module NetPrivate
+    # nodoc: obsolete
+    Socket: untyped
+  end
+end
