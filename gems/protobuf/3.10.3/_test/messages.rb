@@ -1,23 +1,4 @@
 module Messages
-  ::Protobuf::Optionable.inject(self) { ::Google::Protobuf::FileOptions }
-
-  class User < Protobuf::Message; end
-  class Address < Protobuf::Message; end
-
-  class User
-    optional :string, :first_name, 1
-    optional :string, :last_name, 2
-    optional ::Messages::Address, :address, 3
-    optional :bool, :is_active, 4
-  end
-
-  class Address
-    optional :string, :street, 1
-    optional :string, :city, 2
-    optional ::Enum::States, :state, 3
-    optional :int32, :zip_code, 4
-  end
-
   user = User.new
 
   user.field?(:first_name)

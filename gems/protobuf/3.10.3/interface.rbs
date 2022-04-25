@@ -1,0 +1,22 @@
+module Protobuf
+  # An interface with `#to_proto` method which returns a protobuf message object.
+  interface _ToProto[M < Message]
+    def to_proto: () -> M
+  end
+
+  # An interface with `#to_hash` method which returns a hash compatible convertible to a message object.
+  #
+  interface _ToHash[H < Hash[untyped, untyped]]
+    def to_hash: () -> H
+  end
+
+  # `FieldArray` of base type.
+  # `Message` or `Enum` types shouldn't use this.
+  #
+  type field_array[T] = Field::FieldArray[T, T]
+
+  # `FieldHash` of base type.
+  # `Message` or `Enum` types shouldn't use this.
+  #
+  type field_hash[K, V] = Field::FieldHash[K, V, V]
+end
