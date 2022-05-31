@@ -318,8 +318,10 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
           | () { (Model) -> boolish } -> Model?
   def first: () -> Model?
            | (Integer count) -> Array[Model]
+  def first!: () -> Model
   def last: () -> Model?
            | (Integer count) -> Array[Model]
+  def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
   def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
@@ -364,8 +366,10 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
           | (*PrimaryKey) -> Array[Model]
   def first: () -> Model?
            | (Integer count) -> Array[Model]
+  def first!: () -> Model
   def last: () -> Model?
            | (Integer count) -> Array[Model]
+  def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (self) -> void } -> nil
