@@ -189,3 +189,18 @@ end
 class BigDecimal
   prepend ActiveSupport::NumericWithFormat
 end
+
+module ActiveSupport
+  module Tryable : BasicObject
+    def try: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> untyped
+
+    def try!: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> untyped
+  end
+end
+
+class NilClass
+  def try: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> nil
+
+  def try!: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> nil
+end
+
