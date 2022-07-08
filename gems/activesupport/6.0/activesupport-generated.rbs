@@ -4948,40 +4948,12 @@ class Hash[unchecked out K, unchecked out V]
   alias to_param to_query
 end
 
-module ActiveSupport
-  module Tryable : BasicObject
-    # nodoc:
-    def try: (?untyped? method_name, *untyped args) { (untyped) -> untyped } -> untyped
-
-    def try!: (?untyped? method_name, *untyped args) { (untyped) -> untyped } -> untyped
-  end
-end
-
 class Object
   include ActiveSupport::Tryable
 end
 
 class Delegator
   include ActiveSupport::Tryable
-end
-
-class NilClass
-  # Calling +try+ on +nil+ always returns +nil+.
-  # It becomes especially helpful when navigating through associations that may return +nil+.
-  #
-  #   nil.try(:name) # => nil
-  #
-  # Without +try+
-  #   @person && @person.children.any? && @person.children.first.name
-  #
-  # With +try+
-  #   @person.try(:children).try(:first).try(:name)
-  def try: (?untyped? method_name, *untyped args) -> nil
-
-  # Calling +try!+ on +nil+ always returns +nil+.
-  #
-  #   nil.try!(:name) # => nil
-  def try!: (?untyped? method_name, *untyped args) -> nil
 end
 
 class Object
