@@ -192,15 +192,24 @@ end
 
 module ActiveSupport
   module Tryable : BasicObject
-    def try: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> untyped
+    def try: [T] () { (self) -> T } -> T # When yield self
+           | [T] () { () -> T } -> T # When instance_eval
+           | (Object::name method_name, *untyped args) ?{ (*untyped) -> untyped } -> untyped
 
-    def try!: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> untyped
+    def try!: [T] () { (self) -> T } -> T # When yield self
+            | [T] () { () -> T } -> T # When instance_eval
+            | (Object::name method_name, *untyped args) ?{ (*untyped) -> untyped } -> untyped
   end
 end
 
 class NilClass
-  def try: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> nil
+    def try: () { (untyped) -> untyped } -> nil
+           | () { () -> untyped } -> nil
+           | (Object::name method_name, *untyped args) ?{ (*untyped) -> untyped } -> nil
 
-  def try!: (?Symbol method_name, *untyped args) ?{ (*untyped) -> untyped } -> nil
+    def try!: () { (untyped) -> untyped } -> nil
+            | () { () -> untyped } -> nil
+            | (Object::name method_name, *untyped args) ?{ (*untyped) -> untyped } -> nil
+
 end
 
