@@ -6,6 +6,8 @@ redis.set("mykey", "hello world")
 redis.get("mykey")
 # => "hello world"
 
-Redis.current.set(:mykey, 'hello world')
+redis.set(:other_key, 'hello world')
+# => "OK"
 
-Redis.current.get(:mykey)
+redis.get(:other_key)
+# => "hello world"
