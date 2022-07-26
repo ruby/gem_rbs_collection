@@ -88,6 +88,11 @@ module Aws
       type add_ipam_operating_region_set = ::Array[add_ipam_operating_region]
       type add_prefix_list_entries = ::Array[add_prefix_list_entry]
       type add_prefix_list_entry = { cidr: string, description: string? }
+      class AdditionalDetail
+        attr_accessor additional_detail_type: string
+        attr_accessor component: AnalysisComponent
+      end
+      type additional_detail_list = ::Array[AdditionalDetail]
       class Address
         attr_accessor instance_id: string
         attr_accessor public_ip: string
@@ -131,7 +136,7 @@ module Aws
         attr_accessor customer_owned_ipv_4_pool: string
         attr_accessor carrier_ip: string
       end
-      type allocate_hosts_request = { auto_placement: auto_placement?, availability_zone: string, client_token: string?, instance_type: string?, instance_family: string?, quantity: integer, tag_specifications: tag_specification_list_input?, host_recovery: host_recovery? }
+      type allocate_hosts_request = { auto_placement: auto_placement?, availability_zone: string, client_token: string?, instance_type: string?, instance_family: string?, quantity: integer, tag_specifications: tag_specification_list_input?, host_recovery: host_recovery?, outpost_arn: string? }
       class AllocateHostsResult
         attr_accessor host_ids: response_host_id_list
       end
@@ -270,6 +275,10 @@ module Aws
       type associate_transit_gateway_multicast_domain_request = { transit_gateway_multicast_domain_id: transit_gateway_multicast_domain_id?, transit_gateway_attachment_id: transit_gateway_attachment_id?, subnet_ids: transit_gateway_subnet_id_list?, dry_run: boolean? }
       class AssociateTransitGatewayMulticastDomainResult
         attr_accessor associations: TransitGatewayMulticastDomainAssociations
+      end
+      type associate_transit_gateway_policy_table_request = { transit_gateway_policy_table_id: transit_gateway_policy_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id, dry_run: boolean? }
+      class AssociateTransitGatewayPolicyTableResult
+        attr_accessor association: TransitGatewayPolicyTableAssociation
       end
       type associate_transit_gateway_route_table_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id, dry_run: boolean? }
       class AssociateTransitGatewayRouteTableResult
@@ -742,14 +751,14 @@ module Aws
       end
       type coip_address_usage_set = ::Array[CoipAddressUsage]
       class CoipPool
-        attr_accessor pool_id: coip_pool_id
+        attr_accessor pool_id: ipv_4_pool_coip_id
         attr_accessor pool_cidrs: value_string_list
         attr_accessor local_gateway_route_table_id: local_gateway_routetable_id
         attr_accessor tags: tag_list_output
         attr_accessor pool_arn: resource_arn
       end
       type coip_pool_id = ::String
-      type coip_pool_id_set = ::Array[coip_pool_id]
+      type coip_pool_id_set = ::Array[ipv_4_pool_coip_id]
       type coip_pool_max_results = ::Integer
       type coip_pool_set = ::Array[CoipPool]
       type confirm_product_instance_request = { instance_id: instance_id, product_code: string, dry_run: boolean? }
@@ -847,7 +856,7 @@ module Aws
       class CreateClientVpnRouteResult
         attr_accessor status: ClientVpnRouteStatus
       end
-      type create_customer_gateway_request = { bgp_asn: integer, public_ip: string?, certificate_arn: string?, type: gateway_type, tag_specifications: tag_specification_list_input?, device_name: string?, dry_run: boolean? }
+      type create_customer_gateway_request = { bgp_asn: integer, public_ip: string?, certificate_arn: string?, type: gateway_type, tag_specifications: tag_specification_list_input?, device_name: string?, ip_address: string?, dry_run: boolean? }
       class CreateCustomerGatewayResult
         attr_accessor customer_gateway: CustomerGateway
       end
@@ -889,7 +898,7 @@ module Aws
         attr_accessor errors: create_fleet_errors_set
         attr_accessor instances: create_fleet_instances_set
       end
-      type create_flow_logs_request = { dry_run: boolean?, client_token: string?, deliver_logs_permission_arn: string?, log_group_name: string?, resource_ids: flow_log_resource_ids, resource_type: flow_logs_resource_type, traffic_type: traffic_type, log_destination_type: log_destination_type?, log_destination: string?, log_format: string?, tag_specifications: tag_specification_list_input?, max_aggregation_interval: integer?, destination_options: destination_options_request? }
+      type create_flow_logs_request = { dry_run: boolean?, client_token: string?, deliver_logs_permission_arn: string?, log_group_name: string?, resource_ids: flow_log_resource_ids, resource_type: flow_logs_resource_type, traffic_type: traffic_type?, log_destination_type: log_destination_type?, log_destination: string?, log_format: string?, tag_specifications: tag_specification_list_input?, max_aggregation_interval: integer?, destination_options: destination_options_request? }
       class CreateFlowLogsResult
         attr_accessor client_token: string
         attr_accessor flow_log_ids: value_string_list
@@ -916,7 +925,7 @@ module Aws
       class CreateInternetGatewayResult
         attr_accessor internet_gateway: InternetGateway
       end
-      type create_ipam_pool_request = { dry_run: boolean?, ipam_scope_id: ipam_scope_id, locale: string?, source_ipam_pool_id: ipam_pool_id?, description: string?, address_family: address_family?, auto_import: boolean?, publicly_advertisable: boolean?, allocation_min_netmask_length: ipam_netmask_length?, allocation_max_netmask_length: ipam_netmask_length?, allocation_default_netmask_length: ipam_netmask_length?, allocation_resource_tags: request_ipam_resource_tag_list_input?, tag_specifications: tag_specification_list_input?, client_token: string?, aws_service: ipam_pool_aws_service? }
+      type create_ipam_pool_request = { dry_run: boolean?, ipam_scope_id: ipam_scope_id, locale: string?, source_ipam_pool_id: ipam_pool_id?, description: string?, address_family: address_family, auto_import: boolean?, publicly_advertisable: boolean?, allocation_min_netmask_length: ipam_netmask_length?, allocation_max_netmask_length: ipam_netmask_length?, allocation_default_netmask_length: ipam_netmask_length?, allocation_resource_tags: request_ipam_resource_tag_list_input?, tag_specifications: tag_specification_list_input?, client_token: string?, aws_service: ipam_pool_aws_service? }
       class CreateIpamPoolResult
         attr_accessor ipam_pool: IpamPool
       end
@@ -928,7 +937,7 @@ module Aws
       class CreateIpamScopeResult
         attr_accessor ipam_scope: IpamScope
       end
-      type create_key_pair_request = { key_name: string, dry_run: boolean?, key_type: key_type?, tag_specifications: tag_specification_list_input? }
+      type create_key_pair_request = { key_name: string, dry_run: boolean?, key_type: key_type?, tag_specifications: tag_specification_list_input?, key_format: key_format? }
       type create_launch_template_request = { dry_run: boolean?, client_token: string?, launch_template_name: launch_template_name, version_description: version_description?, launch_template_data: request_launch_template_data, tag_specifications: tag_specification_list_input? }
       class CreateLaunchTemplateResult
         attr_accessor launch_template: LaunchTemplate
@@ -979,7 +988,7 @@ module Aws
         attr_accessor network_interface: NetworkInterface
         attr_accessor client_token: string
       end
-      type create_placement_group_request = { dry_run: boolean?, group_name: string?, strategy: placement_strategy?, partition_count: integer?, tag_specifications: tag_specification_list_input? }
+      type create_placement_group_request = { dry_run: boolean?, group_name: string?, strategy: placement_strategy?, partition_count: integer?, tag_specifications: tag_specification_list_input?, spread_level: spread_level? }
       class CreatePlacementGroupResult
         attr_accessor placement_group: PlacementGroup
       end
@@ -1025,7 +1034,7 @@ module Aws
       class CreateStoreImageTaskResult
         attr_accessor object_key: string
       end
-      type create_subnet_cidr_reservation_request = { tag_specifications: tag_specification_list_input?, subnet_id: subnet_id, cidr: string, reservation_type: subnet_cidr_reservation_type, description: string?, dry_run: boolean? }
+      type create_subnet_cidr_reservation_request = { subnet_id: subnet_id, cidr: string, reservation_type: subnet_cidr_reservation_type, description: string?, dry_run: boolean?, tag_specifications: tag_specification_list_input? }
       class CreateSubnetCidrReservationResult
         attr_accessor subnet_cidr_reservation: SubnetCidrReservation
       end
@@ -1049,7 +1058,7 @@ module Aws
         attr_accessor traffic_mirror_session: TrafficMirrorSession
         attr_accessor client_token: string
       end
-      type create_traffic_mirror_target_request = { network_interface_id: network_interface_id?, network_load_balancer_arn: string?, description: string?, tag_specifications: tag_specification_list_input?, dry_run: boolean?, client_token: string? }
+      type create_traffic_mirror_target_request = { network_interface_id: network_interface_id?, network_load_balancer_arn: string?, description: string?, tag_specifications: tag_specification_list_input?, dry_run: boolean?, client_token: string?, gateway_load_balancer_endpoint_id: vpc_endpoint_id? }
       class CreateTrafficMirrorTargetResult
         attr_accessor traffic_mirror_target: TrafficMirrorTarget
         attr_accessor client_token: string
@@ -1068,9 +1077,14 @@ module Aws
       class CreateTransitGatewayMulticastDomainResult
         attr_accessor transit_gateway_multicast_domain: TransitGatewayMulticastDomain
       end
-      type create_transit_gateway_peering_attachment_request = { transit_gateway_id: transit_gateway_id, peer_transit_gateway_id: transit_association_gateway_id, peer_account_id: string, peer_region: string, tag_specifications: tag_specification_list_input?, dry_run: boolean? }
+      type create_transit_gateway_peering_attachment_request = { transit_gateway_id: transit_gateway_id, peer_transit_gateway_id: transit_association_gateway_id, peer_account_id: string, peer_region: string, options: create_transit_gateway_peering_attachment_request_options?, tag_specifications: tag_specification_list_input?, dry_run: boolean? }
+      type create_transit_gateway_peering_attachment_request_options = { dynamic_routing: dynamic_routing_value? }
       class CreateTransitGatewayPeeringAttachmentResult
         attr_accessor transit_gateway_peering_attachment: TransitGatewayPeeringAttachment
+      end
+      type create_transit_gateway_policy_table_request = { transit_gateway_id: transit_gateway_id, tag_specifications: tag_specification_list_input?, dry_run: boolean? }
+      class CreateTransitGatewayPolicyTableResult
+        attr_accessor transit_gateway_policy_table: TransitGatewayPolicyTable
       end
       type create_transit_gateway_prefix_list_reference_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, prefix_list_id: prefix_list_resource_id, transit_gateway_attachment_id: transit_gateway_attachment_id?, blackhole: boolean?, dry_run: boolean? }
       class CreateTransitGatewayPrefixListReferenceResult
@@ -1083,6 +1097,10 @@ module Aws
       type create_transit_gateway_route_request = { destination_cidr_block: string, transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id?, blackhole: boolean?, dry_run: boolean? }
       class CreateTransitGatewayRouteResult
         attr_accessor route: TransitGatewayRoute
+      end
+      type create_transit_gateway_route_table_announcement_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, peering_attachment_id: transit_gateway_attachment_id, tag_specifications: tag_specification_list_input?, dry_run: boolean? }
+      class CreateTransitGatewayRouteTableAnnouncementResult
+        attr_accessor transit_gateway_route_table_announcement: TransitGatewayRouteTableAnnouncement
       end
       type create_transit_gateway_route_table_request = { transit_gateway_id: transit_gateway_id, tag_specifications: tag_specification_list_input?, dry_run: boolean? }
       class CreateTransitGatewayRouteTableResult
@@ -1107,12 +1125,12 @@ module Aws
         attr_accessor connection_notification: ConnectionNotification
         attr_accessor client_token: string
       end
-      type create_vpc_endpoint_request = { dry_run: boolean?, vpc_endpoint_type: vpc_endpoint_type?, vpc_id: vpc_id, service_name: string, policy_document: string?, route_table_ids: vpc_endpoint_route_table_id_list?, subnet_ids: vpc_endpoint_subnet_id_list?, security_group_ids: vpc_endpoint_security_group_id_list?, client_token: string?, private_dns_enabled: boolean?, tag_specifications: tag_specification_list_input? }
+      type create_vpc_endpoint_request = { dry_run: boolean?, vpc_endpoint_type: vpc_endpoint_type?, vpc_id: vpc_id, service_name: string, policy_document: string?, route_table_ids: vpc_endpoint_route_table_id_list?, subnet_ids: vpc_endpoint_subnet_id_list?, security_group_ids: vpc_endpoint_security_group_id_list?, ip_address_type: ip_address_type?, dns_options: dns_options_specification?, client_token: string?, private_dns_enabled: boolean?, tag_specifications: tag_specification_list_input? }
       class CreateVpcEndpointResult
         attr_accessor vpc_endpoint: VpcEndpoint
         attr_accessor client_token: string
       end
-      type create_vpc_endpoint_service_configuration_request = { dry_run: boolean?, acceptance_required: boolean?, private_dns_name: string?, network_load_balancer_arns: value_string_list?, gateway_load_balancer_arns: value_string_list?, client_token: string?, tag_specifications: tag_specification_list_input? }
+      type create_vpc_endpoint_service_configuration_request = { dry_run: boolean?, acceptance_required: boolean?, private_dns_name: string?, network_load_balancer_arns: value_string_list?, gateway_load_balancer_arns: value_string_list?, supported_ip_address_types: value_string_list?, client_token: string?, tag_specifications: tag_specification_list_input? }
       class CreateVpcEndpointServiceConfigurationResult
         attr_accessor service_configuration: ServiceConfiguration
         attr_accessor client_token: string
@@ -1221,7 +1239,7 @@ module Aws
       class DeleteIpamPoolResult
         attr_accessor ipam_pool: IpamPool
       end
-      type delete_ipam_request = { dry_run: boolean?, ipam_id: ipam_id }
+      type delete_ipam_request = { dry_run: boolean?, ipam_id: ipam_id, cascade: boolean? }
       class DeleteIpamResult
         attr_accessor ipam: Ipam
       end
@@ -1350,6 +1368,10 @@ module Aws
       class DeleteTransitGatewayPeeringAttachmentResult
         attr_accessor transit_gateway_peering_attachment: TransitGatewayPeeringAttachment
       end
+      type delete_transit_gateway_policy_table_request = { transit_gateway_policy_table_id: transit_gateway_policy_table_id, dry_run: boolean? }
+      class DeleteTransitGatewayPolicyTableResult
+        attr_accessor transit_gateway_policy_table: TransitGatewayPolicyTable
+      end
       type delete_transit_gateway_prefix_list_reference_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, prefix_list_id: prefix_list_resource_id, dry_run: boolean? }
       class DeleteTransitGatewayPrefixListReferenceResult
         attr_accessor transit_gateway_prefix_list_reference: TransitGatewayPrefixListReference
@@ -1361,6 +1383,10 @@ module Aws
       type delete_transit_gateway_route_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, destination_cidr_block: string, dry_run: boolean? }
       class DeleteTransitGatewayRouteResult
         attr_accessor route: TransitGatewayRoute
+      end
+      type delete_transit_gateway_route_table_announcement_request = { transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id, dry_run: boolean? }
+      class DeleteTransitGatewayRouteTableAnnouncementResult
+        attr_accessor transit_gateway_route_table_announcement: TransitGatewayRouteTableAnnouncement
       end
       type delete_transit_gateway_route_table_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, dry_run: boolean? }
       class DeleteTransitGatewayRouteTableResult
@@ -1741,7 +1767,7 @@ module Aws
         attr_accessor ipv_6_pools: ipv_6_pool_set
         attr_accessor next_token: next_token
       end
-      type describe_key_pairs_request = { filters: filter_list?, key_names: key_name_string_list?, key_pair_ids: key_pair_id_string_list?, dry_run: boolean? }
+      type describe_key_pairs_request = { filters: filter_list?, key_names: key_name_string_list?, key_pair_ids: key_pair_id_string_list?, dry_run: boolean?, include_public_key: boolean? }
       class DescribeKeyPairsResult
         attr_accessor key_pairs: key_pair_list
       end
@@ -2046,6 +2072,16 @@ module Aws
         attr_accessor transit_gateway_peering_attachments: transit_gateway_peering_attachment_list_output
         attr_accessor next_token: string
       end
+      type describe_transit_gateway_policy_tables_request = { transit_gateway_policy_table_ids: transit_gateway_policy_table_id_string_list?, filters: filter_list?, max_results: transit_gateway_max_results?, next_token: string?, dry_run: boolean? }
+      class DescribeTransitGatewayPolicyTablesResult
+        attr_accessor transit_gateway_policy_tables: transit_gateway_policy_table_list_output
+        attr_accessor next_token: string
+      end
+      type describe_transit_gateway_route_table_announcements_request = { transit_gateway_route_table_announcement_ids: transit_gateway_route_table_announcement_id_string_list?, filters: filter_list?, max_results: transit_gateway_max_results?, next_token: string?, dry_run: boolean? }
+      class DescribeTransitGatewayRouteTableAnnouncementsResult
+        attr_accessor transit_gateway_route_table_announcements: transit_gateway_route_table_announcement_list_output
+        attr_accessor next_token: string
+      end
       type describe_transit_gateway_route_tables_request = { transit_gateway_route_table_ids: transit_gateway_route_table_id_string_list?, filters: filter_list?, max_results: transit_gateway_max_results?, next_token: string?, dry_run: boolean? }
       class DescribeTransitGatewayRouteTablesResult
         attr_accessor transit_gateway_route_tables: transit_gateway_route_table_list_output
@@ -2252,7 +2288,7 @@ module Aws
       class DisableSerialConsoleAccessResult
         attr_accessor serial_console_access_enabled: boolean
       end
-      type disable_transit_gateway_route_table_propagation_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id, dry_run: boolean? }
+      type disable_transit_gateway_route_table_propagation_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id?, dry_run: boolean?, transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id? }
       class DisableTransitGatewayRouteTablePropagationResult
         attr_accessor propagation: TransitGatewayPropagation
       end
@@ -2292,6 +2328,10 @@ module Aws
       type disassociate_transit_gateway_multicast_domain_request = { transit_gateway_multicast_domain_id: transit_gateway_multicast_domain_id?, transit_gateway_attachment_id: transit_gateway_attachment_id?, subnet_ids: transit_gateway_subnet_id_list?, dry_run: boolean? }
       class DisassociateTransitGatewayMulticastDomainResult
         attr_accessor associations: TransitGatewayMulticastDomainAssociations
+      end
+      type disassociate_transit_gateway_policy_table_request = { transit_gateway_policy_table_id: transit_gateway_policy_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id, dry_run: boolean? }
+      class DisassociateTransitGatewayPolicyTableResult
+        attr_accessor association: TransitGatewayPolicyTableAssociation
       end
       type disassociate_transit_gateway_route_table_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id, dry_run: boolean? }
       class DisassociateTransitGatewayRouteTableResult
@@ -2337,11 +2377,17 @@ module Aws
       end
       type dns_entry_set = ::Array[DnsEntry]
       type dns_name_state = ("pendingVerification" | "verified" | "failed")
+      class DnsOptions
+        attr_accessor dns_record_ip_type: dns_record_ip_type
+      end
+      type dns_options_specification = { dns_record_ip_type: dns_record_ip_type? }
+      type dns_record_ip_type = ("ipv4" | "dualstack" | "ipv6" | "service-defined")
       type dns_servers_options_modify_structure = { custom_dns_servers: value_string_list?, enabled: boolean? }
       type dns_support_value = ("enable" | "disable")
       type domain_type = ("vpc" | "standard")
       type double = ::Float
       type double_with_constraints = ::Float
+      type dynamic_routing_value = ("enable" | "disable")
       type ebs_block_device = { delete_on_termination: boolean?, iops: integer?, snapshot_id: snapshot_id?, volume_size: integer?, volume_type: volume_type?, kms_key_id: string?, throughput: integer?, outpost_arn: string?, encrypted: boolean? }
       class EbsBlockDevice
         attr_accessor delete_on_termination: boolean
@@ -2494,7 +2540,7 @@ module Aws
       class EnableSerialConsoleAccessResult
         attr_accessor serial_console_access_enabled: boolean
       end
-      type enable_transit_gateway_route_table_propagation_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id, dry_run: boolean? }
+      type enable_transit_gateway_route_table_propagation_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, transit_gateway_attachment_id: transit_gateway_attachment_id?, dry_run: boolean?, transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id? }
       class EnableTransitGatewayRouteTablePropagationResult
         attr_accessor propagation: TransitGatewayPropagation
       end
@@ -2574,6 +2620,10 @@ module Aws
         attr_accessor vpc_endpoint: AnalysisComponent
         attr_accessor vpn_connection: AnalysisComponent
         attr_accessor vpn_gateway: AnalysisComponent
+        attr_accessor transit_gateway: AnalysisComponent
+        attr_accessor transit_gateway_route_table: AnalysisComponent
+        attr_accessor transit_gateway_route_table_route: TransitGatewayRouteTableRoute
+        attr_accessor transit_gateway_attachment: AnalysisComponent
       end
       type explanation_list = ::Array[Explanation]
       type export_client_vpn_client_certificate_revocation_list_request = { client_vpn_endpoint_id: client_vpn_endpoint_id, dry_run: boolean? }
@@ -2782,7 +2832,7 @@ module Aws
       type flow_log_resource_id = ::String
       type flow_log_resource_ids = ::Array[flow_log_resource_id]
       type flow_log_set = ::Array[FlowLog]
-      type flow_logs_resource_type = ("VPC" | "Subnet" | "NetworkInterface")
+      type flow_logs_resource_type = ("VPC" | "Subnet" | "NetworkInterface" | "TransitGateway" | "TransitGatewayAttachment")
       type fpga_device_count = ::Integer
       class FpgaDeviceInfo
         attr_accessor name: fpga_device_name
@@ -2858,7 +2908,7 @@ module Aws
         attr_accessor state: capacity_reservation_state
         attr_accessor instance_usages: instance_usage_set
       end
-      type get_coip_pool_usage_request = { pool_id: coip_pool_id, filters: filter_list?, max_results: coip_pool_max_results?, next_token: string?, dry_run: boolean? }
+      type get_coip_pool_usage_request = { pool_id: ipv_4_pool_coip_id, filters: filter_list?, max_results: coip_pool_max_results?, next_token: string?, dry_run: boolean? }
       class GetCoipPoolUsageResult
         attr_accessor coip_pool_id: string
         attr_accessor coip_address_usages: coip_address_usage_set
@@ -2908,6 +2958,11 @@ module Aws
       class GetInstanceTypesFromInstanceRequirementsResult
         attr_accessor instance_types: instance_type_info_from_instance_requirements_set
         attr_accessor next_token: string
+      end
+      type get_instance_uefi_data_request = { instance_id: instance_id, dry_run: boolean? }
+      class GetInstanceUefiDataResult
+        attr_accessor instance_id: instance_id
+        attr_accessor uefi_data: string
       end
       type get_ipam_address_history_request = { dry_run: boolean?, cidr: string, ipam_scope_id: ipam_scope_id, vpc_id: string?, start_time: millisecond_date_time?, end_time: millisecond_date_time?, max_results: ipam_address_history_max_results?, next_token: next_token? }
       class GetIpamAddressHistoryResult
@@ -3000,6 +3055,15 @@ module Aws
         attr_accessor multicast_domain_associations: transit_gateway_multicast_domain_association_list
         attr_accessor next_token: string
       end
+      type get_transit_gateway_policy_table_associations_request = { transit_gateway_policy_table_id: transit_gateway_policy_table_id, filters: filter_list?, max_results: transit_gateway_max_results?, next_token: string?, dry_run: boolean? }
+      class GetTransitGatewayPolicyTableAssociationsResult
+        attr_accessor associations: transit_gateway_policy_table_association_list_output
+        attr_accessor next_token: string
+      end
+      type get_transit_gateway_policy_table_entries_request = { transit_gateway_policy_table_id: transit_gateway_policy_table_id, filters: filter_list?, max_results: transit_gateway_max_results?, next_token: string?, dry_run: boolean? }
+      class GetTransitGatewayPolicyTableEntriesResult
+        attr_accessor transit_gateway_policy_table_entries: transit_gateway_policy_table_entry_list
+      end
       type get_transit_gateway_prefix_list_references_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, filters: filter_list?, max_results: transit_gateway_max_results?, next_token: string?, dry_run: boolean? }
       class GetTransitGatewayPrefixListReferencesResult
         attr_accessor transit_gateway_prefix_list_references: transit_gateway_prefix_list_reference_set_output
@@ -3088,6 +3152,7 @@ module Aws
         attr_accessor owner_id: string
         attr_accessor availability_zone_id: string
         attr_accessor member_of_service_linked_resource_group: boolean
+        attr_accessor outpost_arn: string
       end
       class HostInstance
         attr_accessor instance_id: string
@@ -3203,6 +3268,7 @@ module Aws
         attr_accessor tags: tag_list_output
         attr_accessor virtualization_type: virtualization_type
         attr_accessor boot_mode: boot_mode_values
+        attr_accessor tpm_support: tpm_support_values
         attr_accessor deprecation_time: string
       end
       class ImageAttribute
@@ -3215,14 +3281,25 @@ module Aws
         attr_accessor ramdisk_id: AttributeValue
         attr_accessor sriov_net_support: AttributeValue
         attr_accessor boot_mode: AttributeValue
+        attr_accessor tpm_support: AttributeValue
+        attr_accessor uefi_data: AttributeValue
+        attr_accessor last_launched_time: AttributeValue
       end
-      type image_attribute_name = ("description" | "kernel" | "ramdisk" | "launchPermission" | "productCodes" | "blockDeviceMapping" | "sriovNetSupport" | "bootMode")
+      type image_attribute_name = ("description" | "kernel" | "ramdisk" | "launchPermission" | "productCodes" | "blockDeviceMapping" | "sriovNetSupport" | "bootMode" | "tpmSupport" | "uefiData" | "lastLaunchedTime")
       type image_disk_container = { description: string?, device_name: string?, format: string?, snapshot_id: snapshot_id?, url: string?, user_bucket: user_bucket? }
       type image_disk_container_list = ::Array[image_disk_container]
       type image_id = ::String
       type image_id_list = ::Array[image_id]
       type image_id_string_list = ::Array[image_id]
       type image_list = ::Array[Image]
+      class ImageRecycleBinInfo
+        attr_accessor image_id: string
+        attr_accessor name: string
+        attr_accessor description: string
+        attr_accessor recycle_bin_enter_time: millisecond_date_time
+        attr_accessor recycle_bin_exit_time: millisecond_date_time
+      end
+      type image_recycle_bin_info_list = ::Array[ImageRecycleBinInfo]
       type image_state = ("pending" | "available" | "invalid" | "deregistered" | "transient" | "failed" | "error")
       type image_type_values = ("machine" | "kernel" | "ramdisk")
       type import_client_vpn_client_certificate_revocation_list_request = { client_vpn_endpoint_id: client_vpn_endpoint_id, certificate_revocation_list: string, dry_run: boolean? }
@@ -3400,6 +3477,8 @@ module Aws
         attr_accessor usage_operation_update_time: millisecond_date_time
         attr_accessor private_dns_name_options: PrivateDnsNameOptionsResponse
         attr_accessor ipv_6_address: string
+        attr_accessor tpm_support: string
+        attr_accessor maintenance_options: InstanceMaintenanceOptions
       end
       class InstanceAttribute
         attr_accessor groups: group_identifier_list_output
@@ -3418,8 +3497,10 @@ module Aws
         attr_accessor source_dest_check: AttributeBooleanValue
         attr_accessor sriov_net_support: AttributeValue
         attr_accessor user_data: AttributeValue
+        attr_accessor disable_api_stop: AttributeBooleanValue
       end
-      type instance_attribute_name = ("instanceType" | "kernel" | "ramdisk" | "userData" | "disableApiTermination" | "instanceInitiatedShutdownBehavior" | "rootDeviceName" | "blockDeviceMapping" | "productCodes" | "sourceDestCheck" | "groupSet" | "ebsOptimized" | "sriovNetSupport" | "enaSupport" | "enclaveOptions")
+      type instance_attribute_name = ("instanceType" | "kernel" | "ramdisk" | "userData" | "disableApiTermination" | "instanceInitiatedShutdownBehavior" | "rootDeviceName" | "blockDeviceMapping" | "productCodes" | "sourceDestCheck" | "groupSet" | "ebsOptimized" | "sriovNetSupport" | "enaSupport" | "enclaveOptions" | "disableApiStop")
+      type instance_auto_recovery_state = ("disabled" | "default")
       class InstanceBlockDeviceMapping
         attr_accessor device_name: string
         attr_accessor ebs: EbsInstanceBlockDevice
@@ -3515,6 +3596,10 @@ module Aws
       type instance_lifecycle = ("spot" | "on-demand")
       type instance_lifecycle_type = ("spot" | "scheduled")
       type instance_list = ::Array[Instance]
+      class InstanceMaintenanceOptions
+        attr_accessor auto_recovery: instance_auto_recovery_state
+      end
+      type instance_maintenance_options_request = { auto_recovery: instance_auto_recovery_state? }
       type instance_market_options_request = { market_type: market_type?, spot_options: spot_market_options? }
       type instance_match_criteria = ("open" | "targeted")
       type instance_metadata_endpoint_state = ("disabled" | "enabled")
@@ -3682,7 +3767,7 @@ module Aws
         attr_accessor instance_tag_keys: instance_tag_key_set
         attr_accessor include_all_tags_of_instance: boolean
       end
-      type instance_type = ("a1.medium" | "a1.large" | "a1.xlarge" | "a1.2xlarge" | "a1.4xlarge" | "a1.metal" | "c1.medium" | "c1.xlarge" | "c3.large" | "c3.xlarge" | "c3.2xlarge" | "c3.4xlarge" | "c3.8xlarge" | "c4.large" | "c4.xlarge" | "c4.2xlarge" | "c4.4xlarge" | "c4.8xlarge" | "c5.large" | "c5.xlarge" | "c5.2xlarge" | "c5.4xlarge" | "c5.9xlarge" | "c5.12xlarge" | "c5.18xlarge" | "c5.24xlarge" | "c5.metal" | "c5a.large" | "c5a.xlarge" | "c5a.2xlarge" | "c5a.4xlarge" | "c5a.8xlarge" | "c5a.12xlarge" | "c5a.16xlarge" | "c5a.24xlarge" | "c5ad.large" | "c5ad.xlarge" | "c5ad.2xlarge" | "c5ad.4xlarge" | "c5ad.8xlarge" | "c5ad.12xlarge" | "c5ad.16xlarge" | "c5ad.24xlarge" | "c5d.large" | "c5d.xlarge" | "c5d.2xlarge" | "c5d.4xlarge" | "c5d.9xlarge" | "c5d.12xlarge" | "c5d.18xlarge" | "c5d.24xlarge" | "c5d.metal" | "c5n.large" | "c5n.xlarge" | "c5n.2xlarge" | "c5n.4xlarge" | "c5n.9xlarge" | "c5n.18xlarge" | "c5n.metal" | "c6g.medium" | "c6g.large" | "c6g.xlarge" | "c6g.2xlarge" | "c6g.4xlarge" | "c6g.8xlarge" | "c6g.12xlarge" | "c6g.16xlarge" | "c6g.metal" | "c6gd.medium" | "c6gd.large" | "c6gd.xlarge" | "c6gd.2xlarge" | "c6gd.4xlarge" | "c6gd.8xlarge" | "c6gd.12xlarge" | "c6gd.16xlarge" | "c6gd.metal" | "c6gn.medium" | "c6gn.large" | "c6gn.xlarge" | "c6gn.2xlarge" | "c6gn.4xlarge" | "c6gn.8xlarge" | "c6gn.12xlarge" | "c6gn.16xlarge" | "c6i.large" | "c6i.xlarge" | "c6i.2xlarge" | "c6i.4xlarge" | "c6i.8xlarge" | "c6i.12xlarge" | "c6i.16xlarge" | "c6i.24xlarge" | "c6i.32xlarge" | "c6i.metal" | "cc1.4xlarge" | "cc2.8xlarge" | "cg1.4xlarge" | "cr1.8xlarge" | "d2.xlarge" | "d2.2xlarge" | "d2.4xlarge" | "d2.8xlarge" | "d3.xlarge" | "d3.2xlarge" | "d3.4xlarge" | "d3.8xlarge" | "d3en.xlarge" | "d3en.2xlarge" | "d3en.4xlarge" | "d3en.6xlarge" | "d3en.8xlarge" | "d3en.12xlarge" | "dl1.24xlarge" | "f1.2xlarge" | "f1.4xlarge" | "f1.16xlarge" | "g2.2xlarge" | "g2.8xlarge" | "g3.4xlarge" | "g3.8xlarge" | "g3.16xlarge" | "g3s.xlarge" | "g4ad.xlarge" | "g4ad.2xlarge" | "g4ad.4xlarge" | "g4ad.8xlarge" | "g4ad.16xlarge" | "g4dn.xlarge" | "g4dn.2xlarge" | "g4dn.4xlarge" | "g4dn.8xlarge" | "g4dn.12xlarge" | "g4dn.16xlarge" | "g4dn.metal" | "g5.xlarge" | "g5.2xlarge" | "g5.4xlarge" | "g5.8xlarge" | "g5.12xlarge" | "g5.16xlarge" | "g5.24xlarge" | "g5.48xlarge" | "g5g.xlarge" | "g5g.2xlarge" | "g5g.4xlarge" | "g5g.8xlarge" | "g5g.16xlarge" | "g5g.metal" | "hi1.4xlarge" | "hpc6a.48xlarge" | "hs1.8xlarge" | "h1.2xlarge" | "h1.4xlarge" | "h1.8xlarge" | "h1.16xlarge" | "i2.xlarge" | "i2.2xlarge" | "i2.4xlarge" | "i2.8xlarge" | "i3.large" | "i3.xlarge" | "i3.2xlarge" | "i3.4xlarge" | "i3.8xlarge" | "i3.16xlarge" | "i3.metal" | "i3en.large" | "i3en.xlarge" | "i3en.2xlarge" | "i3en.3xlarge" | "i3en.6xlarge" | "i3en.12xlarge" | "i3en.24xlarge" | "i3en.metal" | "im4gn.large" | "im4gn.xlarge" | "im4gn.2xlarge" | "im4gn.4xlarge" | "im4gn.8xlarge" | "im4gn.16xlarge" | "inf1.xlarge" | "inf1.2xlarge" | "inf1.6xlarge" | "inf1.24xlarge" | "is4gen.medium" | "is4gen.large" | "is4gen.xlarge" | "is4gen.2xlarge" | "is4gen.4xlarge" | "is4gen.8xlarge" | "m1.small" | "m1.medium" | "m1.large" | "m1.xlarge" | "m2.xlarge" | "m2.2xlarge" | "m2.4xlarge" | "m3.medium" | "m3.large" | "m3.xlarge" | "m3.2xlarge" | "m4.large" | "m4.xlarge" | "m4.2xlarge" | "m4.4xlarge" | "m4.10xlarge" | "m4.16xlarge" | "m5.large" | "m5.xlarge" | "m5.2xlarge" | "m5.4xlarge" | "m5.8xlarge" | "m5.12xlarge" | "m5.16xlarge" | "m5.24xlarge" | "m5.metal" | "m5a.large" | "m5a.xlarge" | "m5a.2xlarge" | "m5a.4xlarge" | "m5a.8xlarge" | "m5a.12xlarge" | "m5a.16xlarge" | "m5a.24xlarge" | "m5ad.large" | "m5ad.xlarge" | "m5ad.2xlarge" | "m5ad.4xlarge" | "m5ad.8xlarge" | "m5ad.12xlarge" | "m5ad.16xlarge" | "m5ad.24xlarge" | "m5d.large" | "m5d.xlarge" | "m5d.2xlarge" | "m5d.4xlarge" | "m5d.8xlarge" | "m5d.12xlarge" | "m5d.16xlarge" | "m5d.24xlarge" | "m5d.metal" | "m5dn.large" | "m5dn.xlarge" | "m5dn.2xlarge" | "m5dn.4xlarge" | "m5dn.8xlarge" | "m5dn.12xlarge" | "m5dn.16xlarge" | "m5dn.24xlarge" | "m5dn.metal" | "m5n.large" | "m5n.xlarge" | "m5n.2xlarge" | "m5n.4xlarge" | "m5n.8xlarge" | "m5n.12xlarge" | "m5n.16xlarge" | "m5n.24xlarge" | "m5n.metal" | "m5zn.large" | "m5zn.xlarge" | "m5zn.2xlarge" | "m5zn.3xlarge" | "m5zn.6xlarge" | "m5zn.12xlarge" | "m5zn.metal" | "m6a.large" | "m6a.xlarge" | "m6a.2xlarge" | "m6a.4xlarge" | "m6a.8xlarge" | "m6a.12xlarge" | "m6a.16xlarge" | "m6a.24xlarge" | "m6a.32xlarge" | "m6a.48xlarge" | "m6g.metal" | "m6g.medium" | "m6g.large" | "m6g.xlarge" | "m6g.2xlarge" | "m6g.4xlarge" | "m6g.8xlarge" | "m6g.12xlarge" | "m6g.16xlarge" | "m6gd.metal" | "m6gd.medium" | "m6gd.large" | "m6gd.xlarge" | "m6gd.2xlarge" | "m6gd.4xlarge" | "m6gd.8xlarge" | "m6gd.12xlarge" | "m6gd.16xlarge" | "m6i.large" | "m6i.xlarge" | "m6i.2xlarge" | "m6i.4xlarge" | "m6i.8xlarge" | "m6i.12xlarge" | "m6i.16xlarge" | "m6i.24xlarge" | "m6i.32xlarge" | "m6i.metal" | "mac1.metal" | "p2.xlarge" | "p2.8xlarge" | "p2.16xlarge" | "p3.2xlarge" | "p3.8xlarge" | "p3.16xlarge" | "p3dn.24xlarge" | "p4d.24xlarge" | "r3.large" | "r3.xlarge" | "r3.2xlarge" | "r3.4xlarge" | "r3.8xlarge" | "r4.large" | "r4.xlarge" | "r4.2xlarge" | "r4.4xlarge" | "r4.8xlarge" | "r4.16xlarge" | "r5.large" | "r5.xlarge" | "r5.2xlarge" | "r5.4xlarge" | "r5.8xlarge" | "r5.12xlarge" | "r5.16xlarge" | "r5.24xlarge" | "r5.metal" | "r5a.large" | "r5a.xlarge" | "r5a.2xlarge" | "r5a.4xlarge" | "r5a.8xlarge" | "r5a.12xlarge" | "r5a.16xlarge" | "r5a.24xlarge" | "r5ad.large" | "r5ad.xlarge" | "r5ad.2xlarge" | "r5ad.4xlarge" | "r5ad.8xlarge" | "r5ad.12xlarge" | "r5ad.16xlarge" | "r5ad.24xlarge" | "r5b.large" | "r5b.xlarge" | "r5b.2xlarge" | "r5b.4xlarge" | "r5b.8xlarge" | "r5b.12xlarge" | "r5b.16xlarge" | "r5b.24xlarge" | "r5b.metal" | "r5d.large" | "r5d.xlarge" | "r5d.2xlarge" | "r5d.4xlarge" | "r5d.8xlarge" | "r5d.12xlarge" | "r5d.16xlarge" | "r5d.24xlarge" | "r5d.metal" | "r5dn.large" | "r5dn.xlarge" | "r5dn.2xlarge" | "r5dn.4xlarge" | "r5dn.8xlarge" | "r5dn.12xlarge" | "r5dn.16xlarge" | "r5dn.24xlarge" | "r5dn.metal" | "r5n.large" | "r5n.xlarge" | "r5n.2xlarge" | "r5n.4xlarge" | "r5n.8xlarge" | "r5n.12xlarge" | "r5n.16xlarge" | "r5n.24xlarge" | "r5n.metal" | "r6g.medium" | "r6g.large" | "r6g.xlarge" | "r6g.2xlarge" | "r6g.4xlarge" | "r6g.8xlarge" | "r6g.12xlarge" | "r6g.16xlarge" | "r6g.metal" | "r6gd.medium" | "r6gd.large" | "r6gd.xlarge" | "r6gd.2xlarge" | "r6gd.4xlarge" | "r6gd.8xlarge" | "r6gd.12xlarge" | "r6gd.16xlarge" | "r6gd.metal" | "r6i.large" | "r6i.xlarge" | "r6i.2xlarge" | "r6i.4xlarge" | "r6i.8xlarge" | "r6i.12xlarge" | "r6i.16xlarge" | "r6i.24xlarge" | "r6i.32xlarge" | "r6i.metal" | "t1.micro" | "t2.nano" | "t2.micro" | "t2.small" | "t2.medium" | "t2.large" | "t2.xlarge" | "t2.2xlarge" | "t3.nano" | "t3.micro" | "t3.small" | "t3.medium" | "t3.large" | "t3.xlarge" | "t3.2xlarge" | "t3a.nano" | "t3a.micro" | "t3a.small" | "t3a.medium" | "t3a.large" | "t3a.xlarge" | "t3a.2xlarge" | "t4g.nano" | "t4g.micro" | "t4g.small" | "t4g.medium" | "t4g.large" | "t4g.xlarge" | "t4g.2xlarge" | "u-6tb1.56xlarge" | "u-6tb1.112xlarge" | "u-9tb1.112xlarge" | "u-12tb1.112xlarge" | "u-6tb1.metal" | "u-9tb1.metal" | "u-12tb1.metal" | "u-18tb1.metal" | "u-24tb1.metal" | "vt1.3xlarge" | "vt1.6xlarge" | "vt1.24xlarge" | "x1.16xlarge" | "x1.32xlarge" | "x1e.xlarge" | "x1e.2xlarge" | "x1e.4xlarge" | "x1e.8xlarge" | "x1e.16xlarge" | "x1e.32xlarge" | "x2gd.medium" | "x2gd.large" | "x2gd.xlarge" | "x2gd.2xlarge" | "x2gd.4xlarge" | "x2gd.8xlarge" | "x2gd.12xlarge" | "x2gd.16xlarge" | "x2gd.metal" | "z1d.large" | "z1d.xlarge" | "z1d.2xlarge" | "z1d.3xlarge" | "z1d.6xlarge" | "z1d.12xlarge" | "z1d.metal")
+      type instance_type = ("a1.medium" | "a1.large" | "a1.xlarge" | "a1.2xlarge" | "a1.4xlarge" | "a1.metal" | "c1.medium" | "c1.xlarge" | "c3.large" | "c3.xlarge" | "c3.2xlarge" | "c3.4xlarge" | "c3.8xlarge" | "c4.large" | "c4.xlarge" | "c4.2xlarge" | "c4.4xlarge" | "c4.8xlarge" | "c5.large" | "c5.xlarge" | "c5.2xlarge" | "c5.4xlarge" | "c5.9xlarge" | "c5.12xlarge" | "c5.18xlarge" | "c5.24xlarge" | "c5.metal" | "c5a.large" | "c5a.xlarge" | "c5a.2xlarge" | "c5a.4xlarge" | "c5a.8xlarge" | "c5a.12xlarge" | "c5a.16xlarge" | "c5a.24xlarge" | "c5ad.large" | "c5ad.xlarge" | "c5ad.2xlarge" | "c5ad.4xlarge" | "c5ad.8xlarge" | "c5ad.12xlarge" | "c5ad.16xlarge" | "c5ad.24xlarge" | "c5d.large" | "c5d.xlarge" | "c5d.2xlarge" | "c5d.4xlarge" | "c5d.9xlarge" | "c5d.12xlarge" | "c5d.18xlarge" | "c5d.24xlarge" | "c5d.metal" | "c5n.large" | "c5n.xlarge" | "c5n.2xlarge" | "c5n.4xlarge" | "c5n.9xlarge" | "c5n.18xlarge" | "c5n.metal" | "c6g.medium" | "c6g.large" | "c6g.xlarge" | "c6g.2xlarge" | "c6g.4xlarge" | "c6g.8xlarge" | "c6g.12xlarge" | "c6g.16xlarge" | "c6g.metal" | "c6gd.medium" | "c6gd.large" | "c6gd.xlarge" | "c6gd.2xlarge" | "c6gd.4xlarge" | "c6gd.8xlarge" | "c6gd.12xlarge" | "c6gd.16xlarge" | "c6gd.metal" | "c6gn.medium" | "c6gn.large" | "c6gn.xlarge" | "c6gn.2xlarge" | "c6gn.4xlarge" | "c6gn.8xlarge" | "c6gn.12xlarge" | "c6gn.16xlarge" | "c6i.large" | "c6i.xlarge" | "c6i.2xlarge" | "c6i.4xlarge" | "c6i.8xlarge" | "c6i.12xlarge" | "c6i.16xlarge" | "c6i.24xlarge" | "c6i.32xlarge" | "c6i.metal" | "cc1.4xlarge" | "cc2.8xlarge" | "cg1.4xlarge" | "cr1.8xlarge" | "d2.xlarge" | "d2.2xlarge" | "d2.4xlarge" | "d2.8xlarge" | "d3.xlarge" | "d3.2xlarge" | "d3.4xlarge" | "d3.8xlarge" | "d3en.xlarge" | "d3en.2xlarge" | "d3en.4xlarge" | "d3en.6xlarge" | "d3en.8xlarge" | "d3en.12xlarge" | "dl1.24xlarge" | "f1.2xlarge" | "f1.4xlarge" | "f1.16xlarge" | "g2.2xlarge" | "g2.8xlarge" | "g3.4xlarge" | "g3.8xlarge" | "g3.16xlarge" | "g3s.xlarge" | "g4ad.xlarge" | "g4ad.2xlarge" | "g4ad.4xlarge" | "g4ad.8xlarge" | "g4ad.16xlarge" | "g4dn.xlarge" | "g4dn.2xlarge" | "g4dn.4xlarge" | "g4dn.8xlarge" | "g4dn.12xlarge" | "g4dn.16xlarge" | "g4dn.metal" | "g5.xlarge" | "g5.2xlarge" | "g5.4xlarge" | "g5.8xlarge" | "g5.12xlarge" | "g5.16xlarge" | "g5.24xlarge" | "g5.48xlarge" | "g5g.xlarge" | "g5g.2xlarge" | "g5g.4xlarge" | "g5g.8xlarge" | "g5g.16xlarge" | "g5g.metal" | "hi1.4xlarge" | "hpc6a.48xlarge" | "hs1.8xlarge" | "h1.2xlarge" | "h1.4xlarge" | "h1.8xlarge" | "h1.16xlarge" | "i2.xlarge" | "i2.2xlarge" | "i2.4xlarge" | "i2.8xlarge" | "i3.large" | "i3.xlarge" | "i3.2xlarge" | "i3.4xlarge" | "i3.8xlarge" | "i3.16xlarge" | "i3.metal" | "i3en.large" | "i3en.xlarge" | "i3en.2xlarge" | "i3en.3xlarge" | "i3en.6xlarge" | "i3en.12xlarge" | "i3en.24xlarge" | "i3en.metal" | "im4gn.large" | "im4gn.xlarge" | "im4gn.2xlarge" | "im4gn.4xlarge" | "im4gn.8xlarge" | "im4gn.16xlarge" | "inf1.xlarge" | "inf1.2xlarge" | "inf1.6xlarge" | "inf1.24xlarge" | "is4gen.medium" | "is4gen.large" | "is4gen.xlarge" | "is4gen.2xlarge" | "is4gen.4xlarge" | "is4gen.8xlarge" | "m1.small" | "m1.medium" | "m1.large" | "m1.xlarge" | "m2.xlarge" | "m2.2xlarge" | "m2.4xlarge" | "m3.medium" | "m3.large" | "m3.xlarge" | "m3.2xlarge" | "m4.large" | "m4.xlarge" | "m4.2xlarge" | "m4.4xlarge" | "m4.10xlarge" | "m4.16xlarge" | "m5.large" | "m5.xlarge" | "m5.2xlarge" | "m5.4xlarge" | "m5.8xlarge" | "m5.12xlarge" | "m5.16xlarge" | "m5.24xlarge" | "m5.metal" | "m5a.large" | "m5a.xlarge" | "m5a.2xlarge" | "m5a.4xlarge" | "m5a.8xlarge" | "m5a.12xlarge" | "m5a.16xlarge" | "m5a.24xlarge" | "m5ad.large" | "m5ad.xlarge" | "m5ad.2xlarge" | "m5ad.4xlarge" | "m5ad.8xlarge" | "m5ad.12xlarge" | "m5ad.16xlarge" | "m5ad.24xlarge" | "m5d.large" | "m5d.xlarge" | "m5d.2xlarge" | "m5d.4xlarge" | "m5d.8xlarge" | "m5d.12xlarge" | "m5d.16xlarge" | "m5d.24xlarge" | "m5d.metal" | "m5dn.large" | "m5dn.xlarge" | "m5dn.2xlarge" | "m5dn.4xlarge" | "m5dn.8xlarge" | "m5dn.12xlarge" | "m5dn.16xlarge" | "m5dn.24xlarge" | "m5dn.metal" | "m5n.large" | "m5n.xlarge" | "m5n.2xlarge" | "m5n.4xlarge" | "m5n.8xlarge" | "m5n.12xlarge" | "m5n.16xlarge" | "m5n.24xlarge" | "m5n.metal" | "m5zn.large" | "m5zn.xlarge" | "m5zn.2xlarge" | "m5zn.3xlarge" | "m5zn.6xlarge" | "m5zn.12xlarge" | "m5zn.metal" | "m6a.large" | "m6a.xlarge" | "m6a.2xlarge" | "m6a.4xlarge" | "m6a.8xlarge" | "m6a.12xlarge" | "m6a.16xlarge" | "m6a.24xlarge" | "m6a.32xlarge" | "m6a.48xlarge" | "m6g.metal" | "m6g.medium" | "m6g.large" | "m6g.xlarge" | "m6g.2xlarge" | "m6g.4xlarge" | "m6g.8xlarge" | "m6g.12xlarge" | "m6g.16xlarge" | "m6gd.metal" | "m6gd.medium" | "m6gd.large" | "m6gd.xlarge" | "m6gd.2xlarge" | "m6gd.4xlarge" | "m6gd.8xlarge" | "m6gd.12xlarge" | "m6gd.16xlarge" | "m6i.large" | "m6i.xlarge" | "m6i.2xlarge" | "m6i.4xlarge" | "m6i.8xlarge" | "m6i.12xlarge" | "m6i.16xlarge" | "m6i.24xlarge" | "m6i.32xlarge" | "m6i.metal" | "mac1.metal" | "p2.xlarge" | "p2.8xlarge" | "p2.16xlarge" | "p3.2xlarge" | "p3.8xlarge" | "p3.16xlarge" | "p3dn.24xlarge" | "p4d.24xlarge" | "r3.large" | "r3.xlarge" | "r3.2xlarge" | "r3.4xlarge" | "r3.8xlarge" | "r4.large" | "r4.xlarge" | "r4.2xlarge" | "r4.4xlarge" | "r4.8xlarge" | "r4.16xlarge" | "r5.large" | "r5.xlarge" | "r5.2xlarge" | "r5.4xlarge" | "r5.8xlarge" | "r5.12xlarge" | "r5.16xlarge" | "r5.24xlarge" | "r5.metal" | "r5a.large" | "r5a.xlarge" | "r5a.2xlarge" | "r5a.4xlarge" | "r5a.8xlarge" | "r5a.12xlarge" | "r5a.16xlarge" | "r5a.24xlarge" | "r5ad.large" | "r5ad.xlarge" | "r5ad.2xlarge" | "r5ad.4xlarge" | "r5ad.8xlarge" | "r5ad.12xlarge" | "r5ad.16xlarge" | "r5ad.24xlarge" | "r5b.large" | "r5b.xlarge" | "r5b.2xlarge" | "r5b.4xlarge" | "r5b.8xlarge" | "r5b.12xlarge" | "r5b.16xlarge" | "r5b.24xlarge" | "r5b.metal" | "r5d.large" | "r5d.xlarge" | "r5d.2xlarge" | "r5d.4xlarge" | "r5d.8xlarge" | "r5d.12xlarge" | "r5d.16xlarge" | "r5d.24xlarge" | "r5d.metal" | "r5dn.large" | "r5dn.xlarge" | "r5dn.2xlarge" | "r5dn.4xlarge" | "r5dn.8xlarge" | "r5dn.12xlarge" | "r5dn.16xlarge" | "r5dn.24xlarge" | "r5dn.metal" | "r5n.large" | "r5n.xlarge" | "r5n.2xlarge" | "r5n.4xlarge" | "r5n.8xlarge" | "r5n.12xlarge" | "r5n.16xlarge" | "r5n.24xlarge" | "r5n.metal" | "r6g.medium" | "r6g.large" | "r6g.xlarge" | "r6g.2xlarge" | "r6g.4xlarge" | "r6g.8xlarge" | "r6g.12xlarge" | "r6g.16xlarge" | "r6g.metal" | "r6gd.medium" | "r6gd.large" | "r6gd.xlarge" | "r6gd.2xlarge" | "r6gd.4xlarge" | "r6gd.8xlarge" | "r6gd.12xlarge" | "r6gd.16xlarge" | "r6gd.metal" | "r6i.large" | "r6i.xlarge" | "r6i.2xlarge" | "r6i.4xlarge" | "r6i.8xlarge" | "r6i.12xlarge" | "r6i.16xlarge" | "r6i.24xlarge" | "r6i.32xlarge" | "r6i.metal" | "t1.micro" | "t2.nano" | "t2.micro" | "t2.small" | "t2.medium" | "t2.large" | "t2.xlarge" | "t2.2xlarge" | "t3.nano" | "t3.micro" | "t3.small" | "t3.medium" | "t3.large" | "t3.xlarge" | "t3.2xlarge" | "t3a.nano" | "t3a.micro" | "t3a.small" | "t3a.medium" | "t3a.large" | "t3a.xlarge" | "t3a.2xlarge" | "t4g.nano" | "t4g.micro" | "t4g.small" | "t4g.medium" | "t4g.large" | "t4g.xlarge" | "t4g.2xlarge" | "u-6tb1.56xlarge" | "u-6tb1.112xlarge" | "u-9tb1.112xlarge" | "u-12tb1.112xlarge" | "u-6tb1.metal" | "u-9tb1.metal" | "u-12tb1.metal" | "u-18tb1.metal" | "u-24tb1.metal" | "vt1.3xlarge" | "vt1.6xlarge" | "vt1.24xlarge" | "x1.16xlarge" | "x1.32xlarge" | "x1e.xlarge" | "x1e.2xlarge" | "x1e.4xlarge" | "x1e.8xlarge" | "x1e.16xlarge" | "x1e.32xlarge" | "x2iezn.2xlarge" | "x2iezn.4xlarge" | "x2iezn.6xlarge" | "x2iezn.8xlarge" | "x2iezn.12xlarge" | "x2iezn.metal" | "x2gd.medium" | "x2gd.large" | "x2gd.xlarge" | "x2gd.2xlarge" | "x2gd.4xlarge" | "x2gd.8xlarge" | "x2gd.12xlarge" | "x2gd.16xlarge" | "x2gd.metal" | "z1d.large" | "z1d.xlarge" | "z1d.2xlarge" | "z1d.3xlarge" | "z1d.6xlarge" | "z1d.12xlarge" | "z1d.metal" | "x2idn.16xlarge" | "x2idn.24xlarge" | "x2idn.32xlarge" | "x2iedn.xlarge" | "x2iedn.2xlarge" | "x2iedn.4xlarge" | "x2iedn.8xlarge" | "x2iedn.16xlarge" | "x2iedn.24xlarge" | "x2iedn.32xlarge" | "c6a.large" | "c6a.xlarge" | "c6a.2xlarge" | "c6a.4xlarge" | "c6a.8xlarge" | "c6a.12xlarge" | "c6a.16xlarge" | "c6a.24xlarge" | "c6a.32xlarge" | "c6a.48xlarge" | "c6a.metal" | "m6a.metal" | "i4i.large" | "i4i.xlarge" | "i4i.2xlarge" | "i4i.4xlarge" | "i4i.8xlarge" | "i4i.16xlarge" | "i4i.32xlarge" | "i4i.metal" | "x2idn.metal" | "x2iedn.metal" | "c7g.medium" | "c7g.large" | "c7g.xlarge" | "c7g.2xlarge" | "c7g.4xlarge" | "c7g.8xlarge" | "c7g.12xlarge" | "c7g.16xlarge")
       type instance_type_hypervisor = ("nitro" | "xen")
       class InstanceTypeInfo
         attr_accessor instance_type: instance_type
@@ -3749,6 +3834,7 @@ module Aws
       type internet_gateway_list_output = ::Array[InternetGateway]
       type ip_address = ::String
       type ip_address_list = ::Array[ip_address]
+      type ip_address_type = ("ipv4" | "dualstack" | "ipv6")
       type ip_permission = { from_port: integer?, ip_protocol: string?, ip_ranges: ip_range_list_input?, ipv_6_ranges: ipv_6_range_list_input?, prefix_list_ids: prefix_list_id_list_input?, to_port: integer?, user_id_group_pairs: user_id_group_pair_list_input? }
       class IpPermission
         attr_accessor from_port: integer
@@ -3862,7 +3948,7 @@ module Aws
       type ipam_pool_cidr_state = ("pending-provision" | "provisioned" | "failed-provision" | "pending-deprovision" | "deprovisioned" | "failed-deprovision" | "pending-import" | "failed-import")
       type ipam_pool_id = ::String
       type ipam_pool_set_output = ::Array[IpamPool]
-      type ipam_pool_state = ("create-in-progress" | "create-complete" | "create-failed" | "modify-in-progress" | "modify-complete" | "modify-failed" | "delete-in-progress" | "delete-complete" | "delete-failed")
+      type ipam_pool_state = ("create-in-progress" | "create-complete" | "create-failed" | "modify-in-progress" | "modify-complete" | "modify-failed" | "delete-in-progress" | "delete-complete" | "delete-failed" | "isolate-in-progress" | "isolate-complete" | "restore-in-progress")
       class IpamResourceCidr
         attr_accessor ipam_id: ipam_id
         attr_accessor ipam_scope_id: ipam_scope_id
@@ -3902,10 +3988,11 @@ module Aws
       end
       type ipam_scope_id = ::String
       type ipam_scope_set_output = ::Array[IpamScope]
-      type ipam_scope_state = ("create-in-progress" | "create-complete" | "create-failed" | "modify-in-progress" | "modify-complete" | "modify-failed" | "delete-in-progress" | "delete-complete" | "delete-failed")
+      type ipam_scope_state = ("create-in-progress" | "create-complete" | "create-failed" | "modify-in-progress" | "modify-complete" | "modify-failed" | "delete-in-progress" | "delete-complete" | "delete-failed" | "isolate-in-progress" | "isolate-complete" | "restore-in-progress")
       type ipam_scope_type = ("public" | "private")
       type ipam_set_output = ::Array[Ipam]
-      type ipam_state = ("create-in-progress" | "create-complete" | "create-failed" | "modify-in-progress" | "modify-complete" | "modify-failed" | "delete-in-progress" | "delete-complete" | "delete-failed")
+      type ipam_state = ("create-in-progress" | "create-complete" | "create-failed" | "modify-in-progress" | "modify-complete" | "modify-failed" | "delete-in-progress" | "delete-complete" | "delete-failed" | "isolate-in-progress" | "isolate-complete" | "restore-in-progress")
+      type ipv_4_pool_coip_id = ::String
       type ipv_4_pool_ec2_id = ::String
       type ipv_4_prefix_list_input = ::Array[ipv_4_prefix_specification_request]
       type ipv_4_prefix_list_output = ::Array[Ipv4PrefixSpecificationRequest]
@@ -3966,6 +4053,7 @@ module Aws
       type ipv_6_range_list_output = ::Array[Ipv6Range]
       type ipv_6_support_value = ("enable" | "disable")
       type kernel_id = ::String
+      type key_format = ("pem" | "ppk")
       type key_name_string_list = ::Array[key_pair_name]
       class KeyPair
         attr_accessor key_fingerprint: string
@@ -3982,6 +4070,8 @@ module Aws
         attr_accessor key_name: string
         attr_accessor key_type: key_type
         attr_accessor tags: tag_list_output
+        attr_accessor public_key: string
+        attr_accessor create_time: millisecond_date_time
       end
       type key_pair_list = ::Array[KeyPairInfo]
       type key_pair_name = ::String
@@ -4033,6 +4123,7 @@ module Aws
         attr_accessor launch_template_specification: FleetLaunchTemplateSpecification
         attr_accessor overrides: FleetLaunchTemplateOverrides
       end
+      type launch_template_auto_recovery_state = ("default" | "disabled")
       class LaunchTemplateBlockDeviceMapping
         attr_accessor device_name: string
         attr_accessor virtual_name: string
@@ -4095,6 +4186,10 @@ module Aws
       type launch_template_iam_instance_profile_specification_request = { arn: string?, name: string? }
       type launch_template_id = ::String
       type launch_template_id_string_list = ::Array[launch_template_id]
+      class LaunchTemplateInstanceMaintenanceOptions
+        attr_accessor auto_recovery: launch_template_auto_recovery_state
+      end
+      type launch_template_instance_maintenance_options_request = { auto_recovery: launch_template_auto_recovery_state? }
       class LaunchTemplateInstanceMarketOptions
         attr_accessor market_type: market_type
         attr_accessor spot_options: LaunchTemplateSpotMarketOptions
@@ -4212,6 +4307,12 @@ module Aws
       type license_configuration_request = { license_configuration_arn: string? }
       type license_list = ::Array[LicenseConfiguration]
       type license_specification_list_request = ::Array[license_configuration_request]
+      type list_images_in_recycle_bin_max_results = ::Integer
+      type list_images_in_recycle_bin_request = { image_ids: image_id_string_list?, next_token: string?, max_results: list_images_in_recycle_bin_max_results?, dry_run: boolean? }
+      class ListImagesInRecycleBinResult
+        attr_accessor images: image_recycle_bin_info_list
+        attr_accessor next_token: string
+      end
       type list_snapshots_in_recycle_bin_max_results = ::Integer
       type list_snapshots_in_recycle_bin_request = { max_results: list_snapshots_in_recycle_bin_max_results?, next_token: string?, snapshot_ids: snapshot_id_string_list?, dry_run: boolean? }
       class ListSnapshotsInRecycleBinResult
@@ -4411,7 +4512,7 @@ module Aws
       type modify_id_format_request = { resource: string, use_long_ids: boolean }
       type modify_identity_id_format_request = { principal_arn: string, resource: string, use_long_ids: boolean }
       type modify_image_attribute_request = { attribute: string?, description: attribute_value?, image_id: image_id, launch_permission: launch_permission_modifications?, operation_type: operation_type?, product_codes: product_code_string_list?, user_groups: user_group_string_list?, user_ids: user_id_string_list?, value: string?, dry_run: boolean?, organization_arns: organization_arn_string_list?, organizational_unit_arns: organizational_unit_arn_string_list? }
-      type modify_instance_attribute_request = { source_dest_check: attribute_boolean_value?, attribute: instance_attribute_name?, block_device_mappings: instance_block_device_mapping_specification_list?, disable_api_termination: attribute_boolean_value?, dry_run: boolean?, ebs_optimized: attribute_boolean_value?, ena_support: attribute_boolean_value?, groups: group_id_string_list?, instance_id: instance_id, instance_initiated_shutdown_behavior: attribute_value?, instance_type: attribute_value?, kernel: attribute_value?, ramdisk: attribute_value?, sriov_net_support: attribute_value?, user_data: blob_attribute_value?, value: string? }
+      type modify_instance_attribute_request = { source_dest_check: attribute_boolean_value?, attribute: instance_attribute_name?, block_device_mappings: instance_block_device_mapping_specification_list?, disable_api_termination: attribute_boolean_value?, dry_run: boolean?, ebs_optimized: attribute_boolean_value?, ena_support: attribute_boolean_value?, groups: group_id_string_list?, instance_id: instance_id, instance_initiated_shutdown_behavior: attribute_value?, instance_type: attribute_value?, kernel: attribute_value?, ramdisk: attribute_value?, sriov_net_support: attribute_value?, user_data: blob_attribute_value?, value: string?, disable_api_stop: attribute_boolean_value? }
       type modify_instance_capacity_reservation_attributes_request = { instance_id: instance_id, capacity_reservation_specification: capacity_reservation_specification, dry_run: boolean? }
       class ModifyInstanceCapacityReservationAttributesResult
         attr_accessor return: boolean
@@ -4428,6 +4529,11 @@ module Aws
       type modify_instance_event_window_request = { dry_run: boolean?, name: string?, instance_event_window_id: instance_event_window_id, time_ranges: instance_event_window_time_range_request_set?, cron_expression: instance_event_window_cron_expression? }
       class ModifyInstanceEventWindowResult
         attr_accessor instance_event_window: InstanceEventWindow
+      end
+      type modify_instance_maintenance_options_request = { instance_id: instance_id, auto_recovery: instance_auto_recovery_state?, dry_run: boolean? }
+      class ModifyInstanceMaintenanceOptionsResult
+        attr_accessor instance_id: string
+        attr_accessor auto_recovery: instance_auto_recovery_state
       end
       type modify_instance_metadata_options_request = { instance_id: instance_id, http_tokens: http_tokens_state?, http_put_response_hop_limit: integer?, http_endpoint: instance_metadata_endpoint_state?, dry_run: boolean?, http_protocol_ipv_6: instance_metadata_protocol_state?, instance_metadata_tags: instance_metadata_tags_state? }
       class ModifyInstanceMetadataOptionsResult
@@ -4498,7 +4604,7 @@ module Aws
       class ModifyTrafficMirrorSessionResult
         attr_accessor traffic_mirror_session: TrafficMirrorSession
       end
-      type modify_transit_gateway_options = { add_transit_gateway_cidr_blocks: transit_gateway_cidr_block_string_list?, remove_transit_gateway_cidr_blocks: transit_gateway_cidr_block_string_list?, vpn_ecmp_support: vpn_ecmp_support_value?, dns_support: dns_support_value?, auto_accept_shared_attachments: auto_accept_shared_attachments_value?, default_route_table_association: default_route_table_association_value?, association_default_route_table_id: transit_gateway_route_table_id?, default_route_table_propagation: default_route_table_propagation_value?, propagation_default_route_table_id: transit_gateway_route_table_id? }
+      type modify_transit_gateway_options = { add_transit_gateway_cidr_blocks: transit_gateway_cidr_block_string_list?, remove_transit_gateway_cidr_blocks: transit_gateway_cidr_block_string_list?, vpn_ecmp_support: vpn_ecmp_support_value?, dns_support: dns_support_value?, auto_accept_shared_attachments: auto_accept_shared_attachments_value?, default_route_table_association: default_route_table_association_value?, association_default_route_table_id: transit_gateway_route_table_id?, default_route_table_propagation: default_route_table_propagation_value?, propagation_default_route_table_id: transit_gateway_route_table_id?, amazon_side_asn: long? }
       type modify_transit_gateway_prefix_list_reference_request = { transit_gateway_route_table_id: transit_gateway_route_table_id, prefix_list_id: prefix_list_resource_id, transit_gateway_attachment_id: transit_gateway_attachment_id?, blackhole: boolean?, dry_run: boolean? }
       class ModifyTransitGatewayPrefixListReferenceResult
         attr_accessor transit_gateway_prefix_list_reference: TransitGatewayPrefixListReference
@@ -4522,11 +4628,11 @@ module Aws
       class ModifyVpcEndpointConnectionNotificationResult
         attr_accessor return_value: boolean
       end
-      type modify_vpc_endpoint_request = { dry_run: boolean?, vpc_endpoint_id: vpc_endpoint_id, reset_policy: boolean?, policy_document: string?, add_route_table_ids: vpc_endpoint_route_table_id_list?, remove_route_table_ids: vpc_endpoint_route_table_id_list?, add_subnet_ids: vpc_endpoint_subnet_id_list?, remove_subnet_ids: vpc_endpoint_subnet_id_list?, add_security_group_ids: vpc_endpoint_security_group_id_list?, remove_security_group_ids: vpc_endpoint_security_group_id_list?, private_dns_enabled: boolean? }
+      type modify_vpc_endpoint_request = { dry_run: boolean?, vpc_endpoint_id: vpc_endpoint_id, reset_policy: boolean?, policy_document: string?, add_route_table_ids: vpc_endpoint_route_table_id_list?, remove_route_table_ids: vpc_endpoint_route_table_id_list?, add_subnet_ids: vpc_endpoint_subnet_id_list?, remove_subnet_ids: vpc_endpoint_subnet_id_list?, add_security_group_ids: vpc_endpoint_security_group_id_list?, remove_security_group_ids: vpc_endpoint_security_group_id_list?, ip_address_type: ip_address_type?, dns_options: dns_options_specification?, private_dns_enabled: boolean? }
       class ModifyVpcEndpointResult
         attr_accessor return: boolean
       end
-      type modify_vpc_endpoint_service_configuration_request = { dry_run: boolean?, service_id: vpc_endpoint_service_id, private_dns_name: string?, remove_private_dns_name: boolean?, acceptance_required: boolean?, add_network_load_balancer_arns: value_string_list?, remove_network_load_balancer_arns: value_string_list?, add_gateway_load_balancer_arns: value_string_list?, remove_gateway_load_balancer_arns: value_string_list? }
+      type modify_vpc_endpoint_service_configuration_request = { dry_run: boolean?, service_id: vpc_endpoint_service_id, private_dns_name: string?, remove_private_dns_name: boolean?, acceptance_required: boolean?, add_network_load_balancer_arns: value_string_list?, remove_network_load_balancer_arns: value_string_list?, add_gateway_load_balancer_arns: value_string_list?, remove_gateway_load_balancer_arns: value_string_list?, add_supported_ip_address_types: value_string_list?, remove_supported_ip_address_types: value_string_list? }
       class ModifyVpcEndpointServiceConfigurationResult
         attr_accessor return: boolean
       end
@@ -4820,7 +4926,7 @@ module Aws
       end
       type network_interface_private_ip_address_list = ::Array[NetworkInterfacePrivateIpAddress]
       type network_interface_status = ("available" | "associated" | "attaching" | "in-use" | "detaching")
-      type network_interface_type = ("interface" | "natGateway" | "efa" | "trunk")
+      type network_interface_type = ("interface" | "natGateway" | "efa" | "trunk" | "load_balancer" | "network_load_balancer" | "vpc_endpoint" | "branch" | "transit_gateway" | "lambda" | "quicksight" | "global_accelerator_managed" | "api_gateway_managed" | "gateway_load_balancer" | "gateway_load_balancer_endpoint" | "iot_rules_managed" | "aws_codestar_connections_managed")
       type network_performance = ::String
       type new_dhcp_configuration = { key: string?, values: value_string_list? }
       type new_dhcp_configuration_list = ::Array[new_dhcp_configuration]
@@ -4869,6 +4975,9 @@ module Aws
         attr_accessor source_vpc: AnalysisComponent
         attr_accessor subnet: AnalysisComponent
         attr_accessor vpc: AnalysisComponent
+        attr_accessor additional_details: additional_detail_list
+        attr_accessor transit_gateway: AnalysisComponent
+        attr_accessor transit_gateway_route_table_route: TransitGatewayRouteTableRoute
       end
       type path_component_list = ::Array[PathComponent]
       class PathStatement
@@ -4896,6 +5005,7 @@ module Aws
       type peering_connection_options_request = { allow_dns_resolution_from_remote_vpc: boolean?, allow_egress_from_local_classic_link_to_remote_vpc: boolean?, allow_egress_from_local_vpc_to_remote_classic_link: boolean? }
       class PeeringTgwInfo
         attr_accessor transit_gateway_id: string
+        attr_accessor core_network_id: string
         attr_accessor owner_id: string
         attr_accessor region: string
       end
@@ -4955,6 +5065,7 @@ module Aws
         attr_accessor group_id: string
         attr_accessor tags: tag_list_output
         attr_accessor group_arn: string
+        attr_accessor spread_level: spread_level
       end
       type placement_group_arn = ::String
       type placement_group_id = ::String
@@ -5183,7 +5294,7 @@ module Aws
       type region_list = ::Array[Region]
       type region_name_string_list = ::Array[string]
       type region_names = ::Array[string]
-      type register_image_request = { image_location: string?, architecture: architecture_values?, block_device_mappings: block_device_mapping_request_list_input?, description: string?, dry_run: boolean?, ena_support: boolean?, kernel_id: kernel_id?, name: string, billing_products: billing_product_list?, ramdisk_id: ramdisk_id?, root_device_name: string?, sriov_net_support: string?, virtualization_type: string?, boot_mode: boot_mode_values? }
+      type register_image_request = { image_location: string?, architecture: architecture_values?, block_device_mappings: block_device_mapping_request_list_input?, description: string?, dry_run: boolean?, ena_support: boolean?, kernel_id: kernel_id?, name: string, billing_products: billing_product_list?, ramdisk_id: ramdisk_id?, root_device_name: string?, sriov_net_support: string?, virtualization_type: string?, boot_mode: boot_mode_values?, tpm_support: tpm_support_values?, uefi_data: string_type? }
       class RegisterImageResult
         attr_accessor image_id: string
       end
@@ -5226,7 +5337,7 @@ module Aws
         attr_accessor successful: response_host_id_list
         attr_accessor unsuccessful: unsuccessful_item_list
       end
-      type release_ipam_pool_allocation_request = { dry_run: boolean?, ipam_pool_id: ipam_pool_id, cidr: string, ipam_pool_allocation_id: ipam_pool_allocation_id? }
+      type release_ipam_pool_allocation_request = { dry_run: boolean?, ipam_pool_id: ipam_pool_id, cidr: string, ipam_pool_allocation_id: ipam_pool_allocation_id }
       class ReleaseIpamPoolAllocationResult
         attr_accessor success: boolean
       end
@@ -5274,7 +5385,7 @@ module Aws
       type request_instance_type_list = ::Array[instance_type]
       type request_ipam_resource_tag = { key: string?, value: string? }
       type request_ipam_resource_tag_list_input = ::Array[request_ipam_resource_tag]
-      type request_launch_template_data = { kernel_id: kernel_id?, ebs_optimized: boolean?, iam_instance_profile: launch_template_iam_instance_profile_specification_request?, block_device_mappings: launch_template_block_device_mapping_request_list?, network_interfaces: launch_template_instance_network_interface_specification_request_list?, image_id: image_id?, instance_type: instance_type?, key_name: key_pair_name?, monitoring: launch_templates_monitoring_request?, placement: launch_template_placement_request?, ram_disk_id: ramdisk_id?, disable_api_termination: boolean?, instance_initiated_shutdown_behavior: shutdown_behavior?, user_data: string?, tag_specifications: launch_template_tag_specification_request_list?, elastic_gpu_specifications: elastic_gpu_specification_list_input?, elastic_inference_accelerators: launch_template_elastic_inference_accelerator_list?, security_group_ids: security_group_id_string_list?, security_groups: security_group_string_list?, instance_market_options: launch_template_instance_market_options_request?, credit_specification: credit_specification_request?, cpu_options: launch_template_cpu_options_request?, capacity_reservation_specification: launch_template_capacity_reservation_specification_request?, license_specifications: launch_template_license_specification_list_request?, hibernation_options: launch_template_hibernation_options_request?, metadata_options: launch_template_instance_metadata_options_request?, enclave_options: launch_template_enclave_options_request?, instance_requirements: instance_requirements_request?, private_dns_name_options: launch_template_private_dns_name_options_request? }
+      type request_launch_template_data = { kernel_id: kernel_id?, ebs_optimized: boolean?, iam_instance_profile: launch_template_iam_instance_profile_specification_request?, block_device_mappings: launch_template_block_device_mapping_request_list?, network_interfaces: launch_template_instance_network_interface_specification_request_list?, image_id: image_id?, instance_type: instance_type?, key_name: key_pair_name?, monitoring: launch_templates_monitoring_request?, placement: launch_template_placement_request?, ram_disk_id: ramdisk_id?, disable_api_termination: boolean?, instance_initiated_shutdown_behavior: shutdown_behavior?, user_data: string?, tag_specifications: launch_template_tag_specification_request_list?, elastic_gpu_specifications: elastic_gpu_specification_list_input?, elastic_inference_accelerators: launch_template_elastic_inference_accelerator_list?, security_group_ids: security_group_id_string_list?, security_groups: security_group_string_list?, instance_market_options: launch_template_instance_market_options_request?, credit_specification: credit_specification_request?, cpu_options: launch_template_cpu_options_request?, capacity_reservation_specification: launch_template_capacity_reservation_specification_request?, license_specifications: launch_template_license_specification_list_request?, hibernation_options: launch_template_hibernation_options_request?, metadata_options: launch_template_instance_metadata_options_request?, enclave_options: launch_template_enclave_options_request?, instance_requirements: instance_requirements_request?, private_dns_name_options: launch_template_private_dns_name_options_request?, maintenance_options: launch_template_instance_maintenance_options_request?, disable_api_stop: boolean? }
       type request_spot_fleet_request = { dry_run: boolean?, spot_fleet_request_config: spot_fleet_request_config_data }
       class RequestSpotFleetResponse
         attr_accessor spot_fleet_request_id: string
@@ -5425,7 +5536,7 @@ module Aws
         attr_accessor resource_types: value_string_list
       end
       type resource_statement_request = { resources: value_string_list?, resource_types: value_string_list? }
-      type resource_type = ("capacity-reservation" | "client-vpn-endpoint" | "customer-gateway" | "carrier-gateway" | "dedicated-host" | "dhcp-options" | "egress-only-internet-gateway" | "elastic-ip" | "elastic-gpu" | "export-image-task" | "export-instance-task" | "fleet" | "fpga-image" | "host-reservation" | "image" | "import-image-task" | "import-snapshot-task" | "instance" | "instance-event-window" | "internet-gateway" | "ipam" | "ipam-pool" | "ipam-scope" | "ipv4pool-ec2" | "ipv6pool-ec2" | "key-pair" | "launch-template" | "local-gateway" | "local-gateway-route-table" | "local-gateway-virtual-interface" | "local-gateway-virtual-interface-group" | "local-gateway-route-table-vpc-association" | "local-gateway-route-table-virtual-interface-group-association" | "natgateway" | "network-acl" | "network-interface" | "network-insights-analysis" | "network-insights-path" | "network-insights-access-scope" | "network-insights-access-scope-analysis" | "placement-group" | "prefix-list" | "replace-root-volume-task" | "reserved-instances" | "route-table" | "security-group" | "security-group-rule" | "snapshot" | "spot-fleet-request" | "spot-instances-request" | "subnet" | "traffic-mirror-filter" | "traffic-mirror-session" | "traffic-mirror-target" | "transit-gateway" | "transit-gateway-attachment" | "transit-gateway-connect-peer" | "transit-gateway-multicast-domain" | "transit-gateway-route-table" | "volume" | "vpc" | "vpc-endpoint" | "vpc-endpoint-service" | "vpc-peering-connection" | "vpn-connection" | "vpn-gateway" | "vpc-flow-log")
+      type resource_type = ("capacity-reservation" | "client-vpn-endpoint" | "customer-gateway" | "carrier-gateway" | "dedicated-host" | "dhcp-options" | "egress-only-internet-gateway" | "elastic-ip" | "elastic-gpu" | "export-image-task" | "export-instance-task" | "fleet" | "fpga-image" | "host-reservation" | "image" | "import-image-task" | "import-snapshot-task" | "instance" | "instance-event-window" | "internet-gateway" | "ipam" | "ipam-pool" | "ipam-scope" | "ipv4pool-ec2" | "ipv6pool-ec2" | "key-pair" | "launch-template" | "local-gateway" | "local-gateway-route-table" | "local-gateway-virtual-interface" | "local-gateway-virtual-interface-group" | "local-gateway-route-table-vpc-association" | "local-gateway-route-table-virtual-interface-group-association" | "natgateway" | "network-acl" | "network-interface" | "network-insights-analysis" | "network-insights-path" | "network-insights-access-scope" | "network-insights-access-scope-analysis" | "placement-group" | "prefix-list" | "replace-root-volume-task" | "reserved-instances" | "route-table" | "security-group" | "security-group-rule" | "snapshot" | "spot-fleet-request" | "spot-instances-request" | "subnet" | "subnet-cidr-reservation" | "traffic-mirror-filter" | "traffic-mirror-session" | "traffic-mirror-target" | "transit-gateway" | "transit-gateway-attachment" | "transit-gateway-connect-peer" | "transit-gateway-multicast-domain" | "transit-gateway-policy-table" | "transit-gateway-route-table" | "transit-gateway-route-table-announcement" | "volume" | "vpc" | "vpc-endpoint" | "vpc-endpoint-service" | "vpc-peering-connection" | "vpn-connection" | "vpn-gateway" | "vpc-flow-log")
       class ResponseError
         attr_accessor code: launch_template_error_code
         attr_accessor message: string
@@ -5462,12 +5573,18 @@ module Aws
         attr_accessor enclave_options: LaunchTemplateEnclaveOptions
         attr_accessor instance_requirements: InstanceRequirements
         attr_accessor private_dns_name_options: LaunchTemplatePrivateDnsNameOptions
+        attr_accessor maintenance_options: LaunchTemplateInstanceMaintenanceOptions
+        attr_accessor disable_api_stop: boolean
       end
       type restorable_by_string_list = ::Array[string]
       type restore_address_to_classic_request = { dry_run: boolean?, public_ip: string }
       class RestoreAddressToClassicResult
         attr_accessor public_ip: string
         attr_accessor status: status
+      end
+      type restore_image_from_recycle_bin_request = { image_id: image_id, dry_run: boolean? }
+      class RestoreImageFromRecycleBinResult
+        attr_accessor return: boolean
       end
       type restore_managed_prefix_list_version_request = { dry_run: boolean?, prefix_list_id: prefix_list_resource_id, previous_version: long, current_version: long }
       class RestoreManagedPrefixListVersionResult
@@ -5565,7 +5682,8 @@ module Aws
         attr_accessor enabled: boolean
       end
       type run_instances_monitoring_enabled = { enabled: boolean }
-      type run_instances_request = { block_device_mappings: block_device_mapping_request_list_input?, image_id: image_id?, instance_type: instance_type?, ipv_6_address_count: integer?, ipv_6_addresses: instance_ipv_6_address_list_input?, kernel_id: kernel_id?, key_name: key_pair_name?, max_count: integer, min_count: integer, monitoring: run_instances_monitoring_enabled?, placement: placement?, ramdisk_id: ramdisk_id?, security_group_ids: security_group_id_string_list?, security_groups: security_group_string_list?, subnet_id: subnet_id?, user_data: string?, additional_info: string?, client_token: string?, disable_api_termination: boolean?, dry_run: boolean?, ebs_optimized: boolean?, iam_instance_profile: iam_instance_profile_specification?, instance_initiated_shutdown_behavior: shutdown_behavior?, network_interfaces: instance_network_interface_specification_list_input?, private_ip_address: string?, elastic_gpu_specification: elastic_gpu_specifications_input?, elastic_inference_accelerators: elastic_inference_accelerators?, tag_specifications: tag_specification_list_input?, launch_template: launch_template_specification?, instance_market_options: instance_market_options_request?, credit_specification: credit_specification_request?, cpu_options: cpu_options_request?, capacity_reservation_specification: capacity_reservation_specification?, hibernation_options: hibernation_options_request?, license_specifications: license_specification_list_request?, metadata_options: instance_metadata_options_request?, enclave_options: enclave_options_request?, private_dns_name_options: private_dns_name_options_request? }
+      type run_instances_request = { block_device_mappings: block_device_mapping_request_list_input?, image_id: image_id?, instance_type: instance_type?, ipv_6_address_count: integer?, ipv_6_addresses: instance_ipv_6_address_list_input?, kernel_id: kernel_id?, key_name: key_pair_name?, max_count: integer, min_count: integer, monitoring: run_instances_monitoring_enabled?, placement: placement?, ramdisk_id: ramdisk_id?, security_group_ids: security_group_id_string_list?, security_groups: security_group_string_list?, subnet_id: subnet_id?, user_data: run_instances_user_data?, additional_info: string?, client_token: string?, disable_api_termination: boolean?, dry_run: boolean?, ebs_optimized: boolean?, iam_instance_profile: iam_instance_profile_specification?, instance_initiated_shutdown_behavior: shutdown_behavior?, network_interfaces: instance_network_interface_specification_list_input?, private_ip_address: string?, elastic_gpu_specification: elastic_gpu_specifications_input?, elastic_inference_accelerators: elastic_inference_accelerators?, tag_specifications: tag_specification_list_input?, launch_template: launch_template_specification?, instance_market_options: instance_market_options_request?, credit_specification: credit_specification_request?, cpu_options: cpu_options_request?, capacity_reservation_specification: capacity_reservation_specification?, hibernation_options: hibernation_options_request?, license_specifications: license_specification_list_request?, metadata_options: instance_metadata_options_request?, enclave_options: enclave_options_request?, private_dns_name_options: private_dns_name_options_request?, maintenance_options: instance_maintenance_options_request?, disable_api_stop: boolean? }
+      type run_instances_user_data = ::String
       type run_scheduled_instances_request = { client_token: string?, dry_run: boolean?, instance_count: integer?, launch_specification: scheduled_instances_launch_specification, scheduled_instance_id: scheduled_instance_id }
       class RunScheduledInstancesResult
         attr_accessor instance_id_set: instance_id_set
@@ -5713,6 +5831,7 @@ module Aws
         attr_accessor manages_vpc_endpoints: boolean
         attr_accessor network_load_balancer_arns: value_string_list
         attr_accessor gateway_load_balancer_arns: value_string_list
+        attr_accessor supported_ip_address_types: supported_ip_address_types
         attr_accessor base_endpoint_dns_names: value_string_list
         attr_accessor private_dns_name: string
         attr_accessor private_dns_name_configuration: PrivateDnsNameConfiguration
@@ -5720,6 +5839,7 @@ module Aws
         attr_accessor tags: tag_list_output
       end
       type service_configuration_set_output = ::Array[ServiceConfiguration]
+      type service_connectivity_type = ("ipv4" | "ipv6")
       class ServiceDetail
         attr_accessor service_name: string
         attr_accessor service_id: string
@@ -5735,6 +5855,7 @@ module Aws
         attr_accessor payer_responsibility: payer_responsibility
         attr_accessor tags: tag_list_output
         attr_accessor private_dns_name_verification_state: dns_name_state
+        attr_accessor supported_ip_address_types: supported_ip_address_types
       end
       type service_detail_set = ::Array[ServiceDetail]
       type service_state = ("Pending" | "Available" | "Deleting" | "Deleted" | "Failed")
@@ -5993,6 +6114,7 @@ module Aws
         attr_accessor timestamp: date_time
       end
       type spot_price_history_list = ::Array[SpotPrice]
+      type spread_level = ("host" | "rack")
       class StaleIpPermission
         attr_accessor from_port: integer
         attr_accessor ip_protocol: string
@@ -6058,6 +6180,7 @@ module Aws
       type store_image_task_result_set = ::Array[StoreImageTaskResult]
       type string = ::String
       type string_list = ::Array[string]
+      type string_type = ::String
       class Subnet
         attr_accessor availability_zone: string
         attr_accessor availability_zone_id: string
@@ -6123,6 +6246,7 @@ module Aws
       end
       type successful_queued_purchase_deletion_set = ::Array[SuccessfulQueuedPurchaseDeletion]
       type summary_status = ("ok" | "impaired" | "insufficient-data" | "not-applicable" | "initializing")
+      type supported_ip_address_types = ::Array[service_connectivity_type]
       class Tag
         attr_accessor key: string
         attr_accessor value: string
@@ -6218,6 +6342,7 @@ module Aws
       end
       type total_local_storage_gb = { min: double?, max: double? }
       type total_local_storage_gb_request = { min: double?, max: double? }
+      type tpm_support_values = ("v2.0")
       type traffic_direction = ("ingress" | "egress")
       class TrafficMirrorFilter
         attr_accessor traffic_mirror_filter_id: string
@@ -6280,11 +6405,12 @@ module Aws
         attr_accessor description: string
         attr_accessor owner_id: string
         attr_accessor tags: tag_list_output
+        attr_accessor gateway_load_balancer_endpoint_id: string
       end
       type traffic_mirror_target_id = ::String
       type traffic_mirror_target_id_list = ::Array[traffic_mirror_target_id]
       type traffic_mirror_target_set_output = ::Array[TrafficMirrorTarget]
-      type traffic_mirror_target_type = ("network-interface" | "network-load-balancer")
+      type traffic_mirror_target_type = ("network-interface" | "network-load-balancer" | "gateway-load-balancer-endpoint")
       type traffic_mirroring_max_results = ::Integer
       type traffic_type = ("ACCEPT" | "REJECT" | "ALL")
       type transit_association_gateway_id = ::String
@@ -6463,14 +6589,56 @@ module Aws
       end
       class TransitGatewayPeeringAttachment
         attr_accessor transit_gateway_attachment_id: string
+        attr_accessor accepter_transit_gateway_attachment_id: string
         attr_accessor requester_tgw_info: PeeringTgwInfo
         attr_accessor accepter_tgw_info: PeeringTgwInfo
+        attr_accessor options: TransitGatewayPeeringAttachmentOptions
         attr_accessor status: PeeringAttachmentStatus
         attr_accessor state: transit_gateway_attachment_state
         attr_accessor creation_time: date_time
         attr_accessor tags: tag_list_output
       end
       type transit_gateway_peering_attachment_list_output = ::Array[TransitGatewayPeeringAttachment]
+      class TransitGatewayPeeringAttachmentOptions
+        attr_accessor dynamic_routing: dynamic_routing_value
+      end
+      class TransitGatewayPolicyRule
+        attr_accessor source_cidr_block: string
+        attr_accessor source_port_range: string
+        attr_accessor destination_cidr_block: string
+        attr_accessor destination_port_range: string
+        attr_accessor protocol: string
+        attr_accessor meta_data: TransitGatewayPolicyRuleMetaData
+      end
+      class TransitGatewayPolicyRuleMetaData
+        attr_accessor meta_data_key: string
+        attr_accessor meta_data_value: string
+      end
+      class TransitGatewayPolicyTable
+        attr_accessor transit_gateway_policy_table_id: transit_gateway_policy_table_id
+        attr_accessor transit_gateway_id: transit_gateway_id
+        attr_accessor state: transit_gateway_policy_table_state
+        attr_accessor creation_time: date_time
+        attr_accessor tags: tag_list_output
+      end
+      class TransitGatewayPolicyTableAssociation
+        attr_accessor transit_gateway_policy_table_id: transit_gateway_policy_table_id
+        attr_accessor transit_gateway_attachment_id: transit_gateway_attachment_id
+        attr_accessor resource_id: string
+        attr_accessor resource_type: transit_gateway_attachment_resource_type
+        attr_accessor state: transit_gateway_association_state
+      end
+      type transit_gateway_policy_table_association_list_output = ::Array[TransitGatewayPolicyTableAssociation]
+      class TransitGatewayPolicyTableEntry
+        attr_accessor policy_rule_number: string
+        attr_accessor policy_rule: TransitGatewayPolicyRule
+        attr_accessor target_route_table_id: transit_gateway_route_table_id
+      end
+      type transit_gateway_policy_table_entry_list = ::Array[TransitGatewayPolicyTableEntry]
+      type transit_gateway_policy_table_id = ::String
+      type transit_gateway_policy_table_id_string_list = ::Array[transit_gateway_policy_table_id]
+      type transit_gateway_policy_table_list_output = ::Array[TransitGatewayPolicyTable]
+      type transit_gateway_policy_table_state = ("pending" | "available" | "deleting" | "deleted")
       class TransitGatewayPrefixListAttachment
         attr_accessor transit_gateway_attachment_id: transit_gateway_attachment_id
         attr_accessor resource_type: transit_gateway_attachment_resource_type
@@ -6492,12 +6660,14 @@ module Aws
         attr_accessor resource_type: transit_gateway_attachment_resource_type
         attr_accessor transit_gateway_route_table_id: string
         attr_accessor state: transit_gateway_propagation_state
+        attr_accessor transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id
       end
       type transit_gateway_propagation_state = ("enabling" | "enabled" | "disabling" | "disabled")
       type transit_gateway_request_options = { amazon_side_asn: long?, auto_accept_shared_attachments: auto_accept_shared_attachments_value?, default_route_table_association: default_route_table_association_value?, default_route_table_propagation: default_route_table_propagation_value?, vpn_ecmp_support: vpn_ecmp_support_value?, dns_support: dns_support_value?, multicast_support: multicast_support_value?, transit_gateway_cidr_blocks: transit_gateway_cidr_block_string_list? }
       class TransitGatewayRoute
         attr_accessor destination_cidr_block: string
         attr_accessor prefix_list_id: prefix_list_resource_id
+        attr_accessor transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id
         attr_accessor transit_gateway_attachments: transit_gateway_route_attachment_list
         attr_accessor type_: transit_gateway_route_type
         attr_accessor state: transit_gateway_route_state
@@ -6519,6 +6689,24 @@ module Aws
         attr_accessor creation_time: date_time
         attr_accessor tags: tag_list_output
       end
+      class TransitGatewayRouteTableAnnouncement
+        attr_accessor transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id
+        attr_accessor transit_gateway_id: transit_gateway_id
+        attr_accessor core_network_id: string
+        attr_accessor peer_transit_gateway_id: transit_gateway_id
+        attr_accessor peer_core_network_id: string
+        attr_accessor peering_attachment_id: transit_gateway_attachment_id
+        attr_accessor announcement_direction: transit_gateway_route_table_announcement_direction
+        attr_accessor transit_gateway_route_table_id: transit_gateway_route_table_id
+        attr_accessor state: transit_gateway_route_table_announcement_state
+        attr_accessor creation_time: date_time
+        attr_accessor tags: tag_list_output
+      end
+      type transit_gateway_route_table_announcement_direction = ("outgoing" | "incoming")
+      type transit_gateway_route_table_announcement_id = ::String
+      type transit_gateway_route_table_announcement_id_string_list = ::Array[transit_gateway_route_table_announcement_id]
+      type transit_gateway_route_table_announcement_list_output = ::Array[TransitGatewayRouteTableAnnouncement]
+      type transit_gateway_route_table_announcement_state = ("available" | "pending" | "failing" | "failed" | "deleting" | "deleted")
       class TransitGatewayRouteTableAssociation
         attr_accessor transit_gateway_attachment_id: string
         attr_accessor resource_id: string
@@ -6534,8 +6722,18 @@ module Aws
         attr_accessor resource_id: string
         attr_accessor resource_type: transit_gateway_attachment_resource_type
         attr_accessor state: transit_gateway_propagation_state
+        attr_accessor transit_gateway_route_table_announcement_id: transit_gateway_route_table_announcement_id
       end
       type transit_gateway_route_table_propagation_list = ::Array[TransitGatewayRouteTablePropagation]
+      class TransitGatewayRouteTableRoute
+        attr_accessor destination_cidr: string
+        attr_accessor state: string
+        attr_accessor route_origin: string
+        attr_accessor prefix_list_id: string
+        attr_accessor attachment_id: string
+        attr_accessor resource_id: string
+        attr_accessor resource_type: string
+      end
       type transit_gateway_route_table_state = ("pending" | "available" | "deleting" | "deleted")
       type transit_gateway_route_type = ("static" | "propagated")
       type transit_gateway_state = ("pending" | "available" | "modifying" | "deleting" | "deleted")
@@ -6836,6 +7034,8 @@ module Aws
         attr_accessor route_table_ids: value_string_list
         attr_accessor subnet_ids: value_string_list
         attr_accessor groups: group_identifier_set
+        attr_accessor ip_address_type: ip_address_type
+        attr_accessor dns_options: DnsOptions
         attr_accessor private_dns_enabled: boolean
         attr_accessor requester_managed: boolean
         attr_accessor network_interface_ids: value_string_list
@@ -6854,6 +7054,7 @@ module Aws
         attr_accessor dns_entries: dns_entry_set
         attr_accessor network_load_balancer_arns: value_string_list
         attr_accessor gateway_load_balancer_arns: value_string_list
+        attr_accessor ip_address_type: ip_address_type
       end
       type vpc_endpoint_connection_set = ::Array[VpcEndpointConnection]
       type vpc_endpoint_id = ::String
@@ -6945,10 +7146,12 @@ module Aws
         attr_accessor remote_ipv_4_network_cidr: string
         attr_accessor local_ipv_6_network_cidr: string
         attr_accessor remote_ipv_6_network_cidr: string
+        attr_accessor outside_ip_address_type: string
+        attr_accessor transport_transit_gateway_attachment_id: string
         attr_accessor tunnel_inside_ip_version: tunnel_inside_ip_version
         attr_accessor tunnel_options: tunnel_options_list
       end
-      type vpn_connection_options_specification = { enable_acceleration: boolean?, static_routes_only: boolean?, tunnel_inside_ip_version: tunnel_inside_ip_version?, tunnel_options: vpn_tunnel_options_specifications_list?, local_ipv_4_network_cidr: string?, remote_ipv_4_network_cidr: string?, local_ipv_6_network_cidr: string?, remote_ipv_6_network_cidr: string? }
+      type vpn_connection_options_specification = { enable_acceleration: boolean?, static_routes_only: boolean?, tunnel_inside_ip_version: tunnel_inside_ip_version?, tunnel_options: vpn_tunnel_options_specifications_list?, local_ipv_4_network_cidr: string?, remote_ipv_4_network_cidr: string?, local_ipv_6_network_cidr: string?, remote_ipv_6_network_cidr: string?, outside_ip_address_type: string?, transport_transit_gateway_attachment_id: transit_gateway_attachment_id? }
       type vpn_ecmp_support_value = ("enable" | "disable")
       class VpnGateway
         attr_accessor availability_zone: string

@@ -30,10 +30,10 @@ module Aws
       type connect_custom_key_store_request = { custom_key_store_id: custom_key_store_id_type }
       class ConnectCustomKeyStoreResponse
       end
-      type connection_error_code_type = ("INVALID_CREDENTIALS" | "CLUSTER_NOT_FOUND" | "NETWORK_ERRORS" | "INTERNAL_ERROR" | "INSUFFICIENT_CLOUDHSM_HSMS" | "USER_LOCKED_OUT" | "USER_NOT_FOUND" | "USER_LOGGED_IN" | "SUBNET_NOT_FOUND")
+      type connection_error_code_type = ("INVALID_CREDENTIALS" | "CLUSTER_NOT_FOUND" | "NETWORK_ERRORS" | "INTERNAL_ERROR" | "INSUFFICIENT_CLOUDHSM_HSMS" | "USER_LOCKED_OUT" | "USER_NOT_FOUND" | "USER_LOGGED_IN" | "SUBNET_NOT_FOUND" | "INSUFFICIENT_FREE_ADDRESSES_IN_SUBNET")
       type connection_state_type = ("CONNECTED" | "CONNECTING" | "FAILED" | "DISCONNECTED" | "DISCONNECTING")
       type create_alias_request = { alias_name: alias_name_type, target_key_id: key_id_type }
-      type create_custom_key_store_request = { custom_key_store_name: custom_key_store_name_type, cloud_hsm_cluster_id: cloud_hsm_cluster_id_type, trust_anchor_certificate: trust_anchor_certificate_type, key_store_password: key_store_password_type }
+      type create_custom_key_store_request = { custom_key_store_name: custom_key_store_name_type, cloud_hsm_cluster_id: cloud_hsm_cluster_id_type?, trust_anchor_certificate: trust_anchor_certificate_type?, key_store_password: key_store_password_type? }
       class CreateCustomKeyStoreResponse
         attr_accessor custom_key_store_id: custom_key_store_id_type
       end
@@ -58,8 +58,8 @@ module Aws
         attr_accessor connection_error_code: connection_error_code_type
         attr_accessor creation_date: date_type
       end
-      type customer_master_key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SYMMETRIC_DEFAULT")
-      type data_key_pair_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1")
+      type customer_master_key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SYMMETRIC_DEFAULT" | "HMAC_224" | "HMAC_256" | "HMAC_384" | "HMAC_512" | "SM2")
+      type data_key_pair_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SM2")
       type data_key_spec = ("AES_256" | "AES_128")
       type date_type = ::Time
       type decrypt_request = { ciphertext_blob: ciphertext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, key_id: key_id_type?, encryption_algorithm: encryption_algorithm_spec? }
@@ -97,7 +97,7 @@ module Aws
         attr_accessor key_id: key_id_type
         attr_accessor encryption_algorithm: encryption_algorithm_spec
       end
-      type encryption_algorithm_spec = ("SYMMETRIC_DEFAULT" | "RSAES_OAEP_SHA_1" | "RSAES_OAEP_SHA_256")
+      type encryption_algorithm_spec = ("SYMMETRIC_DEFAULT" | "RSAES_OAEP_SHA_1" | "RSAES_OAEP_SHA_256" | "SM2PKE")
       type encryption_algorithm_spec_list = ::Array[encryption_algorithm_spec]
       type encryption_context_key = ::String
       type encryption_context_type = ::Hash[encryption_context_key, encryption_context_value]
@@ -128,6 +128,12 @@ module Aws
       type generate_data_key_without_plaintext_request = { key_id: key_id_type, encryption_context: encryption_context_type?, key_spec: data_key_spec?, number_of_bytes: number_of_bytes_type?, grant_tokens: grant_token_list? }
       class GenerateDataKeyWithoutPlaintextResponse
         attr_accessor ciphertext_blob: ciphertext_type
+        attr_accessor key_id: key_id_type
+      end
+      type generate_mac_request = { message: plaintext_type, key_id: key_id_type, mac_algorithm: mac_algorithm_spec, grant_tokens: grant_token_list? }
+      class GenerateMacResponse
+        attr_accessor mac: ciphertext_type
+        attr_accessor mac_algorithm: mac_algorithm_spec
         attr_accessor key_id: key_id_type
       end
       type generate_random_request = { number_of_bytes: number_of_bytes_type?, custom_key_store_id: custom_key_store_id_type? }
@@ -178,7 +184,7 @@ module Aws
         attr_accessor constraints: GrantConstraints
       end
       type grant_name_type = ::String
-      type grant_operation = ("Decrypt" | "Encrypt" | "GenerateDataKey" | "GenerateDataKeyWithoutPlaintext" | "ReEncryptFrom" | "ReEncryptTo" | "Sign" | "Verify" | "GetPublicKey" | "CreateGrant" | "RetireGrant" | "DescribeKey" | "GenerateDataKeyPair" | "GenerateDataKeyPairWithoutPlaintext")
+      type grant_operation = ("Decrypt" | "Encrypt" | "GenerateDataKey" | "GenerateDataKeyWithoutPlaintext" | "ReEncryptFrom" | "ReEncryptTo" | "Sign" | "Verify" | "GetPublicKey" | "CreateGrant" | "RetireGrant" | "DescribeKey" | "GenerateDataKeyPair" | "GenerateDataKeyPairWithoutPlaintext" | "GenerateMac" | "VerifyMac")
       type grant_operation_list = ::Array[grant_operation]
       type grant_token_list = ::Array[grant_token_type]
       type grant_token_type = ::String
@@ -215,11 +221,12 @@ module Aws
         attr_accessor multi_region: nullable_boolean_type
         attr_accessor multi_region_configuration: MultiRegionConfiguration
         attr_accessor pending_deletion_window_in_days: pending_window_in_days_type
+        attr_accessor mac_algorithms: mac_algorithm_spec_list
       end
-      type key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SYMMETRIC_DEFAULT")
+      type key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SYMMETRIC_DEFAULT" | "HMAC_224" | "HMAC_256" | "HMAC_384" | "HMAC_512" | "SM2")
       type key_state = ("Creating" | "Enabled" | "Disabled" | "PendingDeletion" | "PendingImport" | "PendingReplicaDeletion" | "Unavailable" | "Updating")
       type key_store_password_type = ::String
-      type key_usage_type = ("SIGN_VERIFY" | "ENCRYPT_DECRYPT")
+      type key_usage_type = ("SIGN_VERIFY" | "ENCRYPT_DECRYPT" | "GENERATE_VERIFY_MAC")
       type limit_type = ::Integer
       type list_aliases_request = { key_id: key_id_type?, limit: limit_type?, marker: marker_type? }
       class ListAliasesResponse
@@ -252,6 +259,8 @@ module Aws
         attr_accessor truncated: boolean_type
       end
       type list_retirable_grants_request = { limit: limit_type?, marker: marker_type?, retiring_principal: principal_id_type }
+      type mac_algorithm_spec = ("HMAC_SHA_224" | "HMAC_SHA_256" | "HMAC_SHA_384" | "HMAC_SHA_512")
+      type mac_algorithm_spec_list = ::Array[mac_algorithm_spec]
       type marker_type = ::String
       type message_type = ("RAW" | "DIGEST")
       class MultiRegionConfiguration
@@ -306,7 +315,7 @@ module Aws
         attr_accessor signature: ciphertext_type
         attr_accessor signing_algorithm: signing_algorithm_spec
       end
-      type signing_algorithm_spec = ("RSASSA_PSS_SHA_256" | "RSASSA_PSS_SHA_384" | "RSASSA_PSS_SHA_512" | "RSASSA_PKCS1_V1_5_SHA_256" | "RSASSA_PKCS1_V1_5_SHA_384" | "RSASSA_PKCS1_V1_5_SHA_512" | "ECDSA_SHA_256" | "ECDSA_SHA_384" | "ECDSA_SHA_512")
+      type signing_algorithm_spec = ("RSASSA_PSS_SHA_256" | "RSASSA_PSS_SHA_384" | "RSASSA_PSS_SHA_512" | "RSASSA_PKCS1_V1_5_SHA_256" | "RSASSA_PKCS1_V1_5_SHA_384" | "RSASSA_PKCS1_V1_5_SHA_512" | "ECDSA_SHA_256" | "ECDSA_SHA_384" | "ECDSA_SHA_512" | "SM2DSA")
       type signing_algorithm_spec_list = ::Array[signing_algorithm_spec]
       type tag = { tag_key: tag_key_type, tag_value: tag_value_type }
       class Tag
@@ -327,6 +336,12 @@ module Aws
       end
       type update_key_description_request = { key_id: key_id_type, description: description_type }
       type update_primary_region_request = { key_id: key_id_type, primary_region: region_type }
+      type verify_mac_request = { message: plaintext_type, key_id: key_id_type, mac_algorithm: mac_algorithm_spec, mac: ciphertext_type, grant_tokens: grant_token_list? }
+      class VerifyMacResponse
+        attr_accessor key_id: key_id_type
+        attr_accessor mac_valid: boolean_type
+        attr_accessor mac_algorithm: mac_algorithm_spec
+      end
       type verify_request = { key_id: key_id_type, message: plaintext_type, message_type: message_type?, signature: ciphertext_type, signing_algorithm: signing_algorithm_spec, grant_tokens: grant_token_list? }
       class VerifyResponse
         attr_accessor key_id: key_id_type

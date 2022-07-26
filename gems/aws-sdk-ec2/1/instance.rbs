@@ -67,6 +67,8 @@ module Aws
       def usage_operation_update_time: () -> Types::millisecond_date_time
       def private_dns_name_options: () -> Types::PrivateDnsNameOptionsResponse
       def ipv_6_address: () -> Types::string
+      def tpm_support: () -> Types::string
+      def maintenance_options: () -> Types::InstanceMaintenanceOptions
 
       # client_method
 
@@ -85,11 +87,11 @@ module Aws
 
       # waiters
 
-      def exists?: (?Waiters::waiter_options) -> bool
-      def wait_until_exists: (?Waiters::waiter_options) -> self
-      def wait_until_running: (?Waiters::waiter_options) -> self
-      def wait_until_stopped: (?Waiters::waiter_options) -> self
-      def wait_until_terminated: (?Waiters::waiter_options) -> self
+      def exists?: (?Aws::Waiters::waiter_options) -> bool
+      def wait_until_exists: (?Aws::Waiters::waiter_options) -> self
+      def wait_until_running: (?Aws::Waiters::waiter_options) -> self
+      def wait_until_stopped: (?Aws::Waiters::waiter_options) -> self
+      def wait_until_terminated: (?Aws::Waiters::waiter_options) -> self
 
       # actions
 
@@ -102,7 +104,7 @@ module Aws
       def describe_attribute: (attribute: Types::instance_attribute_name, ?dry_run: Types::boolean) -> Types::InstanceAttribute
       def detach_classic_link_vpc: (?dry_run: Types::boolean, vpc_id: Types::vpc_id) -> Types::DetachClassicLinkVpcResult
       def detach_volume: (?device: Types::string, ?force: Types::boolean, volume_id: Types::volume_id, ?dry_run: Types::boolean) -> Types::VolumeAttachment
-      def modify_attribute: (?source_dest_check: Types::attribute_boolean_value, ?attribute: Types::instance_attribute_name, ?block_device_mappings: Types::instance_block_device_mapping_specification_list, ?disable_api_termination: Types::attribute_boolean_value, ?dry_run: Types::boolean, ?ebs_optimized: Types::attribute_boolean_value, ?ena_support: Types::attribute_boolean_value, ?groups: Types::group_id_string_list, ?instance_initiated_shutdown_behavior: Types::attribute_value, ?instance_type: Types::attribute_value, ?kernel: Types::attribute_value, ?ramdisk: Types::attribute_value, ?sriov_net_support: Types::attribute_value, ?user_data: Types::blob_attribute_value, ?value: Types::string) -> EmptyStructure
+      def modify_attribute: (?source_dest_check: Types::attribute_boolean_value, ?attribute: Types::instance_attribute_name, ?block_device_mappings: Types::instance_block_device_mapping_specification_list, ?disable_api_termination: Types::attribute_boolean_value, ?dry_run: Types::boolean, ?ebs_optimized: Types::attribute_boolean_value, ?ena_support: Types::attribute_boolean_value, ?groups: Types::group_id_string_list, ?instance_initiated_shutdown_behavior: Types::attribute_value, ?instance_type: Types::attribute_value, ?kernel: Types::attribute_value, ?ramdisk: Types::attribute_value, ?sriov_net_support: Types::attribute_value, ?user_data: Types::blob_attribute_value, ?value: Types::string, ?disable_api_stop: Types::attribute_boolean_value) -> EmptyStructure
       def monitor: (?dry_run: Types::boolean) -> Types::MonitorInstancesResult
       def password_data: (?dry_run: Types::boolean) -> Types::GetPasswordDataResult
       def reboot: (?dry_run: Types::boolean) -> EmptyStructure

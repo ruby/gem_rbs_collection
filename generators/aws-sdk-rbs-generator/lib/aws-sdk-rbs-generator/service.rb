@@ -15,6 +15,7 @@ module AwsSdkRbsGenerator
       @resource_classes = @resources.fetch(:resources, []).map do |resource_name, resource|
         Views::ResourceClass.new(service: self, shape_dictionary:, resource_name:, resource:)
       end
+      @waiters_module = Views::WaitersModule.new(shape_dictionary: @shape_dictionary, waiters:)
     end
 
     def write_files(dir:)
@@ -33,6 +34,7 @@ module AwsSdkRbsGenerator
         result << ['errors.rbs', @errors_module.render]
         result << ['client.rbs', @client_class.render]
         result << ['resource.rbs', @root_resource_class.render]
+        result << ['waiters.rbs', @waiters_module.render] if !@waiters_module.waiters.empty?
         @resource_classes.each do |resource_class|
           result << ["#{resource_class.name.underscore}.rbs", resource_class.render]
         end

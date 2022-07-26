@@ -48,7 +48,7 @@ module AwsSdkRbsGenerator
         @waiters = @resource.fetch(:waiters, []).map do |waiter_name, waiter_body|
           MethodSignature.new(
             method_name: "wait_until_#{waiter_name.underscore}",
-            arguments: "?Waiters::waiter_options",
+            arguments: "?Aws::Waiters::waiter_options",
             returns: "self",
           )
         end

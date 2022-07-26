@@ -101,6 +101,19 @@ module Aws
       type csv_input = { file_header_info: file_header_info?, comments: comments?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character?, allow_quoted_record_delimiter: allow_quoted_record_delimiter? }
       type csv_output = { quote_fields: quote_fields?, quote_escape_character: quote_escape_character?, record_delimiter: record_delimiter?, field_delimiter: field_delimiter?, quote_character: quote_character? }
       type cache_control = ::String
+      class Checksum
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
+      end
+      type checksum_algorithm = ("CRC32" | "CRC32C" | "SHA1" | "SHA256")
+      type checksum_algorithm_list = ::Array[checksum_algorithm]
+      type checksum_crc32 = ::String
+      type checksum_crc32c = ::String
+      type checksum_mode = ("ENABLED")
+      type checksum_sha1 = ::String
+      type checksum_sha256 = ::String
       type cloud_function = ::String
       class CloudFunctionConfiguration
         attr_accessor id: notification_id
@@ -123,15 +136,19 @@ module Aws
         attr_accessor key: object_key
         attr_accessor expiration: expiration
         attr_accessor etag: etag
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
         attr_accessor server_side_encryption: server_side_encryption
         attr_accessor version_id: object_version_id
         attr_accessor ssekms_key_id: ssekms_key_id
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      type complete_multipart_upload_request = { bucket: bucket_name, key: object_key, multipart_upload: completed_multipart_upload?, upload_id: multipart_upload_id, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      type complete_multipart_upload_request = { bucket: bucket_name, key: object_key, multipart_upload: completed_multipart_upload?, upload_id: multipart_upload_id, checksum_crc32: checksum_crc32?, checksum_crc32c: checksum_crc32c?, checksum_sha1: checksum_sha1?, checksum_sha256: checksum_sha256?, request_payer: request_payer?, expected_bucket_owner: account_id?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5? }
       type completed_multipart_upload = { parts: completed_part_list? }
-      type completed_part = { etag: etag?, part_number: part_number? }
+      type completed_part = { etag: etag?, checksum_crc32: checksum_crc32?, checksum_crc32c: checksum_crc32c?, checksum_sha1: checksum_sha1?, checksum_sha256: checksum_sha256?, part_number: part_number? }
       type completed_part_list = ::Array[completed_part]
       type compression_type = ("NONE" | "GZIP" | "BZIP2")
       class Condition
@@ -162,14 +179,22 @@ module Aws
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      type copy_object_request = { acl: object_canned_acl?, bucket: bucket_name, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_type: content_type?, copy_source: copy_source, copy_source_if_match: copy_source_if_match?, copy_source_if_modified_since: copy_source_if_modified_since?, copy_source_if_none_match: copy_source_if_none_match?, copy_source_if_unmodified_since: copy_source_if_unmodified_since?, expires: expires?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write_acp: grant_write_acp?, key: object_key, metadata: metadata?, metadata_directive: metadata_directive?, tagging_directive: tagging_directive?, server_side_encryption: server_side_encryption?, storage_class: storage_class?, website_redirect_location: website_redirect_location?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, ssekms_key_id: ssekms_key_id?, ssekms_encryption_context: ssekms_encryption_context?, bucket_key_enabled: bucket_key_enabled?, copy_source_sse_customer_algorithm: copy_source_sse_customer_algorithm?, copy_source_sse_customer_key: copy_source_sse_customer_key?, copy_source_sse_customer_key_md5: copy_source_sse_customer_key_md5?, request_payer: request_payer?, tagging: tagging_header?, object_lock_mode: object_lock_mode?, object_lock_retain_until_date: object_lock_retain_until_date?, object_lock_legal_hold_status: object_lock_legal_hold_status?, expected_bucket_owner: account_id?, expected_source_bucket_owner: account_id? }
+      type copy_object_request = { acl: object_canned_acl?, bucket: bucket_name, cache_control: cache_control?, checksum_algorithm: checksum_algorithm?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_type: content_type?, copy_source: copy_source, copy_source_if_match: copy_source_if_match?, copy_source_if_modified_since: copy_source_if_modified_since?, copy_source_if_none_match: copy_source_if_none_match?, copy_source_if_unmodified_since: copy_source_if_unmodified_since?, expires: expires?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write_acp: grant_write_acp?, key: object_key, metadata: metadata?, metadata_directive: metadata_directive?, tagging_directive: tagging_directive?, server_side_encryption: server_side_encryption?, storage_class: storage_class?, website_redirect_location: website_redirect_location?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, ssekms_key_id: ssekms_key_id?, ssekms_encryption_context: ssekms_encryption_context?, bucket_key_enabled: bucket_key_enabled?, copy_source_sse_customer_algorithm: copy_source_sse_customer_algorithm?, copy_source_sse_customer_key: copy_source_sse_customer_key?, copy_source_sse_customer_key_md5: copy_source_sse_customer_key_md5?, request_payer: request_payer?, tagging: tagging_header?, object_lock_mode: object_lock_mode?, object_lock_retain_until_date: object_lock_retain_until_date?, object_lock_legal_hold_status: object_lock_legal_hold_status?, expected_bucket_owner: account_id?, expected_source_bucket_owner: account_id? }
       class CopyObjectResult
         attr_accessor etag: etag
         attr_accessor last_modified: last_modified
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
       end
       class CopyPartResult
         attr_accessor etag: etag
         attr_accessor last_modified: last_modified
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
       end
       type copy_source = ::String
       type copy_source_if_match = ::String
@@ -199,8 +224,9 @@ module Aws
         attr_accessor ssekms_encryption_context: ssekms_encryption_context
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
+        attr_accessor checksum_algorithm: checksum_algorithm
       end
-      type create_multipart_upload_request = { acl: object_canned_acl?, bucket: bucket_name, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_type: content_type?, expires: expires?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write_acp: grant_write_acp?, key: object_key, metadata: metadata?, server_side_encryption: server_side_encryption?, storage_class: storage_class?, website_redirect_location: website_redirect_location?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, ssekms_key_id: ssekms_key_id?, ssekms_encryption_context: ssekms_encryption_context?, bucket_key_enabled: bucket_key_enabled?, request_payer: request_payer?, tagging: tagging_header?, object_lock_mode: object_lock_mode?, object_lock_retain_until_date: object_lock_retain_until_date?, object_lock_legal_hold_status: object_lock_legal_hold_status?, expected_bucket_owner: account_id? }
+      type create_multipart_upload_request = { acl: object_canned_acl?, bucket: bucket_name, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_type: content_type?, expires: expires?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write_acp: grant_write_acp?, key: object_key, metadata: metadata?, server_side_encryption: server_side_encryption?, storage_class: storage_class?, website_redirect_location: website_redirect_location?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, ssekms_key_id: ssekms_key_id?, ssekms_encryption_context: ssekms_encryption_context?, bucket_key_enabled: bucket_key_enabled?, request_payer: request_payer?, tagging: tagging_header?, object_lock_mode: object_lock_mode?, object_lock_retain_until_date: object_lock_retain_until_date?, object_lock_legal_hold_status: object_lock_legal_hold_status?, expected_bucket_owner: account_id?, checksum_algorithm: checksum_algorithm? }
       type creation_date = ::Time
       type date = ::Time
       type days = ::Integer
@@ -255,7 +281,7 @@ module Aws
         attr_accessor request_charged: request_charged
         attr_accessor errors: errors
       end
-      type delete_objects_request = { bucket: bucket_name, delete: delete, mfa: mfa?, request_payer: request_payer?, bypass_governance_retention: bypass_governance_retention?, expected_bucket_owner: account_id? }
+      type delete_objects_request = { bucket: bucket_name, delete: delete, mfa: mfa?, request_payer: request_payer?, bypass_governance_retention: bypass_governance_retention?, expected_bucket_owner: account_id?, checksum_algorithm: checksum_algorithm? }
       type delete_public_access_block_request = { bucket: bucket_name, expected_bucket_owner: account_id? }
       class DeletedObject
         attr_accessor key: object_key
@@ -424,6 +450,26 @@ module Aws
         attr_accessor request_charged: request_charged
       end
       type get_object_acl_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      class GetObjectAttributesOutput
+        attr_accessor delete_marker: delete_marker
+        attr_accessor last_modified: last_modified
+        attr_accessor version_id: object_version_id
+        attr_accessor request_charged: request_charged
+        attr_accessor etag: etag
+        attr_accessor checksum: Checksum
+        attr_accessor object_parts: GetObjectAttributesParts
+        attr_accessor storage_class: storage_class
+        attr_accessor object_size: object_size
+      end
+      class GetObjectAttributesParts
+        attr_accessor total_parts_count: parts_count
+        attr_accessor part_number_marker: part_number_marker
+        attr_accessor next_part_number_marker: next_part_number_marker
+        attr_accessor max_parts: max_parts
+        attr_accessor is_truncated: is_truncated
+        attr_accessor parts: parts_list
+      end
+      type get_object_attributes_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, max_parts: max_parts?, part_number_marker: part_number_marker?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, expected_bucket_owner: account_id?, object_attributes: object_attributes_list }
       class GetObjectLegalHoldOutput
         attr_accessor legal_hold: ObjectLockLegalHold
       end
@@ -441,6 +487,10 @@ module Aws
         attr_accessor last_modified: last_modified
         attr_accessor content_length: content_length
         attr_accessor etag: etag
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
         attr_accessor missing_meta: missing_meta
         attr_accessor version_id: object_version_id
         attr_accessor cache_control: cache_control
@@ -466,7 +516,7 @@ module Aws
         attr_accessor object_lock_retain_until_date: object_lock_retain_until_date
         attr_accessor object_lock_legal_hold_status: object_lock_legal_hold_status
       end
-      type get_object_request = { bucket: bucket_name, if_match: if_match?, if_modified_since: if_modified_since?, if_none_match: if_none_match?, if_unmodified_since: if_unmodified_since?, key: object_key, range: range?, response_cache_control: response_cache_control?, response_content_disposition: response_content_disposition?, response_content_encoding: response_content_encoding?, response_content_language: response_content_language?, response_content_type: response_content_type?, response_expires: response_expires?, version_id: object_version_id?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, part_number: part_number?, expected_bucket_owner: account_id? }
+      type get_object_request = { bucket: bucket_name, if_match: if_match?, if_modified_since: if_modified_since?, if_none_match: if_none_match?, if_unmodified_since: if_unmodified_since?, key: object_key, range: range?, response_cache_control: response_cache_control?, response_content_disposition: response_content_disposition?, response_content_encoding: response_content_encoding?, response_content_language: response_content_language?, response_content_type: response_content_type?, response_expires: response_expires?, version_id: object_version_id?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, part_number: part_number?, expected_bucket_owner: account_id?, checksum_mode: checksum_mode? }
       type get_object_response_status_code = ::Integer
       class GetObjectRetentionOutput
         attr_accessor retention: ObjectLockRetention
@@ -516,6 +566,10 @@ module Aws
         attr_accessor archive_status: archive_status
         attr_accessor last_modified: last_modified
         attr_accessor content_length: content_length
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
         attr_accessor etag: etag
         attr_accessor missing_meta: missing_meta
         attr_accessor version_id: object_version_id
@@ -540,7 +594,7 @@ module Aws
         attr_accessor object_lock_retain_until_date: object_lock_retain_until_date
         attr_accessor object_lock_legal_hold_status: object_lock_legal_hold_status
       end
-      type head_object_request = { bucket: bucket_name, if_match: if_match?, if_modified_since: if_modified_since?, if_none_match: if_none_match?, if_unmodified_since: if_unmodified_since?, key: object_key, range: range?, version_id: object_version_id?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, part_number: part_number?, expected_bucket_owner: account_id? }
+      type head_object_request = { bucket: bucket_name, if_match: if_match?, if_modified_since: if_modified_since?, if_none_match: if_none_match?, if_unmodified_since: if_unmodified_since?, key: object_key, range: range?, version_id: object_version_id?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, part_number: part_number?, expected_bucket_owner: account_id?, checksum_mode: checksum_mode? }
       type host_name = ::String
       type http_error_code_returned_equals = ::String
       type http_redirect_code = ::String
@@ -610,7 +664,7 @@ module Aws
       type inventory_frequency = ("Daily" | "Weekly")
       type inventory_id = ::String
       type inventory_included_object_versions = ("All" | "Current")
-      type inventory_optional_field = ("Size" | "LastModifiedDate" | "StorageClass" | "ETag" | "IsMultipartUploaded" | "ReplicationStatus" | "EncryptionStatus" | "ObjectLockRetainUntilDate" | "ObjectLockMode" | "ObjectLockLegalHoldStatus" | "IntelligentTieringAccessTier" | "BucketKeyStatus")
+      type inventory_optional_field = ("Size" | "LastModifiedDate" | "StorageClass" | "ETag" | "IsMultipartUploaded" | "ReplicationStatus" | "EncryptionStatus" | "ObjectLockRetainUntilDate" | "ObjectLockMode" | "ObjectLockLegalHoldStatus" | "IntelligentTieringAccessTier" | "BucketKeyStatus" | "ChecksumAlgorithm")
       type inventory_optional_fields = ::Array[inventory_optional_field]
       class InventoryS3BucketDestination
         attr_accessor account_id: account_id
@@ -788,8 +842,9 @@ module Aws
         attr_accessor owner: Owner
         attr_accessor storage_class: storage_class
         attr_accessor request_charged: request_charged
+        attr_accessor checksum_algorithm: checksum_algorithm
       end
-      type list_parts_request = { bucket: bucket_name, key: object_key, max_parts: max_parts?, part_number_marker: part_number_marker?, upload_id: multipart_upload_id, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      type list_parts_request = { bucket: bucket_name, key: object_key, max_parts: max_parts?, part_number_marker: part_number_marker?, upload_id: multipart_upload_id, request_payer: request_payer?, expected_bucket_owner: account_id?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5? }
       type location = ::String
       type location_prefix = ::String
       class LoggingEnabled
@@ -847,6 +902,7 @@ module Aws
         attr_accessor storage_class: storage_class
         attr_accessor owner: Owner
         attr_accessor initiator: Initiator
+        attr_accessor checksum_algorithm: checksum_algorithm
       end
       type multipart_upload_id = ::String
       type multipart_upload_list = ::Array[MultipartUpload]
@@ -891,10 +947,13 @@ module Aws
         attr_accessor key: object_key
         attr_accessor last_modified: last_modified
         attr_accessor etag: etag
+        attr_accessor checksum_algorithm: checksum_algorithm_list
         attr_accessor size: size
         attr_accessor storage_class: object_storage_class
         attr_accessor owner: Owner
       end
+      type object_attributes = ("ETag" | "Checksum" | "ObjectParts" | "StorageClass" | "ObjectSize")
+      type object_attributes_list = ::Array[object_attributes]
       type object_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read" | "aws-exec-read" | "bucket-owner-read" | "bucket-owner-full-control")
       type object_identifier = { key: object_key, version_id: object_version_id? }
       type object_identifier_list = ::Array[object_identifier]
@@ -926,11 +985,21 @@ module Aws
       type object_lock_rule = { default_retention: default_retention? }
       type object_lock_token = ::String
       type object_ownership = ("BucketOwnerPreferred" | "ObjectWriter" | "BucketOwnerEnforced")
+      class ObjectPart
+        attr_accessor part_number: part_number
+        attr_accessor size: size
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
+      end
+      type object_size = ::Integer
       type object_size_greater_than_bytes = ::Integer
       type object_size_less_than_bytes = ::Integer
       type object_storage_class = ("STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR")
       class ObjectVersion
         attr_accessor etag: etag
+        attr_accessor checksum_algorithm: checksum_algorithm_list
         attr_accessor size: size
         attr_accessor storage_class: object_version_storage_class
         attr_accessor key: object_key
@@ -966,11 +1035,16 @@ module Aws
         attr_accessor last_modified: last_modified
         attr_accessor etag: etag
         attr_accessor size: size
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
       end
       type part_number = ::Integer
       type part_number_marker = ::Integer
       type parts = ::Array[Part]
       type parts_count = ::Integer
+      type parts_list = ::Array[ObjectPart]
       type payer = ("Requester" | "BucketOwner")
       type permission = ("FULL_CONTROL" | "WRITE" | "WRITE_ACP" | "READ" | "READ_ACP")
       type policy = ::String
@@ -995,41 +1069,45 @@ module Aws
         attr_accessor restrict_public_buckets: setting
       end
       type public_access_block_configuration = { block_public_acls: setting?, ignore_public_acls: setting?, block_public_policy: setting?, restrict_public_buckets: setting? }
-      type put_bucket_accelerate_configuration_request = { bucket: bucket_name, accelerate_configuration: accelerate_configuration, expected_bucket_owner: account_id? }
-      type put_bucket_acl_request = { acl: bucket_canned_acl?, access_control_policy: access_control_policy?, bucket: bucket_name, content_md5: content_md5?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write: grant_write?, grant_write_acp: grant_write_acp?, expected_bucket_owner: account_id? }
+      type put_bucket_accelerate_configuration_request = { bucket: bucket_name, accelerate_configuration: accelerate_configuration, expected_bucket_owner: account_id?, checksum_algorithm: checksum_algorithm? }
+      type put_bucket_acl_request = { acl: bucket_canned_acl?, access_control_policy: access_control_policy?, bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write: grant_write?, grant_write_acp: grant_write_acp?, expected_bucket_owner: account_id? }
       type put_bucket_analytics_configuration_request = { bucket: bucket_name, id: analytics_id, analytics_configuration: analytics_configuration, expected_bucket_owner: account_id? }
-      type put_bucket_cors_request = { bucket: bucket_name, cors_configuration: cors_configuration, content_md5: content_md5?, expected_bucket_owner: account_id? }
-      type put_bucket_encryption_request = { bucket: bucket_name, content_md5: content_md5?, server_side_encryption_configuration: server_side_encryption_configuration, expected_bucket_owner: account_id? }
+      type put_bucket_cors_request = { bucket: bucket_name, cors_configuration: cors_configuration, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, expected_bucket_owner: account_id? }
+      type put_bucket_encryption_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, server_side_encryption_configuration: server_side_encryption_configuration, expected_bucket_owner: account_id? }
       type put_bucket_intelligent_tiering_configuration_request = { bucket: bucket_name, id: intelligent_tiering_id, intelligent_tiering_configuration: intelligent_tiering_configuration }
       type put_bucket_inventory_configuration_request = { bucket: bucket_name, id: inventory_id, inventory_configuration: inventory_configuration, expected_bucket_owner: account_id? }
-      type put_bucket_lifecycle_configuration_request = { bucket: bucket_name, lifecycle_configuration: bucket_lifecycle_configuration?, expected_bucket_owner: account_id? }
-      type put_bucket_lifecycle_request = { bucket: bucket_name, content_md5: content_md5?, lifecycle_configuration: lifecycle_configuration?, expected_bucket_owner: account_id? }
-      type put_bucket_logging_request = { bucket: bucket_name, bucket_logging_status: bucket_logging_status, content_md5: content_md5?, expected_bucket_owner: account_id? }
+      type put_bucket_lifecycle_configuration_request = { bucket: bucket_name, checksum_algorithm: checksum_algorithm?, lifecycle_configuration: bucket_lifecycle_configuration?, expected_bucket_owner: account_id? }
+      type put_bucket_lifecycle_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, lifecycle_configuration: lifecycle_configuration?, expected_bucket_owner: account_id? }
+      type put_bucket_logging_request = { bucket: bucket_name, bucket_logging_status: bucket_logging_status, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, expected_bucket_owner: account_id? }
       type put_bucket_metrics_configuration_request = { bucket: bucket_name, id: metrics_id, metrics_configuration: metrics_configuration, expected_bucket_owner: account_id? }
       type put_bucket_notification_configuration_request = { bucket: bucket_name, notification_configuration: notification_configuration, expected_bucket_owner: account_id?, skip_destination_validation: skip_validation? }
-      type put_bucket_notification_request = { bucket: bucket_name, content_md5: content_md5?, notification_configuration: notification_configuration_deprecated, expected_bucket_owner: account_id? }
+      type put_bucket_notification_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, notification_configuration: notification_configuration_deprecated, expected_bucket_owner: account_id? }
       type put_bucket_ownership_controls_request = { bucket: bucket_name, content_md5: content_md5?, expected_bucket_owner: account_id?, ownership_controls: ownership_controls }
-      type put_bucket_policy_request = { bucket: bucket_name, content_md5: content_md5?, confirm_remove_self_bucket_access: confirm_remove_self_bucket_access?, policy: policy, expected_bucket_owner: account_id? }
-      type put_bucket_replication_request = { bucket: bucket_name, content_md5: content_md5?, replication_configuration: replication_configuration, token: object_lock_token?, expected_bucket_owner: account_id? }
-      type put_bucket_request_payment_request = { bucket: bucket_name, content_md5: content_md5?, request_payment_configuration: request_payment_configuration, expected_bucket_owner: account_id? }
-      type put_bucket_tagging_request = { bucket: bucket_name, content_md5: content_md5?, tagging: tagging, expected_bucket_owner: account_id? }
-      type put_bucket_versioning_request = { bucket: bucket_name, content_md5: content_md5?, mfa: mfa?, versioning_configuration: versioning_configuration, expected_bucket_owner: account_id? }
-      type put_bucket_website_request = { bucket: bucket_name, content_md5: content_md5?, website_configuration: website_configuration, expected_bucket_owner: account_id? }
+      type put_bucket_policy_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, confirm_remove_self_bucket_access: confirm_remove_self_bucket_access?, policy: policy, expected_bucket_owner: account_id? }
+      type put_bucket_replication_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, replication_configuration: replication_configuration, token: object_lock_token?, expected_bucket_owner: account_id? }
+      type put_bucket_request_payment_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, request_payment_configuration: request_payment_configuration, expected_bucket_owner: account_id? }
+      type put_bucket_tagging_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, tagging: tagging, expected_bucket_owner: account_id? }
+      type put_bucket_versioning_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, mfa: mfa?, versioning_configuration: versioning_configuration, expected_bucket_owner: account_id? }
+      type put_bucket_website_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, website_configuration: website_configuration, expected_bucket_owner: account_id? }
       class PutObjectAclOutput
         attr_accessor request_charged: request_charged
       end
-      type put_object_acl_request = { acl: object_canned_acl?, access_control_policy: access_control_policy?, bucket: bucket_name, content_md5: content_md5?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write: grant_write?, grant_write_acp: grant_write_acp?, key: object_key, request_payer: request_payer?, version_id: object_version_id?, expected_bucket_owner: account_id? }
+      type put_object_acl_request = { acl: object_canned_acl?, access_control_policy: access_control_policy?, bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write: grant_write?, grant_write_acp: grant_write_acp?, key: object_key, request_payer: request_payer?, version_id: object_version_id?, expected_bucket_owner: account_id? }
       class PutObjectLegalHoldOutput
         attr_accessor request_charged: request_charged
       end
-      type put_object_legal_hold_request = { bucket: bucket_name, key: object_key, legal_hold: object_lock_legal_hold?, request_payer: request_payer?, version_id: object_version_id?, content_md5: content_md5?, expected_bucket_owner: account_id? }
+      type put_object_legal_hold_request = { bucket: bucket_name, key: object_key, legal_hold: object_lock_legal_hold?, request_payer: request_payer?, version_id: object_version_id?, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, expected_bucket_owner: account_id? }
       class PutObjectLockConfigurationOutput
         attr_accessor request_charged: request_charged
       end
-      type put_object_lock_configuration_request = { bucket: bucket_name, object_lock_configuration: object_lock_configuration?, request_payer: request_payer?, token: object_lock_token?, content_md5: content_md5?, expected_bucket_owner: account_id? }
+      type put_object_lock_configuration_request = { bucket: bucket_name, object_lock_configuration: object_lock_configuration?, request_payer: request_payer?, token: object_lock_token?, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, expected_bucket_owner: account_id? }
       class PutObjectOutput
         attr_accessor expiration: expiration
         attr_accessor etag: etag
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
         attr_accessor server_side_encryption: server_side_encryption
         attr_accessor version_id: object_version_id
         attr_accessor sse_customer_algorithm: sse_customer_algorithm
@@ -1039,16 +1117,16 @@ module Aws
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      type put_object_request = { acl: object_canned_acl?, body: body_streaming?, bucket: bucket_name, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_length: content_length?, content_md5: content_md5?, content_type: content_type?, expires: expires?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write_acp: grant_write_acp?, key: object_key, metadata: metadata?, server_side_encryption: server_side_encryption?, storage_class: storage_class?, website_redirect_location: website_redirect_location?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, ssekms_key_id: ssekms_key_id?, ssekms_encryption_context: ssekms_encryption_context?, bucket_key_enabled: bucket_key_enabled?, request_payer: request_payer?, tagging: tagging_header?, object_lock_mode: object_lock_mode?, object_lock_retain_until_date: object_lock_retain_until_date?, object_lock_legal_hold_status: object_lock_legal_hold_status?, expected_bucket_owner: account_id? }
+      type put_object_request = { acl: object_canned_acl?, body: body_streaming?, bucket: bucket_name, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_length: content_length?, content_md5: content_md5?, content_type: content_type?, checksum_algorithm: checksum_algorithm?, checksum_crc32: checksum_crc32?, checksum_crc32c: checksum_crc32c?, checksum_sha1: checksum_sha1?, checksum_sha256: checksum_sha256?, expires: expires?, grant_full_control: grant_full_control?, grant_read: grant_read?, grant_read_acp: grant_read_acp?, grant_write_acp: grant_write_acp?, key: object_key, metadata: metadata?, server_side_encryption: server_side_encryption?, storage_class: storage_class?, website_redirect_location: website_redirect_location?, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, ssekms_key_id: ssekms_key_id?, ssekms_encryption_context: ssekms_encryption_context?, bucket_key_enabled: bucket_key_enabled?, request_payer: request_payer?, tagging: tagging_header?, object_lock_mode: object_lock_mode?, object_lock_retain_until_date: object_lock_retain_until_date?, object_lock_legal_hold_status: object_lock_legal_hold_status?, expected_bucket_owner: account_id? }
       class PutObjectRetentionOutput
         attr_accessor request_charged: request_charged
       end
-      type put_object_retention_request = { bucket: bucket_name, key: object_key, retention: object_lock_retention?, request_payer: request_payer?, version_id: object_version_id?, bypass_governance_retention: bypass_governance_retention?, content_md5: content_md5?, expected_bucket_owner: account_id? }
+      type put_object_retention_request = { bucket: bucket_name, key: object_key, retention: object_lock_retention?, request_payer: request_payer?, version_id: object_version_id?, bypass_governance_retention: bypass_governance_retention?, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, expected_bucket_owner: account_id? }
       class PutObjectTaggingOutput
         attr_accessor version_id: object_version_id
       end
-      type put_object_tagging_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, content_md5: content_md5?, tagging: tagging, expected_bucket_owner: account_id?, request_payer: request_payer? }
-      type put_public_access_block_request = { bucket: bucket_name, content_md5: content_md5?, public_access_block_configuration: public_access_block_configuration, expected_bucket_owner: account_id? }
+      type put_object_tagging_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, tagging: tagging, expected_bucket_owner: account_id?, request_payer: request_payer? }
+      type put_public_access_block_request = { bucket: bucket_name, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, public_access_block_configuration: public_access_block_configuration, expected_bucket_owner: account_id? }
       type queue_arn = ::String
       class QueueConfiguration
         attr_accessor id: notification_id
@@ -1155,7 +1233,7 @@ module Aws
         attr_accessor request_charged: request_charged
         attr_accessor restore_output_path: restore_output_path
       end
-      type restore_object_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, restore_request: restore_request?, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      type restore_object_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, restore_request: restore_request?, request_payer: request_payer?, checksum_algorithm: checksum_algorithm?, expected_bucket_owner: account_id? }
       type restore_output_path = ::String
       type restore_request = { days: days?, glacier_job_parameters: glacier_job_parameters?, type: restore_request_type?, tier: tier?, description: description?, select_parameters: select_parameters?, output_location: output_location? }
       type restore_request_type = ("SELECT")
@@ -1334,13 +1412,17 @@ module Aws
       class UploadPartOutput
         attr_accessor server_side_encryption: server_side_encryption
         attr_accessor etag: etag
+        attr_accessor checksum_crc32: checksum_crc32
+        attr_accessor checksum_crc32c: checksum_crc32c
+        attr_accessor checksum_sha1: checksum_sha1
+        attr_accessor checksum_sha256: checksum_sha256
         attr_accessor sse_customer_algorithm: sse_customer_algorithm
         attr_accessor sse_customer_key_md5: sse_customer_key_md5
         attr_accessor ssekms_key_id: ssekms_key_id
         attr_accessor bucket_key_enabled: bucket_key_enabled
         attr_accessor request_charged: request_charged
       end
-      type upload_part_request = { body: body_streaming?, bucket: bucket_name, content_length: content_length?, content_md5: content_md5?, key: object_key, part_number: part_number, upload_id: multipart_upload_id, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      type upload_part_request = { body: body_streaming?, bucket: bucket_name, content_length: content_length?, content_md5: content_md5?, checksum_algorithm: checksum_algorithm?, checksum_crc32: checksum_crc32?, checksum_crc32c: checksum_crc32c?, checksum_sha1: checksum_sha1?, checksum_sha256: checksum_sha256?, key: object_key, part_number: part_number, upload_id: multipart_upload_id, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, request_payer: request_payer?, expected_bucket_owner: account_id? }
       type user_metadata = ::Array[metadata_entry]
       type value = ::String
       type version_count = ::Integer
@@ -1348,7 +1430,7 @@ module Aws
       type versioning_configuration = { mfa_delete: mfa_delete?, status: bucket_versioning_status? }
       type website_configuration = { error_document: error_document?, index_document: index_document?, redirect_all_requests_to: redirect_all_requests_to?, routing_rules: routing_rules_input? }
       type website_redirect_location = ::String
-      type write_get_object_response_request = { request_route: request_route, request_token: request_token, body: body_streaming?, status_code: get_object_response_status_code?, error_code: error_code?, error_message: error_message?, accept_ranges: accept_ranges?, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_length: content_length?, content_range: content_range?, content_type: content_type?, delete_marker: delete_marker?, etag: etag?, expires: expires?, expiration: expiration?, last_modified: last_modified?, missing_meta: missing_meta?, metadata: metadata?, object_lock_mode: object_lock_mode?, object_lock_legal_hold_status: object_lock_legal_hold_status?, object_lock_retain_until_date: object_lock_retain_until_date?, parts_count: parts_count?, replication_status: replication_status?, request_charged: request_charged?, restore: restore?, server_side_encryption: server_side_encryption?, sse_customer_algorithm: sse_customer_algorithm?, ssekms_key_id: ssekms_key_id?, sse_customer_key_md5: sse_customer_key_md5?, storage_class: storage_class?, tag_count: tag_count?, version_id: object_version_id?, bucket_key_enabled: bucket_key_enabled? }
+      type write_get_object_response_request = { request_route: request_route, request_token: request_token, body: body_streaming?, status_code: get_object_response_status_code?, error_code: error_code?, error_message: error_message?, accept_ranges: accept_ranges?, cache_control: cache_control?, content_disposition: content_disposition?, content_encoding: content_encoding?, content_language: content_language?, content_length: content_length?, content_range: content_range?, content_type: content_type?, checksum_crc32: checksum_crc32?, checksum_crc32c: checksum_crc32c?, checksum_sha1: checksum_sha1?, checksum_sha256: checksum_sha256?, delete_marker: delete_marker?, etag: etag?, expires: expires?, expiration: expiration?, last_modified: last_modified?, missing_meta: missing_meta?, metadata: metadata?, object_lock_mode: object_lock_mode?, object_lock_legal_hold_status: object_lock_legal_hold_status?, object_lock_retain_until_date: object_lock_retain_until_date?, parts_count: parts_count?, replication_status: replication_status?, request_charged: request_charged?, restore: restore?, server_side_encryption: server_side_encryption?, sse_customer_algorithm: sse_customer_algorithm?, ssekms_key_id: ssekms_key_id?, sse_customer_key_md5: sse_customer_key_md5?, storage_class: storage_class?, tag_count: tag_count?, version_id: object_version_id?, bucket_key_enabled: bucket_key_enabled? }
       type years = ::Integer
     end
   end
