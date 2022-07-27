@@ -5,3 +5,9 @@ redis.set("mykey", "hello world")
 
 redis.get("mykey")
 # => "hello world"
+
+redis.set(:other_key, 'hello world')
+# => "OK"
+
+redis.get(:other_key)
+# => "hello world"
