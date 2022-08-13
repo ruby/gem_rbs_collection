@@ -19,3 +19,12 @@ Then, generate RBS to `/gems` dir and generate supported gems like this.
 /gems/aws-sdk-sqs/1
 ...
 ```
+
+## How to add aws-sdk gems
+
+Edit `generate_all` task in `Rakefile`.
+And try to exec that command.
+
+```
+$ bundle exec rake
+```

@@ -27,6 +27,8 @@ task :update_src do
   end
 end
 
-task :default do
+task :generate_all do
   Rake::Task['write'].invoke("S3", "SQS", "KMS", "EC2", "SSM")
 end
+
+task :default => [:generate_all]
