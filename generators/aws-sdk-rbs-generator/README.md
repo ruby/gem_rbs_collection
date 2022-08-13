@@ -28,3 +28,5 @@ And try to exec that command.
 ```
 $ bundle exec rake
 ```
+
+Then, Add testing code to `gems/aws-sdk-???/1/{_script,_test}`.
