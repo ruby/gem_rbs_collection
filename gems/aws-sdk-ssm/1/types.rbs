@@ -34,7 +34,7 @@ module Aws
       type activation_id = ::String
       type activation_list = ::Array[Activation]
       type add_tags_to_resource_request = { resource_type: resource_type_for_tagging, resource_id: resource_id, tags: tag_list_input }
-      class AddTagsToResourceResult
+      class AddTagsToResourceResult < Aws::EmptyStructure
       end
       type agent_error_code = ::String
       type aggregator_schema_only = bool
@@ -283,7 +283,7 @@ module Aws
       type calendar_name_or_arn_list = ::Array[calendar_name_or_arn]
       type calendar_state = ("OPEN" | "CLOSED")
       type cancel_command_request = { command_id: command_id, instance_ids: instance_id_list? }
-      class CancelCommandResult
+      class CancelCommandResult < Aws::EmptyStructure
       end
       type cancel_maintenance_window_execution_request = { window_execution_id: maintenance_window_execution_id }
       class CancelMaintenanceWindowExecutionResult
@@ -487,20 +487,20 @@ module Aws
         attr_accessor baseline_id: baseline_id
       end
       type create_resource_data_sync_request = { sync_name: resource_data_sync_name, s3_destination: resource_data_sync_s3_destination?, sync_type: resource_data_sync_type?, sync_source: resource_data_sync_source? }
-      class CreateResourceDataSyncResult
+      class CreateResourceDataSyncResult < Aws::EmptyStructure
       end
       type created_date = ::Time
       type date_time = ::Time
       type default_baseline = bool
       type default_instance_name = ::String
       type delete_activation_request = { activation_id: activation_id }
-      class DeleteActivationResult
+      class DeleteActivationResult < Aws::EmptyStructure
       end
       type delete_association_request = { name: document_arn?, instance_id: instance_id?, association_id: association_id? }
-      class DeleteAssociationResult
+      class DeleteAssociationResult < Aws::EmptyStructure
       end
       type delete_document_request = { name: document_name, document_version: document_version?, version_name: document_version_name?, force: boolean? }
-      class DeleteDocumentResult
+      class DeleteDocumentResult < Aws::EmptyStructure
       end
       type delete_inventory_request = { type_name: inventory_item_type_name, schema_delete_option: inventory_schema_delete_option?, dry_run: dry_run?, client_token: uuid? }
       class DeleteInventoryResult
@@ -513,10 +513,10 @@ module Aws
         attr_accessor window_id: maintenance_window_id
       end
       type delete_ops_metadata_request = { ops_metadata_arn: ops_metadata_arn }
-      class DeleteOpsMetadataResult
+      class DeleteOpsMetadataResult < Aws::EmptyStructure
       end
       type delete_parameter_request = { name: ps_parameter_name }
-      class DeleteParameterResult
+      class DeleteParameterResult < Aws::EmptyStructure
       end
       type delete_parameters_request = { names: parameter_name_list }
       class DeleteParametersResult
@@ -528,11 +528,11 @@ module Aws
         attr_accessor baseline_id: baseline_id
       end
       type delete_resource_data_sync_request = { sync_name: resource_data_sync_name, sync_type: resource_data_sync_type? }
-      class DeleteResourceDataSyncResult
+      class DeleteResourceDataSyncResult < Aws::EmptyStructure
       end
       type delivery_timed_out_count = ::Integer
       type deregister_managed_instance_request = { instance_id: managed_instance_id }
-      class DeregisterManagedInstanceResult
+      class DeregisterManagedInstanceResult < Aws::EmptyStructure
       end
       type deregister_patch_baseline_for_patch_group_request = { baseline_id: baseline_id, patch_group: patch_group }
       class DeregisterPatchBaselineForPatchGroupResult
@@ -723,7 +723,7 @@ module Aws
       end
       type description_in_document = ::String
       type disassociate_ops_item_related_item_request = { ops_item_id: ops_item_id, association_id: ops_item_related_item_association_id }
-      class DisassociateOpsItemRelatedItemResponse
+      class DisassociateOpsItemRelatedItemResponse < Aws::EmptyStructure
       end
       type document_arn = ::String
       type document_author = ::String
@@ -1577,7 +1577,7 @@ module Aws
       end
       type metadata_value_string = ::String
       type modify_document_permission_request = { name: document_name, permission_type: document_permission_type, account_ids_to_add: account_id_list?, account_ids_to_remove: account_id_list?, shared_document_version: shared_document_version? }
-      class ModifyDocumentPermissionResponse
+      class ModifyDocumentPermissionResponse < Aws::EmptyStructure
       end
       type next_token = ::String
       class NonCompliantSummary
@@ -2008,7 +2008,7 @@ module Aws
         attr_accessor timed_out_steps: integer
       end
       type put_compliance_items_request = { resource_id: compliance_resource_id, resource_type: compliance_resource_type, compliance_type: compliance_type_name, execution_summary: compliance_execution_summary, items: compliance_item_entry_list, item_content_hash: compliance_item_content_hash?, upload_type: compliance_upload_type? }
-      class PutComplianceItemsResult
+      class PutComplianceItemsResult < Aws::EmptyStructure
       end
       type put_inventory_message = ::String
       type put_inventory_request = { instance_id: instance_id, items: inventory_item_list }
@@ -2054,7 +2054,7 @@ module Aws
       type related_ops_items_output = ::Array[RelatedOpsItem]
       type remaining_count = ::Integer
       type remove_tags_from_resource_request = { resource_type: resource_type_for_tagging, resource_id: resource_id, tag_keys: key_list }
-      class RemoveTagsFromResourceResult
+      class RemoveTagsFromResourceResult < Aws::EmptyStructure
       end
       type reset_service_setting_request = { setting_id: service_setting_id }
       class ResetServiceSettingResult
@@ -2196,7 +2196,7 @@ module Aws
       end
       type scheduled_window_execution_list = ::Array[ScheduledWindowExecution]
       type send_automation_signal_request = { automation_execution_id: automation_execution_id, signal_type: signal_type, payload: automation_parameter_map? }
-      class SendAutomationSignalResult
+      class SendAutomationSignalResult < Aws::EmptyStructure
       end
       type send_command_request = { instance_ids: instance_id_list?, targets: targets_input?, document_name: document_arn, document_version: document_version?, document_hash: document_hash?, document_hash_type: document_hash_type?, timeout_seconds: timeout_seconds?, comment: comment?, parameters: parameters?, output_s3_region: s3_region?, output_s3_bucket_name: s3_bucket_name?, output_s3_key_prefix: s3_key_prefix?, max_concurrency: max_concurrency?, max_errors: max_errors?, service_role_arn: service_role?, notification_config: notification_config?, cloud_watch_output_config: cloud_watch_output_config? }
       class SendCommandResult
@@ -2266,7 +2266,7 @@ module Aws
       type standard_error_content = ::String
       type standard_output_content = ::String
       type start_associations_once_request = { association_ids: association_id_list }
-      class StartAssociationsOnceResult
+      class StartAssociationsOnceResult < Aws::EmptyStructure
       end
       type start_automation_execution_request = { document_name: document_arn, document_version: document_version?, parameters: automation_parameter_map?, client_token: idempotency_token?, mode: execution_mode?, target_parameter_name: automation_parameter_key?, targets: targets_input?, target_maps: target_maps?, max_concurrency: max_concurrency?, max_errors: max_errors?, target_locations: target_locations_input?, tags: tag_list_input? }
       class StartAutomationExecutionResult
@@ -2317,7 +2317,7 @@ module Aws
       type step_execution_filter_value_list = ::Array[step_execution_filter_value]
       type step_execution_list = ::Array[StepExecution]
       type stop_automation_execution_request = { automation_execution_id: automation_execution_id, type: stop_type? }
-      class StopAutomationExecutionResult
+      class StopAutomationExecutionResult < Aws::EmptyStructure
       end
       type stop_type = ("Complete" | "Cancel")
       type stream_url = ::String
@@ -2387,7 +2387,7 @@ module Aws
         attr_accessor description: DocumentDefaultVersionDescription
       end
       type update_document_metadata_request = { name: document_name, document_version: document_version?, document_reviews: document_reviews }
-      class UpdateDocumentMetadataResponse
+      class UpdateDocumentMetadataResponse < Aws::EmptyStructure
       end
       type update_document_request = { content: document_content, attachments: attachments_source_list?, name: document_name, display_name: document_display_name?, version_name: document_version_name?, document_version: document_version?, document_format: document_format?, target_type: target_type? }
       class UpdateDocumentResult
@@ -2435,10 +2435,10 @@ module Aws
         attr_accessor cutoff_behavior: maintenance_window_task_cutoff_behavior
       end
       type update_managed_instance_role_request = { instance_id: managed_instance_id, iam_role: iam_role }
-      class UpdateManagedInstanceRoleResult
+      class UpdateManagedInstanceRoleResult < Aws::EmptyStructure
       end
       type update_ops_item_request = { description: ops_item_description?, operational_data: ops_item_operational_data_input?, operational_data_to_delete: ops_item_ops_data_keys_list?, notifications: ops_item_notifications_input?, priority: ops_item_priority?, related_ops_items: related_ops_items_input?, status: ops_item_status?, ops_item_id: ops_item_id, title: ops_item_title?, category: ops_item_category?, severity: ops_item_severity?, actual_start_time: date_time?, actual_end_time: date_time?, planned_start_time: date_time?, planned_end_time: date_time? }
-      class UpdateOpsItemResponse
+      class UpdateOpsItemResponse < Aws::EmptyStructure
       end
       type update_ops_metadata_request = { ops_metadata_arn: ops_metadata_arn, metadata_to_update: metadata_map_input?, keys_to_delete: metadata_keys_to_delete_list? }
       class UpdateOpsMetadataResult
@@ -2462,10 +2462,10 @@ module Aws
         attr_accessor sources: patch_source_list_output
       end
       type update_resource_data_sync_request = { sync_name: resource_data_sync_name, sync_type: resource_data_sync_type, sync_source: resource_data_sync_source }
-      class UpdateResourceDataSyncResult
+      class UpdateResourceDataSyncResult < Aws::EmptyStructure
       end
       type update_service_setting_request = { setting_id: service_setting_id, setting_value: service_setting_value }
-      class UpdateServiceSettingResult
+      class UpdateServiceSettingResult < Aws::EmptyStructure
       end
       type url = ::String
       type valid_next_step = ::String

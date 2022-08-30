@@ -234,6 +234,10 @@ module AwsSdkRbsGenerator
         end
       end
 
+      def output_structure_members_empty?
+        output_structure_members.empty?
+      end
+
       def rbs_as_alias_output
         "type #{rbs_underscore_name} = #{to_rbs_returns}".tap { dictionary.printed[rbs_underscore_name] = _1 }
       end

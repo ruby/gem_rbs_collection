@@ -4,11 +4,17 @@ module Aws
     module Types
       {{#shape_map}}
       {{#class?}}
+      {{#output_structure_members_empty?}}
+      class {{name}} < Aws::EmptyStructure
+      end
+      {{/output_structure_members_empty?}}
+      {{^output_structure_members_empty?}}
       class {{name}}
         {{#output_structure_members}}
         attr_accessor {{method_name}}: {{returns}}
         {{/output_structure_members}}
       end
+      {{/output_structure_members_empty?}}
       {{/class?}}
       {{#alias?}}
       {{rbs_as_alias}}
