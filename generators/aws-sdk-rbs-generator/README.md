@@ -19,3 +19,14 @@ Then, generate RBS to `/gems` dir and generate supported gems like this.
 /gems/aws-sdk-sqs/1
 ...
 ```
+
+## How to add aws-sdk gems
+
+Add the client service to the list in the `generate_all` task in the `Rakefile`.
+And try to exec following command.
+
+```
+$ bundle exec rake
+```
+
+Then, Add testing code to `gems/aws-sdk-???/1/{_script,_test}`.

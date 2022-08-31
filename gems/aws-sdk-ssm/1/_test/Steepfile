@@ -1,0 +1,12 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+  library "aws-sdk-core:3"
+  library "aws-sdk-ssm:1"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

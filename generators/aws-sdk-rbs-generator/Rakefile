@@ -21,6 +21,14 @@ task :write do |task, args|
   service_args.each { |name| services[name].write_files(dir:) }
 end
 
-task :default do
-  Rake::Task['write'].invoke("S3", "SQS", "KMS", "EC2")
+task :update_src do
+  cd "_src" do
+    sh "git pull origin version-3"
+  end
 end
+
+task :generate_all do
+  Rake::Task['write'].invoke("S3", "SQS", "KMS", "EC2", "SSM")
+end
+
+task :default => [:generate_all]
