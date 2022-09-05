@@ -1,4 +1,4 @@
-# RBS for config gem
+# RBS for enumerize gem
 
 The directory that defines the RBS files for the [enumerize](https://github.com/brainspec/enumerize) gem.
 
