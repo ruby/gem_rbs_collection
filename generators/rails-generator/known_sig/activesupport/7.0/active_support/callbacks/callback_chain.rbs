@@ -1,0 +1,9 @@
+module ActiveSupport
+  module Callbacks
+    class CallbackChain
+      include Enumerable[::ActiveSupport::Callbacks::Callback]
+      def each: () -> Enumerator[::ActiveSupport::Callbacks::Callback, Array[::ActiveSupport::Callbacks::Callback]]
+              | () { (::ActiveSupport::Callbacks::Callback) -> void } -> Array[::ActiveSupport::Callbacks::Callback]
+    end
+  end
+end

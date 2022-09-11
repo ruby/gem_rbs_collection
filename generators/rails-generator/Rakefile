@@ -1,0 +1,337 @@
+## run `$ rake`
+
+def switch_branch(name)
+  cd "_src" do
+    sh "git switch #{name}"
+  end
+end
+
+def generate(out_dir, version)
+  require 'orthoses'
+  require 'orthoses-rails'
+  require 'openssl'
+  require 'cgi'
+  require 'uri'
+
+  Orthoses.logger.level = :error
+
+  loader = -> () {
+    require "active_support/all"
+    require "active_record"
+    require "active_job"
+    require "active_model"
+    require "active_storage/engine"
+    require "action_dispatch"
+    begin
+      require "action_mailbox"
+      require "action_text"
+    rescue LoadError
+    end
+    require "action_mailer"
+    require "action_pack"
+    require "action_view"
+
+    roots = [
+      ActiveSupport,
+      ActiveModel,
+      ActiveJob,
+      ActiveRecord,
+      ActiveStorage,
+      ActionDispatch,
+      ActionMailer,
+      ActionView,
+    ]
+    roots << ActionMailbox if defined?(ActionMailbox)
+    roots << ActionText if defined?(ActionText)
+
+    roots.each do |rails_mod|
+      rails_mod.eager_load!
+      Orthoses::Utils.each_const_recursive(rails_mod, on_error: -> (e) {
+        Orthoses.logger.warn "skip load const by [#{e.root}][#{e.const}](#{e.error.class})#{e.error.message}"
+      })
+      v = rails_mod.respond_to?(:version) ? rails_mod.version : nil
+      puts "loaded #{rails_mod}: v#{v}"
+    end
+    eval(<<~RUBY)
+      module Dummy
+        class Application < Rails::Application
+          config.load_defaults #{version.to_s}
+          config.active_storage.service = :local
+        end
+      end
+    RUBY
+    ENV['RAILS_ENV'] = 'development'
+    Rails.application.initialize!
+  }
+  Orthoses::Builder.new do
+    use Orthoses::CreateFileByName,
+      base_dir: "#{out_dir}/#{version}",
+      header: "# !!! GENERATED CODE !!!\n# Please see generators/rails-generator"
+    use Orthoses::Filter,
+      if: -> (name, content) {
+        # OMG, both ERB and Erb are exist...
+        return false if name.start_with?("Erb")
+
+        # ArgumentError
+        return false if name.start_with?("I18n::Tests")
+
+        # FIXME: too hard
+        return false if name.include?("::Generators")
+
+        # Ignore known sig
+        return false if Orthoses::Utils.rbs_defined_class?(name, collection: true) && content.body.empty?
+
+        true
+      }
+    use Orthoses::Constant,
+      strict: false,
+      if: -> (current, const, _val, _rbs) {
+        !Orthoses::Utils.rbs_defined_const?("#{current}::#{const}", collection: true)
+      },
+      on_error: -> (e) {
+        Orthoses.logger.warn "[Orthoses::Constant] skip load const by #{e.root}[::#{e.const}] (#{e.error.class}) #{e.error.message}"
+      }
+    use Orthoses::ActiveSupport::ClassAttribute
+    use Orthoses::ActiveSupport::Delegation
+    use Orthoses::ActiveSupport::MattrAccessor
+    use Orthoses::ActiveSupport::TimeWithZone
+    use Orthoses::ActiveRecord::QueryMethods
+    use Orthoses::LoadRBS,
+      paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveRecord::VERSION::STRING, "known_sig/activerecord") }
+    use Orthoses::LoadRBS,
+      paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveModel::VERSION::STRING, "known_sig/activemodel") }
+    use Orthoses::LoadRBS,
+      paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveSupport::VERSION::STRING, "known_sig/activesupport") }
+    # # require in method
+    use Orthoses::Tap do |store|
+      store.delete("DummyERB")
+      store.delete("DummyCompiler")
+    end
+    # see activerecord/lib/active_record/migration/compatibility.rb
+    use Orthoses::Tap do |store|
+      # TODO: make middleware
+      if defined?(ActiveRecord::Migration::Compatibility::V7_0)
+        store["ActiveRecord::Migration::Compatibility::V6_1"].header = nil
+        store["ActiveRecord::Migration::Compatibility::V7_0"].header = "class ActiveRecord::Migration::Compatibility::V7_0 < ActiveRecord::Migration::Current"
+      elsif defined?(ActiveRecord::Migration::Compatibility::V6_1)
+        store["ActiveRecord::Migration::Compatibility::V6_0"].header = nil
+        store["ActiveRecord::Migration::Compatibility::V6_1"].header = "class ActiveRecord::Migration::Compatibility::V6_1 < ActiveRecord::Migration::Current"
+      elsif defined?(ActiveRecord::Migration::Compatibility::V6_0)
+        store["ActiveRecord::Migration::Compatibility::V5_2"].header = nil
+        store["ActiveRecord::Migration::Compatibility::V6_0"].header = "class ActiveRecord::Migration::Compatibility::V6_0 < ActiveRecord::Migration::Current"
+      elsif defined?(ActiveRecord::Migration::Compatibility::V5_2)
+        store["ActiveRecord::Migration::Compatibility::V5_1"].header = nil
+        store["ActiveRecord::Migration::Compatibility::V5_2"].header = "class ActiveRecord::Migration::Compatibility::V5_2 < ActiveRecord::Migration::Current"
+      end
+    end
+    # class_eval in #each
+    # see activerecord/lib/active_record/migration/command_recorder.rb
+    use Orthoses::Tap do |store|
+      content = store["ActiveRecord::Migration::CommandRecorder"]
+      ActiveRecord::Migration::CommandRecorder::ReversibleAndIrreversibleMethods.each do |method|
+        content << "def #{method}: (*untyped args) ?{ () -> void } -> untyped"
+      end
+    end
+    # class_eval in #each
+    # see activerecord/lib/active_record/migration/command_recorder.rb
+    use Orthoses::Tap do |store|
+      content = store["ActiveRecord::Migration::CommandRecorder::StraightReversions"]
+      {
+        execute_block:     :execute_block,
+        create_table:      :drop_table,
+        create_join_table: :drop_join_table,
+        add_column:        :remove_column,
+        add_index:         :remove_index,
+        add_timestamps:    :remove_timestamps,
+        add_reference:     :remove_reference,
+        add_foreign_key:   :remove_foreign_key,
+        add_check_constraint: :remove_check_constraint,
+        enable_extension:  :disable_extension
+      }.each do |cmd, inv|
+        [[inv, cmd], [cmd, inv]].uniq.each do |method, inverse|
+          content << "def invert_#{method}: (untyped args) ?{ () -> void } -> [Symbol, untyped, Proc]"
+        end
+      end
+    end
+    # singleton_class.class_eval in included
+    use Orthoses::Tap do |store|
+      store["ActiveRecord::ModelSchema"].body.tap do |body|
+        body.delete("alias _inheritance_column= inheritance_column=")
+        body.delete("alias inheritance_column= real_inheritance_column=")
+      end
+    end
+    # alias in included block
+    use Orthoses::Tap do |store|
+      store["ActiveRecord::ConnectionAdapters::ColumnMethods"].body.tap do |body|
+        body.delete("alias blob binary")
+        body.delete("alias numeric decimal")
+      end
+    end
+    # > Use async_exec instead of exec_params on pg versions before 1.1
+    use Orthoses::Tap do |store|
+      store["PG::Connection"].body.clear
+    end
+    # Entrust to auto super class
+    use Orthoses::Tap do |store|
+      store.each do |_, content|
+        if content.header&.include?(" < Type::")
+          content.header.sub!(/ < Type::(.*)/, " < ::ActiveModel::Type::\\1")
+        end
+        # delegate to auto_header
+        if content.header&.start_with?("class Arel")
+          content.header = nil
+        end
+      end
+      store["ActionView::Helpers::Tags::CollectionRadioButtons::RadioButtonBuilder"].header = nil
+      store["ActionView::Helpers::Tags::CollectionCheckBoxes::CheckBoxBuilder"].header = nil
+      store["ActionView::SyntaxErrorInTemplate"].header = nil
+      # MigrationProxy cannot resolve name since class alias.
+      store["ActiveRecord::NullMigration"].header = nil
+    end
+    use Orthoses::DelegateClass
+    use Orthoses::Attribute
+    use Orthoses::Railties::Mixin, callback: -> (railties_mixin) {
+      Orthoses::CreateFileByName.new(
+        ->{ railties_mixin },
+        base_dir: "#{out_dir}/#{version}/railties_mixin",
+        header: "# !!! GENERATED CODE !!!\n# Please see generators/rails-generator"
+      ).call
+    }
+    use Orthoses::Mixin,
+      if: -> (base_mod, how, mod) {
+        mod != Enumerable # TODO
+      }
+    use Orthoses::RBSPrototypeRB,
+      paths: Dir.glob('_src/{railties,action{cable,mailbox,mailer,pack,text,view},active{job,model,record,storage,support}}/{app,lib}/**/*.rb'),
+      constant_filter: -> (member) { false },
+      mixin_filter: -> (member) { false },
+      attribute_filter: -> (member) { false }
+    use Orthoses::Autoload
+    run loader
+  end.call
+
+  # $ cat out/7.0/**/*.rbs | wc
+  # 69763  339342 2606899
+end
+
+def generate_test_script(gem:, version:, export:, stdlib_dependencies:, gem_dependencies:, rails_dependencies:)
+  Pathname(export).join('_scripts').tap(&:mkdir).join('test').write(<<~SHELL)
+    #!/usr/bin/env bash
+
+    # !!! GENERATED CODE !!!
+    # Please see generators/rails-generator
+
+    # set -eou => Exit command with non-zero status code, Output logs of every command executed, Treat unset variables as an error when substituting.
+    set -eou pipefail
+    # Internal Field Separator - Linux shell variable
+    IFS=$'\n\t'
+    # Print shell input lines
+    set -v
+
+    # Set RBS_DIR variable to change directory to execute type checks using `steep check`
+    RBS_DIR=$(cd $(dirname $0)/..; pwd)
+    # Set REPO_DIR variable to validate RBS files added to the corresponding folder
+    REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
+    # Validate RBS files, using the bundler environment present
+    bundle exec rbs --repo=$REPO_DIR #{stdlib_dependencies.map{"-r #{_1}"}.join(" ")} \\
+      #{gem_dependencies.map{"-r #{_1}"}.join(" ")} \\
+      -r #{gem} validate --silent
+
+    cd ${RBS_DIR}/_test
+    # Run type checks
+    bundle exec steep check
+  SHELL
+
+  sh "chmod +x #{Pathname(export).join('_scripts').join('test')}"
+
+  Pathname(export).join('_test').tap(&:mkdir).join('Steepfile').write(<<~RUBY)
+    # !!! GENERATED CODE !!!
+    # Please see generators/rails-generator
+
+    D = Steep::Diagnostic
+
+    target :test do
+      signature "."
+      check "."
+
+      repo_path "../../../"
+
+    #{stdlib_dependencies.map{"  library \"#{_1}\""}.join("\n")}
+    #{gem_dependencies.map{"  library \"#{_1}\""}.join("\n")}
+
+      library "#{gem}:#{version}"
+    #{rails_dependencies.map{"  library \"#{_1}:#{version}\""}.join("\n")}
+
+      configure_code_diagnostics(D::Ruby.all_error)
+    end
+  RUBY
+end
+
+def generate_manifest(export:, stdlib_dependencies:)
+  Pathname(export).join('manifest.yaml').write(<<~YAML)
+    dependencies:
+      #{stdlib_dependencies.map{"- name: #{_1}"}.join("\n  ")}
+  YAML
+end
+
+def validate(export:, version:, stdlib_dependencies:, gem_dependencies:, rails_dependencies:)
+  stdlib_opt = stdlib_dependencies.map{"-r #{_1}"}.join(" ")
+  gem_opt = gem_dependencies.map{"-I ../../gems/#{_1}"}.join(" ")
+  rails_opt = rails_dependencies.map{"-I export/#{_1}/#{version}"}.join(" ")
+  sh "rbs --no-collection #{stdlib_opt} #{gem_opt} #{rails_opt} -I #{export} validate --silent"
+end
+
+VERSIONS = %w[
+  6.0
+  6.1
+  7.0
+]
+Object.private_constant :VERSIONS
+
+tasks = Dir["tasks/*"]
+tasks.each do |task|
+  load task
+end
+GEMS = tasks.map { File.basename(_1).sub(/\.rake/, '') }
+Object.private_constant :GEMS
+
+task :clean do
+  FileUtils.rm_rf("out")
+end
+
+VERSIONS.each do |version|
+  namespace version do
+    desc "run all version=#{version}"
+    task :all => [
+      :generate,
+      :export,
+      :validate,
+      :install,
+    ]
+
+    desc "run export version=#{version}"
+    task :export => GEMS.map{"#{version}:#{_1}:export"}
+
+    desc "run validate version=#{version}"
+    task :validate => GEMS.map{"#{version}:#{_1}:validate"}
+
+    desc "run install version=#{version}"
+    task :install => GEMS.map{"#{version}:#{_1}:install"}
+
+    desc "generate version=#{version}"
+    task :generate do |t|
+      switch_branch("#{version.tr('.', '-')}-stable")
+      sh "bundle install"
+      sh "bundle exec rake #{t.name}_exec"
+    end
+
+    task :generate_exec do
+      generate("out", version)
+    end
+  end
+end
+
+task default: [
+  :clean,
+  *(VERSIONS.map {"#{_1}:all"})
+]
