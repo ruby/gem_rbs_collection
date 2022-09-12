@@ -1,1 +1,107 @@
-# Write the type definition here!
+module Line
+  module Bot
+    module Event
+      class Base
+        def []: (untyped src) -> untyped
+        def to_hash: () -> untyped
+      end
+
+      class AccountLink < Base
+        def result: () -> String
+        def nonce: () -> String
+      end
+
+      class Beacon < Base
+        def type: () -> String
+        def hwid: () -> String
+        def deviceMessage: () -> String
+      end
+
+      class Follow < Base
+      end
+
+      class Unfollow < Base
+      end
+
+      class Join < Base
+      end
+
+      class Leave < Base
+      end
+
+      class MemberJoined < Base
+      end
+
+      class MemberLeft < Base
+      end
+
+      class Unsend < Base
+      end
+
+      class VideoPlayComplete < Base
+      end
+
+      class Postback < Base
+      end
+
+      class Things < Base
+        def type: () -> untyped
+        def device_id: () -> untyped
+      end
+
+      class MessageType
+        Text: String
+        Image: String
+        Video: String
+        Audio: String
+        File: String
+        Location: String
+        Sticker: String
+        Unsupport: String
+      end
+
+      class Message < Base
+        def type: () -> String
+        def message: () -> untyped
+      end
+    end
+
+    class Client
+      attr_accessor channel_token: String
+      attr_accessor channel_id: String
+      attr_accessor chanchannel_secretnel_id: String
+
+      def self.new: (?Hash[String, String] options) ?{ (instance) -> void } -> instance
+      def endpoint: () -> String
+      def oauth_endpoint: () -> String
+      def blob_endpoint: () -> String
+      def liff_endpoint: () -> String
+
+      def validate_signature: (String content, String channel_signature) -> bool
+      def parse_events_from: (String request_body) -> (Line::Bot::Event::AccountLink |
+                                                       Line::Bot::Event::Beacon |
+                                                       Line::Bot::Event::Follow |
+                                                       Line::Bot::Event::Unfollow |
+                                                       Line::Bot::Event::Join |
+                                                       Line::Bot::Event::Leave |
+                                                       Line::Bot::Event::MemberJoined |
+                                                       Line::Bot::Event::MemberLeft |
+                                                       Line::Bot::Event::Unsend |
+                                                       Line::Bot::Event::VideoPlayComplete |
+                                                       Line::Bot::Event::Postback |
+                                                       Line::Bot::Event::Things |
+                                                       Line::Bot::Event::Message)
+
+      def push_message: (String user_id, untyped messages, ?headers: untyped, ?payload: untyped) -> Net::HTTPResponse
+      def reply_message: (String token, untyped messages) -> Net::HTTPResponse
+      def multicast: ((Array|String) to, untyped messages, ?headers: untyped, ?payload: untyped) -> Net::HTTPResponse
+      def broadcast: (untyped messages, ?headers: untyped) -> Net::HTTPResponse
+      def narrowcast: (untyped messages, ?recipient: untyped, ?filter: untyped, ?limit: untyped, ?headers: untyped) -> Net::HTTPResponse
+      def get_message_content: (String identifier) -> Net::HTTPResponse
+      def get_profile: (String user_id) -> Net::HTTPResponse
+      def get_group_member_profile: (String group_id, String user_id) -> Net::HTTPResponse
+      def get_room_member_profile: (String room_id, String user_id) -> Net::HTTPResponse
+      def get_follower_ids: (?String start, ?Integer limit) -> Net::HTTPResponse
+    end
+  end
+end
