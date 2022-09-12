@@ -1,0 +1,22 @@
+module Sorcery
+  module Model
+    def authenticates_with_sorcery!: () -> void
+
+    module ClassMethods[T]
+      def authenticate: (*String credentials) ?{ () -> untyped } -> (T | nil)
+    end
+  end
+
+  module Controller
+    module InstanceMethods[T]
+      def require_login: () -> (nil | void)
+      def login: (*String credentials) ?{ (T, nil) -> untyped } -> (T | nil | untyped)
+
+      def logged_in?: () -> bool
+      def current_user: () -> (T | nil)
+      def logout: () -> (nil | void)
+      def auto_login: (T, ?bool) -> T
+      def redirect_back_or_to: (String url, ?Hash[(String | Symbol), String] flash_hash) -> (nil | void)
+    end
+  end
+end
