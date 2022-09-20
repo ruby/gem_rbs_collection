@@ -1,17 +1,17 @@
 module Sorcery
+  type failure_reason = :invalid_login | :invalid_password | :inactive
+
   module Model
     def authenticates_with_sorcery!: () -> void
 
     module ClassMethods
-      def authenticate: (*String credentials) ?{ () -> untyped } -> (instance | nil)
+      def authenticate: (*String credentials) ?{ (instance, (failure_reason | untyped)) -> untyped } -> (instance | nil)
     end
   end
 
   module Controller
     module InstanceMethods[T]
       def require_login: () -> void
-
-      type failure_reason = :invalid_login | :invalid_password | :inactive
       def login: [U] (*String credentials) ?{ (T, (failure_reason | nil | untyped)) -> U } -> (T | nil | U)
 
       def logged_in?: () -> bool
