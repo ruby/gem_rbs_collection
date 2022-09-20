@@ -9,6 +9,10 @@ class User
 end
 
 User.authenticate('hoge@example.com', 'password')
+User.authenticate('fuga@example.com', 'password') do |user, failure_reason|
+  p user
+  p failure_reason
+end
 
 class TestController
   include Sorcery::Controller
@@ -18,6 +22,10 @@ controller = TestController.new
 controller.require_login
 controller.login('hoge@example.com', 'password')
 controller.login('hoge@example.com', 'password') { |user| user }
+controller.login('hoge@example.com', 'password') do |user, failure_reason|
+  p user
+  p failure_reason
+end
 controller.current_user
 controller.logout
 
