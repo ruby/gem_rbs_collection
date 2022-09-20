@@ -10,7 +10,9 @@ module Sorcery
   module Controller
     module InstanceMethods[T]
       def require_login: () -> void
-      def login: [U] (*String credentials) ?{ (T, nil) -> U } -> (T | nil | U)
+
+      type failure_reason = :invalid_login | :invalid_password | :inactive
+      def login: [U] (*String credentials) ?{ (T, (failure_reason | nil | untyped)) -> U } -> (T | nil | U)
 
       def logged_in?: () -> bool
       def current_user: () -> (T | nil)
