@@ -8,6 +8,7 @@ Faraday.default_adapter
 conn = Faraday.new(
   url: 'http://example.com/test1',
 )
+conn.headers
 response = conn.get('/get', { param: '1' }, { 'Content-Type' => 'application/json' })
 response.status
 response.headers
