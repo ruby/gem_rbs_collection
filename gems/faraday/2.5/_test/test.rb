@@ -12,21 +12,25 @@ response = conn.get('/get', { param: '1' }, { 'Content-Type' => 'application/jso
 response.status
 response.headers
 response.body
+response.success?
 
 response = conn.head('/head')
 response.status
 response.headers
 response.body
+response.success?
 
 response = conn.delete('/delete')
 response.status
 response.headers
 response.body
+response.success?
 
 response = conn.trace('/trace')
 response.status
 response.headers
 response.body
+response.success?
 
 conn = Faraday.new(
   url: 'http://example.com/test2',
@@ -38,6 +42,7 @@ end
 response.status
 response.headers
 response.body
+response.success?
 
 response = conn.put('/put') do |req|
   req.body = "{ query: 'chunky bacon' }"
@@ -45,6 +50,7 @@ end
 response.status
 response.headers
 response.body
+response.success?
 
 response = conn.patch('/patch') do |req|
   req.body = "{ query: 'chunky bacon' }"
@@ -52,3 +58,4 @@ end
 response.status
 response.headers
 response.body
+response.success?
