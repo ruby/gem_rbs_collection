@@ -3,6 +3,8 @@
 
 require "faraday"
 
+Faraday.default_adapter
+
 conn = Faraday.new(
   url: 'http://example.com/test1',
 )
