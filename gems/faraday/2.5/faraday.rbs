@@ -1,7 +1,11 @@
 module Faraday
+  attr_reader self.default_adapter: Symbol
+
   def self.new: (?untyped url, ?untyped options) ?{ (?untyped) -> void } -> Faraday::Connection
 
   class Connection
+    attr_reader headers: Hash[String, String]
+
     def get: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
     def head: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
     def delete: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
@@ -16,6 +20,7 @@ module Faraday
     def status: () -> Integer
     def headers: () -> untyped
     def body: () -> String
+    def success?: () -> bool
   end
 
   class Request
