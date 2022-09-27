@@ -3,7 +3,16 @@
 
 require "holidays"
 
+Holidays::WEEKS
+Holidays::MONTH_LENGTHS
+Holidays::DAY_SYMBOLS
 
-Holidays.on(Date.civil(2022, 8, 11), :jp)
+holidays = Holidays.on(Date.civil(2022, 8, 11), :jp)
+holidays[0][:date]
+holidays[0][:name]
+holidays[0][:regions]
 
-Holidays.between(Date.civil(2022, 8, 10), Date.civil(2022, 8, 12), :jp)
+holidays = Holidays.between(Date.civil(2022, 8, 10), Date.civil(2022, 8, 12), :jp)
+holidays[0][:date]
+holidays[0][:name]
+holidays[0][:regions]
