@@ -63,6 +63,10 @@ module Rack
   def self.version: -> String
   def self.release: -> String
 
+  interface _Application
+    def call: (Hash[String, untyped] env) -> [_ToI, _Each[[String, String]], _Each[String]]
+  end
+
   class Lobster
     LobsterString: untyped
     LambdaLobster: Proc
