@@ -1020,13 +1020,13 @@ module Rack
     class Raw
       include Helpers
 
-      attr_reader headers: untyped
+      attr_reader headers: Hash[String, String]
       attr_accessor status: untyped
-      def initialize: (untyped status, untyped headers) -> void
-      def has_header?: (untyped key) -> untyped
-      def get_header: (String key) -> untyped
+      def initialize: (untyped status, Hash[String, String] headers) -> void
+      def has_header?: (String key) -> bool
+      def get_header: (String key) -> String?
       def set_header: (String key, String v) -> String
-      def delete_header: (untyped key) -> untyped
+      def delete_header: (String key) -> String?
     end
   end
 
