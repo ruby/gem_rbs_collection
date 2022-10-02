@@ -949,27 +949,27 @@ module Rack
 
   class Response
     CHUNKED: String
-    STATUS_WITH_NO_ENTITY_BODY: untyped
+    STATUS_WITH_NO_ENTITY_BODY: Hash[Integer, true]
     include Helpers
 
-    def self.[]: (untyped status, untyped headers, untyped body) -> Response
-    attr_accessor length: Complex | Float | Integer | Rational
-    attr_accessor status: Integer | String
-    attr_accessor body: (Array[Lint?] | Lint)?
-    attr_reader headers: Hash[String, String] | Utils::HeaderHash
+    def self.[]: (_ToI status, _Each[[String, String]] headers, nil | _Each[String] | _ToStr body) -> Response
+    attr_accessor length: Integer
+    attr_accessor status: _ToI
+    attr_accessor body: _Each[String]
+    attr_reader headers: _Each[[String, String]]
     alias header headers
-    def initialize: (?Lint? body, ?Integer status, ?Hash[bot, bot] headers) -> void
-    def redirect: (untyped target, ?Integer status) -> untyped
+    def initialize: (?nil | _Each[String] | _ToStr body, ?_ToI status, ?_Each[[String, String]] headers) -> void
+    def redirect: (String target, ?_ToI status) -> void
     def chunked?: -> bool
-    def finish: -> ([Integer | String, Hash[String, String] | Utils::HeaderHash, (Array[Lint?] | Lint)?])
+    def finish: -> [_ToI, _Each[[String, String]], _Each[String]]
     alias to_a finish
-    def each: -> nil
-    def write: (String? chunk) -> untyped
-    def close: -> nil
+    def each: ?{ (String) -> void } -> void
+    def write: (_ToS chunk) -> void
+    def close: -> void
     def empty?: -> bool
-    def has_header?: (untyped key) -> bool
+    def has_header?: (String key) -> bool
     def get_header: (String key) -> String?
-    def set_header: (String key, Array[(Array[String] | String)?] | String v) -> (Array[(Array[String] | String)?] | String)
+    def set_header: (String key, String v) -> String
     def delete_header: (String key) -> String?
     alias [] get_header
     alias []= set_header
