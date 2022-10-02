@@ -1,0 +1,38 @@
+module Kaminari
+  def self.config: () -> Kaminari::Config
+  def self.configure: () { (Kaminari::Config) -> void } -> void
+
+  class Config
+    public attr_accessor default_per_page: Integer
+    public attr_accessor max_per_page: Integer?
+    public attr_accessor window: Integer
+    public attr_accessor outer_window: Integer
+    public attr_accessor left: Integer
+    public attr_accessor right: Integer
+    public attr_accessor page_method_name: Symbol | String | :page
+    public attr_accessor max_pages: Integer?
+    public attr_accessor params_on_first_page: bool
+
+    public attr_writer param_name: Symbol | String | :page | untyped
+
+    def param_name: () -> (Symbol | String | :page)
+  end
+
+  module PageScopeMethods
+    include Kaminari::_Model_Relation
+
+    def per: (Integer num, ?Integer max_per_page) -> self
+    def total_pages: () -> Integer
+    def current_page: () -> Integer
+    def next_page: () -> Integer?
+    def prev_page: () -> Integer?
+    def first_page?: () -> bool
+    def last_page?: () -> bool
+    def out_of_range?: () -> bool
+  end
+
+  interface _Model_Relation
+    def limit: (Integer) -> self
+    def offset: (Integer) -> self
+  end
+end
