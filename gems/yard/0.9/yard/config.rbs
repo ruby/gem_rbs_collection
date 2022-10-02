@@ -1,0 +1,64 @@
+class YARD::Config
+  # The system-wide configuration options for YARD
+  # @return [SymbolHash] a map a key-value pair settings.
+  # @see DEFAULT_CONFIG_OPTIONS
+  attr_accessor self.options: SymbolHash
+  # Loads settings from {CONFIG_FILE}. This method is called by YARD at
+  # load time and should not be called by the user.
+  # @return [void]
+  def self.load: () -> void
+  # Saves settings to {CONFIG_FILE}.
+  # @return [void]
+  def self.save: () -> void
+  # Loads gems that match the name 'yard-*' (recommended) or 'yard_*' except
+  # those listed in +~/.yard/ignored_plugins+. This is called immediately
+  # after YARD is loaded to allow plugin support.
+  #
+  # @return [Boolean] true if all plugins loaded successfully, false otherwise.
+  def self.load_plugins: () -> bool
+  # Loads an individual plugin by name. It is not necessary to include the
+  # +yard-+ plugin prefix here.
+  #
+  # @param [String] name the name of the plugin (with or without +yard-+ prefix)
+  # @return [Boolean] whether the plugin was successfully loaded
+  def self.load_plugin: (String name) -> bool
+  # Load gem plugins if :load_plugins is true
+  def self.load_gem_plugins: () -> untyped
+  # Load plugins set in :autoload_plugins
+  def self.load_autoload_plugins: () -> untyped
+  # Load plugins from {arguments}
+  def self.load_commandline_plugins: () -> untyped
+  # Check for command-line safe_mode switch in {arguments}
+  def self.load_commandline_safemode: () -> untyped
+  # Print a warning if the plugin failed to load
+  # @return [false]
+  def self.load_plugin_failed: (untyped name, untyped exception) -> false
+  # Legacy support for {IGNORED_PLUGINS}
+  def self.add_ignored_plugins_file: () -> untyped
+  # Translates plugin names to add yard- prefix.
+  def self.translate_plugin_names: () -> untyped
+  # Loads the YAML configuration file into memory
+  # @return [Hash] the contents of the YAML file from disk
+  # @see CONFIG_FILE
+  def self.read_config_file: () -> Hash[untyped, untyped]
+  # Sanitizes and normalizes a plugin name to include the 'yard-' prefix.
+  # @param [String] name the plugin name
+  # @return [String] the sanitized and normalized plugin name.
+  def self.translate_plugin_name: (String name) -> String
+  # Temporarily loads .yardopts file into @yardopts
+  def self.with_yardopts: () -> untyped
+  # @return [Array<String>] arguments from commandline and yardopts file
+  def self.arguments: () -> Array[String]
+  # The location where YARD stores user-specific settings
+  CONFIG_DIR: untyped
+  # The main configuration YAML file.
+  CONFIG_FILE: untyped
+  # File listing all ignored plugins
+  # @deprecated Set `ignored_plugins` in the {CONFIG_FILE} instead.
+  IGNORED_PLUGINS: untyped
+  # Default configuration options
+  DEFAULT_CONFIG_OPTIONS: untyped
+  # The prefix used for YARD plugins. Name your gem with this prefix
+  # to allow it to be used as a plugin.
+  YARD_PLUGIN_PREFIX: untyped
+end

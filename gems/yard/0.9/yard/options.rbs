@@ -1,0 +1,75 @@
+class YARD::Options
+  # @!macro [attach] yard.default_attr
+  #   @!attribute $1
+  # Defines an attribute named +key+ and sets a default value for it
+  #
+  # @example Defining a default option key
+  #   default_attr :name, 'Default Name'
+  #   default_attr :time, lambda { Time.now }
+  # @param [Symbol] key the option key name
+  # @param [Object, Proc] default the default object value. If the default
+  #   value is a proc, it is executed upon initialization.
+  def self.default_attr: (Symbol key, untyped | Proc default) -> untyped
+  # Delegates calls with Hash syntax to actual method with key name
+  #
+  # @example Calling on an option key with Hash syntax
+  #   options[:format] # equivalent to: options.format
+  # @param [Symbol, String] key the option name to access
+  # @return the value of the option named +key+
+  def []: (Symbol | String key) -> untyped
+  # Delegates setter calls with Hash syntax to the attribute setter with the key name
+  #
+  # @example Setting an option with Hash syntax
+  #   options[:format] = :html # equivalent to: options.format = :html
+  # @param [Symbol, String] key the option to set
+  # @param [Object] value the value to set for the option
+  # @return [Object] the value being set
+  def []=: (Symbol | String key, untyped value) -> untyped
+  # Updates values from an options hash or options object on this object.
+  # All keys passed should be key names defined by attributes on the class.
+  #
+  # @example Updating a set of options on an Options object
+  #   opts.update(:template => :guide, :type => :fulldoc)
+  # @param [Hash, Options] opts
+  # @return [self]
+  def update: (Hash[untyped, untyped] | YARD::Options opts) -> self
+  # Creates a new options object and sets options hash or object value
+  # onto that object.
+  #
+  # @param [Options, Hash] opts
+  # @return [Options] the newly created options object
+  # @see #update
+  def merge: (YARD::Options | Hash[untyped, untyped] opts) -> YARD::Options
+  # @return [Hash] Converts options object to an options hash. All keys
+  #   will be symbolized.
+  def to_hash: () -> Hash[untyped, untyped]
+  # Yields over every option key and value
+  # @yield [key, value] every option key and value
+  # @yieldparam [Symbol] key the option key
+  # @yieldparam [Object] value the option value
+  # @return [void]
+  def each: () { (Symbol key, untyped value) -> untyped } -> void
+  # @return [Boolean] whether another Options object equals the
+  #   keys and values of this options object
+  def ==: (untyped other) -> bool
+  # Handles setting and accessing of unregistered keys similar
+  # to an OpenStruct object.
+  #
+  # @note It is not recommended to set and access unregistered keys on
+  #   an Options object. Instead, register the attribute before using it.
+  def method_missing: (untyped meth, *untyped args) -> untyped
+  # Resets all values to their defaults.
+  #
+  # @abstract Subclasses should override this method to perform custom
+  #   value initialization if not using {default_attr}. Be sure to call
+  #   +super+ so that default initialization can take place.
+  # @return [void]
+  def reset_defaults: () -> void
+  # Deletes an option value for +key+
+  #
+  # @param [Symbol, String] key the key to delete a value for
+  # @return [Object] the value that was deleted
+  def delete: (Symbol | String key) -> untyped
+  # only for 1.8.6
+  def tap: () { (YARD::Options _self) -> untyped } -> untyped
+end

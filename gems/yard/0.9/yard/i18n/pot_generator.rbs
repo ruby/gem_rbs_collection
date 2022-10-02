@@ -1,0 +1,54 @@
+class YARD::I18n::PotGenerator
+  # Extracted messages.
+  #
+  # @return [Messages]
+  # @since 0.8.1
+  attr_reader messages: YARD::I18n::Messages
+  # Creates a POT generator that uses +relative_base_path+ to
+  # generate locations for a msgid. +relative_base_path+ is
+  # prepended to all locations.
+  #
+  # @param [String] relative_base_path a relative working
+  #   directory path from a directory path that has created .pot
+  #   file.
+  def initialize: (String relative_base_path) -> void
+  # Parses {CodeObjects::Base} objects and stores extracted msgids
+  # into {#messages}
+  #
+  # @param [Array<CodeObjects::Base>] objects a list of
+  #   {CodeObjects::Base} to be parsed.
+  # @return [void]
+  def parse_objects: (Array[YARD::CodeObjects::Base] objects) -> void
+  # Parses {CodeObjects::ExtraFileObject} objects and stores
+  # extracted msgids into {#messages}.
+  #
+  # @param [Array<CodeObjects::ExtraFileObject>] files a list
+  #   of {CodeObjects::ExtraFileObject} objects to be parsed.
+  # @return [void]
+  def parse_files: (Array[YARD::CodeObjects::ExtraFileObject] files) -> void
+  # Generates POT from +@messages+.
+  #
+  # One PO file entry is generated from a +Message+ in
+  # +@messages+.
+  #
+  # Locations of the +Message+ are used to generate the reference
+  # line that is started with "#: ". +relative_base_path+ passed
+  # when the generator is created is prepended to each path in location.
+  #
+  # Comments of the +Message+ are used to generate the
+  # translator-comment line that is started with "# ".
+  #
+  # @return [String] POT format string
+  def generate: () -> String
+  private def header: () -> untyped
+  private def current_time: () -> untyped
+  private def generate_pot_creation_date_value: () -> untyped
+  private def generate_message: (untyped pot, untyped message) -> untyped
+  private def escape_message_id: (untyped message_id) -> untyped
+  private def register_message: (untyped id) -> untyped
+  private def extract_documents: (untyped object) -> untyped
+  private def extract_tag_documents: (untyped tag) -> untyped
+  private def extract_tag_name: (untyped tag) -> untyped
+  private def extract_tag_text: (untyped tag) -> untyped
+  private def extract_paragraphs: (untyped file) -> untyped
+end

@@ -1,0 +1,19 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+
+  library "rubygems"
+  library "set"
+  library "optparse"
+  library "logger"
+  library "monitor"
+
+  library "yard:0.9"
+  library "rack:2.2.2"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

@@ -1,0 +1,187 @@
+class YARD::Handlers::Base
+  # @return [Processor] the processor object that manages all global state
+  #   during handling.
+  attr_reader parser: YARD::Handlers::Processor
+  # @return [Object] the statement object currently being processed. Usually
+  #   refers to one semantic language statement, though the strict definition
+  #   depends on the parser used.
+  attr_reader statement: untyped
+  # Returns the value of attribute owner.
+  attr_accessor owner: untyped
+  # Returns the value of attribute namespace.
+  attr_accessor namespace: untyped
+  # Returns the value of attribute visibility.
+  attr_accessor visibility: untyped
+  # Returns the value of attribute scope.
+  attr_accessor scope: untyped
+  # Returns the value of attribute globals.
+  attr_reader globals: untyped
+  # Returns the value of attribute extra_state.
+  attr_reader extra_state: untyped
+  # Clear all registered subclasses. Testing purposes only
+  # @return [void]
+  def self.clear_subclasses: () -> void
+  # Returns all registered handler subclasses.
+  # @return [Array<Base>] a list of handlers
+  def self.subclasses: () -> Array[YARD::Handlers::Base]
+  def self.inherited: (untyped subclass) -> untyped
+  def self.handles: (*YARD::Parser::Ruby::Legacy::RubyToken | Symbol | String | Regexp matches) -> untyped
+  # This class is implemented by {Ruby::Base} and {Ruby::Legacy::Base}.
+  # To implement a base handler class for another language, implement
+  # this method to return true if the handler should process the given
+  # statement object. Use {handlers} to enumerate the matchers declared
+  # for the handler class.
+  #
+  # @param statement a statement object or node (depends on language type)
+  # @return [Boolean] whether or not this handler object should process
+  #   the given statement
+  def self.handles?: (untyped statement) -> bool
+  # @return [Array] a list of matchers for the handler object.
+  # @see handles?
+  def self.handlers: () -> Array[untyped]
+  # Declares that the handler should only be called when inside a
+  # {CodeObjects::NamespaceObject}, not a method body.
+  #
+  # @return [void]
+  def self.namespace_only: () -> void
+  # @return [Boolean] whether the handler should only be processed inside
+  #   a namespace.
+  def self.namespace_only?: () -> bool
+  # Declares that a handler should only be called when inside a filename
+  # by its basename or a regex match for the full path.
+  #
+  # @param [String, Regexp] filename a matching filename or regex
+  # @return [void]
+  # @since 0.6.2
+  def self.in_file: (String | Regexp filename) -> void
+  # @return [Boolean] whether the filename matches the declared file
+  #   match for a handler. If no file match is specified, returns true.
+  # @since 0.6.2
+  def self.matches_file?: (untyped filename) -> bool
+  # Generates a +process+ method, equivalent to +def process; ... end+.
+  # Blocks defined with this syntax will be wrapped inside an anonymous
+  # module so that the handler class can be extended with mixins that
+  # override the +process+ method without alias chaining.
+  #
+  # @!macro yard.handlers.process
+  #   @!method process
+  #   Main processing callback
+  #   @return [void]
+  # @see #process
+  # @return [void]
+  # @since 0.5.4
+  def self.process: () -> void
+  def initialize: (untyped source_parser, untyped stmt) -> void
+  def process: () -> (Array[YARD::CodeObjects::Base] | YARD::CodeObjects::Base | untyped)
+  # Parses the semantic "block" contained in the statement node.
+  #
+  # @abstract Subclasses should call {Processor#process parser.process}
+  def parse_block: (*untyped) -> untyped
+  # Aborts a handler by raising {Handlers::HandlerAborted}.
+  # An exception will only be logged in debugging mode for
+  # this kind of handler exit.
+  #
+  # @since 0.8.4
+  def abort!: () -> untyped
+  # Executes a given block with specific state values for {#owner},
+  # {#namespace} and {#scope}.
+  #
+  # @option opts [CodeObjects::NamespaceObject] :namespace (value of #namespace)
+  #   the namespace object that {#namespace} will be equal to for the
+  #   duration of the block.
+  # @option opts [Symbol] :scope (:instance)
+  #   the scope for the duration of the block.
+  # @option opts [CodeObjects::Base] :owner (value of #owner)
+  #   the owner object (method) for the duration of the block
+  # @yield a block to execute with the given state values.
+  def push_state: (?Hash[untyped, untyped] opts) -> untyped
+  def register: (*Array[YARD::CodeObjects::Base] objects) -> (YARD::CodeObjects::Base | Array[YARD::CodeObjects::Base])
+  # Ensures that the object's namespace is loaded before attaching it
+  # to the namespace.
+  #
+  # @param [CodeObjects::Base] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_ensure_loaded: (YARD::CodeObjects::Base object) -> void
+  # Registers the file/line of the declaration with the object
+  #
+  # @param [CodeObjects::Base] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_file_info: (YARD::CodeObjects::Base object, ?untyped file, ?untyped line, ?untyped comments) -> void
+  # Registers any docstring found for the object and expands macros
+  #
+  # @param [CodeObjects::Base] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_docstring: (YARD::CodeObjects::Base object, ?untyped docstring, ?untyped stmt) -> void
+  # Registers the object as being inside a specific group
+  #
+  # @param [CodeObjects::Base] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_group: (YARD::CodeObjects::Base object, ?untyped group) -> void
+  # Registers any transitive tags from the namespace on the object
+  #
+  # @param [CodeObjects::Base, nil] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_transitive_tags: (YARD::CodeObjects::Base? object) -> void
+  # @param [CodeObjects::Base] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_source: (YARD::CodeObjects::Base object, ?untyped source, ?untyped `type`) -> void
+  # Registers visibility on a method object. If the object does not
+  # respond to setting visibility, nothing is done.
+  #
+  # @param [#visibility=] object the object to register
+  # @param [Symbol] visibility the visibility to set on the object
+  # @since 0.8.0
+  def register_visibility: (untyped object, ?Symbol visibility) -> untyped
+  # Registers the same method information on the module function, if
+  # the object was defined as a module function.
+  #
+  # @param [CodeObjects::Base] object the possible module function object
+  #   to copy data for
+  # @since 0.8.0
+  def register_module_function: (YARD::CodeObjects::Base object) -> untyped
+  # Registers the object as dynamic if the object is defined inside
+  # a method or block (owner != namespace)
+  #
+  # @param [CodeObjects::Base] object the object to register
+  # @return [void]
+  # @since 0.8.0
+  def register_dynamic: (YARD::CodeObjects::Base object) -> void
+  # Ensures that a specific +object+ has been parsed and loaded into the
+  # registry. This is necessary when adding data to a namespace, for instance,
+  # since the namespace may not have been processed yet (it can be located
+  # in a file that has not been handled).
+  #
+  # Calling this method defers the handler until all other files have been
+  # processed. If the object gets resolved, the rest of the handler continues,
+  # otherwise an exception is raised.
+  #
+  # @example Adding a mixin to the String class programmatically
+  #   ensure_loaded! P('String')
+  #   # "String" is now guaranteed to be loaded
+  #   P('String').mixins << P('MyMixin')
+  #
+  # @param [Proxy, CodeObjects::Base] object the object to resolve.
+  # @param [Integer] max_retries the number of times to defer the handler
+  #   before raising a +NamespaceMissingError+.
+  # @raise [NamespaceMissingError] if the object is not resolved within
+  #   +max_retries+ attempts, this exception is raised and the handler
+  #   finishes processing.
+  def ensure_loaded!: (untyped | YARD::CodeObjects::Base object, ?Integer max_retries) -> untyped
+  # @abstract Implement this method to return the parameters in a method call
+  #   statement. It should return an empty list if the statement is not a
+  #   method call.
+  # @return [Array<String>] a list of argument names
+  def call_params: () -> Array[String]
+  # @abstract Implement this method to return the method being called in
+  #   a method call. It should return nil if the statement is not a method
+  #   call.
+  # @return [String] the method name being called
+  # @return [nil] if the statement is not a method call
+  def caller_method: () -> String?
+end

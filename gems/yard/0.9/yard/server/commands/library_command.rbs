@@ -1,0 +1,30 @@
+class YARD::Server::Commands::LibraryCommand < ::YARD::Server::Commands::Base
+  # @return [LibraryVersion] the object containing library information
+  attr_accessor library: YARD::Server::LibraryVersion
+  # @return [LibraryOptions] default options for the library
+  attr_accessor options: YARD::Server::Commands::LibraryOptions
+  # @return [Serializers::Base] the serializer used to perform file linking
+  attr_accessor serializer: YARD::Serializers::Base
+  # @return [Boolean] whether router should route for multiple libraries
+  attr_accessor single_library: bool
+  # @return [Boolean] whether to reparse data
+  attr_accessor incremental: bool
+  # @return [Boolean] whether or not this adapter calls +fork+ when serving
+  #   library requests. Defaults to false.
+  attr_accessor use_fork: bool
+  def initialize: (?untyped opts) -> void
+  def call: (untyped request) -> untyped
+  private def call_without_fork: (untyped request) -> untyped
+  private def call_with_fork: (untyped request) -> untyped
+  private def can_fork?: () -> bool
+  private def save_default_template_info: () -> untyped
+  private def restore_template_info: () -> untyped
+  private def setup_library: () -> untyped
+  private def setup_yardopts: () -> untyped
+  private def load_yardoc: () -> untyped
+  private def not_prepared: () -> untyped
+  # Hack to load a custom fulldoc template object that does
+  # not do any rendering/generation. We need this to access the
+  # generate_*_list methods.
+  private def fulldoc_template: () -> untyped
+end

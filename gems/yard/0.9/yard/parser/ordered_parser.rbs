@@ -1,0 +1,17 @@
+class YARD::Parser::OrderedParser
+  # @return [Array<String>] the list of remaining files to parse
+  attr_accessor files: Array[String]
+  # Creates a new OrderedParser with the global state and a list
+  # of files to parse.
+  #
+  # @note OrderedParser sets itself as the +ordered_parser+ key on
+  #   global_state for later use in {Handlers::Processor}.
+  # @param [OpenStruct] global_state a structure containing all global
+  #   state during parsing
+  # @param [Array<String>] files the list of files to parse
+  def initialize: (OpenStruct global_state, Array[String] files) -> void
+  # Parses the remainder of the {#files} list.
+  #
+  # @see Processor#parse_remaining_files
+  def parse: () -> untyped
+end
