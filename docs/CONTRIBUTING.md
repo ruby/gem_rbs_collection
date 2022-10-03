@@ -85,6 +85,12 @@ Then you can run `steep check` to type check the test scripts.
 
 See existing gems for examples, like [redis/4.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/redis/4.2/_test) or [listen/3.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/listen/3.2/_test).
 
+### Write manifest.yaml
+
+`manifest.yaml` describes dependencies which do not appear in the gemspec.
+If this gem includes such dependencies, comment-out the following lines and declare the dependencies.
+If all dependencies appear in the gemspec, you should remove this file.
+See [the documentation](https://github.com/ruby/rbs/blob/master/docs/collection.md) for more information.
 
 ## Code Owners
 
