@@ -6,14 +6,14 @@ module Faraday
   class Connection
     attr_reader headers: Hash[String, String]
 
-    def get: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
-    def head: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
-    def delete: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
-    def trace: (?String url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def get: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def head: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def delete: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def trace: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
 
-    def post: (?String url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
-    def put: (?String url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
-    def patch: (?String url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def post: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def put: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+    def patch: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
   end
 
   class Response
@@ -25,7 +25,7 @@ module Faraday
 
   class Request
     def http_method=: (untyped) -> void
-    def path=: (untyped) -> void
+    def path=: (String | URI) -> void
     def params=: (untyped) -> void
     def headers=: (untyped) -> void
     def body=: (untyped) -> void
