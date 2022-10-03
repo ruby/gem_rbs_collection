@@ -844,16 +844,16 @@ module Rack
     def delete_param: (untyped k) -> ((Integer | Session::Cookie::Base64::Marshal | String | bool)?)
 
     module Env
-      attr_reader env: Hash[String, String?]?
-      def initialize: (Hash[String, String?]? env) -> void
-      def has_header?: (untyped name) -> bool
-      def get_header: (String name) -> String?
-      def fetch_header: (String name) ?{ -> ((Array[untyped] | Session::Abstract::SessionHash | String | {coder: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, key: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, path: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, domain: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, expire_after: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, httponly: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, defer: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, renew: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, sidbits: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, cookie_only: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure_random: (Integer | Session::Cookie::Base64::Marshal | String | bool)?})?) } -> String?
-      def each_header: -> Enumerator[[String, String?], untyped]
-      def set_header: (String name, (Array[untyped] | Session::Abstract::SessionHash | String | {coder: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, key: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, path: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, domain: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, expire_after: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, httponly: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, defer: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, renew: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, sidbits: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, cookie_only: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure_random: (Integer | Session::Cookie::Base64::Marshal | String | bool)?})? v) -> ((Array[untyped] | Session::Abstract::SessionHash | String | {coder: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, key: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, path: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, domain: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, expire_after: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, httponly: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, defer: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, renew: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, sidbits: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, cookie_only: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure_random: (Integer | Session::Cookie::Base64::Marshal | String | bool)?})?)
-      def add_header: (untyped key, untyped v) -> ((Array[untyped] | Session::Abstract::SessionHash | String | {coder: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, key: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, path: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, domain: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, expire_after: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, httponly: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, defer: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, renew: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, sidbits: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, cookie_only: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure_random: (Integer | Session::Cookie::Base64::Marshal | String | bool)?})?)
-      def delete_header: (untyped name) -> String?
-      def initialize_copy: (untyped other) -> untyped
+      attr_reader env: env
+      def initialize: (env) -> void
+      def has_header?: (String name) -> bool
+      def get_header: (String name) -> untyped?
+      def fetch_header: (String name) ?{ (?String) -> untyped } -> untyped?
+      def each_header: { ([String, untyped]) -> void } -> env | -> Enumerator[[String, untyped], env]
+      def set_header: (String name, untyped v) -> untyped
+      def add_header: (String key, untyped v) -> untyped
+      def delete_header: (String name) -> untyped
+      def initialize_copy: (Env other) -> void
     end
 
     module Helpers
