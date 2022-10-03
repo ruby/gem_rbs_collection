@@ -22,3 +22,5 @@ puts branch.roma
 puts branch.bank
 
 ZenginCode::Bank["0000"] # => nil
+
+ZenginCode.version # => "1.0.1-p20221002"
