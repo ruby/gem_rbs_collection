@@ -74,7 +74,7 @@ module Rack
     include _Application
 
     LobsterString: String
-    LambdaLobster: ^(Hash[String, untyped] env) -> [Integer, Hash[String, String], Array[String]]
+    LambdaLobster: ^(env) -> [Integer, Hash[String, String], Array[String]]
   end
 
   module Auth
@@ -964,7 +964,7 @@ module Rack
     def chunked?: -> bool
     def finish: -> response
     alias to_a finish
-    def each: ?{ (String) -> void } -> void
+    def each: ?{ (?String) -> void } -> void
     def write: (_ToS chunk) -> void
     def close: -> void
     def empty?: -> bool
