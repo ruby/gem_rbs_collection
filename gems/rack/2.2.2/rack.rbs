@@ -833,15 +833,16 @@ module Rack
   end
 
   class Request
-    ALLOWED_SCHEMES: [String, String]
-    SCHEME_WHITELIST: [String, String]
+    attr_accessor ip_filter: ^(_ToStr? ip) -> bool
+    ALLOWED_SCHEMES: Array[String]
+    SCHEME_WHITELIST: Array[String]
     include Helpers
     include Env
 
-    def initialize: (Hash[String, String?]? env) -> void
-    def params: -> (Hash[:coder | :cookie_only | :defer | :domain | :expire_after | :httponly | :key | :path | :renew | :secure | :secure_random | :sidbits, (Integer | Session::Cookie::Base64::Marshal | String | bool)?])
-    def update_param: (untyped k, untyped v) -> nil
-    def delete_param: (untyped k) -> ((Integer | Session::Cookie::Base64::Marshal | String | bool)?)
+    def initialize: (env) -> void
+    def params: -> Hash[untyped, untyped]
+    def update_param: (top k, top v) -> void
+    def delete_param: (top k) -> bot
 
     module Env
       attr_reader env: env
@@ -857,8 +858,8 @@ module Rack
     end
 
     module Helpers
-      FORM_DATA_MEDIA_TYPES: [String, String]
-      PARSEABLE_DATA_MEDIA_TYPES: [String, String]
+      FORM_DATA_MEDIA_TYPES: Array[String]
+      PARSEABLE_DATA_MEDIA_TYPES: Array[String]
       DEFAULT_PORTS: Hash[String, Integer]
       HTTP_X_FORWARDED_FOR: String
       HTTP_X_FORWARDED_HOST: String
@@ -868,21 +869,23 @@ module Rack
       HTTP_X_FORWARDED_SSL: String
       AUTHORITY: Regexp
 
-      def body: -> String?
+      # FIXME: write SPEC-specified duck type for #body and #logger
+      def body: -> IO
       def script_name: -> String
-      def script_name=: (untyped s) -> untyped
+      def script_name=: (_ToS s) -> String
       def path_info: -> String
-      def path_info=: (untyped s) -> untyped
-      def request_method: -> String?
+      def path_info=: (_ToS s) -> String
+      def request_method: -> String
       def query_string: -> String
       def content_length: -> String?
-      def logger: -> untyped
-      def user_agent: -> untyped
-      def multithread?: -> untyped
-      def referer: -> untyped
+      def logger: -> bot
+      def user_agent: -> String?
+      def multithread?: -> bool
+      def referer: -> String?
       alias referrer referer
-      def session: -> untyped
-      def session_options: -> String?
+      def session: -> _ToHash[untyped, untyped]
+      # FIXME: SPEC does not document `rack.session_options`
+      def session_options: -> bot
       def delete?: -> bool
       def get?: -> bool
       def head?: -> bool
@@ -896,51 +899,52 @@ module Rack
       def scheme: -> String?
       def authority: -> String?
       def server_authority: -> String?
-      def server_name: -> untyped
-      def server_port: -> nil
-      def cookies: -> String?
+      def server_name: -> String
+      def server_port: -> Integer?
+      def cookies: -> Hash[String, String]
       def content_type: -> String?
-      def xhr?: -> untyped
-      def host_authority: -> untyped
+      def xhr?: -> bool
+      def host_authority: -> String?
       def host_with_port: (?String? authority) -> String?
       def host: -> String?
       def hostname: -> String?
       def port: -> Integer?
       def forwarded_for: -> Array[String?]?
-      def forwarded_port: -> Array[untyped]?
+      def forwarded_port: -> Array[Integer]?
       def forwarded_authority: -> String?
       def ssl?: -> bool
       def ip: -> String?
       def media_type: -> String?
-      def media_type_params: -> Hash[bot, bot]
-      def content_charset: -> nil
+      def media_type_params: -> Hash[String, String]
+      def content_charset: -> String?
       def form_data?: -> bool
       def parseable_data?: -> bool
-      def GET: -> ((Array[untyped] | Session::Abstract::SessionHash | String | {coder: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, key: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, path: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, domain: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, expire_after: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, httponly: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, defer: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, renew: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, sidbits: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, cookie_only: (Integer | Session::Cookie::Base64::Marshal | String | bool)?, secure_random: (Integer | Session::Cookie::Base64::Marshal | String | bool)?})?)
-      def POST: -> ((Hash[bot, bot] | String)?)
-      def params: -> (Hash[:coder | :cookie_only | :defer | :domain | :expire_after | :httponly | :key | :path | :renew | :secure | :secure_random | :sidbits, (Integer | Session::Cookie::Base64::Marshal | String | bool)?])
-      def update_param: (untyped k, untyped v) -> nil
-      def delete_param: (untyped k) -> ((Integer | Session::Cookie::Base64::Marshal | String | bool)?)
+      def GET: -> Hash[untyped, untyped]
+      def POST: -> Hash[untyped, untyped]
+      def params: -> Hash[untyped, untyped]
+      def update_param: (top k, top v) -> void
+      def delete_param: (top k) -> bot
       def base_url: -> String
       def url: -> String
       def path: -> String
       def fullpath: -> String
       def accept_encoding: -> Array[[String?, Float]]
       def accept_language: -> Array[[String?, Float]]
-      def trusted_proxy?: (String? ip) -> untyped
-      def []: (untyped key) -> ((Integer | Session::Cookie::Base64::Marshal | String | bool)?)
+      def trusted_proxy?: (String? ip) -> bool
+      def []: (untyped key) -> untyped
       def []=: (untyped key, untyped value) -> untyped
-      def values_at: (*untyped keys) -> untyped
+      def values_at: (*untyped keys) -> Array[untyped]
 
       private
-      def default_session: -> Hash[bot, bot]
-      def wrap_ipv6: (nil host) -> String?
-      def parse_http_accept_header: (String? header) -> Array[[String?, Float]]
-      def query_parser: -> untyped
-      def parse_query: (String qs, ?String d) -> untyped
-      def parse_multipart: -> nil
-      def split_header: (untyped value) -> Array[bot]
-      def split_authority: (String? authority) -> [String?, String?, Integer?]
+      def default_session: -> Hash[untyped, untyped]
+      def wrap_ipv6: (String host) -> String
+      def parse_http_accept_header: (_ToS header) -> Array[[String?, Float]]
+      def query_parser: -> QueryParser
+      def parse_query: (String qs, ?String? d) -> Hash[String, String | Array[String]]
+      # FIXME: What exactly does #parse_multipart return?
+      def parse_multipart: -> bot
+      def split_header: (String? value) -> Array[String]
+      def split_authority: (String authority) -> [String?, String?, Integer?]
       def reject_trusted_ip_addresses: (Array[String?]? ip_addresses) -> Array[String?]
       def forwarded_scheme: -> String?
       def allowed_scheme: (String? header) -> String?
