@@ -1,5 +1,5 @@
-mail = Mail::Address.new('Fuga Kkbn (My email address) <fugakkbn@example.com>')
-mail.domain
+address = Mail::Address.new('Fuga Kkbn (My email address) <fugakkbn@example.com>')
+address.domain
 
 mail = Mail.new
 mail.from = 'fugakkbn@example.com'
