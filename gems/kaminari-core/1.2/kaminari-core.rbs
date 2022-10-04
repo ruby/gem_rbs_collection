@@ -18,8 +18,8 @@ module Kaminari
     def param_name: () -> (Symbol | String)
   end
 
-  module PageScopeMethods[Relation] : _Model_Relation[Relation]
-    def per: (Integer num, ?Integer max_per_page) -> Relation
+  module PageScopeMethods : _Model_Relation
+    def per: (Integer num, ?Integer max_per_page) -> self
     def total_pages: () -> Integer
     def current_page: () -> Integer
     def next_page: () -> Integer?
@@ -29,9 +29,9 @@ module Kaminari
     def out_of_range?: () -> bool
   end
 
-  interface _Model_Relation[Relation]
-    def limit: (Integer) -> Relation
-    def offset: (Integer) -> Relation
+  interface _Model_Relation
+    def limit: (Integer) -> self
+    def offset: (Integer) -> self
   end
 
   interface _Caller
