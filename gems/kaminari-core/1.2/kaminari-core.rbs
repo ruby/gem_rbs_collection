@@ -13,7 +13,7 @@ module Kaminari
     attr_accessor max_pages: Integer?
     attr_accessor params_on_first_page: bool
 
-    attr_writer param_name: Symbol | String | _Caller
+    attr_writer param_name: Symbol | String | _Callable
 
     def param_name: () -> (Symbol | String)
   end
@@ -34,7 +34,7 @@ module Kaminari
     def offset: (Integer) -> self
   end
 
-  interface _Caller
+  interface _Callable
     def call: () -> (Symbol | String)
   end
 end
