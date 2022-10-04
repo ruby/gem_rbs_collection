@@ -371,7 +371,7 @@ module Mail
     #
     #  a = Address.new('Mikel Lindsaar (My email address) <mikel@test.lindsaar.net>')
     #  a.domain #=> 'test.lindsaar.net'
-    def domain: (?::Symbol output_type) -> untyped
+    def domain: (?::Symbol output_type) -> ::String
 
     def comments: () -> untyped
 
@@ -2426,7 +2426,7 @@ module Mail
   #  mail[:from] = 'bob@test.lindsaar.net'
   #  mail['subject'] = 'This is an email'
   #  mail.body = 'This is the body'
-  def self.new: (*untyped args) ?{ () -> untyped } -> untyped
+  def self.new: (*untyped args) ?{ () -> untyped } -> Message
 
   # Sets the default delivery method and retriever method for all new Mail objects.
   # The delivery_method and retriever_method default to :smtp and :pop3, with defaults
