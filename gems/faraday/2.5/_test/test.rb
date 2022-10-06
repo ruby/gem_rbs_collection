@@ -10,6 +10,10 @@ conn.headers
 response = conn.get('/get', { param: '1' }, { 'Content-Type' => 'application/json' }) do |req|
   req.path = "/new_get"
   req.path = URI("https://example.com/new_get?abc=m")
+  req.url("/new_url")
+  req.url("/new_url", { x_foo: "OK" })
+  req.url(URI("https://example.com/new_url?abc=foo"))
+  req.url(URI("https://example.com/new_url?abc=bar"), { x_bar: "OK" })
 end
 response.status
 response.headers
