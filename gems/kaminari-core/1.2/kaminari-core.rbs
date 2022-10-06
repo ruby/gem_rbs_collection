@@ -29,6 +29,16 @@ module Kaminari
     def out_of_range?: () -> bool
   end
 
+  module ConfigurationMethods
+    module ClassMethods
+      def paginates_per: (Integer val) -> void
+      def default_per_page: () -> Integer
+      def max_paginates_per: (Integer val) -> void
+      def max_per_page: () -> Integer?
+      def max_pages: (?Integer | Symbol val) -> (Integer? | void)
+    end
+  end
+
   interface _Model_Relation
     def limit: (Integer) -> self
     def offset: (Integer) -> self

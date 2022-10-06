@@ -56,3 +56,15 @@ model.prev_page
 model.first_page?
 model.last_page?
 model.out_of_range?
+
+class Model
+  extend Kaminari::ConfigurationMethods::ClassMethods
+
+  paginates_per 10
+  max_paginates_per 100
+  max_pages 1000
+end
+
+Model.default_per_page
+Model.max_per_page
+Model.max_pages
