@@ -1,0 +1,29 @@
+module Kaminari
+  module ActiveRecordModelExtension
+    module ClassMethods
+      include Kaminari::ConfigurationMethods::ClassMethods
+
+      def page: (?Integer num) -> self
+    end
+  end
+
+  module ActiveRecordRelationMethods
+  end
+
+  module ActiveRecordExtension
+    module ClassMethods
+    end
+  end
+end
+
+module ActiveRecord
+  class Base
+    include Kaminari::ActiveRecordExtension
+    extend Kaminari::ActiveRecordExtension::ClassMethods
+  end
+
+  class Relation
+    include Kaminari::ActiveRecordRelationMethods
+    include Kaminari::PageScopeMethods
+  end
+end

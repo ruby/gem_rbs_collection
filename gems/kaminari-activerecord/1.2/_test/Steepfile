@@ -1,0 +1,23 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+  library "kaminari-activerecord"
+
+  library "kaminari-core:1.2"
+  library "activerecord:6.0"
+  library "activesupport:6.0"
+  library "activemodel:6.0"
+
+  library "singleton"
+  library "logger"
+  library "mutex_m"
+  library "monitor"
+  library "time"
+  library "date"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end
