@@ -358,22 +358,22 @@ module Rack
 
   class Builder
     UTF_8_BOM: String
+    include _Application
 
-    def self.parse_file: ((Array[bot] | Integer | String)? config, ?Server::Options opts) -> [untyped, {config: String?}]
-    def self.load_file: ((Array[bot] | Integer | String)? path, ?Server::Options opts) -> [untyped, {config: String?}]
-    def self.new_from_string: (String? builder_script, ?(Array[bot] | Integer | String)? file) -> untyped
-    def initialize: (?URLMap? default_app) -> void
-    def self.app: (?nil default_app) -> URLMap?
-    def use: (untyped middleware, *untyped args) -> Array[^(URLMap?) -> URLMap]
-    def run: (untyped app) -> untyped
-    def warmup: (?nil prc) -> nil
-    def map: (untyped path) -> nil
+    def self.parse_file: (String config, ?Server::Options opts) -> [bot, Hash[Symbol, untyped]]
+    def self.load_file: (String config, ?Server::Options opts) -> [_Application, Hash[Symbol, untyped]]
+    def self.new_from_string: (String builder_script, ?String file) -> _Application
+    def initialize: (?_Application? default_app) ?{ (self) -> void } -> void
+    def self.app: (?_Application? default_app) ?{ (self) -> void } -> _Application
+    def use: (_Application middleware, *untyped args, **untyped kwargs) ?{ (*untyped) -> void } -> void
+    def run: (_Application app) -> _Application
+    def warmup: (?(^(_Application) -> void)?) ?{ (_Application) -> void } -> (^(_Application) -> void)?
+    def map: (String path) { (Builder) -> void } -> ^(Builder) -> void
     def freeze_app: -> true
-    def to_app: -> URLMap?
-    def call: (untyped env) -> [Integer, Hash[String, String], [String]]
+    def to_app: -> _Application
 
     private
-    def generate_map: (URLMap? default_app, Hash[bot, bot]? mapping) -> URLMap
+    def generate_map: (_Application? default_app, Hash[String, ^(Builder) -> void] mapping) -> URLMap
   end
 
   class BodyProxy
