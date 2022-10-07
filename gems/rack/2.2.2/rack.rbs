@@ -849,7 +849,7 @@ module Rack
       def initialize: (env) -> void
       def has_header?: (String name) -> bool
       def get_header: (String name) -> untyped?
-      def fetch_header: (String name) ?{ (?String) -> untyped } -> untyped?
+      def fetch_header: (String name) ?{ (String) -> untyped } -> untyped?
       def each_header: { ([String, untyped]) -> void } -> env | -> Enumerator[[String, untyped], env]
       def set_header: (String name, untyped v) -> untyped
       def add_header: (String key, untyped v) -> untyped
@@ -968,7 +968,7 @@ module Rack
     def chunked?: -> bool
     def finish: -> response
     alias to_a finish
-    def each: ?{ (?String) -> void } -> void
+    def each: ?{ (String) -> void } -> void
     def write: (_ToS chunk) -> void
     def close: -> void
     def empty?: -> bool
