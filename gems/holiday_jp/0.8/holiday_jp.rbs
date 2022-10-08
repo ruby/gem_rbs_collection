@@ -1,0 +1,43 @@
+module HolidayJp
+  def self.between: (untyped start, untyped last) -> (::Array[Holiday] | ::Array[untyped])
+
+  def self.holiday?: (untyped date) -> bool
+
+  def self.holidays: () -> untyped
+end
+
+module HolidayJp
+  class Holiday
+    WDAY_NAMES: ::Array[::String]
+
+    EN_HOLIDAY_NAMES: ::Hash[::String, "New Year's Day" | "Coming of Age Day" | "National Foundation Day" | "Vernal Equinox Day" | "Constitution Memorial Day" | "Greenery Day" | "Children's Day" | "Marine Day" | "Mountain Day" | "Respect for the Aged Day" | "Autumnal Equinox Day" | "Health and Sports Day" | "Sports Day" | "National Culture Day" | "Labor Thanksgiving Day" | "Emperor's Birthday" | "Showa Day" | "Holiday in lieu" | "Citizen's Holiday" | "The Ceremony of the Enthronement of His Majesty th Emperor (at the Seiden)" | "The Funeral Ceremony of Emperor Showa." | "The Rite of Wedding of HIH Crown Prince Naruhito"]
+
+    attr_reader date: untyped
+
+    attr_reader name: ::String
+
+    def initialize: (untyped date, ::String name) -> void
+
+    def name_en: () -> ::String
+
+    def wday_name: () -> ::String
+
+    alias week wday_name
+  end
+end
+
+module HolidayJp
+  class Holidays
+    attr_accessor holidays: untyped
+
+    def initialize: () -> void
+
+    def between: (untyped start, untyped last) -> untyped
+
+    def holiday?: (untyped date) -> bool
+  end
+end
+
+module HolidayJp
+  VERSION: "0.8.1"
+end
