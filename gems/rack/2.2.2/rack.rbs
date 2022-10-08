@@ -1407,18 +1407,19 @@ module Rack
 
   class MockResponse < Response
     alias self.[] self.new
-    attr_reader original_headers: untyped
-    attr_reader cookies: Hash[bot, bot]
+    attr_reader original_headers: _Each[[String, String]]
+    attr_reader cookies: Hash[String, CGI::Cookie]
     attr_accessor errors: String
-    def initialize: (untyped status, untyped headers, Lint body, ?(Array[(Integer | String)?] | Hash[:input | String, String?] | Integer | MockRequest::FatalWarner | String | StringIO | bool)? errors) -> void
+    # FIXME: write SPEC-specified duck type for errors parameter
+    def initialize: (_ToI status, _Each[[String, String]] headers, nil | _Each[String] | _ToStr body, ?untyped errors) -> void
     def =~: (untyped other) -> Integer?
-    def match: (untyped other) -> MatchData?
+    def match: (Regexp | string other) -> MatchData?
     def body: -> String
     def empty?: -> bool
-    def cookie: (untyped name) -> nil
+    def cookie: (String name) -> CGI::Cookie?
 
     private
-    def parse_cookies_from_header: -> Hash[bot, bot]
-    def identify_cookie_attributes: (untyped cookie_filling) -> Hash[String, untyped]
+    def parse_cookies_from_header: -> Hash[String, CGI::Cookie]
+    def identify_cookie_attributes: (String cookie_filling) -> Hash[String, untyped]
   end
 end
