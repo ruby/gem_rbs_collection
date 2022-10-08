@@ -1,0 +1,12 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+  library "holiday_jp"
+  library "date"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end
