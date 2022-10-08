@@ -1380,28 +1380,28 @@ module Rack
   end
 
   class MockRequest
-    DEFAULT_ENV: Hash[String, StringIO | [Integer, Integer] | bool]
+    DEFAULT_ENV: env
 
-    def initialize: (untyped app) -> void
-    def get: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def post: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def put: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def patch: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def delete: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def head: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def options: (untyped uri, ?Hash[bot, bot] opts) -> MockResponse
-    def request: (?String method, ?String uri, ?Hash[bot, bot] opts) -> MockResponse
-    def self.parse_uri_rfc2396: (String uri) -> untyped
-    def self.env_for: (?String uri, ?Hash[untyped, untyped] opts) -> ((Array[(Hash[String, String] | Integer | String)?] | FatalWarner | Hash[:input | String, (Array[(Integer | String)?] | FatalWarner | Hash[:input | String, String?] | String | StringIO | bool)?] | String | StringIO | bool)?)
+    def initialize: (_Application app) -> void
+    def get: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def post: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def put: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def patch: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def delete: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def head: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def options: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def request: (?_ToS method, ?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
+    def self.parse_uri_rfc2396: (String uri) -> URI::Generic
+    def self.env_for: (?String uri, ?Hash[Symbol, untyped] opts) -> env
 
     class FatalWarning < RuntimeError
     end
 
     class FatalWarner
-      def puts: (untyped warning) -> untyped
-      def write: (untyped warning) -> untyped
+      def puts: (untyped warning) -> bot
+      def write: (untyped warning) -> bot
       def flush: -> nil
-      def string: -> String
+      def string: -> ""
     end
   end
 
