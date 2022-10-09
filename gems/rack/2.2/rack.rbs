@@ -1116,6 +1116,9 @@ module Rack
     class InvalidParameterError < ArgumentError
     end
 
+    class ParamsTooDeepError < RangeError
+    end
+
     class Params
       def initialize: (Integer limit) -> void
       def []: (String? key) -> ((Array[(Array[nil] | Hash[String?, untyped] | Params | String)?] | Hash[String?, (Array[untyped] | Hash[String?, untyped] | Params | String)?] | Params | String)?)
@@ -1128,6 +1131,8 @@ module Rack
   module Utils
     DEFAULT_SEP: Regexp
     COMMON_SEP: Hash[String, Regexp]
+    RFC2822_DAY_NAME: Array[String]
+    RFC2822_MONTH_NAME: Array[String]
     ESCAPE_HTML: Hash[String, String]
     ESCAPE_HTML_PATTERN: Regexp
     HTTP_STATUS_CODES: Hash[Integer, String]
@@ -1231,8 +1236,7 @@ module Rack
     TOKEN: Regexp
     CONDISP: Regexp
     VALUE: Regexp
-    BROKEN_QUOTED: Regexp
-    BROKEN_UNQUOTED: Regexp
+    BROKEN: Regexp
     MULTIPART_CONTENT_TYPE: Regexp
     MULTIPART_CONTENT_DISPOSITION: Regexp
     MULTIPART_CONTENT_ID: Regexp
