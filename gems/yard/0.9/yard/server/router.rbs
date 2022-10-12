@@ -1,3 +1,34 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A router class implements the logic used to recognize a request for a specific
+# URL and run specific {Commands::Base commands}.
+#
+# == Subclassing Notes
+# To create a custom router, subclass this class and pass it into the adapter
+# options through {Adapter#initialize} or by directly modifying {Adapter#router}.
+#
+# The most general customization is to change the URL prefixes recognized by
+# routing, which can be done by overriding {#docs_prefix}, {#list_prefix},
+# {#static_prefix}, and {#search_prefix}.
+#
+# == Implementing Custom Caching
+# By default, the Router class performs static disk-based caching on all
+# requests through the +#check_static_cache+. To override this behaviour,
+# or create your own caching mechanism, mixin your own custom module with
+# this method implemented as per {StaticCaching#check_static_cache}.
+#
+# @example Creating a subclassed router
+#   # Adds 'my' to all routing prefixes
+#   class MyRouter < YARD::Server::Router
+#     def docs_prefix; 'mydocs' end
+#     def list_prefix; 'mylist' end
+#     def static_prefix; 'mystatic' end
+#     def search_prefix; 'mysearch' end
+#   end
+#
+#   # Using it:
+#   WebrickAdapter.new(libraries, :router => MyRouter).start
 class YARD::Server::Router
   # @return [Adapter Dependent] the request data coming in with the routing
   attr_accessor request: untyped

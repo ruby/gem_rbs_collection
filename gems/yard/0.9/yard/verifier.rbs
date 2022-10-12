@@ -1,3 +1,37 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Similar to a Proc, but runs a set of Ruby expressions using a small
+# DSL to make tag lookups easier.
+#
+# The syntax is as follows:
+# * All syntax is Ruby compatible
+# * +object+ (+o+ for short) exist to access the object being verified
+# * +@TAGNAME+ is translated into +object.tag('TAGNAME')+
+# * +@@TAGNAME+ is translated into +object.tags('TAGNAME')+
+# * +object+ can be omitted as target for method calls (it is implied)
+#
+# @example Create a verifier to check for objects that don't have @private tags
+#   verifier = Verifier.new('!@private')
+#   verifier.call(object) # => true (no @private tag)
+# @example Create a verifier to find any return tag with an empty description
+#   Verifier.new('@return.text.empty?')
+#   # Equivalent to:
+#   Verifier.new('object.tag(:return).text.empty?')
+# @example Check if there are any @param tags
+#   Verifier.new('@@param.empty?')
+#   # Equivalent to:
+#   Verifier.new('object.tags(:param).empty?')
+# @example Using +object+ or +o+ to look up object attributes directly
+#   Verifier.new('object.docstring == "hello world"')
+#   # Equivalent to:
+#   Verifier.new('o.docstring == "hello world"')
+# @example Without using +object+ or +o+
+#   Verifier.new('tag(:return).size == 1 || has_tag?(:author)')
+# @example Specifying multiple expressions
+#   Verifier.new('@return', '@param', '@yield')
+#   # Equivalent to:
+#   Verifier.new('@return && @param && @yield')
 class YARD::Verifier
   # @return [Array<String>] a list of all expressions the verifier checks for
   # @since 0.5.6
@@ -28,7 +62,7 @@ class YARD::Verifier
   # @return [Array<CodeObjects::Base>] a list of code objects that match
   #   the verifier.
   def run: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
-  def o: () -> YARD::CodeObjects::Base
+  alias o object
   # Modifies nil to not throw NoMethodErrors. This allows
   # syntax like object.tag(:return).text to work if the #tag
   # call returns nil, which means users don't need to perform

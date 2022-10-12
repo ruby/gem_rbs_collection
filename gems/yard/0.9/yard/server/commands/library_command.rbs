@@ -1,3 +1,12 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# This is the base command for all commands that deal directly with libraries.
+# Some commands do not, but most (like {DisplayObjectCommand}) do. If your
+# command deals with libraries directly, subclass this class instead.
+# See {Base} for notes on how to subclass a command.
+#
+# @abstract
 class YARD::Server::Commands::LibraryCommand < ::YARD::Server::Commands::Base
   # @return [LibraryVersion] the object containing library information
   attr_accessor library: YARD::Server::LibraryVersion
@@ -27,4 +36,7 @@ class YARD::Server::Commands::LibraryCommand < ::YARD::Server::Commands::Base
   # not do any rendering/generation. We need this to access the
   # generate_*_list methods.
   private def fulldoc_template: () -> untyped
+  # Needed to synchronize threads in {#setup_yardopts}
+  # @private
+  @@library_chdir_lock: untyped
 end

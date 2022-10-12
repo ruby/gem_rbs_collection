@@ -1,3 +1,30 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A MacroObject represents a docstring defined through +@!macro NAME+ and can be
+# reused by specifying the tag +@!macro NAME+. You can also provide the
+# +attached+ type flag to the macro definition to have it attached to the
+# specific DSL method so it will be implicitly reused.
+#
+# Macros are fully described in the {file:docs/Tags.md#macro Tags Overview}
+# document.
+#
+# @example Creating a basic named macro
+#   # @!macro prop
+#   #   @!method $1(${3-})
+#   #   @return [$2] the value of the $0
+#   property :foo, String, :a, :b
+#
+#   # @!macro prop
+#   property :bar, Numeric, :value
+#
+# @example Creating a macro that is attached to the method call
+#   # @!macro [attach] prop2
+#   #   @!method $1(value)
+#   property :foo
+#
+#   # Extra data added to docstring
+#   property :bar
 class YARD::CodeObjects::MacroObject < ::YARD::CodeObjects::Base
   # @return [String] the macro data stored on the object
   attr_accessor macro_data: String
@@ -33,7 +60,7 @@ class YARD::CodeObjects::MacroObject < ::YARD::CodeObjects::Base
   # @return [nil] if the +data+ has no macro tag or if the macro is
   #   not new and no macro by the macro name is found.
   def self.find_or_create: (untyped macro_name, untyped data, ?YARD::CodeObjects::Base method_object) -> YARD::CodeObjects::MacroObject?
-  def self.create_docstring: (untyped macro_name, untyped data, ?YARD::CodeObjects::Base method_object) -> YARD::CodeObjects::MacroObject?
+  alias self.create_docstring self.find_or_create
   # Expands +macro_data+ using the interpolation parameters.
   #
   # Interpolation rules:

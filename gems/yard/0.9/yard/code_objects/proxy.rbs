@@ -1,3 +1,18 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# The Proxy class is a way to lazily resolve code objects in
+# cases where the object may not yet exist. A proxy simply stores
+# an unresolved path until a method is called on the object, at which
+# point it does a lookup using {Registry.resolve}. If the object is
+# not found, a warning is raised and {ProxyMethodError} might be raised.
+#
+# @example Creates a Proxy to the String class from a module
+#   # When the String class is parsed this method will
+#   # begin to act like the String ClassObject.
+#   Proxy.new(mymoduleobj, "String")
+# @see Registry.resolve
+# @see ProxyMethodError
 class YARD::CodeObjects::Proxy
   # Returns the value of attribute namespace.
   attr_reader namespace: untyped
@@ -16,9 +31,9 @@ class YARD::CodeObjects::Proxy
   # @return [String] the assumed path of the proxy (or the real path
   #   of the resolved object)
   def path: () -> String
-  def to_s: () -> String
-  def to_str: () -> String
-  def title: () -> String
+  alias to_s path
+  alias to_str path
+  alias title path
   # @return [Boolean]
   def is_a?: (untyped klass) -> bool
   # @return [Boolean]
@@ -27,7 +42,7 @@ class YARD::CodeObjects::Proxy
   def <=>: (untyped other) -> bool
   # @return [Boolean]
   def equal?: (untyped other) -> bool
-  def ==: (untyped other) -> bool
+  alias == equal?
   # @return [Integer] the object's hash value (for equality checking)
   def hash: () -> Integer
   # Returns the class name of the object the proxy is mimicking, if

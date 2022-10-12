@@ -1,3 +1,31 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Parses text and creates a {Docstring} object to represent documentation
+# for a {CodeObjects::Base}. To create a new docstring, you should initialize
+# the parser and call {#parse} followed by {#to_docstring}.
+#
+# == Subclassing Notes
+#
+# The DocstringParser can be subclassed and subtituted during parsing by
+# setting the {Docstring.default_parser} attribute with the name of the
+# subclass. This allows developers to change the way docstrings are
+# parsed, allowing for completely different docstring syntaxes.
+#
+# @example Creating a Docstring with a DocstringParser
+#   DocstringParser.new.parse("text here").to_docstring
+# @example Creating a Custom DocstringParser
+#   # Parses docstrings backwards!
+#   class ReverseDocstringParser
+#     def parse_content(content)
+#       super(content.reverse)
+#     end
+#   end
+#
+#   # Set the parser as default when parsing
+#   YARD::Docstring.default_parser = ReverseDocstringParser
+# @see #parse_content
+# @since 0.8.0
 class YARD::DocstringParser
   # @return [String] the parsed text portion of the docstring,
   #   with tags removed.

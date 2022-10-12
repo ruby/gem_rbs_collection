@@ -1,3 +1,43 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# +Base+ is the superclass of all code objects recognized by YARD. A code
+# object is any entity in the Ruby language (class, method, module). A
+# DSL might subclass +Base+ to create a new custom object representing
+# a new entity type.
+#
+# == Registry Integration
+# Any created object associated with a namespace is immediately registered
+# with the registry. This allows the Registry to act as an identity map
+# to ensure that no object is represented by more than one Ruby object
+# in memory. A unique {#path} is essential for this identity map to work
+# correctly.
+#
+# == Custom Attributes
+# Code objects allow arbitrary custom attributes to be set using the
+# {#[]=} assignment method.
+#
+# == Namespaces
+# There is a special type of object called a "namespace". These are subclasses
+# of the {NamespaceObject} and represent Ruby entities that can have
+# objects defined within them. Classically these are modules and classes,
+# though a DSL might create a custom {NamespaceObject} to describe a
+# specific set of objects.
+#
+# == Separators
+# Custom classes with different separator tokens should define their own
+# separators using the {NamespaceMapper.register_separator} method. The
+# standard Ruby separators have already been defined ('::', '#', '.', etc).
+#
+# @abstract This class should not be used directly. Instead, create a
+#   subclass that implements {#path}, {#sep} or {#type}. You might also
+#   need to register custom separators if {#sep} uses alternate separator
+#   tokens.
+# @see Registry
+# @see #path
+# @see #[]=
+# @see NamespaceObject
+# @see NamespaceMapper.register_separator
 class YARD::CodeObjects::Base
   # The files the object was defined in. To add a file, use {#add_file}.
   # @return [Array<Array(String, Integer)>] a list of files
@@ -98,8 +138,8 @@ class YARD::CodeObjects::Base
   #   the paths are equal
   # @return [Boolean] whether or not the objects are considered the same
   def equal?: (YARD::CodeObjects::Base | YARD::CodeObjects::Proxy other) -> bool
-  def ==: (YARD::CodeObjects::Base | YARD::CodeObjects::Proxy other) -> bool
-  def eql?: (YARD::CodeObjects::Base | YARD::CodeObjects::Proxy other) -> bool
+  alias == equal?
+  alias eql? equal?
   # @return [Integer] the object's hash value (for equality checking)
   def hash: () -> Integer
   # @return [nil] this object does not turn into an array
@@ -153,7 +193,7 @@ class YARD::CodeObjects::Base
   # @return [String] the unique path of the object
   # @see #sep
   def path: () -> String
-  def to_s: () -> String
+  alias to_s path
   # @note
   #   Override this method if your object has a special title that does
   #   not match the {#path} attribute value. This title will be used
@@ -182,8 +222,8 @@ class YARD::CodeObjects::Base
   # Inspects the object, returning the type and path
   # @return [String] a string describing the object
   def inspect: () -> String
-  def parent: () -> YARD::CodeObjects::NamespaceObject
-  def parent=: (untyped obj) -> untyped
+  alias parent namespace
+  alias parent= namespace=
   # Gets a tag from the {#docstring}
   # @see Docstring#tag
   def tag: (untyped name) -> untyped

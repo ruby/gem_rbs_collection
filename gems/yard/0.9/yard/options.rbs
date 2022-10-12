@@ -1,3 +1,72 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Generalized options class for passing around large amounts of options between objects.
+#
+# The options class exists for better visibility and documentability of options being
+# passed through to other objects. Because YARD has parser and template architectures
+# that are heavily reliant on options, it is necessary to make these option keys easily
+# visible and understood by developers. Since the options class is more than just a
+# basic Hash, the subclass can provide aliasing and convenience methods to simplify
+# option property access, and, if needed, support backward-compatibility for deprecated
+# key names.
+#
+# == Hash and OpenStruct-like Access
+#
+# Although the options class allows for Hash-like access (<tt>opts[:key]</tt>), the recommended
+# mechanism for accessing an option key will be via standard method calls on attributes
+#
+# The options class can also act as an open ended key value storage structure (like a
+# Hash or OpenStruct), and allows for setting and getting of unregistered option keys.
+# This methodology is not recommended, however, and is only supported for backward
+# compatibility inside YARD. Whenever possible, developers should define all keys used
+# by an options class.
+#
+# == Declaring Default Values
+#
+# Note that the options class can contain default value definitions for certain options,
+# but to initialize these defaults, {#reset_defaults} must be called manually after
+# initialization; the options object is always created empty until defaults are applied.
+#
+# @abstract Subclasses should define (and document) custom attributes that are expected
+#   to be made available as option keys.
+# @example Defining an Options class with custom option keys
+#   class TemplateOptions < YARD::Options
+#     # @return [Symbol] the output format to generate templates in
+#     attr_accessor :format
+#
+#     # @return [Symbol] the template to use when generating output
+#     attr_accessor :template
+#   end
+# @example Initializing default option values
+#   class TemplateOptions < YARD::Options
+#     def reset_defaults
+#       super
+#       self.format = :html
+#       self.template = :default
+#       self.highlight = true
+#       # ...
+#     end
+#   end
+# @example Using +default_attr+ to create default attributes
+#   class TemplateOptions < YARD::Options
+#     default_attr :format, :html
+#     default_attr :template, :default
+#     default_attr :highlight, true
+#   end
+# @example Deprecating an option while still supporting it
+#   class TemplateOptions < YARD::Options
+#     # @return [Boolean] if syntax highlighting should be performed on code blocks.
+#     #   Defaults to true.
+#     attr_accessor :highlight
+#
+#     # @deprecated Use {#highlight} instead.
+#     # @return [Boolean] if no syntax highlighting should be performs on code blocks.
+#     #   Defaults to false.
+#     attr_accessor :no_highlight
+#     def no_highlight=(value) @highlight = !value end
+#     def no_highlight; !highlight end
+#   end
 class YARD::Options
   # @!macro [attach] yard.default_attr
   #   @!attribute $1
@@ -21,7 +90,7 @@ class YARD::Options
   #
   # @example Setting an option with Hash syntax
   #   options[:format] = :html # equivalent to: options.format = :html
-  # @param [Symbol, String] key the option to set
+  # @param [Symbol, String] key the optin to set
   # @param [Object] value the value to set for the option
   # @return [Object] the value being set
   def []=: (Symbol | String key, untyped value) -> untyped

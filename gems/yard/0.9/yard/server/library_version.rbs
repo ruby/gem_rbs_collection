@@ -1,3 +1,6 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
 class YARD::Server::LibraryVersion
   # @return [String] the name of the library
   attr_accessor name: String
@@ -37,8 +40,8 @@ class YARD::Server::LibraryVersion
   def hash: () -> Integer
   # @return [Boolean] whether another LibraryVersion is equal to this one
   def eql?: (untyped other) -> bool
-  def ==: (untyped other) -> bool
-  def equal?: (untyped other) -> bool
+  alias == eql?
+  alias equal? eql?
   # @return [Boolean] whether the library has been completely processed
   #   and is ready to be served
   def ready?: () -> bool
@@ -85,4 +88,5 @@ class YARD::Server::LibraryVersion
   private def load_source_path: () -> untyped
   private def load_yardoc_file: () -> untyped
   private def serializer: () -> untyped
+  @@chdir_mutex: untyped
 end

@@ -1,21 +1,30 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Helper methods for loading and managing markup types.
 module YARD::Templates::Helpers::MarkupHelper
   # The default list of markup providers for each markup type
   MARKUP_PROVIDERS: untyped
+
   # Returns a list of extensions for various markup types. To register
   # extensions for a type, add them to the array of extensions for the
   # type.
   # @since 0.6.0
   MARKUP_EXTENSIONS: untyped
+
   # Contains the Regexp object that matches the shebang line of extra
   # files to detect the markup type.
   MARKUP_FILE_SHEBANG: untyped
+
   # @return [Hash{Symbol=>{(:provider,:class)=>Object}}] the cached markup providers
   # @private
   # @since 0.6.4
   attr_accessor self.markup_cache: untyped
+
   # Clears the markup provider cache information. Mainly used for testing.
   # @return [void]
   def self.clear_markup_cache: () -> void
+
   # Attempts to load the first valid markup provider in {MARKUP_PROVIDERS}.
   # If a provider is specified, immediately try to load it.
   #
@@ -28,6 +37,7 @@ module YARD::Templates::Helpers::MarkupHelper
   #
   # @return [Boolean] whether the markup provider was successfully loaded.
   def load_markup_provider: (?untyped `type`) -> bool
+
   # Checks for a shebang or looks at the file extension to determine
   # the markup type for the file contents. File extensions are registered
   # for a markup type in {MARKUP_EXTENSIONS}.
@@ -44,6 +54,7 @@ module YARD::Templates::Helpers::MarkupHelper
   # @see MARKUP_EXTENSIONS
   # @since 0.6.0
   def markup_for_file: (String contents, untyped filename) -> Symbol
+
   # Strips any shebang lines on the file contents that pertain to
   # markup or preprocessing data.
   #
@@ -51,12 +62,14 @@ module YARD::Templates::Helpers::MarkupHelper
   # @return [String] the file contents minus any preprocessing tags
   # @since 0.6.0
   def markup_file_contents: (untyped contents) -> String
+
   # Gets the markup provider class/module constant for a markup type
   # Call {#load_markup_provider} before using this method.
   #
   # @param [Symbol] type the markup type (:rdoc, :markdown, etc.)
   # @return [Class] the markup class
   def markup_class: (?Symbol `type`) -> Class
+
   # Gets the markup provider name for a markup type
   # Call {#load_markup_provider} before using this method.
   #

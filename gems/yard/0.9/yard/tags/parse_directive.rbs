@@ -1,0 +1,30 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Parses a block of code as if it were present in the source file at that
+# location. This directive is useful if a class has dynamic meta-programmed
+# behaviour that cannot be recognized by YARD.
+#
+# You can specify the language of the code block using the types
+# specification list. By default, the code language is "ruby".
+#
+# @example Documenting dynamic module inclusion
+#   class User
+#     # includes "UserMixin" and extends "UserMixin::ClassMethods"
+#     # using the UserMixin.included callback.
+#     # @!parse include UserMixin
+#     # @!parse extend UserMixin::ClassMethods
+#   end
+# @example Declaring a method as an attribute
+#   # This should really be an attribute
+#   # @!parse attr_reader :foo
+#   def object; @parent.object end
+# @example Parsing C code
+#   # @!parse [c]
+#   #   void Init_Foo() {
+#   #     rb_define_method(rb_cFoo, "method", method, 0);
+#   #   }
+# @since 0.8.0
+class YARD::Tags::ParseDirective < ::YARD::Tags::Directive
+  def call: () -> untyped
+end
