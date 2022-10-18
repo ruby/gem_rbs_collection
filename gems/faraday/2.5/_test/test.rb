@@ -3,6 +3,7 @@
 
 require "faraday"
 
+Faraday::VERSION
 Faraday.default_adapter
 
 conn = Faraday.new('http://example.com/test1')
