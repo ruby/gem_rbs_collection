@@ -36,4 +36,13 @@ module Faraday
     def []: (untyped key) -> void
     def []=: (untyped key, untyped value) -> void
   end
+
+  module FlatParamsEncoder
+    extend Forwardable
+
+    def self.encode: (Hash[_ToS, _ToS | Array[_ToS]] | nil params) -> (nil | String)
+    def self.decode: (String | nil query) -> (nil | Hash[String, true | String | Array[String]])
+
+    attr_accessor self.sort_params: boolish
+  end
 end
