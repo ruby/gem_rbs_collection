@@ -72,3 +72,25 @@ response.status
 response.headers
 response.body
 response.success?
+
+Faraday::FlatParamsEncoder.sort_params = true
+Faraday::FlatParamsEncoder.sort_params
+Faraday::FlatParamsEncoder.encode(a: :x)
+Faraday::FlatParamsEncoder.encode(nil)
+if v = Faraday::FlatParamsEncoder.encode(a: [1, 2])
+  v.upcase!
+end
+
+Faraday::FlatParamsEncoder.decode(nil)
+if v = Faraday::FlatParamsEncoder.decode("a&b=1&b=2&c=true")
+  v.each do |key, value|
+    key.upcase!
+    case value
+    when true
+    when String
+      value.upcase!
+    else
+      value.each
+    end
+  end
+end
