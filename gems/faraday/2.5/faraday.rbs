@@ -1,4 +1,6 @@
 module Faraday
+  VERSION: ::String
+
   attr_reader self.default_adapter: Symbol
 
   def self.new: (?untyped url, ?untyped options) ?{ (?untyped) -> void } -> Faraday::Connection
@@ -33,5 +35,14 @@ module Faraday
     def url: (String | URI path, ?::Hash[untyped, untyped] params) -> void
     def []: (untyped key) -> void
     def []=: (untyped key, untyped value) -> void
+  end
+
+  module FlatParamsEncoder
+    extend Forwardable
+
+    def self.encode: (Hash[_ToS, _ToS | Array[_ToS]] | nil params) -> (nil | String)
+    def self.decode: (String | nil query) -> (nil | Hash[String, true | String | Array[String]])
+
+    attr_accessor self.sort_params: boolish
   end
 end

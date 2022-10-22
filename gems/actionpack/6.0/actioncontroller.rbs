@@ -5,7 +5,8 @@ module ActionController
   end
 
   interface _API_and_Base_singletion
-    def rescue_from: (*Class, ?with: Symbol | Proc) { (Exception) -> void } -> void
+    def rescue_from: (*Class, ?with: Symbol | Proc) -> void
+                   | (*Class) { (Exception) -> void } -> void
   end
 
   class Base < Metal
