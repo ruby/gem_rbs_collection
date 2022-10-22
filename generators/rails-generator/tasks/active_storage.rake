@@ -1,5 +1,3 @@
-require 'rbs'
-
 stdlib_dependencies = %w[time monitor singleton logger mutex_m json date benchmark digest forwardable did_you_mean openssl socket minitest securerandom ipaddr]
 gem_dependencies = %w[nokogiri i18n rack]
 rails_dependencies = %w[activesupport activemodel activejob activerecord actionview actionpack]
@@ -11,6 +9,8 @@ VERSIONS.each do |version|
 
       desc "export to #{export}"
       task :export do
+        require 'rbs'
+
         sh "rm -fr #{export}"
         sh "mkdir -p #{export}"
 

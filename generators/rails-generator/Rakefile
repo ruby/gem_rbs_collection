@@ -1,10 +1,18 @@
 ## run `$ rake`
 
-def switch_branch(name)
-  cd "_src" do
-    sh "git switch #{name}"
-  end
+VERSIONS = %w[
+  6.0
+  6.1
+  7.0
+]
+Object.private_constant :VERSIONS
+
+tasks = Dir["tasks/*"]
+tasks.each do |task|
+  load task
 end
+GEMS = tasks.map { File.basename(_1).sub(/\.rake/, '') }
+Object.private_constant :GEMS
 
 def generate(out_dir, version)
   require 'orthoses'
@@ -14,6 +22,12 @@ def generate(out_dir, version)
   require 'uri'
 
   Orthoses.logger.level = :error
+
+  gem_paths = GEMS.map do |gem|
+    Gem::Specification.find_by_name(gem.tr('_', '')).full_gem_path
+  end
+
+  header = "# !!! GENERATED CODE !!!\n# Please see generators/rails-generator\n"
 
   loader = -> () {
     require "active_support/all"
@@ -66,7 +80,7 @@ def generate(out_dir, version)
   Orthoses::Builder.new do
     use Orthoses::CreateFileByName,
       base_dir: "#{out_dir}/#{version}",
-      header: "# !!! GENERATED CODE !!!\n# Please see generators/rails-generator"
+      header: header
     use Orthoses::Filter,
       if: -> (name, content) {
         # OMG, both ERB and Erb are exist...
@@ -194,7 +208,7 @@ def generate(out_dir, version)
       Orthoses::CreateFileByName.new(
         ->{ railties_mixin },
         base_dir: "#{out_dir}/#{version}/railties_mixin",
-        header: "# !!! GENERATED CODE !!!\n# Please see generators/rails-generator"
+        header: header
       ).call
     }
     use Orthoses::Mixin,
@@ -202,7 +216,7 @@ def generate(out_dir, version)
         mod != Enumerable # TODO
       }
     use Orthoses::RBSPrototypeRB,
-      paths: Dir.glob('_src/{railties,action{cable,mailbox,mailer,pack,text,view},active{job,model,record,storage,support}}/{app,lib}/**/*.rb'),
+      paths: gem_paths.map { |gem_path| Dir.glob("#{gem_path}/{lib,app}/**/*.rb") }.flatten,
       constant_filter: -> (member) { false },
       mixin_filter: -> (member) { false },
       attribute_filter: -> (member) { false }
@@ -281,20 +295,6 @@ def validate(export:, version:, stdlib_dependencies:, gem_dependencies:, rails_d
   sh "rbs --no-collection #{stdlib_opt} #{gem_opt} #{rails_opt} -I #{export} validate --silent"
 end
 
-VERSIONS = %w[
-  6.0
-  6.1
-  7.0
-]
-Object.private_constant :VERSIONS
-
-tasks = Dir["tasks/*"]
-tasks.each do |task|
-  load task
-end
-GEMS = tasks.map { File.basename(_1).sub(/\.rake/, '') }
-Object.private_constant :GEMS
-
 task :clean do
   FileUtils.rm_rf("out")
 end
@@ -302,12 +302,22 @@ end
 VERSIONS.each do |version|
   namespace version do
     desc "run all version=#{version}"
-    task :all => [
+    task :all do |t|
+      env = "BUNDLE_GEMFILE='gemfiles/rails_#{version.tr('.', '_')}.gemfile'"
+      sh "#{env} bundle install"
+      sh "#{env} bundle exec rake #{t.name}_exec"
+    end
+    task :all_exec => [
       :generate,
       :export,
       :validate,
       :install,
     ]
+
+    desc "generate version=#{version}"
+    task :generate do
+      generate("out", version)
+    end
 
     desc "run export version=#{version}"
     task :export => GEMS.map{"#{version}:#{_1}:export"}
@@ -317,17 +327,6 @@ VERSIONS.each do |version|
 
     desc "run install version=#{version}"
     task :install => GEMS.map{"#{version}:#{_1}:install"}
-
-    desc "generate version=#{version}"
-    task :generate do |t|
-      switch_branch("#{version.tr('.', '-')}-stable")
-      sh "bundle install"
-      sh "bundle exec rake #{t.name}_exec"
-    end
-
-    task :generate_exec do
-      generate("out", version)
-    end
   end
 end
 
@@ -335,3 +334,13 @@ task default: [
   :clean,
   *(VERSIONS.map {"#{_1}:all"})
 ]
+
+namespace :bundle do
+  desc "bundle update all"
+  task :update do
+    VERSIONS.each do |version|
+      env = "BUNDLE_GEMFILE='gemfiles/rails_#{version.tr('.', '_')}.gemfile'"
+      sh "#{env} bundle update"
+    end
+  end
+end
