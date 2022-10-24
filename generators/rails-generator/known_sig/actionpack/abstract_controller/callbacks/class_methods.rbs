@@ -1,0 +1,41 @@
+module AbstractController::Callbacks::ClassMethods
+  ##
+  # :method: before_action
+  #
+  # :call-seq: before_action(names, block)
+  #
+  # Append a callback before actions. See _insert_callbacks for parameter details.
+  #
+  # If the callback renders or redirects, the action will not run. If there
+  # are additional callbacks scheduled to run after that callback, they are
+  # also cancelled.
+  def before_action: (*untyped) -> void
+
+  ##
+  # :method: after_action
+  #
+  # :call-seq: after_action(names, block)
+  #
+  # Append a callback after actions. See _insert_callbacks for parameter details.
+  def after_action: (*untyped) -> void
+
+  ##
+  # :method: around_action
+  #
+  # :call-seq: around_action(names, block)
+  #
+  # Append a callback around actions. See _insert_callbacks for parameter details.
+  def around_action: (*untyped) -> void
+
+  def prepend_before_action: (*untyped) -> void
+  def prepend_after_action: (*untyped) -> void
+  def prepend_around_action: (*untyped) -> void
+
+  def skip_before_action: (*untyped) -> void
+  def skip_around_action: (*untyped) -> void
+  def skip_after_action: (*untyped) -> void
+
+  alias append_before_action before_action
+  alias append_after_action after_action
+  alias append_around_action around_action
+end
