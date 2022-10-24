@@ -105,17 +105,20 @@ def generate(out_dir, version)
       on_error: -> (e) {
         Orthoses.logger.warn "[Orthoses::Constant] skip load const by #{e.root}[::#{e.const}] (#{e.error.class}) #{e.error.message}"
       }
-    use Orthoses::ActiveSupport::ClassAttribute
-    use Orthoses::ActiveSupport::Delegation
-    use Orthoses::ActiveSupport::MattrAccessor
-    use Orthoses::ActiveSupport::TimeWithZone
-    use Orthoses::ActiveRecord::QueryMethods
+    use Orthoses::LoadRBS,
+      paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveStorage::VERSION::STRING, "known_sig/activestorage") }
     use Orthoses::LoadRBS,
       paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveRecord::VERSION::STRING, "known_sig/activerecord") }
     use Orthoses::LoadRBS,
       paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveModel::VERSION::STRING, "known_sig/activemodel") }
     use Orthoses::LoadRBS,
       paths: -> { Orthoses::PathHelper.best_version_paths(::ActiveSupport::VERSION::STRING, "known_sig/activesupport") }
+    use Orthoses::ActiveSupport::Concern
+    use Orthoses::ActiveSupport::ClassAttribute
+    use Orthoses::ActiveSupport::Delegation
+    use Orthoses::ActiveSupport::MattrAccessor
+    use Orthoses::ActiveSupport::TimeWithZone
+    use Orthoses::ActiveRecord::QueryMethods
     # # require in method
     use Orthoses::Tap do |store|
       store.delete("DummyERB")
