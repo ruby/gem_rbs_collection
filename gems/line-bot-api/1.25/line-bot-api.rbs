@@ -1,0 +1,171 @@
+module Line
+  module Bot
+    module Event
+      class Base
+        def []: (untyped src) -> untyped
+        def to_hash: () -> untyped
+      end
+
+      class AccountLink < Base
+        def result: () -> String
+        def nonce: () -> String
+      end
+
+      class Beacon < Base
+        def type: () -> String
+        def hwid: () -> String
+        def deviceMessage: () -> String
+      end
+
+      class Follow < Base
+      end
+
+      class Unfollow < Base
+      end
+
+      class Join < Base
+      end
+
+      class Leave < Base
+      end
+
+      class MemberJoined < Base
+      end
+
+      class MemberLeft < Base
+      end
+
+      class Unsend < Base
+      end
+
+      class VideoPlayComplete < Base
+      end
+
+      class Postback < Base
+      end
+
+      class Things < Base
+        def type: () -> untyped
+        def device_id: () -> untyped
+      end
+
+      class MessageType
+        Text: String
+        Image: String
+        Video: String
+        Audio: String
+        File: String
+        Location: String
+        Sticker: String
+        Unsupport: String
+      end
+
+      class Message < Base
+        def type: () -> String
+        def message: () -> untyped
+      end
+    end
+
+    class Client
+      attr_accessor channel_token: String
+      attr_accessor channel_id: String
+      attr_accessor channel_secret: String
+      attr_accessor endpoint: String
+      attr_accessor blob_endpoint: String
+
+      def initialize: (?Hash[String, String] options) ?{ (instance) -> void } -> void
+      def oauth_endpoint: () -> String
+      def liff_endpoint: () -> String
+
+      def validate_signature: (String content, String channel_signature) -> bool
+      def parse_events_from: (String request_body) -> (Line::Bot::Event::AccountLink |
+                                                       Line::Bot::Event::Beacon |
+                                                       Line::Bot::Event::Follow |
+                                                       Line::Bot::Event::Unfollow |
+                                                       Line::Bot::Event::Join |
+                                                       Line::Bot::Event::Leave |
+                                                       Line::Bot::Event::MemberJoined |
+                                                       Line::Bot::Event::MemberLeft |
+                                                       Line::Bot::Event::Unsend |
+                                                       Line::Bot::Event::VideoPlayComplete |
+                                                       Line::Bot::Event::Postback |
+                                                       Line::Bot::Event::Things |
+                                                       Line::Bot::Event::Message)
+
+      def push_message: (String user_id, untyped messages, ?headers: untyped, ?payload: untyped) -> Net::HTTPResponse
+      def reply_message: (String token, untyped messages) -> Net::HTTPResponse
+      def multicast: ((String|Array[String]) to, untyped messages, ?headers: untyped, ?payload: untyped) -> Net::HTTPResponse
+      def broadcast: (untyped messages, ?headers: untyped) -> Net::HTTPResponse
+      def narrowcast: (untyped messages, ?recipient: untyped, ?filter: untyped, ?limit: untyped, ?headers: untyped) -> Net::HTTPResponse
+
+      def leave_group: (String group_id) -> Net::HTTPResponse
+      def leave_room: (String room_id) -> Net::HTTPResponse
+
+      def get_message_content: (String identifier) -> Net::HTTPResponse
+      def get_profile: (String user_id) -> Net::HTTPResponse
+      def get_group_member_profile: (String group_id, String user_id) -> Net::HTTPResponse
+      def get_room_member_profile: (String room_id, String user_id) -> Net::HTTPResponse
+      def get_follower_ids: (?String start, ?Integer limit) -> Net::HTTPResponse
+      def get_group_member_ids: (String group_id, ?String continuation_token) -> Net::HTTPResponse
+      def get_room_member_ids: (String room_id, ?String continuation_token) -> Net::HTTPResponse
+      def get_group_summary: (String group_id) -> Net::HTTPResponse
+      def get_group_members_count: (String group_id) -> Net::HTTPResponse
+      def get_room_members_count: (String room_id) -> Net::HTTPResponse
+      def get_rich_menus: () -> Net::HTTPResponse
+      def get_rich_menu: (String rich_menu_id) -> Net::HTTPResponse
+      def get_message_delivery_reply: (String dateYyyymmdd) -> Net::HTTPResponse
+      def get_message_delivery_push: (String dateYyyymmdd) -> Net::HTTPResponse
+      def get_message_delivery_multicast: (String dateYyyymmdd) -> Net::HTTPResponse
+      def get_message_delivery_broadcast: (String dateYyyymmdd) -> Net::HTTPResponse
+
+      def create_rich_menu: (Hash[untyped, untyped] rich_menu) -> Net::HTTPResponse
+      def validate_rich_menu_object: (Hash[untyped, untyped] rich_menu) -> Net::HTTPResponse
+      def delete_rich_menu: (String rich_menu_id) -> Net::HTTPResponse
+      def get_user_rich_menu: (String user_id) -> Net::HTTPResponse
+      def get_default_rich_menu: () -> Net::HTTPResponse
+      def set_default_rich_menu: (String rich_menu_id) -> Net::HTTPResponse
+      def unset_default_rich_menu: () -> Net::HTTPResponse
+      def set_rich_menus_alias: (String rich_menu_id, String rich_menu_alias_id) -> Net::HTTPResponse
+      def unset_rich_menus_alias: (String rich_menu_alias_id) -> Net::HTTPResponse
+      def update_rich_menus_alias: (String rich_menu_id, String rich_menu_alias_id) -> Net::HTTPResponse
+      def get_rich_menus_alias: (String rich_menu_alias_id) -> Net::HTTPResponse
+      def get_rich_menus_alias_list: () -> Net::HTTPResponse
+      def link_user_rich_menu: (String user_id, String rich_menu_id) -> Net::HTTPResponse
+      def unlink_user_rich_menu: (String user_id) -> Net::HTTPResponse
+      def bulk_link_rich_menus: (Array[String] user_ids, String rich_menu_id) -> Net::HTTPResponse
+      def bulk_unlink_rich_menus: (Array[String] user_ids) -> Net::HTTPResponse
+      def get_rich_menu_image: (String user_id) -> Net::HTTPResponse
+      def create_rich_menu_image: (String rich_menu_id, File file) -> Net::HTTPResponse
+      def create_link_token: (String user_id) -> Net::HTTPResponse
+      def get_quota: () -> Net::HTTPResponse
+      def get_quota_consumption: () -> Net::HTTPResponse
+      def get_number_of_message_deliveries: (String dateYyyymmdd) -> Net::HTTPResponse
+      def get_user_interaction_statistics: (String request_id) -> Net::HTTPResponse
+      def get_number_of_followers: (String dateYyyymmdd) -> Net::HTTPResponse
+      def get_friend_demographics: () -> Net::HTTPResponse
+      def get_bot_info: () -> Net::HTTPResponse
+      def get_webhook_endpoint: () -> Net::HTTPResponse
+      def set_webhook_endpoint: (String webhook_endpoint) -> Net::HTTPResponse
+      def test_webhook_endpoint: (?String webhook_endpoint) -> Net::HTTPResponse
+
+      def get_liff_apps: () -> Net::HTTPResponse
+      def create_liff_app: (untyped app) -> Net::HTTPResponse
+      def update_liff_app: (String liff_id, untyped app) -> Net::HTTPResponse
+      def delete_liff_app: (String liff_id) -> Net::HTTPResponse
+
+      def create_user_id_audience: (Hash[untyped, untyped] params) -> Net::HTTPResponse
+      def update_user_id_audience: (Hash[untyped, untyped] params) -> Net::HTTPResponse
+      def create_click_audience: (Hash[untyped, untyped] params) -> Net::HTTPResponse
+      def create_impression_audience: (Hash[untyped, untyped] params) -> Net::HTTPResponse
+      def rename_audience: (Integer audience_group_id, String description) -> Net::HTTPResponse
+      def delete_audience: (Integer audience_group_id) -> Net::HTTPResponse
+      def get_audience: (Integer audience_group_id) -> Net::HTTPResponse
+      def get_audiences: (Hash[untyped, untyped] params) -> Net::HTTPResponse
+      def get_audience_authority_level: () -> Net::HTTPResponse
+      def update_audience_authority_level: (String authority_level) -> Net::HTTPResponse
+      def get_statistics_per_unit: (unit: String, from: String, to: String) -> Net::HTTPResponse
+      def get_aggregation_info: () -> Net::HTTPResponse
+      def get_aggregation_list: (?limit: Integer, ?start: String) -> Net::HTTPResponse
+    end
+  end
+end
