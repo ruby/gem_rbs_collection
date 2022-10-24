@@ -58,27 +58,16 @@ Generate RBS file to `out` dir.
 
 Rails gems has dependencies, so it loads all library code and outputs an RBS file.
 
-### Export task
-
-```
-$ bundle exec rake 7.0:active_support:export
-```
-
-From the `out` directory, select the necessary files for each gem and copy them to `export`.
-Generate a test script at the same time so that the entire directory can be replaced.
-
-### Validate task
-
-```
-$ bundle exec rake 7.0:active_support:validate
-```
-
-Run `rbs validate` to `export` dir for each gems.
-
 ### Install task
 
 ```
 $ bundle exec rake 7.0:active_storage:install
 ```
 
-Copy files from `export` to `/gems/*`.
+Copy files from `out` to `/gems/*`.
+
+## patch.rbs
+
+Several libraries define `patch.rbs`.
+The signatures here are temporary and should be written as library definitions to rbs and gem_rbs_collection.
+As soon as the correct definitions are added, please remove the patch side.

@@ -29,9 +29,10 @@ VERSIONS.each do |version|
         # split to activestorage
         sh "cat out/#{version}/active_record/base.rbs | grep -v ActiveStorage > #{install_to}/active_record/base.rbs"
 
-        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("patch.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
+          # TODO: These signatures should be defined as library signatures.
 
           module PG
             class SimpleDecoder

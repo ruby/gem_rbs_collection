@@ -34,9 +34,10 @@ VERSIONS.each do |version|
         # 5.2
         sh "cp -a out/#{version}/logger_silence.rbs #{install_to}" if File.exist?("out/#{version}/logger_silence.rbs")
 
-        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("patch.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
+          # TODO: These signatures should be defined as library signatures.
 
           module DRb
             module DRbUndumped

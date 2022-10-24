@@ -62,6 +62,7 @@ VERSIONS.each do |version|
         Pathname(install_to).join('_test').join('test.rbs').write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
+          # TODO: These signatures should be defined as library signatures.
 
           # from railties
           class ActiveRecord::Base

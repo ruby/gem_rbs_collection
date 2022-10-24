@@ -16,9 +16,10 @@ VERSIONS.each do |version|
         sh "cp -a out/#{version}/active_model #{install_to}"
         sh "rm #{install_to}/active_model/railtie.rbs"
 
-        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("patch.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
+          # TODO: These signatures should be defined as library signatures.
 
           class Delegator
           end
