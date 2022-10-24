@@ -23,8 +23,8 @@ VERSIONS.each do |version|
           enumerable false_class fiber file float hash integer io ip_addr
           kernel load_error marshal
           method module name_error nil_class numeric
-          object pathname range rails regexp securerandom singleton
-          socket string symbol thread time true_class uri unbound_method
+          object pathname range regexp securerandom singleton
+          string symbol thread time true_class uri unbound_method
         ].each do |lib|
           out = "out/#{version}/#{lib}"
           sh "cp -a #{out} #{install_to}" if File.exist?(out)
@@ -44,6 +44,10 @@ VERSIONS.each do |version|
           end
           module Concurrent
             class Map
+            end
+          end
+          module RDoc
+            class Task
             end
           end
         RBS
