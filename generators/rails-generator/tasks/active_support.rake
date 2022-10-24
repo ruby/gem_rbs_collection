@@ -19,9 +19,12 @@ VERSIONS.each do |version|
 
         # core_ext
         %w[
-          array benchmark big_decimal class date date_and_time date_time digest
-          enumerable file hash integer kernel load_error marshal module name_error numeric
-          object pathname range regexp securerandom string symbol time uri
+          array benchmark big_decimal class date_and_time date_time date delegator digest
+          enumerable false_class fiber file float hash integer io ip_addr
+          kernel load_error marshal
+          method module name_error nil_class numeric
+          object pathname range rails regexp securerandom singleton
+          socket string symbol thread time true_class uri unbound_method
         ].each do |lib|
           out = "out/#{version}/#{lib}"
           sh "cp -a #{out} #{install_to}" if File.exist?(out)
