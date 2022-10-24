@@ -5,31 +5,31 @@ rails_dependencies = %w[activesupport activemodel]
 VERSIONS.each do |version|
   namespace version do
     namespace :active_record do
-      export = "export/activerecord/#{version}"
+      install_to = File.expand_path("../../../gems/activerecord/#{version}", __dir__)
 
-      desc "export to #{export}"
-      task :export do
-        sh "rm -fr #{export}"
-        sh "mkdir -p #{export}"
+      desc "install to #{install_to}"
+      task :install do
+        sh "rm -fr #{install_to}"
+        sh "mkdir -p #{install_to}"
 
-        sh "cp -a out/#{version}/active_record.rbs #{export}"
-        sh "cp -a out/#{version}/active_record #{export}"
-        sh "cp -a out/#{version}/arel #{export}"
-        sh "cp -a out/#{version}/arel.rbs #{export}"
-        sh "cp -a out/#{version}/_active_record_relation.rbs #{export}"
-        sh "cp -a out/#{version}/_active_record_relation_class_methods.rbs #{export}"
+        sh "cp -a out/#{version}/active_record.rbs #{install_to}"
+        sh "cp -a out/#{version}/active_record #{install_to}"
+        sh "cp -a out/#{version}/arel #{install_to}"
+        sh "cp -a out/#{version}/arel.rbs #{install_to}"
+        sh "cp -a out/#{version}/_active_record_relation.rbs #{install_to}"
+        sh "cp -a out/#{version}/_active_record_relation_class_methods.rbs #{install_to}"
 
         # split to railties
-        sh "rm #{export}/active_record/railtie.rbs"
-        sh "rm -f #{export}/active_record/destroy_association_async_job.rbs"
+        sh "rm #{install_to}/active_record/railtie.rbs"
+        sh "rm -f #{install_to}/active_record/destroy_association_async_job.rbs"
 
-        sh "rm -fr #{export}/active_record/connection_adapters" # FIXME we want to support
-        sh "rm -fr #{export}/active_record/migration/compatibility" # FIXME we want to support
+        sh "rm -fr #{install_to}/active_record/connection_adapters" # FIXME we want to support
+        sh "rm -fr #{install_to}/active_record/migration/compatibility" # FIXME we want to support
 
         # split to activestorage
-        sh "cat out/#{version}/active_record/base.rbs | grep -v ActiveStorage > #{export}/active_record/base.rbs"
+        sh "cat out/#{version}/active_record/base.rbs | grep -v ActiveStorage > #{install_to}/active_record/base.rbs"
 
-        Pathname(export).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -48,13 +48,13 @@ VERSIONS.each do |version|
         generate_test_script(
           gem: :activerecord,
           version: version,
-          export: export,
+          install_to: install_to,
           stdlib_dependencies: stdlib_dependencies,
           gem_dependencies: gem_dependencies,
           rails_dependencies: rails_dependencies,
         )
 
-        Pathname(export).join('_test').join('test.rb').write(<<~RUBY)
+        Pathname(install_to).join('_test').join('test.rb').write(<<~RUBY)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -64,31 +64,13 @@ VERSIONS.each do |version|
           user = User.new
         RUBY
 
-        Pathname(export).join('_test').join('test.rbs').write(<<~RBS)
+        Pathname(install_to).join('_test').join('test.rbs').write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
           class User < ActiveRecord::Base
           end
         RBS
-      end
-
-      desc "validate version=#{version} gem=active_record"
-      task :validate do
-        validate(
-          export: export,
-          version: version,
-          stdlib_dependencies: stdlib_dependencies,
-          gem_dependencies: gem_dependencies,
-          rails_dependencies: rails_dependencies,
-        )
-      end
-
-      desc "install to ../../../gems/activerecord/#{version}"
-      task :install do
-        install_to = File.expand_path("../../../gems/activerecord/#{version}", __dir__)
-        sh "rm -fr #{install_to}"
-        sh "cp -a #{export} #{install_to}"
       end
     end
   end

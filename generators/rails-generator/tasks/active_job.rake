@@ -5,18 +5,18 @@ rails_dependencies = %w[activesupport]
 VERSIONS.each do |version|
   namespace version do
     namespace :active_job do
-      export = "export/activejob/#{version}"
+      install_to = File.expand_path("../../../gems/activejob/#{version}", __dir__)
 
-      desc "export to #{export}"
-      task :export do
-        sh "rm -fr #{export}"
-        sh "mkdir -p #{export}"
+      desc "install to #{install_to}"
+      task :install do
+        sh "rm -fr #{install_to}"
+        sh "mkdir -p #{install_to}"
 
-        sh "cp -a out/#{version}/active_job.rbs #{export}"
-        sh "cp -a out/#{version}/active_job #{export}"
-        sh "rm #{export}/active_job/railtie.rbs"
+        sh "cp -a out/#{version}/active_job.rbs #{install_to}"
+        sh "cp -a out/#{version}/active_job #{install_to}"
+        sh "rm #{install_to}/active_job/railtie.rbs"
 
-        Pathname(export).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -33,13 +33,13 @@ VERSIONS.each do |version|
         generate_test_script(
           gem: :activejob,
           version: version,
-          export: export,
+          install_to: install_to,
           stdlib_dependencies: stdlib_dependencies,
           gem_dependencies: gem_dependencies,
           rails_dependencies: rails_dependencies,
         )
 
-        Pathname(export).join('_test').join('test.rb').write(<<~RUBY)
+        Pathname(install_to).join('_test').join('test.rb').write(<<~RUBY)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -70,7 +70,7 @@ VERSIONS.each do |version|
           SendMessageJob.set(queue: :another_queue).perform_later(flag: false)
         RUBY
 
-        Pathname(export).join('_test').join('test.rbs').write(<<~RBS)
+        Pathname(install_to).join('_test').join('test.rbs').write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -78,24 +78,6 @@ VERSIONS.each do |version|
             def perform: (*untyped) -> void
           end
         RBS
-      end
-
-      desc "validate version=#{version} gem=active_job"
-      task :validate do
-        validate(
-          export: export,
-          version: version,
-          stdlib_dependencies: stdlib_dependencies,
-          gem_dependencies: gem_dependencies,
-          rails_dependencies: rails_dependencies,
-        )
-      end
-
-      desc "install to ../../../gems/activejob/#{version}"
-      task :install do
-        install_to = File.expand_path("../../../gems/activejob/#{version}", __dir__)
-        sh "rm -fr #{install_to}"
-        sh "cp -a #{export} #{install_to}"
       end
     end
   end

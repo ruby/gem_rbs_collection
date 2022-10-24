@@ -5,28 +5,28 @@ rails_dependencies = %w[activesupport actionview]
 VERSIONS.each do |version|
   namespace version do
     namespace :action_pack do
-      export = "export/actionpack/#{version}"
+      install_to = File.expand_path("../../../gems/actionpack/#{version}", __dir__)
 
-      desc "export to #{export}"
-      task :export do
-        sh "rm -fr #{export}"
-        sh "mkdir -p #{export}"
+      desc "install to #{install_to}"
+      task :install do
+        sh "rm -fr #{install_to}"
+        sh "mkdir -p #{install_to}"
 
-        sh "cp -a out/#{version}/action_pack.rbs #{export}"
-        sh "cp -a out/#{version}/action_pack #{export}"
-        sh "cp -a out/#{version}/action_controller.rbs #{export}"
-        sh "cp -a out/#{version}/action_controller #{export}"
-        sh "cp -a out/#{version}/action_dispatch.rbs #{export}"
-        sh "cp -a out/#{version}/action_dispatch #{export}"
-        sh "cp -a out/#{version}/abstract_controller.rbs #{export}"
-        sh "cp -a out/#{version}/abstract_controller #{export}"
-        sh "cp -a out/#{version}/mime.rbs #{export}"
-        sh "cp -a out/#{version}/mime #{export}"
+        sh "cp -a out/#{version}/action_pack.rbs #{install_to}"
+        sh "cp -a out/#{version}/action_pack #{install_to}"
+        sh "cp -a out/#{version}/action_controller.rbs #{install_to}"
+        sh "cp -a out/#{version}/action_controller #{install_to}"
+        sh "cp -a out/#{version}/action_dispatch.rbs #{install_to}"
+        sh "cp -a out/#{version}/action_dispatch #{install_to}"
+        sh "cp -a out/#{version}/abstract_controller.rbs #{install_to}"
+        sh "cp -a out/#{version}/abstract_controller #{install_to}"
+        sh "cp -a out/#{version}/mime.rbs #{install_to}"
+        sh "cp -a out/#{version}/mime #{install_to}"
 
-        sh "rm #{export}/action_controller/railtie.rbs"
-        sh "rm #{export}/action_dispatch/railtie.rbs"
+        sh "rm #{install_to}/action_controller/railtie.rbs"
+        sh "rm #{install_to}/action_dispatch/railtie.rbs"
 
-        Pathname(export).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -120,24 +120,6 @@ VERSIONS.each do |version|
             end
           end
         RBS
-      end
-
-      desc "validate version=#{version} gem=action_pack"
-      task :validate do
-        validate(
-          export: export,
-          version: version,
-          stdlib_dependencies: stdlib_dependencies,
-          gem_dependencies: gem_dependencies,
-          rails_dependencies: rails_dependencies,
-        )
-      end
-
-      desc "install to ../../../gems/actionpack/#{version}"
-      task :install do
-        install_to = File.expand_path("../../../gems/actionpack/#{version}", __dir__)
-        sh "rm -fr #{install_to}"
-        sh "cp -a #{export} #{install_to}"
       end
     end
   end

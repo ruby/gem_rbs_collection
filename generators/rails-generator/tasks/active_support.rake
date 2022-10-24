@@ -5,17 +5,17 @@ rails_dependencies = %w[]
 VERSIONS.each do |version|
   namespace version do
     namespace :active_support do
-      export = "export/activesupport/#{version}"
+      install_to = File.expand_path("../../../gems/activesupport/#{version}", __dir__)
 
-      desc "export to #{export}"
-      task :export do
-        sh "rm -fr #{export}"
-        sh "mkdir -p #{export}"
+      desc "install to #{install_to}"
+      task :install do
+        sh "rm -fr #{install_to}"
+        sh "mkdir -p #{install_to}"
 
         # minimum
-        sh "cp -a out/#{version}/active_support.rbs #{export}"
-        sh "cp -a out/#{version}/active_support #{export}"
-        sh "rm #{export}/active_support/railtie.rbs"
+        sh "cp -a out/#{version}/active_support.rbs #{install_to}"
+        sh "cp -a out/#{version}/active_support #{install_to}"
+        sh "rm #{install_to}/active_support/railtie.rbs"
 
         # core_ext
         %w[
@@ -24,14 +24,14 @@ VERSIONS.each do |version|
           object pathname range regexp securerandom string symbol time uri
         ].each do |lib|
           out = "out/#{version}/#{lib}"
-          sh "cp -a #{out} #{export}" if File.exist?(out)
-          sh "cp -a #{out}.rbs #{export}" if File.exist?("#{out}.rbs")
+          sh "cp -a #{out} #{install_to}" if File.exist?(out)
+          sh "cp -a #{out}.rbs #{install_to}" if File.exist?("#{out}.rbs")
         end
 
         # 5.2
-        sh "cp -a out/#{version}/logger_silence.rbs #{export}" if File.exist?("out/#{version}/logger_silence.rbs")
+        sh "cp -a out/#{version}/logger_silence.rbs #{install_to}" if File.exist?("out/#{version}/logger_silence.rbs")
 
-        Pathname(export).join("EXTERNAL_TODO.rbs").write(<<~RBS)
+        Pathname(install_to).join("EXTERNAL_TODO.rbs").write(<<~RBS)
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -47,26 +47,26 @@ VERSIONS.each do |version|
 
         case version
         when "6.0", "6.1"
-          sh "rm -fr #{export}/uri"
+          sh "rm -fr #{install_to}/uri"
         when "7.0"
           # deprecated
-          sh "rm -fr #{export}/uri{,.rbs}"
+          sh "rm -fr #{install_to}/uri{,.rbs}"
         end
 
         generate_manifest(
-          export: export,
+          install_to: install_to,
           stdlib_dependencies: stdlib_dependencies
         )
         generate_test_script(
           gem: :activesupport,
           version: version,
-          export: export,
+          install_to: install_to,
           stdlib_dependencies: stdlib_dependencies,
           gem_dependencies: gem_dependencies,
           rails_dependencies: rails_dependencies,
         )
 
-        Pathname(export).join('_test').join('test.rb').write(<<~'RUBY')
+        Pathname(install_to).join('_test').join('test.rb').write(<<~'RUBY')
           # !!! GENERATED CODE !!!
           # Please see generators/rails-generator
 
@@ -78,24 +78,6 @@ VERSIONS.each do |version|
 
           3.days.ago + 1.minute
         RUBY
-      end
-
-      desc "validate version=#{version} gem=active_support"
-      task :validate do
-        validate(
-          export: export,
-          version: version,
-          stdlib_dependencies: stdlib_dependencies,
-          gem_dependencies: gem_dependencies,
-          rails_dependencies: rails_dependencies,
-        )
-      end
-
-      desc "install to ../../../gems/activesupport/#{version}"
-      task :install do
-        install_to = File.expand_path("../../../gems/activesupport/#{version}", __dir__)
-        sh "rm -fr #{install_to}"
-        sh "cp -a #{export} #{install_to}"
       end
     end
   end

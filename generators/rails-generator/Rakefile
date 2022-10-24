@@ -228,8 +228,8 @@ def generate(out_dir, version)
   # 69763  339342 2606899
 end
 
-def generate_test_script(gem:, version:, export:, stdlib_dependencies:, gem_dependencies:, rails_dependencies:)
-  Pathname(export).join('_scripts').tap(&:mkdir).join('test').write(<<~SHELL)
+def generate_test_script(gem:, version:, install_to:, stdlib_dependencies:, gem_dependencies:, rails_dependencies:)
+  Pathname(install_to).join('_scripts').tap(&:mkdir).join('test').write(<<~SHELL)
     #!/usr/bin/env bash
 
     # !!! GENERATED CODE !!!
@@ -249,6 +249,7 @@ def generate_test_script(gem:, version:, export:, stdlib_dependencies:, gem_depe
     # Validate RBS files, using the bundler environment present
     bundle exec rbs --repo=$REPO_DIR #{stdlib_dependencies.map{"-r #{_1}"}.join(" ")} \\
       #{gem_dependencies.map{"-r #{_1}"}.join(" ")} \\
+      #{rails_dependencies.map{"-r #{_1}"}.join(" ")} \\
       -r #{gem} validate --silent
 
     cd ${RBS_DIR}/_test
@@ -256,9 +257,9 @@ def generate_test_script(gem:, version:, export:, stdlib_dependencies:, gem_depe
     bundle exec steep check
   SHELL
 
-  sh "chmod +x #{Pathname(export).join('_scripts').join('test')}"
+  sh "chmod +x #{Pathname(install_to).join('_scripts').join('test')}"
 
-  Pathname(export).join('_test').tap(&:mkdir).join('Steepfile').write(<<~RUBY)
+  Pathname(install_to).join('_test').tap(&:mkdir).join('Steepfile').write(<<~RUBY)
     # !!! GENERATED CODE !!!
     # Please see generators/rails-generator
 
@@ -281,18 +282,11 @@ def generate_test_script(gem:, version:, export:, stdlib_dependencies:, gem_depe
   RUBY
 end
 
-def generate_manifest(export:, stdlib_dependencies:)
-  Pathname(export).join('manifest.yaml').write(<<~YAML)
+def generate_manifest(install_to:, stdlib_dependencies:)
+  Pathname(install_to).join('manifest.yaml').write(<<~YAML)
     dependencies:
       #{stdlib_dependencies.map{"- name: #{_1}"}.join("\n  ")}
   YAML
-end
-
-def validate(export:, version:, stdlib_dependencies:, gem_dependencies:, rails_dependencies:)
-  stdlib_opt = stdlib_dependencies.map{"-r #{_1}"}.join(" ")
-  gem_opt = gem_dependencies.map{"-I ../../gems/#{_1}"}.join(" ")
-  rails_opt = rails_dependencies.map{"-I export/#{_1}/#{version}"}.join(" ")
-  sh "rbs --no-collection #{stdlib_opt} #{gem_opt} #{rails_opt} -I #{export} validate --silent"
 end
 
 task :clean do
@@ -309,9 +303,8 @@ VERSIONS.each do |version|
     end
     task :all_exec => [
       :generate,
-      :export,
-      :validate,
       :install,
+      :test
     ]
 
     desc "generate version=#{version}"
@@ -319,14 +312,21 @@ VERSIONS.each do |version|
       generate("out", version)
     end
 
-    desc "run export version=#{version}"
-    task :export => GEMS.map{"#{version}:#{_1}:export"}
-
-    desc "run validate version=#{version}"
-    task :validate => GEMS.map{"#{version}:#{_1}:validate"}
-
     desc "run install version=#{version}"
     task :install => GEMS.map{"#{version}:#{_1}:install"}
+
+    desc "run test version=#{version}"
+    task :test => GEMS.map{"#{version}:#{_1}:test"}
+    GEMS.each do |gem|
+      namespace gem do
+        task :test do
+          cd File.expand_path("../../gems/#{gem.tr('_', '')}/#{version}", __dir__) do
+            gemfile = File.expand_path("../../Gemfile", __dir__)
+            sh "BUNDLE_GEMFILE=#{gemfile} ./_scripts/test" if File.exist?("./_scripts/test")
+          end
+        end
+      end
+    end
   end
 end
 
