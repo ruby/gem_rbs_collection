@@ -12,7 +12,7 @@ We aim to automate as much as possible the parts that can be automated, and only
 
 ```
 $ bundle install
-$ bundle exec rbs collection install
+$ bundle exec rbs --collection orthoses.yaml collection install
 ```
 
 ### Add RBS definition
@@ -44,6 +44,7 @@ All subtasks are separated by version.
 ```
 $ bundle exec rake 6.0:all
 $ bundle exec rake 6.1:generate
+$ bundle exec rake 7.0:install
 ```
 
 Please see `$ bundle exec rake -T` also.
