@@ -1,5 +1,6 @@
-stdlib_dependencies = %w[benchmark date digest json logger monitor mutex_m pathname singleton time minitest securerandom ipaddr did_you_mean]
-gem_dependencies = %w[nokogiri i18n rack rails-dom-testing]
+stdlib_dependencies = %w[benchmark date digest json logger monitor mutex_m pathname
+                         singleton time minitestsecurerandom ipaddr did_you_mean uri cgi]
+gem_dependencies = %w[nokogiri i18n rack]
 rails_dependencies = %w[activesupport actionview]
 
 VERSIONS.each do |version|

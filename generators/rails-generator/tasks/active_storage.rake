@@ -1,5 +1,5 @@
 stdlib_dependencies = %w[time monitor singleton logger mutex_m json date benchmark digest forwardable did_you_mean
-                         openssl socket minitest securerandom ipaddr tempfile]
+                         openssl socket minitest securerandom ipaddr tempfile uri cgi]
 gem_dependencies = %w[nokogiri i18n rack]
 rails_dependencies = %w[activesupport activemodel activejob activerecord actionview actionpack]
 
