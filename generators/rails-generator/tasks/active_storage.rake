@@ -56,7 +56,7 @@ VERSIONS.each do |version|
 
           user = User.new
           one = ActiveStorage::Attached::One.new("one_image", user)
-          one.url # TODO すでにあるRBSをknown_sigとしてとりこむ
+          one.url
         RUBY
 
         Pathname(install_to).join('_test').join('test.rbs').write(<<~RBS)
