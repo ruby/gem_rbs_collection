@@ -81,23 +81,25 @@ def generate(out_dir, version)
   Orthoses::Builder.new do
     use Orthoses::CreateFileByName,
       base_dir: "#{out_dir}/#{version}",
-      header: header
-    use Orthoses::Filter,
+      header: header,
       if: -> (name, content) {
-        # OMG, both ERB and Erb are exist...
-        return false if name.start_with?("Erb")
-
-        # ArgumentError
-        return false if name.start_with?("I18n::Tests")
-
-        # FIXME: too hard
-        return false if name.include?("::Generators")
-
         # Ignore known sig
         return false if Orthoses::Utils.rbs_defined_class?(name, collection: true) && content.body.empty?
 
         true
       }
+    use Orthoses::Filter do |name, content|
+      # OMG, both ERB and Erb are exist...
+      next false if name.start_with?("Erb")
+
+      # ArgumentError
+      next false if name.start_with?("I18n::Tests")
+
+      # FIXME: too hard
+      next false if name.include?("::Generators")
+
+      true
+    end
     use Orthoses::Constant,
       strict: false,
       if: -> (current, const, _val, _rbs) {
