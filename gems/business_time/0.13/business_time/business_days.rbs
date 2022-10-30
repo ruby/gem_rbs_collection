@@ -1,0 +1,28 @@
+module BusinessTime
+  class BusinessDays
+    include Comparable
+    attr_reader days: Integer
+
+    def initialize: (Integer days, ?untyped options) -> void
+
+    def <=>: (untyped other) -> Integer?
+
+    def after: (Time time, ?untyped options) -> Time
+             | (Date time, ?untyped options) -> Date
+             | (DateTime time, ?untyped options) -> DateTime
+             | (ActiveSupport::TimeWithZone time, ?untyped options) -> ActiveSupport::TimeWithZone
+             | () -> ActiveSupport::TimeWithZone
+
+    alias from_now after
+    alias since after
+
+    def before: (Time time, ?untyped options) -> Time
+              | (Date time, ?untyped options) -> Date
+              | (DateTime time, ?untyped options) -> DateTime
+              | (ActiveSupport::TimeWithZone time, ?untyped options) -> ActiveSupport::TimeWithZone
+              | () -> ActiveSupport::TimeWithZone
+
+    alias ago before
+    alias until before
+  end
+end
