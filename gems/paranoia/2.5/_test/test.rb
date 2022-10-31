@@ -21,8 +21,10 @@ end
 product = Product.new
 
 product.destroy
-puts product.deleted_at
 
 product.really_destroy!
 
-Product.with_deleted.where(id: 47)
+Product.with_deleted
+
+# TODO: Comment-in the following code after typing with_deleted
+# Product.with_deleted.where(id: 47)
