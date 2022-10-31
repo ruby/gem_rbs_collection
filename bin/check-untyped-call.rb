@@ -33,6 +33,18 @@ CSV.parse(out, headers: true).each do |row|
   ok = false
 end
 
-exit 1 unless ok
+unless ok
+  puts <<~END
+    The test files contain code like this:
+
+    # RBS
+    def f: () -> untyped
+    # Ruby
+    f.something
+
+    In this case, `f` accepts any method calls because it's untyped. It tests nothing. Let's fix it!
+  END
+  exit 1
+end
 
 puts green "No untyped calls detected. 🐾"
