@@ -11,7 +11,7 @@ def green(str)
   "\e[32m#{str}\e[0m"
 end
 
-out, err, status = Open3.capture3('steep', 'stats')
+out, err, status = Open3.capture3('steep', 'stats', '--format=csv')
 unless status.success?
   raise <<~END
     steep stats` fails.
