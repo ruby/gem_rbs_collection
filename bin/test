@@ -47,6 +47,7 @@ dirs.each do |dir|
   when !test_path.executable?
     puts "Skipping: `#{test_path}` is not executable..."
   else
+    puts "::group::Test for #{dir}" if ENV['CI']
     puts "Detected test script: #{test_path}"
 
     env = {
@@ -64,6 +65,8 @@ dirs.each do |dir|
       puts " => Failure 🚨"
       failed = true
     end
+
+    puts "::endgroup::" if ENV['CI']
   end
 end
 
