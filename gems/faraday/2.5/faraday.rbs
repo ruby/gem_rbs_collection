@@ -1,7 +1,42 @@
 module Faraday
+  VERSION: ::String
+
   attr_reader self.default_adapter: Symbol
 
   def self.new: (?untyped url, ?untyped options) ?{ (?untyped) -> void } -> Faraday::Connection
+
+  class Adapter
+    extend MiddlewareRegistry
+
+    CONTENT_LENGTH: "Content-Length"
+
+    interface _SupportsParallel
+      def supports_parallel: () -> boolish
+      def supports_parallel=: (boolish value) -> void
+      def supports_parallel?: () -> boolish
+    end
+
+    module Parallelism
+      include _SupportsParallel
+
+      def inherited: (_SupportsParallel subclass) -> void
+    end
+
+    extend Parallelism
+
+    def initialize: (?untyped? _app, ?::Hash[untyped, untyped] opts) ?{ () -> untyped } -> void
+    def connection: (untyped env) ?{ (untyped) -> untyped } -> untyped
+    def close: () -> void
+    def call: (untyped env) -> Response
+
+    private
+
+    # TODO: The block parameter should be `Utils::Headers`, but it has not yet been defined.
+    def save_response: (untyped env, Integer status, String body, ?Hash[untyped, untyped]? headers, ?String? reason_phrase, ?finished: bool) ?{ (untyped) -> void } -> Response
+    def request_timeout: (:read | :open | :write `type`, Hash[Symbol, untyped] options) -> Integer?
+
+    TIMEOUT_KEYS: { read: :read_timeout, open: :open_timeout, write: :write_timeout }
+  end
 
   class Connection
     attr_reader headers: Hash[String, String]
@@ -33,5 +68,37 @@ module Faraday
     def url: (String | URI path, ?::Hash[untyped, untyped] params) -> void
     def []: (untyped key) -> void
     def []=: (untyped key, untyped value) -> void
+  end
+
+  module FlatParamsEncoder
+    extend Forwardable
+
+    def self.encode: (Hash[_ToS, _ToS | Array[_ToS]] | nil params) -> (nil | String)
+    def self.decode: (String | nil query) -> (nil | Hash[String, true | String | Array[String]])
+
+    attr_accessor self.sort_params: boolish
+  end
+
+  class Middleware
+    extend MiddlewareRegistry
+
+    attr_reader app: untyped
+    attr_reader options: Hash[untyped, untyped]
+
+    def initialize: (?untyped? app, ?::Hash[untyped, untyped] options) -> void
+    def call: (untyped env) -> untyped
+    def close: () -> void
+  end
+
+  module MiddlewareRegistry
+    def registered_middleware: () -> Hash[Symbol, untyped]
+    def register_middleware: (**untyped mappings) -> void
+    def unregister_middleware: (Symbol key) -> void
+    def lookup_middleware: (Symbol key) -> untyped
+
+    private
+
+    def middleware_mutex: () ?{ () -> untyped } -> void
+    def load_middleware: (Symbol key) -> untyped
   end
 end
