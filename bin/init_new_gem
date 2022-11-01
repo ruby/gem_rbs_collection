@@ -105,6 +105,8 @@ put base / '_scripts/test', <<~BASH
   cd ${RBS_DIR}/_test
   # Run type checks
   bundle exec steep check
+
+  $(git rev-parse --show-toplevel)/bin/check-untyped-call.rb
 BASH
 (base / '_scripts/test').chmod(0o755)
 put base / 'manifest.yaml', <<~'YAML'
