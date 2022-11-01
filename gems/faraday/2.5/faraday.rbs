@@ -5,6 +5,39 @@ module Faraday
 
   def self.new: (?untyped url, ?untyped options) ?{ (?untyped) -> void } -> Faraday::Connection
 
+  class Adapter
+    extend MiddlewareRegistry
+
+    CONTENT_LENGTH: "Content-Length"
+
+    interface _SupportsParallel
+      def supports_parallel: () -> boolish
+      def supports_parallel=: (boolish value) -> void
+      def supports_parallel?: () -> boolish
+    end
+
+    module Parallelism
+      include _SupportsParallel
+
+      def inherited: (_SupportsParallel subclass) -> void
+    end
+
+    extend Parallelism
+
+    def initialize: (?untyped? _app, ?::Hash[untyped, untyped] opts) ?{ () -> untyped } -> void
+    def connection: (untyped env) ?{ (untyped) -> untyped } -> untyped
+    def close: () -> void
+    def call: (untyped env) -> Response
+
+    private
+
+    # TODO: The block parameter should be `Utils::Headers`, but it has not yet been defined.
+    def save_response: (untyped env, Integer status, String body, ?Hash[untyped, untyped]? headers, ?String? reason_phrase, ?finished: bool) ?{ (untyped) -> void } -> Response
+    def request_timeout: (:read | :open | :write `type`, Hash[Symbol, untyped] options) -> Integer?
+
+    TIMEOUT_KEYS: { read: :read_timeout, open: :open_timeout, write: :write_timeout }
+  end
+
   class Connection
     attr_reader headers: Hash[String, String]
 
