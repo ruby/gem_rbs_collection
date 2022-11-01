@@ -45,4 +45,27 @@ module Faraday
 
     attr_accessor self.sort_params: boolish
   end
+
+  class Middleware
+    extend MiddlewareRegistry
+
+    attr_reader app: untyped
+    attr_reader options: Hash[untyped, untyped]
+
+    def initialize: (?untyped? app, ?::Hash[untyped, untyped] options) -> void
+    def call: (untyped env) -> untyped
+    def close: () -> void
+  end
+
+  module MiddlewareRegistry
+    def registered_middleware: () -> Hash[Symbol, untyped]
+    def register_middleware: (**untyped mappings) -> void
+    def unregister_middleware: (Symbol key) -> void
+    def lookup_middleware: (Symbol key) -> untyped
+
+    private
+
+    def middleware_mutex: () ?{ () -> untyped } -> void
+    def load_middleware: (Symbol key) -> untyped
+  end
 end

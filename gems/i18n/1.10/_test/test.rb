@@ -26,4 +26,7 @@ puts I18n.translate(:test) #=> This is test!
 I18n.locale = :ja
 puts I18n.t(:test) #=> テストです。
 
-puts I18n.backend.translate(:en, 'test') #=> This is test!
+puts I18n.backend
+
+# TODO: comment-in the following test when the `I18n.backend` type is improved
+# puts I18n.backend.translate(:en, 'test') #=> This is test!

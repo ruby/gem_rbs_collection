@@ -365,7 +365,7 @@ module Rack
     def self.new_from_string: (String builder_script, ?String file) -> _Application
     def initialize: (?_Application? default_app) ?{ (self) -> void } -> void
     def self.app: (?_Application? default_app) ?{ (self) -> void } -> _Application
-    def use: (_Application middleware, *untyped args, **untyped kwargs) ?{ (*untyped) -> void } -> void
+    def use: (Class middleware, *untyped args, **untyped kwargs) ?{ (*untyped) -> void } -> void
     def run: (_Application app) -> _Application
     def warmup: (?(^(_Application) -> void)?) ?{ (_Application) -> void } -> (^(_Application) -> void)?
     def map: (String path) { (Builder) -> void } -> ^(Builder) -> void
@@ -419,7 +419,7 @@ module Rack
 
   class Config
     include _Application
-    
+
     def initialize: (_Application app) {(env) -> void} -> void
   end
 

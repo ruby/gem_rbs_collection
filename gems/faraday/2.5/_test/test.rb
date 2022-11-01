@@ -94,3 +94,13 @@ if v = Faraday::FlatParamsEncoder.decode("a&b=1&b=2&c=true")
     end
   end
 end
+
+Faraday::Middleware.register_middleware(custom: Faraday::Middleware)
+Faraday::Middleware.registered_middleware.each { |k, v| [k, v] }
+Faraday::Middleware.lookup_middleware(:custom)
+Faraday::Middleware.unregister_middleware(:custom)
+custom_middleware = Faraday::Middleware.new(Object.new, { foo: 123 })
+custom_middleware.app
+custom_middleware.options.transform_keys
+custom_middleware.call(Object.new)
+custom_middleware.close
