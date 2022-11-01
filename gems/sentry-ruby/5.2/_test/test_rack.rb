@@ -22,5 +22,3 @@ end
 builder = Rack::Builder.new
 builder.use(Sentry::Rack::CaptureExceptions)
 builder.use(FooMiddleware)
-
-
