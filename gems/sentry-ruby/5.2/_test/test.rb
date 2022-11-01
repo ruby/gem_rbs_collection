@@ -33,17 +33,19 @@ Sentry.set_user(email: "jane@example.com")
 Sentry.set_user({})
 
 Sentry.configure_scope do |scope|
-  scope.set_context(
-    'character',
-    {
-      name: 'Mighty Fighter',
-      age: 19,
-      attack_type: 'melee'
-    }
-  )
+  # TODO: Comment-in after scope is typed
+  # scope.set_context(
+  #   'character',
+  #   {
+  #     name: 'Mighty Fighter',
+  #     age: 19,
+  #     attack_type: 'melee'
+  #   }
+  # )
 end
 
 Sentry.with_scope do |scope|
-  scope.set_tags(my_tag: "my value")
-  Sentry.capture_message("test")
+  # TODO: Comment-in after scope is typed
+  # scope.set_tags(my_tag: "my value")
+  # Sentry.capture_message("test")
 end

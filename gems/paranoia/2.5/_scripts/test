@@ -15,8 +15,10 @@ REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
 bundle exec rbs --repo $REPO_DIR -r paranoia:2.5 \
        -r activerecord -r activesupport -r activemodel \
        -r time -r mutex_m -r monitor -r date -r singleton -r logger \
-       validate
+       validate --silent
 
 cd ${RBS_DIR}/_test
 # Run type checks
 bundle exec steep check
+
+$(git rev-parse --show-toplevel)/bin/check-untyped-call.rb

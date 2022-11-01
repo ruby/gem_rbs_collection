@@ -37,7 +37,7 @@ def putv(message)
   end
 end
 
-failed = false
+failed_libs = []
 
 dirs.each do |dir|
   test_path = dir + "_scripts/test"
@@ -47,6 +47,7 @@ dirs.each do |dir|
   when !test_path.executable?
     puts "Skipping: `#{test_path}` is not executable..."
   else
+    puts "::group::Test for #{dir}" if ENV['CI']
     puts "Detected test script: #{test_path}"
 
     env = {
@@ -62,9 +63,14 @@ dirs.each do |dir|
       puts " => Success 💪"
     else
       puts " => Failure 🚨"
-      failed = true
+      failed_libs << dir
     end
+
+    puts "::endgroup::" if ENV['CI']
   end
 end
 
-exit 1 if failed
+unless failed_libs.empty?
+  puts "Failed: #{failed_libs.join(', ')}"
+  exit 1
+end
