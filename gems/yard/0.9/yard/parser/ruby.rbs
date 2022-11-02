@@ -1,0 +1,27 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Ruby parsing components.
+module YARD::Parser::Ruby
+  # Builds and s-expression by creating {AstNode} objects with
+  # the type provided by the first argument.
+  #
+  # @example An implicit list of keywords
+  #   ast = s(s(:kw, "if"), s(:kw, "else"))
+  #   ast.type # => :list
+  # @example A method call
+  #   s(:command, s(:var_ref, "mymethod"))
+  #
+  # @overload s(*nodes, opts = {})
+  #   @param [Array<AstNode>] nodes a list of nodes.
+  #   @param [Hash] opts any extra options (docstring, file, source) to
+  #     set on the object
+  #   @return [AstNode] an implicit node where node.type == +:list+
+  # @overload s(type, *children, opts = {})
+  #   @param [Symbol] type the node type
+  #   @param [Array<AstNode>] children any child nodes inside this one
+  #   @param [Hash] opts any extra options to set on the object
+  #   @return [AstNode] a node of type +type+.
+  # @see AstNode#initialize
+  def s: (*untyped args) -> untyped
+end

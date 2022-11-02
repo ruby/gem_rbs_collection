@@ -1,0 +1,141 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Performs a search over the objects inside of a library and returns
+# the results as HTML or plaintext
+class YARD::Server::Commands::SearchCommand < ::YARD::Server::Commands::LibraryCommand
+  attr_accessor results: untyped
+  attr_accessor query: untyped
+  def run: () -> untyped
+  def visible_results: () -> untyped
+  private def url_for: (untyped object) -> untyped
+  private def serve_xhr: () -> untyped
+  private def serve_normal: () -> untyped
+  private def search_for_object: () -> untyped
+  # Modifies {Templates::Helpers::HtmlHelper#url_for_file} to return a URL instead
+  # of a disk location.
+  # @param (see Templates::Helpers::HtmlHelper#url_for_file)
+  # @return (see Templates::Helpers::HtmlHelper#url_for_file)
+  def url_for_file: (String | YARD::CodeObjects::ExtraFileObject filename, ?String anchor) -> String
+  # Modifies {Templates::Helpers::HtmlHelper#url_for_list} to return a URL
+  # based on the list prefix instead of a HTML filename.
+  # @param (see Templates::Helpers::HtmlHelper#url_for_list)
+  # @return (see Templates::Helpers::HtmlHelper#url_for_list)
+  def url_for_list: (String | Symbol `type`) -> String
+  # Returns the frames URL for the page
+  # @return (see Templates::Helpers::HtmlHelper#url_for_frameset)
+  def url_for_frameset: () -> String
+  # Returns the main URL, first checking a readme and then linking to the index
+  # @return (see Templates::Helpers::HtmlHelper#url_for_main)
+  def url_for_main: () -> String
+  # Returns the URL for the alphabetic index page
+  # @return (see Templates::Helpers::HtmlHelper#url_for_index)
+  def url_for_index: () -> String
+  # @param path_components [Array<String>] components of a URL
+  # @return [String] the absolute path from any mounted base URI.
+  def abs_url: (*Array[String] path_components) -> String
+  # @example The base path for a library 'foo'
+  #   base_path('docs') # => 'docs/foo'
+  # @param [String] path the path prefix for a base path URI
+  # @return [String] the base URI for a library with an extra +path+ prefix
+  def base_path: (String path) -> String
+  # @return [Router] convenience method for accessing the router
+  def router: () -> YARD::Server::Router
+  # @return [String] a timestamp for a given file
+  def mtime: (untyped file) -> String
+  # @return [String] a URL for a file with a timestamp
+  def mtime_url: (untyped file) -> String
+  # Prunes the method listing by running the verifier and removing attributes/aliases
+  # @param [Array<CodeObjects::Base>] list a list of methods
+  # @param [Boolean] hide_attributes whether to prune attribute methods from the list
+  # @return [Array<CodeObjects::Base>] a pruned list of methods
+  def prune_method_listing: (Array[YARD::CodeObjects::Base] list, ?bool hide_attributes) -> Array[YARD::CodeObjects::Base]
+  # An object that keeps track of global state throughout the entire template
+  # rendering process (including any sub-templates).
+  #
+  # @return [OpenStruct] a struct object that stores state
+  # @since 0.6.0
+  def globals: () -> OpenStruct
+  # Runs a list of objects against the {Verifier} object passed into the
+  # template and returns the subset of verified objects.
+  #
+  # @param [Array<CodeObjects::Base>] list a list of code objects
+  # @return [Array<CodeObjects::Base>] a list of code objects that match
+  #   the verifier. If no verifier is supplied, all objects are returned.
+  def run_verifier: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
+  # Links objects or URLs. This method will delegate to the correct +link_+
+  # method depending on the arguments passed in.
+  #
+  # @example Linking a URL
+  #   linkify('http://example.com')
+  # @example Including docstring contents of an object
+  #   linkify('include:YARD::Docstring')
+  # @example Linking to an extra file
+  #   linkify('file:README')
+  # @example Linking an object by path
+  #   linkify('YARD::Docstring')
+  def linkify: (*untyped args) -> untyped
+  # Includes an object's docstring into output.
+  # @since 0.6.0
+  # @param [CodeObjects::Base] obj the object to include
+  # @return [String] the object's docstring (no tags)
+  def link_include_object: (YARD::CodeObjects::Base obj) -> String
+  # Include a file as a docstring in output
+  # @since 0.7.0
+  # @param [String] file the filename to include
+  # @return [String] the file's contents
+  def link_include_file: (String file) -> String
+  # Links to an object with an optional title
+  #
+  # @param [CodeObjects::Base] obj the object to link to
+  # @param [String] title the title to use for the link
+  # @return [String] the linked object
+  def link_object: (YARD::CodeObjects::Base obj, ?String title) -> String
+  # Links to a URL
+  #
+  # @param [String] url the URL to link to
+  # @param [String] title the optional title to display the link as
+  # @param [Hash] params optional parameters for the link
+  # @return [String] the linked URL
+  def link_url: (String url, ?String title, ?Hash[untyped, untyped] params) -> String
+  # Links to an extra file
+  #
+  # @param [String] filename the filename to link to
+  # @param [String] title the title of the link
+  # @param [String] anchor optional anchor
+  # @return [String] the link to the file
+  # @since 0.5.5
+  def link_file: (String filename, ?String title, ?String anchor) -> String
+  # Formats a list of return types for output and links each type.
+  #
+  # @example Formatting types
+  #   format_types(['String', 'Array']) #=> "(String, Array)"
+  # @example Formatting types without surrounding brackets
+  #   format_types(['String', 'Array'], false) #=> "String, Array"
+  # @param [Array<String>] list a list of types
+  # @param [Boolean] brackets whether to surround the types in brackets
+  # @return [String] the formatted list of Ruby types
+  def format_types: (Array[String] list, ?bool brackets) -> String
+  # @example Formatted type of an exception class
+  #   o = ClassObject.new(:root, :MyError)
+  #   o.superclass = P('RuntimeError')
+  #   format_object_type(o) # => "Exception"
+  # @example Formatted type of a method
+  #   o = MethodObject.new(:root, :to_s)
+  #   format_object_type(o) # => "Method"
+  # @param [CodeObjects::Base] object the object to retrieve the type for
+  # @return [String] the human-readable formatted {CodeObjects::Base#type #type}
+  #   for the object
+  def format_object_type: (YARD::CodeObjects::Base object) -> String
+  # @example
+  #   s = format_object_title ModuleObject.new(:root, :MyModuleName)
+  #   s # => "Module: MyModuleName"
+  # @param [CodeObjects::Base] object the object to retrieve a title for
+  # @return [String] the page title name for a given object
+  def format_object_title: (YARD::CodeObjects::Base object) -> String
+  # Indents and formats source code
+  #
+  # @param [String] value the input source code
+  # @return [String] formatted source code
+  def format_source: (String value) -> String
+end

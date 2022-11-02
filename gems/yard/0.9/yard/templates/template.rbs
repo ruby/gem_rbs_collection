@@ -1,0 +1,249 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+module YARD::Templates::Template
+  # Extra includes are mixins that are included after a template is created. These
+  # mixins can be registered by plugins to operate on templates and override behaviour.
+  #
+  # Note that this array can be filled with modules or proc objects. If a proc object
+  # is given, the proc will be called with the {Template#options} hash containing
+  # relevant template information like the object, format, and more. The proc should
+  # return a module or nil if there is none.
+  #
+  # @example Adding in extra mixins to include on a template
+  #   Template.extra_includes << MyHelper
+  # @example Conditionally including a mixin if the format is html
+  #   Template.extra_includes << proc {|opts| MyHelper if opts.format == :html }
+  # @return [Array<Module, Proc>] a list of modules to be automatically included
+  #   into any new template module
+  attr_accessor self.extra_includes: Array[Module | Proc]
+
+  # Returns the value of attribute class.
+  attr_accessor class: untyped
+
+  # Returns the value of attribute section.
+  attr_accessor section: untyped
+
+  # Returns the value of attribute options.
+  attr_accessor options: untyped
+
+  # @!parse extend ClassMethods
+  # @private
+  def self.included: (untyped klass) -> untyped
+
+  # Includes the {extra_includes} modules into the template object.
+  #
+  # @param [Template] template the template object to mixin the extra includes.
+  # @param [SymbolHash] options the options hash containing all template information
+  # @return [void]
+  def self.include_extra: (YARD::Templates::Template template, SymbolHash options) -> void
+
+  # Loads a template specified by path. If +:template+ or +:format+ is
+  # specified in the {#options} hash, they are prepended and appended
+  # to the path respectively.
+  #
+  # @param [Array<String, Symbol>] path the path of the template
+  # @return [Template] the loaded template module
+  def T: (*Array[String | Symbol] path) -> YARD::Templates::Template
+
+  # Sets the sections (and subsections) to be rendered for the template
+  #
+  # @example Sets a set of erb sections
+  #   sections :a, :b, :c # searches for a.erb, b.erb, c.erb
+  # @example Sets a set of method and erb sections
+  #   sections :a, :b, :c # a is a method, the rest are erb files
+  # @example Sections with subsections
+  #   sections :header, [:name, :children]
+  #   # the above will call header.erb and only renders the subsections
+  #   # if they are yielded by the template (see #yieldall)
+  # @param [Array<Symbol, String, Template, Array>] args the sections
+  #   to use to render the template. For symbols and strings, the
+  #   section will be executed as a method (if one exists), or rendered
+  #   from the file "name.erb" where name is the section name. For
+  #   templates, they will have {Template::ClassMethods#run} called on them.
+  #   Any subsections can be yielded to using yield or {#yieldall}
+  def sections: (*Array[Symbol | String | YARD::Templates::Template | Array[untyped]] args) -> untyped
+
+  # Initialization called on the template. Override this in a 'setup.rb'
+  # file in the template's path to implement a template
+  #
+  # @example A default set of sections
+  #   def init
+  #     sections :section1, :section2, [:subsection1, :etc]
+  #   end
+  # @see #sections
+  def init: () -> untyped
+
+  # Runs a template on +sects+ using extra options. This method should
+  # not be called directly. Instead, call the class method {ClassMethods#run}
+  #
+  # @param [Hash, nil] opts any extra options to apply to sections
+  # @param [Section, Array] sects a section list of sections to render
+  # @param [Fixnum] start_at the index in the section list to start from
+  # @param [Boolean] break_first if true, renders only the first section
+  # @yield [opts] calls for the subsections to be rendered
+  # @yieldparam [Hash] opts any extra options to yield
+  # @return [String] the rendered sections joined together
+  def run: (?Hash[untyped, untyped]? opts, ?YARD::Templates::Section | Array[untyped] sects, ?Integer start_at, ?bool break_first) { (Hash[untyped, untyped] opts) -> untyped } -> String
+
+  # Yields all subsections with any extra options
+  #
+  # @param [Hash] opts extra options to be applied to subsections
+  def yieldall: (?Hash[untyped, untyped] opts) -> untyped
+
+  # @param [String, Symbol] section the section name
+  # @yield calls subsections to be rendered
+  # @return [String] the contents of the ERB rendered section
+  def erb: (String | Symbol section) -> String
+
+  # Returns the contents of a file. If +allow_inherited+ is set to +true+,
+  # use +{{{__super__}}}+ inside the file contents to insert the contents
+  # of the file from an inherited template. For instance, if +templates/b+
+  # inherits from +templates/a+ and file "test.css" exists in both directories,
+  # both file contents can be retrieved by having +templates/b/test.css+ look
+  # like:
+  #
+  #   {{{__super__}}}
+  #   ...
+  #   body { css styles here }
+  #   p.class { other styles }
+  #
+  # @param [String] basename the name of the file
+  # @param [Boolean] allow_inherited whether inherited templates can
+  #   be inserted with +{{{__super__}}}+
+  # @return [String] the contents of a file identified by +basename+. All
+  #   template paths (including any mixed in templates) are searched for
+  #   the file
+  # @see ClassMethods#find_file
+  # @see ClassMethods#find_nth_file
+  def file: (String basename, ?bool allow_inherited) -> String
+
+  # Calls the ERB file from the last inherited template with {#section}.erb
+  #
+  # @param [Symbol, String] sect if provided, uses a specific section name
+  # @return [String] the rendered ERB file in any of the inherited template
+  #   paths.
+  def superb: (?Symbol | String sect) -> String
+
+  private def cache: (untyped section) -> untyped
+
+  def self.is_a?: (untyped) -> bool
+
+  # @return [String] formatted arguments for a method
+  def format_args: (untyped object) -> String
+
+  # @return [String] formatted and linked return types for a method
+  def format_return_types: (untyped object) -> String
+
+  # @return [String] formatted block if one exists
+  def format_block: (untyped object) -> String
+
+  # @return [String] formats line numbers for source code of an object
+  def format_lines: (untyped object) -> String
+
+  # @return [String] formats source of an object
+  def format_code: (untyped object, ?untyped _show_lines) -> String
+
+  # @return [String] formats source code of a constant value
+  def format_constant: (untyped value) -> String
+
+  # An object that keeps track of global state throughout the entire template
+  # rendering process (including any sub-templates).
+  #
+  # @return [OpenStruct] a struct object that stores state
+  # @since 0.6.0
+  def globals: () -> OpenStruct
+
+  # Runs a list of objects against the {Verifier} object passed into the
+  # template and returns the subset of verified objects.
+  #
+  # @param [Array<CodeObjects::Base>] list a list of code objects
+  # @return [Array<CodeObjects::Base>] a list of code objects that match
+  #   the verifier. If no verifier is supplied, all objects are returned.
+  def run_verifier: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
+
+  # Links objects or URLs. This method will delegate to the correct +link_+
+  # method depending on the arguments passed in.
+  #
+  # @example Linking a URL
+  #   linkify('http://example.com')
+  # @example Including docstring contents of an object
+  #   linkify('include:YARD::Docstring')
+  # @example Linking to an extra file
+  #   linkify('file:README')
+  # @example Linking an object by path
+  #   linkify('YARD::Docstring')
+  def linkify: (*untyped args) -> untyped
+
+  # Includes an object's docstring into output.
+  # @since 0.6.0
+  # @param [CodeObjects::Base] obj the object to include
+  # @return [String] the object's docstring (no tags)
+  def link_include_object: (YARD::CodeObjects::Base obj) -> String
+
+  # Include a file as a docstring in output
+  # @since 0.7.0
+  # @param [String] file the filename to include
+  # @return [String] the file's contents
+  def link_include_file: (String file) -> String
+
+  # Links to an object with an optional title
+  #
+  # @param [CodeObjects::Base] obj the object to link to
+  # @param [String] title the title to use for the link
+  # @return [String] the linked object
+  def link_object: (YARD::CodeObjects::Base obj, ?String title) -> String
+
+  # Links to a URL
+  #
+  # @param [String] url the URL to link to
+  # @param [String] title the optional title to display the link as
+  # @param [Hash] params optional parameters for the link
+  # @return [String] the linked URL
+  def link_url: (String url, ?String title, ?Hash[untyped, untyped] params) -> String
+
+  # Links to an extra file
+  #
+  # @param [String] filename the filename to link to
+  # @param [String] title the title of the link
+  # @param [String] anchor optional anchor
+  # @return [String] the link to the file
+  # @since 0.5.5
+  def link_file: (String filename, ?String title, ?String anchor) -> String
+
+  # Formats a list of return types for output and links each type.
+  #
+  # @example Formatting types
+  #   format_types(['String', 'Array']) #=> "(String, Array)"
+  # @example Formatting types without surrounding brackets
+  #   format_types(['String', 'Array'], false) #=> "String, Array"
+  # @param [Array<String>] list a list of types
+  # @param [Boolean] brackets whether to surround the types in brackets
+  # @return [String] the formatted list of Ruby types
+  def format_types: (Array[String] list, ?bool brackets) -> String
+
+  # @example Formatted type of an exception class
+  #   o = ClassObject.new(:root, :MyError)
+  #   o.superclass = P('RuntimeError')
+  #   format_object_type(o) # => "Exception"
+  # @example Formatted type of a method
+  #   o = MethodObject.new(:root, :to_s)
+  #   format_object_type(o) # => "Method"
+  # @param [CodeObjects::Base] object the object to retrieve the type for
+  # @return [String] the human-readable formatted {CodeObjects::Base#type #type}
+  #   for the object
+  def format_object_type: (YARD::CodeObjects::Base object) -> String
+
+  # @example
+  #   s = format_object_title ModuleObject.new(:root, :MyModuleName)
+  #   s # => "Module: MyModuleName"
+  # @param [CodeObjects::Base] object the object to retrieve a title for
+  # @return [String] the page title name for a given object
+  def format_object_title: (YARD::CodeObjects::Base object) -> String
+
+  # Indents and formats source code
+  #
+  # @param [String] value the input source code
+  # @return [String] formatted source code
+  def format_source: (String value) -> String
+end

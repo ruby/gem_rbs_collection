@@ -1,0 +1,23 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Serves static content when no other router matches a request
+class YARD::Server::Commands::StaticFileCommand < ::YARD::Server::Commands::LibraryCommand
+  def run: () -> untyped
+  # Serves an empty favicon.
+  # @raise [FinishRequest] finalizes an empty body if the path matches
+  #   /favicon.ico so browsers don't complain.
+  def favicon?: () -> bool
+  # Attempts to route a path to a static template file.
+  #
+  # @raise [FinishRequest] if a file was found and served
+  # @return [void]
+  def static_template_file?: () -> void
+  # @since 0.6.0
+  private def find_file: (untyped adapter, untyped url) -> untyped
+  # Defines the paths used to search for static assets. To define an
+  # extra path, use {YARD::Server.register_static_path} rather than
+  # modifying this constant directly. Also note that files in the
+  # document root will always take precedence over these paths.
+  STATIC_PATHS: untyped
+end

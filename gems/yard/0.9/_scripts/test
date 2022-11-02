@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Exit command with non-zero status code, Output logs of every command executed, Treat unset variables as an error when substituting.
+set -eou pipefail
+# Internal Field Separator - Linux shell variable
+IFS=$'\n\t'
+
+# Print shell input lines
+set -v
+
+# Set RBS_DIR variable to change directory to execute type checks using `steep check`
+RBS_DIR=$(cd $(dirname $0)/..; pwd)
+# Set REPO_DIR variable to validate RBS files added to the corresponding folder
+REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
+# Validate RBS files, using the bundler environment present
+bundle exec rbs --repo $REPO_DIR -r yard:0.9 -r set -r optparse -r logger -r monitor -r rack:2.2 -r uri -r cgi validate --silent
+
+cd ${RBS_DIR}/_test
+# Run type checks
+bundle exec steep check
+
+$(git rev-parse --show-toplevel)/bin/check-untyped-call.rb

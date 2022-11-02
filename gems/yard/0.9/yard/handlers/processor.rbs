@@ -1,0 +1,103 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Iterates over all statements in a file and delegates them to the
+# {Handlers::Base} objects that are registered to handle the statement.
+#
+# This class is passed to each handler and keeps overall processing state.
+# For example, if the {#visibility} is set in a handler, all following
+# statements will have access to this state. This allows "public",
+# "protected" and "private" statements to be handled in classes and modules.
+# In addition, the {#namespace} can be set during parsing to control
+# where objects are being created from. You can also access extra stateful
+# properties that any handler can set during the duration of the post
+# processing of a file from {#extra_state}. If you need to access state
+# across different files, look at {#globals}.
+#
+# @see Handlers::Base
+class YARD::Handlers::Processor
+  # @return [Hash] a list of registered parser type extensions
+  # @private
+  # @since 0.6.0
+  attr_reader self.namespace_for_handler: Hash[untyped, untyped]
+  # @return [String] the filename
+  attr_accessor file: String
+  # @return [CodeObjects::NamespaceObject] the current namespace
+  attr_accessor namespace: YARD::CodeObjects::NamespaceObject
+  # @return [Symbol] the current visibility (public, private, protected)
+  attr_accessor visibility: Symbol
+  # @return [Symbol] the current scope (class, instance)
+  attr_accessor scope: Symbol
+  # @return [CodeObjects::Base, nil] unlike the namespace, the owner
+  #   is a non-namespace object that should be stored between statements.
+  #   For instance, when parsing a method body, the {CodeObjects::MethodObject}
+  #   is set as the owner, in case any extra method information is processed.
+  attr_accessor owner: YARD::CodeObjects::Base?
+  # @return [Symbol] the parser type (:ruby, :ruby18, :c)
+  attr_accessor parser_type: Symbol
+  # Handlers can share state for the entire post processing stage through
+  # this attribute. Note that post processing stage spans multiple files.
+  # To share state only within a single file, use {#extra_state}
+  #
+  # @example Sharing state among two handlers
+  #   class Handler1 < YARD::Handlers::Ruby::Base
+  #     handles :class
+  #     process { globals.foo = :bar }
+  #   end
+  #
+  #   class Handler2 < YARD::Handlers::Ruby::Base
+  #     handles :method
+  #     process { puts globals.foo }
+  #   end
+  # @return [OpenStruct] global shared state for post-processing stage
+  # @see #extra_state
+  attr_accessor globals: OpenStruct
+  # Share state across different handlers inside of a file.
+  # This attribute is similar to {#visibility}, {#scope}, {#namespace}
+  # and {#owner}, in that they all maintain state across all handlers
+  # for the entire source file. Use this attribute to store any data
+  # your handler might need to save during the parsing of a file. If
+  # you need to save state across files, see {#globals}.
+  #
+  # @return [OpenStruct] an open structure that can store arbitrary data
+  # @see #globals
+  attr_accessor extra_state: OpenStruct
+  # Registers a new namespace for handlers of the given type.
+  # @since 0.6.0
+  def self.register_handler_namespace: (untyped `type`, untyped ns) -> untyped
+  # Creates a new Processor for a +file+.
+  # @param [Parser::SourceParser] parser the parser used to initialize the processor
+  def initialize: (YARD::Parser::SourceParser parser) -> void
+  # Processes a list of statements by finding handlers to process each
+  # one.
+  #
+  # @param [Array] statements a list of statements
+  # @return [void]
+  def process: (Array[untyped] statements) -> void
+  # Continue parsing the remainder of the files in the +globals.ordered_parser+
+  # object. After the remainder of files are parsed, processing will continue
+  # on the current file.
+  #
+  # @return [void]
+  # @see Parser::OrderedParser
+  def parse_remaining_files: () -> void
+  # Searches for all handlers in {Base.subclasses} that match the +statement+
+  #
+  # @param statement the statement object to match.
+  # @return [Array<Base>] a list of handlers to process the statement with.
+  def find_handlers: (untyped statement) -> Array[YARD::Handlers::Base]
+  private def handles?: (untyped handler, untyped statement) -> bool
+  # Returns the handler base class
+  # @return [Base] the base class
+  private def handler_base_class: () -> YARD::Handlers::Base
+  # The module holding the handlers to be loaded
+  #
+  # @return [Module] the module containing the handlers depending on
+  #   {#parser_type}.
+  private def handler_base_namespace: () -> Module
+  # Loads handlers from {#handler_base_namespace}. This ensures that
+  # Ruby1.9 handlers are never loaded into 1.8; also lowers the amount
+  # of modules that are loaded
+  # @return [void]
+  private def load_handlers: () -> void
+end

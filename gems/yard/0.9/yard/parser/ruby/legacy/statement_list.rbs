@@ -1,0 +1,68 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+class YARD::Parser::Ruby::Legacy::StatementList < ::Array[untyped]
+  # Returns the value of attribute shebang_line.
+  attr_accessor shebang_line: untyped
+  # Returns the value of attribute encoding_line.
+  attr_accessor encoding_line: untyped
+  # Creates a new statement list
+  #
+  # @param [TokenList, String] content the tokens to create the list from
+  def initialize: (YARD::Parser::Ruby::Legacy::TokenList | String content) -> void
+  # Returns the next statement in the token stream
+  #
+  # @return [Statement] the next statement
+  private def next_statement: () -> YARD::Parser::Ruby::Legacy::Statement
+  # Processes a single token
+  #
+  # @param [RubyToken::Token] tk the token to process
+  private def process_token: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> untyped
+  # Processes a token in a block
+  #
+  # @param [RubyToken::Token] tk the token to process
+  private def process_block_token: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> untyped
+  # Processes a comment token that comes before a statement
+  #
+  # @param [RubyToken::Token] tk the token to process
+  # @return [Boolean] whether or not +tk+ was processed as an initial comment
+  private def process_initial_comment: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> bool
+  # Processes a simple block-opening token;
+  # that is, a block opener such as +begin+ or +do+
+  # that isn't followed by an expression
+  #
+  # @param [RubyToken::Token] tk the token to process
+  private def process_simple_block_opener: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> untyped
+  # Processes a complex block-opening token;
+  # that is, a block opener such as +while+ or +for+
+  # that is followed by an expression
+  #
+  # @param [RubyToken::Token] tk the token to process
+  private def process_complex_block_opener: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> untyped
+  # Processes a token that closes a statement
+  #
+  # @param [RubyToken::Token] tk the token to process
+  private def process_statement_end: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> untyped
+  # Handles the balancing of parentheses and blocks
+  #
+  # @param [RubyToken::Token] tk the token to process
+  # @return [Boolean] whether or not the current statement's parentheses and blocks
+  #   are balanced after +tk+
+  private def balances?: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> bool
+  # Adds a token to the current statement,
+  # unless it's a newline, semicolon, or comment
+  #
+  # @param [RubyToken::Token] tk the token to process
+  private def push_token: (YARD::Parser::Ruby::Legacy::RubyToken::Token tk) -> untyped
+  # Returns the next token in the stream that's not a space
+  #
+  # @return [RubyToken::Token] the next non-space token
+  private def peek_no_space: () -> YARD::Parser::Ruby::Legacy::RubyToken::Token
+  # @private
+  def set_token_position: (untyped line, untyped char) -> untyped
+  # @private
+  def Token: (untyped token, ?untyped value) -> untyped
+  # The following list of tokens will require a block to be opened
+  # if used at the beginning of a statement.
+  OPEN_BLOCK_TOKENS: untyped
+end

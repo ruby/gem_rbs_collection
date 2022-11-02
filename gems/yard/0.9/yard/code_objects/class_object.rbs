@@ -1,0 +1,52 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A ClassObject represents a Ruby class in source code. It is a {ModuleObject}
+# with extra inheritance semantics through the superclass.
+class YARD::CodeObjects::ClassObject < ::YARD::CodeObjects::NamespaceObject
+  # The {ClassObject} that this class object inherits from in Ruby source.
+  # @return [ClassObject] a class object that is the superclass of this one
+  attr_accessor superclass: YARD::CodeObjects::ClassObject
+  # Creates a new class object in +namespace+ with +name+
+  #
+  # @see Base.new
+  def initialize: (untyped namespace, untyped name, *untyped args) -> void
+  # Whether or not the class is a Ruby Exception
+  #
+  # @return [Boolean] whether the object represents a Ruby exception
+  def is_exception?: () -> bool
+  # Returns the inheritance tree of the object including self.
+  #
+  # @param [Boolean] include_mods whether or not to include mixins in the
+  #   inheritance tree.
+  # @return [Array<NamespaceObject>] the list of code objects that make up
+  #   the inheritance tree.
+  def inheritance_tree: (?bool include_mods) -> Array[YARD::CodeObjects::NamespaceObject]
+  # Returns the list of methods matching the options hash. Returns
+  # all methods if hash is empty.
+  #
+  # @param [Hash] opts the options hash to match
+  # @option opts [Boolean] :inherited (true) whether inherited methods should be
+  #   included in the list
+  # @option opts [Boolean] :included (true) whether mixed in methods should be
+  #   included in the list
+  # @return [Array<MethodObject>] the list of methods that matched
+  def meths: (?Hash[untyped, untyped] opts) -> Array[YARD::CodeObjects::MethodObject]
+  # Returns only the methods that were inherited.
+  #
+  # @return [Array<MethodObject>] the list of inherited method objects
+  def inherited_meths: (?untyped opts) -> Array[YARD::CodeObjects::MethodObject]
+  # Returns the list of constants matching the options hash.
+  #
+  # @param [Hash] opts the options hash to match
+  # @option opts [Boolean] :inherited (true) whether inherited constant should be
+  #   included in the list
+  # @option opts [Boolean] :included (true) whether mixed in constant should be
+  #   included in the list
+  # @return [Array<ConstantObject>] the list of constant that matched
+  def constants: (?Hash[untyped, untyped] opts) -> Array[YARD::CodeObjects::ConstantObject]
+  # Returns only the constants that were inherited.
+  #
+  # @return [Array<ConstantObject>] the list of inherited constant objects
+  def inherited_constants: () -> Array[YARD::CodeObjects::ConstantObject]
+end

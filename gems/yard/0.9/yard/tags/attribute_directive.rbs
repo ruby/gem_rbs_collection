@@ -1,0 +1,36 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Defines an attribute with a given name, using indented block data as the
+# attribute's docstring. If the type specifier is supplied with "r", "w", or
+# "rw", the attribute is made readonly, writeonly or readwrite respectively.
+# A readwrite attribute is the default, if no type is specified. The comment
+# containing this directive does not need to be attached to any source, but
+# if it is, that source code will be used as the method's source.
+#
+# To define a regular method, see {tag:!method}
+#
+# @note This directive should only be used if there is no explicit +attr_*+
+#   declaration for the attribute in any source files (i.e., the attribute
+#   is declared dynamically via meta-programming). In all other cases, add
+#   documentation to the attribute declaration itself.
+# @note For backwards compatibility support, you do not need to indent
+#   the attribute's docstring text. If an +@!attribute+ directive is seen with
+#   no indented block, the entire docstring is used as the new attribute's
+#   docstring text.
+# @example Defining a simple readonly attribute
+#   # @!attribute [r] count
+#   #   @return [Fixnum] the size of the list
+# @example Defining a simple readwrite attribute
+#   # @!attribute name
+#   #   @return [String] the name of the user
+# @see tag:!method
+# @since 0.7.0
+class YARD::Tags::AttributeDirective < ::YARD::Tags::MethodDirective
+  def after_parse: () -> untyped
+  def method_name: () -> untyped
+  def method_signature: () -> untyped
+  private def create_attribute_data: (untyped object) -> untyped
+  private def writable?: () -> bool
+  private def readable?: () -> bool
+end

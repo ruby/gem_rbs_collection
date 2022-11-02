@@ -1,0 +1,222 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Yardoc is the default YARD CLI command (+yard doc+ and historic +yardoc+
+# executable) used to generate and output (mainly) HTML documentation given
+# a set of source files.
+#
+# == Usage
+#
+# Main usage for this command is:
+#
+#   $ yardoc [options] [source_files [- extra_files]]
+#
+# See +yardoc --help+ for details on valid options.
+#
+# == Options File (+.yardopts+)
+#
+# If a +.yardopts+ file is found in the source directory being processed,
+# YARD will use the contents of the file as arguments to the command,
+# treating newlines as spaces. You can use shell-style quotations to
+# group space delimited arguments, just like on the command line.
+#
+# A valid +.yardopts+ file might look like:
+#
+#   --no-private
+#   --title "My Title"
+#   --exclude foo --exclude bar
+#   lib/**/*.erb
+#   lib/**/*.rb -
+#   HACKING.rdoc LEGAL COPYRIGHT
+#
+# Note that Yardoc also supports the legacy RDoc style +.document+ file,
+# though this file can only specify source globs to parse, not options.
+#
+# == Queries (+--query+)
+#
+# Yardoc supports queries to select specific code objects for which to
+# generate documentation. For example, you might want to generate
+# documentation only for your public API. If you've documented your public
+# methods with +@api public+, you can use the following query to select
+# all of these objects:
+#
+#   --query '@api.text == "public"'
+#
+# Note that the syntax for queries is mostly Ruby with a few syntactic
+# simplifications for meta-data tags. See the {Verifier} class for an
+# overview of this syntax.
+#
+# == Adding Custom Ad-Hoc Meta-data Tags (+--tag+)
+#
+# YARD allows specification of {file:docs/Tags.md meta-data tags}
+# programmatically via the {YARD::Tags::Library} class, but often this is not
+# practical for users writing documentation. To make adding custom tags
+# easier, Yardoc has a few command-line switches for creating basic tags
+# and displaying them in generated HTML output.
+#
+# To specify a custom tag to be displayed in output, use any of the
+# following:
+#
+# * +--tag+ TAG:TITLE
+# * +--name-tag+ TAG:TITLE
+# * +--type-tag+ TAG:TITLE
+# * +--type-name-tag+ TAG:TITLE
+# * +--title-tag+ TAG:TITLE
+#
+# "TAG:TITLE" is of the form: name:"Display Title", for example:
+#
+#   --tag overload:"Overloaded Method"
+#
+# See +yard help doc+ for a description of the various options.
+#
+# Tags added in this way are automatically displayed in output. To add
+# a meta-data tag that does not show up in output, use +--hide-tag TAG+.
+# Note that you can also use this option on existing tags to hide
+# builtin tags, for instance.
+#
+# == Processed Data Storage (+.yardoc+ directory)
+#
+# When Yardoc parses a source directory, it creates a +.yardoc+ directory
+# (by default, override with +-b+) at the root of the project. This directory
+# contains marshal dumps for all raw object data in the source, so that
+# you can access it later for various commands (+stats+, +graph+, etc.).
+# This directory is also used as a cache for any future calls to +yardoc+
+# so as to process only the files which have changed since the last call.
+#
+# When Yardoc uses the cache in subsequent calls to +yardoc+, methods
+# or classes that have been deleted from source since the last parsing
+# will not be erased from the cache (YARD never deletes objects). In such
+# a case, you should wipe the cache and do a clean parsing of the source tree.
+# You can do this by deleting the +.yardoc+ directory manually, or running
+# Yardoc without +--use-cache+ (+-c+).
+#
+# @since 0.2.1
+# @see Verifier
+class YARD::CLI::Yardoc < ::YARD::CLI::YardoptsCommand
+  # @return [Hash] the hash of options passed to the template.
+  # @see Templates::Engine#render
+  attr_reader options: Hash[untyped, untyped]
+  # @return [Array<String>] list of Ruby source files to process
+  attr_accessor files: Array[String]
+  # @return [Array<String>] list of excluded paths (regexp matches)
+  # @since 0.5.3
+  attr_accessor excluded: Array[String]
+  # @return [Boolean] whether to use the existing yardoc db if the
+  #   .yardoc already exists. Also makes use of file checksums to
+  #   parse only changed files.
+  attr_accessor use_cache: bool
+  # @return [Boolean] whether objects should be serialized to .yardoc db
+  attr_accessor save_yardoc: bool
+  # @return [Boolean] whether to generate output
+  attr_accessor generate: bool
+  # @return [Boolean] whether to print a list of objects
+  # @since 0.5.5
+  attr_accessor list: bool
+  # Keep track of which visibilities are to be shown
+  # @return [Array<Symbol>] a list of visibilities
+  # @since 0.5.6
+  attr_accessor visibilities: Array[Symbol]
+  # Keep track of which APIs are to be shown
+  # @return [Array<String>] a list of APIs
+  # @since 0.8.1
+  attr_accessor apis: Array[String]
+  # Keep track of which APIs are to be hidden
+  # @return [Array<String>] a list of APIs to be hidden
+  # @since 0.8.7
+  attr_accessor hidden_apis: Array[String]
+  # @return [Array<Symbol>] a list of tags to hide from templates
+  # @since 0.6.0
+  attr_accessor hidden_tags: Array[Symbol]
+  # @return [Boolean] whether to print statistics after parsing
+  # @since 0.6.0
+  attr_accessor statistics: bool
+  # @return [Array<String>] a list of assets to copy after generation
+  # @since 0.6.0
+  attr_accessor assets: Array[String]
+  # @return [Boolean] whether markup option was specified
+  # @since 0.7.0
+  attr_accessor has_markup: bool
+  # @return [Boolean] whether yard exits with error status code if a warning occurs
+  attr_accessor fail_on_warning: bool
+  # Creates a new instance of the commandline utility
+  def initialize: () -> void
+  def description: () -> untyped
+  # Runs the commandline utility, parsing arguments and generating
+  # output if set.
+  #
+  # @param [Array<String>] args the list of arguments. If the list only
+  #   contains a single nil value, skip calling of {#parse_arguments}
+  # @return [void]
+  def run: (*Array[String] args) -> void
+  # Parses commandline arguments
+  # @param [Array<String>] args the list of arguments
+  # @return [Boolean] whether or not arguments are valid
+  # @since 0.5.6
+  def parse_arguments: (*Array[String] args) -> bool
+  # The list of all objects to process. Override this method to change
+  # which objects YARD should generate documentation for.
+  #
+  # @deprecated To hide methods use the +@private+ tag instead.
+  # @return [Array<CodeObjects::Base>] a list of code objects to process
+  def all_objects: () -> Array[YARD::CodeObjects::Base]
+  # Generates output for objects
+  # @param [Hash, nil] checksums if supplied, a list of checkums for files.
+  # @return [void]
+  # @since 0.5.1
+  private def run_generate: (Hash[untyped, untyped]? checksums) -> void
+  # Verifies that the markup options are valid before parsing any code.
+  # Failing early is better than failing late.
+  #
+  # @return (see YARD::Templates::Helpers::MarkupHelper#load_markup_provider)
+  private def verify_markup_options: () -> bool
+  # Copies any assets to the output directory
+  # @return [void]
+  # @since 0.6.0
+  private def copy_assets: () -> void
+  # Prints a list of all objects
+  # @return [void]
+  # @since 0.5.5
+  private def print_list: () -> void
+  # Adds a set of extra documentation files to be processed
+  # @param [Array<String>] files the set of documentation files
+  private def add_extra_files: (*Array[String] files) -> untyped
+  # @param file [String] the filename to validate
+  # @param check_exists [Boolean] whether the file should exist on disk
+  # @return [Boolean] whether the file is allowed to be used
+  private def extra_file_valid?: (String file, ?bool check_exists) -> bool
+  # Parses the file arguments into Ruby files and extra files, which are
+  # separated by a '-' element.
+  #
+  # @example Parses a set of Ruby source files
+  #   parse_files %w(file1 file2 file3)
+  # @example Parses a set of Ruby files with a separator and extra files
+  #   parse_files %w(file1 file2 - extrafile1 extrafile2)
+  # @param [Array<String>] files the list of files to parse
+  # @return [void]
+  private def parse_files: (*Array[String] files) -> void
+  # Adds verifier rule for visibilities
+  # @return [void]
+  # @since 0.5.6
+  private def add_visibility_verifier: () -> void
+  # Adds verifier rule for APIs
+  # @return [void]
+  # @since 0.8.1
+  private def add_api_verifier: () -> void
+  # Applies the specified locale to collected objects
+  # @return [void]
+  # @since 0.8.3
+  private def apply_locale: () -> void
+  private def run_verifier: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
+  # @since 0.6.0
+  private def add_tag: (untyped tag_data, ?untyped factory_method) -> untyped
+  # Parses commandline options.
+  # @param [Array<String>] args each tokenized argument
+  private def optparse: (*Array[String] args) -> untyped
+  # Adds general options
+  private def general_options: (untyped opts) -> untyped
+  # Adds output options
+  private def output_options: (untyped opts) -> untyped
+  # Adds tag options
+  # @since 0.6.0
+  private def tag_options: (untyped opts) -> untyped
+end

@@ -1,0 +1,19 @@
+<%= notice %>
+
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+
+<% stdlib_dependencies.each do |stdlib| %>
+  library "<%= stdlib %>"
+<% end %>
+
+  library "yard:0.9"
+  library "rack:2.2.2"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

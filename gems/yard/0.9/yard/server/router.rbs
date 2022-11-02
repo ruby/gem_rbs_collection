@@ -1,0 +1,115 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A router class implements the logic used to recognize a request for a specific
+# URL and run specific {Commands::Base commands}.
+#
+# == Subclassing Notes
+# To create a custom router, subclass this class and pass it into the adapter
+# options through {Adapter#initialize} or by directly modifying {Adapter#router}.
+#
+# The most general customization is to change the URL prefixes recognized by
+# routing, which can be done by overriding {#docs_prefix}, {#list_prefix},
+# {#static_prefix}, and {#search_prefix}.
+#
+# == Implementing Custom Caching
+# By default, the Router class performs static disk-based caching on all
+# requests through the +#check_static_cache+. To override this behaviour,
+# or create your own caching mechanism, mixin your own custom module with
+# this method implemented as per {StaticCaching#check_static_cache}.
+#
+# @example Creating a subclassed router
+#   # Adds 'my' to all routing prefixes
+#   class MyRouter < YARD::Server::Router
+#     def docs_prefix; 'mydocs' end
+#     def list_prefix; 'mylist' end
+#     def static_prefix; 'mystatic' end
+#     def search_prefix; 'mysearch' end
+#   end
+#
+#   # Using it:
+#   WebrickAdapter.new(libraries, :router => MyRouter).start
+class YARD::Server::Router
+  # @return [Adapter Dependent] the request data coming in with the routing
+  attr_accessor request: untyped
+  # @return [Adapter] the adapter used by the router
+  attr_accessor adapter: YARD::Server::Adapter
+  # Creates a new router for a specific adapter
+  #
+  # @param [Adapter] adapter the adapter to route requests to
+  def initialize: (YARD::Server::Adapter adapter) -> void
+  # Perform routing on a specific request, serving the request as a static
+  # file through {Commands::RootRequestCommand} if no route is found.
+  #
+  # @param [Adapter Dependent] request the request object
+  # @return [Array(Numeric,Hash,Array)] the Rack-style server response data
+  def call: (untyped request) -> [ Numeric, Hash[untyped, untyped], Array[untyped] ]
+  # @return [String] the URI prefix for all object documentation requests
+  def docs_prefix: () -> String
+  # @return [String] the URI prefix for all class/method/file list requests
+  def list_prefix: () -> String
+  # @return [String] the URI prefix for all search requests
+  def search_prefix: () -> String
+  # @return [String] the URI prefix for all static assets (templates)
+  def static_prefix: () -> String
+  # @return [Array(LibraryVersion, Array<String>)] the library followed
+  #   by the rest of the path components in the request path. LibraryVersion
+  #   will be nil if no matching library was found.
+  def parse_library_from_path: (untyped paths) -> [ YARD::Server::LibraryVersion, Array[String] ]
+  # Performs routing algorithm to find which prefix is called, first
+  # parsing out library name/version information.
+  #
+  # @return [Array(Numeric,Hash,Array<String>)] the Rack-style response
+  # @return [nil] if no route is matched
+  def route: (?untyped path) -> [ Numeric, Hash[untyped, untyped], Array[String] ]?
+  # Routes requests from {#docs_prefix} and calls the appropriate command
+  # @param [LibraryVersion] library the library to route for
+  # @param [Array<String>] paths path components (split by '/')
+  # @return (see #route)
+  def route_docs: (YARD::Server::LibraryVersion library, Array[String] paths) -> [ Numeric, Hash[untyped, untyped], Array[String] ]?
+  # Routes for the index of a library / multiple libraries
+  # @return (see #route)
+  def route_index: () -> [ Numeric, Hash[untyped, untyped], Array[String] ]?
+  # Routes requests from {#list_prefix} and calls the appropriate command
+  # @param (see #route_docs)
+  # @return (see #route_docs)
+  def route_list: (YARD::Server::LibraryVersion library, Array[String] paths) -> [ Numeric, Hash[untyped, untyped], Array[String] ]?
+  # Routes requests from {#search_prefix} and calls the appropriate command
+  # @param (see #route_docs)
+  # @return (see #route_docs)
+  def route_search: (YARD::Server::LibraryVersion library, Array[String] paths) -> [ Numeric, Hash[untyped, untyped], Array[String] ]?
+  def route_static: (untyped library, untyped paths) -> untyped
+  # Adds extra :library/:path option keys to the adapter options.
+  # Use this method when passing options to a command.
+  #
+  # @param (see #route_docs)
+  # @return [Hash] finalized options
+  def final_options: (YARD::Server::LibraryVersion library, Array[String] paths) -> Hash[untyped, untyped]
+  # Called by a router to return the cached object. By default, this
+  # method performs disk-based caching. To perform other forms of caching,
+  # implement your own +#check_static_cache+ method and mix the module into
+  # the Router class.
+  #
+  # Note that caching does not occur here. This method simply checks for
+  # the existence of cached data. To actually cache a response, see
+  # {Commands::Base#cache}.
+  #
+  # @example Implementing In-Memory Cache Checking
+  #   module MemoryCaching
+  #     def check_static_cache
+  #       # $memory_cache is filled by {Commands::Base#cache}
+  #       cached_data = $memory_cache[request.path]
+  #       if cached_data
+  #         [200, {'Content-Type' => 'text/html'}, [cached_data]]
+  #       else
+  #         nil
+  #       end
+  #     end
+  #   end
+  #
+  #   class YARD::Server::Router; include MemoryCaching; end
+  # @return [Array(Numeric,Hash,Array)] the Rack-style response
+  # @return [nil] if no cache is available and routing should continue
+  # @see Commands::Base#cache
+  def check_static_cache: () -> [ Numeric, Hash[untyped, untyped], Array[untyped] ]?
+end

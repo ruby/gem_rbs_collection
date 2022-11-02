@@ -1,0 +1,48 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Displays documentation for a specific object identified by the path
+class YARD::Server::Commands::DisplayObjectCommand < ::YARD::Server::Commands::LibraryCommand
+  def run: () -> untyped
+  def index: () -> untyped
+  def not_found: () -> untyped
+  private def object_path: () -> untyped
+  # Modifies {Templates::Helpers::HtmlHelper#url_for} to return a URL instead
+  # of a disk location.
+  # @param (see Templates::Helpers::HtmlHelper#url_for)
+  # @return (see Templates::Helpers::HtmlHelper#url_for)
+  def url_for: (String | YARD::CodeObjects::Base obj, ?String anchor, ?bool relative) -> String
+  # Modifies {Templates::Helpers::HtmlHelper#url_for_file} to return a URL instead
+  # of a disk location.
+  # @param (see Templates::Helpers::HtmlHelper#url_for_file)
+  # @return (see Templates::Helpers::HtmlHelper#url_for_file)
+  def url_for_file: (String | YARD::CodeObjects::ExtraFileObject filename, ?String anchor) -> String
+  # Modifies {Templates::Helpers::HtmlHelper#url_for_list} to return a URL
+  # based on the list prefix instead of a HTML filename.
+  # @param (see Templates::Helpers::HtmlHelper#url_for_list)
+  # @return (see Templates::Helpers::HtmlHelper#url_for_list)
+  def url_for_list: (String | Symbol `type`) -> String
+  # Returns the frames URL for the page
+  # @return (see Templates::Helpers::HtmlHelper#url_for_frameset)
+  def url_for_frameset: () -> String
+  # Returns the main URL, first checking a readme and then linking to the index
+  # @return (see Templates::Helpers::HtmlHelper#url_for_main)
+  def url_for_main: () -> String
+  # Returns the URL for the alphabetic index page
+  # @return (see Templates::Helpers::HtmlHelper#url_for_index)
+  def url_for_index: () -> String
+  # @param path_components [Array<String>] components of a URL
+  # @return [String] the absolute path from any mounted base URI.
+  def abs_url: (*Array[String] path_components) -> String
+  # @example The base path for a library 'foo'
+  #   base_path('docs') # => 'docs/foo'
+  # @param [String] path the path prefix for a base path URI
+  # @return [String] the base URI for a library with an extra +path+ prefix
+  def base_path: (String path) -> String
+  # @return [Router] convenience method for accessing the router
+  def router: () -> YARD::Server::Router
+  # @return [String] a timestamp for a given file
+  def mtime: (untyped file) -> String
+  # @return [String] a URL for a file with a timestamp
+  def mtime_url: (untyped file) -> String
+end

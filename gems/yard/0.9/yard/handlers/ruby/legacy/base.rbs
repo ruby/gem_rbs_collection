@@ -1,0 +1,85 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# This is the base handler for the legacy parser. To implement a legacy
+# handler, subclass this class.
+#
+# @abstract (see Ruby::Base)
+class YARD::Handlers::Ruby::Legacy::Base < ::YARD::Handlers::Base
+  # @return [Boolean] whether or not a {Parser::Ruby::Legacy::Statement} object should be handled
+  #   by this handler.
+  def self.handles?: (untyped stmt) -> bool
+  # Parses a statement's block with a set of state values. If the
+  # statement has no block, nothing happens. A description of state
+  # values can be found at {Handlers::Base#push_state}
+  #
+  # @param [Hash] opts State options
+  # @option opts (see Handlers::Base#push_state)
+  # @see Handlers::Base#push_state #push_state
+  def parse_block: (?Hash[untyped, untyped] opts) -> untyped
+  # Extracts method information for macro expansion only
+  #
+  # @todo This is a duplicate implementation of {MethodHandler}. Refactor.
+  # @return [Array<String,Array<Array<String>>>] the method name followed by method
+  #   arguments (name and optional value)
+  private def extract_method_details: () -> Array[String | Array[Array[String]]]
+  # The string value of a token. For example, the return value for the symbol :sym
+  # would be :sym. The return value for a string +"foo #{ bar}"+ would be the literal
+  # +"foo #{ bar}"+ without any interpolation. The return value of the identifier
+  # 'test' would be the same value: 'test'. Here is a list of common types and
+  # their return values:
+  #
+  # @example
+  #   tokval(TokenList.new('"foo"').first) => "foo"
+  #   tokval(TokenList.new(':foo').first) => :foo
+  #   tokval(TokenList.new('CONSTANT').first, RubyToken::TkId) => "CONSTANT"
+  #   tokval(TokenList.new('identifier').first, RubyToken::TkId) => "identifier"
+  #   tokval(TokenList.new('3.25').first) => 3.25
+  #   tokval(TokenList.new('/xyz/i').first) => /xyz/i
+  #
+  # @param [Token] token The token of the class
+  #
+  # @param [Array<Class<Token>>, Symbol] accepted_types
+  #   The allowed token types that this token can be. Defaults to [{TkVal}].
+  #   A list of types would be, for example, [+TkSTRING+, +TkSYMBOL+], to return
+  #   the token's value if it is either of those types. If +TkVal+ is accepted,
+  #   +TkNode+ is also accepted.
+  #
+  #   Certain symbol keys are allowed to specify multiple types in one fell swoop.
+  #   These symbols are:
+  #     :string       => +TkSTRING+, +TkDSTRING+, +TkDXSTRING+ and +TkXSTRING+
+  #     :attr         => +TkSYMBOL+ and +TkSTRING+
+  #     :identifier   => +TkIDENTIFIER, +TkFID+ and +TkGVAR+.
+  #     :number       => +TkFLOAT+, +TkINTEGER+
+  #
+  # @return [Object] if the token is one of the accepted types, in its real value form.
+  #   It should be noted that identifiers and constants are kept in String form.
+  # @return [nil] if the token is not any of the specified accepted types
+  private def tokval: (untyped token, *Array[untyped] | Symbol accepted_types) -> untyped
+  # Returns a list of symbols or string values from a statement.
+  # The list must be a valid comma delimited list, and values
+  # will only be returned to the end of the list only.
+  #
+  # Example:
+  #   attr_accessor :a, 'b', :c, :d => ['a', 'b', 'c', 'd']
+  #   attr_accessor 'a', UNACCEPTED_TYPE, 'c' => ['a', 'c']
+  #
+  # The tokval list of a {Parser::Ruby::Legacy::TokenList} of the above
+  # code would be the {#tokval} value of :a, 'b',
+  # :c and :d.
+  #
+  # It should also be noted that this function stops immediately at
+  # any ruby keyword encountered:
+  #   "attr_accessor :a, :b, :c if x == 5"  => ['a', 'b', 'c']
+  #
+  # @param [TokenList] tokenlist The list of tokens to process.
+  # @param [Array<Class<Token>>] accepted_types passed to {#tokval}
+  # @return [Array<String>] the list of tokvalues in the list.
+  # @return [Array<EMPTY>] if there are no symbols or Strings in the list
+  # @see #tokval
+  private def tokval_list: (untyped tokenlist, *Array[untyped] accepted_types) -> (Array[String] | Array[untyped])
+  # @private
+  def set_token_position: (untyped line, untyped char) -> untyped
+  # @private
+  def Token: (untyped token, ?untyped value) -> untyped
+end
