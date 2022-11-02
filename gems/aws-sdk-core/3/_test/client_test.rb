@@ -15,14 +15,12 @@ client = Client.new(
 )
 
 # instance methods
-client.config.endpoint
-client.config.api
+client.config
 client.handlers
 client.operation_names
 
 # HandlerBuilder
-handler = client.handle_request { |c| c }
-handler.new(->(_) { }).call('context')
+client.handle_request { |c| c }
 
 # ClientStubs
 client.api_requests
