@@ -1,0 +1,40 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A local documentation server
+# @since 0.6.0
+class YARD::CLI::Server < ::YARD::CLI::Command
+  # @return [Hash] a list of options to pass to the doc server
+  attr_accessor options: Hash[untyped, untyped]
+  # @return [Hash] a list of options to pass to the web server
+  attr_accessor server_options: Hash[untyped, untyped]
+  # @return [Hash] a list of library names and yardoc files to serve
+  attr_accessor libraries: Hash[untyped, untyped]
+  # @return [YARD::Server::Adapter] the adapter to use for loading the web server
+  attr_accessor adapter: YARD::Server::Adapter
+  # @return [Array<String>] a list of scripts to load
+  # @since 0.6.2
+  attr_accessor scripts: Array[String]
+  # @return [Array<String>] a list of template paths to register
+  # @since 0.6.2
+  attr_accessor template_paths: Array[String]
+  # Creates a new instance of the Server command line utility
+  def initialize: () -> void
+  def description: () -> untyped
+  def run: (*untyped args) -> untyped
+  private def load_scripts: () -> untyped
+  private def load_template_paths: () -> untyped
+  private def select_adapter: () -> untyped
+  private def add_libraries: (untyped args) -> untyped
+  # @param [String] library The library name.
+  # @param [String, nil] dir The argument provided on the CLI after the
+  #   library name. Is supposed to point to either a project directory
+  #   with a Yard options file, or a yardoc db.
+  # @return [LibraryVersion, nil]
+  private def create_library_version_if_yardopts_exist: (String library, String? dir) -> untyped
+  private def add_gems: () -> untyped
+  private def add_gems_from_gemfile: (?untyped gemfile) -> untyped
+  private def optparse: (*untyped args) -> untyped
+  private def generate_doc_for_first_time: (untyped libver) -> untyped
+  private def extract_db_from_options_file: (untyped options_file) -> untyped
+end

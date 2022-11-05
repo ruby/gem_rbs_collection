@@ -1,0 +1,26 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Matches if/unless conditions inside classes and attempts to process only
+# one branch (by evaluating the condition if possible).
+#
+# @example A simple class conditional
+#   class Foo
+#     if 0
+#       # This method is ignored
+#       def xyz; end
+#     end
+#   end
+class YARD::Handlers::Ruby::ClassConditionHandler < ::YARD::Handlers::Ruby::Base
+  #
+  # @!method process
+  # Main processing callback
+  # @return [void]
+  def process: () -> void
+  # Parses the condition part of the if/unless statement
+  #
+  # @return [true, false, nil] true if the condition can be definitely
+  #   parsed to true, false if not, and nil if the condition cannot be
+  #   parsed with certainty (it's dynamic)
+  def parse_condition: () -> (true | false)?
+end

@@ -1,0 +1,148 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# @since 0.6.0
+class YARD::CLI::Stats < ::YARD::CLI::Yardoc
+  # @return [Boolean] whether to parse and load registry
+  attr_accessor parse: bool
+  # @param [Boolean] parse whether to parse and load registry (see {#parse})
+  def initialize: (?bool parse) -> void
+  def description: () -> untyped
+  # Runs the commandline utility, parsing arguments and generating
+  # output if set.
+  #
+  # @param [Array<String>] args the list of arguments
+  # @return [void]
+  def run: (*Array[String] args) -> void
+  # Prints statistics for different object types
+  #
+  # To add statistics for a specific type, add a method +#stats_for_TYPE+
+  # to this class that calls {#output}.
+  def print_statistics: () -> untyped
+  # Prints list of undocumented objects
+  def print_undocumented_objects: () -> untyped
+  # @return [Array<CodeObjects::Base>] all the parsed objects in the registry,
+  #   removing any objects that are not visible (private, protected) depending
+  #   on the arguments passed to the command.
+  def all_objects: () -> Array[YARD::CodeObjects::Base]
+  # Statistics for files
+  def stats_for_files: () -> untyped
+  # Statistics for modules
+  def stats_for_modules: () -> untyped
+  # Statistics for classes
+  def stats_for_classes: () -> untyped
+  # Statistics for constants
+  def stats_for_constants: () -> untyped
+  # Statistics for attributes
+  def stats_for_attributes: () -> untyped
+  # Statistics for methods
+  def stats_for_methods: () -> untyped
+  # Prints a statistic to standard out. This method is optimized for
+  # getting Integer values, though it allows any data to be printed.
+  #
+  # @param [String] name the statistic name
+  # @param [Integer, String] data the numeric (or any) data representing
+  #   the statistic. If +data+ is an Integer, it should represent the
+  #   total objects of a type.
+  # @param [Integer, nil] undoc number of undocumented objects for the type
+  # @return [void]
+  def output: (String name, Integer | String data, ?Integer? undoc) -> void
+  private def type_statistics: (untyped `type`) -> untyped
+  # Parses commandline options.
+  # @param [Array<String>] args each tokenized argument
+  private def optparse: (*Array[String] args) -> untyped
+  private def general_options: (untyped opts) -> untyped
+  # An object that keeps track of global state throughout the entire template
+  # rendering process (including any sub-templates).
+  #
+  # @return [OpenStruct] a struct object that stores state
+  # @since 0.6.0
+  def globals: () -> OpenStruct
+  # Runs a list of objects against the {Verifier} object passed into the
+  # template and returns the subset of verified objects.
+  #
+  # @param [Array<CodeObjects::Base>] list a list of code objects
+  # @return [Array<CodeObjects::Base>] a list of code objects that match
+  #   the verifier. If no verifier is supplied, all objects are returned.
+  def run_verifier: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
+  # Links objects or URLs. This method will delegate to the correct +link_+
+  # method depending on the arguments passed in.
+  #
+  # @example Linking a URL
+  #   linkify('http://example.com')
+  # @example Including docstring contents of an object
+  #   linkify('include:YARD::Docstring')
+  # @example Linking to an extra file
+  #   linkify('file:README')
+  # @example Linking an object by path
+  #   linkify('YARD::Docstring')
+  def linkify: (*untyped args) -> untyped
+  # Includes an object's docstring into output.
+  # @since 0.6.0
+  # @param [CodeObjects::Base] obj the object to include
+  # @return [String] the object's docstring (no tags)
+  def link_include_object: (YARD::CodeObjects::Base obj) -> String
+  # Include a file as a docstring in output
+  # @since 0.7.0
+  # @param [String] file the filename to include
+  # @return [String] the file's contents
+  def link_include_file: (String file) -> String
+  # Links to an object with an optional title
+  #
+  # @param [CodeObjects::Base] obj the object to link to
+  # @param [String] title the title to use for the link
+  # @return [String] the linked object
+  def link_object: (YARD::CodeObjects::Base obj, ?String title) -> String
+  # Links to a URL
+  #
+  # @param [String] url the URL to link to
+  # @param [String] title the optional title to display the link as
+  # @param [Hash] params optional parameters for the link
+  # @return [String] the linked URL
+  def link_url: (String url, ?String title, ?Hash[untyped, untyped] params) -> String
+  # Links to an extra file
+  #
+  # @param [String] filename the filename to link to
+  # @param [String] title the title of the link
+  # @param [String] anchor optional anchor
+  # @return [String] the link to the file
+  # @since 0.5.5
+  def link_file: (String filename, ?String title, ?String anchor) -> String
+  # Formats a list of return types for output and links each type.
+  #
+  # @example Formatting types
+  #   format_types(['String', 'Array']) #=> "(String, Array)"
+  # @example Formatting types without surrounding brackets
+  #   format_types(['String', 'Array'], false) #=> "String, Array"
+  # @param [Array<String>] list a list of types
+  # @param [Boolean] brackets whether to surround the types in brackets
+  # @return [String] the formatted list of Ruby types
+  def format_types: (Array[String] list, ?bool brackets) -> String
+  # @example Formatted type of an exception class
+  #   o = ClassObject.new(:root, :MyError)
+  #   o.superclass = P('RuntimeError')
+  #   format_object_type(o) # => "Exception"
+  # @example Formatted type of a method
+  #   o = MethodObject.new(:root, :to_s)
+  #   format_object_type(o) # => "Method"
+  # @param [CodeObjects::Base] object the object to retrieve the type for
+  # @return [String] the human-readable formatted {CodeObjects::Base#type #type}
+  #   for the object
+  def format_object_type: (YARD::CodeObjects::Base object) -> String
+  # @example
+  #   s = format_object_title ModuleObject.new(:root, :MyModuleName)
+  #   s # => "Module: MyModuleName"
+  # @param [CodeObjects::Base] object the object to retrieve a title for
+  # @return [String] the page title name for a given object
+  def format_object_title: (YARD::CodeObjects::Base object) -> String
+  # Indents and formats source code
+  #
+  # @param [String] value the input source code
+  # @return [String] formatted source code
+  def format_source: (String value) -> String
+  # Maintains the order in which +stats_for_+ statistics methods should be
+  # printed.
+  #
+  # @see #print_statistics
+  STATS_ORDER: untyped
+end

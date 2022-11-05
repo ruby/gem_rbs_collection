@@ -1,0 +1,109 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A "namespace" is any object that can store other objects within itself.
+# The two main Ruby objects that can act as namespaces are modules
+# ({ModuleObject}) and classes ({ClassObject}).
+class YARD::CodeObjects::NamespaceObject < ::YARD::CodeObjects::Base
+  # @return [Array<String>] a list of ordered group names inside the namespace
+  # @since 0.6.0
+  attr_accessor groups: Array[String]
+  # The list of objects defined in this namespace
+  # @return [Array<Base>] a list of objects
+  attr_reader children: Array[YARD::CodeObjects::Base]
+  # A hash containing two keys, class and instance, each containing
+  # the attribute name with a { :read, :write } hash for the read and
+  # write objects respectively.
+  #
+  # @example The attributes of an object
+  #   >> Registry.at('YARD::Docstring').attributes
+  #   => {
+  #         :class => { },
+  #         :instance => {
+  #           :ref_tags => {
+  #             :read => #<yardoc method YARD::Docstring#ref_tags>,
+  #             :write => nil
+  #           },
+  #           :object => {
+  #             :read => #<yardoc method YARD::Docstring#object>,
+  #             :write => #<yardoc method YARD::Docstring#object=>
+  #            },
+  #            ...
+  #         }
+  #       }
+  # @return [Hash] a list of methods
+  attr_reader attributes: Hash[untyped, untyped]
+  # A hash containing two keys, :class and :instance, each containing
+  # a hash of objects and their alias names.
+  # @return [Hash] a list of methods
+  attr_reader aliases: Hash[untyped, untyped]
+  # Class mixins
+  # @return [Array<ModuleObject>] a list of mixins
+  attr_reader class_mixins: Array[YARD::CodeObjects::ModuleObject]
+  # Instance mixins
+  # @return [Array<ModuleObject>] a list of mixins
+  attr_reader instance_mixins: Array[YARD::CodeObjects::ModuleObject]
+  # Creates a new namespace object inside +namespace+ with +name+.
+  # @see Base#initialize
+  def initialize: (untyped namespace, untyped name, *untyped args) -> void
+  # Only the class attributes
+  # @return [Hash] a list of method names and their read/write objects
+  # @see #attributes
+  def class_attributes: () -> Hash[untyped, untyped]
+  # Only the instance attributes
+  # @return [Hash] a list of method names and their read/write objects
+  # @see #attributes
+  def instance_attributes: () -> Hash[untyped, untyped]
+  # Looks for a child that matches the attributes specified by +opts+.
+  #
+  # @example Finds a child by name and scope
+  #   namespace.child(:name => :to_s, :scope => :instance)
+  #   # => #<yardoc method MyClass#to_s>
+  # @return [Base, nil] the first matched child object, or nil
+  def child: (?untyped opts) -> YARD::CodeObjects::Base?
+  # Returns all methods that match the attributes specified by +opts+. If
+  # no options are provided, returns all methods.
+  #
+  # @example Finds all private and protected class methods
+  #   namespace.meths(:visibility => [:private, :protected], :scope => :class)
+  #   # => [#<yardoc method MyClass.privmeth>, #<yardoc method MyClass.protmeth>]
+  # @option opts [Array<Symbol>, Symbol] :visibility ([:public, :private,
+  #   :protected]) the visibility of the methods to list. Can be an array or
+  #   single value.
+  # @option opts [Array<Symbol>, Symbol] :scope ([:class, :instance]) the
+  #   scope of the methods to list. Can be an array or single value.
+  # @option opts [Boolean] :included (true) whether to include mixed in
+  #   methods in the list.
+  # @return [Array<MethodObject>] a list of method objects
+  def meths: (?Hash[untyped, untyped] opts) -> Array[YARD::CodeObjects::MethodObject]
+  # Returns methods included from any mixins that match the attributes
+  # specified by +opts+. If no options are specified, returns all included
+  # methods.
+  #
+  # @option opts [Array<Symbol>, Symbol] :visibility ([:public, :private,
+  #   :protected]) the visibility of the methods to list. Can be an array or
+  #   single value.
+  # @option opts [Array<Symbol>, Symbol] :scope ([:class, :instance]) the
+  #   scope of the methods to list. Can be an array or single value.
+  # @option opts [Boolean] :included (true) whether to include mixed in
+  #   methods in the list.
+  # @see #meths
+  def included_meths: (?Hash[untyped, untyped] opts) -> untyped
+  # Returns all constants in the namespace
+  #
+  # @option opts [Boolean] :included (true) whether or not to include
+  #   mixed in constants in list
+  # @return [Array<ConstantObject>] a list of constant objects
+  def constants: (?Hash[untyped, untyped] opts) -> Array[YARD::CodeObjects::ConstantObject]
+  # Returns constants included from any mixins
+  # @return [Array<ConstantObject>] a list of constant objects
+  def included_constants: () -> Array[YARD::CodeObjects::ConstantObject]
+  # Returns class variables defined in this namespace.
+  # @return [Array<ClassVariableObject>] a list of class variable objects
+  def cvars: () -> Array[YARD::CodeObjects::ClassVariableObject]
+  # Returns for specific scopes. If no scopes are provided, returns all mixins.
+  # @param [Array<Symbol>] scopes a list of scopes (:class, :instance) to
+  #   return mixins for. If this is empty, all scopes will be returned.
+  # @return [Array<ModuleObject>] a list of mixins
+  def mixins: (*Array[Symbol] scopes) -> Array[YARD::CodeObjects::ModuleObject]
+end

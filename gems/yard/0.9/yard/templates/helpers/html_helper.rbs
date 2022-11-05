@@ -1,0 +1,319 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# The helper module for HTML templates.
+module YARD::Templates::Helpers::HtmlHelper
+  # Escapes HTML entities
+  #
+  # @param [String] text the text to escape
+  # @return [String] the HTML with escaped entities
+  def h: (String text) -> String
+
+  # Escapes a URL
+  #
+  # @param [String] text the URL
+  # @return [String] the escaped URL
+  private def urlencode: (String text) -> String
+
+  # Escapes a URL
+  # @param [String] text
+  #   the URL
+  # @return [String] the escaped URL
+  def self.urlencode: (String text) -> String
+
+  # Turns text into HTML using +markup+ style formatting.
+  #
+  # @param [String] text the text to format
+  # @param [Symbol] markup examples are +:markdown+, +:textile+, +:rdoc+.
+  #   To add a custom markup type, see {MarkupHelper}
+  # @return [String] the HTML
+  def htmlify: (String text, ?Symbol markup) -> String
+
+  # Converts Markdown to HTML
+  # @param [String] text input Markdown text
+  # @return [String] output HTML
+  # @since 0.6.0
+  def html_markup_markdown: (String text) -> String
+
+  # Converts org-mode to HTML
+  # @param [String] text input org-mode text
+  # @return [String] output HTML
+  def html_markup_org: (String text) -> String
+
+  # Converts Asciidoc to HTML
+  # @param [String] text input Asciidoc text
+  # @return [String] output HTML
+  def html_markup_asciidoc: (String text) -> String
+
+  # Converts Textile to HTML
+  # @param [String] text the input Textile text
+  # @return [String] output HTML
+  # @since 0.6.0
+  def html_markup_textile: (String text) -> String
+
+  # Converts plaintext to strict Textile (hard breaks)
+  # @param [String] text the input textile data
+  # @return [String] the output HTML
+  # @since 0.6.0
+  def html_markup_textile_strict: (String text) -> String
+
+  # Converts RDoc formatting (SimpleMarkup) to HTML
+  # @param [String] text the input RDoc formatted text
+  # @return [String] output HTML
+  # @since 0.6.0
+  def html_markup_rdoc: (String text) -> String
+
+  # Converts plaintext to pre-formatted HTML
+  # @param [String] text the input text
+  # @return [String] the output HTML
+  # @since 0.6.0
+  def html_markup_pre: (String text) -> String
+
+  # Converts plaintext to regular HTML
+  # @param [String] text the input text
+  # @return [String] the output HTML
+  # @since 0.6.0
+  def html_markup_text: (String text) -> String
+
+  # @return [String] the same text with no markup
+  # @since 0.6.6
+  def html_markup_none: (untyped text) -> String
+
+  # Converts HTML to HTML
+  # @param [String] text input html
+  # @return [String] output HTML
+  # @since 0.6.0
+  def html_markup_html: (String text) -> String
+
+  # Highlights Ruby source. Similar to {#html_syntax_highlight}, but
+  # this method is meant to be called from {#htmlify} when markup is
+  # set to "ruby".
+  #
+  # @param [String] source the Ruby source
+  # @return [String] the highlighted HTML
+  # @since 0.7.0
+  def html_markup_ruby: (String source) -> String
+
+  # @return [String] HTMLified text as a single line (paragraphs removed)
+  def htmlify_line: (*untyped args) -> String
+
+  # Syntax highlights +source+ in language +type+.
+  #
+  # @note To support a specific language +type+, implement the method
+  #   +html_syntax_highlight_TYPE+ in this class.
+  #
+  # @param [String] source the source code to highlight
+  # @param [Symbol, String] type the language type (:ruby, :plain, etc). Use
+  #   :plain for no syntax highlighting.
+  # @return [String] the highlighted source
+  def html_syntax_highlight: (String source, ?Symbol | String `type`) -> String
+
+  # @return [String] unhighlighted source
+  def html_syntax_highlight_plain: (untyped source) -> String
+
+  # Resolves any text in the form of +{Name}+ to the object specified by
+  # Name. Also supports link titles in the form +{Name title}+.
+  #
+  # @example Linking to an instance method
+  #   resolve_links("{MyClass#method}") # => "<a href='...'>MyClass#method</a>"
+  # @example Linking to a class with a title
+  #   resolve_links("{A::B::C the C class}") # => "<a href='...'>the c class</a>"
+  # @param [String] text the text to resolve links in
+  # @return [String] HTML with linkified references
+  def resolve_links: (String text) -> String
+
+  def link_file: (String filename, ?String title, ?String anchor) -> String
+
+  def link_include_file: (String file) -> String
+
+  def link_include_object: (YARD::CodeObjects::Base obj) -> String
+
+  def link_object: (YARD::CodeObjects::Base obj, ?String title, ?untyped anchor, ?untyped relative) -> String
+
+  def link_url: (String url, ?String title, ?Hash[untyped, untyped] params) -> String
+
+  # @param [CodeObjects::Base] object the object to get an anchor for
+  # @return [String] the anchor for a specific object
+  def anchor_for: (YARD::CodeObjects::Base object) -> String
+
+  # Returns the URL for an object.
+  #
+  # @param [String, CodeObjects::Base] obj the object (or object path) to link to
+  # @param [String] anchor the anchor to link to
+  # @param [Boolean] relative use a relative or absolute link
+  # @return [String] the URL location of the object
+  def url_for: (String | YARD::CodeObjects::Base obj, ?String anchor, ?bool relative) -> String
+
+  alias mtime_url url_for
+
+  # Returns the URL for a specific file
+  #
+  # @param [String, CodeObjects::ExtraFileObject] filename the filename to link to
+  # @param [String] anchor optional anchor
+  # @return [String] the URL pointing to the file
+  def url_for_file: (String | YARD::CodeObjects::ExtraFileObject filename, ?String anchor) -> String
+
+  # Returns the URL for a list type
+  #
+  # @param [String, Symbol] type the list type to generate a URL for
+  # @return [String] the URL pointing to the list
+  # @since 0.8.0
+  def url_for_list: (String | Symbol `type`) -> String
+
+  # Returns the URL for the frameset page
+  #
+  # @return [String] the URL pointing to the frames page
+  # @since 0.8.0
+  def url_for_frameset: () -> String
+
+  # Returns the URL for the main page (README or alphabetic index)
+  #
+  # @return [String] the URL pointing to the first main page the
+  #   user should see.
+  def url_for_main: () -> String
+
+  # Returns the URL for the alphabetic index page
+  #
+  # @return [String] the URL pointing to the first main page the
+  #   user should see.
+  def url_for_index: () -> String
+
+  # Formats a list of objects and links them
+  # @return [String] a formatted list of objects
+  def format_object_name_list: (untyped objects) -> String
+
+  def format_types: (Array[String] | FalseClass typelist, ?bool brackets) -> String
+
+  # Get the return types for a method signature.
+  #
+  # @param [CodeObjects::MethodObject] meth the method object
+  # @param [Boolean] link whether to link the types
+  # @return [String] the signature types
+  # @since 0.5.3
+  def signature_types: (YARD::CodeObjects::MethodObject meth, ?bool link) -> String
+
+  # Formats the signature of method +meth+.
+  #
+  # @param [CodeObjects::MethodObject] meth the method object to list
+  #   the signature of
+  # @param [Boolean] link whether to link the method signature to the details view
+  # @param [Boolean] show_extras whether to show extra meta-data (visibility, attribute info)
+  # @param [Boolean] full_attr_name whether to show the full attribute name
+  #   ("name=" instead of "name")
+  # @return [String] the formatted method signature
+  def signature: (YARD::CodeObjects::MethodObject meth, ?bool link, ?bool show_extras, ?bool full_attr_name) -> String
+
+  # Returns the current character set. The default value can be overridden
+  # by setting the +LANG+ environment variable or by overriding this
+  # method. In Ruby 1.9 you can also modify this value by setting
+  # +Encoding.default_external+.
+  #
+  # @return [String] the current character set
+  # @since 0.5.4
+  def charset: () -> String
+
+  # Converts a set of hash options into HTML attributes for a tag
+  #
+  # @param [Hash{String => String}] opts the tag options
+  # @return [String] the tag attributes of an HTML tag
+  private def tag_attrs: (?Hash[String, String] opts) -> String
+
+  # Converts a {CodeObjects::MethodObject} into an overload object
+  # @since 0.5.3
+  private def convert_method_to_overload: (untyped meth) -> untyped
+
+  # Parses !!!lang out of codeblock, returning the codeblock language
+  # followed by the source code.
+  #
+  # @param [String] source the source code whose language to determine
+  # @return [Array(String, String)] the language, if any, and the
+  #   remaining source
+  # @since 0.7.5
+  private def parse_lang_for_codeblock: (String source) -> [ String, String ]
+
+  # Parses code blocks out of html and performs syntax highlighting
+  # on code inside of the blocks.
+  #
+  # @param [String] html the html to search for code in
+  # @return [String] highlighted html
+  # @see #html_syntax_highlight
+  private def parse_codeblocks: (String html) -> String
+
+  # Parses code block's HTML attributes in order to detect the programming
+  # language of what's enclosed in that code block.
+  #
+  # @param [String, nil] pre_html_attrs HTML attribute list of +pre+ element
+  # @param [String, nil] code_html_attrs HTML attribute list of +code+
+  #   element
+  # @return [String, nil] detected programming language
+  private def detect_lang_in_codeblock_attributes: (String? pre_html_attrs, String? code_html_attrs) -> String?
+
+  # Highlights Ruby source
+  # @param [String] source the Ruby source code
+  # @return [String] the highlighted Ruby source
+  def html_syntax_highlight_ruby: (String source) -> String
+
+  # Prunes the method listing by running the verifier and removing attributes/aliases
+  # @param [Array<CodeObjects::Base>] list a list of methods
+  # @param [Boolean] hide_attributes whether to prune attribute methods from the list
+  # @return [Array<CodeObjects::Base>] a pruned list of methods
+  def prune_method_listing: (Array[YARD::CodeObjects::Base] list, ?bool hide_attributes) -> Array[YARD::CodeObjects::Base]
+
+  # Attempts to load the first valid markup provider in {MARKUP_PROVIDERS}.
+  # If a provider is specified, immediately try to load it.
+  #
+  # On success this sets `@markup_provider` and `@markup_class` to
+  # the provider name and library constant class/module respectively for
+  # the loaded provider.
+  #
+  # On failure this method will inform the user that no provider could be
+  # found and exit the program.
+  #
+  # @return [Boolean] whether the markup provider was successfully loaded.
+  def load_markup_provider: (?untyped `type`) -> bool
+
+  # Checks for a shebang or looks at the file extension to determine
+  # the markup type for the file contents. File extensions are registered
+  # for a markup type in {MARKUP_EXTENSIONS}.
+  #
+  # A shebang should be on the first line of a file and be in the form:
+  #
+  #   #!markup_type
+  #
+  # Standard markup types are text, html, rdoc, markdown, textile
+  #
+  # @param [String] contents Unused. Was necessary prior to 0.7.0.
+  #   Newer versions of YARD use {CodeObjects::ExtraFileObject#contents}
+  # @return [Symbol] the markup type recognized for the file
+  # @see MARKUP_EXTENSIONS
+  # @since 0.6.0
+  def markup_for_file: (String contents, untyped filename) -> Symbol
+
+  # Strips any shebang lines on the file contents that pertain to
+  # markup or preprocessing data.
+  #
+  # @deprecated Use {CodeObjects::ExtraFileObject#contents} instead
+  # @return [String] the file contents minus any preprocessing tags
+  # @since 0.6.0
+  def markup_file_contents: (untyped contents) -> String
+
+  # Gets the markup provider class/module constant for a markup type
+  # Call {#load_markup_provider} before using this method.
+  #
+  # @param [Symbol] type the markup type (:rdoc, :markdown, etc.)
+  # @return [Class] the markup class
+  def markup_class: (?Symbol `type`) -> Class
+
+  # Gets the markup provider name for a markup type
+  # Call {#load_markup_provider} before using this method.
+  #
+  # @param [Symbol] type the markup type (:rdoc, :markdown, etc.)
+  # @return [Symbol] the markup provider name (usually the gem name of the library)
+  def markup_provider: (?Symbol `type`) -> Symbol
+
+  # @private
+  URLMATCH: untyped
+
+  # @private
+  ASCIIDOC_ATTRIBUTES: untyped
+end

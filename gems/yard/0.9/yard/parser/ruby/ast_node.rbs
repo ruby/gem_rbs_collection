@@ -1,0 +1,130 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# An AST node is characterized by a type and a list of children. It
+# is most easily represented by the s-expression {#s} such as:
+#   # AST for "if true; 5 end":
+#   s(s(:if, s(:var_ref, s(:kw, "true")), s(s(:int, "5")), nil))
+#
+# The node type is not considered part of the list, only its children.
+# So +ast[0]+ does not refer to the type, but rather the first child
+# (or object). Items that are not +AstNode+ objects can be part of the
+# list, like Strings or Symbols representing names. To return only
+# the AstNode children of the node, use {#children}.
+class YARD::Parser::Ruby::AstNode < ::Array[untyped]
+  # Returns the value of attribute docstring_hash_flag.
+  attr_accessor docstring_hash_flag: untyped
+  # Returns the value of attribute docstring.
+  attr_accessor docstring: untyped
+  # Returns the value of attribute docstring_range.
+  attr_accessor docstring_range: untyped
+  # @return [String] the parse of {#full_source} that the node represents
+  attr_accessor source: String
+  # @deprecated Groups are now defined by directives
+  # @see Tags::GroupDirective
+  attr_accessor group: untyped
+  # @return [Range] the character range in {#full_source} represented
+  #   by the node
+  attr_accessor source_range: Range[untyped]
+  # @return [Range] the line range in {#full_source} represented
+  #   by the node
+  attr_accessor line_range: Range[untyped]
+  # @return [String] the filename the node was parsed from
+  attr_accessor file: String
+  # @return [String] the full source that the node was parsed from
+  attr_accessor full_source: String
+  # @return [Symbol] the node's unique symbolic type
+  attr_accessor type: Symbol
+  # @return [AstNode, nil] the node's parent or nil if it is a root node.
+  attr_accessor parent: YARD::Parser::Ruby::AstNode?
+  # Finds the node subclass that should be instantiated for a specific
+  # node type
+  #
+  # @param [Symbol] type the node type to find a subclass for
+  # @return [Class] a subclass of AstNode to instantiate the node with.
+  def self.node_class_for: (Symbol `type`) -> Class
+  # Creates a new AST node
+  #
+  # @param [Symbol] type the type of node being created
+  # @param [Array<AstNode>] arr the child nodes
+  # @param [Hash] opts any extra line options
+  # @option opts [Fixnum] :line (nil) the line the node starts on in source
+  # @option opts [String] :char (nil) the character number the node starts on
+  #   in source
+  # @option opts [Fixnum] :listline (nil) a special key like :line but for
+  #   list nodes
+  # @option opts [Fixnum] :listchar (nil) a special key like :char but for
+  #   list nodes
+  # @option opts [Boolean] :token (nil) whether the node represents a token
+  def initialize: (Symbol `type`, Array[YARD::Parser::Ruby::AstNode] arr, ?Hash[untyped, untyped] opts) -> void
+  # @return [Boolean] whether the node is equal to another by checking
+  #   the list and type
+  # @private
+  def ==: (untyped other) -> bool
+  # Searches through the node and all descendants and returns the
+  # first node with a type matching any of +node_types+, otherwise
+  # returns the original node (self).
+  #
+  # @example Returns the first method definition in a block of code
+  #   ast = YARD.parse_string("if true; def x; end end").ast
+  #   ast.jump(:def)
+  #   # => s(:def, s(:ident, "x"), s(:params, nil, nil, nil, nil,
+  #   #      nil), s(s(:void_stmt, )))
+  # @example Returns first 'def' or 'class' statement
+  #   ast = YARD.parse_string("class X; def y; end end")
+  #   ast.jump(:def, :class).first
+  #   # =>
+  # @example If the node types are not present in the AST
+  #   ast = YARD.parse("def x; end")
+  #   ast.jump(:def)
+  #
+  # @param [Array<Symbol>] node_types a set of node types to match
+  # @return [AstNode] the matching node, if one was found
+  # @return [self] if no node was found
+  def jump: (*Array[Symbol] node_types) -> (YARD::Parser::Ruby::AstNode | self)
+  # @return [Array<AstNode>] the {AstNode} children inside the node
+  def children: () -> Array[YARD::Parser::Ruby::AstNode]
+  # Traverses the object and yields each node (including descendants) in order.
+  #
+  # @yield each descendant node in order
+  # @yieldparam [AstNode] self, or a child/descendant node
+  # @return [void]
+  def traverse: () { (YARD::Parser::Ruby::AstNode `self`) -> untyped } -> void
+  # @return [Boolean] whether the node is a token
+  def token?: () -> bool
+  # @return [Boolean] whether the node is a reference (variable,
+  #   constant name)
+  def ref?: () -> bool
+  # @return [Boolean] whether the node is a literal value
+  def literal?: () -> bool
+  # @return [Boolean] whether the node is a keyword
+  def kw?: () -> bool
+  # @return [Boolean] whether the node is a method call
+  def call?: () -> bool
+  # @return [Boolean] whether the node is a method definition
+  def def?: () -> bool
+  # @return [Boolean] whether the node is a if/elsif/else condition
+  def condition?: () -> bool
+  # @return [Boolean] whether the node is a loop
+  def loop?: () -> bool
+  # @return [Boolean] whether the node has a block
+  def block?: () -> bool
+  # @return [Boolean] whether the node has a {#line_range} set
+  def has_line?: () -> bool
+  # @return [Fixnum] the starting line number of the node
+  def line: () -> Integer
+  # @return [String] the first line of source represented by the node.
+  def first_line: () -> String
+  # @return [String] the first line of source the node represents
+  def show: () -> String
+  # @return [nil] pretty prints the node
+  def pretty_print: (untyped q) -> nil
+  # @return [String] inspects the object
+  def inspect: () -> String
+  # Resets line information
+  # @return [void]
+  private def reset_line_info: () -> void
+  # List of all known keywords
+  # @return [Hash]
+  KEYWORDS: Hash[untyped, untyped]
+end

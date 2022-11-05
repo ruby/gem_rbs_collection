@@ -1,0 +1,68 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# An Options class containing default options for base template rendering. For
+# options specific to generation of HTML output, see {CLI::YardocOptions}.
+#
+# @see CLI::YardocOptions
+class YARD::Templates::TemplateOptions < ::YARD::Options
+  # @return [Symbol] the template output format
+  # @!attribute format
+  attr_accessor format: Symbol
+  # @return [Symbol] the template name used to render output
+  # @!attribute template
+  attr_accessor template: Symbol
+  # @return [Symbol] the markup format to use when parsing docstrings
+  # @!attribute markup
+  attr_accessor markup: Symbol
+  # @return [String] the default return type for a method with no return tags
+  # @!attribute default_return
+  attr_accessor default_return: String
+  # @return [Boolean] whether void methods should show "void" in their signature
+  # @!attribute hide_void_return
+  attr_accessor hide_void_return: bool
+  # @return [Boolean] whether code blocks should be syntax highlighted
+  # @!attribute highlight
+  attr_accessor highlight: bool
+  # @return [Class] the markup provider class for the markup format
+  attr_accessor markup_provider: Class
+  # @return [OpenStruct] an open struct containing any global state across all
+  #   generated objects in a template.
+  # @!attribute globals
+  attr_accessor globals: OpenStruct
+  # @return [CodeObjects::Base] the main object being generated in the template
+  attr_accessor object: YARD::CodeObjects::Base
+  # @return [CodeObjects::Base] the owner of the generated object
+  attr_accessor owner: YARD::CodeObjects::Base
+  # @return [Symbol] the template type used to generate output
+  attr_accessor type: Symbol
+  # @return [Boolean] whether serialization should be performed
+  # @!attribute serialize
+  attr_accessor serialize: bool
+  # @return [Serializers::Base] the serializer used to generate links and serialize
+  #   output. Serialization output only occurs if {#serialize} is +true+.
+  attr_accessor serializer: YARD::Serializers::Base
+  # @deprecated use {#highlight} instead.
+  # @return [Boolean] whether highlighting should be ignored
+  attr_accessor no_highlight: bool
+  # @return [String] the title of a given page
+  attr_accessor page_title: String
+  # @return [Boolean] whether the page is the "index"
+  attr_accessor index: bool
+  # @example A list of mixin path names (including wildcards)
+  #   opts.embed_mixins #=> ['ClassMethods', '*Helper', 'YARD::*']
+  # @return [Array<String>] an array of module name wildcards to embed into
+  #   class documentation as if their methods were defined directly in the class.
+  #   Useful for modules like ClassMethods. If the name contains '::', the module
+  #   is matched against the full mixin path, otherwise only the module name is used.
+  # @!attribute embed_mixins
+  attr_accessor embed_mixins: Array[String]
+  # @return [Verifier] the verifier object
+  attr_accessor verifier: YARD::Verifier
+  alias __globals globals
+  # @param [CodeObjects::Base] mixin accepts any code object, but returns
+  #   nil unless the object is a module.
+  # @return [Boolean] whether a mixin matches the embed_mixins list
+  # @return [nil] if the mixin is not a module object
+  def embed_mixins_match?: (YARD::CodeObjects::Base mixin) -> bool?
+end

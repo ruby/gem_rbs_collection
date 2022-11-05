@@ -1,0 +1,31 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# +Locale+ is a unit of translation. It has {#name} and a set of
+# messages.
+#
+# @since 0.8.2
+class YARD::I18n::Locale
+  # @return [String, nil] the default locale name.
+  # @since 0.8.4
+  attr_accessor self.default: String?
+  # @return [String] the name of the locale. It used IETF language
+  #   tag format +[language[_territory][.codeset][@modifier]]+.
+  # @see http://tools.ietf.org/rfc/bcp/bcp47.txt
+  #   BCP 47 - Tags for Identifying Languages
+  attr_reader name: String
+  # Creates a locale for +name+ locale.
+  #
+  # @param [String] name the locale name.
+  def initialize: (String name) -> void
+  # Loads translation messages from +locale_directory+/{#name}.po.
+  #
+  # @param [String] locale_directory the directory path that has
+  #   {#name}.po.
+  # @return [Boolean] +true+ if PO file exists, +false+ otherwise.
+  def load: (String locale_directory) -> bool
+  # @param [String] message the translation target message.
+  # @return [String] translated message. If tarnslation isn't
+  #   registered, the +message+ is returned.
+  def translate: (String message) -> String
+end

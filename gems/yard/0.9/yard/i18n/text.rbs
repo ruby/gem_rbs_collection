@@ -1,0 +1,42 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Provides some convenient features for translating a text.
+class YARD::I18n::Text
+  # Creates a text object that has translation related features for
+  # the input text.
+  #
+  # @param [#each_line] input a text to be translated.
+  # @option options [Boolean] :have_header (false) whether the
+  #   input text has header or not.
+  def initialize: (untyped input, ?Hash[untyped, untyped] options) -> void
+  # Extracts translation target messages from +@input+.
+  #
+  # @yield [:attribute, name, value, line_no] the block that
+  #   receives extracted an attribute in header. It may called many
+  #   times.
+  # @yieldparam [String] name the name of extracted attribute.
+  # @yieldparam [String] value the value of extracted attribute.
+  # @yieldparam [Integer] line_no the defined line number of extracted
+  #   attribute.
+  # @yield [:paragraph, text, start_line_no] the block that
+  #   receives extracted a paragraph in body. Paragraph is a text
+  #   block separated by one or more empty lines. Empty line is a
+  #   line that contains only zero or more whitespaces. It may
+  #   called many times.
+  # @yieldparam [String] text the text of extracted paragraph.
+  # @yieldparam [Integer] start_line_no the start line number of
+  #   extracted paragraph.
+  # @return [void]
+  def extract_messages: () { (String name, String value, Integer line_no, String text, Integer start_line_no) -> untyped } -> void
+  # Translates into +locale+.
+  #
+  # @param [Locale] locale the translation target locale.
+  # @return [String] translated text.
+  def translate: (YARD::I18n::Locale locale) -> String
+  private def parse: () -> untyped
+  private def emit_markup_event: (untyped line, untyped line_no) -> untyped
+  private def emit_attribute_event: (untyped match_data, untyped line_no) -> untyped
+  private def emit_empty_line_event: (untyped line, untyped line_no) -> untyped
+  private def emit_paragraph_event: (untyped paragraph, untyped paragraph_start_line, untyped line_no) -> untyped
+end

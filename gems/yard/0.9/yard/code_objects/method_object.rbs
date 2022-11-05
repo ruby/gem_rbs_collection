@@ -1,0 +1,86 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Represents a Ruby method in source
+class YARD::CodeObjects::MethodObject < ::YARD::CodeObjects::Base
+  # The scope of the method (+:class+ or +:instance+)
+  #
+  # @return [Symbol] the scope
+  attr_accessor scope: Symbol
+  # Whether the object is explicitly defined in source or whether it was
+  # inferred by a handler. For instance, attribute methods are generally
+  # inferred and therefore not explicitly defined in source.
+  #
+  # @return [Boolean] whether the object is explicitly defined in source.
+  attr_accessor explicit: bool
+  # Returns the list of parameters parsed out of the method signature
+  # with their default values.
+  #
+  # @return [Array<Array(String, String)>] a list of parameter names followed
+  #   by their default values (or nil)
+  attr_accessor parameters: Array[[ String, String ]]
+  # Creates a new method object in +namespace+ with +name+ and an instance
+  # or class +scope+
+  #
+  # If scope is +:module+, this object is instantiated as a public
+  # method in +:class+ scope, but also creates a new (empty) method
+  # as a private +:instance+ method on the same class or module.
+  #
+  # @param [NamespaceObject] namespace the namespace
+  # @param [String, Symbol] name the method name
+  # @param [Symbol] scope +:instance+, +:class+, or +:module+
+  def initialize: (YARD::CodeObjects::NamespaceObject namespace, String | Symbol name, ?Symbol scope) -> void
+  # @return whether or not the method is the #initialize constructor method
+  def constructor?: () -> bool
+  # @return [Boolean] whether or not this method was created as a module
+  #   function
+  # @since 0.8.0
+  def module_function?: () -> bool
+  # Returns the read/writer info for the attribute if it is one
+  # @return [SymbolHash] if there is information about the attribute
+  # @return [nil] if the method is not an attribute
+  # @since 0.5.3
+  def attr_info: () -> SymbolHash?
+  # @return [Boolean] whether the method is a writer attribute
+  # @since 0.5.3
+  def writer?: () -> bool
+  # @return [Boolean] whether the method is a reader attribute
+  # @since 0.5.3
+  def reader?: () -> bool
+  # Tests if the object is defined as an attribute in the namespace
+  # @return [Boolean] whether the object is an attribute
+  def is_attribute?: () -> bool
+  # Tests if the object is defined as an alias of another method
+  # @return [Boolean] whether the object is an alias
+  def is_alias?: () -> bool
+  # Tests boolean {#explicit} value.
+  #
+  # @return [Boolean] whether the method is explicitly defined in source
+  def is_explicit?: () -> bool
+  # @return [MethodObject] the object that this method overrides
+  # @return [nil] if it does not override a method
+  # @since 0.6.0
+  def overridden_method: () -> YARD::CodeObjects::MethodObject?
+  # Returns all alias names of the object
+  # @return [Array<MethodObject>] the alias names
+  def aliases: () -> Array[YARD::CodeObjects::MethodObject]
+  # Override path handling for instance methods in the root namespace
+  # (they should still have a separator as a prefix).
+  # @return [String] the path of a method
+  def path: () -> String
+  # Returns the name of the object.
+  #
+  # @example The name of an instance method (with prefix)
+  #   an_instance_method.name(true) # => "#mymethod"
+  # @example The name of a class method (with prefix)
+  #   a_class_method.name(true) # => "mymethod"
+  # @param [Boolean] prefix whether or not to show the prefix
+  # @return [String] returns {#sep} + +name+ for an instance method if
+  #   prefix is true
+  # @return [Symbol] the name without {#sep} if prefix is set to false
+  def name: (?bool prefix) -> (String | Symbol)
+  # Override separator to differentiate between class and instance
+  # methods.
+  # @return [String] "#" for an instance method, "." for class
+  def sep: () -> String
+end

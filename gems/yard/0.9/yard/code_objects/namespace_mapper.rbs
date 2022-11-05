@@ -1,0 +1,81 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# This module controls registration and accessing of namespace separators
+# for {Registry} lookup.
+#
+# @since 0.9.1
+module YARD::CodeObjects::NamespaceMapper
+  # @return [String] the default separator when no separator can begin
+  #   determined.
+  private attr_accessor self.default_separator: String
+
+  # Registers a separator with an optional set of valid types that
+  # must follow the separator lexically.
+  #
+  # Calls all callbacks defined by {NamespaceMapper.on_invalidate} after
+  # the separator is registered.
+  #
+  # @param sep [String] the separator string for the namespace
+  # @param valid_types [Array<Symbol>] a list of object types that
+  #   must follow the separator. If the list is empty, any type can
+  #   follow the separator.
+  # @example Registering separators for a method object
+  #   # Anything after a "#" denotes a method object
+  #   register_separator "#", :method
+  #   # Anything after a "." denotes a method object
+  #   register_separator ".", :method
+  # @see .on_invalidate
+  def register_separator: (String sep, *Array[Symbol] valid_types) -> untyped
+
+  # Unregisters a separator by a type.
+  #
+  # @param type [Symbol] the type to unregister
+  # @see #register_separator
+  def unregister_separator_by_type: (Symbol `type`) -> untyped
+
+  # Clears the map of separators.
+  #
+  # @return [void]
+  def clear_separators: () -> void
+
+  # Gets or sets the default separator value to use when no
+  # separator for the namespace can be determined.
+  #
+  # @param value [String, nil] the default separator, or nil to return the
+  #   value
+  # @example
+  #   default_separator "::"
+  def default_separator: (?String? value) -> untyped
+
+  # @return [Array<String>] all of the registered separators
+  def separators: () -> Array[String]
+
+  # @return [Regexp] the regexp match of all separators
+  def separators_match: () -> Regexp
+
+  # @param sep [String] the separator to return types for
+  # @return [Array<Symbol>] a list of types registered to a separator
+  def types_for_separator: (String sep) -> Array[Symbol]
+
+  # @param type [String] the type to return separators for
+  # @return [Array<Symbol>] a list of separators registered to a type
+  def separators_for_type: (String `type`) -> Array[Symbol]
+
+  # Adds a callback that triggers when a new separator is registered or
+  # the cache is cleared by invalidation.
+  def self.on_invalidate: () -> untyped
+
+  # @return [Hash] a mapping of types to separators
+  private def self.map: () -> Hash[untyped, untyped]
+
+  # @return [Hash] a reverse mapping of separators to types
+  private def self.rev_map: () -> Hash[untyped, untyped]
+
+  # Invalidates all separators
+  # @return [void]
+  private def self.invalidate: () -> void
+
+  # @return [Regexp] the full list of separators as a regexp match
+  private def self.map_match: () -> Regexp
+end

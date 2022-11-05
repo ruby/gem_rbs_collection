@@ -1,0 +1,34 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Acts as a container for {Message} objects.
+#
+# @since 0.8.1
+class YARD::I18n::Messages
+  # @return [Hash{String=>Message}] the set of message objects
+  attr_reader messages: Hash[String, YARD::I18n::Message]
+  # Creates a new container.
+  def initialize: () -> void
+  # Enumerates each {Message} in the container.
+  #
+  # @yieldparam [Message] message the next message object in
+  #   the enumeration.
+  # @return [void]
+  def each: () { (YARD::I18n::Message message) -> untyped } -> void
+  # @param [String] id the message ID to perform a lookup on.
+  # @return [Message, nil] a registered message for the given +id+,
+  #   or nil if no message for the ID is found.
+  def []: (String id) -> YARD::I18n::Message?
+  # Registers a {Message}, the mssage ID of which is +id+. If
+  # corresponding +Message+ is already registered, the previously
+  # registered object is returned.
+  #
+  # @param [String] id the ID of the message to be registered.
+  # @return [Message] the registered +Message+.
+  def register: (String id) -> YARD::I18n::Message
+  # Checks if this messages list is equal to another messages list.
+  #
+  # @param [Messages] other the container to compare.
+  # @return [Boolean] whether +self+ and +other+ is equivalence or not.
+  def ==: (YARD::I18n::Messages other) -> bool
+end

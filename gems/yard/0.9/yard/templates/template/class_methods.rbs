@@ -1,0 +1,41 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+module YARD::Templates::Template::ClassMethods
+  # Returns the value of attribute path.
+  attr_accessor path: untyped
+
+  # Returns the value of attribute full_path.
+  attr_accessor full_path: untyped
+
+  # @return [Array<String>] a list of full paths
+  # @note This method caches path results. Paths should not be modified
+  #   after this method is called; call {#reset_full_paths} to reset cache.
+  def full_paths: () -> Array[String]
+
+  # Searches for a file identified by +basename+ in the template's
+  # path as well as any mixed in template paths. Equivalent to calling
+  # {ClassMethods#find_nth_file} with index of 1.
+  #
+  # @param [String] basename the filename to search for
+  # @return [String] the full path of a file on disk with filename
+  #   +basename+ in one of the template's paths.
+  # @see find_nth_file
+  def find_file: (String basename) -> String
+
+  # Searches for the nth file (where n = +index+) identified
+  # by basename in the template's path and any mixed in template paths.
+  #
+  # @param [String] basename the filename to search for
+  # @param [Fixnum] index the nth existing file to return
+  # @return [String] the full path of the nth file on disk with
+  #   filename +basename+ in one of the template paths
+  def find_nth_file: (String basename, ?Integer index) -> String
+
+  def is_a?: (untyped klass) -> bool
+
+  # Alias for creating a {Section} with arguments
+  # @see Section#initialize
+  # @since 0.6.0
+  def S: (*untyped args) -> untyped
+end

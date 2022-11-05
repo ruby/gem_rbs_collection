@@ -1,0 +1,82 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Supports {#each} enumeration over a source's tokens, yielding
+# the token and a possible {CodeObjects::Base} associated with the
+# constant or identifier token.
+class YARD::Parser::Ruby::TokenResolver
+  # Creates a token resolver for given source.
+  #
+  # @param source [String] the source code to tokenize
+  # @param namespace [CodeObjects::Base] the object/namespace to resolve from
+  def initialize: (String source, ?YARD::CodeObjects::Base namespace) -> void
+  # Iterates over each token, yielding the token and a possible code
+  # object that is associated with the token.
+  #
+  # @yieldparam token [Array(Symbol,String,Array(Integer,Integer))] the
+  #   current token object being iterated
+  # @yieldparam object [CodeObjects::Base, nil] the fully qualified code
+  #   object associated with the current token, or nil if there is no object
+  #   for the yielded token.
+  # @example Yielding code objects
+  #   r = TokenResolver.new("A::B::C")
+  #   r.each do |tok, obj|
+  #     if obj
+  #       puts "#{tok[0]} -> #{obj.path.inspect}"
+  #     else
+  #       puts "No object: #{tok.inspect}"
+  #     end
+  #   end
+  #
+  #   # Prints:
+  #   # :const -> "A"
+  #   # No object: [:op, "::"]
+  #   # :const -> "A::B"
+  #   # No object: [:op, "::"]
+  #   # :const -> "A::B::C"
+  def each: () { ([ Symbol, String, [ Integer, Integer ] ] token, YARD::CodeObjects::Base? object) -> untyped } -> untyped
+  # Registers a separator with an optional set of valid types that
+  # must follow the separator lexically.
+  #
+  # Calls all callbacks defined by {NamespaceMapper.on_invalidate} after
+  # the separator is registered.
+  #
+  # @param sep [String] the separator string for the namespace
+  # @param valid_types [Array<Symbol>] a list of object types that
+  #   must follow the separator. If the list is empty, any type can
+  #   follow the separator.
+  # @example Registering separators for a method object
+  #   # Anything after a "#" denotes a method object
+  #   register_separator "#", :method
+  #   # Anything after a "." denotes a method object
+  #   register_separator ".", :method
+  # @see .on_invalidate
+  def register_separator: (String sep, *Array[Symbol] valid_types) -> untyped
+  # Unregisters a separator by a type.
+  #
+  # @param type [Symbol] the type to unregister
+  # @see #register_separator
+  def unregister_separator_by_type: (Symbol `type`) -> untyped
+  # Clears the map of separators.
+  #
+  # @return [void]
+  def clear_separators: () -> void
+  # Gets or sets the default separator value to use when no
+  # separator for the namespace can be determined.
+  #
+  # @param value [String, nil] the default separator, or nil to return the
+  #   value
+  # @example
+  #   default_separator "::"
+  def default_separator: (?String? value) -> untyped
+  # @return [Array<String>] all of the registered separators
+  def separators: () -> Array[String]
+  # @return [Regexp] the regexp match of all separators
+  def separators_match: () -> Regexp
+  # @param sep [String] the separator to return types for
+  # @return [Array<Symbol>] a list of types registered to a separator
+  def types_for_separator: (String sep) -> Array[Symbol]
+  # @param type [String] the type to return separators for
+  # @return [Array<Symbol>] a list of separators registered to a type
+  def separators_for_type: (String `type`) -> Array[Symbol]
+end

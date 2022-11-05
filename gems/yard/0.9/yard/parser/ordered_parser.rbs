@@ -1,0 +1,26 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Responsible for parsing a list of files in order. The
+# {#parse} method of this class can be called from the
+# {SourceParser#globals} globals state list to re-enter
+# parsing for the remainder of files in the list recursively.
+#
+# @see Processor#parse_remaining_files
+class YARD::Parser::OrderedParser
+  # @return [Array<String>] the list of remaining files to parse
+  attr_accessor files: Array[String]
+  # Creates a new OrderedParser with the global state and a list
+  # of files to parse.
+  #
+  # @note OrderedParser sets itself as the +ordered_parser+ key on
+  #   global_state for later use in {Handlers::Processor}.
+  # @param [OpenStruct] global_state a structure containing all global
+  #   state during parsing
+  # @param [Array<String>] files the list of files to parse
+  def initialize: (OpenStruct global_state, Array[String] files) -> void
+  # Parses the remainder of the {#files} list.
+  #
+  # @see Processor#parse_remaining_files
+  def parse: () -> untyped
+end

@@ -1,0 +1,37 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Abstract base class for command that reads .yardopts file
+#
+# @abstract
+# @since 0.8.3
+class YARD::CLI::YardoptsCommand < ::YARD::CLI::Command
+  # @return [Boolean] whether to parse options from .yardopts
+  attr_accessor use_yardopts_file: bool
+  # @return [Boolean] whether to parse options from .document
+  attr_accessor use_document_file: bool
+  # The options file name (defaults to {DEFAULT_YARDOPTS_FILE})
+  # @return [String] the filename to load extra options from
+  attr_accessor options_file: String
+  # Creates a new command that reads .yardopts
+  def initialize: () -> void
+  # Parses commandline arguments
+  # @param [Array<String>] args the list of arguments
+  # @return [Boolean] whether or not arguments are valid
+  # @since 0.5.6
+  def parse_arguments: (*Array[String] args) -> bool
+  # Adds --[no-]yardopts / --[no-]document
+  def yardopts_options: (untyped opts) -> untyped
+  # Parses the .yardopts file for default yard options
+  # @return [Array<String>] an array of options parsed from .yardopts
+  private def yardopts: (?untyped file) -> Array[String]
+  # Parses out the yardopts/document options
+  private def parse_yardopts_options: (*untyped args) -> untyped
+  private def parse_rdoc_document_file: (?untyped file) -> untyped
+  private def parse_yardopts: (?untyped file) -> untyped
+  # Reads a .document file in the directory to get source file globs
+  # @return [Array<String>] an array of files parsed from .document
+  private def support_rdoc_document_file!: (?untyped file) -> Array[String]
+  # The configuration filename to load extra options from
+  DEFAULT_YARDOPTS_FILE: untyped
+end

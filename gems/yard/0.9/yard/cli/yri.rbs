@@ -1,0 +1,70 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# A tool to view documentation in the console like `ri`
+class YARD::CLI::YRI < ::YARD::CLI::Command
+  # Helper method to run the utility on an instance.
+  # @see #run
+  def self.run: (*untyped args) -> untyped
+  def initialize: () -> void
+  # Runs the command-line utility.
+  #
+  # @example
+  #   YRI.new.run('String#reverse')
+  # @param [Array<String>] args each tokenized argument
+  def run: (*Array[String] args) -> untyped
+  # Prints the command usage
+  # @return [void]
+  # @since 0.5.6
+  def print_usage: () -> void
+  # Caches the .yardoc file where an object can be found in the {CACHE_FILE}
+  # @return [void]
+  def cache_object: (untyped name, untyped path) -> void
+  # @param [CodeObjects::Base] object the object to print.
+  # @return [String] the formatted output for an object.
+  def print_object: (YARD::CodeObjects::Base object) -> String
+  # Locates an object by name starting in the cached paths and then
+  # searching through any search paths.
+  #
+  # @param [String] name the full name of the object
+  # @return [CodeObjects::Base] an object if found
+  # @return [nil] if no object is found
+  def find_object: (String name) -> YARD::CodeObjects::Base?
+  # Tries to load the object with name. If successful, caches the object
+  # with the cache_path
+  #
+  # @param [String] name the object path
+  # @param [String] cache_path the location of the yardoc
+  #   db containing the object to cache for future lookups.
+  #   No caching is done if this is nil.
+  # @return [void]
+  private def try_load_object: (String name, String cache_path) -> void
+  # Loads {CACHE_FILE}
+  # @return [void]
+  private def load_cache: () -> void
+  # Adds all RubyGems yardoc files to search paths
+  # @return [void]
+  private def add_gem_paths: () -> void
+  # Adds paths in {SEARCH_PATHS_FILE}
+  # @since 0.5.1
+  private def add_default_paths: () -> untyped
+  # Parses commandline options.
+  # @param [Array<String>] args each tokenized argument
+  private def optparse: (*Array[String] args) -> untyped
+  # The location in {YARD::CONFIG_DIR} where the YRI cache file is loaded
+  # from.
+  CACHE_FILE: untyped
+  # A file containing all paths, delimited by newlines, to search for
+  # yardoc databases.
+  # @since 0.5.1
+  SEARCH_PATHS_FILE: untyped
+  # Default search paths that should be loaded dynamically into YRI. These paths
+  # take precedence over all other paths ({SEARCH_PATHS_FILE} and RubyGems
+  # paths). To add a path, call:
+  #
+  #   DEFAULT_SEARCH_PATHS.push("/path/to/.yardoc")
+  #
+  # @return [Array<String>] a list of extra search paths
+  # @since 0.6.0
+  DEFAULT_SEARCH_PATHS: Array[String]
+end

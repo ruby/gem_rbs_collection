@@ -1,0 +1,92 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+class YARD::Server::LibraryVersion
+  # @return [String] the name of the library
+  attr_accessor name: String
+  # @return [String] the version of the specific library
+  attr_accessor version: String
+  # @return [String] the location of the yardoc file used to load the object
+  #   information from.
+  # @return [nil] if no yardoc file exists yet. In this case, {#prepare!} will
+  #   be called on this library to build the yardoc file.
+  # @note To implement a custom yardoc file getter, implement
+  attr_accessor yardoc_file: String?
+  # @return [Symbol] the source type representing where the yardoc should be
+  #   loaded from. Defaults are +:disk+ and +:gem+, though custom sources
+  #   may be implemented. This value is used to inform {#prepare!} about how
+  #   to load the necessary data in order to display documentation for an object.
+  # @see LibraryVersion LibraryVersion documentation for "Implementing a Custom Library Source"
+  attr_accessor source: Symbol
+  # @return [String] the location of the source code for a library. This
+  #   value is filled by calling +#source_path_for_SOURCE+ on this class.
+  # @return [nil] if there is no source code
+  # @see LibraryVersion LibraryVersion documentation for "Implementing a Custom Library Source"
+  attr_accessor source_path: String?
+  # @param [String] name the name of the library
+  # @param [String] version the specific (usually, but not always, numeric) library
+  #   version
+  # @param [String] yardoc the location of the yardoc file, or nil if it is
+  #   generated later
+  # @param [Symbol] source the location of the files used to build the yardoc.
+  #   Builtin source types are +:disk+ or +:gem+.
+  def initialize: (String name, ?String version, ?String yardoc, ?Symbol source) -> void
+  # @param [Boolean] url_format if true, returns the string in a URI-compatible
+  #   format (for appending to a URL). Otherwise, it is given in a more human
+  #   readable format.
+  # @return [String] the string representation of the library.
+  def to_s: (?bool url_format) -> String
+  # @return [Fixnum] used for Hash mapping.
+  def hash: () -> Integer
+  # @return [Boolean] whether another LibraryVersion is equal to this one
+  def eql?: (untyped other) -> bool
+  alias == eql?
+  alias equal? eql?
+  # @return [Boolean] whether the library has been completely processed
+  #   and is ready to be served
+  def ready?: () -> bool
+  # @note You should not directly override this method. Instead, implement
+  #   +load_yardoc_from_SOURCENAME+ when implementing loading for a specific
+  #   source type. See the {LibraryVersion} documentation for "Implementing
+  #   a Custom Library Source"
+  #
+  # Prepares a library to be displayed by the server. This callback is
+  # performed before each request on a library to ensure that it is loaded
+  # and ready to be viewed. If any steps need to be performed prior to loading,
+  # they are performed through this method (though they should be implemented
+  # through the +load_yardoc_from_SOURCE+ method).
+  #
+  # @raise [LibraryNotPreparedError] if the library is not ready to be
+  #   displayed. Usually when raising this error, you would simultaneously
+  #   begin preparing the library for subsequent requests, although this
+  #   is not necessary.
+  def prepare!: () -> untyped
+  # @return [Gem::Specification] a gemspec object for a given library. Used
+  #   for :gem source types.
+  # @return [nil] if there is no installed gem for the library
+  def gemspec: () -> Gem::Specification?
+  # Called when a library of source type "disk" is to be prepared. In this
+  # case, the {#yardoc_file} should already be set, but the library may not
+  # be prepared. Run preparation if not done.
+  #
+  # @raise [LibraryNotPreparedError] if the yardoc file has not been
+  #   prepared.
+  def load_yardoc_from_disk: () -> untyped
+  # Called when a library of source type "gem" is to be prepared. In this
+  # case, the {#yardoc_file} needs to point to the correct location for
+  # the installed gem. The yardoc file is built if it has not been done.
+  #
+  # @raise [LibraryNotPreparedError] if the gem does not have an existing
+  #   yardoc file.
+  def load_yardoc_from_gem: () -> untyped
+  # @return [String] the source path for a disk source
+  def source_path_for_disk: () -> String
+  # @return [String] the source path for a gem source
+  def source_path_for_gem: () -> String
+  # @return [String] the yardoc file for a gem source
+  def yardoc_file_for_gem: () -> String
+  private def load_source_path: () -> untyped
+  private def load_yardoc_file: () -> untyped
+  private def serializer: () -> untyped
+  @@chdir_mutex: untyped
+end

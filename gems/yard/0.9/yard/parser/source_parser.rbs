@@ -1,0 +1,270 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+# Responsible for parsing a source file into the namespace. Parsing
+# also invokes handlers to process the parsed statements and generate
+# any code objects that may be recognized.
+#
+# == Custom Parsers
+# SourceParser allows custom parsers to be registered and called when
+# a certain filetype is recognized. To register a parser and hook it
+# up to a set of file extensions, call {register_parser_type}
+#
+# @see register_parser_type
+# @see Handlers::Base
+# @see CodeObjects::Base
+class YARD::Parser::SourceParser
+  # @return [Symbol] the default parser type (defaults to :ruby)
+  attr_accessor self.parser_type: Symbol
+  # @return [String] the filename being parsed by the parser.
+  attr_accessor file: String
+  # @return [Symbol] the parser type associated with the parser instance.
+  #   This should be set by the {#initialize constructor}.
+  attr_accessor parser_type: Symbol
+  # @return [OpenStruct] an open struct containing arbitrary global state
+  #   shared between files and handlers.
+  # @since 0.7.0
+  attr_reader globals: OpenStruct
+  # @return [String] the contents of the file to be parsed
+  # @since 0.7.0
+  attr_reader contents: String
+  # Parses a path or set of paths
+  #
+  # @param [String, Array<String>] paths a path, glob, or list of paths to
+  #   parse
+  # @param [Array<String, Regexp>] excluded a list of excluded path matchers
+  # @param [Fixnum] level the logger level to use during parsing. See
+  #   {YARD::Logger}
+  # @return [void]
+  def self.parse: (?String | Array[String] paths, ?Array[String | Regexp] excluded, ?Integer level) -> void
+  # Parses a string +content+
+  #
+  # @param [String] content the block of code to parse
+  # @param [Symbol] ptype the parser type to use. See {parser_type}.
+  # @return the parser object that was used to parse +content+
+  def self.parse_string: (String content, ?Symbol ptype) -> untyped
+  # Tokenizes but does not parse the block of code
+  #
+  # @param [String] content the block of code to tokenize
+  # @param [Symbol] ptype the parser type to use. See {parser_type}.
+  # @return [Array] a list of tokens
+  def self.tokenize: (String content, ?Symbol ptype) -> Array[untyped]
+  # Registers a new parser type.
+  #
+  # @example Registering a parser for "java" files
+  #   SourceParser.register_parser_type :java, JavaParser, 'java'
+  # @param [Symbol] type a symbolic name for the parser type
+  # @param [Base] parser_klass a class that implements parsing and tokenization
+  # @param [Array<String>, String, Regexp] extensions a list of extensions or a
+  #   regex to match against the file extension
+  # @return [void]
+  # @see Parser::Base
+  def self.register_parser_type: (Symbol `type`, YARD::Parser::Base parser_klass, ?Array[String] | String | Regexp extensions) -> void
+  # @return [Hash{Symbol=>Object}] a list of registered parser types
+  # @private
+  # @since 0.5.6
+  def self.parser_types: () -> Hash[Symbol, untyped]
+  # @return [Hash] a list of registered parser type extensions
+  # @private
+  # @since 0.5.6
+  def self.parser_type_extensions: () -> Hash[untyped, untyped]
+  # Finds a parser type that is registered for the extension. If no
+  # type is found, the default Ruby type is returned.
+  #
+  # @return [Symbol] the parser type to be used for the extension
+  # @since 0.5.6
+  def self.parser_type_for_extension: (untyped extension) -> Symbol
+  # Returns the validated parser type. Basically, enforces that :ruby
+  # type is never set if the Ripper library is not available
+  #
+  # @param [Symbol] type the parser type to set
+  # @return [Symbol] the validated parser type
+  # @private
+  def self.validated_parser_type: (Symbol `type`) -> Symbol
+  # Registers a callback to be called before a list of files is parsed
+  # via {parse}. The block passed to this method will be called on
+  # subsequent parse calls.
+  #
+  # @example Installing a simple callback
+  #   SourceParser.before_parse_list do |files, globals|
+  #     puts "Starting to parse..."
+  #   end
+  #   YARD.parse('lib/**/*.rb')
+  #   # prints "Starting to parse..."
+  #
+  # @example Setting global state
+  #   SourceParser.before_parse_list do |files, globals|
+  #     globals.method_count = 0
+  #   end
+  #   SourceParser.after_parse_list do |files, globals|
+  #     puts "Found #{globals.method_count} methods"
+  #   end
+  #   class MyCountHandler < Handlers::Ruby::Base
+  #     handles :def, :defs
+  #     process { globals.method_count += 1 }
+  #   end
+  #   YARD.parse
+  #   # Prints: "Found 37 methods"
+  #
+  # @example Using a global callback to cancel parsing
+  #   SourceParser.before_parse_list do |files, globals|
+  #     return false if files.include?('foo.rb')
+  #   end
+  #
+  #   YARD.parse(['foo.rb', 'bar.rb']) # callback cancels this method
+  #   YARD.parse('bar.rb') # parses normally
+  #
+  # @yield [files, globals] the yielded block is called once before
+  #   parsing all files
+  # @yieldparam [Array<String>] files the list of files that will be parsed.
+  # @yieldparam [OpenStruct] globals a global structure to store arbitrary
+  #   state for post processing (see {Handlers::Processor#globals})
+  # @yieldreturn [Boolean] if the block returns +false+, parsing is
+  #   cancelled.
+  # @return [Proc] the yielded block
+  # @see after_parse_list
+  # @see before_parse_file
+  # @since 0.7.0
+  def self.before_parse_list: () { (Array[String] files, OpenStruct globals) -> bool } -> Proc
+  # Registers a callback to be called after a list of files is parsed
+  # via {parse}. The block passed to this method will be called on
+  # subsequent parse calls.
+  #
+  # @example Printing results after parsing occurs
+  #   SourceParser.after_parse_list do
+  #     puts "Finished parsing!"
+  #   end
+  #   YARD.parse
+  #   # Prints "Finished parsing!" after parsing files
+  # @yield [files, globals] the yielded block is called once before
+  #   parsing all files
+  # @yieldparam [Array<String>] files the list of files that will be parsed.
+  # @yieldparam [OpenStruct] globals a global structure to store arbitrary
+  #   state for post processing (see {Handlers::Processor#globals})
+  # @yieldreturn [void] the return value for the block is ignored.
+  # @return [Proc] the yielded block
+  # @see before_parse_list
+  # @see before_parse_file
+  # @since 0.7.0
+  def self.after_parse_list: () { (Array[String] files, OpenStruct globals) -> void } -> Proc
+  # Registers a callback to be called before an individual file is parsed.
+  # The block passed to this method will be called on subsequent parse
+  # calls.
+  #
+  # To register a callback that is called before the entire list of files
+  # is processed, see {before_parse_list}.
+  #
+  # @example Installing a simple callback
+  #   SourceParser.before_parse_file do |parser|
+  #     puts "I'm parsing #{parser.file}"
+  #   end
+  #   YARD.parse('lib/**/*.rb')
+  #   # prints:
+  #   "I'm parsing lib/foo.rb"
+  #   "I'm parsing lib/foo_bar.rb"
+  #   "I'm parsing lib/last_file.rb"
+  #
+  # @example Cancel parsing of any test_*.rb files
+  #   SourceParser.before_parse_file do |parser|
+  #     return false if parser.file =~ /^test_.+\.rb$/
+  #   end
+  #
+  # @yield [parser] the yielded block is called once before each
+  #   file that is parsed. This might happen many times for a single
+  #   codebase.
+  # @yieldparam [SourceParser] parser the parser object that will {#parse}
+  #   the file.
+  # @yieldreturn [Boolean] if the block returns +false+, parsing for
+  #   the file is cancelled.
+  # @return [Proc] the yielded block
+  # @see after_parse_file
+  # @see before_parse_list
+  # @since 0.7.0
+  def self.before_parse_file: () { (YARD::Parser::SourceParser parser) -> bool } -> Proc
+  # Registers a callback to be called after an individual file is parsed.
+  # The block passed to this method will be called on subsequent parse
+  # calls.
+  #
+  # To register a callback that is called after the entire list of files
+  # is processed, see {after_parse_list}.
+  #
+  # @example Printing the length of each file after it is parsed
+  #   SourceParser.after_parse_file do |parser|
+  #     puts "#{parser.file} is #{parser.contents.size} characters"
+  #   end
+  #   YARD.parse('lib/**/*.rb')
+  #   # prints:
+  #   "lib/foo.rb is 1240 characters"
+  #   "lib/foo_bar.rb is 248 characters"
+  #
+  # @yield [parser] the yielded block is called once after each file
+  #   that is parsed. This might happen many times for a single codebase.
+  # @yieldparam [SourceParser] parser the parser object that parsed
+  #   the file.
+  # @yieldreturn [void] the return value for the block is ignored.
+  # @return [Proc] the yielded block
+  # @see before_parse_file
+  # @see after_parse_list
+  # @since 0.7.0
+  def self.after_parse_file: () { (YARD::Parser::SourceParser parser) -> void } -> Proc
+  # @return [Array<Proc>] the list of callbacks to be called before
+  #   parsing a list of files. Should only be used for testing.
+  # @since 0.7.0
+  def self.before_parse_list_callbacks: () -> Array[Proc]
+  # @return [Array<Proc>] the list of callbacks to be called after
+  #   parsing a list of files. Should only be used for testing.
+  # @since 0.7.0
+  def self.after_parse_list_callbacks: () -> Array[Proc]
+  # @return [Array<Proc>] the list of callbacks to be called before
+  #   parsing a file. Should only be used for testing.
+  # @since 0.7.0
+  def self.before_parse_file_callbacks: () -> Array[Proc]
+  # @return [Array<Proc>] the list of callbacks to be called after
+  #   parsing a file. Should only be used for testing.
+  # @since 0.7.0
+  def self.after_parse_file_callbacks: () -> Array[Proc]
+  # Parses a list of files in a queue.
+  #
+  # @param [Array<String>] files a list of files to queue for parsing
+  # @return [void]
+  private def self.parse_in_order: (*Array[String] files) -> void
+  # @overload initialize(parser_type = SourceParser.parser_type, globals = nil)
+  #   Creates a new parser object for code parsing with a specific parser type.
+  #
+  #   @param [Symbol] parser_type the parser type to use
+  #   @param [OpenStruct] globals global state to be re-used across separate source files
+  def initialize: (?untyped parser_type, ?untyped globals1, ?untyped globals2) -> void
+  # The main parser method. This should not be called directly. Instead,
+  # use the class methods {parse} and {parse_string}.
+  #
+  # @param [String, #read, Object] content the source file to parse
+  # @return [Object, nil] the parser object used to parse the source
+  def parse: (?String | untyped | untyped content) -> untyped
+  # Tokenizes but does not parse the block of code using the current {#parser_type}
+  #
+  # @param [String] content the block of code to tokenize
+  # @return [Array] a list of tokens
+  def tokenize: (String content) -> Array[untyped]
+  # Searches for encoding line and forces encoding
+  # @since 0.5.3
+  private def convert_encoding: (untyped content) -> untyped
+  # Runs a {Handlers::Processor} object to post process the parsed statements.
+  # @return [void]
+  private def post_process: () -> void
+  # Guesses the parser type to use depending on the file extension.
+  #
+  # @param [String] filename the filename to use to guess the parser type
+  # @return [Symbol] a parser type that matches the filename
+  private def parser_type_for_filename: (String filename) -> Symbol
+  # @since 0.5.6
+  private def parser_class: () -> untyped
+  SHEBANG_LINE: untyped
+  ENCODING_LINE: untyped
+  FROZEN_STRING_LINE: untyped
+  # The default glob of files to be parsed.
+  # @since 0.9.0
+  DEFAULT_PATH_GLOB: untyped
+  # Byte order marks for various encodings
+  # @since 0.7.0
+  ENCODING_BYTE_ORDER_MARKS: untyped
+end

@@ -15,10 +15,12 @@ REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
 bundle exec rbs --repo $REPO_DIR -r actionpack:6.0 \
   -rmonitor -rdate -rsingleton -rlogger -rmutex_m -rtime -ractivesupport \
   -ractionview \
-  -rrack \
+  -rrack -rcgi -ruri \
   validate --silent
 
 # TODO
 # cd ${RBS_DIR}/_test
 # # Run type checks
 # bundle exec steep check
+
+# $(git rev-parse --show-toplevel)/bin/check-untyped-call.rb
