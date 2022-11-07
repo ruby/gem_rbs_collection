@@ -1,0 +1,27 @@
+module BusinessTime
+  class BusinessHours
+    include Comparable
+    attr_reader hours: Integer
+
+    def initialize: (Integer hours, ?untyped options) -> void
+
+    def <=>: (untyped other) -> Integer?
+
+    def ago: (?untyped options) -> ActiveSupport::TimeWithZone
+
+    def from_now: (?untyped options) -> ActiveSupport::TimeWithZone
+
+    def after: (Time time, ?untyped options) -> Time
+             | (Date time, ?untyped options) -> Date
+             | (DateTime time, ?untyped options) -> DateTime
+             | (ActiveSupport::TimeWithZone time, ?untyped options) -> ActiveSupport::TimeWithZone
+             | () -> ActiveSupport::TimeWithZone
+    alias since after
+
+    def before: (Time time, ?untyped options) -> Time
+              | (Date time, ?untyped options) -> Date
+              | (DateTime time, ?untyped options) -> DateTime
+              | (ActiveSupport::TimeWithZone time, ?untyped options) -> ActiveSupport::TimeWithZone
+              | () -> ActiveSupport::TimeWithZone
+  end
+end

@@ -1,0 +1,24 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature '.'
+
+  repo_path "../../../"
+
+  library "pathname"
+  library "logger"
+  library "mutex_m"
+  library "date"
+  library "monitor"
+  library "singleton"
+  library "tsort"
+  library 'time'
+  library "activesupport:6.0"
+
+  library "set"
+
+  library "business_time:0.13"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

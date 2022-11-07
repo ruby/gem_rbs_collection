@@ -1,0 +1,41 @@
+class Date
+  include BusinessTime::TimeExtensions
+
+  def business_days_until: (Date to_date, ?bool inclusive, ?untyped options) -> Integer
+
+  def business_dates_until: (Date to_date, ?bool inclusive, ?untyped options) -> Array[Date]
+
+  def week: () -> Integer
+
+  def quarter: () -> Integer
+
+  def fiscal_month_offset: () -> Integer
+
+  def fiscal_year_week: () -> Integer
+
+  def fiscal_year_month: () -> Integer
+
+  def fiscal_year_quarter: () -> Integer
+
+  def fiscal_year: () -> Integer
+
+  def fiscal_year_yday: () -> Integer
+end
+
+class Integer
+  def business_hours: () -> BusinessTime::BusinessHours
+  alias business_hour business_hours
+
+  def business_days: () -> BusinessTime::BusinessDays
+  alias business_day business_days
+end
+
+class Time
+  include BusinessTime::TimeExtensions
+  extend BusinessTime::TimeExtensions::ClassMethods
+end
+
+class ActiveSupport::TimeWithZone
+  include BusinessTime::TimeExtensions
+  extend BusinessTime::TimeExtensions::ClassMethods
+end
