@@ -1,0 +1,80 @@
+module BusinessTime
+  module TimeExtensions
+    interface _ToDate
+      def to_date: () -> Date
+    end
+
+    # True if this time is on a workday (between 00:00:00 and 23:59:59), even if
+    # this time falls outside of normal business hours.
+    # holidays option allows you to pass in a different Array of holiday dates on
+    # each call vs the BusinessTime::Config.holidays which is always static.
+    def workday?: (?holidays: _ToDate | Array[_ToDate]) -> bool
+
+    # True if this time falls on a weekday.
+    def weekday?: () -> bool
+
+    module ClassMethods
+      # Gives the time at the end of the workday, assuming that this time falls on a
+      # workday.
+      # Note: It pretends that this day is a workday whether or not it really is a
+      # workday.
+      def end_of_workday: (Time day) -> Time
+                        | (Date day) -> Date
+                        | (DateTime day) -> DateTime
+                        | (ActiveSupport::TimeWithZone day) -> ActiveSupport::TimeWithZone
+
+      # Gives the time at the beginning of the workday, assuming that this time
+      # falls on a workday.
+      # Note: It pretends that this day is a workday whether or not it really is a
+      # workday.
+      def beginning_of_workday: (Time day) -> Time
+                              | (Date day) -> Date
+                              | (DateTime day) -> DateTime
+                              | (ActiveSupport::TimeWithZone day) -> ActiveSupport::TimeWithZone
+
+      # True if this time is on a workday (between 00:00:00 and 23:59:59), even if
+      # this time falls outside of normal business hours.
+      def before_business_hours?: (Time | Date | DateTime | ActiveSupport::TimeWithZone time) -> bool
+
+      def after_business_hours?: (Time | Date | DateTime | ActiveSupport::TimeWithZone time) -> bool
+
+      # Rolls forward to the next beginning_of_workday
+      # when the time is outside of business hours
+      def roll_forward: (Time day, ?untyped options) -> Time
+                      | (Date day, ?untyped options) -> Date
+                      | (DateTime day, ?untyped options) -> DateTime
+                      | (ActiveSupport::TimeWithZone day, ?untyped options) -> ActiveSupport::TimeWithZone
+
+      # Returns the time parameter itself if it is a business day
+      # or else returns the next business day
+      def first_business_day: (Time day, ?untyped options) -> Time
+                            | (Date day, ?untyped options) -> Date
+                            | (DateTime day, ?untyped options) -> DateTime
+                            | (ActiveSupport::TimeWithZone day, ?untyped options) -> ActiveSupport::TimeWithZone
+
+      # Rolls backwards to the previous end_of_workday when the time is outside
+      # of business hours
+      def roll_backward: (Time day, ?untyped options) -> Time
+                       | (Date day, ?untyped options) -> Date
+                       | (DateTime day, ?untyped options) -> DateTime
+                       | (ActiveSupport::TimeWithZone day, ?untyped options) -> ActiveSupport::TimeWithZone
+
+      # Returns the time parameter itself if it is a business day
+      # or else returns the previous business day
+      def previous_business_day: (Time day, ?untyped options) -> Time
+                               | (Date day, ?untyped options) -> Date
+                               | (DateTime day, ?untyped options) -> DateTime
+                               | (ActiveSupport::TimeWithZone day, ?untyped options) -> ActiveSupport::TimeWithZone
+
+      def work_hours_total: (Time | Date | DateTime | ActiveSupport::TimeWithZone day, ?untyped options) -> Integer
+    end
+
+    def business_time_until: (Time | Date | DateTime | ActiveSupport::TimeWithZone to_time, ?untyped options) -> Float
+
+    def during_business_hours?: (?untyped options) -> bool
+
+    def consecutive_workdays: (?untyped options) -> Array[self]
+
+    def consecutive_non_working_days: (?untyped options) -> Array[self]
+  end
+end
