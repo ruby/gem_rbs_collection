@@ -1,0 +1,43 @@
+module HolidayJp
+  def self.between: (untyped start, untyped last) -> (::Array[Holiday])
+
+  def self.holiday?: (untyped date) -> bool
+
+  def self.holidays: () -> ::Hash[untyped, untyped]
+end
+
+module HolidayJp
+  class Holiday
+    WDAY_NAMES: ::Array[::String]
+
+    EN_HOLIDAY_NAMES: ::Hash[::String, ::String]
+
+    attr_reader date: untyped
+
+    attr_reader name: ::String
+
+    def initialize: (untyped date, ::String name) -> void
+
+    def name_en: () -> ::String
+
+    def wday_name: () -> ::String
+
+    alias week wday_name
+  end
+end
+
+module HolidayJp
+  class Holidays
+    attr_accessor holidays: ::Hash[untyped, untyped]
+
+    def initialize: () -> void
+
+    def between: (untyped start, untyped last) -> untyped
+
+    def holiday?: (untyped date) -> bool
+  end
+end
+
+module HolidayJp
+  VERSION: ::String
+end
