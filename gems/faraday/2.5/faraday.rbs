@@ -101,4 +101,42 @@ module Faraday
     def middleware_mutex: () ?{ () -> untyped } -> void
     def load_middleware: (Symbol key) -> untyped
   end
+
+  module Utils
+    class Headers < ::Hash[Symbol | String, untyped]
+      @names: ::Hash[String, String]
+
+      def self.from: (untyped value) -> Headers
+      def self.allocate: () -> Headers
+      def initialize: (?::Hash[Symbol | String, untyped]? hash) -> void
+      def initialize_names: () -> void
+      def initialize_copy: (self other) -> self
+
+      KeyMap: ::Hash[Symbol, String]
+
+      def []: (String | Symbol key) -> untyped?
+      def []=: (String | Symbol key, untyped val) -> untyped
+      def fetch: (String | Symbol key, *untyped args) ?{ () -> untyped } -> untyped
+      def delete: (String | Symbol key) -> untyped?
+      def include?: (String | Symbol key) -> bool
+
+      alias has_key? include?
+      alias member? include?
+      alias key? include?
+
+      def merge!: (::Hash[Symbol | String, untyped] other) -> self
+      alias update merge!
+
+      def merge: (::Hash[Symbol | String, untyped] other) -> Headers
+      def replace: (::Hash[Symbol | String, untyped] other) -> self
+      def to_hash: () -> Headers
+      def parse: (String? header_string) -> Array[untyped]?
+
+      attr_reader names: ::Hash[String, String]
+
+      private
+
+      def add_parsed: (Symbol | String key, String value) -> untyped
+    end
+  end
 end
