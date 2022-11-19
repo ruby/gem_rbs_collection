@@ -198,4 +198,8 @@ class Redis
   # @return [String] `PONG`
   def ping: (?String? message) -> String
 
+  def zcard: (String|Symbol key) -> Integer
+  def zadd: (String|Symbol key, *untyped args, ?nx: bool, ?xx: bool, ?lt: bool, ?gt: bool, ?ch: bool, ?incr: bool) -> [bool, Integer, Float]
+  def zincrby: (String|Symbol key, Integer|Float increment, String member) -> Float
+  def zrem: (String|Symbol key, String|Array[String] member) -> [bool, Integer]
 end
