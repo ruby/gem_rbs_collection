@@ -201,6 +201,6 @@ class Redis
   def zcard: (_ToS key) -> Integer
   def zadd: (_ToS key, *untyped args, ?nx: bool, ?ch: bool, ?incr: bool) -> (bool | Integer | Float)
           | (_ToS key, *untyped args, ?xx: bool, ?ch: bool, ?incr: bool) -> (bool | Integer | Float)
-  def zincrby: (_ToS key, Integer|Float increment, String member) -> Float
+  def zincrby: (_ToS key, Integer|Float|"-inf"|"+inf" increment, String member) -> Float
   def zrem: (_ToS key, String|Array[String] member) -> (bool | Integer)
 end
