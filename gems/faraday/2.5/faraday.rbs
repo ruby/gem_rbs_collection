@@ -25,17 +25,69 @@ module Faraday
     extend Parallelism
 
     def initialize: (?untyped? _app, ?::Hash[untyped, untyped] opts) ?{ () -> untyped } -> void
-    def connection: (untyped env) ?{ (untyped) -> untyped } -> untyped
+    def connection: (untyped env) ?{ (untyped) -> untyped } -> untyped # TODO: `env` should be Faraday::Env
     def close: () -> void
-    def call: (untyped env) -> Response
+    def call: (untyped env) -> Response # TODO: `env` should be Faraday::Env
 
     private
 
     # TODO: The block parameter should be `Utils::Headers`, but it has not yet been defined.
-    def save_response: (untyped env, Integer status, String body, ?Hash[untyped, untyped]? headers, ?String? reason_phrase, ?finished: bool) ?{ (untyped) -> void } -> Response
+    def save_response: (untyped env, Integer status, String body, ?Hash[untyped, untyped]? headers, ?String? reason_phrase, ?finished: bool) ?{ (untyped) -> void } -> Response # TODO: `env` should be Faraday::Env
     def request_timeout: (:read | :open | :write `type`, Hash[Symbol, untyped] options) -> Integer?
 
     TIMEOUT_KEYS: { read: :read_timeout, open: :open_timeout, write: :write_timeout }
+
+    class Test < Adapter
+      type meta = { match_data: ::MatchData? }
+
+      attr_accessor stubs: untyped
+
+      class Stubs
+        class NotFound < StandardError
+        end
+
+        def initialize: (?strict_mode: bool) ?{ (self) -> void } -> void
+        def empty?: () -> bool
+        def match: (untyped env) -> ((false | nil) | [Stub, meta]) # TODO: `env` should be Faraday::Env
+        def get: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def head: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def post: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def put: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def patch: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def delete: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def options: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def verify_stubbed_calls: () -> void
+        def strict_mode=: (boolish value) -> void
+
+        private # protected is not yet supported. See https://github.com/ruby/rbs/issues/579
+
+        def new_stub: (:get | :head | :post | :put | :patch | :delete | :options request_method, String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers, ?(^(String) -> bool | _ToS)? body) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def matches?: (::Hash[Symbol, untyped] stack, untyped env) -> ([Stub, meta] | nil) # TODO: `env` should be Faraday::Env
+      end
+
+      class Stub
+        attr_accessor host: String?
+        attr_accessor path: String?
+        attr_accessor query: String?
+        attr_accessor headers: Utils::Headers?
+        attr_accessor body: String?
+        attr_accessor strict_mode: boolish
+        attr_accessor block: Proc?
+
+        def initialize: (String? host, String? path, String? query, Utils::Headers? headers, String? body, boolish strict_mode, Proc block) -> void
+        def matches?: (untyped env) -> [bool, meta] # TODO: `env` should be Faraday::Env
+        def path_match?: (String request_path, meta) -> bool
+        def params_match?: (untyped env) -> bool # TODO: `env` should be Faraday::Env
+        def headers_match?: (::Hash[String | Symbol, untyped] request_headers) -> bool
+        def body_match?: (String request_body) -> bool
+        def to_s: () -> ::String
+      end
+
+      def initialize: (untyped app) ?{ (Stubs stubs) -> void } -> void
+                    | (untyped app, untyped? stubs) ?{ (untyped stubs) -> void } -> void
+      def configure: () { (untyped) -> void } -> void
+      def call: (untyped env) -> untyped # TODO: `env` should be Faraday::Env
+    end
   end
 
   class Connection
@@ -86,7 +138,7 @@ module Faraday
     attr_reader options: Hash[untyped, untyped]
 
     def initialize: (?untyped? app, ?::Hash[untyped, untyped] options) -> void
-    def call: (untyped env) -> untyped
+    def call: (untyped env) -> untyped # TODO: `env` should be Faraday::Env
     def close: () -> void
   end
 
