@@ -29,13 +29,14 @@ jobs:
     - name: Get changed gems
       id: changes
       run: |
-        echo 'gems<<GEMS' >> $GITHUB_OUTPUT
+        END_MARKER="$(uuidgen)"
+        echo "gems<<${END_MARKER}" >> $GITHUB_OUTPUT
         gh pr diff ${{ github.event.number }} --name-only | \
           grep '^gems/' | \
           awk -F / '{printf "%s/%s/%s\n", $1, $2, $3}' | \
           sort -u | \
           tee -a $GITHUB_OUTPUT
-        echo 'GEMS' >> $GITHUB_OUTPUT
+        echo "${END_MARKER}" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: 'Run test on changed gems'
