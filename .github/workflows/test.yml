@@ -18,25 +18,30 @@ jobs:
     - name: 'Test syntax check'
       run: 'rbs parse gems/**/*.rbs'
   test_on_changed_gems:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    container:
-      image: rubylang/ruby:3.1-focal
     steps:
     - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
       with:
-        fetch-depth: 100
-    - name: 'Install dependencies'
-      run: 'bundle install --frozen'
-    - name: 'git config'
+        ruby-version: '3.1'
+        bundler-cache: true
+    - name: Get changed gems
+      id: changes
       run: |
-        git config --global --add safe.directory /__w/gem_rbs_collection/gem_rbs_collection
-    - name: Get changed files
-      id: changed-files
-      uses: tj-actions/changed-files@v34.5.0
+        END_MARKER="$(uuidgen)"
+        echo "gems<<${END_MARKER}" >> $GITHUB_OUTPUT
+        gh pr diff ${{ github.event.number }} --name-only | \
+          grep '^gems/' | \
+          awk -F / '{printf "%s/%s/%s\n", $1, $2, $3}' | \
+          sort -u | \
+          tee -a $GITHUB_OUTPUT
+        echo "${END_MARKER}" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: 'Run test on changed gems'
+      if: steps.changes.outputs.gems
       run: |
-        CHANGED_GEMS="$(echo ${{ steps.changed-files.outputs.all_modified_files }} | ruby -e 'puts gets.split.filter_map{_1[%r!^(gems/[^/]+/[^/]+/)!, 1]}.uniq.join(%q! !)')"
-        echo "Changed gems: ${CHANGED_GEMS}"
-        if [ -n "${CHANGED_GEMS}" ]; then
-          bin/test $CHANGED_GEMS --verbose
-        fi
+        cat <<EOD | xargs bin/test --verbose
+          ${{ steps.changes.outputs.gems }}
+        EOD
