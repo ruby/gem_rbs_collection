@@ -22,9 +22,9 @@ module Concurrent
       def default_executor: () -> executor
 
       def delay: () -> Event
-        | [A, T] (*A) { (*A) -> T } -> Future[T, Exception]
+        | [A, T] (*A args) { (*A args) -> T } -> Future[T, Exception]
       def delay_on: (executor default_executor) -> Event
-        | [A, T] (executor, *A) { (*A) -> T } -> Future[T, Exception]
+        | [A, T] (executor default_executor, *A args) { (*A args) -> T } -> Future[T, Exception]
 
       def fulfilled_future: [T] (T value, ?executor default_executor) -> Future[T, bot]
 
@@ -118,7 +118,7 @@ module Concurrent
       ## Following methods are actually defined in the base class and have specific types for Event
 
       def chain: [A, U] (*A args) { (*A args) -> U } -> Future[U, Exception]
-      def chain_on: [A, U] (executor executor, *A) { (*A args) -> U } -> Future[U, Exception]
+      def chain_on: [A, U] (executor executor, *A args) { (*A args) -> U } -> Future[U, Exception]
 
       def on_resolution: [A] (*A args) { (*A args) -> void } -> self
       def on_resolution!: [A] (*A args) { (*A args) -> void } -> self
