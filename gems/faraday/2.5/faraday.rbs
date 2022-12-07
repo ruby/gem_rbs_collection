@@ -90,6 +90,15 @@ module Faraday
     end
   end
 
+  class AdapterRegistry
+    @lock: untyped # TODO: Replace this with `Monitor`
+    @constants: Hash[String, untyped]
+
+    def initialize: () -> void
+    def get: (Symbol | String name) -> untyped
+    def set: (untyped klass, ?_ToS? name) -> void
+  end
+
   class Connection
     attr_reader headers: Hash[String, String]
 
