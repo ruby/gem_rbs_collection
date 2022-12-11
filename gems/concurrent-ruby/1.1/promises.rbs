@@ -210,8 +210,8 @@ module Concurrent
       def resolve: (?true raise_on_reassign, ?boolish reserved) -> self
         | (boolish raise_on_reassign, ?boolish reserved) -> (self | false)
 
-      def wait: (?nil) -> self
-        | (Numeric timeout, ?boolish resolve_on_timeout) -> bool
+      def wait: (Numeric timeout, boolish resolve_on_timeout) -> bool
+        | ...
 
       def with_hidden_resolvable: () -> Event
     end
@@ -225,8 +225,8 @@ module Concurrent
       def fulfill:  (T value, ?true raise_on_reassign, ?boolish reserved) -> self
         | (T value, boolish raise_on_reassign, ?boolish reserved) -> (self | false)
 
-      def reason: (?Numeric timeout) -> (E | nil)
-        | [R] (Numeric timeout, R timeout_value, ?[boolish, T?, E?] resolve_on_timeout) -> (E | R | nil)
+      def reason: [R] (Numeric timeout, R timeout_value, [boolish, T?, E?] resolve_on_timeout) -> (E | R | nil)
+        | ...
 
       def reject: (E reason, ?true raise_on_reassign, ?boolish reserved) -> self
         | (E reason, boolish raise_on_reassign, ?boolish reserved) -> (self | false)
@@ -234,14 +234,14 @@ module Concurrent
       def resolve: (?boolish fulfilled, ?T? value, ?E? reason, ?true raise_on_reassign, ?boolish reserved) -> self
         | (boolish fulfilled, T? value, E? reason, boolish raise_on_reassign, ?boolish reserved) -> (self | false)
 
-      def result: (nil?) -> ([true, T, nil] | [false, nil, E])
-        | (?Numeric timeout, ?[boolish, T?, E?] resolve_on_timeout) -> ([true, T, nil] | [false, nil, E] | nil)
+      def result: (Numeric timeout, [boolish, T?, E?] resolve_on_timeout) -> ([true, T, nil] | [false, nil, E] | nil)
+        | ...
 
-      def value: (?Numeric timeout) -> (T | nil)
-        | [R] (?Numeric timeout, ?R timeout_value, ?[boolish, T?, E?] resolve_on_timeout) -> (T | R | nil)
+      def value: [R] (Numeric timeout, R timeout_value, [boolish, T?, E?] resolve_on_timeout) -> (T | R | nil)
+        | ...
 
-      def value!: (?Numeric timeout) -> (T | nil)
-        | [R] (?Numeric timeout, ?R timeout_value, ?[boolish, T?, E?] resolve_on_timeout) -> (T | R | nil)
+      def value!: [R] (Numeric timeout, R timeout_value, [boolish, T?, E?] resolve_on_timeout) -> (T | R | nil)
+        | ...
 
       def with_hidden_resolvable: () -> Future[T, E]
     end
