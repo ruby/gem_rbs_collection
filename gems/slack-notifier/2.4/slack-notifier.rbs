@@ -28,10 +28,11 @@ module Slack
 
     class PayloadMiddleware
       class Base
-        attr_reader options: untyped
+        attr_reader options: Hash[Symbol, untyped]
 
         def self.middleware_name: (String | Symbol) -> self
-        def self.options: (untyped) -> untyped
+        def self.options: (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+        def call: (?Hash[Symbol, untyped] payload) -> Hash[Symbol, untyped]
       end
     end
   end
