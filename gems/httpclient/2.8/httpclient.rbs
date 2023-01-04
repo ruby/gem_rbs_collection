@@ -236,7 +236,7 @@ class HTTPClient
             | String
             | _Reader
 
-  module DelegateMethods
+  interface _DelegateMethods
     def get_content: (
                        String | URI uri,
                        ?query: query,
@@ -356,8 +356,8 @@ class HTTPClient
                  ?header: header,
                ) { (String) -> void } -> HTTP::MessageNil
   end
-  include DelegateMethods
-  extend DelegateMethods
+  include _DelegateMethods
+  extend _DelegateMethods
 
   def patch: (
              String | URI uri,
