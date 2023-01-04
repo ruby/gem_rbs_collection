@@ -1,0 +1,39 @@
+module Slack
+  class Notifier
+    def initialize: (String webhook_url, ?Hash[Symbol, untyped] options) ?{ () [self: Config] -> untyped } -> void
+    def ping: (Hash[Symbol, untyped] | String message, ?Hash[untyped, untyped] options) -> Array[untyped]
+    def post: (?Hash[Symbol, untyped] payload) -> Array[untyped]
+    def config: () -> Config
+
+    class Config
+      interface _Client
+        def post: (String, ?Hash[untyped, untyped]) -> untyped
+      end
+
+      def initialize: () -> void
+      def defaults: (?Hash[Symbol, untyped]? new_defaults) -> Hash[Symbol, untyped]
+      def http_client: (?_Client? client) -> _Client
+      def middleware: (*untyped args) -> untyped
+    end
+
+    module Util
+      class LinkFormatter
+        def self.format: (String str, ?{ formats: Array[Symbol] } opts) -> String
+      end
+
+      module Escape
+        def self.html: (String str) -> String
+      end
+    end
+
+    class PayloadMiddleware
+      class Base
+        attr_reader options: Hash[Symbol, untyped]
+
+        def self.middleware_name: (String | Symbol) -> self
+        def self.options: (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+        def call: (?Hash[Symbol, untyped] payload) -> Hash[Symbol, untyped]
+      end
+    end
+  end
+end
