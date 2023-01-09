@@ -44,7 +44,7 @@ module AwsSdkRbsGenerator
     private
 
     def gem_name
-      "aws-sdk-#{@name.underscore}"
+      "aws-sdk-#{@name.downcase}"
     end
 
     def gem_major_version
