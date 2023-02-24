@@ -112,6 +112,66 @@ module Faraday
     def patch: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
   end
 
+  class Error < StandardError
+    attr_reader response: Hash[Symbol, untyped]?
+    attr_reader wrapped_exception: Exception?
+
+    type exc = Exception | Hash[Symbol, untyped] | String
+
+    def initialize: (?exc? exc, ?Hash[Symbol, untyped]? response) -> void
+    def backtrace: () -> ::Array[String]?
+    def inspect: () -> ::String
+    def response_status: () -> untyped
+    def response_headers: () -> untyped
+    def response_body: () -> untyped
+    def exc_msg_and_response!: (?exc? exc, ?Hash[Symbol, untyped]? response) -> String
+    def exc_msg_and_response: (?exc? exc, ?Hash[Symbol, untyped]? response) -> [Exception?, String, Hash[Symbol, untyped]?]
+  end
+
+  class ClientError < Error
+  end
+
+  class BadRequestError < ClientError
+  end
+
+  class UnauthorizedError < ClientError
+  end
+
+  class ForbiddenError < ClientError
+  end
+
+  class ResourceNotFound < ClientError
+  end
+
+  class ProxyAuthError < ClientError
+  end
+
+  class ConflictError < ClientError
+  end
+
+  class UnprocessableEntityError < ClientError
+  end
+
+  class ServerError < Error
+  end
+
+  class TimeoutError < ServerError
+    def initialize: (?(Exception | Hash[Symbol, untyped] | String)? exc, ?Hash[Symbol, untyped]? response) -> void
+  end
+
+  class NilStatusError < ServerError
+    def initialize: ((Exception | Hash[Symbol, untyped] | String)? exc, ?Hash[Symbol, untyped]? response) -> void
+  end
+
+  class ConnectionFailed < Error
+  end
+
+  class SSLError < Error
+  end
+
+  class ParsingError < Error
+  end
+
   class Response
     def status: () -> Integer
     def headers: () -> untyped
