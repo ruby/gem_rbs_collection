@@ -203,7 +203,7 @@ module YARD::Registry
   #   +proxy_fallback+ is +true+.
   # @return [nil] if +proxy_fallback+ is +false+ and no object was found.
   # @see P
-  def self.resolve: (YARD::CodeObjects::NamespaceObject? namespace, String | Symbol name, ?bool inheritance, ?bool proxy_fallback, ?Symbol? `type`) -> (YARD::CodeObjects::Base | YARD::CodeObjects::Proxy)?
+  def self.resolve: (YARD::CodeObjects::NamespaceObject? namespace, String | Symbol name, ?bool inheritance, ?bool proxy_fallback, ?Symbol? type) -> (YARD::CodeObjects::Base | YARD::CodeObjects::Proxy)?
 
   # @return [Hash{String => String}] a set of checksums for files
   def self.checksums: () -> Hash[String, String]
@@ -230,7 +230,7 @@ module YARD::Registry
   # @param [String] name the name to look for
   # @param [Symbol, nil] type the {CodeObjects::Base#type} that the resolved
   #   object must be equal to
-  private def self.partial_resolve: (YARD::CodeObjects::NamespaceObject namespace, String name, ?Symbol? `type`) -> untyped
+  private def self.partial_resolve: (YARD::CodeObjects::NamespaceObject namespace, String name, ?Symbol? type) -> untyped
 
   # @since 0.6.5
   private def self.thread_local_store: () -> untyped
