@@ -42,7 +42,7 @@ class YARD::Parser::Ruby::AstNode < ::Array[untyped]
   #
   # @param [Symbol] type the node type to find a subclass for
   # @return [Class] a subclass of AstNode to instantiate the node with.
-  def self.node_class_for: (Symbol `type`) -> Class
+  def self.node_class_for: (Symbol type) -> Class
   # Creates a new AST node
   #
   # @param [Symbol] type the type of node being created
@@ -56,7 +56,7 @@ class YARD::Parser::Ruby::AstNode < ::Array[untyped]
   # @option opts [Fixnum] :listchar (nil) a special key like :char but for
   #   list nodes
   # @option opts [Boolean] :token (nil) whether the node represents a token
-  def initialize: (Symbol `type`, Array[YARD::Parser::Ruby::AstNode] arr, ?Hash[untyped, untyped] opts) -> void
+  def initialize: (Symbol type, Array[YARD::Parser::Ruby::AstNode] arr, ?Hash[untyped, untyped] opts) -> void
   # @return [Boolean] whether the node is equal to another by checking
   #   the list and type
   # @private
@@ -89,7 +89,7 @@ class YARD::Parser::Ruby::AstNode < ::Array[untyped]
   # @yield each descendant node in order
   # @yieldparam [AstNode] self, or a child/descendant node
   # @return [void]
-  def traverse: () { (YARD::Parser::Ruby::AstNode `self`) -> untyped } -> void
+  def traverse: () { (YARD::Parser::Ruby::AstNode self) -> untyped } -> void
   # @return [Boolean] whether the node is a token
   def token?: () -> bool
   # @return [Boolean] whether the node is a reference (variable,

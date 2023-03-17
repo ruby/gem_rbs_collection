@@ -41,11 +41,11 @@ class YARD::RegistryResolver
   #   resolver.lookup_by_math("A::B#foo", inheritance: true)
   def lookup_by_path: (untyped path, ?Hash[untyped, untyped] opts) -> (YARD::CodeObjects::Base | YARD::CodeObjects::Proxy)?
   # return [Boolean] if the obj's type matches the provided type.
-  private def validate: (untyped obj, untyped `type`) -> untyped
+  private def validate: (untyped obj, untyped type) -> untyped
   # Performs a lexical lookup from a namespace for a path and a type hint.
-  private def lookup_path_direct: (untyped namespace, untyped path, untyped `type`) -> untyped
+  private def lookup_path_direct: (untyped namespace, untyped path, untyped type) -> untyped
   # Performs a lookup through the inheritance chain on a path with a type hint.
-  private def lookup_path_inherited: (untyped namespace, untyped path, untyped `type`) -> untyped
+  private def lookup_path_inherited: (untyped namespace, untyped path, untyped type) -> untyped
   # Collects and returns all inherited namespaces for a given object
   private def collect_namespaces: (untyped object) -> untyped
   # @return [Regexp] the regexp match of the default separator
@@ -77,7 +77,7 @@ class YARD::RegistryResolver
   #
   # @param type [Symbol] the type to unregister
   # @see #register_separator
-  def unregister_separator_by_type: (Symbol `type`) -> untyped
+  def unregister_separator_by_type: (Symbol type) -> untyped
   # Clears the map of separators.
   #
   # @return [void]
@@ -99,5 +99,5 @@ class YARD::RegistryResolver
   def types_for_separator: (String sep) -> Array[Symbol]
   # @param type [String] the type to return separators for
   # @return [Array<Symbol>] a list of separators registered to a type
-  def separators_for_type: (String `type`) -> Array[Symbol]
+  def separators_for_type: (String type) -> Array[Symbol]
 end

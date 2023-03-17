@@ -3,6 +3,20 @@ require 'fileutils'
 require 'pathname'
 require 'erb'
 
+stdlib_dependencies = %w[
+  uri
+  cgi
+  optparse
+  logger
+  monitor
+]
+
+# Testing of gem_rbs_collection is currently done with rbs2.
+# When it is executed in rbs3, the following should be removed.
+stdlib_dependencies_rbs2 = %w[
+  set
+]
+
 output_dir = '../../gems/yard/0.9'
 FileUtils.rm_rf(output_dir)
 Orthoses.logger.level = :warn
@@ -50,13 +64,6 @@ Orthoses::Builder.new do
   }
 end.call
 
-stdlib_dependencies = %w[
-  set
-  optparse
-  logger
-  monitor
-]
-
 def erb(template_filename, **vars)
   "templates/#{template_filename}.erb"
     .then { File.expand_path(_1) }
@@ -70,12 +77,12 @@ out.join("manifest.yaml").write(erb("manifest.yaml", notice: notice, stdlib_depe
 out.join('_scripts').tap do |scripts|
   scripts.mkpath
   scripts.join("test").tap do |test|
-    test.write(erb("_scripts/test", notice: notice, stdlib_dependencies: stdlib_dependencies))
+    test.write(erb("_scripts/test", notice: notice, stdlib_dependencies: stdlib_dependencies + stdlib_dependencies_rbs2))
     test.chmod(0o755)
   end
 end
 out.join('_test').tap do |test|
   test.mkpath
   test.join("yard.rb").write(erb("_test/yard.rb", notice: notice))
-  test.join('Steepfile').write(erb("_test/Steepfile", notice: notice, stdlib_dependencies: stdlib_dependencies))
+  test.join('Steepfile').write(erb("_test/Steepfile", notice: notice, stdlib_dependencies: stdlib_dependencies + stdlib_dependencies_rbs2))
 end
