@@ -14,3 +14,5 @@ nil.try('round', 2)
 nil.try(:tap) { |n| p n }
 nil.try { p 'hello' }
 nil.try { |n| p n }
+[1, 2, 3, 4].try { |n| p n.in_groups(2) }
+[1, 2, 3, 4].try { |n| n.in_groups(2) { |group| p group } }
