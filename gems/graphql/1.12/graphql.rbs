@@ -34,10 +34,14 @@ module GraphQL
       extend Member::HasArguments::ArgumentClassAccessor
       extend _Argument
     end
+
+    # When you include this module, you also need to write
+    # `extend GraphQL::Schema::Interface::DefinitionMethods` in an RBS file.
     module Interface
       module DefinitionMethods
         include Member::BaseDSLMethods
         include Member::HasFields
+        include Member::HasInterfaces
         include Member::RelayShortcuts
       end
       extend DefinitionMethods
@@ -61,6 +65,10 @@ module GraphQL
         module ArgumentClassAccessor
           def argument_class: (?Class? new_arg_class) -> void
         end
+      end
+
+      module HasInterfaces
+        def implements: (*Module | String | LateBoundType new_interfaces, **untyped options) -> void
       end
 
       module HasFields
@@ -87,12 +95,15 @@ module GraphQL
       end
       extend RelayShortcuts
     end
+    class LateBoundType
+    end
     class Mutation < Resolver
       extend Member::HasFields
       extend Resolver::HasPayloadType
     end
     class Object < Member
       extend Member::HasFields
+      extend Member::HasInterfaces
       attr_reader object: untyped
       attr_reader context: GraphQL::Query::Context
     end
@@ -130,6 +141,10 @@ module GraphQL
     def self.rescue_from: (*untyped err_classes) { (untyped err) -> void } -> void
     def self.mutation: (?Class? new_mutation_object) -> void
     def self.query: (?Class? new_query_object) -> void
+    def self.type_error: (Error type_error, Query::Context ctx) -> untyped
+    def self.context_class: (Class? new_context_class) -> Class?
+    def self.use: (Class plugin, **untyped kwargs) -> void
+    def self.validate_max_errors: (Integer new_validate_max_errors) -> Integer?
   end
   module Types
     class Boolean < GraphQL::Schema::Scalar
@@ -151,9 +166,19 @@ module GraphQL
       end
       module HasNodesField
       end
+      module Node
+      end
       module NodeBehaviors
       end
+
+      # When you include this module, you also need to wirte
+      # `extend GraphQL::Types::Relay::ConnectionBehaviors::ClassMethods` in an RBS file.
       module ConnectionBehaviors
+        module ClassMethods
+          def node_nullable: (bool?) -> bool
+          def edges_nullable: (bool?) -> bool
+          def edge_nullable: (bool?) -> bool
+        end
       end
       module EdgeBehaviors
       end
@@ -165,5 +190,9 @@ module GraphQL
   end
   class ExecutionError < Error
     def to_h: () -> Hash[String, untyped]
+  end
+  class RequiredImplementationMissingError < Error
+  end
+  class Dataloader
   end
 end
