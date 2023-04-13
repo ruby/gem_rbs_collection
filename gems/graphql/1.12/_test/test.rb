@@ -51,6 +51,10 @@ module Types
     include GraphQL::Types::Relay::HasNodesField
     field :ping, String, null: false, description: "ping"
     def ping = context[:ping]
+
+    field :article, String, null: false do
+      argument :id, ID, required: true
+    end
   end
 end
 
