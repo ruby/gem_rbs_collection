@@ -50,7 +50,7 @@ module Types
     include GraphQL::Types::Relay::HasNodeField
     include GraphQL::Types::Relay::HasNodesField
     field :ping, String, null: false, description: "ping"
-    def ping = context[:ping].pong
+    def ping = context[:ping]
   end
 end
 
