@@ -65,6 +65,8 @@ module GraphQL
         module ArgumentClassAccessor
           def argument_class: (?Class? new_arg_class) -> void
         end
+
+        include _Argument
       end
 
       module HasInterfaces
@@ -83,7 +85,7 @@ module GraphQL
           ?resolver_method: Symbol,
           ?resolver: Class,
           ?mutation: Class,
-        ) ?{ (untyped) -> void } -> void
+        ) ?{ (Field) [self: Field] -> void } -> void
         def field_class: (?Class? new_field_class) -> void
         def global_id_field: (Symbol field_name, **untyped kwargs) -> void
       end
