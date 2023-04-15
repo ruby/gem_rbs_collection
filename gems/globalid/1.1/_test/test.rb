@@ -8,10 +8,11 @@ GlobalID.app = 'blah'
 class Person
   include GlobalID::Identification
 
+  # @dynamic id, id=
   attr_accessor :id
 
   def self.find(id)
-    new.tap { |p| p.id = id }
+    new.tap { |obj| obj.id = id }
   end
 end
 
