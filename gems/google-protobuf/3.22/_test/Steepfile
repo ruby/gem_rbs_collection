@@ -1,0 +1,13 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature "."
+
+  repo_path "../../../"
+  library "google-protobuf"
+  library "forwardable"
+  library "time"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

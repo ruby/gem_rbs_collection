@@ -1,0 +1,27 @@
+module Google
+  module Protobuf
+    class Descriptor
+      include Enumerable[FieldDescriptor | OneofDescriptor]
+
+      public
+
+      def each: () { (FieldDescriptor | OneofDescriptor) -> void } -> void
+
+      def each_oneof: () { (OneofDescriptor) -> void } -> void
+
+      def file_descriptor: () -> FileDescriptor
+
+      def lookup: (String field) -> FieldDescriptor?
+
+      def lookup_oneof: (String field) -> OneofDescriptor?
+
+      def msgclass: () -> Class
+
+      def name: () -> String
+
+      private
+
+      def initialize: (untyped, untyped, untyped) -> void
+    end
+  end
+end

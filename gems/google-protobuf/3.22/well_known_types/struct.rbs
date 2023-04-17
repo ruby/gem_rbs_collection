@@ -1,0 +1,37 @@
+module Google
+  module Protobuf
+    class Struct[unchecked out T, unchecked out U] < Google::Protobuf::AbstractMessage
+      def self.from_hash: [A, B] (_ToHash[A, B] hash) -> Struct[A, B]
+
+      public
+
+      def []: (T key) -> U?
+
+      def []=: (T key, U value) -> void
+
+      def has_key?: (T key) -> bool
+
+      # <!--
+      #   rdoc-file=enum.c
+      #   - to_h -> hash
+      #   - to_h {|element| ... }  -> hash
+      # -->
+      # When `self` consists of 2-element arrays, returns a hash each of whose entries
+      # is the key-value pair formed from one of those arrays:
+      #
+      #     [[:foo, 0], [:bar, 1], [:baz, 2]].to_h # => {:foo=>0, :bar=>1, :baz=>2}
+      #
+      # When a block is given, the block is called with each element of `self`; the
+      # block should return a 2-element array which becomes a key-value pair in the
+      # returned hash:
+      #
+      #     (0..3).to_h {|i| [i, i ** 2]} # => {0=>0, 1=>1, 2=>4, 3=>9}
+      #
+      # Raises an exception if an element of `self` is not a 2-element array, and a
+      # block is not passed.
+      #
+      def to_h: () -> ::Hash[T, U]
+              | [A, B] () { (T, U) -> [ A, B ] } -> ::Hash[A, B]
+    end
+  end
+end
