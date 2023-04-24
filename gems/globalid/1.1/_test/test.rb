@@ -20,3 +20,4 @@ person = Person.find(1)
 person_gid = person.to_global_id
 p person_gid.uri
 p person_gid.to_s
+p person_gid.model_id
