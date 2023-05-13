@@ -32,7 +32,7 @@ end
 
 puts '## High level api'
 
-resource = Aws::S3::Resource.new(client: client)
+resource = Aws::S3::Resource.new(client: client, region: 'test')
 p resource.bucket('a').wait_until_exists(delay: 1).object('b').delete.version_id.upcase
 
 resource.buckets.each do |bucket|
