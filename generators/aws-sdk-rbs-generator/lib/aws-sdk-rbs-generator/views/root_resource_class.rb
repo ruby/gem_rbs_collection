@@ -16,6 +16,10 @@ module AwsSdkRbsGenerator
       def service_name
         @service.name
       end
+
+      def client_option
+        @service.client_class.client_option
+      end
     end
   end
 end

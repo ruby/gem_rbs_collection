@@ -2,7 +2,7 @@
 
 module AwsSdkRbsGenerator
   class Service
-    attr_reader :name, :api, :resources, :paginators, :shape_dictionary
+    attr_reader :name, :api, :resources, :paginators, :shape_dictionary, :client_class
     def initialize(name:, api:, resources:, paginators:, waiters:)
       @name = name
       @api = api
