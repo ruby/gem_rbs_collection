@@ -1,0 +1,51 @@
+class Circuitbox
+  VERSION: String
+
+  class CircuitBreaker
+    def run: (?exception: bool) { () -> untyped } -> untyped
+  end
+
+  module Configuration
+    attr_writer default_circuit_store: untyped
+
+    attr_writer default_notifier: untyped
+
+    def self.extended: (untyped base) -> untyped
+
+    def configure: () { (self) -> void } -> nil
+
+    def default_circuit_store: () -> untyped
+
+    def default_notifier: () -> untyped
+  end
+
+  class FaradayMiddleware
+  end
+
+  class MemoryStore
+  end
+
+  module Notifier
+    class ActiveSupport
+      def notify: (untyped circuit_name, _ToS event) -> untyped
+
+      def notify_warning: (untyped circuit_name, untyped message) -> untyped
+
+      def notify_run: (untyped circuit_name) { () -> untyped } -> untyped
+    end
+
+    class Null
+      def notify: (untyped _circuit_name, _ToS _event) -> nil
+
+      def notify_warning: (untyped _circuit_name, untyped _message) -> nil
+
+      def notify_run: (untyped _circuit_name) { () -> untyped } -> untyped
+    end
+  end
+
+  extend Configuration
+
+  # def self.circuit: [T] (String | Symbol service_name, Hash[untyped, untyped] options) ?{ () -> T } -> (CircuitBreaker | T)
+  def self.circuit: (String | Symbol service_name, Hash[untyped, untyped] options) -> CircuitBreaker
+                  | [T] (String | Symbol service_name, Hash[untyped, untyped] options) ?{ () -> T } -> T
+end
