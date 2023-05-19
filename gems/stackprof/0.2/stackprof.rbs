@@ -4,7 +4,7 @@ module StackProf
   type mode = :cpu | :wall | :object | :custom
   type result = Hash[Symbol, untyped] # TODO: Use record type for more useful type
 
-  def self.run: (?mode: mode, out: String, ?interval: Integer) { () -> void } -> result
+  def self.run: (?mode: mode, out: String, ?interval: Integer, ?raw: bool) { () -> void } -> result
 
   def self.results: (?String out) -> result
 
@@ -12,7 +12,7 @@ module StackProf
 
   def self.sample: () -> bool
 
-  def self.start: (?mode: mode, out: String, ?interval: Integer) -> bool
+  def self.start: (?mode: mode, out: String, ?interval: Integer, ?raw: bool) -> bool
 
   def self.stop: () -> bool
 
