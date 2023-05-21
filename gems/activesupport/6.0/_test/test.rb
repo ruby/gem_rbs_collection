@@ -23,3 +23,10 @@ hash.stringify_keys!
 
 hash.symbolize_keys
 hash.symbolize_keys!
+
+hash = { hoge: { hogefuga: { hogehoge: 1 }, fugahoge: 2 }, fuga: 3 }
+hash.deep_stringify_keys
+hash.deep_stringify_keys!
+
+hash.deep_symbolize_keys
+hash.deep_symbolize_keys!
