@@ -1,7 +1,5 @@
 # gem_rbs_collection: A collection of RBS for gems
 
-**Naming note:** This repository was called `gem_rbs` before. We have renamed the repository to make it more clear that this is a collection of RBS files for gems.
-
 [RBS](https://github.com/ruby/rbs) is a standard type signature syntax for Ruby programs.
 This is a community managed collection of RBS files for gems which ships without RBS.
 
