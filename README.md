@@ -5,44 +5,20 @@ This is a community-managed collection of RBS files for gems that ship without R
 
 ## Loading RBS from the repository
 
-`git submodule` is the easiest way to import this collection to your project.
+You can use `rbs collection` command to load RBS files from this repository.
 
-```
-# Add new submodule inside your project
-$ git submodule add https://github.com/ruby/gem_rbs_collection.git vendor/rbs/gem_rbs_collection
-```
+```console
+# Create rbs_collection.yaml
+$ rbs collection init
 
-### Using gem RBS from `rbs` command
-
-Specify the path with `--repo` option and use `-r` option to require RBS of a library.
-
-```
-$ rbs --repo vendor/rbs/gem_rbs_collection/gems -r redis list
+# Resolve dependencies and install RBS files from this repository
+$ rbs collection install
 ```
 
-### Using gem RBS from Steep
+If `rbs_collection.yaml` exists, the installed RBSs are loaded automatically.
+You do not need any configuration for `rbs` and `steep` commands.
 
-Steep uses `Steepfile` to configure library RBSs to load.
-
-```rb
-target(:lib) do
-  repo_path "vendor/rbs/gem_rbs_collection/gems"
-  library "redis"
-end
-```
-
-### Loading RBS directory from the repository directory
-
-> This is not recommended, but I'm writing this section to load RBS files for other tools which doesn't support this feature yet.
-
-You can load RBS files through directory path.
-
-```
-$ rbs -I vendor/rbs/gem_rbs_collection/gems/redis/4.2 list
-```
-
-If you load RBS files with directory path, it loads everything in the directory.
-This is different from when loading RBS files with library name that ignores directories starting with `_` (underscore).
+See [collection.md](https://github.com/ruby/rbs/blob/master/docs/collection.md) in ruby/rbs repository for more details.
 
 ## How to contribute
 
