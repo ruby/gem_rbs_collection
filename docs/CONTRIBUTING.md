@@ -1,5 +1,11 @@
 # Contribution Guide
 
+## Before you start💎
+
+**If you are the owner of the gem:**
+Adding RBS files directory in your gem would be a better option.
+Write RBS files, put them in `sig` directory, and included the directory in the gem package.
+
 ## Adding RBS of a gem
 
 Adding RBS files for a gem can be done with 4 steps.
