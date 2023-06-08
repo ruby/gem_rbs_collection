@@ -1,0 +1,57 @@
+module Moneta
+  interface _ValueTransformer
+    def load: (untyped key, ?::Hash[untyped, untyped] options) -> untyped
+
+    def store: (untyped key, untyped value, ?::Hash[untyped, untyped] options) -> untyped
+
+    def delete: (untyped key, ?::Hash[untyped, untyped] options) -> untyped
+
+    def create: (untyped key, untyped value, ?::Hash[untyped, untyped] options) -> untyped
+
+    def values_at: (*untyped keys, **untyped options) -> untyped
+
+    def fetch_values: (*untyped keys, **untyped options) ?{ (untyped) -> untyped } -> untyped
+
+    def slice: (*untyped keys, **untyped options) -> untyped
+
+    def merge!: (untyped pairs, ?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+  end
+
+  interface _KeyValueTransformer
+    def key?: (untyped key, ?::Hash[untyped, untyped] options) -> bool
+
+    def each_key: () ?{ (untyped) -> untyped } -> untyped
+
+    def increment: (untyped key, ?Integer amount, ?::Hash[untyped, untyped] options) -> untyped
+
+    def load: (untyped key, ?::Hash[untyped, untyped] options) -> untyped
+
+    def store: (untyped key, untyped value, ?::Hash[untyped, untyped] options) -> untyped
+
+    def delete: (untyped key, ?::Hash[untyped, untyped] options) -> untyped
+
+    def create: (untyped key, untyped value, ?::Hash[untyped, untyped] options) -> untyped
+
+    def values_at: (*untyped keys, **untyped options) -> untyped
+
+    def fetch_values: (*untyped keys, **untyped options) ?{ (untyped) -> untyped } -> untyped
+
+    def slice: (*untyped keys, **untyped options) -> untyped
+
+    def merge!: (_ToA[_ToA[untyped]] pairs, ?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+  end
+
+  class Builder
+    def initialize: () { () [self: self] -> void } -> void
+
+    def build: () -> Array[untyped]
+
+    def use: (Symbol | Class proxy, ?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> void
+
+    def adapter: (Symbol | Class proxy, ?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> void
+  end
+
+  def self.new: (Symbol name, ?::Hash[untyped, untyped] options) -> (_ValueTransformer | _KeyValueTransformer)
+
+  def self.build: () { () [self: Builder] -> void } -> (_ValueTransformer | _KeyValueTransformer)
+end
