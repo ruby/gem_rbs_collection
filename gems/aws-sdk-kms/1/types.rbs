@@ -20,6 +20,7 @@ module Aws
       end
       type alias_name_type = ::String
       type arn_type = ::String
+      type attestation_document_type = ::String
       type boolean_type = bool
       type cancel_key_deletion_request = { key_id: key_id_type }
       class CancelKeyDeletionResponse
@@ -30,10 +31,10 @@ module Aws
       type connect_custom_key_store_request = { custom_key_store_id: custom_key_store_id_type }
       class ConnectCustomKeyStoreResponse < Aws::EmptyStructure
       end
-      type connection_error_code_type = ("INVALID_CREDENTIALS" | "CLUSTER_NOT_FOUND" | "NETWORK_ERRORS" | "INTERNAL_ERROR" | "INSUFFICIENT_CLOUDHSM_HSMS" | "USER_LOCKED_OUT" | "USER_NOT_FOUND" | "USER_LOGGED_IN" | "SUBNET_NOT_FOUND" | "INSUFFICIENT_FREE_ADDRESSES_IN_SUBNET")
+      type connection_error_code_type = ("INVALID_CREDENTIALS" | "CLUSTER_NOT_FOUND" | "NETWORK_ERRORS" | "INTERNAL_ERROR" | "INSUFFICIENT_CLOUDHSM_HSMS" | "USER_LOCKED_OUT" | "USER_NOT_FOUND" | "USER_LOGGED_IN" | "SUBNET_NOT_FOUND" | "INSUFFICIENT_FREE_ADDRESSES_IN_SUBNET" | "XKS_PROXY_ACCESS_DENIED" | "XKS_PROXY_NOT_REACHABLE" | "XKS_VPC_ENDPOINT_SERVICE_NOT_FOUND" | "XKS_PROXY_INVALID_RESPONSE" | "XKS_PROXY_INVALID_CONFIGURATION" | "XKS_VPC_ENDPOINT_SERVICE_INVALID_CONFIGURATION" | "XKS_PROXY_TIMED_OUT" | "XKS_PROXY_INVALID_TLS_CONFIGURATION")
       type connection_state_type = ("CONNECTED" | "CONNECTING" | "FAILED" | "DISCONNECTED" | "DISCONNECTING")
       type create_alias_request = { alias_name: alias_name_type, target_key_id: key_id_type }
-      type create_custom_key_store_request = { custom_key_store_name: custom_key_store_name_type, cloud_hsm_cluster_id: cloud_hsm_cluster_id_type?, trust_anchor_certificate: trust_anchor_certificate_type?, key_store_password: key_store_password_type? }
+      type create_custom_key_store_request = { custom_key_store_name: custom_key_store_name_type, cloud_hsm_cluster_id: cloud_hsm_cluster_id_type?, trust_anchor_certificate: trust_anchor_certificate_type?, key_store_password: key_store_password_type?, custom_key_store_type: custom_key_store_type?, xks_proxy_uri_endpoint: xks_proxy_uri_endpoint_type?, xks_proxy_uri_path: xks_proxy_uri_path_type?, xks_proxy_vpc_endpoint_service_name: xks_proxy_vpc_endpoint_service_name_type?, xks_proxy_authentication_credential: xks_proxy_authentication_credential_type?, xks_proxy_connectivity: xks_proxy_connectivity_type? }
       class CreateCustomKeyStoreResponse
         attr_accessor custom_key_store_id: custom_key_store_id_type
       end
@@ -42,12 +43,13 @@ module Aws
         attr_accessor grant_token: grant_token_type
         attr_accessor grant_id: grant_id_type
       end
-      type create_key_request = { policy: policy_type?, description: description_type?, key_usage: key_usage_type?, customer_master_key_spec: customer_master_key_spec?, key_spec: key_spec?, origin: origin_type?, custom_key_store_id: custom_key_store_id_type?, bypass_policy_lockout_safety_check: boolean_type?, tags: tag_list_input?, multi_region: nullable_boolean_type? }
+      type create_key_request = { policy: policy_type?, description: description_type?, key_usage: key_usage_type?, customer_master_key_spec: customer_master_key_spec?, key_spec: key_spec?, origin: origin_type?, custom_key_store_id: custom_key_store_id_type?, bypass_policy_lockout_safety_check: boolean_type?, tags: tag_list_input?, multi_region: nullable_boolean_type?, xks_key_id: xks_key_id_type? }
       class CreateKeyResponse
         attr_accessor key_metadata: KeyMetadata
       end
       type custom_key_store_id_type = ::String
       type custom_key_store_name_type = ::String
+      type custom_key_store_type = ("AWS_CLOUDHSM" | "EXTERNAL_KEY_STORE")
       type custom_key_stores_list = ::Array[CustomKeyStoresListEntry]
       class CustomKeyStoresListEntry
         attr_accessor custom_key_store_id: custom_key_store_id_type
@@ -57,16 +59,19 @@ module Aws
         attr_accessor connection_state: connection_state_type
         attr_accessor connection_error_code: connection_error_code_type
         attr_accessor creation_date: date_type
+        attr_accessor custom_key_store_type: custom_key_store_type
+        attr_accessor xks_proxy_configuration: XksProxyConfigurationType
       end
       type customer_master_key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SYMMETRIC_DEFAULT" | "HMAC_224" | "HMAC_256" | "HMAC_384" | "HMAC_512" | "SM2")
       type data_key_pair_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SM2")
       type data_key_spec = ("AES_256" | "AES_128")
       type date_type = ::Time
-      type decrypt_request = { ciphertext_blob: ciphertext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, key_id: key_id_type?, encryption_algorithm: encryption_algorithm_spec? }
+      type decrypt_request = { ciphertext_blob: ciphertext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, key_id: key_id_type?, encryption_algorithm: encryption_algorithm_spec?, recipient: recipient_info? }
       class DecryptResponse
         attr_accessor key_id: key_id_type
         attr_accessor plaintext: plaintext_type
         attr_accessor encryption_algorithm: encryption_algorithm_spec
+        attr_accessor ciphertext_for_recipient: ciphertext_type
       end
       type delete_alias_request = { alias_name: alias_name_type }
       type delete_custom_key_store_request = { custom_key_store_id: custom_key_store_id_type }
@@ -104,13 +109,14 @@ module Aws
       type encryption_context_value = ::String
       type error_message_type = ::String
       type expiration_model_type = ("KEY_MATERIAL_EXPIRES" | "KEY_MATERIAL_DOES_NOT_EXPIRE")
-      type generate_data_key_pair_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list? }
+      type generate_data_key_pair_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list?, recipient: recipient_info? }
       class GenerateDataKeyPairResponse
         attr_accessor private_key_ciphertext_blob: ciphertext_type
         attr_accessor private_key_plaintext: plaintext_type
         attr_accessor public_key: public_key_type
         attr_accessor key_id: key_id_type
         attr_accessor key_pair_spec: data_key_pair_spec
+        attr_accessor ciphertext_for_recipient: ciphertext_type
       end
       type generate_data_key_pair_without_plaintext_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list? }
       class GenerateDataKeyPairWithoutPlaintextResponse
@@ -119,11 +125,12 @@ module Aws
         attr_accessor key_id: key_id_type
         attr_accessor key_pair_spec: data_key_pair_spec
       end
-      type generate_data_key_request = { key_id: key_id_type, encryption_context: encryption_context_type?, number_of_bytes: number_of_bytes_type?, key_spec: data_key_spec?, grant_tokens: grant_token_list? }
+      type generate_data_key_request = { key_id: key_id_type, encryption_context: encryption_context_type?, number_of_bytes: number_of_bytes_type?, key_spec: data_key_spec?, grant_tokens: grant_token_list?, recipient: recipient_info? }
       class GenerateDataKeyResponse
         attr_accessor ciphertext_blob: ciphertext_type
         attr_accessor plaintext: plaintext_type
         attr_accessor key_id: key_id_type
+        attr_accessor ciphertext_for_recipient: ciphertext_type
       end
       type generate_data_key_without_plaintext_request = { key_id: key_id_type, encryption_context: encryption_context_type?, key_spec: data_key_spec?, number_of_bytes: number_of_bytes_type?, grant_tokens: grant_token_list? }
       class GenerateDataKeyWithoutPlaintextResponse
@@ -136,9 +143,10 @@ module Aws
         attr_accessor mac_algorithm: mac_algorithm_spec
         attr_accessor key_id: key_id_type
       end
-      type generate_random_request = { number_of_bytes: number_of_bytes_type?, custom_key_store_id: custom_key_store_id_type? }
+      type generate_random_request = { number_of_bytes: number_of_bytes_type?, custom_key_store_id: custom_key_store_id_type?, recipient: recipient_info? }
       class GenerateRandomResponse
         attr_accessor plaintext: plaintext_type
+        attr_accessor ciphertext_for_recipient: ciphertext_type
       end
       type get_key_policy_request = { key_id: key_id_type, policy_name: policy_name_type }
       class GetKeyPolicyResponse
@@ -191,6 +199,7 @@ module Aws
       type import_key_material_request = { key_id: key_id_type, import_token: ciphertext_type, encrypted_key_material: ciphertext_type, valid_to: date_type?, expiration_model: expiration_model_type? }
       class ImportKeyMaterialResponse < Aws::EmptyStructure
       end
+      type key_encryption_mechanism = ("RSAES_OAEP_SHA_256")
       type key_id_type = ::String
       type key_list = ::Array[KeyListEntry]
       class KeyListEntry
@@ -222,6 +231,7 @@ module Aws
         attr_accessor multi_region_configuration: MultiRegionConfiguration
         attr_accessor pending_deletion_window_in_days: pending_window_in_days_type
         attr_accessor mac_algorithms: mac_algorithm_spec_list
+        attr_accessor xks_key_configuration: XksKeyConfigurationType
       end
       type key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SYMMETRIC_DEFAULT" | "HMAC_224" | "HMAC_256" | "HMAC_384" | "HMAC_512" | "SM2")
       type key_state = ("Creating" | "Enabled" | "Disabled" | "PendingDeletion" | "PendingImport" | "PendingReplicaDeletion" | "Unavailable" | "Updating")
@@ -276,7 +286,7 @@ module Aws
       type multi_region_key_type = ("PRIMARY" | "REPLICA")
       type nullable_boolean_type = bool
       type number_of_bytes_type = ::Integer
-      type origin_type = ("AWS_KMS" | "EXTERNAL" | "AWS_CLOUDHSM")
+      type origin_type = ("AWS_KMS" | "EXTERNAL" | "AWS_CLOUDHSM" | "EXTERNAL_KEY_STORE")
       type pending_window_in_days_type = ::Integer
       type plaintext_type = ::String
       type policy_name_list = ::Array[policy_name_type]
@@ -293,6 +303,7 @@ module Aws
         attr_accessor source_encryption_algorithm: encryption_algorithm_spec
         attr_accessor destination_encryption_algorithm: encryption_algorithm_spec
       end
+      type recipient_info = { key_encryption_algorithm: key_encryption_mechanism?, attestation_document: attestation_document_type? }
       type region_type = ::String
       type replicate_key_request = { key_id: key_id_type, replica_region: region_type, policy: policy_type?, bypass_policy_lockout_safety_check: boolean_type?, description: description_type?, tags: tag_list_input? }
       class ReplicateKeyResponse
@@ -331,7 +342,7 @@ module Aws
       type trust_anchor_certificate_type = ::String
       type untag_resource_request = { key_id: key_id_type, tag_keys: tag_key_list }
       type update_alias_request = { alias_name: alias_name_type, target_key_id: key_id_type }
-      type update_custom_key_store_request = { custom_key_store_id: custom_key_store_id_type, new_custom_key_store_name: custom_key_store_name_type?, key_store_password: key_store_password_type?, cloud_hsm_cluster_id: cloud_hsm_cluster_id_type? }
+      type update_custom_key_store_request = { custom_key_store_id: custom_key_store_id_type, new_custom_key_store_name: custom_key_store_name_type?, key_store_password: key_store_password_type?, cloud_hsm_cluster_id: cloud_hsm_cluster_id_type?, xks_proxy_uri_endpoint: xks_proxy_uri_endpoint_type?, xks_proxy_uri_path: xks_proxy_uri_path_type?, xks_proxy_vpc_endpoint_service_name: xks_proxy_vpc_endpoint_service_name_type?, xks_proxy_authentication_credential: xks_proxy_authentication_credential_type?, xks_proxy_connectivity: xks_proxy_connectivity_type? }
       class UpdateCustomKeyStoreResponse < Aws::EmptyStructure
       end
       type update_key_description_request = { key_id: key_id_type, description: description_type }
@@ -349,6 +360,24 @@ module Aws
         attr_accessor signing_algorithm: signing_algorithm_spec
       end
       type wrapping_key_spec = ("RSA_2048")
+      class XksKeyConfigurationType
+        attr_accessor id: xks_key_id_type
+      end
+      type xks_key_id_type = ::String
+      type xks_proxy_authentication_access_key_id_type = ::String
+      type xks_proxy_authentication_credential_type = { access_key_id: xks_proxy_authentication_access_key_id_type, raw_secret_access_key: xks_proxy_authentication_raw_secret_access_key_type }
+      type xks_proxy_authentication_raw_secret_access_key_type = ::String
+      class XksProxyConfigurationType
+        attr_accessor connectivity: xks_proxy_connectivity_type
+        attr_accessor access_key_id: xks_proxy_authentication_access_key_id_type
+        attr_accessor uri_endpoint: xks_proxy_uri_endpoint_type
+        attr_accessor uri_path: xks_proxy_uri_path_type
+        attr_accessor vpc_endpoint_service_name: xks_proxy_vpc_endpoint_service_name_type
+      end
+      type xks_proxy_connectivity_type = ("PUBLIC_ENDPOINT" | "VPC_ENDPOINT_SERVICE")
+      type xks_proxy_uri_endpoint_type = ::String
+      type xks_proxy_uri_path_type = ::String
+      type xks_proxy_vpc_endpoint_service_name_type = ::String
     end
   end
 end
