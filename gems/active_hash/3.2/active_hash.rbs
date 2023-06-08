@@ -1,0 +1,52 @@
+module ActiveHash
+  class Base
+    def self.scope: (Symbol name, untyped) -> void
+    def self.all: (?options: untyped) -> Relation[instance]
+    def self.data: () -> Array[Hash[untyped, untyped]]
+    def self.data=: (Array[Hash[untyped, untyped]]) -> void
+
+    # delegate to all
+    def self.where: (*untyped) -> Relation[instance]
+    def self.find: (:all) -> Relation[instance]
+                 | (:first, *untyped args) -> instance?
+                 | (Array[untyped] id) -> Array[instance]
+                 | (untyped id) -> instance?
+                 | () { (instance) -> boolish } -> instance?
+    def self.find_by: (untyped options) -> instance?
+    def self.find_by!: (untyped options) -> instance
+    def self.find_by_id: (untyped id) -> instance?
+    def self.count: () -> Integer
+    def self.pluck: (Symbol column_names) -> Array[untyped]
+                  | (*Symbol column_names) -> Array[Array[untyped]]
+    def self.ids: () -> Array[untyped]
+    def self.pick: (Symbol column_names) -> untyped
+                 | (*Symbol column_names) -> Array[untyped]
+    def self.first: () -> instance?
+    def self.last: () -> instance?
+    def self.order: (*untyped options) -> Relation[instance]
+
+    def id: () -> untyped?
+  end
+
+  class Relation[T]
+    def to_a: -> Array[T]
+    def where: (*untyped) -> self
+    def find: (:all) -> self
+            | (:first, *untyped args) -> T?
+            | (Array[untyped] id) -> Array[T]
+            | (untyped id) -> T?
+            | () { (instance) -> boolish } -> T?
+    def find_by: (untyped options) -> T?
+    def find_by!: (untyped options) -> T
+    def find_by_id: (untyped id) -> T?
+    def count: () -> Integer
+    def pluck: (Symbol column_names) -> Array[untyped]
+             | (*Symbol column_names) -> Array[Array[untyped]]
+    def ids: () -> Array[untyped]
+    def pick: (Symbol column_names) -> untyped
+            | (*Symbol column_names) -> Array[untyped]
+    def first: () -> T?
+    def last: () -> T?
+    def order: (*untyped options) -> self
+  end
+end

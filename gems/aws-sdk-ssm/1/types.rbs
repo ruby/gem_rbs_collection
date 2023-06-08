@@ -38,6 +38,23 @@ module Aws
       end
       type agent_error_code = ::String
       type aggregator_schema_only = bool
+      type alarm = { name: alarm_name }
+      class Alarm
+        attr_accessor name: alarm_name
+      end
+      type alarm_configuration = { ignore_poll_alarm_failure: boolean?, alarms: alarm_list_input }
+      class AlarmConfiguration
+        attr_accessor ignore_poll_alarm_failure: boolean
+        attr_accessor alarms: alarm_list_output
+      end
+      type alarm_list_input = ::Array[alarm]
+      type alarm_list_output = ::Array[Alarm]
+      type alarm_name = ::String
+      class AlarmStateInformation
+        attr_accessor name: alarm_name
+        attr_accessor state: external_alarm_state
+      end
+      type alarm_state_information_list = ::Array[AlarmStateInformation]
       type allowed_pattern = ::String
       type apply_only_at_cron_interval = bool
       type approve_after_days = ::Integer
@@ -87,6 +104,8 @@ module Aws
         attr_accessor target_locations: target_locations_output
         attr_accessor schedule_offset: schedule_offset
         attr_accessor target_maps: target_maps
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
       end
       type association_description_list = ::Array[AssociationDescription]
       class AssociationExecution
@@ -98,6 +117,8 @@ module Aws
         attr_accessor created_time: date_time
         attr_accessor last_execution_date: date_time
         attr_accessor resource_count_by_status: resource_count_by_status
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
       end
       type association_execution_filter = { key: association_execution_filter_key, value: association_execution_filter_value, type: association_filter_operator_type }
       type association_execution_filter_key = ("ExecutionId" | "Status" | "CreatedTime")
@@ -221,6 +242,8 @@ module Aws
         attr_accessor target: string
         attr_accessor target_locations: target_locations_output
         attr_accessor progress_counters: ProgressCounters
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
         attr_accessor automation_subtype: automation_subtype
         attr_accessor scheduled_time: date_time
         attr_accessor runbooks: runbooks_output
@@ -257,6 +280,8 @@ module Aws
         attr_accessor max_errors: max_errors
         attr_accessor target: string
         attr_accessor automation_type: automation_type
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
         attr_accessor automation_subtype: automation_subtype
         attr_accessor scheduled_time: date_time
         attr_accessor runbooks: runbooks_output
@@ -327,6 +352,8 @@ module Aws
         attr_accessor notification_config: NotificationConfig
         attr_accessor cloud_watch_output_config: CloudWatchOutputConfig
         attr_accessor timeout_seconds: timeout_seconds
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
       end
       type command_filter = { key: command_filter_key, value: command_filter_value }
       type command_filter_key = ("InvokedAfter" | "InvokedBefore" | "Status" | "ExecutionStage" | "DocumentName")
@@ -437,7 +464,7 @@ module Aws
       end
       type create_association_batch_request = { entries: create_association_batch_request_entries_input }
       type create_association_batch_request_entries_input = ::Array[create_association_batch_request_entry]
-      type create_association_batch_request_entry = { name: document_arn, instance_id: instance_id?, parameters: parameters?, automation_target_parameter_name: automation_target_parameter_name?, document_version: document_version?, targets: targets_input?, schedule_expression: schedule_expression?, output_location: instance_association_output_location?, association_name: association_name?, max_errors: max_errors?, max_concurrency: max_concurrency?, compliance_severity: association_compliance_severity?, sync_compliance: association_sync_compliance?, apply_only_at_cron_interval: apply_only_at_cron_interval?, calendar_names: calendar_name_or_arn_list?, target_locations: target_locations_input?, schedule_offset: schedule_offset?, target_maps: target_maps? }
+      type create_association_batch_request_entry = { name: document_arn, instance_id: instance_id?, parameters: parameters?, automation_target_parameter_name: automation_target_parameter_name?, document_version: document_version?, targets: targets_input?, schedule_expression: schedule_expression?, output_location: instance_association_output_location?, association_name: association_name?, max_errors: max_errors?, max_concurrency: max_concurrency?, compliance_severity: association_compliance_severity?, sync_compliance: association_sync_compliance?, apply_only_at_cron_interval: apply_only_at_cron_interval?, calendar_names: calendar_name_or_arn_list?, target_locations: target_locations_input?, schedule_offset: schedule_offset?, target_maps: target_maps?, alarm_configuration: alarm_configuration? }
       class CreateAssociationBatchRequestEntry
         attr_accessor name: document_arn
         attr_accessor instance_id: instance_id
@@ -457,12 +484,13 @@ module Aws
         attr_accessor target_locations: target_locations_output
         attr_accessor schedule_offset: schedule_offset
         attr_accessor target_maps: target_maps
+        attr_accessor alarm_configuration: AlarmConfiguration
       end
       class CreateAssociationBatchResult
         attr_accessor successful: association_description_list
         attr_accessor failed: failed_create_association_list
       end
-      type create_association_request = { name: document_arn, document_version: document_version?, instance_id: instance_id?, parameters: parameters?, targets: targets_input?, schedule_expression: schedule_expression?, output_location: instance_association_output_location?, association_name: association_name?, automation_target_parameter_name: automation_target_parameter_name?, max_errors: max_errors?, max_concurrency: max_concurrency?, compliance_severity: association_compliance_severity?, sync_compliance: association_sync_compliance?, apply_only_at_cron_interval: apply_only_at_cron_interval?, calendar_names: calendar_name_or_arn_list?, target_locations: target_locations_input?, schedule_offset: schedule_offset?, target_maps: target_maps? }
+      type create_association_request = { name: document_arn, document_version: document_version?, instance_id: instance_id?, parameters: parameters?, targets: targets_input?, schedule_expression: schedule_expression?, output_location: instance_association_output_location?, association_name: association_name?, automation_target_parameter_name: automation_target_parameter_name?, max_errors: max_errors?, max_concurrency: max_concurrency?, compliance_severity: association_compliance_severity?, sync_compliance: association_sync_compliance?, apply_only_at_cron_interval: apply_only_at_cron_interval?, calendar_names: calendar_name_or_arn_list?, target_locations: target_locations_input?, schedule_offset: schedule_offset?, target_maps: target_maps?, tags: tag_list_input?, alarm_configuration: alarm_configuration? }
       class CreateAssociationResult
         attr_accessor association_description: AssociationDescription
       end
@@ -474,9 +502,10 @@ module Aws
       class CreateMaintenanceWindowResult
         attr_accessor window_id: maintenance_window_id
       end
-      type create_ops_item_request = { description: ops_item_description, ops_item_type: ops_item_type?, operational_data: ops_item_operational_data_input?, notifications: ops_item_notifications_input?, priority: ops_item_priority?, related_ops_items: related_ops_items_input?, source: ops_item_source, title: ops_item_title, tags: tag_list_input?, category: ops_item_category?, severity: ops_item_severity?, actual_start_time: date_time?, actual_end_time: date_time?, planned_start_time: date_time?, planned_end_time: date_time? }
+      type create_ops_item_request = { description: ops_item_description, ops_item_type: ops_item_type?, operational_data: ops_item_operational_data_input?, notifications: ops_item_notifications_input?, priority: ops_item_priority?, related_ops_items: related_ops_items_input?, source: ops_item_source, title: ops_item_title, tags: tag_list_input?, category: ops_item_category?, severity: ops_item_severity?, actual_start_time: date_time?, actual_end_time: date_time?, planned_start_time: date_time?, planned_end_time: date_time?, account_id: ops_item_account_id? }
       class CreateOpsItemResponse
         attr_accessor ops_item_id: string
+        attr_accessor ops_item_arn: ops_item_arn
       end
       type create_ops_metadata_request = { resource_id: ops_metadata_resource_id, metadata: metadata_map_input?, tags: tag_list_input? }
       class CreateOpsMetadataResult
@@ -529,6 +558,9 @@ module Aws
       end
       type delete_resource_data_sync_request = { sync_name: resource_data_sync_name, sync_type: resource_data_sync_type? }
       class DeleteResourceDataSyncResult < Aws::EmptyStructure
+      end
+      type delete_resource_policy_request = { resource_arn: resource_arn_string, policy_id: policy_id, policy_hash: policy_hash }
+      class DeleteResourcePolicyResponse < Aws::EmptyStructure
       end
       type delivery_timed_out_count = ::Integer
       type deregister_managed_instance_request = { instance_id: managed_instance_id }
@@ -815,10 +847,12 @@ module Aws
       type document_parameter_type = ("String" | "StringList")
       type document_permission_max_results = ::Integer
       type document_permission_type = ("Share")
-      type document_requires = { name: document_arn, version: document_version? }
+      type document_requires = { name: document_arn, version: document_version?, require_type: require_type?, version_name: document_version_name? }
       class DocumentRequires
         attr_accessor name: document_arn
         attr_accessor version: document_version
+        attr_accessor require_type: require_type
+        attr_accessor version_name: document_version_name
       end
       type document_requires_list_input = ::Array[document_requires]
       type document_requires_list_output = ::Array[DocumentRequires]
@@ -845,7 +879,7 @@ module Aws
       type document_sha_1 = ::String
       type document_status = ("Creating" | "Active" | "Updating" | "Deleting" | "Failed")
       type document_status_information = ::String
-      type document_type = ("Command" | "Policy" | "Automation" | "Session" | "Package" | "ApplicationConfiguration" | "ApplicationConfigurationSchema" | "DeploymentStrategy" | "ChangeCalendar" | "Automation.ChangeTemplate" | "ProblemAnalysis" | "ProblemAnalysisTemplate")
+      type document_type = ("Command" | "Policy" | "Automation" | "Session" | "Package" | "ApplicationConfiguration" | "ApplicationConfigurationSchema" | "DeploymentStrategy" | "ChangeCalendar" | "Automation.ChangeTemplate" | "ProblemAnalysis" | "ProblemAnalysisTemplate" | "CloudFormation" | "ConformancePackTemplate" | "QuickSetup")
       type document_version = ::String
       class DocumentVersionInfo
         attr_accessor name: document_name
@@ -873,6 +907,7 @@ module Aws
       type execution_mode = ("Auto" | "Interactive")
       type execution_role_name = ::String
       type expiration_date = ::Time
+      type external_alarm_state = ("UNKNOWN" | "ALARM")
       class FailedCreateAssociation
         attr_accessor entry: CreateAssociationBatchRequestEntry
         attr_accessor message: batch_error_message
@@ -998,6 +1033,8 @@ module Aws
         attr_accessor status_details: maintenance_window_execution_status_details
         attr_accessor start_time: date_time
         attr_accessor end_time: date_time
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
       end
       type get_maintenance_window_request = { window_id: maintenance_window_id }
       class GetMaintenanceWindowResult
@@ -1034,8 +1071,9 @@ module Aws
         attr_accessor name: maintenance_window_name
         attr_accessor description: maintenance_window_description
         attr_accessor cutoff_behavior: maintenance_window_task_cutoff_behavior
+        attr_accessor alarm_configuration: AlarmConfiguration
       end
-      type get_ops_item_request = { ops_item_id: ops_item_id }
+      type get_ops_item_request = { ops_item_id: ops_item_id, ops_item_arn: ops_item_arn? }
       class GetOpsItemResponse
         attr_accessor ops_item: OpsItem
       end
@@ -1094,6 +1132,17 @@ module Aws
         attr_accessor modified_date: date_time
         attr_accessor description: baseline_description
         attr_accessor sources: patch_source_list_output
+      end
+      type get_resource_policies_request = { resource_arn: resource_arn_string, next_token: string?, max_results: resource_policy_max_results? }
+      class GetResourcePoliciesResponse
+        attr_accessor next_token: string
+        attr_accessor policies: get_resource_policies_response_entries
+      end
+      type get_resource_policies_response_entries = ::Array[GetResourcePoliciesResponseEntry]
+      class GetResourcePoliciesResponseEntry
+        attr_accessor policy_id: policy_id
+        attr_accessor policy_hash: policy_hash
+        attr_accessor policy: policy
       end
       type get_service_setting_request = { setting_id: service_setting_id }
       class GetServiceSettingResult
@@ -1427,6 +1476,8 @@ module Aws
         attr_accessor end_time: date_time
         attr_accessor task_arn: maintenance_window_task_arn
         attr_accessor task_type: maintenance_window_task_type
+        attr_accessor alarm_configuration: AlarmConfiguration
+        attr_accessor triggered_alarms: alarm_state_information_list
       end
       type maintenance_window_execution_task_identity_list = ::Array[MaintenanceWindowExecutionTaskIdentity]
       type maintenance_window_execution_task_invocation_id = ::String
@@ -1534,6 +1585,7 @@ module Aws
         attr_accessor name: maintenance_window_name
         attr_accessor description: maintenance_window_description
         attr_accessor cutoff_behavior: maintenance_window_task_cutoff_behavior
+        attr_accessor alarm_configuration: AlarmConfiguration
       end
       type maintenance_window_task_arn = ::String
       type maintenance_window_task_cutoff_behavior = ("CONTINUE_TASK" | "CANCEL_TASK")
@@ -1595,7 +1647,7 @@ module Aws
       type notification_event = ("All" | "InProgress" | "Success" | "TimedOut" | "Cancelled" | "Failed")
       type notification_event_list = ::Array[notification_event]
       type notification_type = ("Command" | "Invocation")
-      type operating_system = ("WINDOWS" | "AMAZON_LINUX" | "AMAZON_LINUX_2" | "UBUNTU" | "REDHAT_ENTERPRISE_LINUX" | "SUSE" | "CENTOS" | "ORACLE_LINUX" | "DEBIAN" | "MACOS" | "RASPBIAN" | "ROCKY_LINUX")
+      type operating_system = ("WINDOWS" | "AMAZON_LINUX" | "AMAZON_LINUX_2" | "AMAZON_LINUX_2022" | "UBUNTU" | "REDHAT_ENTERPRISE_LINUX" | "SUSE" | "CENTOS" | "ORACLE_LINUX" | "DEBIAN" | "MACOS" | "RASPBIAN" | "ROCKY_LINUX" | "ALMA_LINUX" | "AMAZON_LINUX_2023")
       type ops_aggregator = { aggregator_type: ops_aggregator_type?, type_name: ops_data_type_name?, attribute_name: ops_data_attribute_name?, values: ops_aggregator_value_map?, filters: ops_filter_list?, aggregators: ops_aggregator_list? }
       type ops_aggregator_list = ::Array[ops_aggregator]
       type ops_aggregator_type = ::String
@@ -1647,7 +1699,10 @@ module Aws
         attr_accessor actual_end_time: date_time
         attr_accessor planned_start_time: date_time
         attr_accessor planned_end_time: date_time
+        attr_accessor ops_item_arn: ops_item_arn
       end
+      type ops_item_account_id = ::String
+      type ops_item_arn = ::String
       type ops_item_category = ::String
       type ops_item_data_key = ::String
       type ops_item_data_type = ("SearchableString" | "String")
@@ -1676,7 +1731,7 @@ module Aws
         attr_accessor created_time: date_time
       end
       type ops_item_filter = { key: ops_item_filter_key, values: ops_item_filter_values, operator: ops_item_filter_operator }
-      type ops_item_filter_key = ("Status" | "CreatedBy" | "Source" | "Priority" | "Title" | "OpsItemId" | "CreatedTime" | "LastModifiedTime" | "ActualStartTime" | "ActualEndTime" | "PlannedStartTime" | "PlannedEndTime" | "OperationalData" | "OperationalDataKey" | "OperationalDataValue" | "ResourceId" | "AutomationId" | "Category" | "Severity" | "OpsItemType" | "ChangeRequestByRequesterArn" | "ChangeRequestByRequesterName" | "ChangeRequestByApproverArn" | "ChangeRequestByApproverName" | "ChangeRequestByTemplate" | "ChangeRequestByTargetsResourceGroup" | "InsightByType")
+      type ops_item_filter_key = ("Status" | "CreatedBy" | "Source" | "Priority" | "Title" | "OpsItemId" | "CreatedTime" | "LastModifiedTime" | "ActualStartTime" | "ActualEndTime" | "PlannedStartTime" | "PlannedEndTime" | "OperationalData" | "OperationalDataKey" | "OperationalDataValue" | "ResourceId" | "AutomationId" | "Category" | "Severity" | "OpsItemType" | "ChangeRequestByRequesterArn" | "ChangeRequestByRequesterName" | "ChangeRequestByApproverArn" | "ChangeRequestByApproverName" | "ChangeRequestByTemplate" | "ChangeRequestByTargetsResourceGroup" | "InsightByType" | "AccountId")
       type ops_item_filter_operator = ("Equal" | "Contains" | "GreaterThan" | "LessThan")
       type ops_item_filter_value = ::String
       type ops_item_filter_values = ::Array[ops_item_filter_value]
@@ -1999,6 +2054,9 @@ module Aws
       type ping_status = ("Online" | "ConnectionLost" | "Inactive")
       type platform_type = ("Windows" | "Linux" | "MacOS")
       type platform_type_list = ::Array[platform_type]
+      type policy = ::String
+      type policy_hash = ::String
+      type policy_id = ::String
       type product = ::String
       class ProgressCounters
         attr_accessor total_steps: integer
@@ -2020,6 +2078,11 @@ module Aws
         attr_accessor version: ps_parameter_version
         attr_accessor tier: parameter_tier
       end
+      type put_resource_policy_request = { resource_arn: resource_arn_string, policy: policy, policy_id: policy_id?, policy_hash: policy_hash? }
+      class PutResourcePolicyResponse
+        attr_accessor policy_id: policy_id
+        attr_accessor policy_hash: policy_hash
+      end
       type reboot_option = ("RebootIfNeeded" | "NoReboot")
       type region = ::String
       type regions = ::Array[region]
@@ -2036,7 +2099,7 @@ module Aws
       class RegisterTargetWithMaintenanceWindowResult
         attr_accessor window_target_id: maintenance_window_target_id
       end
-      type register_task_with_maintenance_window_request = { window_id: maintenance_window_id, targets: targets_input?, task_arn: maintenance_window_task_arn, service_role_arn: service_role?, task_type: maintenance_window_task_type, task_parameters: maintenance_window_task_parameters_input?, task_invocation_parameters: maintenance_window_task_invocation_parameters?, priority: maintenance_window_task_priority?, max_concurrency: max_concurrency?, max_errors: max_errors?, logging_info: logging_info?, name: maintenance_window_name?, description: maintenance_window_description?, client_token: client_token?, cutoff_behavior: maintenance_window_task_cutoff_behavior? }
+      type register_task_with_maintenance_window_request = { window_id: maintenance_window_id, targets: targets_input?, task_arn: maintenance_window_task_arn, service_role_arn: service_role?, task_type: maintenance_window_task_type, task_parameters: maintenance_window_task_parameters_input?, task_invocation_parameters: maintenance_window_task_invocation_parameters?, priority: maintenance_window_task_priority?, max_concurrency: max_concurrency?, max_errors: max_errors?, logging_info: logging_info?, name: maintenance_window_name?, description: maintenance_window_description?, client_token: client_token?, cutoff_behavior: maintenance_window_task_cutoff_behavior?, alarm_configuration: alarm_configuration? }
       class RegisterTaskWithMaintenanceWindowResult
         attr_accessor window_task_id: maintenance_window_task_id
       end
@@ -2056,6 +2119,7 @@ module Aws
       type remove_tags_from_resource_request = { resource_type: resource_type_for_tagging, resource_id: resource_id, tag_keys: key_list }
       class RemoveTagsFromResourceResult < Aws::EmptyStructure
       end
+      type require_type = ::String
       type reset_service_setting_request = { setting_id: service_setting_id }
       class ResetServiceSettingResult
         attr_accessor service_setting: ServiceSetting
@@ -2064,6 +2128,7 @@ module Aws
         attr_accessor parameter_values: target_parameter_list
         attr_accessor truncated: boolean
       end
+      type resource_arn_string = ::String
       class ResourceComplianceSummaryItem
         attr_accessor compliance_type: compliance_type_name
         attr_accessor resource_type: compliance_resource_type
@@ -2142,8 +2207,10 @@ module Aws
       type resource_data_sync_state = ::String
       type resource_data_sync_type = ::String
       type resource_id = ::String
+      type resource_policy_max_results = ::Integer
+      type resource_policy_parameter_names_list = ::Array[string]
       type resource_type = ("ManagedInstance" | "Document" | "EC2Instance")
-      type resource_type_for_tagging = ("Document" | "ManagedInstance" | "MaintenanceWindow" | "Parameter" | "PatchBaseline" | "OpsItem" | "OpsMetadata" | "Automation")
+      type resource_type_for_tagging = ("Document" | "ManagedInstance" | "MaintenanceWindow" | "Parameter" | "PatchBaseline" | "OpsItem" | "OpsMetadata" | "Automation" | "Association")
       type response_code = ::Integer
       type result_attribute = { type_name: inventory_item_type_name }
       type result_attribute_list = ::Array[result_attribute]
@@ -2198,7 +2265,7 @@ module Aws
       type send_automation_signal_request = { automation_execution_id: automation_execution_id, signal_type: signal_type, payload: automation_parameter_map? }
       class SendAutomationSignalResult < Aws::EmptyStructure
       end
-      type send_command_request = { instance_ids: instance_id_list?, targets: targets_input?, document_name: document_arn, document_version: document_version?, document_hash: document_hash?, document_hash_type: document_hash_type?, timeout_seconds: timeout_seconds?, comment: comment?, parameters: parameters?, output_s3_region: s3_region?, output_s3_bucket_name: s3_bucket_name?, output_s3_key_prefix: s3_key_prefix?, max_concurrency: max_concurrency?, max_errors: max_errors?, service_role_arn: service_role?, notification_config: notification_config?, cloud_watch_output_config: cloud_watch_output_config? }
+      type send_command_request = { instance_ids: instance_id_list?, targets: targets_input?, document_name: document_arn, document_version: document_version?, document_hash: document_hash?, document_hash_type: document_hash_type?, timeout_seconds: timeout_seconds?, comment: comment?, parameters: parameters?, output_s3_region: s3_region?, output_s3_bucket_name: s3_bucket_name?, output_s3_key_prefix: s3_key_prefix?, max_concurrency: max_concurrency?, max_errors: max_errors?, service_role_arn: service_role?, notification_config: notification_config?, cloud_watch_output_config: cloud_watch_output_config?, alarm_configuration: alarm_configuration? }
       class SendCommandResult
         attr_accessor command: Command
       end
@@ -2268,7 +2335,7 @@ module Aws
       type start_associations_once_request = { association_ids: association_id_list }
       class StartAssociationsOnceResult < Aws::EmptyStructure
       end
-      type start_automation_execution_request = { document_name: document_arn, document_version: document_version?, parameters: automation_parameter_map?, client_token: idempotency_token?, mode: execution_mode?, target_parameter_name: automation_parameter_key?, targets: targets_input?, target_maps: target_maps?, max_concurrency: max_concurrency?, max_errors: max_errors?, target_locations: target_locations_input?, tags: tag_list_input? }
+      type start_automation_execution_request = { document_name: document_arn, document_version: document_version?, parameters: automation_parameter_map?, client_token: idempotency_token?, mode: execution_mode?, target_parameter_name: automation_parameter_key?, targets: targets_input?, target_maps: target_maps?, max_concurrency: max_concurrency?, max_errors: max_errors?, target_locations: target_locations_input?, tags: tag_list_input?, alarm_configuration: alarm_configuration? }
       class StartAutomationExecutionResult
         attr_accessor automation_execution_id: automation_execution_id
       end
@@ -2309,6 +2376,7 @@ module Aws
         attr_accessor valid_next_steps: valid_next_step_list
         attr_accessor targets: targets_output
         attr_accessor target_location: TargetLocation
+        attr_accessor triggered_alarms: alarm_state_information_list
       end
       type step_execution_filter = { key: step_execution_filter_key, values: step_execution_filter_value_list }
       type step_execution_filter_key = ("StartTimeBefore" | "StartTimeAfter" | "StepExecutionStatus" | "StepExecutionId" | "StepName" | "Action")
@@ -2340,13 +2408,14 @@ module Aws
       end
       type target_count = ::Integer
       type target_key = ::String
-      type target_location = { accounts: accounts?, regions: regions?, target_location_max_concurrency: max_concurrency?, target_location_max_errors: max_errors?, execution_role_name: execution_role_name? }
+      type target_location = { accounts: accounts?, regions: regions?, target_location_max_concurrency: max_concurrency?, target_location_max_errors: max_errors?, execution_role_name: execution_role_name?, target_location_alarm_configuration: alarm_configuration? }
       class TargetLocation
         attr_accessor accounts: accounts
         attr_accessor regions: regions
         attr_accessor target_location_max_concurrency: max_concurrency
         attr_accessor target_location_max_errors: max_errors
         attr_accessor execution_role_name: execution_role_name
+        attr_accessor target_location_alarm_configuration: AlarmConfiguration
       end
       type target_locations_input = ::Array[target_location]
       type target_locations_output = ::Array[TargetLocation]
@@ -2374,7 +2443,7 @@ module Aws
         attr_accessor removed_labels: parameter_label_list
         attr_accessor invalid_labels: parameter_label_list
       end
-      type update_association_request = { association_id: association_id, parameters: parameters?, document_version: document_version?, schedule_expression: schedule_expression?, output_location: instance_association_output_location?, name: document_arn?, targets: targets_input?, association_name: association_name?, association_version: association_version?, automation_target_parameter_name: automation_target_parameter_name?, max_errors: max_errors?, max_concurrency: max_concurrency?, compliance_severity: association_compliance_severity?, sync_compliance: association_sync_compliance?, apply_only_at_cron_interval: apply_only_at_cron_interval?, calendar_names: calendar_name_or_arn_list?, target_locations: target_locations_input?, schedule_offset: schedule_offset?, target_maps: target_maps? }
+      type update_association_request = { association_id: association_id, parameters: parameters?, document_version: document_version?, schedule_expression: schedule_expression?, output_location: instance_association_output_location?, name: document_arn?, targets: targets_input?, association_name: association_name?, association_version: association_version?, automation_target_parameter_name: automation_target_parameter_name?, max_errors: max_errors?, max_concurrency: max_concurrency?, compliance_severity: association_compliance_severity?, sync_compliance: association_sync_compliance?, apply_only_at_cron_interval: apply_only_at_cron_interval?, calendar_names: calendar_name_or_arn_list?, target_locations: target_locations_input?, schedule_offset: schedule_offset?, target_maps: target_maps?, alarm_configuration: alarm_configuration? }
       class UpdateAssociationResult
         attr_accessor association_description: AssociationDescription
       end
@@ -2417,7 +2486,7 @@ module Aws
         attr_accessor name: maintenance_window_name
         attr_accessor description: maintenance_window_description
       end
-      type update_maintenance_window_task_request = { window_id: maintenance_window_id, window_task_id: maintenance_window_task_id, targets: targets_input?, task_arn: maintenance_window_task_arn?, service_role_arn: service_role?, task_parameters: maintenance_window_task_parameters_input?, task_invocation_parameters: maintenance_window_task_invocation_parameters?, priority: maintenance_window_task_priority?, max_concurrency: max_concurrency?, max_errors: max_errors?, logging_info: logging_info?, name: maintenance_window_name?, description: maintenance_window_description?, replace: boolean?, cutoff_behavior: maintenance_window_task_cutoff_behavior? }
+      type update_maintenance_window_task_request = { window_id: maintenance_window_id, window_task_id: maintenance_window_task_id, targets: targets_input?, task_arn: maintenance_window_task_arn?, service_role_arn: service_role?, task_parameters: maintenance_window_task_parameters_input?, task_invocation_parameters: maintenance_window_task_invocation_parameters?, priority: maintenance_window_task_priority?, max_concurrency: max_concurrency?, max_errors: max_errors?, logging_info: logging_info?, name: maintenance_window_name?, description: maintenance_window_description?, replace: boolean?, cutoff_behavior: maintenance_window_task_cutoff_behavior?, alarm_configuration: alarm_configuration? }
       class UpdateMaintenanceWindowTaskResult
         attr_accessor window_id: maintenance_window_id
         attr_accessor window_task_id: maintenance_window_task_id
@@ -2433,11 +2502,12 @@ module Aws
         attr_accessor name: maintenance_window_name
         attr_accessor description: maintenance_window_description
         attr_accessor cutoff_behavior: maintenance_window_task_cutoff_behavior
+        attr_accessor alarm_configuration: AlarmConfiguration
       end
       type update_managed_instance_role_request = { instance_id: managed_instance_id, iam_role: iam_role }
       class UpdateManagedInstanceRoleResult < Aws::EmptyStructure
       end
-      type update_ops_item_request = { description: ops_item_description?, operational_data: ops_item_operational_data_input?, operational_data_to_delete: ops_item_ops_data_keys_list?, notifications: ops_item_notifications_input?, priority: ops_item_priority?, related_ops_items: related_ops_items_input?, status: ops_item_status?, ops_item_id: ops_item_id, title: ops_item_title?, category: ops_item_category?, severity: ops_item_severity?, actual_start_time: date_time?, actual_end_time: date_time?, planned_start_time: date_time?, planned_end_time: date_time? }
+      type update_ops_item_request = { description: ops_item_description?, operational_data: ops_item_operational_data_input?, operational_data_to_delete: ops_item_ops_data_keys_list?, notifications: ops_item_notifications_input?, priority: ops_item_priority?, related_ops_items: related_ops_items_input?, status: ops_item_status?, ops_item_id: ops_item_id, title: ops_item_title?, category: ops_item_category?, severity: ops_item_severity?, actual_start_time: date_time?, actual_end_time: date_time?, planned_start_time: date_time?, planned_end_time: date_time?, ops_item_arn: ops_item_arn? }
       class UpdateOpsItemResponse < Aws::EmptyStructure
       end
       type update_ops_metadata_request = { ops_metadata_arn: ops_metadata_arn, metadata_to_update: metadata_map_input?, keys_to_delete: metadata_keys_to_delete_list? }
