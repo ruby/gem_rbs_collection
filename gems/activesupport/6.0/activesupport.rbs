@@ -162,6 +162,24 @@ class Hash[unchecked out K, unchecked out V]
   # Manual definition to make block optional
   def deep_merge!: (untyped other_hash) ?{ () -> untyped } -> untyped
                  | ...
+
+  def stringify_keys: () -> Hash[String, V]
+
+  def stringify_keys!: () -> self
+
+  def symbolize_keys: () -> Hash[Symbol, V]
+  alias to_options symbolize_keys
+
+  def symbolize_keys!: () -> self
+  alias to_options! symbolize_keys!
+
+  def deep_stringify_keys: () -> Hash[String, untyped]
+
+  def deep_stringify_keys!: () -> self
+
+  def deep_symbolize_keys: () -> Hash[Symbol, untyped]
+
+  def deep_symbolize_keys!: () -> self
 end
 
 class Module
