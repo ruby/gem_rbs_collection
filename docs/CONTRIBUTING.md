@@ -15,6 +15,8 @@ Adding RBS files for a gem can be done with 4 steps.
 3. Write RBS files
 4. Write tests
 
+If the type is already defined in gem_rbs_collection, edit the RBS file, test file.
+
 (And you can open a pull request to get your code published.)
 
 ### Set up environment
