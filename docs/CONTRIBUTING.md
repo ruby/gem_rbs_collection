@@ -6,6 +6,9 @@
 Adding RBS files directory in your gem would be a better option.
 Write RBS files, put them in `sig` directory, and included the directory in the gem package.
 
+**If you are not the owner of the gem:**
+Please refer to the following steps to contribute to this project.
+
 ## Adding RBS of a gem
 
 Adding RBS files for a gem can be done with 4 steps.
