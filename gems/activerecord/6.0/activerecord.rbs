@@ -315,9 +315,36 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
           | (Array[PrimaryKey]) -> Array[Model]
           | (*PrimaryKey) -> Array[Model]
           | () { (Model) -> boolish } -> Model?
+  def find_or_create_by: (*untyped) -> Model
+                       | (*untyped) { (Model) -> void } -> Model
+  def find_or_create_by!: (*untyped) -> Model
+                        | (*untyped) { (Model) -> void } -> Model
+  def find_or_initialize_by: (*untyped) -> Model
+                           | (*untyped) { (Model) -> void } -> Model
+  def create_or_find_by: (*untyped) -> Model
+                       | (*untyped) { (Model) -> void } -> Model
+  def create_or_find_by!: (*untyped) -> Model
+                        | (*untyped) { (Model) -> void } -> Model
+  def take: () -> Model
+          | (Integer limit) -> Array[Model]
+  def take!: () -> Model
   def first: () -> Model?
            | (Integer count) -> Array[Model]
   def first!: () -> Model
+  def second: () -> Model?
+  def second!: () -> Model
+  def third: () -> Model?
+  def third!: () -> Model
+  def fourth: () -> Model?
+  def fourth!: () -> Model
+  def fifth: () -> Model?
+  def fifth!: () -> Model
+  def forty_two: () -> Model?
+  def forty_two!: () -> Model
+  def second_to_last: () -> Model?
+  def second_to_last!: () -> Model
+  def third_to_last: () -> Model?
+  def third_to_last!: () -> Model
   def last: () -> Model?
            | (Integer count) -> Array[Model]
   def last!: () -> Model
@@ -325,12 +352,17 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
+  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
   def update_all: (*untyped) -> untyped
+  def touch_all: (*untyped, ?time: untyped) -> untyped
+  def destroy_by: (*untyped) -> untyped
+  def delete_by: (*untyped) -> untyped
   def each: () { (Model) -> void } -> self
   def select: (*Symbol | String) -> self
             | () { (Model) -> boolish } -> Array[Model]
+  def reselect: (*Symbol | String) -> self
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
@@ -341,6 +373,14 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
            | (*Symbol | String columns) -> Array[Array[untyped]]
   def where: (*untyped) -> Relation
   def exists?: (*untyped) -> bool
+  def any?: () -> bool
+          | () { (Model) -> boolish } -> bool
+  def many?: () -> bool
+           | () { (Model) -> boolish } -> bool
+  def none?: () -> bool
+           | () { (Model) -> boolish } -> bool
+  def one?: () -> bool
+          | () { (Model) -> boolish } -> bool
   def order: (*untyped) -> Relation
   def group: (*Symbol | String) -> untyped
   def distinct: () -> Relation
@@ -363,20 +403,52 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def find: (PrimaryKey id) -> Model
           | (Array[PrimaryKey]) -> Array[Model]
           | (*PrimaryKey) -> Array[Model]
+  def find_or_create_by: (*untyped) -> Model
+                       | (*untyped) { (Model) -> void } -> Model
+  def find_or_create_by!: (*untyped) -> Model
+                        | (*untyped) { (Model) -> void } -> Model
+  def find_or_initialize_by: (*untyped) -> Model
+                           | (*untyped) { (Model) -> void } -> Model
+  def create_or_find_by: (*untyped) -> Model
+                       | (*untyped) { (Model) -> void } -> Model
+  def create_or_find_by!: (*untyped) -> Model
+                        | (*untyped) { (Model) -> void } -> Model
+  def take: () -> Model
+          | (Integer limit) -> Array[Model]
+  def take!: () -> Model
   def first: () -> Model?
            | (Integer count) -> Array[Model]
   def first!: () -> Model
+  def second: () -> Model?
+  def second!: () -> Model
+  def third: () -> Model?
+  def third!: () -> Model
+  def fourth: () -> Model?
+  def fourth!: () -> Model
+  def fifth: () -> Model?
+  def fifth!: () -> Model
+  def forty_two: () -> Model?
+  def forty_two!: () -> Model
+  def second_to_last: () -> Model?
+  def second_to_last!: () -> Model
+  def third_to_last: () -> Model?
+  def third_to_last!: () -> Model
   def last: () -> Model?
            | (Integer count) -> Array[Model]
   def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
+  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
   def update_all: (*untyped) -> untyped
+  def touch_all: (*untyped, ?time: untyped) -> untyped
+  def destroy_by: (*untyped) -> untyped
+  def delete_by: (*untyped) -> untyped
   def select: (*Symbol | String) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
+  def reselect: (*Symbol | String) -> Relation
 end
 
 # https://github.com/rails/rails/blob/fbe2433be6e052a1acac63c7faf287c52ed3c5ba/activerecord/lib/arel/nodes/unary.rb
