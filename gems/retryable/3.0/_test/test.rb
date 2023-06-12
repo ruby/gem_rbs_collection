@@ -13,18 +13,32 @@ Retryable.retryable do |retries, exception|
 end
 
 Retryable.retryable(
-  ensure: ->(retries) { retries.bit_length },
-  exception_cb: ->(exception) { exception.backtrace },
-  log_method: ->(retries, exception) { [retries.bit_length, exception.backtrace] },
+  ensure: ->(retries) {
+    # @type var retries: Integer
+    retries.bit_length
+  },
+  exception_cb: ->(exception) {
+    # @type var exception: Exception
+    exception.backtrace
+  },
+  log_method: ->(retries, exception) {
+    # @type var retries: Integer
+    # @type var exception: Exception?
+    [retries.bit_length, exception&.backtrace]
+  },
   matching: [/foo/, "bar"],
   not: [ArgumentError],
   on: StandardError,
   sleep: 10,
-  sleep_method: ->(n) { n ** 1 },
+  sleep_method: ->(seconds) {
+    # @type var seconds: real
+    seconds * 2
+  },
   tries: 3
 ) do
   puts "foo"
 end
+Retryable.retryable({ sleep: 3.2 }) {}
 
 Retryable.configuration.tap do |config|
   config.contexts.keys
@@ -65,7 +79,10 @@ Retryable.configure do |config|
   config.on = [ArgumentError]
   config.sleep = 1
   config.sleep = 0.5
-  config.sleep = ->(retries) { retries ** 2 }
+  config.sleep = ->(retries) {
+    # @type var retries: Integer
+    retries ** 2
+  }
   config.sleep_method = ->(n) { sleep(n.to_int + 1.5) }
   config.tries = 3
 end
