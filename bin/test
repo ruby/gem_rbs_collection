@@ -4,30 +4,30 @@ require "pathname"
 require "optparse"
 require "open3"
 
+@all = false
 @verbose = false
 @repo_root = Pathname(__dir__) + "../gems"
 @repos = []
 
 OptionParser.new do |opts|
+  opts.banner = "Usage: bin/test [options] <gem...>"
+
   opts.on("--root=PATH", "Specify repository root") do |path|
     @repo_root = Pathname(path)
   end
   opts.on("--repo=PATH", "Add more repositories") do |path|
     @repos << Pathname(path)
   end
+  opts.on("-a", "--all", "Test all gems") do @all = true end
   opts.on("-v", "--verbose", "Print more messages") do @verbose = true end
 end.parse!(ARGV)
 
-dirs = ARGV.map {|path| Pathname(path) }
-# if dirs.empty?
-#   (Pathname(__dir__) + "../gems").children.flat_map(&:children).each do |path|
-#     if path.directory?
-#       unless path.basename.to_s.start_with?(".")
-#         dirs << path.relative_path_from(Pathname.pwd)
-#       end
-#     end
-#   end
-# end
+dirs =
+  if @all
+    Pathname(__dir__).glob("../gems/*/*").map {|dir| dir.relative_path_from(Dir.pwd) }
+  else
+    ARGV.map {|path| Pathname(path) }
+  end
 
 def putv(message)
   if @verbose
@@ -37,40 +37,66 @@ def putv(message)
   end
 end
 
-failed_libs = []
+def putci(message)
+  puts message if ENV["CI"]
+end
+
+passed_gems = []
+failed_gems = []
 
 dirs.each do |dir|
-  test_path = dir + "_scripts/test"
+  test_script = dir + "_scripts/test"
   case
-  when !test_path.file?
-    puts "Skipping: cannot find test script at `#{test_path}`..."
-  when !test_path.executable?
-    puts "Skipping: `#{test_path}` is not executable..."
+  when !dir.exist?
+    puts "Skipping: `#{dir}` is not found..."
+    putci "::warning ::`#{dir}` is not found"
+  when !dir.directory?
+    puts "Skipping: `#{dir}` is not a directory..."
+    putci "::warning ::`#{dir}` is not a directory"
+  when !test_script.exist?
+    puts "Skipping: `#{test_script}` is not found..."
+    putci "::warning ::`#{test_script}` is not found"
+  when !test_script.file?
+    puts "Skipping: `#{test_script}` is not a file..."
+    putci "::warning ::`#{test_script}` is not a file"
+  when !test_script.executable?
+    puts "Skipping: `#{test_script}` is not executable..."
+    putci "::warning ::`#{test_script}` is not executable"
   else
-    puts "::group::Test for #{dir}" if ENV['CI']
-    puts "Detected test script: #{test_path}"
+    putci "::group::Test for #{dir}"
+    puts "Detected test script: #{test_script}"
 
     env = {
       "REPO_ROOT" => @repo_root.to_s,
       "REPOS" => @repos.join(File::PATH_SEPARATOR),
       "RBS_DIR" => dir.to_s
     }
-    stdout, status = Open3.capture2(env, test_path.to_s)
-
-    putv(stdout)
+    status = Open3.popen2e(env, test_script.to_s) do |_stdin, stdout_stderr, thread|
+      putv stdout_stderr
+      thread.value
+    end
 
     if status.success?
       puts " => Success 💪"
+      passed_gems << dir
     else
       puts " => Failure 🚨"
-      failed_libs << dir
+      putci "::error ::`#{dir}` test failed"
+      failed_gems << dir
     end
 
-    puts "::endgroup::" if ENV['CI']
+    putci "::endgroup::"
   end
 end
 
-unless failed_libs.empty?
-  puts "Failed: #{failed_libs.join(', ')}"
+unless failed_gems.empty?
+  puts ""
+  puts "# Failed gems"
+  failed_gems.each {|gem| puts gem }
+  exit 1
+end
+
+if passed_gems.empty?
+  puts "No succeeded gems"
   exit 1
 end
