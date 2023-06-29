@@ -22,10 +22,9 @@ jobs:
     - name: 'Test syntax check'
       run: 'rbs parse gems/**/*.rbs'
 
-  test_on_changed_gems:
-    if: github.event_name == 'pull_request'
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
@@ -34,6 +33,7 @@ jobs:
         bundler-cache: true
     - name: Get changed gems
       id: changes
+      if: ${{ github.event_name == 'pull_request' }}
       run: |
         END_MARKER="$(uuidgen)"
         echo "gems<<${END_MARKER}" >> "$GITHUB_OUTPUT"
@@ -46,21 +46,11 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run test on changed gems
-      if: steps.changes.outputs.gems
+      if: ${{ steps.changes.outputs.gems }}
       run: |
         cat <<EOD | xargs bin/test --verbose
           ${{ steps.changes.outputs.gems }}
         EOD
-
-  test_all_gems:
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
     - name: Run test on all gems
+      if: ${{ !steps.changes.outputs.gems }}
       run: bin/test --all --verbose
