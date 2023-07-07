@@ -8,7 +8,7 @@ The directory that defines the RBS files for the [enumerize](https://github.com/
 
 The most common use cases for this gem would be:
 
-```rb
+```ruby
 # user.rb
 require 'enumerize'
 
@@ -21,7 +21,7 @@ end
 
 In this case, the RBS file should be written as follows:
 
-```
+```rbs
 # user.rbs
 class User
   extend Enumerize
