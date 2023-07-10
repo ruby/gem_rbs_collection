@@ -55,7 +55,7 @@ Focus on the APIs your app is using.
 
 We don't recommend adding top-level type aliases and interfaces.
 
-```
+```rbs
 # Don't do this.
 
 type redis_config = { host: String?, port: Integer? }
