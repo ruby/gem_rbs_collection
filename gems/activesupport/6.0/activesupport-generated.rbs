@@ -654,22 +654,6 @@ module ActiveSupport
       # duration of a block. Repeated calls to the cache for the same key will hit the
       # in-memory cache for faster access.
       module LocalCache
-        class LocalCacheRegistry
-          # Class for storing and registering the local caches.
-          # :nodoc:
-          extend ActiveSupport::PerThreadRegistry
-
-          def initialize: () -> untyped
-
-          def cache_for: (untyped local_cache_key) -> untyped
-
-          def set_cache_for: (untyped local_cache_key, untyped value) -> untyped
-
-          def self.set_cache_for: (untyped l, untyped v) -> untyped
-
-          def self.cache_for: (untyped l) -> untyped
-        end
-
         # Simple memory backed cache. This cache is not thread safe and is intended only
         # for serving as a temporary memory cache for a single thread.
         class LocalStore < Store
