@@ -2,4 +2,16 @@ module ActiveRecord
   module Enum
     def enum: (Hash[Symbol, untyped] definitions) -> void
   end
+
+  class RuntimeRegistry
+    extend ActiveSupport::PerThreadRegistry
+
+    attr_accessor connection_handler: untyped
+    def self.connection_handler: () -> untyped
+    def self.connection_handler=: (untyped) -> untyped
+
+    attr_accessor sql_runtime: untyped
+    def self.sql_runtime: () -> untyped
+    def self.sql_runtime=: (untyped) -> untyped
+  end
 end

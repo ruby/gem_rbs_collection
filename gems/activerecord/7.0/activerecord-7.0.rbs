@@ -10,4 +10,12 @@ module ActiveRecord
             | ((String | Symbol) name, **untyped options) -> void
             | ((String | Symbol) name, (Hash[(Symbol | String), untyped] | Array[Symbol | String]) values, **untyped options) -> void
   end
+
+  module RuntimeRegistry
+    def sql_runtime: () -> untyped
+
+    def sql_runtime=: (untyped runtime) -> untyped
+
+    extend RuntimeRegistry
+  end
 end
