@@ -2,10 +2,13 @@ module ActiveSupport
   module Cache
     module Strategy
       module LocalCache
-        module LocalCacheRegistry
+        class LocalCacheRegistry
+          def initialize: () -> void
           def cache_for: (untyped local_cache_key) -> untyped
           def set_cache_for: (untyped local_cache_key, untyped value) -> untyped
-          extend LocalCacheRegistry
+          def self.set_cache_for: (untyped l, untyped v) -> untyped
+          def self.cache_for: (untyped l) -> untyped
+          extend ActiveSupport::PerThreadRegistry
         end
       end
     end
