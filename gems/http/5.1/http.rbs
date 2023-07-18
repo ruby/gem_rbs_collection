@@ -1,1 +1,46 @@
 # Write the type definition here!
+
+module HTTP
+  interface _Stringable
+    def to_s: () -> String
+  end
+
+  interface _Callable
+    def call: () -> (Symbol | String)
+  end
+
+  class Client
+    def initialize: (?Hash[untyped, untyped] default_options) -> void
+  end
+
+  class Request
+    extend Forwardable
+
+    attr_reader verb: _Stringable
+    attr_reader scheme: Symbol
+    attr_reader uri_normalizer: _Callable
+    attr_reader uri: HTTP::URI | _Stringable
+    attr_reader proxy: Hash[untyped, untyped]
+    attr_reader body: String | Enumerable[untyped] | IO | nil
+    attr_reader version: String
+
+    def initialize: (Hash[Symbol, untyped] opts) -> void
+  end
+
+  class Response
+    extend Forwardable
+
+    attr_reader status: Integer
+    attr_reader version: String
+    attr_reader body: String
+    attr_reader request: HTTP::Request
+    attr_reader proxy_headers: Hash[untyped, untyped]
+
+    def initialize: (Hash[Symbol, untyped] opts) -> void
+  end
+
+  class URI
+    attr_reader host: String
+    attr_reader normalized_host: String
+  end
+end
