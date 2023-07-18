@@ -66,7 +66,7 @@ module Aws
       type analytics_s3_bucket_destination = { format: analytics_s3_export_file_format, bucket_account_id: account_id?, bucket: bucket_name, prefix: prefix? }
       type analytics_s3_export_file_format = ("CSV")
       type archive_status = ("ARCHIVE_ACCESS" | "DEEP_ARCHIVE_ACCESS")
-      type body_streaming = ::IO
+      type body_streaming_output = ::IO
       type body_streaming_input = ::String | ::StringIO | ::File
       type body = ::String
       class Bucket
@@ -480,7 +480,7 @@ module Aws
       end
       type get_object_lock_configuration_request = { bucket: bucket_name, expected_bucket_owner: account_id? }
       class GetObjectOutput
-        attr_accessor body: body_streaming
+        attr_accessor body: body_streaming_output
         attr_accessor delete_marker: delete_marker
         attr_accessor accept_ranges: accept_ranges
         attr_accessor expiration: expiration
@@ -529,7 +529,7 @@ module Aws
       end
       type get_object_tagging_request = { bucket: bucket_name, key: object_key, version_id: object_version_id?, expected_bucket_owner: account_id?, request_payer: request_payer? }
       class GetObjectTorrentOutput
-        attr_accessor body: body_streaming
+        attr_accessor body: body_streaming_output
         attr_accessor request_charged: request_charged
       end
       type get_object_torrent_request = { bucket: bucket_name, key: object_key, request_payer: request_payer?, expected_bucket_owner: account_id? }
@@ -1152,7 +1152,7 @@ module Aws
       type range = ::String
       type record_delimiter = ::String
       class RecordsEvent
-        attr_accessor payload: body_streaming
+        attr_accessor payload: body_streaming_output
       end
       class Redirect
         attr_accessor host_name: host_name

@@ -153,7 +153,7 @@ module AwsSdkRbsGenerator
           value_shapes = dictionary[shape_body.fetch("value").fetch("shape")]
           (1 < key_shapes.length && !!key_shapes.find(&:structure?)) || (1 < value_shapes.length && !!value_shapes.find(&:structure?))
         else
-          if streaming? && input?
+          if streaming?
             true
           else
             false
