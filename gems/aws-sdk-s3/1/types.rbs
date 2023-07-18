@@ -77,7 +77,7 @@ module Aws
       type bucket_canned_acl = ("private" | "public-read" | "public-read-write" | "authenticated-read")
       type bucket_key_enabled = bool
       type bucket_lifecycle_configuration = { rules: lifecycle_rules_input }
-      type bucket_location_constraint = ("af-south-1" | "ap-east-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-northeast-3" | "ap-south-1" | "ap-southeast-1" | "ap-southeast-2" | "ap-southeast-3" | "ca-central-1" | "cn-north-1" | "cn-northwest-1" | "EU" | "eu-central-1" | "eu-north-1" | "eu-south-1" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "me-south-1" | "sa-east-1" | "us-east-2" | "us-gov-east-1" | "us-gov-west-1" | "us-west-1" | "us-west-2")
+      type bucket_location_constraint = ("af-south-1" | "ap-east-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-northeast-3" | "ap-south-1" | "ap-southeast-1" | "ap-southeast-2" | "ap-southeast-3" | "ca-central-1" | "cn-north-1" | "cn-northwest-1" | "EU" | "eu-central-1" | "eu-north-1" | "eu-south-1" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "me-south-1" | "sa-east-1" | "us-east-2" | "us-gov-east-1" | "us-gov-west-1" | "us-west-1" | "us-west-2" | "ap-south-2" | "eu-south-2")
       type bucket_logging_status = { logging_enabled: logging_enabled? }
       type bucket_logs_permission = ("FULL_CONTROL" | "READ" | "WRITE")
       type bucket_name = ::String
@@ -361,8 +361,9 @@ module Aws
       type filter_rule_value = ::String
       class GetBucketAccelerateConfigurationOutput
         attr_accessor status: bucket_accelerate_status
+        attr_accessor request_charged: request_charged
       end
-      type get_bucket_accelerate_configuration_request = { bucket: bucket_name, expected_bucket_owner: account_id? }
+      type get_bucket_accelerate_configuration_request = { bucket: bucket_name, expected_bucket_owner: account_id?, request_payer: request_payer? }
       class GetBucketAclOutput
         attr_accessor owner: Owner
         attr_accessor grants: grants_output
@@ -665,7 +666,7 @@ module Aws
       type inventory_frequency = ("Daily" | "Weekly")
       type inventory_id = ::String
       type inventory_included_object_versions = ("All" | "Current")
-      type inventory_optional_field = ("Size" | "LastModifiedDate" | "StorageClass" | "ETag" | "IsMultipartUploaded" | "ReplicationStatus" | "EncryptionStatus" | "ObjectLockRetainUntilDate" | "ObjectLockMode" | "ObjectLockLegalHoldStatus" | "IntelligentTieringAccessTier" | "BucketKeyStatus" | "ChecksumAlgorithm")
+      type inventory_optional_field = ("Size" | "LastModifiedDate" | "StorageClass" | "ETag" | "IsMultipartUploaded" | "ReplicationStatus" | "EncryptionStatus" | "ObjectLockRetainUntilDate" | "ObjectLockMode" | "ObjectLockLegalHoldStatus" | "IntelligentTieringAccessTier" | "BucketKeyStatus" | "ChecksumAlgorithm" | "ObjectAccessControlList" | "ObjectOwner")
       type inventory_optional_fields = ::Array[inventory_optional_field]
       class InventoryS3BucketDestination
         attr_accessor account_id: account_id
@@ -682,6 +683,7 @@ module Aws
       type is_enabled = bool
       type is_latest = bool
       type is_public = bool
+      type is_restore_in_progress = bool
       type is_truncated = bool
       type json_input = { type: json_type? }
       type json_output = { record_delimiter: record_delimiter? }
@@ -782,8 +784,9 @@ module Aws
         attr_accessor uploads: multipart_upload_list
         attr_accessor common_prefixes: common_prefix_list
         attr_accessor encoding_type: encoding_type
+        attr_accessor request_charged: request_charged
       end
-      type list_multipart_uploads_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, key_marker: key_marker?, max_uploads: max_uploads?, prefix: prefix?, upload_id_marker: upload_id_marker?, expected_bucket_owner: account_id? }
+      type list_multipart_uploads_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, key_marker: key_marker?, max_uploads: max_uploads?, prefix: prefix?, upload_id_marker: upload_id_marker?, expected_bucket_owner: account_id?, request_payer: request_payer? }
       class ListObjectVersionsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor key_marker: key_marker
@@ -798,8 +801,9 @@ module Aws
         attr_accessor max_keys: max_keys
         attr_accessor common_prefixes: common_prefix_list
         attr_accessor encoding_type: encoding_type
+        attr_accessor request_charged: request_charged
       end
-      type list_object_versions_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, key_marker: key_marker?, max_keys: max_keys?, prefix: prefix?, version_id_marker: version_id_marker?, expected_bucket_owner: account_id? }
+      type list_object_versions_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, key_marker: key_marker?, max_keys: max_keys?, prefix: prefix?, version_id_marker: version_id_marker?, expected_bucket_owner: account_id?, request_payer: request_payer?, optional_object_attributes: optional_object_attributes_list? }
       class ListObjectsOutput
         attr_accessor is_truncated: is_truncated
         attr_accessor marker: marker
@@ -811,8 +815,9 @@ module Aws
         attr_accessor max_keys: max_keys
         attr_accessor common_prefixes: common_prefix_list
         attr_accessor encoding_type: encoding_type
+        attr_accessor request_charged: request_charged
       end
-      type list_objects_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, marker: marker?, max_keys: max_keys?, prefix: prefix?, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      type list_objects_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, marker: marker?, max_keys: max_keys?, prefix: prefix?, request_payer: request_payer?, expected_bucket_owner: account_id?, optional_object_attributes: optional_object_attributes_list? }
       class ListObjectsV2Output
         attr_accessor is_truncated: is_truncated
         attr_accessor contents: object_list
@@ -826,8 +831,9 @@ module Aws
         attr_accessor continuation_token: token
         attr_accessor next_continuation_token: next_token
         attr_accessor start_after: start_after
+        attr_accessor request_charged: request_charged
       end
-      type list_objects_v2_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, max_keys: max_keys?, prefix: prefix?, continuation_token: token?, fetch_owner: fetch_owner?, start_after: start_after?, request_payer: request_payer?, expected_bucket_owner: account_id? }
+      type list_objects_v2_request = { bucket: bucket_name, delimiter: delimiter?, encoding_type: encoding_type?, max_keys: max_keys?, prefix: prefix?, continuation_token: token?, fetch_owner: fetch_owner?, start_after: start_after?, request_payer: request_payer?, expected_bucket_owner: account_id?, optional_object_attributes: optional_object_attributes_list? }
       class ListPartsOutput
         attr_accessor abort_date: abort_date
         attr_accessor abort_rule_id: abort_rule_id
@@ -952,6 +958,7 @@ module Aws
         attr_accessor size: size
         attr_accessor storage_class: object_storage_class
         attr_accessor owner: Owner
+        attr_accessor restore_status: RestoreStatus
       end
       type object_attributes = ("ETag" | "Checksum" | "ObjectParts" | "StorageClass" | "ObjectSize")
       type object_attributes_list = ::Array[object_attributes]
@@ -1008,10 +1015,13 @@ module Aws
         attr_accessor is_latest: is_latest
         attr_accessor last_modified: last_modified
         attr_accessor owner: Owner
+        attr_accessor restore_status: RestoreStatus
       end
       type object_version_id = ::String
       type object_version_list = ::Array[ObjectVersion]
       type object_version_storage_class = ("STANDARD")
+      type optional_object_attributes = ("RestoreStatus")
+      type optional_object_attributes_list = ::Array[optional_object_attributes]
       type output_location = { s3: s3_location? }
       type output_serialization = { csv: csv_output?, json: json_output? }
       class Owner
@@ -1230,6 +1240,7 @@ module Aws
       type response_content_type = ::String
       type response_expires = ::Time
       type restore = ::String
+      type restore_expiry_date = ::Time
       class RestoreObjectOutput
         attr_accessor request_charged: request_charged
         attr_accessor restore_output_path: restore_output_path
@@ -1238,6 +1249,10 @@ module Aws
       type restore_output_path = ::String
       type restore_request = { days: days?, glacier_job_parameters: glacier_job_parameters?, type: restore_request_type?, tier: tier?, description: description?, select_parameters: select_parameters?, output_location: output_location? }
       type restore_request_type = ("SELECT")
+      class RestoreStatus
+        attr_accessor is_restore_in_progress: is_restore_in_progress
+        attr_accessor restore_expiry_date: restore_expiry_date
+      end
       type role = ::String
       class RoutingRule
         attr_accessor condition: Condition
@@ -1289,7 +1304,7 @@ module Aws
       end
       type select_object_content_request = { bucket: bucket_name, key: object_key, sse_customer_algorithm: sse_customer_algorithm?, sse_customer_key: sse_customer_key?, sse_customer_key_md5: sse_customer_key_md5?, expression: expression, expression_type: expression_type, request_progress: request_progress?, input_serialization: input_serialization, output_serialization: output_serialization, scan_range: scan_range?, expected_bucket_owner: account_id? }
       type select_parameters = { input_serialization: input_serialization, expression_type: expression_type, expression: expression, output_serialization: output_serialization }
-      type server_side_encryption = ("AES256" | "aws:kms")
+      type server_side_encryption = ("AES256" | "aws:kms" | "aws:kms:dsse")
       class ServerSideEncryptionByDefault
         attr_accessor sse_algorithm: server_side_encryption
         attr_accessor kms_master_key_id: ssekms_key_id
