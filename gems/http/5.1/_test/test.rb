@@ -8,3 +8,5 @@ response = HTTP::Response.new(
   version: "1.1",
   body: "Hello world!",
 )
+
+response.code == 200
