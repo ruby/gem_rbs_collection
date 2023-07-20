@@ -1,23 +1,19 @@
 module HTTP
-  interface _Stringable
-    def to_s: () -> String
-  end
-
   interface _Callable
     def call: () -> (Symbol | String)
   end
 
-  def self.auth: (_Stringable) -> HTTP::Client
+  def self.auth: (_ToS) -> HTTP::Client
 
   class Client
     def initialize: (?Hash[untyped, untyped] default_options) -> void
   end
 
   class Request
-    attr_reader verb: _Stringable
+    attr_reader verb: _ToS
     attr_reader scheme: Symbol
     attr_reader uri_normalizer: _Callable
-    attr_reader uri: HTTP::URI | _Stringable
+    attr_reader uri: HTTP::URI | _ToS
     attr_reader proxy: Hash[untyped, untyped]
     attr_reader body: String | Enumerable[untyped] | IO | nil
     attr_reader version: String
