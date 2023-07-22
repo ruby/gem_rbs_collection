@@ -80,3 +80,14 @@ class MySchema < GraphQL::Schema
     raise "error!"
   end
 end
+
+# sample dataloader
+class MyDataloaderSchema < GraphQL::Schema
+  use GraphQL::Dataloader
+end
+
+class MyDataloader < GraphQL::Dataloader::Source
+  def fetch(keys)
+    keys.map { |key| nil }
+  end
+end
