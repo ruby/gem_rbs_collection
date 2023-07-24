@@ -1,0 +1,40 @@
+module HTTP
+  interface _Callable
+    def call: () -> (Symbol | String)
+  end
+
+  def self.auth: (_ToS) -> HTTP::Client
+
+  class Client
+    def initialize: (?Hash[untyped, untyped] default_options) -> void
+  end
+
+  class Request
+    attr_reader verb: _ToS
+    attr_reader scheme: Symbol
+    attr_reader uri_normalizer: _Callable
+    attr_reader uri: HTTP::URI | _ToS
+    attr_reader proxy: Hash[untyped, untyped]
+    attr_reader body: String | Enumerable[untyped] | IO | nil
+    attr_reader version: String
+
+    def initialize: (Hash[Symbol, untyped] opts) -> void
+  end
+
+  class Response
+    attr_reader status: Integer
+    attr_reader version: String
+    attr_reader body: String
+    attr_reader request: HTTP::Request
+    attr_reader proxy_headers: Hash[untyped, untyped]
+
+    def initialize: (Hash[Symbol, untyped] opts) -> void
+
+    def code: () -> Integer
+  end
+
+  class URI
+    attr_reader host: String
+    attr_reader normalized_host: String
+  end
+end

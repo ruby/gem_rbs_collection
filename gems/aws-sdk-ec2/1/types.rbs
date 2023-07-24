@@ -163,7 +163,7 @@ module Aws
         attr_accessor customer_owned_ipv_4_pool: string
         attr_accessor carrier_ip: string
       end
-      type allocate_hosts_request = { auto_placement: auto_placement?, availability_zone: string, client_token: string?, instance_type: string?, instance_family: string?, quantity: integer, tag_specifications: tag_specification_list_input?, host_recovery: host_recovery?, outpost_arn: string?, host_maintenance: host_maintenance? }
+      type allocate_hosts_request = { auto_placement: auto_placement?, availability_zone: string, client_token: string?, instance_type: string?, instance_family: string?, quantity: integer?, tag_specifications: tag_specification_list_input?, host_recovery: host_recovery?, outpost_arn: string?, host_maintenance: host_maintenance?, asset_ids: asset_id_list? }
       class AllocateHostsResult
         attr_accessor host_ids: response_host_id_list
       end
@@ -260,6 +260,8 @@ module Aws
       type architecture_type_set = ::Array[architecture_type]
       type architecture_values = ("i386" | "x86_64" | "arm64" | "x86_64_mac" | "arm64_mac")
       type arn_list = ::Array[resource_arn]
+      type asset_id = ::String
+      type asset_id_list = ::Array[asset_id]
       type assign_ipv_6_addresses_request = { ipv_6_address_count: integer?, ipv_6_addresses: ipv_6_address_list?, ipv_6_prefix_count: integer?, ipv_6_prefixes: ip_prefix_list?, network_interface_id: network_interface_id }
       class AssignIpv6AddressesResult
         attr_accessor assigned_ipv_6_addresses: ipv_6_address_list
@@ -444,6 +446,7 @@ module Aws
         attr_accessor parent_zone_name: string
         attr_accessor parent_zone_id: string
       end
+      type availability_zone_id = ::String
       type availability_zone_list = ::Array[AvailabilityZone]
       class AvailabilityZoneMessage
         attr_accessor message: string
@@ -932,7 +935,7 @@ module Aws
         attr_accessor fleet_capacity_reservations: fleet_capacity_reservation_set
         attr_accessor tags: tag_list_output
       end
-      type create_capacity_reservation_request = { client_token: string?, instance_type: string, instance_platform: capacity_reservation_instance_platform, availability_zone: string?, availability_zone_id: string?, tenancy: capacity_reservation_tenancy?, instance_count: integer, ebs_optimized: boolean?, ephemeral_storage: boolean?, end_date: date_time?, end_date_type: end_date_type?, instance_match_criteria: instance_match_criteria?, tag_specifications: tag_specification_list_input?, dry_run: boolean?, outpost_arn: outpost_arn?, placement_group_arn: placement_group_arn? }
+      type create_capacity_reservation_request = { client_token: string?, instance_type: string, instance_platform: capacity_reservation_instance_platform, availability_zone: availability_zone_name?, availability_zone_id: availability_zone_id?, tenancy: capacity_reservation_tenancy?, instance_count: integer, ebs_optimized: boolean?, ephemeral_storage: boolean?, end_date: date_time?, end_date_type: end_date_type?, instance_match_criteria: instance_match_criteria?, tag_specifications: tag_specification_list_input?, dry_run: boolean?, outpost_arn: outpost_arn?, placement_group_arn: placement_group_arn? }
       class CreateCapacityReservationResult
         attr_accessor capacity_reservation: CapacityReservation
       end
@@ -1014,6 +1017,11 @@ module Aws
       type create_image_request = { block_device_mappings: block_device_mapping_request_list_input?, description: string?, dry_run: boolean?, instance_id: instance_id, name: string, no_reboot: boolean?, tag_specifications: tag_specification_list_input? }
       class CreateImageResult
         attr_accessor image_id: string
+      end
+      type create_instance_connect_endpoint_request = { dry_run: boolean?, subnet_id: subnet_id, security_group_ids: security_group_id_string_list_request?, preserve_client_ip: boolean?, client_token: string?, tag_specifications: tag_specification_list_input? }
+      class CreateInstanceConnectEndpointResult
+        attr_accessor instance_connect_endpoint: Ec2InstanceConnectEndpoint
+        attr_accessor client_token: string
       end
       type create_instance_event_window_request = { dry_run: boolean?, name: string?, time_ranges: instance_event_window_time_range_request_set?, cron_expression: instance_event_window_cron_expression?, tag_specifications: tag_specification_list_input? }
       class CreateInstanceEventWindowResult
@@ -1385,6 +1393,10 @@ module Aws
       class DeleteFpgaImageResult
         attr_accessor return: boolean
       end
+      type delete_instance_connect_endpoint_request = { dry_run: boolean?, instance_connect_endpoint_id: instance_connect_endpoint_id }
+      class DeleteInstanceConnectEndpointResult
+        attr_accessor instance_connect_endpoint: Ec2InstanceConnectEndpoint
+      end
       type delete_instance_event_window_request = { dry_run: boolean?, force_delete: boolean?, instance_event_window_id: instance_event_window_id }
       class DeleteInstanceEventWindowResult
         attr_accessor instance_event_window_state: InstanceEventWindowStateChange
@@ -1615,7 +1627,7 @@ module Aws
       end
       type deprovisioned_address_set = ::Array[string]
       type deregister_image_request = { image_id: image_id, dry_run: boolean? }
-      type deregister_instance_event_notification_attributes_request = { dry_run: boolean?, instance_tag_attribute: deregister_instance_tag_attribute_request? }
+      type deregister_instance_event_notification_attributes_request = { dry_run: boolean?, instance_tag_attribute: deregister_instance_tag_attribute_request }
       class DeregisterInstanceEventNotificationAttributesResult
         attr_accessor instance_tag_attribute: InstanceTagNotificationAttribute
       end
@@ -1901,6 +1913,11 @@ module Aws
         attr_accessor next_token: string
       end
       type describe_instance_attribute_request = { attribute: instance_attribute_name, dry_run: boolean?, instance_id: instance_id }
+      type describe_instance_connect_endpoints_request = { dry_run: boolean?, max_results: instance_connect_endpoint_max_results?, next_token: next_token?, filters: filter_list?, instance_connect_endpoint_ids: value_string_list? }
+      class DescribeInstanceConnectEndpointsResult
+        attr_accessor instance_connect_endpoints: instance_connect_endpoint_set_output
+        attr_accessor next_token: next_token
+      end
       type describe_instance_credit_specifications_max_results = ::Integer
       type describe_instance_credit_specifications_request = { dry_run: boolean?, filters: filter_list?, instance_ids: instance_id_string_list?, max_results: describe_instance_credit_specifications_max_results?, next_token: string? }
       class DescribeInstanceCreditSpecificationsResult
@@ -2688,6 +2705,24 @@ module Aws
         attr_accessor maximum_iops: maximum_iops
       end
       type ebs_optimized_support = ("unsupported" | "supported" | "default")
+      class Ec2InstanceConnectEndpoint
+        attr_accessor owner_id: string
+        attr_accessor instance_connect_endpoint_id: instance_connect_endpoint_id
+        attr_accessor instance_connect_endpoint_arn: resource_arn
+        attr_accessor state: ec2_instance_connect_endpoint_state
+        attr_accessor state_message: string
+        attr_accessor dns_name: string
+        attr_accessor fips_dns_name: string
+        attr_accessor network_interface_ids: network_interface_id_set
+        attr_accessor vpc_id: vpc_id
+        attr_accessor availability_zone: string
+        attr_accessor created_at: millisecond_date_time
+        attr_accessor subnet_id: subnet_id
+        attr_accessor preserve_client_ip: boolean
+        attr_accessor security_group_ids: security_group_id_set
+        attr_accessor tags: tag_list_output
+      end
+      type ec2_instance_connect_endpoint_state = ("create-in-progress" | "create-complete" | "create-failed" | "delete-in-progress" | "delete-complete" | "delete-failed")
       class EfaInfo
         attr_accessor maximum_efa_interfaces: maximum_efa_interfaces
       end
@@ -3500,6 +3535,7 @@ module Aws
         attr_accessor member_of_service_linked_resource_group: boolean
         attr_accessor outpost_arn: string
         attr_accessor host_maintenance: host_maintenance
+        attr_accessor asset_id: asset_id
       end
       class HostInstance
         attr_accessor instance_id: string
@@ -3867,6 +3903,9 @@ module Aws
         attr_accessor instance_type: string
         attr_accessor total_capacity: integer
       end
+      type instance_connect_endpoint_id = ::String
+      type instance_connect_endpoint_max_results = ::Integer
+      type instance_connect_endpoint_set_output = ::Array[Ec2InstanceConnectEndpoint]
       class InstanceCount
         attr_accessor instance_count: integer
         attr_accessor state: listing_state
@@ -4125,7 +4164,7 @@ module Aws
         attr_accessor instance_tag_keys: instance_tag_key_set
         attr_accessor include_all_tags_of_instance: boolean
       end
-      type instance_type = ("a1.medium" | "a1.large" | "a1.xlarge" | "a1.2xlarge" | "a1.4xlarge" | "a1.metal" | "c1.medium" | "c1.xlarge" | "c3.large" | "c3.xlarge" | "c3.2xlarge" | "c3.4xlarge" | "c3.8xlarge" | "c4.large" | "c4.xlarge" | "c4.2xlarge" | "c4.4xlarge" | "c4.8xlarge" | "c5.large" | "c5.xlarge" | "c5.2xlarge" | "c5.4xlarge" | "c5.9xlarge" | "c5.12xlarge" | "c5.18xlarge" | "c5.24xlarge" | "c5.metal" | "c5a.large" | "c5a.xlarge" | "c5a.2xlarge" | "c5a.4xlarge" | "c5a.8xlarge" | "c5a.12xlarge" | "c5a.16xlarge" | "c5a.24xlarge" | "c5ad.large" | "c5ad.xlarge" | "c5ad.2xlarge" | "c5ad.4xlarge" | "c5ad.8xlarge" | "c5ad.12xlarge" | "c5ad.16xlarge" | "c5ad.24xlarge" | "c5d.large" | "c5d.xlarge" | "c5d.2xlarge" | "c5d.4xlarge" | "c5d.9xlarge" | "c5d.12xlarge" | "c5d.18xlarge" | "c5d.24xlarge" | "c5d.metal" | "c5n.large" | "c5n.xlarge" | "c5n.2xlarge" | "c5n.4xlarge" | "c5n.9xlarge" | "c5n.18xlarge" | "c5n.metal" | "c6g.medium" | "c6g.large" | "c6g.xlarge" | "c6g.2xlarge" | "c6g.4xlarge" | "c6g.8xlarge" | "c6g.12xlarge" | "c6g.16xlarge" | "c6g.metal" | "c6gd.medium" | "c6gd.large" | "c6gd.xlarge" | "c6gd.2xlarge" | "c6gd.4xlarge" | "c6gd.8xlarge" | "c6gd.12xlarge" | "c6gd.16xlarge" | "c6gd.metal" | "c6gn.medium" | "c6gn.large" | "c6gn.xlarge" | "c6gn.2xlarge" | "c6gn.4xlarge" | "c6gn.8xlarge" | "c6gn.12xlarge" | "c6gn.16xlarge" | "c6i.large" | "c6i.xlarge" | "c6i.2xlarge" | "c6i.4xlarge" | "c6i.8xlarge" | "c6i.12xlarge" | "c6i.16xlarge" | "c6i.24xlarge" | "c6i.32xlarge" | "c6i.metal" | "cc1.4xlarge" | "cc2.8xlarge" | "cg1.4xlarge" | "cr1.8xlarge" | "d2.xlarge" | "d2.2xlarge" | "d2.4xlarge" | "d2.8xlarge" | "d3.xlarge" | "d3.2xlarge" | "d3.4xlarge" | "d3.8xlarge" | "d3en.xlarge" | "d3en.2xlarge" | "d3en.4xlarge" | "d3en.6xlarge" | "d3en.8xlarge" | "d3en.12xlarge" | "dl1.24xlarge" | "f1.2xlarge" | "f1.4xlarge" | "f1.16xlarge" | "g2.2xlarge" | "g2.8xlarge" | "g3.4xlarge" | "g3.8xlarge" | "g3.16xlarge" | "g3s.xlarge" | "g4ad.xlarge" | "g4ad.2xlarge" | "g4ad.4xlarge" | "g4ad.8xlarge" | "g4ad.16xlarge" | "g4dn.xlarge" | "g4dn.2xlarge" | "g4dn.4xlarge" | "g4dn.8xlarge" | "g4dn.12xlarge" | "g4dn.16xlarge" | "g4dn.metal" | "g5.xlarge" | "g5.2xlarge" | "g5.4xlarge" | "g5.8xlarge" | "g5.12xlarge" | "g5.16xlarge" | "g5.24xlarge" | "g5.48xlarge" | "g5g.xlarge" | "g5g.2xlarge" | "g5g.4xlarge" | "g5g.8xlarge" | "g5g.16xlarge" | "g5g.metal" | "hi1.4xlarge" | "hpc6a.48xlarge" | "hs1.8xlarge" | "h1.2xlarge" | "h1.4xlarge" | "h1.8xlarge" | "h1.16xlarge" | "i2.xlarge" | "i2.2xlarge" | "i2.4xlarge" | "i2.8xlarge" | "i3.large" | "i3.xlarge" | "i3.2xlarge" | "i3.4xlarge" | "i3.8xlarge" | "i3.16xlarge" | "i3.metal" | "i3en.large" | "i3en.xlarge" | "i3en.2xlarge" | "i3en.3xlarge" | "i3en.6xlarge" | "i3en.12xlarge" | "i3en.24xlarge" | "i3en.metal" | "im4gn.large" | "im4gn.xlarge" | "im4gn.2xlarge" | "im4gn.4xlarge" | "im4gn.8xlarge" | "im4gn.16xlarge" | "inf1.xlarge" | "inf1.2xlarge" | "inf1.6xlarge" | "inf1.24xlarge" | "is4gen.medium" | "is4gen.large" | "is4gen.xlarge" | "is4gen.2xlarge" | "is4gen.4xlarge" | "is4gen.8xlarge" | "m1.small" | "m1.medium" | "m1.large" | "m1.xlarge" | "m2.xlarge" | "m2.2xlarge" | "m2.4xlarge" | "m3.medium" | "m3.large" | "m3.xlarge" | "m3.2xlarge" | "m4.large" | "m4.xlarge" | "m4.2xlarge" | "m4.4xlarge" | "m4.10xlarge" | "m4.16xlarge" | "m5.large" | "m5.xlarge" | "m5.2xlarge" | "m5.4xlarge" | "m5.8xlarge" | "m5.12xlarge" | "m5.16xlarge" | "m5.24xlarge" | "m5.metal" | "m5a.large" | "m5a.xlarge" | "m5a.2xlarge" | "m5a.4xlarge" | "m5a.8xlarge" | "m5a.12xlarge" | "m5a.16xlarge" | "m5a.24xlarge" | "m5ad.large" | "m5ad.xlarge" | "m5ad.2xlarge" | "m5ad.4xlarge" | "m5ad.8xlarge" | "m5ad.12xlarge" | "m5ad.16xlarge" | "m5ad.24xlarge" | "m5d.large" | "m5d.xlarge" | "m5d.2xlarge" | "m5d.4xlarge" | "m5d.8xlarge" | "m5d.12xlarge" | "m5d.16xlarge" | "m5d.24xlarge" | "m5d.metal" | "m5dn.large" | "m5dn.xlarge" | "m5dn.2xlarge" | "m5dn.4xlarge" | "m5dn.8xlarge" | "m5dn.12xlarge" | "m5dn.16xlarge" | "m5dn.24xlarge" | "m5dn.metal" | "m5n.large" | "m5n.xlarge" | "m5n.2xlarge" | "m5n.4xlarge" | "m5n.8xlarge" | "m5n.12xlarge" | "m5n.16xlarge" | "m5n.24xlarge" | "m5n.metal" | "m5zn.large" | "m5zn.xlarge" | "m5zn.2xlarge" | "m5zn.3xlarge" | "m5zn.6xlarge" | "m5zn.12xlarge" | "m5zn.metal" | "m6a.large" | "m6a.xlarge" | "m6a.2xlarge" | "m6a.4xlarge" | "m6a.8xlarge" | "m6a.12xlarge" | "m6a.16xlarge" | "m6a.24xlarge" | "m6a.32xlarge" | "m6a.48xlarge" | "m6g.metal" | "m6g.medium" | "m6g.large" | "m6g.xlarge" | "m6g.2xlarge" | "m6g.4xlarge" | "m6g.8xlarge" | "m6g.12xlarge" | "m6g.16xlarge" | "m6gd.metal" | "m6gd.medium" | "m6gd.large" | "m6gd.xlarge" | "m6gd.2xlarge" | "m6gd.4xlarge" | "m6gd.8xlarge" | "m6gd.12xlarge" | "m6gd.16xlarge" | "m6i.large" | "m6i.xlarge" | "m6i.2xlarge" | "m6i.4xlarge" | "m6i.8xlarge" | "m6i.12xlarge" | "m6i.16xlarge" | "m6i.24xlarge" | "m6i.32xlarge" | "m6i.metal" | "mac1.metal" | "p2.xlarge" | "p2.8xlarge" | "p2.16xlarge" | "p3.2xlarge" | "p3.8xlarge" | "p3.16xlarge" | "p3dn.24xlarge" | "p4d.24xlarge" | "r3.large" | "r3.xlarge" | "r3.2xlarge" | "r3.4xlarge" | "r3.8xlarge" | "r4.large" | "r4.xlarge" | "r4.2xlarge" | "r4.4xlarge" | "r4.8xlarge" | "r4.16xlarge" | "r5.large" | "r5.xlarge" | "r5.2xlarge" | "r5.4xlarge" | "r5.8xlarge" | "r5.12xlarge" | "r5.16xlarge" | "r5.24xlarge" | "r5.metal" | "r5a.large" | "r5a.xlarge" | "r5a.2xlarge" | "r5a.4xlarge" | "r5a.8xlarge" | "r5a.12xlarge" | "r5a.16xlarge" | "r5a.24xlarge" | "r5ad.large" | "r5ad.xlarge" | "r5ad.2xlarge" | "r5ad.4xlarge" | "r5ad.8xlarge" | "r5ad.12xlarge" | "r5ad.16xlarge" | "r5ad.24xlarge" | "r5b.large" | "r5b.xlarge" | "r5b.2xlarge" | "r5b.4xlarge" | "r5b.8xlarge" | "r5b.12xlarge" | "r5b.16xlarge" | "r5b.24xlarge" | "r5b.metal" | "r5d.large" | "r5d.xlarge" | "r5d.2xlarge" | "r5d.4xlarge" | "r5d.8xlarge" | "r5d.12xlarge" | "r5d.16xlarge" | "r5d.24xlarge" | "r5d.metal" | "r5dn.large" | "r5dn.xlarge" | "r5dn.2xlarge" | "r5dn.4xlarge" | "r5dn.8xlarge" | "r5dn.12xlarge" | "r5dn.16xlarge" | "r5dn.24xlarge" | "r5dn.metal" | "r5n.large" | "r5n.xlarge" | "r5n.2xlarge" | "r5n.4xlarge" | "r5n.8xlarge" | "r5n.12xlarge" | "r5n.16xlarge" | "r5n.24xlarge" | "r5n.metal" | "r6g.medium" | "r6g.large" | "r6g.xlarge" | "r6g.2xlarge" | "r6g.4xlarge" | "r6g.8xlarge" | "r6g.12xlarge" | "r6g.16xlarge" | "r6g.metal" | "r6gd.medium" | "r6gd.large" | "r6gd.xlarge" | "r6gd.2xlarge" | "r6gd.4xlarge" | "r6gd.8xlarge" | "r6gd.12xlarge" | "r6gd.16xlarge" | "r6gd.metal" | "r6i.large" | "r6i.xlarge" | "r6i.2xlarge" | "r6i.4xlarge" | "r6i.8xlarge" | "r6i.12xlarge" | "r6i.16xlarge" | "r6i.24xlarge" | "r6i.32xlarge" | "r6i.metal" | "t1.micro" | "t2.nano" | "t2.micro" | "t2.small" | "t2.medium" | "t2.large" | "t2.xlarge" | "t2.2xlarge" | "t3.nano" | "t3.micro" | "t3.small" | "t3.medium" | "t3.large" | "t3.xlarge" | "t3.2xlarge" | "t3a.nano" | "t3a.micro" | "t3a.small" | "t3a.medium" | "t3a.large" | "t3a.xlarge" | "t3a.2xlarge" | "t4g.nano" | "t4g.micro" | "t4g.small" | "t4g.medium" | "t4g.large" | "t4g.xlarge" | "t4g.2xlarge" | "u-6tb1.56xlarge" | "u-6tb1.112xlarge" | "u-9tb1.112xlarge" | "u-12tb1.112xlarge" | "u-6tb1.metal" | "u-9tb1.metal" | "u-12tb1.metal" | "u-18tb1.metal" | "u-24tb1.metal" | "vt1.3xlarge" | "vt1.6xlarge" | "vt1.24xlarge" | "x1.16xlarge" | "x1.32xlarge" | "x1e.xlarge" | "x1e.2xlarge" | "x1e.4xlarge" | "x1e.8xlarge" | "x1e.16xlarge" | "x1e.32xlarge" | "x2iezn.2xlarge" | "x2iezn.4xlarge" | "x2iezn.6xlarge" | "x2iezn.8xlarge" | "x2iezn.12xlarge" | "x2iezn.metal" | "x2gd.medium" | "x2gd.large" | "x2gd.xlarge" | "x2gd.2xlarge" | "x2gd.4xlarge" | "x2gd.8xlarge" | "x2gd.12xlarge" | "x2gd.16xlarge" | "x2gd.metal" | "z1d.large" | "z1d.xlarge" | "z1d.2xlarge" | "z1d.3xlarge" | "z1d.6xlarge" | "z1d.12xlarge" | "z1d.metal" | "x2idn.16xlarge" | "x2idn.24xlarge" | "x2idn.32xlarge" | "x2iedn.xlarge" | "x2iedn.2xlarge" | "x2iedn.4xlarge" | "x2iedn.8xlarge" | "x2iedn.16xlarge" | "x2iedn.24xlarge" | "x2iedn.32xlarge" | "c6a.large" | "c6a.xlarge" | "c6a.2xlarge" | "c6a.4xlarge" | "c6a.8xlarge" | "c6a.12xlarge" | "c6a.16xlarge" | "c6a.24xlarge" | "c6a.32xlarge" | "c6a.48xlarge" | "c6a.metal" | "m6a.metal" | "i4i.large" | "i4i.xlarge" | "i4i.2xlarge" | "i4i.4xlarge" | "i4i.8xlarge" | "i4i.16xlarge" | "i4i.32xlarge" | "i4i.metal" | "x2idn.metal" | "x2iedn.metal" | "c7g.medium" | "c7g.large" | "c7g.xlarge" | "c7g.2xlarge" | "c7g.4xlarge" | "c7g.8xlarge" | "c7g.12xlarge" | "c7g.16xlarge" | "mac2.metal" | "c6id.large" | "c6id.xlarge" | "c6id.2xlarge" | "c6id.4xlarge" | "c6id.8xlarge" | "c6id.12xlarge" | "c6id.16xlarge" | "c6id.24xlarge" | "c6id.32xlarge" | "c6id.metal" | "m6id.large" | "m6id.xlarge" | "m6id.2xlarge" | "m6id.4xlarge" | "m6id.8xlarge" | "m6id.12xlarge" | "m6id.16xlarge" | "m6id.24xlarge" | "m6id.32xlarge" | "m6id.metal" | "r6id.large" | "r6id.xlarge" | "r6id.2xlarge" | "r6id.4xlarge" | "r6id.8xlarge" | "r6id.12xlarge" | "r6id.16xlarge" | "r6id.24xlarge" | "r6id.32xlarge" | "r6id.metal" | "r6a.large" | "r6a.xlarge" | "r6a.2xlarge" | "r6a.4xlarge" | "r6a.8xlarge" | "r6a.12xlarge" | "r6a.16xlarge" | "r6a.24xlarge" | "r6a.32xlarge" | "r6a.48xlarge" | "r6a.metal" | "p4de.24xlarge" | "u-3tb1.56xlarge" | "u-18tb1.112xlarge" | "u-24tb1.112xlarge" | "trn1.2xlarge" | "trn1.32xlarge" | "hpc6id.32xlarge" | "c6in.large" | "c6in.xlarge" | "c6in.2xlarge" | "c6in.4xlarge" | "c6in.8xlarge" | "c6in.12xlarge" | "c6in.16xlarge" | "c6in.24xlarge" | "c6in.32xlarge" | "m6in.large" | "m6in.xlarge" | "m6in.2xlarge" | "m6in.4xlarge" | "m6in.8xlarge" | "m6in.12xlarge" | "m6in.16xlarge" | "m6in.24xlarge" | "m6in.32xlarge" | "m6idn.large" | "m6idn.xlarge" | "m6idn.2xlarge" | "m6idn.4xlarge" | "m6idn.8xlarge" | "m6idn.12xlarge" | "m6idn.16xlarge" | "m6idn.24xlarge" | "m6idn.32xlarge" | "r6in.large" | "r6in.xlarge" | "r6in.2xlarge" | "r6in.4xlarge" | "r6in.8xlarge" | "r6in.12xlarge" | "r6in.16xlarge" | "r6in.24xlarge" | "r6in.32xlarge" | "r6idn.large" | "r6idn.xlarge" | "r6idn.2xlarge" | "r6idn.4xlarge" | "r6idn.8xlarge" | "r6idn.12xlarge" | "r6idn.16xlarge" | "r6idn.24xlarge" | "r6idn.32xlarge" | "c7g.metal" | "m7g.medium" | "m7g.large" | "m7g.xlarge" | "m7g.2xlarge" | "m7g.4xlarge" | "m7g.8xlarge" | "m7g.12xlarge" | "m7g.16xlarge" | "m7g.metal" | "r7g.medium" | "r7g.large" | "r7g.xlarge" | "r7g.2xlarge" | "r7g.4xlarge" | "r7g.8xlarge" | "r7g.12xlarge" | "r7g.16xlarge" | "r7g.metal" | "c6in.metal" | "m6in.metal" | "m6idn.metal" | "r6in.metal" | "r6idn.metal" | "inf2.xlarge" | "inf2.8xlarge" | "inf2.24xlarge" | "inf2.48xlarge" | "trn1n.32xlarge" | "i4g.large" | "i4g.xlarge" | "i4g.2xlarge" | "i4g.4xlarge" | "i4g.8xlarge" | "i4g.16xlarge")
+      type instance_type = ("a1.medium" | "a1.large" | "a1.xlarge" | "a1.2xlarge" | "a1.4xlarge" | "a1.metal" | "c1.medium" | "c1.xlarge" | "c3.large" | "c3.xlarge" | "c3.2xlarge" | "c3.4xlarge" | "c3.8xlarge" | "c4.large" | "c4.xlarge" | "c4.2xlarge" | "c4.4xlarge" | "c4.8xlarge" | "c5.large" | "c5.xlarge" | "c5.2xlarge" | "c5.4xlarge" | "c5.9xlarge" | "c5.12xlarge" | "c5.18xlarge" | "c5.24xlarge" | "c5.metal" | "c5a.large" | "c5a.xlarge" | "c5a.2xlarge" | "c5a.4xlarge" | "c5a.8xlarge" | "c5a.12xlarge" | "c5a.16xlarge" | "c5a.24xlarge" | "c5ad.large" | "c5ad.xlarge" | "c5ad.2xlarge" | "c5ad.4xlarge" | "c5ad.8xlarge" | "c5ad.12xlarge" | "c5ad.16xlarge" | "c5ad.24xlarge" | "c5d.large" | "c5d.xlarge" | "c5d.2xlarge" | "c5d.4xlarge" | "c5d.9xlarge" | "c5d.12xlarge" | "c5d.18xlarge" | "c5d.24xlarge" | "c5d.metal" | "c5n.large" | "c5n.xlarge" | "c5n.2xlarge" | "c5n.4xlarge" | "c5n.9xlarge" | "c5n.18xlarge" | "c5n.metal" | "c6g.medium" | "c6g.large" | "c6g.xlarge" | "c6g.2xlarge" | "c6g.4xlarge" | "c6g.8xlarge" | "c6g.12xlarge" | "c6g.16xlarge" | "c6g.metal" | "c6gd.medium" | "c6gd.large" | "c6gd.xlarge" | "c6gd.2xlarge" | "c6gd.4xlarge" | "c6gd.8xlarge" | "c6gd.12xlarge" | "c6gd.16xlarge" | "c6gd.metal" | "c6gn.medium" | "c6gn.large" | "c6gn.xlarge" | "c6gn.2xlarge" | "c6gn.4xlarge" | "c6gn.8xlarge" | "c6gn.12xlarge" | "c6gn.16xlarge" | "c6i.large" | "c6i.xlarge" | "c6i.2xlarge" | "c6i.4xlarge" | "c6i.8xlarge" | "c6i.12xlarge" | "c6i.16xlarge" | "c6i.24xlarge" | "c6i.32xlarge" | "c6i.metal" | "cc1.4xlarge" | "cc2.8xlarge" | "cg1.4xlarge" | "cr1.8xlarge" | "d2.xlarge" | "d2.2xlarge" | "d2.4xlarge" | "d2.8xlarge" | "d3.xlarge" | "d3.2xlarge" | "d3.4xlarge" | "d3.8xlarge" | "d3en.xlarge" | "d3en.2xlarge" | "d3en.4xlarge" | "d3en.6xlarge" | "d3en.8xlarge" | "d3en.12xlarge" | "dl1.24xlarge" | "f1.2xlarge" | "f1.4xlarge" | "f1.16xlarge" | "g2.2xlarge" | "g2.8xlarge" | "g3.4xlarge" | "g3.8xlarge" | "g3.16xlarge" | "g3s.xlarge" | "g4ad.xlarge" | "g4ad.2xlarge" | "g4ad.4xlarge" | "g4ad.8xlarge" | "g4ad.16xlarge" | "g4dn.xlarge" | "g4dn.2xlarge" | "g4dn.4xlarge" | "g4dn.8xlarge" | "g4dn.12xlarge" | "g4dn.16xlarge" | "g4dn.metal" | "g5.xlarge" | "g5.2xlarge" | "g5.4xlarge" | "g5.8xlarge" | "g5.12xlarge" | "g5.16xlarge" | "g5.24xlarge" | "g5.48xlarge" | "g5g.xlarge" | "g5g.2xlarge" | "g5g.4xlarge" | "g5g.8xlarge" | "g5g.16xlarge" | "g5g.metal" | "hi1.4xlarge" | "hpc6a.48xlarge" | "hs1.8xlarge" | "h1.2xlarge" | "h1.4xlarge" | "h1.8xlarge" | "h1.16xlarge" | "i2.xlarge" | "i2.2xlarge" | "i2.4xlarge" | "i2.8xlarge" | "i3.large" | "i3.xlarge" | "i3.2xlarge" | "i3.4xlarge" | "i3.8xlarge" | "i3.16xlarge" | "i3.metal" | "i3en.large" | "i3en.xlarge" | "i3en.2xlarge" | "i3en.3xlarge" | "i3en.6xlarge" | "i3en.12xlarge" | "i3en.24xlarge" | "i3en.metal" | "im4gn.large" | "im4gn.xlarge" | "im4gn.2xlarge" | "im4gn.4xlarge" | "im4gn.8xlarge" | "im4gn.16xlarge" | "inf1.xlarge" | "inf1.2xlarge" | "inf1.6xlarge" | "inf1.24xlarge" | "is4gen.medium" | "is4gen.large" | "is4gen.xlarge" | "is4gen.2xlarge" | "is4gen.4xlarge" | "is4gen.8xlarge" | "m1.small" | "m1.medium" | "m1.large" | "m1.xlarge" | "m2.xlarge" | "m2.2xlarge" | "m2.4xlarge" | "m3.medium" | "m3.large" | "m3.xlarge" | "m3.2xlarge" | "m4.large" | "m4.xlarge" | "m4.2xlarge" | "m4.4xlarge" | "m4.10xlarge" | "m4.16xlarge" | "m5.large" | "m5.xlarge" | "m5.2xlarge" | "m5.4xlarge" | "m5.8xlarge" | "m5.12xlarge" | "m5.16xlarge" | "m5.24xlarge" | "m5.metal" | "m5a.large" | "m5a.xlarge" | "m5a.2xlarge" | "m5a.4xlarge" | "m5a.8xlarge" | "m5a.12xlarge" | "m5a.16xlarge" | "m5a.24xlarge" | "m5ad.large" | "m5ad.xlarge" | "m5ad.2xlarge" | "m5ad.4xlarge" | "m5ad.8xlarge" | "m5ad.12xlarge" | "m5ad.16xlarge" | "m5ad.24xlarge" | "m5d.large" | "m5d.xlarge" | "m5d.2xlarge" | "m5d.4xlarge" | "m5d.8xlarge" | "m5d.12xlarge" | "m5d.16xlarge" | "m5d.24xlarge" | "m5d.metal" | "m5dn.large" | "m5dn.xlarge" | "m5dn.2xlarge" | "m5dn.4xlarge" | "m5dn.8xlarge" | "m5dn.12xlarge" | "m5dn.16xlarge" | "m5dn.24xlarge" | "m5dn.metal" | "m5n.large" | "m5n.xlarge" | "m5n.2xlarge" | "m5n.4xlarge" | "m5n.8xlarge" | "m5n.12xlarge" | "m5n.16xlarge" | "m5n.24xlarge" | "m5n.metal" | "m5zn.large" | "m5zn.xlarge" | "m5zn.2xlarge" | "m5zn.3xlarge" | "m5zn.6xlarge" | "m5zn.12xlarge" | "m5zn.metal" | "m6a.large" | "m6a.xlarge" | "m6a.2xlarge" | "m6a.4xlarge" | "m6a.8xlarge" | "m6a.12xlarge" | "m6a.16xlarge" | "m6a.24xlarge" | "m6a.32xlarge" | "m6a.48xlarge" | "m6g.metal" | "m6g.medium" | "m6g.large" | "m6g.xlarge" | "m6g.2xlarge" | "m6g.4xlarge" | "m6g.8xlarge" | "m6g.12xlarge" | "m6g.16xlarge" | "m6gd.metal" | "m6gd.medium" | "m6gd.large" | "m6gd.xlarge" | "m6gd.2xlarge" | "m6gd.4xlarge" | "m6gd.8xlarge" | "m6gd.12xlarge" | "m6gd.16xlarge" | "m6i.large" | "m6i.xlarge" | "m6i.2xlarge" | "m6i.4xlarge" | "m6i.8xlarge" | "m6i.12xlarge" | "m6i.16xlarge" | "m6i.24xlarge" | "m6i.32xlarge" | "m6i.metal" | "mac1.metal" | "p2.xlarge" | "p2.8xlarge" | "p2.16xlarge" | "p3.2xlarge" | "p3.8xlarge" | "p3.16xlarge" | "p3dn.24xlarge" | "p4d.24xlarge" | "r3.large" | "r3.xlarge" | "r3.2xlarge" | "r3.4xlarge" | "r3.8xlarge" | "r4.large" | "r4.xlarge" | "r4.2xlarge" | "r4.4xlarge" | "r4.8xlarge" | "r4.16xlarge" | "r5.large" | "r5.xlarge" | "r5.2xlarge" | "r5.4xlarge" | "r5.8xlarge" | "r5.12xlarge" | "r5.16xlarge" | "r5.24xlarge" | "r5.metal" | "r5a.large" | "r5a.xlarge" | "r5a.2xlarge" | "r5a.4xlarge" | "r5a.8xlarge" | "r5a.12xlarge" | "r5a.16xlarge" | "r5a.24xlarge" | "r5ad.large" | "r5ad.xlarge" | "r5ad.2xlarge" | "r5ad.4xlarge" | "r5ad.8xlarge" | "r5ad.12xlarge" | "r5ad.16xlarge" | "r5ad.24xlarge" | "r5b.large" | "r5b.xlarge" | "r5b.2xlarge" | "r5b.4xlarge" | "r5b.8xlarge" | "r5b.12xlarge" | "r5b.16xlarge" | "r5b.24xlarge" | "r5b.metal" | "r5d.large" | "r5d.xlarge" | "r5d.2xlarge" | "r5d.4xlarge" | "r5d.8xlarge" | "r5d.12xlarge" | "r5d.16xlarge" | "r5d.24xlarge" | "r5d.metal" | "r5dn.large" | "r5dn.xlarge" | "r5dn.2xlarge" | "r5dn.4xlarge" | "r5dn.8xlarge" | "r5dn.12xlarge" | "r5dn.16xlarge" | "r5dn.24xlarge" | "r5dn.metal" | "r5n.large" | "r5n.xlarge" | "r5n.2xlarge" | "r5n.4xlarge" | "r5n.8xlarge" | "r5n.12xlarge" | "r5n.16xlarge" | "r5n.24xlarge" | "r5n.metal" | "r6g.medium" | "r6g.large" | "r6g.xlarge" | "r6g.2xlarge" | "r6g.4xlarge" | "r6g.8xlarge" | "r6g.12xlarge" | "r6g.16xlarge" | "r6g.metal" | "r6gd.medium" | "r6gd.large" | "r6gd.xlarge" | "r6gd.2xlarge" | "r6gd.4xlarge" | "r6gd.8xlarge" | "r6gd.12xlarge" | "r6gd.16xlarge" | "r6gd.metal" | "r6i.large" | "r6i.xlarge" | "r6i.2xlarge" | "r6i.4xlarge" | "r6i.8xlarge" | "r6i.12xlarge" | "r6i.16xlarge" | "r6i.24xlarge" | "r6i.32xlarge" | "r6i.metal" | "t1.micro" | "t2.nano" | "t2.micro" | "t2.small" | "t2.medium" | "t2.large" | "t2.xlarge" | "t2.2xlarge" | "t3.nano" | "t3.micro" | "t3.small" | "t3.medium" | "t3.large" | "t3.xlarge" | "t3.2xlarge" | "t3a.nano" | "t3a.micro" | "t3a.small" | "t3a.medium" | "t3a.large" | "t3a.xlarge" | "t3a.2xlarge" | "t4g.nano" | "t4g.micro" | "t4g.small" | "t4g.medium" | "t4g.large" | "t4g.xlarge" | "t4g.2xlarge" | "u-6tb1.56xlarge" | "u-6tb1.112xlarge" | "u-9tb1.112xlarge" | "u-12tb1.112xlarge" | "u-6tb1.metal" | "u-9tb1.metal" | "u-12tb1.metal" | "u-18tb1.metal" | "u-24tb1.metal" | "vt1.3xlarge" | "vt1.6xlarge" | "vt1.24xlarge" | "x1.16xlarge" | "x1.32xlarge" | "x1e.xlarge" | "x1e.2xlarge" | "x1e.4xlarge" | "x1e.8xlarge" | "x1e.16xlarge" | "x1e.32xlarge" | "x2iezn.2xlarge" | "x2iezn.4xlarge" | "x2iezn.6xlarge" | "x2iezn.8xlarge" | "x2iezn.12xlarge" | "x2iezn.metal" | "x2gd.medium" | "x2gd.large" | "x2gd.xlarge" | "x2gd.2xlarge" | "x2gd.4xlarge" | "x2gd.8xlarge" | "x2gd.12xlarge" | "x2gd.16xlarge" | "x2gd.metal" | "z1d.large" | "z1d.xlarge" | "z1d.2xlarge" | "z1d.3xlarge" | "z1d.6xlarge" | "z1d.12xlarge" | "z1d.metal" | "x2idn.16xlarge" | "x2idn.24xlarge" | "x2idn.32xlarge" | "x2iedn.xlarge" | "x2iedn.2xlarge" | "x2iedn.4xlarge" | "x2iedn.8xlarge" | "x2iedn.16xlarge" | "x2iedn.24xlarge" | "x2iedn.32xlarge" | "c6a.large" | "c6a.xlarge" | "c6a.2xlarge" | "c6a.4xlarge" | "c6a.8xlarge" | "c6a.12xlarge" | "c6a.16xlarge" | "c6a.24xlarge" | "c6a.32xlarge" | "c6a.48xlarge" | "c6a.metal" | "m6a.metal" | "i4i.large" | "i4i.xlarge" | "i4i.2xlarge" | "i4i.4xlarge" | "i4i.8xlarge" | "i4i.16xlarge" | "i4i.32xlarge" | "i4i.metal" | "x2idn.metal" | "x2iedn.metal" | "c7g.medium" | "c7g.large" | "c7g.xlarge" | "c7g.2xlarge" | "c7g.4xlarge" | "c7g.8xlarge" | "c7g.12xlarge" | "c7g.16xlarge" | "mac2.metal" | "c6id.large" | "c6id.xlarge" | "c6id.2xlarge" | "c6id.4xlarge" | "c6id.8xlarge" | "c6id.12xlarge" | "c6id.16xlarge" | "c6id.24xlarge" | "c6id.32xlarge" | "c6id.metal" | "m6id.large" | "m6id.xlarge" | "m6id.2xlarge" | "m6id.4xlarge" | "m6id.8xlarge" | "m6id.12xlarge" | "m6id.16xlarge" | "m6id.24xlarge" | "m6id.32xlarge" | "m6id.metal" | "r6id.large" | "r6id.xlarge" | "r6id.2xlarge" | "r6id.4xlarge" | "r6id.8xlarge" | "r6id.12xlarge" | "r6id.16xlarge" | "r6id.24xlarge" | "r6id.32xlarge" | "r6id.metal" | "r6a.large" | "r6a.xlarge" | "r6a.2xlarge" | "r6a.4xlarge" | "r6a.8xlarge" | "r6a.12xlarge" | "r6a.16xlarge" | "r6a.24xlarge" | "r6a.32xlarge" | "r6a.48xlarge" | "r6a.metal" | "p4de.24xlarge" | "u-3tb1.56xlarge" | "u-18tb1.112xlarge" | "u-24tb1.112xlarge" | "trn1.2xlarge" | "trn1.32xlarge" | "hpc6id.32xlarge" | "c6in.large" | "c6in.xlarge" | "c6in.2xlarge" | "c6in.4xlarge" | "c6in.8xlarge" | "c6in.12xlarge" | "c6in.16xlarge" | "c6in.24xlarge" | "c6in.32xlarge" | "m6in.large" | "m6in.xlarge" | "m6in.2xlarge" | "m6in.4xlarge" | "m6in.8xlarge" | "m6in.12xlarge" | "m6in.16xlarge" | "m6in.24xlarge" | "m6in.32xlarge" | "m6idn.large" | "m6idn.xlarge" | "m6idn.2xlarge" | "m6idn.4xlarge" | "m6idn.8xlarge" | "m6idn.12xlarge" | "m6idn.16xlarge" | "m6idn.24xlarge" | "m6idn.32xlarge" | "r6in.large" | "r6in.xlarge" | "r6in.2xlarge" | "r6in.4xlarge" | "r6in.8xlarge" | "r6in.12xlarge" | "r6in.16xlarge" | "r6in.24xlarge" | "r6in.32xlarge" | "r6idn.large" | "r6idn.xlarge" | "r6idn.2xlarge" | "r6idn.4xlarge" | "r6idn.8xlarge" | "r6idn.12xlarge" | "r6idn.16xlarge" | "r6idn.24xlarge" | "r6idn.32xlarge" | "c7g.metal" | "m7g.medium" | "m7g.large" | "m7g.xlarge" | "m7g.2xlarge" | "m7g.4xlarge" | "m7g.8xlarge" | "m7g.12xlarge" | "m7g.16xlarge" | "m7g.metal" | "r7g.medium" | "r7g.large" | "r7g.xlarge" | "r7g.2xlarge" | "r7g.4xlarge" | "r7g.8xlarge" | "r7g.12xlarge" | "r7g.16xlarge" | "r7g.metal" | "c6in.metal" | "m6in.metal" | "m6idn.metal" | "r6in.metal" | "r6idn.metal" | "inf2.xlarge" | "inf2.8xlarge" | "inf2.24xlarge" | "inf2.48xlarge" | "trn1n.32xlarge" | "i4g.large" | "i4g.xlarge" | "i4g.2xlarge" | "i4g.4xlarge" | "i4g.8xlarge" | "i4g.16xlarge" | "hpc7g.4xlarge" | "hpc7g.8xlarge" | "hpc7g.16xlarge" | "c7gn.medium" | "c7gn.large" | "c7gn.xlarge" | "c7gn.2xlarge" | "c7gn.4xlarge" | "c7gn.8xlarge" | "c7gn.12xlarge" | "c7gn.16xlarge")
       type instance_type_hypervisor = ("nitro" | "xen")
       class InstanceTypeInfo
         attr_accessor instance_type: instance_type
@@ -4152,6 +4191,9 @@ module Aws
         attr_accessor dedicated_hosts_supported: dedicated_host_flag
         attr_accessor auto_recovery_supported: auto_recovery_flag
         attr_accessor supported_boot_modes: boot_mode_type_list
+        attr_accessor nitro_enclaves_support: nitro_enclaves_support
+        attr_accessor nitro_tpm_support: nitro_tpm_support
+        attr_accessor nitro_tpm_info: NitroTpmInfo
       end
       class InstanceTypeInfoFromInstanceRequirements
         attr_accessor instance_type: string
@@ -5161,7 +5203,7 @@ module Aws
       class ModifyVpnTunnelOptionsResult
         attr_accessor vpn_connection: VpnConnection
       end
-      type modify_vpn_tunnel_options_specification = { tunnel_inside_cidr: string?, tunnel_inside_ipv_6_cidr: string?, pre_shared_key: string?, phase_1_lifetime_seconds: integer?, phase_2_lifetime_seconds: integer?, rekey_margin_time_seconds: integer?, rekey_fuzz_percentage: integer?, replay_window_size: integer?, dpd_timeout_seconds: integer?, dpd_timeout_action: string?, phase_1_encryption_algorithms: phase_1_encryption_algorithms_request_list?, phase_2_encryption_algorithms: phase_2_encryption_algorithms_request_list?, phase_1_integrity_algorithms: phase_1_integrity_algorithms_request_list?, phase_2_integrity_algorithms: phase_2_integrity_algorithms_request_list?, phase_1_dh_group_numbers: phase_1_dh_group_numbers_request_list?, phase_2_dh_group_numbers: phase_2_dh_group_numbers_request_list?, ike_versions: ike_versions_request_list?, startup_action: string?, log_options: vpn_tunnel_log_options_specification?, enable_tunnel_lifecycle_control: boolean? }
+      type modify_vpn_tunnel_options_specification = { tunnel_inside_cidr: string?, tunnel_inside_ipv_6_cidr: string?, pre_shared_key: pre_shared_key?, phase_1_lifetime_seconds: integer?, phase_2_lifetime_seconds: integer?, rekey_margin_time_seconds: integer?, rekey_fuzz_percentage: integer?, replay_window_size: integer?, dpd_timeout_seconds: integer?, dpd_timeout_action: string?, phase_1_encryption_algorithms: phase_1_encryption_algorithms_request_list?, phase_2_encryption_algorithms: phase_2_encryption_algorithms_request_list?, phase_1_integrity_algorithms: phase_1_integrity_algorithms_request_list?, phase_2_integrity_algorithms: phase_2_integrity_algorithms_request_list?, phase_1_dh_group_numbers: phase_1_dh_group_numbers_request_list?, phase_2_dh_group_numbers: phase_2_dh_group_numbers_request_list?, ike_versions: ike_versions_request_list?, startup_action: string?, log_options: vpn_tunnel_log_options_specification?, enable_tunnel_lifecycle_control: boolean? }
       type monitor_instances_request = { instance_ids: instance_id_string_list, dry_run: boolean? }
       class MonitorInstancesResult
         attr_accessor instance_monitorings: instance_monitoring_list
@@ -5408,6 +5450,7 @@ module Aws
       type network_interface_creation_type = ("efa" | "branch" | "trunk")
       type network_interface_id = ::String
       type network_interface_id_list = ::Array[network_interface_id]
+      type network_interface_id_set = ::Array[string]
       class NetworkInterfaceIpv6Address
         attr_accessor ipv_6_address: string
       end
@@ -5442,6 +5485,13 @@ module Aws
       type new_dhcp_configuration = { key: string?, values: value_string_list? }
       type new_dhcp_configuration_list = ::Array[new_dhcp_configuration]
       type next_token = ::String
+      type nitro_enclaves_support = ("unsupported" | "supported")
+      class NitroTpmInfo
+        attr_accessor supported_versions: nitro_tpm_supported_versions_list
+      end
+      type nitro_tpm_support = ("unsupported" | "supported")
+      type nitro_tpm_supported_version_type = ::String
+      type nitro_tpm_supported_versions_list = ::Array[nitro_tpm_supported_version_type]
       type occurrence_day_request_set = ::Array[integer]
       type occurrence_day_set = ::Array[integer]
       type offering_class_type = ("standard" | "convertible")
@@ -5837,7 +5887,7 @@ module Aws
       class RegisterImageResult
         attr_accessor image_id: string
       end
-      type register_instance_event_notification_attributes_request = { dry_run: boolean?, instance_tag_attribute: register_instance_tag_attribute_request? }
+      type register_instance_event_notification_attributes_request = { dry_run: boolean?, instance_tag_attribute: register_instance_tag_attribute_request }
       class RegisterInstanceEventNotificationAttributesResult
         attr_accessor instance_tag_attribute: InstanceTagNotificationAttribute
       end
@@ -6083,7 +6133,7 @@ module Aws
         attr_accessor resource_types: value_string_list
       end
       type resource_statement_request = { resources: value_string_list?, resource_types: value_string_list? }
-      type resource_type = ("capacity-reservation" | "client-vpn-endpoint" | "customer-gateway" | "carrier-gateway" | "coip-pool" | "dedicated-host" | "dhcp-options" | "egress-only-internet-gateway" | "elastic-ip" | "elastic-gpu" | "export-image-task" | "export-instance-task" | "fleet" | "fpga-image" | "host-reservation" | "image" | "import-image-task" | "import-snapshot-task" | "instance" | "instance-event-window" | "internet-gateway" | "ipam" | "ipam-pool" | "ipam-scope" | "ipv4pool-ec2" | "ipv6pool-ec2" | "key-pair" | "launch-template" | "local-gateway" | "local-gateway-route-table" | "local-gateway-virtual-interface" | "local-gateway-virtual-interface-group" | "local-gateway-route-table-vpc-association" | "local-gateway-route-table-virtual-interface-group-association" | "natgateway" | "network-acl" | "network-interface" | "network-insights-analysis" | "network-insights-path" | "network-insights-access-scope" | "network-insights-access-scope-analysis" | "placement-group" | "prefix-list" | "replace-root-volume-task" | "reserved-instances" | "route-table" | "security-group" | "security-group-rule" | "snapshot" | "spot-fleet-request" | "spot-instances-request" | "subnet" | "subnet-cidr-reservation" | "traffic-mirror-filter" | "traffic-mirror-session" | "traffic-mirror-target" | "transit-gateway" | "transit-gateway-attachment" | "transit-gateway-connect-peer" | "transit-gateway-multicast-domain" | "transit-gateway-policy-table" | "transit-gateway-route-table" | "transit-gateway-route-table-announcement" | "volume" | "vpc" | "vpc-endpoint" | "vpc-endpoint-connection" | "vpc-endpoint-service" | "vpc-endpoint-service-permission" | "vpc-peering-connection" | "vpn-connection" | "vpn-gateway" | "vpc-flow-log" | "capacity-reservation-fleet" | "traffic-mirror-filter-rule" | "vpc-endpoint-connection-device-type" | "verified-access-instance" | "verified-access-group" | "verified-access-endpoint" | "verified-access-policy" | "verified-access-trust-provider" | "vpn-connection-device-type" | "vpc-block-public-access-exclusion" | "ipam-resource-discovery" | "ipam-resource-discovery-association")
+      type resource_type = ("capacity-reservation" | "client-vpn-endpoint" | "customer-gateway" | "carrier-gateway" | "coip-pool" | "dedicated-host" | "dhcp-options" | "egress-only-internet-gateway" | "elastic-ip" | "elastic-gpu" | "export-image-task" | "export-instance-task" | "fleet" | "fpga-image" | "host-reservation" | "image" | "import-image-task" | "import-snapshot-task" | "instance" | "instance-event-window" | "internet-gateway" | "ipam" | "ipam-pool" | "ipam-scope" | "ipv4pool-ec2" | "ipv6pool-ec2" | "key-pair" | "launch-template" | "local-gateway" | "local-gateway-route-table" | "local-gateway-virtual-interface" | "local-gateway-virtual-interface-group" | "local-gateway-route-table-vpc-association" | "local-gateway-route-table-virtual-interface-group-association" | "natgateway" | "network-acl" | "network-interface" | "network-insights-analysis" | "network-insights-path" | "network-insights-access-scope" | "network-insights-access-scope-analysis" | "placement-group" | "prefix-list" | "replace-root-volume-task" | "reserved-instances" | "route-table" | "security-group" | "security-group-rule" | "snapshot" | "spot-fleet-request" | "spot-instances-request" | "subnet" | "subnet-cidr-reservation" | "traffic-mirror-filter" | "traffic-mirror-session" | "traffic-mirror-target" | "transit-gateway" | "transit-gateway-attachment" | "transit-gateway-connect-peer" | "transit-gateway-multicast-domain" | "transit-gateway-policy-table" | "transit-gateway-route-table" | "transit-gateway-route-table-announcement" | "volume" | "vpc" | "vpc-endpoint" | "vpc-endpoint-connection" | "vpc-endpoint-service" | "vpc-endpoint-service-permission" | "vpc-peering-connection" | "vpn-connection" | "vpn-gateway" | "vpc-flow-log" | "capacity-reservation-fleet" | "traffic-mirror-filter-rule" | "vpc-endpoint-connection-device-type" | "verified-access-instance" | "verified-access-group" | "verified-access-endpoint" | "verified-access-policy" | "verified-access-trust-provider" | "vpn-connection-device-type" | "vpc-block-public-access-exclusion" | "ipam-resource-discovery" | "ipam-resource-discovery-association" | "instance-connect-endpoint")
       class ResponseError
         attr_accessor code: launch_template_error_code
         attr_accessor message: string
@@ -6345,7 +6395,9 @@ module Aws
       end
       type security_group_id = ::String
       type security_group_id_list = ::Array[security_group_id]
+      type security_group_id_set = ::Array[security_group_id]
       type security_group_id_string_list = ::Array[security_group_id]
+      type security_group_id_string_list_request = ::Array[security_group_id]
       class SecurityGroupIdentifier
         attr_accessor group_id: string
         attr_accessor group_name: string
@@ -6887,7 +6939,7 @@ module Aws
       type target_storage_tier = ("archive")
       type telemetry_status = ("UP" | "DOWN")
       type tenancy = ("default" | "dedicated" | "host")
-      type terminate_client_vpn_connections_request = { client_vpn_endpoint_id: client_vpn_endpoint_id, connection_id: vpn_connection_id?, username: string?, dry_run: boolean? }
+      type terminate_client_vpn_connections_request = { client_vpn_endpoint_id: client_vpn_endpoint_id, connection_id: string?, username: string?, dry_run: boolean? }
       class TerminateClientVpnConnectionsResult
         attr_accessor client_vpn_endpoint_id: string
         attr_accessor username: string
@@ -7350,7 +7402,7 @@ module Aws
         attr_accessor outside_ip_address: string
         attr_accessor tunnel_inside_cidr: string
         attr_accessor tunnel_inside_ipv_6_cidr: string
-        attr_accessor pre_shared_key: string
+        attr_accessor pre_shared_key: pre_shared_key
         attr_accessor phase_1_lifetime_seconds: integer
         attr_accessor phase_2_lifetime_seconds: integer
         attr_accessor rekey_margin_time_seconds: integer
@@ -7552,7 +7604,7 @@ module Aws
         attr_accessor delivery_stream: string
       end
       type verified_access_log_kinesis_data_firehose_destination_options = { enabled: boolean, delivery_stream: string? }
-      type verified_access_log_options = { s3: verified_access_log_s3_destination_options?, cloud_watch_logs: verified_access_log_cloud_watch_logs_destination_options?, kinesis_data_firehose: verified_access_log_kinesis_data_firehose_destination_options? }
+      type verified_access_log_options = { s3: verified_access_log_s3_destination_options?, cloud_watch_logs: verified_access_log_cloud_watch_logs_destination_options?, kinesis_data_firehose: verified_access_log_kinesis_data_firehose_destination_options?, log_version: string?, include_trust_context: boolean? }
       class VerifiedAccessLogS3Destination
         attr_accessor enabled: boolean
         attr_accessor delivery_status: VerifiedAccessLogDeliveryStatus
@@ -7565,6 +7617,8 @@ module Aws
         attr_accessor s3: VerifiedAccessLogS3Destination
         attr_accessor cloud_watch_logs: VerifiedAccessLogCloudWatchLogsDestination
         attr_accessor kinesis_data_firehose: VerifiedAccessLogKinesisDataFirehoseDestination
+        attr_accessor log_version: string
+        attr_accessor include_trust_context: boolean
       end
       class VerifiedAccessTrustProvider
         attr_accessor verified_access_trust_provider_id: string
@@ -7829,7 +7883,7 @@ module Aws
       type vpc_state = ("pending" | "available")
       type vpc_tenancy = ("default")
       class VpnConnection
-        attr_accessor customer_gateway_configuration: string
+        attr_accessor customer_gateway_configuration: customer_gateway_configuration
         attr_accessor customer_gateway_id: string
         attr_accessor category: string
         attr_accessor state: vpn_state
@@ -7896,7 +7950,7 @@ module Aws
         attr_accessor cloud_watch_log_options: CloudWatchLogOptions
       end
       type vpn_tunnel_log_options_specification = { cloud_watch_log_options: cloud_watch_log_options_specification? }
-      type vpn_tunnel_options_specification = { tunnel_inside_cidr: string?, tunnel_inside_ipv_6_cidr: string?, pre_shared_key: string?, phase_1_lifetime_seconds: integer?, phase_2_lifetime_seconds: integer?, rekey_margin_time_seconds: integer?, rekey_fuzz_percentage: integer?, replay_window_size: integer?, dpd_timeout_seconds: integer?, dpd_timeout_action: string?, phase_1_encryption_algorithms: phase_1_encryption_algorithms_request_list?, phase_2_encryption_algorithms: phase_2_encryption_algorithms_request_list?, phase_1_integrity_algorithms: phase_1_integrity_algorithms_request_list?, phase_2_integrity_algorithms: phase_2_integrity_algorithms_request_list?, phase_1_dh_group_numbers: phase_1_dh_group_numbers_request_list?, phase_2_dh_group_numbers: phase_2_dh_group_numbers_request_list?, ike_versions: ike_versions_request_list?, startup_action: string?, log_options: vpn_tunnel_log_options_specification?, enable_tunnel_lifecycle_control: boolean? }
+      type vpn_tunnel_options_specification = { tunnel_inside_cidr: string?, tunnel_inside_ipv_6_cidr: string?, pre_shared_key: pre_shared_key?, phase_1_lifetime_seconds: integer?, phase_2_lifetime_seconds: integer?, rekey_margin_time_seconds: integer?, rekey_fuzz_percentage: integer?, replay_window_size: integer?, dpd_timeout_seconds: integer?, dpd_timeout_action: string?, phase_1_encryption_algorithms: phase_1_encryption_algorithms_request_list?, phase_2_encryption_algorithms: phase_2_encryption_algorithms_request_list?, phase_1_integrity_algorithms: phase_1_integrity_algorithms_request_list?, phase_2_integrity_algorithms: phase_2_integrity_algorithms_request_list?, phase_1_dh_group_numbers: phase_1_dh_group_numbers_request_list?, phase_2_dh_group_numbers: phase_2_dh_group_numbers_request_list?, ike_versions: ike_versions_request_list?, startup_action: string?, log_options: vpn_tunnel_log_options_specification?, enable_tunnel_lifecycle_control: boolean? }
       type vpn_tunnel_options_specifications_list = ::Array[vpn_tunnel_options_specification]
       type week_day = ("sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday")
       type withdraw_byoip_cidr_request = { cidr: string, dry_run: boolean? }
@@ -7905,6 +7959,8 @@ module Aws
       end
       type zone_id_string_list = ::Array[string]
       type zone_name_string_list = ::Array[string]
+      type customer_gateway_configuration = ::String
+      type pre_shared_key = ::String
       type scope = ("Availability Zone" | "Region")
       type snapshot_tier_status_set = ::Array[SnapshotTierStatus]
       type total_fpga_memory = ::Integer
