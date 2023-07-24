@@ -23,6 +23,10 @@ module Aws
       type binary_list = ::Array[binary]
       type boolean = bool
       type boxed_integer = ::Integer
+      type cancel_message_move_task_request = { task_handle: string }
+      class CancelMessageMoveTaskResult
+        attr_accessor approximate_number_of_messages_moved: long
+      end
       type change_message_visibility_batch_request = { queue_url: string, entries: change_message_visibility_batch_request_entry_list }
       type change_message_visibility_batch_request_entry = { id: string, receipt_handle: string, visibility_timeout: integer? }
       type change_message_visibility_batch_request_entry_list = ::Array[change_message_visibility_batch_request_entry]
@@ -66,6 +70,22 @@ module Aws
         attr_accessor queue_urls: queue_url_list
         attr_accessor next_token: token
       end
+      type list_message_move_tasks_request = { source_arn: string, max_results: integer? }
+      class ListMessageMoveTasksResult
+        attr_accessor results: list_message_move_tasks_result_entry_list
+      end
+      class ListMessageMoveTasksResultEntry
+        attr_accessor task_handle: string
+        attr_accessor status: string
+        attr_accessor source_arn: string
+        attr_accessor destination_arn: string
+        attr_accessor max_number_of_messages_per_second: integer
+        attr_accessor approximate_number_of_messages_moved: long
+        attr_accessor approximate_number_of_messages_to_move: long
+        attr_accessor failure_reason: string
+        attr_accessor started_timestamp: long
+      end
+      type list_message_move_tasks_result_entry_list = ::Array[ListMessageMoveTasksResultEntry]
       type list_queue_tags_request = { queue_url: string }
       class ListQueueTagsResult
         attr_accessor tags: tag_map
@@ -75,6 +95,7 @@ module Aws
         attr_accessor queue_urls: queue_url_list
         attr_accessor next_token: token
       end
+      type long = ::Integer
       class Message
         attr_accessor message_id: string
         attr_accessor receipt_handle: string
@@ -99,7 +120,7 @@ module Aws
       type message_body_system_attribute_map = ::Hash[message_system_attribute_name_for_sends, message_system_attribute_value]
       type message_list = ::Array[Message]
       type message_system_attribute_map = ::Hash[message_system_attribute_name, string]
-      type message_system_attribute_name = ("SenderId" | "SentTimestamp" | "ApproximateReceiveCount" | "ApproximateFirstReceiveTimestamp" | "SequenceNumber" | "MessageDeduplicationId" | "MessageGroupId" | "AWSTraceHeader")
+      type message_system_attribute_name = ("SenderId" | "SentTimestamp" | "ApproximateReceiveCount" | "ApproximateFirstReceiveTimestamp" | "SequenceNumber" | "MessageDeduplicationId" | "MessageGroupId" | "AWSTraceHeader" | "DeadLetterQueueSourceArn")
       type message_system_attribute_name_for_sends = ("AWSTraceHeader")
       type message_system_attribute_value = { string_value: string?, binary_value: binary?, string_list_values: string_list?, binary_list_values: binary_list?, data_type: string }
       type purge_queue_request = { queue_url: string }
@@ -136,6 +157,10 @@ module Aws
         attr_accessor sequence_number: string
       end
       type set_queue_attributes_request = { queue_url: string, attributes: queue_attribute_map }
+      type start_message_move_task_request = { source_arn: string, destination_arn: string?, max_number_of_messages_per_second: integer? }
+      class StartMessageMoveTaskResult
+        attr_accessor task_handle: string
+      end
       type string = ::String
       type string_list = ::Array[string]
       type tag_key = ::String

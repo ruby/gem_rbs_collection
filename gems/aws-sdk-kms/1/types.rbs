@@ -9,7 +9,7 @@ module Aws
   module KMS
     module Types
       type aws_account_id_type = ::String
-      type algorithm_spec = ("RSAES_PKCS1_V1_5" | "RSAES_OAEP_SHA_1" | "RSAES_OAEP_SHA_256")
+      type algorithm_spec = ("RSAES_PKCS1_V1_5" | "RSAES_OAEP_SHA_1" | "RSAES_OAEP_SHA_256" | "RSA_AES_KEY_WRAP_SHA_1" | "RSA_AES_KEY_WRAP_SHA_256")
       type alias_list = ::Array[AliasListEntry]
       class AliasListEntry
         attr_accessor alias_name: alias_name_type
@@ -38,7 +38,7 @@ module Aws
       class CreateCustomKeyStoreResponse
         attr_accessor custom_key_store_id: custom_key_store_id_type
       end
-      type create_grant_request = { key_id: key_id_type, grantee_principal: principal_id_type, retiring_principal: principal_id_type?, operations: grant_operation_list, constraints: grant_constraints?, grant_tokens: grant_token_list?, name: grant_name_type? }
+      type create_grant_request = { key_id: key_id_type, grantee_principal: principal_id_type, retiring_principal: principal_id_type?, operations: grant_operation_list, constraints: grant_constraints?, grant_tokens: grant_token_list?, name: grant_name_type?, dry_run: nullable_boolean_type? }
       class CreateGrantResponse
         attr_accessor grant_token: grant_token_type
         attr_accessor grant_id: grant_id_type
@@ -66,7 +66,7 @@ module Aws
       type data_key_pair_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096" | "ECC_NIST_P256" | "ECC_NIST_P384" | "ECC_NIST_P521" | "ECC_SECG_P256K1" | "SM2")
       type data_key_spec = ("AES_256" | "AES_128")
       type date_type = ::Time
-      type decrypt_request = { ciphertext_blob: ciphertext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, key_id: key_id_type?, encryption_algorithm: encryption_algorithm_spec?, recipient: recipient_info? }
+      type decrypt_request = { ciphertext_blob: ciphertext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, key_id: key_id_type?, encryption_algorithm: encryption_algorithm_spec?, recipient: recipient_info?, dry_run: nullable_boolean_type? }
       class DecryptResponse
         attr_accessor key_id: key_id_type
         attr_accessor plaintext: plaintext_type
@@ -96,7 +96,7 @@ module Aws
       end
       type enable_key_request = { key_id: key_id_type }
       type enable_key_rotation_request = { key_id: key_id_type }
-      type encrypt_request = { key_id: key_id_type, plaintext: plaintext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, encryption_algorithm: encryption_algorithm_spec? }
+      type encrypt_request = { key_id: key_id_type, plaintext: plaintext_type, encryption_context: encryption_context_type?, grant_tokens: grant_token_list?, encryption_algorithm: encryption_algorithm_spec?, dry_run: nullable_boolean_type? }
       class EncryptResponse
         attr_accessor ciphertext_blob: ciphertext_type
         attr_accessor key_id: key_id_type
@@ -109,7 +109,7 @@ module Aws
       type encryption_context_value = ::String
       type error_message_type = ::String
       type expiration_model_type = ("KEY_MATERIAL_EXPIRES" | "KEY_MATERIAL_DOES_NOT_EXPIRE")
-      type generate_data_key_pair_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list?, recipient: recipient_info? }
+      type generate_data_key_pair_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list?, recipient: recipient_info?, dry_run: nullable_boolean_type? }
       class GenerateDataKeyPairResponse
         attr_accessor private_key_ciphertext_blob: ciphertext_type
         attr_accessor private_key_plaintext: plaintext_type
@@ -118,26 +118,26 @@ module Aws
         attr_accessor key_pair_spec: data_key_pair_spec
         attr_accessor ciphertext_for_recipient: ciphertext_type
       end
-      type generate_data_key_pair_without_plaintext_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list? }
+      type generate_data_key_pair_without_plaintext_request = { encryption_context: encryption_context_type?, key_id: key_id_type, key_pair_spec: data_key_pair_spec, grant_tokens: grant_token_list?, dry_run: nullable_boolean_type? }
       class GenerateDataKeyPairWithoutPlaintextResponse
         attr_accessor private_key_ciphertext_blob: ciphertext_type
         attr_accessor public_key: public_key_type
         attr_accessor key_id: key_id_type
         attr_accessor key_pair_spec: data_key_pair_spec
       end
-      type generate_data_key_request = { key_id: key_id_type, encryption_context: encryption_context_type?, number_of_bytes: number_of_bytes_type?, key_spec: data_key_spec?, grant_tokens: grant_token_list?, recipient: recipient_info? }
+      type generate_data_key_request = { key_id: key_id_type, encryption_context: encryption_context_type?, number_of_bytes: number_of_bytes_type?, key_spec: data_key_spec?, grant_tokens: grant_token_list?, recipient: recipient_info?, dry_run: nullable_boolean_type? }
       class GenerateDataKeyResponse
         attr_accessor ciphertext_blob: ciphertext_type
         attr_accessor plaintext: plaintext_type
         attr_accessor key_id: key_id_type
         attr_accessor ciphertext_for_recipient: ciphertext_type
       end
-      type generate_data_key_without_plaintext_request = { key_id: key_id_type, encryption_context: encryption_context_type?, key_spec: data_key_spec?, number_of_bytes: number_of_bytes_type?, grant_tokens: grant_token_list? }
+      type generate_data_key_without_plaintext_request = { key_id: key_id_type, encryption_context: encryption_context_type?, key_spec: data_key_spec?, number_of_bytes: number_of_bytes_type?, grant_tokens: grant_token_list?, dry_run: nullable_boolean_type? }
       class GenerateDataKeyWithoutPlaintextResponse
         attr_accessor ciphertext_blob: ciphertext_type
         attr_accessor key_id: key_id_type
       end
-      type generate_mac_request = { message: plaintext_type, key_id: key_id_type, mac_algorithm: mac_algorithm_spec, grant_tokens: grant_token_list? }
+      type generate_mac_request = { message: plaintext_type, key_id: key_id_type, mac_algorithm: mac_algorithm_spec, grant_tokens: grant_token_list?, dry_run: nullable_boolean_type? }
       class GenerateMacResponse
         attr_accessor mac: ciphertext_type
         attr_accessor mac_algorithm: mac_algorithm_spec
@@ -295,7 +295,7 @@ module Aws
       type principal_id_type = ::String
       type public_key_type = ::String
       type put_key_policy_request = { key_id: key_id_type, policy_name: policy_name_type, policy: policy_type, bypass_policy_lockout_safety_check: boolean_type? }
-      type re_encrypt_request = { ciphertext_blob: ciphertext_type, source_encryption_context: encryption_context_type?, source_key_id: key_id_type?, destination_key_id: key_id_type, destination_encryption_context: encryption_context_type?, source_encryption_algorithm: encryption_algorithm_spec?, destination_encryption_algorithm: encryption_algorithm_spec?, grant_tokens: grant_token_list? }
+      type re_encrypt_request = { ciphertext_blob: ciphertext_type, source_encryption_context: encryption_context_type?, source_key_id: key_id_type?, destination_key_id: key_id_type, destination_encryption_context: encryption_context_type?, source_encryption_algorithm: encryption_algorithm_spec?, destination_encryption_algorithm: encryption_algorithm_spec?, grant_tokens: grant_token_list?, dry_run: nullable_boolean_type? }
       class ReEncryptResponse
         attr_accessor ciphertext_blob: ciphertext_type
         attr_accessor source_key_id: key_id_type
@@ -311,8 +311,8 @@ module Aws
         attr_accessor replica_policy: policy_type
         attr_accessor replica_tags: tag_list_output
       end
-      type retire_grant_request = { grant_token: grant_token_type?, key_id: key_id_type?, grant_id: grant_id_type? }
-      type revoke_grant_request = { key_id: key_id_type, grant_id: grant_id_type }
+      type retire_grant_request = { grant_token: grant_token_type?, key_id: key_id_type?, grant_id: grant_id_type?, dry_run: nullable_boolean_type? }
+      type revoke_grant_request = { key_id: key_id_type, grant_id: grant_id_type, dry_run: nullable_boolean_type? }
       type schedule_key_deletion_request = { key_id: key_id_type, pending_window_in_days: pending_window_in_days_type? }
       class ScheduleKeyDeletionResponse
         attr_accessor key_id: key_id_type
@@ -320,7 +320,7 @@ module Aws
         attr_accessor key_state: key_state
         attr_accessor pending_window_in_days: pending_window_in_days_type
       end
-      type sign_request = { key_id: key_id_type, message: plaintext_type, message_type: message_type?, grant_tokens: grant_token_list?, signing_algorithm: signing_algorithm_spec }
+      type sign_request = { key_id: key_id_type, message: plaintext_type, message_type: message_type?, grant_tokens: grant_token_list?, signing_algorithm: signing_algorithm_spec, dry_run: nullable_boolean_type? }
       class SignResponse
         attr_accessor key_id: key_id_type
         attr_accessor signature: ciphertext_type
@@ -347,19 +347,19 @@ module Aws
       end
       type update_key_description_request = { key_id: key_id_type, description: description_type }
       type update_primary_region_request = { key_id: key_id_type, primary_region: region_type }
-      type verify_mac_request = { message: plaintext_type, key_id: key_id_type, mac_algorithm: mac_algorithm_spec, mac: ciphertext_type, grant_tokens: grant_token_list? }
+      type verify_mac_request = { message: plaintext_type, key_id: key_id_type, mac_algorithm: mac_algorithm_spec, mac: ciphertext_type, grant_tokens: grant_token_list?, dry_run: nullable_boolean_type? }
       class VerifyMacResponse
         attr_accessor key_id: key_id_type
         attr_accessor mac_valid: boolean_type
         attr_accessor mac_algorithm: mac_algorithm_spec
       end
-      type verify_request = { key_id: key_id_type, message: plaintext_type, message_type: message_type?, signature: ciphertext_type, signing_algorithm: signing_algorithm_spec, grant_tokens: grant_token_list? }
+      type verify_request = { key_id: key_id_type, message: plaintext_type, message_type: message_type?, signature: ciphertext_type, signing_algorithm: signing_algorithm_spec, grant_tokens: grant_token_list?, dry_run: nullable_boolean_type? }
       class VerifyResponse
         attr_accessor key_id: key_id_type
         attr_accessor signature_valid: boolean_type
         attr_accessor signing_algorithm: signing_algorithm_spec
       end
-      type wrapping_key_spec = ("RSA_2048")
+      type wrapping_key_spec = ("RSA_2048" | "RSA_3072" | "RSA_4096")
       class XksKeyConfigurationType
         attr_accessor id: xks_key_id_type
       end
