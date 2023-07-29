@@ -63,7 +63,7 @@ module Sidekiq
   #   config.death_handlers << ->(job, ex) do
   #   end
   # end
-  def self.death_handlers: () -> Array[^(Sidekiq::Job, Exception) -> void]
+  def self.death_handlers: () -> Array[^(Sidekiq::JobRecord, Exception) -> void]
 
   def self.load_json: (String string) -> untyped
 
@@ -352,7 +352,7 @@ module Sidekiq
   #   end
   #
   class Queue
-    include Enumerable[Sidekiq::Job]
+    include Enumerable[Sidekiq::JobRecord]
 
     #
     # Return all known queues within Redis.
@@ -375,14 +375,14 @@ module Sidekiq
     # @return Float
     def latency: () -> Float
 
-    def each: () { (Sidekiq::Job) -> void } -> nil
+    def each: () { (Sidekiq::JobRecord) -> void } -> nil
 
     #
     # Find the job with the given JID within this queue.
     #
     # This is a slow, inefficient operation.  Do not use under
     # normal conditions.
-    def find_job: (String jid) -> Sidekiq::Job
+    def find_job: (String jid) -> Sidekiq::JobRecord
 
     def clear: () -> [Integer, boolish]
   end
@@ -392,9 +392,9 @@ module Sidekiq
   # sorted set.
   #
   # The job should be considered immutable but may be
-  # removed from the queue via Job#delete.
+  # removed from the queue via JobRecord#delete.
   #
-  class Job
+  class JobRecord
     attr_reader item: (Hash[String, untyped] | String)
 
     attr_reader value: (Hash[String, untyped] | String)
@@ -432,7 +432,7 @@ module Sidekiq
     def []: (String name) -> untyped
   end
 
-  class SortedEntry < Job
+  class SortedEntry < JobRecord
     attr_reader score: (Time | Numeric)
 
     attr_reader parent: Sidekiq::SortedSet
