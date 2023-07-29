@@ -9,6 +9,15 @@ class YourWorker
   end
 end
 
+class YourJob
+  include Sidekiq::Job
+
+  def perform
+    logger.info "Things are happening."
+    logger.debug "Here's some info: #{hash.inspect}"
+  end
+end
+
 Sidekiq.logger.level = Logger::ERROR
 Sidekiq.configure_server do |config|
   config.logger = Sidekiq::Logger.new($stdout, level: Logger::INFO)

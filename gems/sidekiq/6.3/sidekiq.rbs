@@ -387,6 +387,93 @@ module Sidekiq
     def clear: () -> [Integer, boolish]
   end
 
+  module Job
+    #
+    # The Options module is extracted so we can include it in ActiveJob::Base
+    # and allow native AJs to configure Sidekiq features/internals.
+    module Options
+      def self.included: (untyped base) -> untyped
+
+      module ClassMethods
+        #
+        # Allows customization for this type of Worker.
+        # Legal options:
+        #
+        #   queue - name of queue to use for this job type, default *default*
+        #   retry - enable retries for this Worker in case of error during execution,
+        #      *true* to use the default or *Integer* count
+        #   backtrace - whether to save any error backtrace in the retry payload to display in web UI,
+        #      can be true, false or an integer number of lines to save, default *false*
+        #
+        # In practice, any option is allowed.  This is the main mechanism to configure the
+        # options for a specific job.
+        def sidekiq_options: (?Hash[Symbol, untyped] opts) -> untyped
+                           | (?queue: String, ?retry: (bool | Integer), ?dead: bool, ?backtrace: (bool | Integer), ?pool: untyped, ?tags: Array[String]) -> untyped
+
+        def sidekiq_retry_in: () { (Integer count, Exception exception) -> Integer? } -> void
+
+        def sidekiq_retries_exhausted: () { (Hash[String, untyped] msg, Exception exception) -> void } -> Integer
+
+        def get_sidekiq_options: () -> untyped
+
+        def sidekiq_class_attribute: (*untyped attrs) -> untyped
+      end
+    end
+
+    attr_accessor jid: String
+
+    def self.included: (untyped base) -> untyped
+
+    def logger: () -> Sidekiq::Logger
+
+    # This helper class encapsulates the set options for `set`, e.g.
+    #
+    #     SomeWorker.set(queue: 'foo').perform_async(....)
+    #
+    class Setter
+      def initialize: (Class klass, Hash[Symbol, untyped] opts) -> untyped
+
+      def set: (untyped options) -> instance
+
+      def perform_async: (*untyped args) -> String
+
+      # +interval+ must be a timestamp, numeric or something that acts
+      #   numeric (like an activesupport time interval).
+      def perform_in: ((Time | untyped) interval, *untyped args) -> String
+
+      alias perform_at perform_in
+    end
+
+    module ClassMethods
+      def set: (Hash[Symbol, untyped] options) -> Sidekiq::Worker::Setter
+
+      def perform_async: (*untyped args) -> String
+
+      # +interval+ must be a timestamp, numeric or something that acts
+      #   numeric (like an activesupport time interval).
+      def perform_in: ((Time | untyped) interval, *untyped args) -> String
+
+      alias perform_at perform_in
+
+      #
+      # Allows customization for this type of Worker.
+      # Legal options:
+      #
+      #   queue - use a named queue for this Worker, default 'default'
+      #   retry - enable the RetryJobs middleware for this Worker, *true* to use the default
+      #      or *Integer* count
+      #   backtrace - whether to save any error backtrace in the retry payload to display in web UI,
+      #      can be true, false or an integer number of lines to save, default *false*
+      #   pool - use the given Redis connection pool to push this type of job to a given shard.
+      #
+      # In practice, any option is allowed.  This is the main mechanism to configure the
+      # options for a specific job.
+      def sidekiq_options: (?Hash[Symbol, untyped] opts) -> Hash[Symbol, untyped]
+
+      def client_push: (Hash[(Symbol | String), untyped] item) -> String
+    end
+  end
+
   #
   # Encapsulates a pending job within a Sidekiq queue or
   # sorted set.

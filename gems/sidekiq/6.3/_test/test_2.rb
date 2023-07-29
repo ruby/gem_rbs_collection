@@ -2,6 +2,10 @@ class HardWorker
   include Sidekiq::Worker
 end
 
+class HardJob
+  include Sidekiq::Job
+end
+
 class Hook
 end
 
@@ -9,6 +13,7 @@ class Middleware
 end
 
 HardWorker.perform_async(1, 2, 3)
+HardJob.perform_async(1, 2, 3)
 
 # Test Sidekiq::Client
 client = Sidekiq::Client.new
@@ -21,6 +26,13 @@ Sidekiq::Client.enqueue(HardWorker, 'foo', 1, :bat => 'bar')
 Sidekiq::Client.enqueue_to(:queue_name, HardWorker, 'foo', 1, :bat => 'bar')
 Sidekiq::Client.enqueue_to_in(:queue_name, Time.now + 3 * 60, HardWorker, 'foo', 1, :bat => 'bar')
 Sidekiq::Client.enqueue_in(Time.now + 3 * 60, HardWorker, 'foo', 1, :bat => 'bar')
+
+Sidekiq::Client.push('class' => HardJob, 'args' => [1, 2, 3])
+Sidekiq::Client.push_bulk('class' => HardJob, 'args' => [[1, 2, 3], [4,5,6]])
+Sidekiq::Client.enqueue(HardJob, 'foo', 1, :bat => 'bar')
+Sidekiq::Client.enqueue_to(:queue_name, HardJob, 'foo', 1, :bat => 'bar')
+Sidekiq::Client.enqueue_to_in(:queue_name, Time.now + 3 * 60, HardJob, 'foo', 1, :bat => 'bar')
+Sidekiq::Client.enqueue_in(Time.now + 3 * 60, HardJob, 'foo', 1, :bat => 'bar')
 
 # Test configuration of middleware
 Sidekiq.configure_server do |config|
