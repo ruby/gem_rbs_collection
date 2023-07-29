@@ -12,7 +12,7 @@ RBS_DIR=$(cd $(dirname $0)/..; pwd)
 # Set REPO_DIR variable to validate RBS files added to the corresponding folder
 REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
 # Validate RBS files, using the bundler environment present
-bundle exec rbs --repo $REPO_DIR -r sidekiq:6.3 validate --silent
+bundle exec rbs --repo $REPO_DIR -r sidekiq:6.3 -r redis:4.2 -r logger:0 -r monitor:0 validate --silent
 
 cd ${RBS_DIR}/_test
 # Run type checks
