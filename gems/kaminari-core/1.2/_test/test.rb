@@ -18,7 +18,7 @@ end
 Kaminari.config.param_name
 
 Kaminari.configure do |config|
-  config.param_name = -> () { :page }
+  config.param_name = _ = -> () { :page }
   config.max_per_page = nil
   config.max_pages = nil
 end
