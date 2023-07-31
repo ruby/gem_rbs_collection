@@ -1,0 +1,44 @@
+class ConnectionPool[T]
+  DEFAULTS: Hash[Symbol, untyped]
+
+  VERSION: String
+
+  class Error < RuntimeError
+  end
+
+  module ForkTracker
+  end
+
+  class PoolShuttingDownError < ConnectionPool::Error
+  end
+
+  class TimedStack
+  end
+
+  class TimeoutError < Timeout::Error
+  end
+
+  class Wrapper < BasicObject
+    METHODS: Array[untyped]
+  end
+
+  attr_reader size: Integer
+
+  attr_reader auto_reload_after_fork: bool
+
+  def initialize: (?size: Integer, ?timeout: Integer, ?auto_reload_after_fork: bool) { () -> T } -> void
+
+  def with: [A] (?timeout: Integer) { (T) -> A } -> A
+
+  alias then with
+
+  def checkout: (?timeout: Integer) -> T
+
+  def checkin: (?force: bool) -> void
+
+  def shutdown: () { (T) -> void } -> void
+
+  def reload: () { (T) -> void } -> void
+
+  def available: () -> Integer
+end
