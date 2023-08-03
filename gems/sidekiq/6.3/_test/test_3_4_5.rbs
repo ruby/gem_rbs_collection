@@ -1,0 +1,87 @@
+class LessRetryableWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class LessRetryableJob
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  def perform: () -> void
+end
+
+class NonRetryableWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class NonRetryableJob
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  def perform: () -> void
+end
+
+class NoDeathWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class NoDeathJob
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  def perform: () -> void
+end
+
+class WorkerWithCustomRetry
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  extend Sidekiq::Worker::Options::ClassMethods
+  def perform: () -> void
+end
+
+class JobWithCustomRetry
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  extend Sidekiq::Job::Options::ClassMethods
+  def perform: () -> void
+end
+
+class FailingWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  extend Sidekiq::Worker::Options::ClassMethods
+  def perform: () -> void
+end
+
+class FailingJob
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  extend Sidekiq::Job::Options::ClassMethods
+  def perform: () -> void
+end
+
+class ImportantWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class ImportantJob
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  def perform: () -> void
+end
+
+class YourWorker
+  include Sidekiq::Worker
+  extend Sidekiq::Worker::ClassMethods
+  def perform: () -> void
+end
+
+class YourJob
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  def perform: () -> void
+end

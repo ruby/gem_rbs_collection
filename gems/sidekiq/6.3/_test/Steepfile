@@ -1,0 +1,14 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+
+  repo_path "../../../"
+  library "sidekiq:6.3"
+  library "redis:4.2"
+  library "logger:0"
+  library "monitor:0"
+  signature "."
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end
