@@ -10,4 +10,42 @@ module ActiveSupport
       end
     end
   end
+
+  module Notifications
+    interface _Callable5
+      def call: (String, Time, Time, String, Hash[untyped, untyped]) -> void
+    end
+
+    interface _Callable1
+      def call: (untyped event) -> void
+    end
+
+    # Subscribe to a given event name with the passed +block+.
+    #
+    # You can subscribe to events by passing a String to match exact event
+    # names, or by passing a Regexp to match all events that match a pattern.
+    #
+    #   ActiveSupport::Notifications.subscribe(/render/) do |*args|
+    #     @event = ActiveSupport::Notifications::Event.new(*args)
+    #   end
+    #
+    # The +block+ will receive five parameters with information about the event:
+    #
+    #   ActiveSupport::Notifications.subscribe('render') do |name, start, finish, id, payload|
+    #     name    # => String, name of the event (such as 'render' from above)
+    #     start   # => Time, when the instrumented block started execution
+    #     finish  # => Time, when the instrumented block ended execution
+    #     id      # => String, unique ID for the instrumenter that fired the event
+    #     payload # => Hash, the payload
+    #   end
+    #
+    # If the block passed to the method only takes one parameter,
+    # it will yield an event object to the block:
+    #
+    #   ActiveSupport::Notifications.subscribe(/render/) do |event|
+    #     @event = event
+    #   end
+    def self.subscribe: (String | Regexp, _Callable5 | _Callable1) -> Subscriber
+                      | ...
+  end
 end
