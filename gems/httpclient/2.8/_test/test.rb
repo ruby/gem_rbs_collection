@@ -3,7 +3,7 @@ require "httpclient"
 HTTPClient.get("http://example.com").body
 
 client = HTTPClient.new
-if false
+if _ = false
   client.set_auth("http://example.com", "user", "pass")
 end
 res = client.get("http://example.com", query: {"q" => "v"})
