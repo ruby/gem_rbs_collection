@@ -697,14 +697,14 @@ module Sidekiq
         #
         # In practice, any option is allowed.  This is the main mechanism to configure the
         # options for a specific job.
-        def sidekiq_options: (?Hash[Symbol, untyped] opts) -> untyped
-                           | (?queue: String, ?retry: (bool | Integer), ?dead: bool, ?backtrace: (bool | Integer), ?pool: untyped, ?tags: Array[String]) -> untyped
+        def sidekiq_options: (?Hash[Symbol | String, untyped] opts) -> untyped
+                           | (?queue: String, ?retry: (bool | Integer), ?dead: bool, ?backtrace: (bool | Integer), ?pool: untyped, ?tags: Array[String]) -> Hash[String, untyped]
 
         def sidekiq_retry_in: () { (Integer count, Exception exception) -> Integer? } -> void
 
         def sidekiq_retries_exhausted: () { (Hash[String, untyped] msg, Exception exception) -> void } -> Integer
 
-        def get_sidekiq_options: () -> untyped
+        def get_sidekiq_options: () -> Hash[String, untyped]
 
         def sidekiq_class_attribute: (*untyped attrs) -> untyped
       end
@@ -758,7 +758,7 @@ module Sidekiq
       #
       # In practice, any option is allowed.  This is the main mechanism to configure the
       # options for a specific job.
-      def sidekiq_options: (?Hash[Symbol, untyped] opts) -> Hash[Symbol, untyped]
+      def sidekiq_options: (?Hash[Symbol | String, untyped] opts) -> Hash[String, untyped]
 
       def client_push: (Hash[(Symbol | String), untyped] item) -> String
     end
