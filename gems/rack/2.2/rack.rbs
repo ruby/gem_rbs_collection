@@ -377,12 +377,15 @@ module Rack
   end
 
   class BodyProxy
-    def initialize: ((Array[(Lint | String)?] | BodyProxy | Lint)? body) ?{ -> nil } -> void
-    def respond_to_missing?: (untyped method_name, ?false include_all) -> bool
+    def initialize: (untyped? body) ?{ () -> void } -> void
+
     def close: -> nil
+
     def closed?: -> bool
-    def each: () { (String) -> void } -> void
-    def method_missing: (:each method_name, *untyped args) ?{ -> (IO | StringIO) } -> untyped
+
+    def respond_to_missing?: (Symbol, ?bool include_all) -> bool
+
+    def method_missing: (Symbol, *untyped args, **untyped kwargs) ?{ () -> untyped } -> untyped
   end
 
   class Cascade
