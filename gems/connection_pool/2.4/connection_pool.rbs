@@ -12,14 +12,14 @@ class ConnectionPool[T]
     def initialize: (pool: ConnectionPool[T]) -> void
                   | (?size: Integer, ?timeout: Numeric, ?auto_reload_after_fork: bool) { () -> T } -> void
     def wrapped_pool: () -> ConnectionPool[T]
-    def with: () { (T) -> void } -> void
+    def with: [A] () { (T) -> A } -> A
     def pool_shutdown: () { (T) -> void } -> void
     def pool_size: () -> Integer
     def pool_available: () -> Integer
   end
 
   def initialize: (?size: Integer, ?timeout: Numeric, ?auto_reload_after_fork: bool) { () -> T } -> void
-  def with: (?timeout: Numeric) { (T) -> void } -> void
+  def with: [A] (?timeout: Numeric) { (T) -> A } -> A
   def checkout: (?timeout: Numeric) -> T
   def checkin: (?force: bool) -> void
   def shutdown: () { (T) -> void } -> void
