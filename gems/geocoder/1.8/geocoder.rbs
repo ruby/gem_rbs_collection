@@ -2,16 +2,16 @@ module Geocoder
   #
   # Search for information about an address or a set of coordinates.
   #
-  def self.search: (untyped query, ?::Hash[untyped, untyped] options) -> untyped
+  def self.search: (String | [Float, Float] | Query query, ?::Hash[Symbol, untyped] options) -> Array[Result::_Base]
 
   #
   # Look up the coordinates of the given street or IP address.
   #
-  def self.coordinates: (untyped address, ?::Hash[untyped, untyped] options) -> (untyped | nil)
+  def self.coordinates: (String | [Float, Float] | Query address, ?::Hash[Symbol, untyped] options) -> [Float, Float]?
 
   #
   # Look up the address of the given coordinates ([lat,lon])
   # or IP address (string).
   #
-  def self.address: (untyped query, ?::Hash[untyped, untyped] options) -> (untyped | nil)
+  def self.address: (String | [Float, Float] | Query query, ?::Hash[Symbol, untyped] options) -> String?
 end
