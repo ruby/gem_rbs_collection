@@ -1,0 +1,59 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module SNS
+    class Client < Seahorse::Client::Base
+      include Aws::ClientStubs
+
+      def self.new: (?credentials: untyped, ?region: String, ?access_key_id: String?, ?active_endpoint_cache: bool?, ?adaptive_retry_wait_to_fill: bool?, ?client_side_monitoring: bool?, ?client_side_monitoring_client_id: String?, ?client_side_monitoring_host: String?, ?client_side_monitoring_port: Integer?, ?client_side_monitoring_publisher: untyped?, ?convert_params: bool?, ?correct_clock_skew: bool?, ?defaults_mode: String?, ?disable_host_prefix_injection: bool?, ?disable_request_compression: bool?, ?endpoint: untyped?, ?endpoint_cache_max_entries: Integer?, ?endpoint_cache_max_threads: Integer?, ?endpoint_cache_poll_interval: Integer?, ?endpoint_discovery: bool?, ?endpoint_provider: untyped?, ?http_continue_timeout: Integer?, ?http_idle_timeout: Integer?, ?http_open_timeout: Integer?, ?http_proxy: String?, ?http_read_timeout: Integer?, ?http_wire_trace: bool?, ?ignore_configured_endpoint_urls: bool?, ?log_formatter: untyped?, ?log_level: Symbol?, ?logger: untyped?, ?max_attempts: Integer?, ?on_chunk_sent: Proc?, ?profile: String?, ?raise_response_errors: bool?, ?request_min_compression_size_bytes: Integer?, ?retry_backoff: Proc?, ?retry_base_delay: Float?, ?retry_jitter: (:none | :equal | :full | ^(Integer) -> Integer)?, ?retry_limit: Integer?, ?retry_max_delay: Integer?, ?retry_mode: ("legacy" | "standard" | "adaptive")?, ?sdk_ua_app_id: String?, ?secret_access_key: String?, ?session_token: String?, ?ssl_ca_bundle: String?, ?ssl_ca_directory: String?, ?ssl_ca_store: String?, ?ssl_timeout: Float?, ?ssl_verify_peer: bool?, ?stub_responses: untyped?, ?token_provider: untyped?, ?use_dualstack_endpoint: bool?, ?use_fips_endpoint: bool?, ?validate_params: bool?) -> instance
+      def add_permission: (topic_arn: Types::topic_arn, label: Types::label, aws_account_id: Types::delegates_list, action_name: Types::actions_list) -> Aws::EmptyStructure
+      def check_if_phone_number_is_opted_out: (phone_number: Types::phone_number) -> Types::CheckIfPhoneNumberIsOptedOutResponse
+      def confirm_subscription: (topic_arn: Types::topic_arn, token: Types::token, ?authenticate_on_unsubscribe: Types::authenticate_on_unsubscribe) -> Types::ConfirmSubscriptionResponse
+      def create_platform_application: (name: Types::tString, platform: Types::tString, attributes: Types::map_string_to_string) -> Types::CreatePlatformApplicationResponse
+      def create_platform_endpoint: (platform_application_arn: Types::tString, token: Types::tString, ?custom_user_data: Types::tString, ?attributes: Types::map_string_to_string) -> Types::CreateEndpointResponse
+      def create_sms_sandbox_phone_number: (phone_number: Types::phone_number_string, ?language_code: Types::language_code_string) -> Types::CreateSMSSandboxPhoneNumberResult
+      def create_topic: (name: Types::topic_name, ?attributes: Types::topic_attributes_map, ?tags: Types::tag_list_input, ?data_protection_policy: Types::attribute_value) -> Types::CreateTopicResponse
+      def delete_endpoint: (endpoint_arn: Types::tString) -> Aws::EmptyStructure
+      def delete_platform_application: (platform_application_arn: Types::tString) -> Aws::EmptyStructure
+      def delete_sms_sandbox_phone_number: (phone_number: Types::phone_number_string) -> Types::DeleteSMSSandboxPhoneNumberResult
+      def delete_topic: (topic_arn: Types::topic_arn) -> Aws::EmptyStructure
+      def get_data_protection_policy: (resource_arn: Types::topic_arn) -> Types::GetDataProtectionPolicyResponse
+      def get_endpoint_attributes: (endpoint_arn: Types::tString) -> Types::GetEndpointAttributesResponse
+      def get_platform_application_attributes: (platform_application_arn: Types::tString) -> Types::GetPlatformApplicationAttributesResponse
+      def get_sms_attributes: (?attributes: Types::list_string) -> Types::GetSMSAttributesResponse
+      def get_sms_sandbox_account_status: () -> Types::GetSMSSandboxAccountStatusResult
+      def get_subscription_attributes: (subscription_arn: Types::subscription_arn) -> Types::GetSubscriptionAttributesResponse
+      def get_topic_attributes: (topic_arn: Types::topic_arn) -> Types::GetTopicAttributesResponse
+      def list_endpoints_by_platform_application: (platform_application_arn: Types::tString, ?next_token: Types::tString) -> Types::ListEndpointsByPlatformApplicationResponse
+      def list_origination_numbers: (?next_token: Types::next_token, ?max_results: Types::max_items_list_origination_numbers) -> Types::ListOriginationNumbersResult
+      def list_phone_numbers_opted_out: (?next_token: Types::string) -> Types::ListPhoneNumbersOptedOutResponse
+      def list_platform_applications: (?next_token: Types::tString) -> Types::ListPlatformApplicationsResponse
+      def list_sms_sandbox_phone_numbers: (?next_token: Types::next_token, ?max_results: Types::max_items) -> Types::ListSMSSandboxPhoneNumbersResult
+      def list_subscriptions: (?next_token: Types::next_token) -> Types::ListSubscriptionsResponse
+      def list_subscriptions_by_topic: (topic_arn: Types::topic_arn, ?next_token: Types::next_token) -> Types::ListSubscriptionsByTopicResponse
+      def list_tags_for_resource: (resource_arn: Types::amazon_resource_name) -> Types::ListTagsForResourceResponse
+      def list_topics: (?next_token: Types::next_token) -> Types::ListTopicsResponse
+      def opt_in_phone_number: (phone_number: Types::phone_number) -> Types::OptInPhoneNumberResponse
+      def publish: (?topic_arn: Types::topic_arn, ?target_arn: Types::tString, ?phone_number: Types::tString, message: Types::message, ?subject: Types::subject, ?message_structure: Types::message_structure, ?message_attributes: Types::message_attribute_map, ?message_deduplication_id: Types::tString, ?message_group_id: Types::tString) -> Types::PublishResponse
+      def publish_batch: (topic_arn: Types::topic_arn, publish_batch_request_entries: Types::publish_batch_request_entry_list) -> Types::PublishBatchResponse
+      def put_data_protection_policy: (resource_arn: Types::topic_arn, data_protection_policy: Types::attribute_value) -> Aws::EmptyStructure
+      def remove_permission: (topic_arn: Types::topic_arn, label: Types::label) -> Aws::EmptyStructure
+      def set_endpoint_attributes: (endpoint_arn: Types::tString, attributes: Types::map_string_to_string) -> Aws::EmptyStructure
+      def set_platform_application_attributes: (platform_application_arn: Types::tString, attributes: Types::map_string_to_string) -> Aws::EmptyStructure
+      def set_sms_attributes: (attributes: Types::map_string_to_string) -> Types::SetSMSAttributesResponse
+      def set_subscription_attributes: (subscription_arn: Types::subscription_arn, attribute_name: Types::attribute_name, ?attribute_value: Types::attribute_value) -> Aws::EmptyStructure
+      def set_topic_attributes: (topic_arn: Types::topic_arn, attribute_name: Types::attribute_name, ?attribute_value: Types::attribute_value) -> Aws::EmptyStructure
+      def subscribe: (topic_arn: Types::topic_arn, protocol: Types::protocol, ?endpoint: Types::endpoint, ?attributes: Types::subscription_attributes_map, ?return_subscription_arn: Types::boolean) -> Types::SubscribeResponse
+      def tag_resource: (resource_arn: Types::amazon_resource_name, tags: Types::tag_list_input) -> Types::TagResourceResponse
+      def unsubscribe: (subscription_arn: Types::subscription_arn) -> Aws::EmptyStructure
+      def untag_resource: (resource_arn: Types::amazon_resource_name, tag_keys: Types::tag_key_list) -> Types::UntagResourceResponse
+      def verify_sms_sandbox_phone_number: (phone_number: Types::phone_number_string, one_time_password: Types::otp_code) -> Types::VerifySMSSandboxPhoneNumberResult
+    end
+  end
+end
+
