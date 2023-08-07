@@ -14,3 +14,8 @@ class Colour < ActiveHash::Base
       { id: 3, name: "blue", code: "#0000ff" }
   ]
 end
+
+class Pallete < ActiveHash::Base
+  include ActiveHash::Associations
+  has_many :colours
+end
