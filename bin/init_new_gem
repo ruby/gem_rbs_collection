@@ -124,25 +124,25 @@ if git_repo
 end
 
 if github_account
+  github_account = "@#{github_account}" unless github_account.start_with?('@')
   update(Pathname('.github/CODEOWNERS')) do |content|
     lines = content.lines
-    insert_idx = nil
-    at_col = nil
-    entered = false
-    lines.each.with_index do |line, idx|
-      insert_idx = idx and break if entered && !line.match?(%r!^/gems/!)
-      next unless entered = line.match?(%r!^/gems/!)
-      insert_idx = idx
-      at_col ||= line.index('@')
 
-      break if "/gems/#{gem_name}" < line
+    pre_gems_lines, gems_lines = 
+      lines.map(&:chomp).slice_before('# Maintainer of individual gems (alphabetical order)').to_a
+    pre_gems_lines << gems_lines.shift
+
+    gems_lines << "/gems/#{gem_name} #{github_account}"
+    gems_lines.sort!
+
+    gems = gems_lines.map {|line| line.split }
+    longest_gem_size = gems.map {|gem, _| gem.size }.max
+    gem_lines = gems.map do |gem, owner|
+      space = " " * (longest_gem_size - gem.size)
+      "#{gem}#{space} #{owner}"
     end
 
-    insert_line = "/gems/#{gem_name}"
-    insert_line += ' ' * (at_col - insert_line.size)
-    insert_line += "@#{github_account}\n"
-    lines.insert(insert_idx, insert_line)
-    lines.join
+    (pre_gems_lines + gem_lines).join("\n")
   end
 end
 
