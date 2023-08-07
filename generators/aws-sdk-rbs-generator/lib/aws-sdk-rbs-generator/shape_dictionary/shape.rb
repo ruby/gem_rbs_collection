@@ -185,7 +185,15 @@ module AwsSdkRbsGenerator
       end
 
       def rbs_underscore_name_without_kind
-        "#{escape(name.underscore)}#{streaming? ? "_streaming" : ""}"
+        n =
+          # SNS's api has shape keys "String" and "string"
+          # Should we apply this case all?
+          if @dictionary.service.name == "SNS" && name == "String"
+            "t#{name}"
+          else
+            "#{escape(name.underscore)}"
+          end
+        "#{n}#{streaming? ? "_streaming" : ""}"
       end
 
       def rbs_input_name

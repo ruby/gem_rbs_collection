@@ -1,0 +1,256 @@
+# WARNING ABOUT GENERATED CODE
+#
+# This file is generated. See the generator README.md for more information:
+# https://github.com/ruby/gem_rbs_collection/blob/main/generators/aws-sdk-rbs-generator/README.md
+#
+# WARNING ABOUT GENERATED CODE
+
+module Aws
+  module SNS
+    module Types
+      type actions_list = ::Array[action]
+      type add_permission_input = { topic_arn: topic_arn, label: label, aws_account_id: delegates_list, action_name: actions_list }
+      type amazon_resource_name = ::String
+      class BatchResultErrorEntry
+        attr_accessor id: tString
+        attr_accessor code: tString
+        attr_accessor message: tString
+        attr_accessor sender_fault: boolean
+      end
+      type batch_result_error_entry_list = ::Array[BatchResultErrorEntry]
+      type binary = ::String
+      type check_if_phone_number_is_opted_out_input = { phone_number: phone_number }
+      class CheckIfPhoneNumberIsOptedOutResponse
+        attr_accessor is_opted_out: boolean
+      end
+      type confirm_subscription_input = { topic_arn: topic_arn, token: token, authenticate_on_unsubscribe: authenticate_on_unsubscribe? }
+      class ConfirmSubscriptionResponse
+        attr_accessor subscription_arn: subscription_arn
+      end
+      class CreateEndpointResponse
+        attr_accessor endpoint_arn: tString
+      end
+      type create_platform_application_input = { name: tString, platform: tString, attributes: map_string_to_string }
+      class CreatePlatformApplicationResponse
+        attr_accessor platform_application_arn: tString
+      end
+      type create_platform_endpoint_input = { platform_application_arn: tString, token: tString, custom_user_data: tString?, attributes: map_string_to_string? }
+      type create_sms_sandbox_phone_number_input = { phone_number: phone_number_string, language_code: language_code_string? }
+      class CreateSMSSandboxPhoneNumberResult < Aws::EmptyStructure
+      end
+      type create_topic_input = { name: topic_name, attributes: topic_attributes_map?, tags: tag_list_input?, data_protection_policy: attribute_value? }
+      class CreateTopicResponse
+        attr_accessor topic_arn: topic_arn
+      end
+      type delegates_list = ::Array[delegate]
+      type delete_endpoint_input = { endpoint_arn: tString }
+      type delete_platform_application_input = { platform_application_arn: tString }
+      type delete_sms_sandbox_phone_number_input = { phone_number: phone_number_string }
+      class DeleteSMSSandboxPhoneNumberResult < Aws::EmptyStructure
+      end
+      type delete_topic_input = { topic_arn: topic_arn }
+      class Endpoint
+        attr_accessor endpoint_arn: tString
+        attr_accessor attributes: map_string_to_string
+      end
+      type get_data_protection_policy_input = { resource_arn: topic_arn }
+      class GetDataProtectionPolicyResponse
+        attr_accessor data_protection_policy: attribute_value
+      end
+      type get_endpoint_attributes_input = { endpoint_arn: tString }
+      class GetEndpointAttributesResponse
+        attr_accessor attributes: map_string_to_string
+      end
+      type get_platform_application_attributes_input = { platform_application_arn: tString }
+      class GetPlatformApplicationAttributesResponse
+        attr_accessor attributes: map_string_to_string
+      end
+      type get_sms_attributes_input = { attributes: list_string? }
+      class GetSMSAttributesResponse
+        attr_accessor attributes: map_string_to_string
+      end
+      type get_sms_sandbox_account_status_input = ::Hash[untyped, untyped]
+      class GetSMSSandboxAccountStatusResult
+        attr_accessor is_in_sandbox: boolean
+      end
+      type get_subscription_attributes_input = { subscription_arn: subscription_arn }
+      class GetSubscriptionAttributesResponse
+        attr_accessor attributes: subscription_attributes_map
+      end
+      type get_topic_attributes_input = { topic_arn: topic_arn }
+      class GetTopicAttributesResponse
+        attr_accessor attributes: topic_attributes_map
+      end
+      type iso_2_country_code = ::String
+      type language_code_string = ("en-US" | "en-GB" | "es-419" | "es-ES" | "de-DE" | "fr-CA" | "fr-FR" | "it-IT" | "ja-JP" | "pt-BR" | "kr-KR" | "zh-CN" | "zh-TW")
+      type list_endpoints_by_platform_application_input = { platform_application_arn: tString, next_token: tString? }
+      class ListEndpointsByPlatformApplicationResponse
+        attr_accessor endpoints: list_of_endpoints
+        attr_accessor next_token: tString
+      end
+      type list_of_endpoints = ::Array[Endpoint]
+      type list_of_platform_applications = ::Array[PlatformApplication]
+      type list_origination_numbers_request = { next_token: next_token?, max_results: max_items_list_origination_numbers? }
+      class ListOriginationNumbersResult
+        attr_accessor next_token: next_token
+        attr_accessor phone_numbers: phone_number_information_list
+      end
+      type list_phone_numbers_opted_out_input = { next_token: string? }
+      class ListPhoneNumbersOptedOutResponse
+        attr_accessor phone_numbers: phone_number_list
+        attr_accessor next_token: string
+      end
+      type list_platform_applications_input = { next_token: tString? }
+      class ListPlatformApplicationsResponse
+        attr_accessor platform_applications: list_of_platform_applications
+        attr_accessor next_token: tString
+      end
+      type list_sms_sandbox_phone_numbers_input = { next_token: next_token?, max_results: max_items? }
+      class ListSMSSandboxPhoneNumbersResult
+        attr_accessor phone_numbers: sms_sandbox_phone_number_list
+        attr_accessor next_token: string
+      end
+      type list_string = ::Array[tString]
+      type list_subscriptions_by_topic_input = { topic_arn: topic_arn, next_token: next_token? }
+      class ListSubscriptionsByTopicResponse
+        attr_accessor subscriptions: subscriptions_list
+        attr_accessor next_token: next_token
+      end
+      type list_subscriptions_input = { next_token: next_token? }
+      class ListSubscriptionsResponse
+        attr_accessor subscriptions: subscriptions_list
+        attr_accessor next_token: next_token
+      end
+      type list_tags_for_resource_request = { resource_arn: amazon_resource_name }
+      class ListTagsForResourceResponse
+        attr_accessor tags: tag_list_output
+      end
+      type list_topics_input = { next_token: next_token? }
+      class ListTopicsResponse
+        attr_accessor topics: topics_list
+        attr_accessor next_token: next_token
+      end
+      type map_string_to_string = ::Hash[tString, tString]
+      type max_items = ::Integer
+      type max_items_list_origination_numbers = ::Integer
+      type message_attribute_map = ::Hash[tString, message_attribute_value]
+      type message_attribute_value = { data_type: tString, string_value: tString?, binary_value: binary? }
+      type number_capability = ("SMS" | "MMS" | "VOICE")
+      type number_capability_list = ::Array[number_capability]
+      type otp_code = ::String
+      type opt_in_phone_number_input = { phone_number: phone_number }
+      class OptInPhoneNumberResponse < Aws::EmptyStructure
+      end
+      type phone_number = ::String
+      class PhoneNumberInformation
+        attr_accessor created_at: timestamp
+        attr_accessor phone_number: tString
+        attr_accessor status: tString
+        attr_accessor iso_2_country_code: iso_2_country_code
+        attr_accessor route_type: route_type
+        attr_accessor number_capabilities: number_capability_list
+      end
+      type phone_number_information_list = ::Array[PhoneNumberInformation]
+      type phone_number_list = ::Array[phone_number]
+      type phone_number_string = ::String
+      class PlatformApplication
+        attr_accessor platform_application_arn: tString
+        attr_accessor attributes: map_string_to_string
+      end
+      type publish_batch_input = { topic_arn: topic_arn, publish_batch_request_entries: publish_batch_request_entry_list }
+      type publish_batch_request_entry = { id: tString, message: message, subject: subject?, message_structure: message_structure?, message_attributes: message_attribute_map?, message_deduplication_id: tString?, message_group_id: tString? }
+      type publish_batch_request_entry_list = ::Array[publish_batch_request_entry]
+      class PublishBatchResponse
+        attr_accessor successful: publish_batch_result_entry_list
+        attr_accessor failed: batch_result_error_entry_list
+      end
+      class PublishBatchResultEntry
+        attr_accessor id: tString
+        attr_accessor message_id: message_id
+        attr_accessor sequence_number: tString
+      end
+      type publish_batch_result_entry_list = ::Array[PublishBatchResultEntry]
+      type publish_input = { topic_arn: topic_arn?, target_arn: tString?, phone_number: tString?, message: message, subject: subject?, message_structure: message_structure?, message_attributes: message_attribute_map?, message_deduplication_id: tString?, message_group_id: tString? }
+      class PublishResponse
+        attr_accessor message_id: message_id
+        attr_accessor sequence_number: tString
+      end
+      type put_data_protection_policy_input = { resource_arn: topic_arn, data_protection_policy: attribute_value }
+      type remove_permission_input = { topic_arn: topic_arn, label: label }
+      type route_type = ("Transactional" | "Promotional" | "Premium")
+      class SMSSandboxPhoneNumber
+        attr_accessor phone_number: phone_number_string
+        attr_accessor status: sms_sandbox_phone_number_verification_status
+      end
+      type sms_sandbox_phone_number_list = ::Array[SMSSandboxPhoneNumber]
+      type sms_sandbox_phone_number_verification_status = ("Pending" | "Verified")
+      type set_endpoint_attributes_input = { endpoint_arn: tString, attributes: map_string_to_string }
+      type set_platform_application_attributes_input = { platform_application_arn: tString, attributes: map_string_to_string }
+      type set_sms_attributes_input = { attributes: map_string_to_string }
+      class SetSMSAttributesResponse < Aws::EmptyStructure
+      end
+      type set_subscription_attributes_input = { subscription_arn: subscription_arn, attribute_name: attribute_name, attribute_value: attribute_value? }
+      type set_topic_attributes_input = { topic_arn: topic_arn, attribute_name: attribute_name, attribute_value: attribute_value? }
+      type tString = ::String
+      type subscribe_input = { topic_arn: topic_arn, protocol: protocol, endpoint: endpoint?, attributes: subscription_attributes_map?, return_subscription_arn: boolean? }
+      class SubscribeResponse
+        attr_accessor subscription_arn: subscription_arn
+      end
+      class Subscription
+        attr_accessor subscription_arn: subscription_arn
+        attr_accessor owner: account
+        attr_accessor protocol: protocol
+        attr_accessor endpoint: endpoint
+        attr_accessor topic_arn: topic_arn
+      end
+      type subscription_attributes_map = ::Hash[attribute_name, attribute_value]
+      type subscriptions_list = ::Array[Subscription]
+      type tag = { key: tag_key, value: tag_value }
+      class Tag
+        attr_accessor key: tag_key
+        attr_accessor value: tag_value
+      end
+      type tag_key = ::String
+      type tag_key_list = ::Array[tag_key]
+      type tag_list_input = ::Array[tag]
+      type tag_list_output = ::Array[Tag]
+      type tag_resource_request = { resource_arn: amazon_resource_name, tags: tag_list_input }
+      class TagResourceResponse < Aws::EmptyStructure
+      end
+      type tag_value = ::String
+      type timestamp = ::Time
+      class Topic
+        attr_accessor topic_arn: topic_arn
+      end
+      type topic_attributes_map = ::Hash[attribute_name, attribute_value]
+      type topics_list = ::Array[Topic]
+      type unsubscribe_input = { subscription_arn: subscription_arn }
+      type untag_resource_request = { resource_arn: amazon_resource_name, tag_keys: tag_key_list }
+      class UntagResourceResponse < Aws::EmptyStructure
+      end
+      type verify_sms_sandbox_phone_number_input = { phone_number: phone_number_string, one_time_password: otp_code }
+      class VerifySMSSandboxPhoneNumberResult < Aws::EmptyStructure
+      end
+      type account = ::String
+      type action = ::String
+      type attribute_name = ::String
+      type attribute_value = ::String
+      type authenticate_on_unsubscribe = ::String
+      type boolean = bool
+      type delegate = ::String
+      type endpoint = ::String
+      type label = ::String
+      type message = ::String
+      type message_id = ::String
+      type message_structure = ::String
+      type next_token = ::String
+      type protocol = ::String
+      type string = ::String
+      type subject = ::String
+      type subscription_arn = ::String
+      type token = ::String
+      type topic_arn = ::String
+      type topic_name = ::String
+    end
+  end
+end
