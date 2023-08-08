@@ -1,5 +1,201 @@
 module Flipper
   class DSL
+    interface _DelegateMethods
+      # Public: Check if a feature is enabled.
+      #
+      # name - The String or Symbol name of the feature.
+      # args - The args passed through to the enabled check.
+      #
+      # Returns true if feature is enabled, false if not.
+      def enabled?: (name_type name, *untyped args) -> bool
+
+      # Public: Enable a feature.
+      #
+      # name - The String or Symbol name of the feature.
+      # args - The args passed through to the feature instance enable call.
+      #
+      # Returns the result of the feature instance enable call.
+      def enable: (name_type name, *untyped args) -> bool
+
+      # Public: Enable a feature for an actor.
+      #
+      # name - The String or Symbol name of the feature.
+      # actor - a Flipper::Types::Actor instance or an object that responds
+      #         to flipper_id.
+      #
+      # Returns result of Feature#enable.
+      def enable_actor: (name_type name, untyped actor) -> untyped
+
+      # Public: Enable a feature for a group.
+      #
+      # name - The String or Symbol name of the feature.
+      # group - a Flipper::Types::Group instance or a String or Symbol name of a
+      #         registered group.
+      #
+      # Returns result of Feature#enable.
+      def enable_group: (name_type name, untyped group) -> untyped
+
+      # Public: Enable a feature a percentage of time.
+      #
+      # name - The String or Symbol name of the feature.
+      # percentage - a Flipper::Types::PercentageOfTime instance or an object
+      #              that responds to to_i.
+      #
+      # Returns result of Feature#enable.
+      def enable_percentage_of_time: (name_type name, untyped percentage) -> untyped
+
+      # Public: Enable a feature for a percentage of actors.
+      #
+      # name - The String or Symbol name of the feature.
+      # percentage - a Flipper::Types::PercentageOfActors instance or an object
+      #              that responds to to_i.
+      #
+      # Returns result of Feature#enable.
+      def enable_percentage_of_actors: (name_type name, untyped percentage) -> untyped
+
+      # Public: Disable a feature.
+      #
+      # name - The String or Symbol name of the feature.
+      # args - The args passed through to the feature instance enable call.
+      #
+      # Returns the result of the feature instance disable call.
+      def disable: (name_type name, *untyped args) -> bool
+
+      # Public: Disable a feature for an actor.
+      #
+      # name - The String or Symbol name of the feature.
+      # actor - a Flipper::Types::Actor instance or an object that responds
+      #         to flipper_id.
+      #
+      # Returns result of disable.
+      def disable_actor: (name_type name, untyped actor) -> untyped
+
+      # Public: Disable a feature for a group.
+      #
+      # name - The String or Symbol name of the feature.
+      # group - a Flipper::Types::Group instance or a String or Symbol name of a
+      #         registered group.
+      #
+      # Returns result of disable.
+      def disable_group: (name_type name, untyped group) -> untyped
+
+      # Public: Disable a feature a percentage of time.
+      #
+      # name - The String or Symbol name of the feature.
+      # percentage - a Flipper::Types::PercentageOfTime instance or an object
+      #              that responds to to_i.
+      #
+      # Returns result of disable.
+      def disable_percentage_of_time: (name_type name) -> untyped
+
+      # Public: Disable a feature for a percentage of actors.
+      #
+      # name - The String or Symbol name of the feature.
+      # percentage - a Flipper::Types::PercentageOfActors instance or an object
+      #              that responds to to_i.
+      #
+      # Returns result of disable.
+      def disable_percentage_of_actors: (name_type name) -> untyped
+
+      # Public: Add a feature.
+      #
+      # name - The String or Symbol name of the feature.
+      #
+      # Returns result of add.
+      def add: (name_type name) -> untyped
+
+      # Public: Has a feature been added in the adapter.
+      #
+      # name - The String or Symbol name of the feature.
+      #
+      # Returns true if added else false.
+      def exist?: (name_type name) -> untyped
+
+      # Public: Remove a feature.
+      #
+      # name - The String or Symbol name of the feature.
+      #
+      # Returns result of remove.
+      def remove: (name_type name) -> untyped
+
+      # Public: Access a feature instance by name.
+      #
+      # name - The String or Symbol name of the feature.
+      #
+      # Returns an instance of Flipper::Feature.
+      def feature: (name_type name) -> untyped
+
+      # Public: Preload the features with the given names.
+      #
+      # names - An Array of String or Symbol names of the features.
+      #
+      # Returns an Array of Flipper::Feature.
+      def preload: (untyped names) -> untyped
+
+      # Public: Preload all the adapters features.
+      #
+      # Returns an Array of Flipper::Feature.
+      def preload_all: () -> untyped
+
+      # Public: Shortcut access to a feature instance by name.
+      #
+      # name - The String or Symbol name of the feature.
+      #
+      # Returns an instance of Flipper::Feature.
+      alias [] feature
+
+      # Public: Shortcut for getting a boolean type instance.
+      #
+      # value - The true or false value for the boolean.
+      #
+      # Returns a Flipper::Types::Boolean instance.
+      def boolean: (?bool value) -> untyped
+
+      # Public: Even shorter shortcut for getting a boolean type instance.
+      #
+      # value - The true or false value for the boolean.
+      #
+      # Returns a Flipper::Types::Boolean instance.
+      alias bool boolean
+
+      # Public: Wraps an object as a flipper actor.
+      #
+      # actor - The object that you would like to wrap.
+      #
+      # Returns an instance of Flipper::Types::Actor.
+      # Raises ArgumentError if actor does not respond to `flipper_id`.
+      def actor: (untyped actor) -> untyped
+
+      # Public: Shortcut for getting a percentage of time instance.
+      #
+      # number - The percentage of time that should be enabled.
+      #
+      # Returns Flipper::Types::PercentageOfTime.
+      def time: (untyped number) -> untyped
+
+      alias percentage_of_time time
+
+      # Public: Shortcut for getting a percentage of actors instance.
+      #
+      # number - The percentage of actors that should be enabled.
+      #
+      # Returns Flipper::Types::PercentageOfActors.
+      def actors: (untyped number) -> untyped
+
+      alias percentage_of_actors actors
+
+      # Public: Returns a Set of the known features for this adapter.
+      #
+      # Returns Set of Flipper::Feature instances.
+      def features: () -> untyped
+
+      # Cloud DSL method that does nothing for open source version.
+      def sync: () -> nil
+
+      # Cloud DSL method that does nothing for open source version.
+      def sync_secret: () -> nil
+    end
+
     extend Forwardable
 
     # Private
@@ -16,205 +212,13 @@ module Flipper
     #           :memoize - Should adapter be wrapped by memoize adapter or not.
     def initialize: (untyped adapter, ?::Hash[untyped, untyped] options) -> void
 
-    # Public: Check if a feature is enabled.
-    #
-    # name - The String or Symbol name of the feature.
-    # args - The args passed through to the enabled check.
-    #
-    # Returns true if feature is enabled, false if not.
-    def enabled?: (untyped name, *untyped args) -> untyped
-
-    # Public: Enable a feature.
-    #
-    # name - The String or Symbol name of the feature.
-    # args - The args passed through to the feature instance enable call.
-    #
-    # Returns the result of the feature instance enable call.
-    def enable: (untyped name, *untyped args) -> untyped
-
-    # Public: Enable a feature for an actor.
-    #
-    # name - The String or Symbol name of the feature.
-    # actor - a Flipper::Types::Actor instance or an object that responds
-    #         to flipper_id.
-    #
-    # Returns result of Feature#enable.
-    def enable_actor: (untyped name, untyped actor) -> untyped
-
-    # Public: Enable a feature for a group.
-    #
-    # name - The String or Symbol name of the feature.
-    # group - a Flipper::Types::Group instance or a String or Symbol name of a
-    #         registered group.
-    #
-    # Returns result of Feature#enable.
-    def enable_group: (untyped name, untyped group) -> untyped
-
-    # Public: Enable a feature a percentage of time.
-    #
-    # name - The String or Symbol name of the feature.
-    # percentage - a Flipper::Types::PercentageOfTime instance or an object
-    #              that responds to to_i.
-    #
-    # Returns result of Feature#enable.
-    def enable_percentage_of_time: (untyped name, untyped percentage) -> untyped
-
-    # Public: Enable a feature for a percentage of actors.
-    #
-    # name - The String or Symbol name of the feature.
-    # percentage - a Flipper::Types::PercentageOfActors instance or an object
-    #              that responds to to_i.
-    #
-    # Returns result of Feature#enable.
-    def enable_percentage_of_actors: (untyped name, untyped percentage) -> untyped
-
-    # Public: Disable a feature.
-    #
-    # name - The String or Symbol name of the feature.
-    # args - The args passed through to the feature instance enable call.
-    #
-    # Returns the result of the feature instance disable call.
-    def disable: (untyped name, *untyped args) -> untyped
-
-    # Public: Disable a feature for an actor.
-    #
-    # name - The String or Symbol name of the feature.
-    # actor - a Flipper::Types::Actor instance or an object that responds
-    #         to flipper_id.
-    #
-    # Returns result of disable.
-    def disable_actor: (untyped name, untyped actor) -> untyped
-
-    # Public: Disable a feature for a group.
-    #
-    # name - The String or Symbol name of the feature.
-    # group - a Flipper::Types::Group instance or a String or Symbol name of a
-    #         registered group.
-    #
-    # Returns result of disable.
-    def disable_group: (untyped name, untyped group) -> untyped
-
-    # Public: Disable a feature a percentage of time.
-    #
-    # name - The String or Symbol name of the feature.
-    # percentage - a Flipper::Types::PercentageOfTime instance or an object
-    #              that responds to to_i.
-    #
-    # Returns result of disable.
-    def disable_percentage_of_time: (untyped name) -> untyped
-
-    # Public: Disable a feature for a percentage of actors.
-    #
-    # name - The String or Symbol name of the feature.
-    # percentage - a Flipper::Types::PercentageOfActors instance or an object
-    #              that responds to to_i.
-    #
-    # Returns result of disable.
-    def disable_percentage_of_actors: (untyped name) -> untyped
-
-    # Public: Add a feature.
-    #
-    # name - The String or Symbol name of the feature.
-    #
-    # Returns result of add.
-    def add: (untyped name) -> untyped
-
-    # Public: Has a feature been added in the adapter.
-    #
-    # name - The String or Symbol name of the feature.
-    #
-    # Returns true if added else false.
-    def exist?: (untyped name) -> untyped
-
-    # Public: Remove a feature.
-    #
-    # name - The String or Symbol name of the feature.
-    #
-    # Returns result of remove.
-    def remove: (untyped name) -> untyped
-
-    # Public: Access a feature instance by name.
-    #
-    # name - The String or Symbol name of the feature.
-    #
-    # Returns an instance of Flipper::Feature.
-    def feature: (untyped name) -> untyped
-
-    # Public: Preload the features with the given names.
-    #
-    # names - An Array of String or Symbol names of the features.
-    #
-    # Returns an Array of Flipper::Feature.
-    def preload: (untyped names) -> untyped
-
-    # Public: Preload all the adapters features.
-    #
-    # Returns an Array of Flipper::Feature.
-    def preload_all: () -> untyped
-
-    # Public: Shortcut access to a feature instance by name.
-    #
-    # name - The String or Symbol name of the feature.
-    #
-    # Returns an instance of Flipper::Feature.
-    alias [] feature
-
-    # Public: Shortcut for getting a boolean type instance.
-    #
-    # value - The true or false value for the boolean.
-    #
-    # Returns a Flipper::Types::Boolean instance.
-    def boolean: (?bool value) -> untyped
-
-    # Public: Even shorter shortcut for getting a boolean type instance.
-    #
-    # value - The true or false value for the boolean.
-    #
-    # Returns a Flipper::Types::Boolean instance.
-    alias bool boolean
+    include _DelegateMethods
 
     # Public: Access a flipper group by name.
     #
     # name - The String or Symbol name of the feature.
     #
     # Returns an instance of Flipper::Group.
-    def group: (untyped name) -> untyped
-
-    # Public: Wraps an object as a flipper actor.
-    #
-    # actor - The object that you would like to wrap.
-    #
-    # Returns an instance of Flipper::Types::Actor.
-    # Raises ArgumentError if actor does not respond to `flipper_id`.
-    def actor: (untyped actor) -> untyped
-
-    # Public: Shortcut for getting a percentage of time instance.
-    #
-    # number - The percentage of time that should be enabled.
-    #
-    # Returns Flipper::Types::PercentageOfTime.
-    def time: (untyped number) -> untyped
-
-    alias percentage_of_time time
-
-    # Public: Shortcut for getting a percentage of actors instance.
-    #
-    # number - The percentage of actors that should be enabled.
-    #
-    # Returns Flipper::Types::PercentageOfActors.
-    def actors: (untyped number) -> untyped
-
-    alias percentage_of_actors actors
-
-    # Public: Returns a Set of the known features for this adapter.
-    #
-    # Returns Set of Flipper::Feature instances.
-    def features: () -> untyped
-
-    # Cloud DSL method that does nothing for open source version.
-    def sync: () -> nil
-
-    # Cloud DSL method that does nothing for open source version.
-    def sync_secret: () -> nil
+    def group: (name_type name) -> untyped
   end
 end

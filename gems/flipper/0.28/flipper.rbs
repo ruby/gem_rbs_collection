@@ -1,4 +1,6 @@
 module Flipper
+  type name_type = String | Symbol
+
   extend ::Flipper
 
   extend Forwardable
@@ -17,13 +19,13 @@ module Flipper
   #   end
   #
   # Yields Flipper::Configuration instance.
-  def configure: () ?{ (untyped) -> untyped } -> (untyped | nil)
+  def configure: () ?{ (Configuration) -> void } -> void
 
   # Public: Returns Flipper::Configuration instance.
-  def configuration: () -> untyped
+  def configuration: () -> Configuration
 
   # Public: Sets Flipper::Configuration instance.
-  def configuration=: (untyped configuration) -> untyped
+  def configuration=: (Configuration configuration) -> untyped
 
   # Public: Default per thread flipper instance if configured. You should not
   # need to use this directly as most of the Flipper::DSL methods are delegated
@@ -32,6 +34,8 @@ module Flipper
   #
   # Returns Flipper::DSL instance.
   def instance: () -> untyped
+  
+  include DSL::_DelegateMethods
 
   # Public: Set the flipper instance. It is most common to use the
   # Configuration#default to set this instance, but for things like the test
