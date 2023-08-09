@@ -1,0 +1,385 @@
+#
+module MIME
+end
+
+# The definition of one MIME content-type.
+#
+# == Usage
+#  require 'mime/types'
+#
+#  plaintext = MIME::Types['text/plain'] # => [ text/plain ]
+#  text = plaintext.first
+#  puts text.media_type            # => 'text'
+#  puts text.sub_type              # => 'plain'
+#
+#  puts text.extensions.join(' ')  # => 'txt asc c cc h hh cpp hpp dat hlp'
+#  puts text.preferred_extension   # => 'txt'
+#  puts text.friendly              # => 'Text Document'
+#  puts text.i18n_key              # => 'text.plain'
+#
+#  puts text.encoding              # => quoted-printable
+#  puts text.default_encoding      # => quoted-printable
+#  puts text.binary?               # => false
+#  puts text.ascii?                # => true
+#  puts text.obsolete?             # => false
+#  puts text.registered?           # => true
+#  puts text.provisional?          # => false
+#  puts text.complete?             # => true
+#
+#  puts text                       # => 'text/plain'
+#
+#  puts text == 'text/plain'       # => true
+#  puts 'text/plain' == text       # => true
+#  puts text == 'text/x-plain'     # => false
+#  puts 'text/x-plain' == text     # => false
+#
+#  puts MIME::Type.simplified('x-appl/x-zip') # => 'x-appl/x-zip'
+#  puts MIME::Type.i18n_key('x-appl/x-zip') # => 'x-appl.x-zip'
+#
+#  puts text.like?('text/x-plain') # => true
+#  puts text.like?(MIME::Type.new('x-text/x-plain')) # => true
+#
+#  puts text.xrefs.inspect # => { "rfc" => [ "rfc2046", "rfc3676", "rfc5147" ] }
+#  puts text.xref_urls # => [ "http://www.iana.org/go/rfc2046",
+#                      #      "http://www.iana.org/go/rfc3676",
+#                      #      "http://www.iana.org/go/rfc5147" ]
+#
+#  xtext = MIME::Type.new('x-text/x-plain')
+#  puts xtext.media_type # => 'text'
+#  puts xtext.raw_media_type # => 'x-text'
+#  puts xtext.sub_type # => 'plain'
+#  puts xtext.raw_sub_type # => 'x-plain'
+#  puts xtext.complete? # => false
+#
+#  puts MIME::Types.any? { |type| type.content_type == 'text/plain' } # => true
+#  puts MIME::Types.all?(&:registered?) # => false
+#
+#  # Various string representations of MIME types
+#  qcelp = MIME::Types['audio/QCELP'].first # => audio/QCELP
+#  puts qcelp.content_type         # => 'audio/QCELP'
+#  puts qcelp.simplified           # => 'audio/qcelp'
+#
+#  xwingz = MIME::Types['application/x-Wingz'].first # => application/x-Wingz
+#  puts xwingz.content_type        # => 'application/x-Wingz'
+#  puts xwingz.simplified          # => 'application/x-wingz'
+class MIME::Type
+  # Reflects a MIME content-type specification that is not correctly
+  # formatted (it isn't +type+/+subtype+).
+  class InvalidContentType < ArgumentError
+    # :stopdoc:
+    def initialize: (untyped type_string) -> void
+
+    def to_s: () -> ::String
+  end
+
+  # Reflects an unsupported MIME encoding.
+  class InvalidEncoding < ArgumentError
+    # :stopdoc:
+    def initialize: (untyped encoding) -> void
+
+    def to_s: () -> ::String
+  end
+
+  # The released version of the mime-types library.
+  VERSION: "3.5.0"
+
+  include Comparable
+
+  # :stopdoc:
+  # TODO verify mime-type character restrictions; I am pretty sure that this is
+  # too wide open.
+  MEDIA_TYPE_RE: ::Regexp
+
+  I18N_RE: ::Regexp
+
+  BINARY_ENCODINGS: ::Array["base64" | "8bit"]
+
+  ASCII_ENCODINGS: ::Array["7bit" | "quoted-printable"]
+
+  # Builds a MIME::Type object from the +content_type+, a MIME Content Type
+  # value (e.g., 'text/plain' or 'application/x-eruby'). The constructed object
+  # is yielded to an optional block for additional configuration, such as
+  # associating extensions and encoding information.
+  #
+  # * When provided a Hash or a MIME::Type, the MIME::Type will be
+  #   constructed with #init_with.
+  # * When provided an Array, the MIME::Type will be constructed using
+  #   the first element as the content type and the remaining flattened
+  #   elements as extensions.
+  # * Otherwise, the content_type will be used as a string.
+  #
+  # Yields the newly constructed +self+ object.
+  def initialize: (untyped content_type) ?{ (untyped) -> untyped } -> void
+
+  # Indicates that a MIME type is like another type. This differs from
+  # <tt>==</tt> because <tt>x-</tt> prefixes are removed for this comparison.
+  def like?: (untyped other) -> untyped
+
+  # Compares the +other+ MIME::Type against the exact content type or the
+  # simplified type (the simplified type will be used if comparing against
+  # something that can be treated as a String with #to_s). In comparisons, this
+  # is done against the lowercase version of the MIME::Type.
+  def <=>: (untyped other) -> (-1 | untyped)
+
+  # Compares the +other+ MIME::Type based on how reliable it is before doing a
+  # normal <=> comparison. Used by MIME::Types#[] to sort types. The
+  # comparisons involved are:
+  #
+  # 1. self.simplified <=> other.simplified (ensures that we
+  #    don't try to compare different types)
+  # 2. IANA-registered definitions < other definitions.
+  # 3. Complete definitions < incomplete definitions.
+  # 4. Current definitions < obsolete definitions.
+  # 5. Obselete with use-instead names < obsolete without.
+  # 6. Obsolete use-instead definitions are compared.
+  #
+  # While this method is public, its use is strongly discouraged by consumers
+  # of mime-types. In mime-types 3, this method is likely to see substantial
+  # revision and simplification to ensure current registered content types sort
+  # before unregistered or obsolete content types.
+  def priority_compare: (untyped other) -> untyped
+
+  # Returns +true+ if the +other+ object is a MIME::Type and the content types
+  # match.
+  def eql?: (untyped other) -> untyped
+
+  # Returns a hash based on the #simplified value.
+  #
+  # This maintains the invariant that two #eql? instances must have the same
+  # #hash (although having the same #hash does *not* imply that the objects are
+  # #eql?).
+  #
+  # To see why, suppose a MIME::Type instance +a+ is compared to another object
+  # +b+, and that <code>a.eql?(b)</code> is true. By the definition of #eql?,
+  # we know the following:
+  #
+  # 1. +b+ is a MIME::Type instance itself.
+  # 2. <code>a == b</code> is true.
+  #
+  # Due to the first point, we know that +b+ should respond to the #simplified
+  # method. Thus, per the definition of #<=>, we know that +a.simplified+ must
+  # be equal to +b.simplified+, as compared by the <=> method corresponding to
+  # +a.simplified+.
+  #
+  # Presumably, if <code>a.simplified <=> b.simplified</code> is +0+, then
+  # +a.simplified+ has the same hash as +b.simplified+. So we assume it's
+  # suitable for #hash to delegate to #simplified in service of the #eql?
+  # invariant.
+  def hash: () -> untyped
+
+  # Returns the whole MIME content-type string.
+  #
+  # The content type is a presentation value from the MIME type registry and
+  # should not be used for comparison. The case of the content type is
+  # preserved, and extension markers (<tt>x-</tt>) are kept.
+  #
+  #   text/plain        => text/plain
+  #   x-chemical/x-pdb  => x-chemical/x-pdb
+  #   audio/QCELP       => audio/QCELP
+  attr_reader content_type: untyped
+
+  # A simplified form of the MIME content-type string, suitable for
+  # case-insensitive comparison, with the content_type converted to lowercase.
+  #
+  #   text/plain        => text/plain
+  #   x-chemical/x-pdb  => x-chemical/x-pdb
+  #   audio/QCELP       => audio/qcelp
+  attr_reader simplified: untyped
+
+  # Returns the media type of the simplified MIME::Type.
+  #
+  #   text/plain        => text
+  #   x-chemical/x-pdb  => x-chemical
+  #   audio/QCELP       => audio
+  attr_reader media_type: untyped
+
+  # Returns the media type of the unmodified MIME::Type.
+  #
+  #   text/plain        => text
+  #   x-chemical/x-pdb  => x-chemical
+  #   audio/QCELP       => audio
+  attr_reader raw_media_type: untyped
+
+  # Returns the sub-type of the simplified MIME::Type.
+  #
+  #   text/plain        => plain
+  #   x-chemical/x-pdb  => pdb
+  #   audio/QCELP       => QCELP
+  attr_reader sub_type: untyped
+
+  # Returns the media type of the unmodified MIME::Type.
+  #
+  #   text/plain        => plain
+  #   x-chemical/x-pdb  => x-pdb
+  #   audio/QCELP       => qcelp
+  attr_reader raw_sub_type: untyped
+
+  #
+  # The list of extensions which are known to be used for this MIME::Type.
+  # Non-array values will be coerced into an array with #to_a. Array values
+  # will be flattened, +nil+ values removed, and made unique.
+  #
+  # :attr_accessor: extensions
+  def extensions: () -> untyped
+
+  #
+  def extensions=: (untyped value) -> untyped
+
+  # Merge the +extensions+ provided into this MIME::Type. The extensions added
+  # will be merged uniquely.
+  def add_extensions: (*untyped extensions) -> untyped
+
+  #
+  def preferred_extension: () -> untyped
+
+  #
+  def preferred_extension=: (untyped value) -> untyped
+
+  #
+  attr_reader encoding: untyped
+
+  #
+  def encoding=: (untyped enc) -> untyped
+
+  # Returns the default encoding for the MIME::Type based on the media type.
+  def default_encoding: () -> ("quoted-printable" | "base64")
+
+  #
+  def use_instead: () -> (untyped | nil)
+
+  #
+  attr_writer use_instead: untyped
+
+  # Returns +true+ if the media type is obsolete.
+  attr_accessor obsolete: untyped
+
+  alias obsolete? obsolete
+
+  # The documentation for this MIME::Type.
+  attr_accessor docs: untyped
+
+  # A friendly short description for this MIME::Type.
+  #
+  # call-seq:
+  #   text_plain.friendly         # => "Text File"
+  #   text_plain.friendly('en')   # => "Text File"
+  def friendly: (?::String lang) -> untyped
+
+  # A key suitable for use as a lookup key for translations, such as with
+  # the I18n library.
+  #
+  # call-seq:
+  #    text_plain.i18n_key # => "text.plain"
+  #    3gpp_xml.i18n_key   # => "application.vnd-3gpp-bsf-xml"
+  #      # from application/vnd.3gpp.bsf+xml
+  #    x_msword.i18n_key   # => "application.word"
+  #      # from application/x-msword
+  attr_reader i18n_key: untyped
+
+  #
+  attr_reader xrefs: untyped
+
+  #
+  def xrefs=: (untyped xrefs) -> untyped
+
+  # The decoded cross-reference URL list for this MIME::Type.
+  def xref_urls: () -> untyped
+
+  # Indicates whether the MIME type has been registered with IANA.
+  attr_accessor registered: untyped
+
+  alias registered? registered
+
+  # Indicates whether the MIME type's registration with IANA is provisional.
+  attr_accessor provisional: untyped
+
+  # Indicates whether the MIME type's registration with IANA is provisional.
+  def provisional?: () -> untyped
+
+  # MIME types can be specified to be sent across a network in particular
+  # formats. This method returns +true+ when the MIME::Type encoding is set
+  # to <tt>base64</tt>.
+  def binary?: () -> untyped
+
+  # MIME types can be specified to be sent across a network in particular
+  # formats. This method returns +false+ when the MIME::Type encoding is
+  # set to <tt>base64</tt>.
+  def ascii?: () -> untyped
+
+  # Indicateswhether the MIME type is declared as a signature type.
+  attr_accessor signature: untyped
+
+  alias signature? signature
+
+  # Returns +true+ if the MIME::Type specifies an extension list,
+  # indicating that it is a complete MIME::Type.
+  def complete?: () -> untyped
+
+  # Returns the MIME::Type as a string.
+  def to_s: () -> untyped
+
+  # Returns the MIME::Type as a string for implicit conversions. This allows
+  # MIME::Type objects to appear on either side of a comparison.
+  #
+  #   'text/plain' == MIME::Type.new('text/plain')
+  def to_str: () -> untyped
+
+  # Converts the MIME::Type to a JSON string.
+  def to_json: (*untyped args) -> untyped
+
+  # Converts the MIME::Type to a hash. The output of this method can also be
+  # used to initialize a MIME::Type.
+  def to_h: () -> untyped
+
+  # Populates the +coder+ with attributes about this record for
+  # serialization. The structure of +coder+ should match the structure used
+  # with #init_with.
+  #
+  # This method should be considered a private implementation detail.
+  def encode_with: (untyped coder) -> untyped
+
+  # Initialize an empty object from +coder+, which must contain the
+  # attributes necessary for initializing an empty object.
+  #
+  # This method should be considered a private implementation detail.
+  def init_with: (untyped coder) -> untyped
+
+  def inspect: () -> ::String
+
+  # MIME media types are case-insensitive, but are typically presented in a
+  # case-preserving format in the type registry. This method converts
+  # +content_type+ to lowercase.
+  #
+  # In previous versions of mime-types, this would also remove any extension
+  # prefix (<tt>x-</tt>). This is no longer default behaviour, but may be
+  # provided by providing a truth value to +remove_x_prefix+.
+  def self.simplified: (untyped content_type, ?remove_x_prefix: bool) -> untyped
+
+  # Converts a provided +content_type+ into a translation key suitable for
+  # use with the I18n library.
+  def self.i18n_key: (untyped content_type) -> untyped
+
+  # Return a +MatchData+ object of the +content_type+ against pattern of
+  # media types.
+  def self.match: (untyped content_type) -> untyped
+
+  private
+
+  def self.simplify_matchdata: (untyped matchdata, ?bool remove_x, ?joiner: ::String) ?{ (untyped) -> untyped } -> (nil | untyped)
+
+  def content_type=: (untyped type_string) -> untyped
+
+  def intern_string: (untyped string) -> untyped
+
+  def xref_map: (untyped values, untyped helper) -> untyped
+
+  def xref_url_for_rfc: (untyped value) -> untyped
+
+  def xref_url_for_draft: (untyped value) -> untyped
+
+  def xref_url_for_rfc_errata: (untyped value) -> untyped
+
+  def xref_url_for_person: (untyped value) -> untyped
+
+  def xref_url_for_template: (untyped value) -> untyped
+end
