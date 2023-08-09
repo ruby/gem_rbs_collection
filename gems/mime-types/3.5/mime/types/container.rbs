@@ -1,37 +1,41 @@
-# MIME::Types requires a serializable keyed container that returns an empty Set
-# on a key miss. Hash#default_value cannot be used because, while it traverses
-# the Marshal format correctly, it won't survive any other serialization
-# format (plus, a default of a mutable object resuls in a shared mess).
-# Hash#default_proc cannot be used without a wrapper because it prevents
-# Marshal serialization (and doesn't survive the round-trip).
-class MIME::Types::Container
-  extend Forwardable
+module MIME
+  class Types
+    # MIME::Types requires a serializable keyed container that returns an empty Set
+    # on a key miss. Hash#default_value cannot be used because, while it traverses
+    # the Marshal format correctly, it won't survive any other serialization
+    # format (plus, a default of a mutable object resuls in a shared mess).
+    # Hash#default_proc cannot be used without a wrapper because it prevents
+    # Marshal serialization (and doesn't survive the round-trip).
+    class Container
+      extend Forwardable
 
-  def initialize: (?::Hash[untyped, untyped] hash) -> void
+      def initialize: (?::Hash[untyped, untyped] hash) -> void
 
-  def []: (untyped key) -> untyped
+      def []: (untyped key) -> untyped
 
-  def []=: (untyped key, untyped value) -> untyped
+      def []=: (untyped key, untyped value) -> untyped
 
-  def merge: (untyped other) -> untyped
+      def merge: (untyped other) -> untyped
 
-  def merge!: (untyped other) -> untyped
+      def merge!: (untyped other) -> untyped
 
-  def to_hash: () -> untyped
+      def to_hash: () -> untyped
 
-  def add: (untyped key, untyped value) -> untyped
+      def add: (untyped key, untyped value) -> untyped
 
-  def marshal_dump: () -> untyped
+      def marshal_dump: () -> untyped
 
-  def marshal_load: (untyped hash) -> untyped
+      def marshal_load: (untyped hash) -> untyped
 
-  def encode_with: (untyped coder) -> untyped
+      def encode_with: (untyped coder) -> untyped
 
-  def init_with: (untyped coder) -> untyped
+      def init_with: (untyped coder) -> untyped
 
-  attr_accessor container: untyped
+      attr_accessor container: untyped
 
-  def normalize: () -> untyped
+      def normalize: () -> untyped
 
-  EMPTY_SET: untyped
+      EMPTY_SET: untyped
+    end
+  end
 end
