@@ -1,0 +1,36 @@
+module MIME
+  class Types
+    extend Enumerable[MIME::Type]
+
+    # MIME::Types#[] against the default MIME::Types registry.
+    def self.[]: (untyped type_id, ?complete: bool, ?registered: bool) -> Array[MIME::Type]
+
+    # MIME::Types#count against the default MIME::Types registry.
+    def self.count: () -> Integer
+
+    # MIME::Types#each against the default MIME::Types registry.
+    def self.each: () ?{ (MIME::Type]) -> void } -> Array[MIME::Type]
+
+    # MIME::Types#type_for against the default MIME::Types registry.
+    def self.type_for: (untyped filename) -> Array[MIME::Type]
+
+    alias self.of self.type_for
+
+    # MIME::Types#add against the default MIME::Types registry.
+    def self.add: (*untyped types) -> untyped
+
+    private
+
+    def self.lazy_load?: () -> (nil | untyped)
+
+    def self.__types__: () -> untyped
+
+    def self.load_mode: () -> { columnar: true }
+
+    def self.load_default_mime_types: (?untyped mode) -> untyped
+
+    def self.__instances__: () -> untyped
+
+    def self.reindex_extensions: (untyped type) -> true
+  end
+end
