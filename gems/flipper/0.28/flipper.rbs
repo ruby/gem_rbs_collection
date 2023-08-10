@@ -1,0 +1,95 @@
+module Flipper
+  type name_type = String | Symbol
+
+  extend ::Flipper
+
+  extend Forwardable
+
+  # Private: The namespace for all instrumented events.
+  InstrumentationNamespace: :flipper
+
+  # Public: Start here. Given an adapter returns a handy DSL to all the flipper
+  # goodness. To see supported options, check out dsl.rb.
+  def new: (untyped adapter, ?::Hash[untyped, untyped] options) -> untyped
+
+  # Public: Configure flipper.
+  #
+  #   Flipper.configure do |config|
+  #     config.adapter { ... }
+  #   end
+  #
+  # Yields Flipper::Configuration instance.
+  def configure: () ?{ (Configuration) -> void } -> void
+
+  # Public: Returns Flipper::Configuration instance.
+  def configuration: () -> Configuration
+
+  # Public: Sets Flipper::Configuration instance.
+  def configuration=: (Configuration configuration) -> untyped
+
+  # Public: Default per thread flipper instance if configured. You should not
+  # need to use this directly as most of the Flipper::DSL methods are delegated
+  # from Flipper module itself. Instead of doing Flipper.instance.enabled?(:search),
+  # you can use Flipper.enabled?(:search) for the same result.
+  #
+  # Returns Flipper::DSL instance.
+  def instance: () -> untyped
+  
+  include DSL::_DelegateMethods
+
+  # Public: Set the flipper instance. It is most common to use the
+  # Configuration#default to set this instance, but for things like the test
+  # environment, this writer is actually useful.
+  def instance=: (untyped flipper) -> untyped
+
+  # Public: Use this to register a group by name.
+  #
+  # name - The Symbol name of the group.
+  # block - The block that should be used to determine if the group matches a
+  #         given actor.
+  #
+  # Examples
+  #
+  #   Flipper.register(:admins) { |actor|
+  #     actor.respond_to?(:admin?) && actor.admin?
+  #   }
+  #
+  # Returns a Flipper::Group.
+  # Raises Flipper::DuplicateGroup if the group is already registered.
+  def register: (untyped name) { () -> untyped } -> untyped
+
+  # Public: Returns a Set of registered Types::Group instances.
+  def groups: () -> untyped
+
+  # Public: Returns a Set of symbols where each symbol is a registered
+  # group name. If you just want the names, this is more efficient than doing
+  # `Flipper.groups.map(&:name)`.
+  def group_names: () -> untyped
+
+  # Public: Clears the group registry.
+  #
+  # Returns nothing.
+  def unregister_groups: () -> untyped
+
+  # Public: Check if a group exists
+  #
+  # Returns boolean
+  def group_exists?: (untyped name) -> untyped
+
+  # Public: Fetches a group by name.
+  #
+  # name - The Symbol name of the group.
+  #
+  # Examples
+  #
+  #   Flipper.group(:admins)
+  #
+  # Returns Flipper::Group.
+  def group: (untyped name) -> untyped
+
+  # Internal: Registry of all groups_registry.
+  def groups_registry: () -> untyped
+
+  # Internal: Change the groups_registry registry.
+  def groups_registry=: (untyped registry) -> untyped
+end
