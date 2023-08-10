@@ -1,0 +1,38 @@
+module Flipper
+  # Adding a module include so we have some hooks for stuff down the road
+  module Adapter
+    def self.included: (untyped base) -> untyped
+
+    module ClassMethods
+      # Public: Default config for a feature's gate values.
+      def default_config: () -> { boolean: nil, groups: untyped, actors: untyped, percentage_of_actors: nil, percentage_of_time: nil }
+
+      def from: (untyped source) -> untyped
+    end
+
+    # Public: Get all features and gate values in one call. Defaults to one call
+    # to features and another to get_multi. Feel free to override per adapter to
+    # make this more efficient.
+    def get_all: () -> untyped
+
+    # Public: Get multiple features in one call. Defaults to one get per
+    # feature. Feel free to override per adapter to make this more efficient and
+    # reduce network calls.
+    def get_multi: (untyped features) -> untyped
+
+    # Public: Ensure that adapter is in sync with source adapter provided.
+    #
+    # source - The source dsl, adapter or export to import.
+    #
+    # Returns true if successful.
+    def import: (untyped source) -> true
+
+    # Public: Exports the adapter in a given format for a given format version.
+    #
+    # Returns a Flipper::Export instance.
+    def export: (?format: ::Symbol, ?version: ::Integer) -> untyped
+
+    # Public: Default config for a feature's gate values.
+    def default_config: () -> untyped
+  end
+end

@@ -1,0 +1,49 @@
+module Flipper
+  module Adapters
+    # Public: Adapter for storing everything in memory.
+    # Useful for tests/specs.
+    class Memory
+      include ::Flipper::Adapter
+
+      FeaturesKey: :features
+
+      # Public: The name of the adapter.
+      attr_reader name: untyped
+
+      # Public
+      def initialize: (?untyped? source) -> void
+
+      # Public: The set of known features.
+      def features: () -> untyped
+
+      # Public: Adds a feature to the set of known features.
+      def add: (untyped feature) -> true
+
+      # Public: Removes a feature from the set of known features and clears
+      # all the values for the feature.
+      def remove: (untyped feature) -> true
+
+      # Public: Clears all the gate values for a feature.
+      def clear: (untyped feature) -> true
+
+      # Public
+      def get: (untyped feature) -> untyped
+
+      def get_multi: (untyped features) -> untyped
+
+      def get_all: () -> untyped
+
+      # Public
+      def enable: (untyped feature, untyped gate, untyped thing) -> untyped
+
+      # Public
+      def disable: (untyped feature, untyped gate, untyped thing) -> untyped
+
+      # Public
+      def inspect: () -> ::String
+
+      # Public: a more efficient implementation of import for this adapter
+      def import: (untyped source) -> true
+    end
+  end
+end
