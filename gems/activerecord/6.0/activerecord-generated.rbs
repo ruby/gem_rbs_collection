@@ -20167,7 +20167,7 @@ module ActiveRecord
       #
       #   sanitize_sql_hash_for_assignment({ status: nil, group_id: 1 }, "posts")
       #   # => "`posts`.`status` = NULL, `posts`.`group_id` = 1"
-      def sanitize_sql_hash_for_assignment: (untyped attrs, untyped table) -> untyped
+      def sanitize_sql_hash_for_assignment: (Hash attrs, String table) -> String
 
       # Sanitizes a +string+ so that it is safe to use within an SQL
       # LIKE statement. This method uses +escape_character+ to escape all occurrences of "\", "_" and "%".
@@ -20183,7 +20183,7 @@ module ActiveRecord
       #
       #   sanitize_sql_like("snake_cased_string", "!")
       #   # => "snake!_cased!_string"
-      def sanitize_sql_like: (untyped string, ?::String escape_character) -> untyped
+      def sanitize_sql_like: (String string, ?::String escape_character) -> String
 
       # Accepts an array of conditions. The array has each value
       # sanitized and interpolated into the SQL statement.
