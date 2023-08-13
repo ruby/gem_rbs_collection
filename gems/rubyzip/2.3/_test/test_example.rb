@@ -6,11 +6,11 @@ require 'zip'
 
 Zip::InputStream.open('example.zip') do |zis|
   entry = zis.get_next_entry
-  print "First line of '#{entry.name} (#{entry.size} bytes):  "
-  puts "'#{zis.gets.chomp}'"
+  print "First line of '#{entry&.name} (#{entry&.size} bytes):  "
+  puts "'#{zis.gets&.chomp}'"
   entry = zis.get_next_entry
-  print "First line of '#{entry.name} (#{entry.size} bytes):  "
-  puts "'#{zis.gets.chomp}'"
+  print "First line of '#{entry&.name} (#{entry&.size} bytes):  "
+  puts "'#{zis.gets&.chomp}'"
 end
 
 ####### Using ZipFile to read the directory of a zip file: #######
@@ -70,9 +70,3 @@ puts "Zip file splitted in #{part_zips_count} parts"
 Zip::File.split('large_zip_file.zip', 1_048_576, true, 'part_zip_file') do |part_count, part_index, chunk_bytes, segment_bytes|
   puts "#{part_index} of #{part_count} part splitting: #{(chunk_bytes.to_f / segment_bytes * 100).to_i}%"
 end
-
-# For other examples, look at zip.rb and ziptest.rb
-
-# Copyright (C) 2002 Thomas Sondergaard
-# rubyzip is free software; you can redistribute it and/or
-# modify it under the terms of the ruby license.

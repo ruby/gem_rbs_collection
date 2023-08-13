@@ -37,7 +37,7 @@ module Zip
     # Similar to ::new. If a block is passed the Zip::File object is passed
     # to the block and is automatically closed afterwards, just as with
     # ruby's builtin File::open method.
-    def self.open: (untyped file_name, ?bool create, ?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+    def self.open: (untyped file_name, ?bool create, ?::Hash[untyped, untyped] options) ?{ (File) -> void } -> File
 
     # Same as #open. But outputs data to a buffer instead of a file
     def self.add_buffer: () { (untyped) -> untyped } -> untyped
@@ -60,17 +60,17 @@ module Zip
 
     def self.get_partial_zip_file_name: (untyped zip_file_name, untyped partial_zip_file_name) -> untyped
 
-    def self.get_segment_count_for_split: (untyped zip_file_size, untyped segment_size) -> untyped
+    def self.get_segment_count_for_split: (untyped zip_file_size, untyped segment_size) -> Integer
 
     def self.put_split_signature: (untyped szip_file, untyped segment_size) -> untyped
 
     #
     # TODO: Make the code more understandable
     #
-    def self.save_splited_part: (untyped zip_file, untyped partial_zip_file_name, untyped zip_file_size, untyped szip_file_index, untyped segment_size, untyped segment_count) ?{ (untyped, untyped, untyped, untyped) -> untyped } -> untyped
+    def self.save_splited_part: (untyped zip_file, untyped partial_zip_file_name, untyped zip_file_size, untyped szip_file_index, untyped segment_size, untyped segment_count) ?{ (Integer segment_count, Integer szip_file_index, Integer chunk_bytes, Integer ssegment_size) -> void } -> void
 
     # Splits an archive into parts with segment size
-    def self.split: (untyped zip_file_name, ?untyped segment_size, ?bool delete_zip_file, ?untyped? partial_zip_file_name) -> (nil | untyped)
+    def self.split: (String zip_file_name, ?Integer segment_size, ?bool delete_zip_file, ?String? partial_zip_file_name) ?{ (Integer segment_count, Integer szip_file_index, Integer chunk_bytes, Integer ssegment_size) -> void } -> Integer
 
     # Returns an input stream to the specified entry. If a block is passed
     # the stream object is passed to the block and the stream is automatically
@@ -91,17 +91,17 @@ module Zip
     def read: (untyped entry) -> untyped
 
     # Convenience method for adding the contents of a file to the archive
-    def add: (untyped entry, untyped src_path) ?{ () -> untyped } -> untyped
+    def add: (String entry, String src_path) ?{ () -> untyped } -> untyped
 
     # Convenience method for adding the contents of a file to the archive
     # in Stored format (uncompressed)
-    def add_stored: (untyped entry, untyped src_path) { () -> untyped } -> untyped
+    def add_stored: (String entry, untyped src_path) { () -> untyped } -> untyped
 
     # Removes the specified entry.
-    def remove: (untyped entry) -> untyped
+    def remove: (String entry) -> untyped
 
     # Renames the specified entry.
-    def rename: (untyped entry, untyped new_name) { () -> untyped } -> untyped
+    def rename: (String entry, String new_name) ?{ () -> untyped } -> untyped
 
     # Replaces the specified entry with the contents of src_path (from
     # the file system).

@@ -18,10 +18,10 @@ module Zip
     # method on a newly created InputStream before reading from
     # the first entry in the archive. Returns nil when there are
     # no more entries.
-    def get_next_entry: () -> untyped
+    def get_next_entry: () -> Entry?
 
     # Rewinds the stream to the beginning of the current entry
-    def rewind: () -> (nil | untyped)
+    def rewind: () -> Entry?
 
     # Modeled after IO.sysread
     def sysread: (?untyped? length, ?::String outbuf) -> untyped
@@ -29,7 +29,7 @@ module Zip
     # Same as #initialize but if a block is passed the opened
     # stream is passed to the block and closed when the block
     # returns.
-    def self.open: (untyped filename_or_io, ?::Integer offset, ?untyped? decrypter) ?{ (untyped) -> untyped } -> untyped
+    def self.open: (untyped filename_or_io, ?::Integer offset, ?untyped? decrypter) ?{ (InputStream) -> void } -> InputStream
 
     def self.open_buffer: (untyped filename_or_io, ?::Integer offset) -> untyped
 

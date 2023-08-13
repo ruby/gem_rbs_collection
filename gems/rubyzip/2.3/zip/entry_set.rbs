@@ -1,6 +1,6 @@
 module Zip
   class EntrySet
-    include Enumerable
+    include Enumerable[Entry]
 
     attr_accessor entry_set: untyped
 
@@ -8,7 +8,7 @@ module Zip
 
     def initialize: (?untyped an_enumerable) -> void
 
-    def include?: (untyped entry) -> untyped
+    def include?: (untyped entry) -> bool
 
     def find_entry: (untyped entry) -> untyped
 
@@ -22,9 +22,9 @@ module Zip
 
     def delete: (untyped entry) -> (untyped | nil)
 
-    def each: () { (untyped) -> untyped } -> untyped
+    def each: () { (Entry) -> void } -> void
 
-    def entries: () -> untyped
+    def entries: () -> Array[Entry]
 
     # deep clone
     def dup: () -> untyped

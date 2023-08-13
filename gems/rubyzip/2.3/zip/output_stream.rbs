@@ -8,7 +8,7 @@ module Zip
     # exists it will be overwritten.
     def initialize: (untyped file_name, ?bool stream, ?untyped? encrypter) -> void
 
-    def self.open: (untyped file_name, ?untyped? encrypter) ?{ (untyped) -> untyped } -> untyped
+    def self.open: (untyped file_name, ?untyped? encrypter) ?{ (OutputStream) -> void } -> OutputStream
 
     # Same as #open but writes to a filestream instead
     def self.write_buffer: (?untyped io, ?untyped? encrypter) { (untyped) -> untyped } -> untyped
@@ -21,7 +21,7 @@ module Zip
 
     # Closes the current entry and opens a new for writing.
     # +entry+ can be a ZipEntry object or a string.
-    def put_next_entry: (untyped entry_name, ?untyped? comment, ?untyped? extra, ?untyped compression_method, ?untyped level) -> untyped
+    def put_next_entry: (String entry_name, ?untyped? comment, ?untyped? extra, ?untyped compression_method, ?untyped level) -> untyped
 
     def copy_raw_entry: (untyped entry) -> untyped
 

@@ -4,7 +4,7 @@ module Zip
     # such as gets, getc, readline and readlines
     # depends on: input_finished?, produce_input and read
     module AbstractInputStream
-      include Enumerable
+      include Enumerable[untyped]
 
       include FakeIO
 
@@ -18,7 +18,7 @@ module Zip
 
       def readlines: (?untyped a_sep_string) -> untyped
 
-      def gets: (?untyped a_sep_string, ?untyped? number_of_bytes) -> untyped
+      def gets: (?untyped a_sep_string, ?untyped? number_of_bytes) -> String?
 
       def ungetc: (untyped byte) -> untyped
 
