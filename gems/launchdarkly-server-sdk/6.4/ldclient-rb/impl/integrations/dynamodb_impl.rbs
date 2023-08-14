@@ -1,0 +1,92 @@
+module LaunchDarkly
+  module Impl
+    module Integrations
+      module DynamoDB
+        class DynamoDBStoreImplBase
+          AWS_SDK_ENABLED: bool
+
+          PARTITION_KEY: "namespace"
+
+          SORT_KEY: "key"
+
+          def initialize: (untyped table_name, untyped opts) -> void
+
+          def stop: () -> nil
+
+          def description: () -> "DynamoDB"
+        end
+
+        #
+        # Internal implementation of the DynamoDB feature store, intended to be used with CachingStoreWrapper.
+        #
+        class DynamoDBFeatureStoreCore < DynamoDBStoreImplBase
+          VERSION_ATTRIBUTE: "version"
+
+          ITEM_JSON_ATTRIBUTE: "item"
+
+          def initialize: (untyped table_name, untyped opts) -> void
+
+          def description: () -> "DynamoDBFeatureStore"
+
+          def init_internal: (untyped all_data) -> untyped
+
+          def get_internal: (untyped kind, untyped key) -> untyped
+
+          def get_all_internal: (untyped kind) -> untyped
+
+          def upsert_internal: (untyped kind, untyped new_item) -> untyped
+
+          def initialized_internal?: () -> untyped
+
+          private
+
+          def prefixed_namespace: (untyped base_str) -> untyped
+
+          def namespace_for_kind: (untyped kind) -> untyped
+
+          def inited_key: () -> untyped
+
+          def make_keys_hash: (untyped namespace, untyped key) -> ::Hash[untyped, untyped]
+
+          def make_query_for_kind: (untyped kind) -> { table_name: untyped, consistent_read: true, key_conditions: ::Hash[untyped, { comparison_operator: "EQ", attribute_value_list: ::Array[untyped] }] }
+
+          def get_item_by_keys: (untyped namespace, untyped key) -> untyped
+
+          def read_existing_keys: (untyped kinds) -> untyped
+
+          def marshal_item: (untyped kind, untyped item) -> untyped
+
+          def unmarshal_item: (untyped kind, untyped item) -> (nil | untyped)
+        end
+
+        class DynamoDBBigSegmentStore < DynamoDBStoreImplBase
+          KEY_METADATA: "big_segments_metadata"
+
+          KEY_USER_DATA: "big_segments_user"
+
+          ATTR_SYNC_TIME: "synchronizedOn"
+
+          ATTR_INCLUDED: "included"
+
+          ATTR_EXCLUDED: "excluded"
+
+          def initialize: (untyped table_name, untyped opts) -> void
+
+          def description: () -> "DynamoDBBigSegmentStore"
+
+          def get_metadata: () -> untyped
+
+          def get_membership: (untyped user_hash) -> (nil | untyped)
+        end
+
+        class DynamoDBUtil
+          #
+          # Calls client.batch_write_item as many times as necessary to submit all of the given requests.
+          # The requests array is consumed.
+          #
+          def self.batch_write_requests: (untyped client, untyped table, untyped requests) -> untyped
+        end
+      end
+    end
+  end
+end

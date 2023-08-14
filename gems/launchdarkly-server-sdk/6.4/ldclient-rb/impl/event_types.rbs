@@ -1,0 +1,71 @@
+module LaunchDarkly
+  module Impl
+    class Event
+      def initialize: (untyped timestamp, untyped user) -> void
+
+      attr_reader timestamp: untyped
+
+      attr_reader kind: untyped
+
+      attr_reader user: untyped
+    end
+
+    class EvalEvent < Event
+      def initialize: (untyped timestamp, untyped user, untyped key, ?untyped? version, ?untyped? variation, ?untyped? value, ?untyped? reason, ?untyped? default, ?bool track_events, ?untyped? debug_until, ?untyped? prereq_of) -> void
+
+      attr_reader key: untyped
+
+      attr_reader version: untyped
+
+      attr_reader variation: untyped
+
+      attr_reader value: untyped
+
+      attr_reader reason: untyped
+
+      attr_reader default: untyped
+
+      attr_reader track_events: untyped
+
+      attr_reader debug_until: untyped
+
+      attr_reader prereq_of: untyped
+    end
+
+    class IdentifyEvent < Event
+      def initialize: (untyped timestamp, untyped user) -> void
+    end
+
+    class CustomEvent < Event
+      def initialize: (untyped timestamp, untyped user, untyped key, ?untyped? data, ?untyped? metric_value) -> void
+
+      attr_reader key: untyped
+
+      attr_reader data: untyped
+
+      attr_reader metric_value: untyped
+    end
+
+    class AliasEvent < Event
+      def initialize: (untyped timestamp, untyped key, untyped context_kind, untyped previous_key, untyped previous_context_kind) -> void
+
+      attr_reader key: untyped
+
+      attr_reader context_kind: untyped
+
+      attr_reader previous_key: untyped
+
+      attr_reader previous_context_kind: untyped
+    end
+
+    class IndexEvent < Event
+      def initialize: (untyped timestamp, untyped user) -> void
+    end
+
+    class DebugEvent < Event
+      def initialize: (untyped eval_event) -> void
+
+      attr_reader eval_event: untyped
+    end
+  end
+end

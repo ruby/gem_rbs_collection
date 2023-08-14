@@ -1,0 +1,280 @@
+module LaunchDarkly
+  module Integrations
+    class TestData
+      #
+      # A builder for feature flag configurations to be used with {TestData}.
+      #
+      # @see TestData#flag
+      # @see TestData#update
+      #
+      class FlagBuilder
+        attr_reader key: String
+
+        # @private
+        def initialize: (String key) -> void
+
+        # @private
+        def initialize_copy: (instance other) -> void
+
+        #
+        # Sets targeting to be on or off for this flag.
+        #
+        # The effect of this depends on the rest of the flag configuration, just as it does on the
+        # real LaunchDarkly dashboard. In the default configuration that you get from calling
+        # {TestData#flag} with a new flag key, the flag will return `false`
+        # whenever targeting is off, and `true` when targeting is on.
+        #
+        # @param on [Boolean] true if targeting should be on
+        # @return [FlagBuilder] the builder
+        #
+        def on: (bool on) -> self
+
+        #
+        # Specifies the fallthrough variation. The fallthrough is the value
+        # that is returned if targeting is on and the user was not matched by a more specific
+        # target or rule.
+        #
+        # If the flag was previously configured with other variations and the variation specified is a boolean,
+        # this also changes it to a boolean flag.
+        #
+        # @param variation [Boolean, Integer] true or false or the desired fallthrough variation index:
+        #                  0 for the first, 1 for the second, etc.
+        # @return [FlagBuilder] the builder
+        #
+        def fallthrough_variation: (bool | Integer variation) -> self
+
+        #
+        # Specifies the off variation for a flag. This is the variation that is returned
+        # whenever targeting is off.
+        #
+        # If the flag was previously configured with other variations and the variation specified is a boolean,
+        # this also changes it to a boolean flag.
+        #
+        # @param variation [Boolean, Integer] true or false or the desired off variation index:
+        #                  0 for the first, 1 for the second, etc.
+        # @return [FlagBuilder] the builder
+        #
+        def off_variation: (bool | Integer variation) -> self
+
+        #
+        # Changes the allowable variation values for the flag.
+        #
+        # The value may be of any valid JSON type. For instance, a boolean flag
+        # normally has `true, false`; a string-valued flag might have
+        # `'red', 'green'`; etc.
+        #
+        # @example A single variation
+        #    td.flag('new-flag')
+        #      .variations(true)
+        #
+        # @example Multiple variations
+        #   td.flag('new-flag')
+        #     .variations('red', 'green', 'blue')
+        #
+        # @param variations [Array<Object>] the the desired variations
+        # @return [FlagBuilder] the builder
+        #
+        def variations: (*untyped variations) -> self
+
+        #
+        # Sets the flag to always return the specified variation for all users.
+        #
+        # The variation is specified, Targeting is switched on, and any existing targets or rules are removed.
+        # The fallthrough variation is set to the specified value. The off variation is left unchanged.
+        #
+        # If the flag was previously configured with other variations and the variation specified is a boolean,
+        # this also changes it to a boolean flag.
+        #
+        # @param variation [Boolean, Integer] true or false or the desired variation index to return:
+        #                  0 for the first, 1 for the second, etc.
+        # @return [FlagBuilder] the builder
+        #
+        def variation_for_all_users: (bool | Integer variation) -> self
+
+        #
+        # Sets the flag to always return the specified variation value for all users.
+        #
+        # The value may be of any valid JSON type. This method changes the
+        # flag to have only a single variation, which is this value, and to return the same
+        # variation regardless of whether targeting is on or off. Any existing targets or rules
+        # are removed.
+        #
+        # @param value [Object] the desired value to be returned for all users
+        # @return [FlagBuilder] the builder
+        #
+        def value_for_all_users: (untyped value) -> self
+
+        #
+        # Sets the flag to return the specified variation for a specific user key when targeting
+        # is on.
+        #
+        # This has no effect when targeting is turned off for the flag.
+        #
+        # If the flag was previously configured with other variations and the variation specified is a boolean,
+        # this also changes it to a boolean flag.
+        #
+        # @param user_key [String] a user key
+        # @param variation [Boolean, Integer] true or false or the desired variation index to return:
+        #                  0 for the first, 1 for the second, etc.
+        # @return [FlagBuilder] the builder
+        #
+        def variation_for_user: (String user_key, bool | Integer variation) -> self
+
+        #
+        # Starts defining a flag rule, using the "is one of" operator.
+        #
+        # @example create a rule that returns `true` if the name is "Patsy" or "Edina"
+        #     testData.flag("flag")
+        #         .if_match(:name, 'Patsy', 'Edina')
+        #         .then_return(true);
+        #
+        # @param attribute [Symbol] the user attribute to match against
+        # @param values [Array<Object>] values to compare to
+        # @return [FlagRuleBuilder] a flag rule builder
+        #
+        # @see FlagRuleBuilder#then_return
+        # @see FlagRuleBuilder#and_match
+        # @see FlagRuleBuilder#and_not_match
+        #
+        def if_match: (Symbol attribute, *untyped values) -> FlagRuleBuilder
+
+        #
+        # Starts defining a flag rule, using the "is not one of" operator.
+        #
+        # @example create a rule that returns `true` if the name is neither "Saffron" nor "Bubble"
+        #     testData.flag("flag")
+        #         .if_not_match(:name, 'Saffron', 'Bubble')
+        #         .then_return(true)
+        #
+        # @param attribute [Symbol] the user attribute to match against
+        # @param values [Array<Object>] values to compare to
+        # @return [FlagRuleBuilder] a flag rule builder
+        #
+        # @see FlagRuleBuilder#then_return
+        # @see FlagRuleBuilder#and_match
+        # @see FlagRuleBuilder#and_not_match
+        #
+        def if_not_match: (Symbol attribute, *untyped values) -> self
+
+        #
+        # Removes any existing user targets from the flag.
+        # This undoes the effect of methods like {#variation_for_user}
+        #
+        # @return [FlagBuilder] the same builder
+        #
+        def clear_user_targets: () -> self
+
+        #
+        # Removes any existing rules from the flag.
+        # This undoes the effect of methods like {#if_match}
+        #
+        # @return [FlagBuilder] the same builder
+        #
+        def clear_rules: () -> self
+
+        # @private
+        def add_rule: (untyped rule) -> self
+
+        #
+        # A shortcut for setting the flag to use the standard boolean configuration.
+        #
+        # This is the default for all new flags created with {TestData#flag}.
+        # The flag will have two variations, `true` and `false` (in that order);
+        # it will return `false` whenever targeting is off, and `true` when targeting is on
+        # if no other settings specify otherwise.
+        #
+        # @return [FlagBuilder] the builder
+        #
+        def boolean_flag: () -> self
+
+        # @private
+        def build: (untyped version) -> untyped
+
+        #
+        # A builder for feature flag rules to be used with {FlagBuilder}.
+        #
+        # In the LaunchDarkly model, a flag can have any number of rules, and a rule can have any number of
+        # clauses. A clause is an individual test such as "name is 'X'". A rule matches a user if all of the
+        # rule's clauses match the user.
+        #
+        # To start defining a rule, use one of the flag builder's matching methods such as
+        # {FlagBuilder#if_match}. This defines the first clause for the rule.
+        # Optionally, you may add more clauses with the rule builder's methods such as
+        # {#and_match} or {#and_not_match}.
+        # Finally, call {#then_return} to finish defining the rule.
+        #
+        class FlagRuleBuilder
+          # @private
+          FlagRuleClause: untyped
+
+          # @private
+          def initialize: (FlagBuilder flag_builder) -> void
+
+          # @private
+          def intialize_copy: (untyped other) -> untyped
+
+          #
+          # Adds another clause, using the "is one of" operator.
+          #
+          # @example create a rule that returns `true` if the name is "Patsy" and the country is "gb"
+          #     testData.flag("flag")
+          #         .if_match(:name, 'Patsy')
+          #         .and_match(:country, 'gb')
+          #         .then_return(true)
+          #
+          # @param attribute [Symbol] the user attribute to match against
+          # @param values [Array<Object>] values to compare to
+          # @return [FlagRuleBuilder] the rule builder
+          #
+          def and_match: (Symbol attribute, *untyped values) -> self
+
+          #
+          # Adds another clause, using the "is not one of" operator.
+          #
+          # @example create a rule that returns `true` if the name is "Patsy" and the country is not "gb"
+          #     testData.flag("flag")
+          #         .if_match(:name, 'Patsy')
+          #         .and_not_match(:country, 'gb')
+          #         .then_return(true)
+          #
+          # @param attribute [Symbol] the user attribute to match against
+          # @param values [Array<Object>] values to compare to
+          # @return [FlagRuleBuilder] the rule builder
+          #
+          def and_not_match: (Symbol attribute, *untyped values) -> self
+
+          #
+          # Finishes defining the rule, specifying the result as either a boolean
+          # or a variation index.
+          #
+          # If the flag was previously configured with other variations and the variation specified is a boolean,
+          # this also changes it to a boolean flag.
+          #
+          # @param variation [Boolean, Integer] true or false or the desired variation index:
+          #                  0 for the first, 1 for the second, etc.
+          # @return [FlagBuilder] the flag builder with this rule added
+          #
+          def then_return: (bool | Integer variation) -> FlagBuilder
+
+          # @private
+          def build: (untyped ri) -> { id: untyped, variation: untyped, clauses: untyped }
+        end
+
+        # @private
+        def variation_for_boolean: (untyped variation) -> untyped
+
+        private
+
+        TRUE_VARIATION_INDEX: 0
+
+        FALSE_VARIATION_INDEX: 1
+
+        def is_boolean_flag: () -> untyped
+
+        def deep_copy_hash: (untyped from) -> untyped
+
+        def deep_copy_array: (untyped from) -> untyped
+      end
+    end
+  end
+end

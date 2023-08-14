@@ -1,0 +1,71 @@
+module LaunchDarkly
+  module Impl
+    module Integrations
+      module Redis
+        class RedisStoreImplBase
+          REDIS_ENABLED: bool
+
+          def initialize: (untyped opts) -> void
+
+          def stop: () -> (nil | untyped | nil)
+
+          def description: () -> "Redis"
+
+          def with_connection: () { (untyped) -> untyped } -> untyped
+
+          private
+
+          def create_redis_pool: (untyped opts) -> untyped
+        end
+
+        #
+        # Internal implementation of the Redis feature store, intended to be used with CachingStoreWrapper.
+        #
+        class RedisFeatureStoreCore < RedisStoreImplBase
+          def initialize: (untyped opts) -> void
+
+          def description: () -> "RedisFeatureStore"
+
+          def init_internal: (untyped all_data) -> untyped
+
+          def get_internal: (untyped kind, untyped key) -> untyped
+
+          def get_all_internal: (untyped kind) -> untyped
+
+          def upsert_internal: (untyped kind, untyped new_item) -> untyped
+
+          def initialized_internal?: () -> untyped
+
+          private
+
+          def before_update_transaction: (untyped base_key, untyped key) -> (untyped | nil)
+
+          def items_key: (untyped kind) -> untyped
+
+          def cache_key: (untyped kind, untyped key) -> untyped
+
+          def inited_key: () -> untyped
+
+          def get_redis: (untyped redis, untyped kind, untyped key) -> untyped
+        end
+
+        #
+        # Internal implementation of the Redis big segment store.
+        #
+        class RedisBigSegmentStore < RedisStoreImplBase
+          KEY_LAST_UP_TO_DATE: ":big_segments_synchronized_on"
+
+          KEY_USER_INCLUDE: ":big_segment_include:"
+
+          KEY_USER_EXCLUDE: ":big_segment_exclude:"
+
+          def description: () -> "RedisBigSegmentStore"
+
+          def get_metadata: () -> untyped
+
+          def get_membership: (untyped user_hash) -> untyped
+        end
+      end
+    end
+  end
+end

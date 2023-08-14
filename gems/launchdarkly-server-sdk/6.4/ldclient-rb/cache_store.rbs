@@ -1,0 +1,35 @@
+module LaunchDarkly
+  #
+  # A thread-safe in-memory store that uses the same semantics that Faraday would expect, although we
+  # no longer use Faraday. This is used by Requestor, when we are not in a Rails environment.
+  #
+  # @private
+  #
+  class ThreadSafeMemoryStore
+    #
+    # Default constructor
+    #
+    # @return [ThreadSafeMemoryStore] a new store
+    def initialize: () -> void
+
+    #
+    # Read a value from the cache
+    # @param key [Object] the cache key
+    #
+    # @return [Object] the cache value
+    def read: (untyped key) -> untyped
+
+    #
+    # Store a value in the cache
+    # @param key [Object] the cache key
+    # @param value [Object] the value to associate with the key
+    #
+    # @return [Object] the value
+    def write: (untyped key, untyped value) -> untyped
+
+    #
+    # Delete a value in the cache
+    # @param key [Object] the cache key
+    def delete: (untyped key) -> untyped
+  end
+end

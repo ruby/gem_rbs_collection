@@ -1,0 +1,52 @@
+module LaunchDarkly
+  module Impl
+    # Defines the behavior of all operators that can be used in feature flag rules and segment rules.
+    module EvaluatorOperators
+      # Applies an operator to produce a boolean result.
+      #
+      # @param op [Symbol] one of the supported LaunchDarkly operators, as a symbol
+      # @param user_value the value of the user attribute that is referenced in the current clause (left-hand
+      #   side of the expression)
+      # @param clause_value the constant value that `user_value` is being compared to (right-hand side of the
+      #   expression)
+      # @return [Boolean] true if the expression should be considered a match; false if it is not a match, or
+      #   if the values cannot be compared because they are of the wrong types, or if the operator is unknown
+      def self.apply: (untyped op, untyped user_value, untyped clause_value) -> untyped
+
+      # Retrieves the value of a user attribute by name.
+      #
+      # Built-in attributes correspond to top-level properties in the user object. They are treated as strings and
+      # non-string values are coerced to strings, except for `anonymous` which is meant to be a boolean if present
+      # and is not currently coerced. This behavior is consistent with earlier versions of the Ruby SDK, but is not
+      # guaranteed to be consistent with other SDKs, since the evaluator specification is based on the strongly-typed
+      # SDKs where it is not possible for an attribute to have the wrong type.
+      #
+      # Custom attributes correspond to properties within the `custom` property, if any, and can be of any type.
+      #
+      # @param user [Object] the user properties
+      # @param attribute [String|Symbol] the attribute to get, for instance `:key` or `:name` or `:some_custom_attr`
+      # @return the attribute value, or nil if the attribute is unknown
+      def self.user_value: (untyped user, untyped attribute) -> (nil | untyped)
+
+      private
+
+      BUILTINS: untyped
+
+      NUMERIC_VERSION_COMPONENTS_REGEX: untyped
+
+      def self.string_op: (untyped user_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.numeric_op: (untyped user_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.date_op: (untyped user_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.semver_op: (untyped user_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.to_date: (untyped value) -> (untyped | untyped | nil)
+
+      def self.to_semver: (untyped value) -> (untyped | nil)
+
+      def self.add_zero_version_component: (untyped v) -> untyped
+    end
+  end
+end

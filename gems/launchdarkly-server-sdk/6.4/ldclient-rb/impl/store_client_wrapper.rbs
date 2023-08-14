@@ -1,0 +1,28 @@
+module LaunchDarkly
+  module Impl
+    #
+    # Provides additional behavior that the client requires before or after feature store operations.
+    # Currently this just means sorting the data set for init(). In the future we may also use this
+    # to provide an update listener capability.
+    #
+    class FeatureStoreClientWrapper
+      include Interfaces::FeatureStore
+
+      def initialize: (untyped store) -> void
+
+      def init: (untyped all_data) -> untyped
+
+      def get: (untyped kind, untyped key) -> untyped
+
+      def all: (untyped kind) -> untyped
+
+      def upsert: (untyped kind, untyped item) -> untyped
+
+      def delete: (untyped kind, untyped key, untyped version) -> untyped
+
+      def initialized?: () -> untyped
+
+      def stop: () -> untyped
+    end
+  end
+end

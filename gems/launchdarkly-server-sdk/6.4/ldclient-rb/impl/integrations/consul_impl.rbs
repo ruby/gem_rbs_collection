@@ -1,0 +1,44 @@
+module LaunchDarkly
+  module Impl
+    module Integrations
+      module Consul
+        #
+        # Internal implementation of the Consul feature store, intended to be used with CachingStoreWrapper.
+        #
+        class ConsulFeatureStoreCore
+          CONSUL_ENABLED: bool
+
+          def initialize: (untyped opts) -> void
+
+          def init_internal: (untyped all_data) -> untyped
+
+          def get_internal: (untyped kind, untyped key) -> untyped
+
+          def get_all_internal: (untyped kind) -> untyped
+
+          def upsert_internal: (untyped kind, untyped new_item) -> untyped
+
+          def initialized_internal?: () -> untyped
+
+          def stop: () -> nil
+
+          private
+
+          def item_key: (untyped kind, untyped key) -> untyped
+
+          def kind_key: (untyped kind) -> untyped
+
+          def inited_key: () -> untyped
+        end
+
+        class ConsulUtil
+          #
+          # Submits as many transactions as necessary to submit all of the given operations.
+          # The ops array is consumed.
+          #
+          def self.batch_operations: (untyped ops) -> untyped
+        end
+      end
+    end
+  end
+end

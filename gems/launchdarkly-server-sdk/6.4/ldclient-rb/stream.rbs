@@ -1,0 +1,37 @@
+module LaunchDarkly
+  # @private
+  PUT: :put
+
+  # @private
+  PATCH: :patch
+
+  # @private
+  DELETE: :delete
+
+  # @private
+  READ_TIMEOUT_SECONDS: 300
+
+  # @private
+  KEY_PATHS: ::Hash[untyped, "/flags/" | "/segments/"]
+
+  # @private
+  class StreamProcessor
+    def initialize: (untyped sdk_key, untyped config, ?untyped? diagnostic_accumulator) -> void
+
+    def initialized?: () -> untyped
+
+    def start: () -> untyped
+
+    def stop: () -> (untyped | nil)
+
+    private
+
+    def process_message: (untyped message) -> untyped
+
+    def key_for_path: (untyped kind, untyped path) -> (untyped | nil)
+
+    def log_connection_started: () -> untyped
+
+    def log_connection_result: (untyped is_success) -> (untyped | nil)
+  end
+end
