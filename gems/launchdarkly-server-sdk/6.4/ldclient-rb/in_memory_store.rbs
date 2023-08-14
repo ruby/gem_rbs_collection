@@ -1,0 +1,41 @@
+module LaunchDarkly
+  # These constants denote the types of data that can be stored in the feature store.  If
+  # we add another storable data type in the future, as long as it follows the same pattern
+  # (having "key", "version", and "deleted" properties), we only need to add a corresponding
+  # constant here and the existing store should be able to handle it.
+  #
+  # The :priority and :get_dependency_keys properties are used by FeatureStoreDataSetSorter
+  # to ensure data consistency during non-atomic updates.
+  type kind = { namespace: String, priority: Integer, get_dependency_keys: untyped }
+
+  # @private
+  FEATURES: kind
+
+  # @private
+  SEGMENTS: kind
+
+  #
+  # Default implementation of the LaunchDarkly client's feature store, using an in-memory
+  # cache.  This object holds feature flags and related data received from LaunchDarkly.
+  # Database-backed implementations are available in {LaunchDarkly::Integrations}.
+  #
+  class InMemoryFeatureStore
+    include LaunchDarkly::Interfaces::FeatureStore
+
+    def initialize: () -> void
+
+    def get: (kind, String | Symbol key) -> Hash[Symbol, untyped]?
+
+    def all: (kind) -> Hash[Symbol, Hash[Symbol, untyped]]
+
+    def delete: (kind, String | Symbol key, Integer version) -> void
+
+    def init: (Hash[kind, Hash[Symbol, Hash[Symbol, untyped]]] all_data) -> void
+
+    def upsert: (kind, Hash[Symbol, untyped] item) -> void
+
+    def initialized?: () -> bool
+
+    def stop: () -> void
+  end
+end

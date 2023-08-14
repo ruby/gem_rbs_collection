@@ -1,0 +1,26 @@
+module LaunchDarkly
+  module Impl
+    module Model
+      # Abstraction of deserializing a feature flag or segment that was read from a data store or
+      # received from LaunchDarkly.
+      #
+      # SDK code outside of Impl::Model should use this method instead of calling the model class
+      # constructors directly, so as not to rely on implementation details.
+      #
+      # @param kind [Hash] normally either FEATURES or SEGMENTS
+      # @param input [object] a JSON string or a parsed hash (or a data model object, in which case
+      #  we'll just return the original object)
+      # @param logger [Logger|nil] logs errors if there are any data validation problems
+      # @return [Object] the flag or segment (or, for an unknown data kind, the data as a hash)
+      def self.deserialize: (untyped kind, untyped input, ?untyped? logger) -> (nil | untyped)
+
+      # Abstraction of serializing a feature flag or segment that will be written to a data store.
+      # Currently we just call to_json, but SDK code outside of Impl::Model should use this method
+      # instead of to_json, so as not to rely on implementation details.
+      def self.serialize: (untyped kind, untyped item) -> untyped
+
+      # Translates a { flags: ..., segments: ... } object received from LaunchDarkly to the data store format.
+      def self.make_all_store_data: (untyped received_data, ?untyped? logger) -> ::Hash[untyped, untyped]
+    end
+  end
+end

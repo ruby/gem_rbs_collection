@@ -1,0 +1,175 @@
+module LaunchDarkly
+  module Impl
+    # Used internally to record that we evaluated a prerequisite flag.
+    PrerequisiteEvalRecord: untyped
+
+    class EvaluationException < StandardError
+      def initialize: (untyped msg, ?untyped error_kind) -> void
+
+      # @return [Symbol]
+      attr_reader error_kind: untyped
+    end
+
+    class InvalidReferenceException < EvaluationException
+    end
+
+    class EvaluatorState
+      # @param original_flag [LaunchDarkly::Impl::Model::FeatureFlag]
+      def initialize: (untyped original_flag) -> void
+
+      attr_reader prereq_stack: untyped
+
+      attr_reader segment_stack: untyped
+    end
+
+    #
+    # A helper class for managing cycle detection.
+    #
+    # Each time a method sees a new flag or segment, they can push that
+    # object's key onto the stack. Once processing for that object has
+    # finished, you can call pop to remove it.
+    #
+    # Because the most common use case would be a flag or segment without ANY
+    # prerequisites, this stack has a small optimization in place-- the stack
+    # is not created until absolutely necessary.
+    #
+    class EvaluatorStack
+      # @param original [String, nil]
+      def initialize: (untyped original) -> void
+
+      # @param key [String]
+      def push: (untyped key) -> (nil | untyped)
+
+      def pop: () -> (nil | untyped)
+
+      #
+      # @param key [String]
+      # @return [Boolean]
+      #
+      def include?: (untyped key) -> (true | false | untyped)
+    end
+
+    # Encapsulates the feature flag evaluation logic. The Evaluator has no knowledge of the rest of the SDK environment;
+    # if it needs to retrieve flags or segments that are referenced by a flag, it does so through a simple function that
+    # is provided in the constructor. It also produces feature requests as appropriate for any referenced prerequisite
+    # flags, but does not send them.
+    class Evaluator
+      # A single Evaluator is instantiated for each client instance.
+      #
+      # @param get_flag [Function] called if the Evaluator needs to query a different flag from the one that it is
+      #   currently evaluating (i.e. a prerequisite flag); takes a single parameter, the flag key, and returns the
+      #   flag data - or nil if the flag is unknown or deleted
+      # @param get_segment [Function] similar to `get_flag`, but is used to query a context segment.
+      # @param logger [Logger] the client's logger
+      def initialize: (untyped get_flag, untyped get_segment, untyped get_big_segments_membership, untyped logger) -> void
+
+      # Used internally to hold an evaluation result and additional state that may be accumulated during an
+      # evaluation. It's simpler and a bit more efficient to represent these as mutable properties rather than
+      # trying to use a pure functional approach, and since we're not exposing this object to any application code
+      # or retaining it anywhere, we don't have to be quite as strict about immutability.
+      #
+      # The big_segments_status and big_segments_membership properties are not used by the caller; they are used
+      # during an evaluation to cache the result of any Big Segments query that we've done for this context, because
+      # we don't want to do multiple queries for the same context if multiple Big Segments are referenced in the same
+      # evaluation.
+      EvalResult: untyped
+
+      # Helper function used internally to construct an EvaluationDetail for an error result.
+      def self.error_result: (untyped errorKind, ?untyped? value) -> untyped
+
+      # The client's entry point for evaluating a flag. The returned `EvalResult` contains the evaluation result and
+      # any events that were generated for prerequisite flags; its `value` will be `nil` if the flag returns the
+      # default value. Error conditions produce a result with a nil value and an error reason, not an exception.
+      #
+      # @param flag [LaunchDarkly::Impl::Model::FeatureFlag] the flag
+      # @param context [LaunchDarkly::LDContext] the evaluation context
+      # @return [EvalResult] the evaluation result
+      def evaluate: (untyped flag, untyped context) -> untyped
+
+      # @param segment [LaunchDarkly::Impl::Model::Segment]
+      def self.make_big_segment_ref: (untyped segment) -> ::String
+
+      private
+
+      # @param flag [LaunchDarkly::Impl::Model::FeatureFlag] the flag
+      # @param context [LaunchDarkly::LDContext] the evaluation context
+      # @param eval_result [EvalResult]
+      # @param state [EvaluatorState]
+      # @raise [EvaluationException]
+      def eval_internal: (untyped flag, untyped context, untyped eval_result, untyped state) -> untyped
+
+      # @param flag [LaunchDarkly::Impl::Model::FeatureFlag] the flag
+      # @param context [LaunchDarkly::LDContext] the evaluation context
+      # @param eval_result [EvalResult]
+      # @param state [EvaluatorState]
+      # @raise [EvaluationException] if a flag prereq cycle is detected
+      def check_prerequisites: (untyped flag, untyped context, untyped eval_result, untyped state) -> (nil | untyped)
+
+      # @param rule [LaunchDarkly::Impl::Model::FlagRule]
+      # @param context [LaunchDarkly::LDContext]
+      # @param eval_result [EvalResult]
+      # @param state [EvaluatorState]
+      # @raise [InvalidReferenceException]
+      def rule_match_context: (untyped rule, untyped context, untyped eval_result, untyped state) -> (false | true)
+
+      # @param clause [LaunchDarkly::Impl::Model::Clause]
+      # @param context [LaunchDarkly::LDContext]
+      # @param eval_result [EvalResult]
+      # @param state [EvaluatorState]
+      # @raise [InvalidReferenceException]
+      def clause_match_context: (untyped clause, untyped context, untyped eval_result, untyped state) -> untyped
+
+      # @param clause [LaunchDarkly::Impl::Model::Clause]
+      # @param context_value [any]
+      # @return [Boolean]
+      def match_any_clause_value: (untyped clause, untyped context_value) -> untyped
+
+      # @param clause [LaunchDarkly::Impl::Model::Clause]
+      # @param context [LaunchDarkly::LDContext]
+      # @return [Boolean]
+      def clause_match_by_kind: (untyped clause, untyped context) -> (true | false)
+
+      # @param clause [LaunchDarkly::Impl::Model::Clause]
+      # @param context [LaunchDarkly::LDContext]
+      # @return [Boolean]
+      # @raise [InvalidReferenceException] Raised if the clause.attribute is an invalid reference
+      def clause_match_context_no_segments: (untyped clause, untyped context) -> (untyped | false)
+
+      # @param segment [LaunchDarkly::Impl::Model::Segment]
+      # @param context [LaunchDarkly::LDContext]
+      # @param eval_result [EvalResult]
+      # @param state [EvaluatorState]
+      # @return [Boolean]
+      def segment_match_context: (untyped segment, untyped context, untyped eval_result, untyped state) -> untyped
+
+      # @param segment [LaunchDarkly::Impl::Model::Segment]
+      # @param context [LaunchDarkly::LDContext]
+      # @param eval_result [EvalResult]
+      # @param state [EvaluatorState]
+      # @return [Boolean]
+      def big_segment_match_context: (untyped segment, untyped context, untyped eval_result, untyped state) -> (false | untyped)
+
+      # @param segment [LaunchDarkly::Impl::Model::Segment]
+      # @param context [LaunchDarkly::LDContext]
+      # @param use_includes_and_excludes [Boolean]
+      # @param state [EvaluatorState]
+      # @return [Boolean]
+      def simple_segment_match_context: (untyped segment, untyped context, untyped use_includes_and_excludes, untyped eval_result, untyped state) -> (true | false)
+
+      # @param rule [LaunchDarkly::Impl::Model::SegmentRule]
+      # @param context [LaunchDarkly::LDContext]
+      # @param segment_key [String]
+      # @param salt [String]
+      # @return [Boolean]
+      # @raise [InvalidReferenceException]
+      def segment_rule_match_context: (untyped rule, untyped context, untyped segment_key, untyped salt, untyped eval_result, untyped state) -> (false | true | untyped)
+
+      def get_value_for_variation_or_rollout: (untyped flag, untyped vr, untyped context, untyped precomputed_results) -> untyped
+
+      # @param [LaunchDarkly::LDContext] context
+      # @param [LaunchDarkly::Impl::Model::FeatureFlag] flag
+      # @return [LaunchDarkly::EvaluationDetail, nil]
+      def check_targets: (untyped context, untyped flag) -> (nil | untyped)
+    end
+  end
+end

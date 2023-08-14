@@ -1,0 +1,34 @@
+module LaunchDarkly
+  # @private
+  class PollingProcessor
+    def initialize: (untyped config, untyped requestor) -> void
+
+    def initialized?: () -> untyped
+
+    def start: () -> untyped
+
+    def stop: () -> untyped
+
+    def poll: () -> untyped
+
+    private
+
+    #
+    # The original implementation of this class relied on the feature store
+    # directly, which we are trying to move away from. Customers who might have
+    # instantiated this directly for some reason wouldn't know they have to set
+    # the config's sink manually, so we have to fall back to the store if the
+    # sink isn't present.
+    #
+    # The next major release should be able to simplify this structure and
+    # remove the need for fall back to the data store because the update sink
+    # should always be present.
+    #
+    def update_sink_or_data_store: () -> untyped
+
+    #
+    # @param [LaunchDarkly::Interfaces::DataSource::ErrorInfo, nil] error_info
+    #
+    def stop_with_error_info: (?untyped? error_info) -> untyped
+  end
+end

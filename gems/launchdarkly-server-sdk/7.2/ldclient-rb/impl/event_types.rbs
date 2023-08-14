@@ -1,0 +1,61 @@
+module LaunchDarkly
+  module Impl
+    class Event
+      # @param timestamp [Integer]
+      # @param context [LaunchDarkly::LDContext]
+      def initialize: (untyped timestamp, untyped context) -> void
+
+      # @return [Integer]
+      attr_reader timestamp: untyped
+
+      # @return [LaunchDarkly::LDContext]
+      attr_reader context: untyped
+    end
+
+    class EvalEvent < Event
+      def initialize: (untyped timestamp, untyped context, untyped key, ?untyped? version, ?untyped? variation, ?untyped? value, ?untyped? reason, ?untyped? default, ?bool track_events, ?untyped? debug_until, ?untyped? prereq_of) -> void
+
+      attr_reader key: untyped
+
+      attr_reader version: untyped
+
+      attr_reader variation: untyped
+
+      attr_reader value: untyped
+
+      attr_reader reason: untyped
+
+      attr_reader default: untyped
+
+      attr_reader track_events: untyped
+
+      attr_reader debug_until: untyped
+
+      attr_reader prereq_of: untyped
+    end
+
+    class IdentifyEvent < Event
+      def initialize: (untyped timestamp, untyped context) -> void
+    end
+
+    class CustomEvent < Event
+      def initialize: (untyped timestamp, untyped context, untyped key, ?untyped? data, ?untyped? metric_value) -> void
+
+      attr_reader key: untyped
+
+      attr_reader data: untyped
+
+      attr_reader metric_value: untyped
+    end
+
+    class IndexEvent < Event
+      def initialize: (untyped timestamp, untyped context) -> void
+    end
+
+    class DebugEvent < Event
+      def initialize: (untyped eval_event) -> void
+
+      attr_reader eval_event: untyped
+    end
+  end
+end

@@ -1,0 +1,24 @@
+module LaunchDarkly
+  # A thread-safe cache with maximum number of entries and TTL.
+  # Adapted from https://github.com/SamSaffron/lru_redux/blob/master/lib/lru_redux/ttl/cache.rb
+  # under MIT license with the following changes:
+  #   * made thread-safe
+  #   * removed many unused methods
+  #   * reading a key does not reset its expiration time, only writing
+  # @private
+  class ExpiringCache
+    def initialize: (untyped max_size, untyped ttl) -> void
+
+    def []: (untyped key) -> untyped
+
+    def []=: (untyped key, untyped val) -> untyped
+
+    def delete: (untyped key) -> untyped
+
+    def clear: () -> untyped
+
+    private
+
+    def ttl_evict: () -> untyped
+  end
+end

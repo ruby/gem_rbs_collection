@@ -1,0 +1,68 @@
+module LaunchDarkly
+  module Impl
+    # Used internally to record that we evaluated a prerequisite flag.
+    PrerequisiteEvalRecord: untyped
+
+    # Encapsulates the feature flag evaluation logic. The Evaluator has no knowledge of the rest of the SDK environment;
+    # if it needs to retrieve flags or segments that are referenced by a flag, it does so through a simple function that
+    # is provided in the constructor. It also produces feature requests as appropriate for any referenced prerequisite
+    # flags, but does not send them.
+    class Evaluator
+      # A single Evaluator is instantiated for each client instance.
+      #
+      # @param get_flag [Function] called if the Evaluator needs to query a different flag from the one that it is
+      #   currently evaluating (i.e. a prerequisite flag); takes a single parameter, the flag key, and returns the
+      #   flag data - or nil if the flag is unknown or deleted
+      # @param get_segment [Function] similar to `get_flag`, but is used to query a user segment.
+      # @param logger [Logger] the client's logger
+      def initialize: (untyped get_flag, untyped get_segment, untyped get_big_segments_membership, untyped logger) -> void
+
+      # Used internally to hold an evaluation result and additional state that may be accumulated during an
+      # evaluation. It's simpler and a bit more efficient to represent these as mutable properties rather than
+      # trying to use a pure functional approach, and since we're not exposing this object to any application code
+      # or retaining it anywhere, we don't have to be quite as strict about immutability.
+      #
+      # The big_segments_status and big_segments_membership properties are not used by the caller; they are used
+      # during an evaluation to cache the result of any Big Segments query that we've done for this user, because
+      # we don't want to do multiple queries for the same user if multiple Big Segments are referenced in the same
+      # evaluation.
+      EvalResult: untyped
+
+      # Helper function used internally to construct an EvaluationDetail for an error result.
+      def self.error_result: (untyped errorKind, ?untyped? value) -> untyped
+
+      # The client's entry point for evaluating a flag. The returned `EvalResult` contains the evaluation result and
+      # any events that were generated for prerequisite flags; its `value` will be `nil` if the flag returns the
+      # default value. Error conditions produce a result with a nil value and an error reason, not an exception.
+      #
+      # @param flag [Object] the flag
+      # @param user [Object] the user properties
+      # @return [EvalResult] the evaluation result 
+      def evaluate: (untyped flag, untyped user) -> untyped
+
+      def self.make_big_segment_ref: (untyped segment) -> ::String
+
+      private
+
+      def eval_internal: (untyped flag, untyped user, untyped state) -> untyped
+
+      def check_prerequisites: (untyped flag, untyped user, untyped state) -> (untyped | nil)
+
+      def rule_match_user: (untyped rule, untyped user, untyped state) -> (false | true)
+
+      def clause_match_user: (untyped clause, untyped user, untyped state) -> untyped
+
+      def clause_match_user_no_segments: (untyped clause, untyped user) -> (false | untyped)
+
+      def segment_match_user: (untyped segment, untyped user, untyped state) -> (false | untyped)
+
+      def big_segment_match_user: (untyped segment, untyped user, untyped state) -> (false | untyped)
+
+      def simple_segment_match_user: (untyped segment, untyped user, untyped use_includes_and_excludes) -> (true | false)
+
+      def segment_rule_match_user: (untyped rule, untyped user, untyped segment_key, untyped salt) -> (false | true | untyped)
+
+      def get_value_for_variation_or_rollout: (untyped flag, untyped vr, untyped user, untyped reason, untyped precomputed_results) -> untyped
+    end
+  end
+end

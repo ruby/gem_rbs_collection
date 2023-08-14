@@ -1,0 +1,45 @@
+module LaunchDarkly
+  module Impl
+    BigSegmentMembershipResult: untyped
+
+    class BigSegmentStoreManager
+      # use this as a singleton whenever a membership query returns nil; it's safe to reuse it because
+      # we will never modify the membership properties after they're queried
+      EMPTY_MEMBERSHIP: ::Hash[untyped, untyped]
+
+      def initialize: (untyped big_segments_config, untyped logger) -> void
+
+      attr_reader status_provider: untyped
+
+      def stop: () -> untyped
+
+      def get_context_membership: (untyped context_key) -> (nil | untyped)
+
+      def get_status: () -> untyped
+
+      def poll_store_and_update_status: () -> untyped
+
+      def stale?: (untyped timestamp) -> untyped
+
+      def self.hash_for_context_key: (untyped context_key) -> untyped
+    end
+
+    #
+    # Default implementation of the BigSegmentStoreStatusProvider interface.
+    #
+    # There isn't much to this because the real implementation is in BigSegmentStoreManager - we pass in a lambda
+    # that allows us to get the current status from that class. Also, the standard Observer methods such as
+    # add_observer are provided for us because BigSegmentStoreStatusProvider mixes in Observer, so all we need to
+    # to do make notifications happen is to call the Observer methods "changed" and "notify_observers".
+    #
+    class BigSegmentStoreStatusProviderImpl
+      include LaunchDarkly::Interfaces::BigSegmentStoreStatusProvider
+
+      def initialize: (untyped status_fn) -> void
+
+      def status: () -> untyped
+
+      def update_status: (untyped new_status) -> (untyped | nil)
+    end
+  end
+end

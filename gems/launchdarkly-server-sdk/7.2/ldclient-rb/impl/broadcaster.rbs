@@ -1,0 +1,49 @@
+module LaunchDarkly
+  module Impl
+    #
+    # A generic mechanism for registering event listeners and broadcasting
+    # events to them.
+    #
+    # The SDK maintains an instance of this for each available type of listener
+    # (flag change, data store status, etc.). They are all intended to share a
+    # single executor service; notifications are submitted individually to this
+    # service for each listener.
+    #
+    class Broadcaster
+      def initialize: (untyped executor, untyped logger) -> void
+
+      #
+      # Register a listener to this broadcaster.
+      #
+      # @param listener [#update]
+      #
+      def add_listener: (untyped listener) -> (nil | untyped)
+
+      #
+      # Removes a registered listener from this broadcaster.
+      #
+      def remove_listener: (untyped listener) -> untyped
+
+      def has_listeners?: () -> untyped
+
+      #
+      # Broadcast the provided event to all registered listeners.
+      #
+      # Each listener will be notified using the broadcasters executor. This
+      # method is non-blocking.
+      #
+      def broadcast: (untyped event) -> untyped
+
+      private
+
+      # @return [Concurrent::ThreadPoolExecutor]
+      attr_reader executor: untyped
+
+      # @return [Logger]
+      attr_reader logger: untyped
+
+      # @return [Concurrent::Set]
+      attr_reader listeners: untyped
+    end
+  end
+end

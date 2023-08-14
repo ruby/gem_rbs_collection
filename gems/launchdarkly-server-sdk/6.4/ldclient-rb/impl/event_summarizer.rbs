@@ -1,0 +1,28 @@
+module LaunchDarkly
+  module Impl
+    EventSummary: untyped
+
+    EventSummaryFlagInfo: untyped
+
+    EventSummaryFlagVariationCounter: untyped
+
+    # Manages the state of summarizable information for the EventProcessor, including the
+    # event counters and user deduplication. Note that the methods of this class are
+    # deliberately not thread-safe; the EventProcessor is responsible for enforcing
+    # synchronization across both the summarizer and the event queue.
+    class EventSummarizer
+      class Counter
+      end
+
+      def initialize: () -> void
+
+      # Adds this event to our counters, if it is a type of event we need to count.
+      def summarize_event: (untyped event) -> (nil | untyped)
+
+      # Returns a snapshot of the current summarized event data, and resets this state.
+      def snapshot: () -> untyped
+
+      def clear: () -> untyped
+    end
+  end
+end

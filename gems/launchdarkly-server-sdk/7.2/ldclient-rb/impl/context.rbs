@@ -1,0 +1,72 @@
+module LaunchDarkly
+  module Impl
+    module Context
+      ERR_KIND_NON_STRING: "context kind must be a string"
+
+      ERR_KIND_CANNOT_BE_KIND: "\"kind\" is not a valid context kind"
+
+      ERR_KIND_CANNOT_BE_MULTI: "\"multi\" is not a valid context kind"
+
+      ERR_KIND_INVALID_CHARS: "context kind contains disallowed characters"
+
+      ERR_KEY_NON_STRING: "context key must be a string"
+
+      ERR_KEY_EMPTY: "context key must not be empty"
+
+      ERR_NAME_NON_STRING: "context name must be a string"
+
+      ERR_ANONYMOUS_NON_BOOLEAN: "context anonymous must be a boolean"
+
+      #
+      # We allow consumers of this SDK to provide us with either a Hash or an
+      # instance of an LDContext. This is convenient for them but not as much
+      # for us. To make the conversion slightly more convenient for us, we have
+      # created this method.
+      #
+      # @param context [Hash, LDContext]
+      # @return [LDContext]
+      #
+      def self.make_context: (untyped context) -> untyped
+
+      #
+      # Returns an error message if the kind is invalid; nil otherwise.
+      #
+      # @param kind [any]
+      # @return [String, nil]
+      #
+      def self.validate_kind: (untyped kind) -> untyped
+
+      #
+      # Returns an error message if the key is invalid; nil otherwise.
+      #
+      # @param key [any]
+      # @return [String, nil]
+      #
+      def self.validate_key: (untyped key) -> untyped
+
+      #
+      # Returns an error message if the name is invalid; nil otherwise.
+      #
+      # @param name [any]
+      # @return [String, nil]
+      #
+      def self.validate_name: (untyped name) -> (untyped | nil)
+
+      #
+      # Returns an error message if anonymous is invalid; nil otherwise.
+      #
+      # @param anonymous [any]
+      # @param allow_nil [Boolean]
+      # @return [String, nil]
+      #
+      def self.validate_anonymous: (untyped anonymous, untyped allow_nil) -> (nil | untyped)
+
+      #
+      # @param kind [String]
+      # @param key [String]
+      # @return [String]
+      #
+      def self.canonicalize_key_for_kind: (untyped kind, untyped key) -> ::String
+    end
+  end
+end

@@ -1,0 +1,55 @@
+module LaunchDarkly
+  module Impl
+    module DataSource
+      class StatusProvider
+        include LaunchDarkly::Interfaces::DataSource::StatusProvider
+
+        extend Forwardable
+
+        def initialize: (untyped status_broadcaster, untyped update_sink) -> void
+
+        def status: () -> untyped
+      end
+
+      class UpdateSink
+        include LaunchDarkly::Interfaces::DataSource::UpdateSink
+
+        # @return [LaunchDarkly::Interfaces::DataSource::Status]
+        attr_reader current_status: untyped
+
+        def initialize: (untyped data_store, untyped status_broadcaster, untyped flag_change_broadcaster) -> void
+
+        def init: (untyped all_data) -> (nil | untyped)
+
+        def upsert: (untyped kind, untyped item) -> untyped
+
+        def delete: (untyped kind, untyped key, untyped version) -> untyped
+
+        def update_status: (untyped new_state, untyped new_error) -> (nil | untyped)
+
+        private
+
+        def update_full_dependency_tracker: (untyped all_data) -> untyped
+
+        #
+        # Method to monitor updates to the store. You provide a block to update
+        # the store. This mthod wraps that block, catching and re-raising all
+        # errors, and notifying all status listeners of the error.
+        #
+        def monitor_store_update: () { () -> untyped } -> untyped
+
+        #
+        # @param [Hash] old_data
+        # @param [Hash] new_data
+        # @return [Set]
+        #
+        def compute_changed_items_for_full_data_set: (untyped old_data, untyped new_data) -> untyped
+
+        #
+        # @param affected_items [Set]
+        #
+        def send_change_events: (untyped affected_items) -> untyped
+      end
+    end
+  end
+end

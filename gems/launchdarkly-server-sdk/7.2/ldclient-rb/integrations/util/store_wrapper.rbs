@@ -1,0 +1,145 @@
+module LaunchDarkly
+  module Integrations
+    #
+    # Support code that may be helpful in creating integrations.
+    #
+    # @since 5.5.0
+    #
+    module Util
+      #
+      # CachingStoreWrapper is a partial implementation of the {LaunchDarkly::Interfaces::FeatureStore}
+      # pattern that delegates part of its behavior to another object, while providing optional caching
+      # behavior and other logic that would otherwise be repeated in every feature store implementation.
+      # This makes it easier to create new database integrations by implementing only the database-specific
+      # logic.
+      #
+      # The mixin {FeatureStoreCore} describes the methods that need to be supported by the inner
+      # implementation object.
+      #
+      class CachingStoreWrapper
+        include LaunchDarkly::Interfaces::FeatureStore
+
+        #
+        # Creates a new store wrapper instance.
+        #
+        # @param core [Object]  an object that implements the {FeatureStoreCore} methods
+        # @param opts [Hash]  a hash that may include cache-related options; all others will be ignored
+        # @option opts [Float] :expiration (15)  cache TTL; zero means no caching
+        # @option opts [Integer] :capacity (1000)  maximum number of items in the cache
+        #
+        def initialize: (untyped core, untyped opts) -> void
+
+        def monitoring_enabled?: () -> untyped
+
+        def available?: () -> (false | untyped)
+
+        def init: (untyped all_data) -> untyped
+
+        def get: (untyped kind, untyped key) -> untyped
+
+        def all: (untyped kind) -> untyped
+
+        def upsert: (untyped kind, untyped item) -> untyped
+
+        def delete: (untyped kind, untyped key, untyped version) -> untyped
+
+        def initialized?: () -> (true | untyped)
+
+        def stop: () -> untyped
+
+        private
+
+        # We use just one cache for 3 kinds of objects. Individual entities use a key like 'features:my-flag'.
+        def item_cache_key: (untyped kind, untyped key) -> untyped
+
+        # The result of a call to get_all_internal is cached using the "kind" object as a key.
+        def all_cache_key: (untyped kind) -> untyped
+
+        # The result of initialized_internal? is cached using this key.
+        def inited_cache_key: () -> "$inited"
+
+        def item_if_not_deleted: (untyped item) -> (nil | untyped)
+
+        def items_if_not_deleted: (untyped items) -> untyped
+      end
+
+      #
+      # This module describes the methods that you must implement on your own object in order to
+      # use {CachingStoreWrapper}.
+      #
+      module FeatureStoreCore
+        #
+        # Initializes the store. This is the same as {LaunchDarkly::Interfaces::FeatureStore#init},
+        # but the wrapper will take care of updating the cache if caching is enabled.
+        #
+        # If possible, the store should update the entire data set atomically. If that is not possible,
+        # it should iterate through the outer hash and then the inner hash using the existing iteration
+        # order of those hashes (the SDK will ensure that the items were inserted into the hashes in
+        # the correct order), storing each item, and then delete any leftover items at the very end.
+        #
+        # @param all_data [Hash]  a hash where each key is one of the data kind objects, and each
+        #   value is in turn a hash of string keys to entities
+        # @return [void]
+        #
+        def init_internal: (untyped all_data) -> nil
+
+        #
+        # Retrieves a single entity. This is the same as {LaunchDarkly::Interfaces::FeatureStore#get}
+        # except that 1. the wrapper will take care of filtering out deleted entities by checking the
+        # `:deleted` property, so you can just return exactly what was in the data store, and 2. the
+        # wrapper will take care of checking and updating the cache if caching is enabled.
+        #
+        # @param kind [Object]  the kind of entity to get
+        # @param key [String]  the unique key of the entity to get
+        # @return [Hash]  the entity; nil if the key was not found
+        #
+        def get_internal: (untyped kind, untyped key) -> nil
+
+        #
+        # Retrieves all entities of the specified kind. This is the same as {LaunchDarkly::Interfaces::FeatureStore#all}
+        # except that 1. the wrapper will take care of filtering out deleted entities by checking the
+        # `:deleted` property, so you can just return exactly what was in the data store, and 2. the
+        # wrapper will take care of checking and updating the cache if caching is enabled.
+        #
+        # @param kind [Object]  the kind of entity to get
+        # @return [Hash]  a hash where each key is the entity's `:key` property and each value
+        #   is the entity
+        #
+        def get_all_internal: (untyped kind) -> nil
+
+        #
+        # Attempts to add or update an entity. This is the same as {LaunchDarkly::Interfaces::FeatureStore#upsert}
+        # except that 1. the wrapper will take care of updating the cache if caching is enabled, and 2.
+        # the method is expected to return the final state of the entity (i.e. either the `item`
+        # parameter if the update succeeded, or the previously existing entity in the store if the
+        # update failed; this is used for the caching logic).
+        #
+        # Note that FeatureStoreCore does not have a `delete` method. This is because {CachingStoreWrapper}
+        # implements `delete` by simply calling `upsert` with an item whose `:deleted` property is true.
+        #
+        # @param kind [Object]  the kind of entity to add or update
+        # @param item [Hash]  the entity to add or update
+        # @return [Hash]  the entity as it now exists in the store after the update
+        #
+        def upsert_internal: (untyped kind, untyped item) -> nil
+
+        #
+        # Checks whether this store has been initialized. This is the same as
+        # {LaunchDarkly::Interfaces::FeatureStore#initialized?} except that there is less of a concern
+        # for efficiency, because the wrapper will use caching and memoization in order to call the method
+        # as little as possible.
+        #
+        # @return [Boolean]  true if the store is in an initialized state
+        #
+        def initialized_internal?: () -> nil
+
+        #
+        # Performs any necessary cleanup to shut down the store when the client is being shut down.
+        #
+        # @return [void]
+        #
+        def stop: () -> nil
+      end
+    end
+  end
+end

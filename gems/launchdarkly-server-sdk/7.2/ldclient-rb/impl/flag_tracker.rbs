@@ -1,0 +1,29 @@
+module LaunchDarkly
+  module Impl
+    class FlagTracker
+      include LaunchDarkly::Interfaces::FlagTracker
+
+      extend Forwardable
+
+      def initialize: (untyped broadcaster, untyped eval_fn) -> void
+
+      def add_flag_value_change_listener: (untyped key, untyped context, untyped listener) -> untyped
+
+      #
+      # An adapter which turns a normal flag change listener into a flag value change listener.
+      #
+      class FlagValueChangeAdapter
+        # @param [Symbol] flag_key
+        # @param [LaunchDarkly::LDContext] context
+        # @param [#update] listener
+        # @param [#call] eval_fn
+        def initialize: (untyped flag_key, untyped context, untyped listener, untyped eval_fn) -> void
+
+        #
+        # @param [LaunchDarkly::Interfaces::FlagChange] flag_change
+        #
+        def update: (untyped flag_change) -> (nil | untyped)
+      end
+    end
+  end
+end

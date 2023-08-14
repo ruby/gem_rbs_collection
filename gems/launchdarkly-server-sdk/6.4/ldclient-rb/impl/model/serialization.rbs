@@ -1,0 +1,16 @@
+module LaunchDarkly
+  module Impl
+    module Model
+      # Abstraction of deserializing a feature flag or segment that was read from a data store or
+      # received from LaunchDarkly.
+      def self.deserialize: (untyped kind, untyped json, ?untyped? logger) -> (nil | untyped)
+
+      # Abstraction of serializing a feature flag or segment that will be written to a data store.
+      # Currently we just call to_json.
+      def self.serialize: (untyped kind, untyped item) -> untyped
+
+      # Translates a { flags: ..., segments: ... } object received from LaunchDarkly to the data store format.
+      def self.make_all_store_data: (untyped received_data, ?untyped? logger) -> ::Hash[untyped, untyped]
+    end
+  end
+end

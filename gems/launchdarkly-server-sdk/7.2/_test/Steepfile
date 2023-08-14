@@ -1,0 +1,12 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature "."
+
+  repo_path "../../../"
+  library "launchdarkly-server-sdk:7.2"
+  library "forwardable"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

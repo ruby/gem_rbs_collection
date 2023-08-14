@@ -1,0 +1,97 @@
+module LaunchDarkly
+  module Impl
+    module DataModelPreprocessing
+      #
+      # Container for a precomputed result that includes a specific variation index and value, an
+      # evaluation reason, and optionally an alternate evaluation reason that corresponds to the
+      # "in experiment" state.
+      #
+      class EvalResultsForSingleVariation
+        def initialize: (untyped value, untyped variation_index, untyped regular_reason, ?untyped? in_experiment_reason) -> void
+
+        # @param in_experiment [Boolean] indicates whether we want the result to include
+        #   "inExperiment: true" in the reason or not
+        # @return [EvaluationDetail]
+        def get_result: (?bool in_experiment) -> untyped
+      end
+
+      #
+      # Container for a set of precomputed results, one for each possible flag variation.
+      #
+      class EvalResultFactoryMultiVariations
+        def initialize: (untyped variation_factories) -> void
+
+        # @param index [Integer] the variation index
+        # @param in_experiment [Boolean] indicates whether we want the result to include
+        #   "inExperiment: true" in the reason or not
+        def for_variation: (untyped index, untyped in_experiment) -> untyped
+      end
+
+      # Base class for all of the preprocessed data classes we embed in our data model. Using this class
+      # ensures that none of its properties will be included in JSON representations. It also overrides
+      # == to say that it is always equal with another instance of the same class; equality tests on
+      # this class are only ever done in test code, and we want the contents of these classes to be
+      # ignored in test code unless we are looking at specific attributes.
+      class PreprocessedDataBase
+        def as_json: (*untyped) -> nil
+
+        def to_json: (*untyped a) -> "null"
+
+        def ==: (untyped other) -> untyped
+      end
+
+      class FlagPreprocessed < PreprocessedDataBase
+        def initialize: (untyped off_result, untyped fallthrough_factory) -> void
+
+        # @return [EvalResultsForSingleVariation]
+        attr_reader off_result: untyped
+
+        # @return [EvalResultFactoryMultiVariations]
+        attr_reader fallthrough_factory: untyped
+      end
+
+      class PrerequisitePreprocessed < PreprocessedDataBase
+        def initialize: (untyped failed_result) -> void
+
+        # @return [EvalResultsForSingleVariation]
+        attr_reader failed_result: untyped
+      end
+
+      class TargetPreprocessed < PreprocessedDataBase
+        def initialize: (untyped match_result) -> void
+
+        # @return [EvalResultsForSingleVariation]
+        attr_reader match_result: untyped
+      end
+
+      class FlagRulePreprocessed < PreprocessedDataBase
+        def initialize: (untyped all_match_results) -> void
+
+        # @return [EvalResultsForSingleVariation]
+        attr_reader all_match_results: untyped
+      end
+
+      class Preprocessor
+        def initialize: (?untyped? logger) -> void
+
+        def preprocess_item!: (untyped kind, untyped item) -> (untyped | untyped | nil)
+
+        def preprocess_all_items!: (untyped kind, untyped items_map) -> untyped
+
+        def preprocess_flag!: (untyped flag) -> untyped
+
+        def preprocess_segment!: (untyped segment) -> nil
+
+        private
+
+        def preprocess_prerequisite!: (untyped prereq, untyped flag) -> untyped
+
+        def preprocess_target!: (untyped target, untyped flag) -> untyped
+
+        def preprocess_flag_rule!: (untyped rule, untyped index, untyped flag) -> untyped
+
+        def precompute_multi_variation_results: (untyped flag, untyped regular_reason, untyped in_experiment_reason) -> untyped
+      end
+    end
+  end
+end

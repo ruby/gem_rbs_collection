@@ -1,0 +1,48 @@
+module LaunchDarkly
+  module Impl
+    module Integrations
+      class FileDataSourceImpl
+        #
+        # @param data_store [LaunchDarkly::Interfaces::FeatureStore]
+        # @param data_source_update_sink [LaunchDarkly::Interfaces::DataSource::UpdateSink, nil] Might be nil for backwards compatibility reasons.
+        # @param logger [Logger]
+        # @param options [Hash]
+        #
+        def initialize: (untyped data_store, untyped data_source_update_sink, untyped logger, ?::Hash[untyped, untyped] options) -> void
+
+        def initialized?: () -> untyped
+
+        def start: () -> untyped
+
+        def stop: () -> (untyped | nil)
+
+        private
+
+        def load_all: () -> (nil | untyped)
+
+        def load_file: (untyped path, untyped all_data) -> untyped
+
+        def parse_content: (untyped content) -> untyped
+
+        def symbolize_all_keys: (untyped value) -> untyped
+
+        def add_item: (untyped all_data, untyped kind, untyped item) -> untyped
+
+        def make_flag_with_value: (untyped key, untyped value) -> { key: untyped, on: true, fallthrough: { variation: 0 }, variations: ::Array[untyped] }
+
+        def start_listener: () -> untyped
+
+        def start_listener_with_listen_gem: (untyped resolved_paths) -> untyped
+
+        #
+        # Used internally by FileDataSource to track data file changes if the 'listen' gem is not available.
+        #
+        class FileDataSourcePoller
+          def initialize: (untyped resolved_paths, untyped interval, untyped reloader, untyped logger) -> void
+
+          def stop: () -> untyped
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,265 @@
+module LaunchDarkly
+  #
+  # A client for LaunchDarkly. Client instances are thread-safe. Users
+  # should create a single client instance for the lifetime of the application.
+  #
+  class LDClient
+    include Impl
+
+    #
+    # Creates a new client instance that connects to LaunchDarkly. A custom
+    # configuration parameter can also supplied to specify advanced options,
+    # but for most use cases, the default configuration is appropriate.
+    #
+    # The client will immediately attempt to connect to LaunchDarkly and retrieve
+    # your feature flag data. If it cannot successfully do so within the time limit
+    # specified by `wait_for_sec`, the constructor will return a client that is in
+    # an uninitialized state. See {#initialized?} for more details.
+    #
+    # @param sdk_key [String] the SDK key for your LaunchDarkly account
+    # @param config [Config] an optional client configuration object
+    # @param wait_for_sec [Float] maximum time (in seconds) to wait for initialization
+    #
+    # @return [LDClient] The LaunchDarkly client instance
+    #
+    def initialize: (String sdk_key, ?Config config, ?Float | Integer wait_for_sec) -> void
+
+    #
+    # Tells the client that all pending analytics events should be delivered as soon as possible.
+    #
+    # When the LaunchDarkly client generates analytics events (from {#variation}, {#variation_detail},
+    # {#identify}, or {#track}), they are queued on a worker thread. The event thread normally
+    # sends all queued events to LaunchDarkly at regular intervals, controlled by the
+    # {Config#flush_interval} option. Calling `flush` triggers a send without waiting for the
+    # next interval.
+    #
+    # Flushing is asynchronous, so this method will return before it is complete. However, if you
+    # call {#close}, events are guaranteed to be sent before that method returns.
+    #
+    def flush: () -> void
+
+    #
+    # @param key [String] the feature flag key
+    # @param user [Hash] the user properties
+    # @param default [Boolean] (false) the value to use if the flag cannot be evaluated
+    # @return [Boolean] the flag value
+    # @deprecated Use {#variation} instead.
+    #
+    def toggle?: (String key, Hash[Symbol, untyped] user, ?bool default) -> bool
+
+    #
+    # Creates a hash string that can be used by the JavaScript SDK to identify a user.
+    # For more information, see [Secure mode](https://docs.launchdarkly.com/sdk/features/secure-mode#ruby).
+    #
+    # @param user [Hash] the user properties
+    # @return [String] a hash string
+    #
+    def secure_mode_hash: (Hash[Symbol, untyped] user) -> String
+
+    #
+    # Returns whether the client has been initialized and is ready to serve feature flag requests.
+    #
+    # If this returns false, it means that the client did not succeed in connecting to
+    # LaunchDarkly within the time limit that you specified in the constructor. It could
+    # still succeed in connecting at a later time (on another thread), or it could have
+    # given up permanently (for instance, if your SDK key is invalid). In the meantime,
+    # any call to {#variation} or {#variation_detail} will behave as follows:
+    #
+    # 1. It will check whether the feature store already contains data (that is, you
+    # are using a database-backed store and it was populated by a previous run of this
+    # application). If so, it will use the last known feature flag data.
+    #
+    # 2. Failing that, it will return the value that you specified for the `default`
+    # parameter of {#variation} or {#variation_detail}.
+    #
+    # @return [Boolean] true if the client has been initialized
+    #
+    def initialized?: () -> bool
+
+    #
+    # Determines the variation of a feature flag to present to a user.
+    #
+    # At a minimum, the user hash should contain a `:key`, which should be the unique
+    # identifier for your user (or, for an anonymous user, a session identifier or
+    # cookie).
+    #
+    # Other supported user attributes include IP address, country code, and an arbitrary hash of
+    # custom attributes. For more about the supported user properties and how they work in
+    # LaunchDarkly, see [Targeting users](https://docs.launchdarkly.com/home/flags/targeting-users).
+    #
+    # The optional `:privateAttributeNames` user property allows you to specify a list of
+    # attribute names that should not be sent back to LaunchDarkly.
+    # [Private attributes](https://docs.launchdarkly.com/home/users/attributes#creating-private-user-attributes)
+    # can also be configured globally in {Config}.
+    #
+    # @example Basic user hash
+    #   {key: "my-user-id"}
+    #
+    # @example More complete user hash
+    #   {key: "my-user-id", ip: "127.0.0.1", country: "US", custom: {customer_rank: 1000}}
+    #
+    # @example User with a private attribute
+    #   {key: "my-user-id", email: "email@example.com", privateAttributeNames: ["email"]}
+    #
+    # @param key [String] the unique feature key for the feature flag, as shown
+    #   on the LaunchDarkly dashboard
+    # @param user [Hash] a hash containing parameters for the end user requesting the flag
+    # @param default the default value of the flag; this is used if there is an error
+    #   condition making it impossible to find or evaluate the flag
+    #
+    # @return the variation to show the user, or the default value if there's an an error
+    #
+    def variation: (String key, Hash[Symbol, untyped] user, untyped default) -> untyped
+
+    #
+    # Determines the variation of a feature flag for a user, like {#variation}, but also
+    # provides additional information about how this value was calculated.
+    #
+    # The return value of `variation_detail` is an {EvaluationDetail} object, which has
+    # three properties: the result value, the positional index of this value in the flag's
+    # list of variations, and an object describing the main reason why this value was
+    # selected. See {EvaluationDetail} for more on these properties.
+    #
+    # Calling `variation_detail` instead of `variation` also causes the "reason" data to
+    # be included in analytics events, if you are capturing detailed event data for this flag.
+    #
+    # For more information, see the reference guide on
+    # [Evaluation reasons](https://docs.launchdarkly.com/sdk/concepts/evaluation-reasons).
+    #
+    # @param key [String] the unique feature key for the feature flag, as shown
+    #   on the LaunchDarkly dashboard
+    # @param user [Hash] a hash containing parameters for the end user requesting the flag
+    # @param default the default value of the flag; this is used if there is an error
+    #   condition making it impossible to find or evaluate the flag
+    #
+    # @return [EvaluationDetail] an object describing the result
+    #
+    def variation_detail: (String key, Hash[Symbol, untyped] user, untyped default) -> EvaluationDetail
+
+    #
+    # Registers the user. This method simply creates an analytics event containing the user
+    # properties, so that LaunchDarkly will know about that user if it does not already.
+    #
+    # Calling {#variation} or {#variation_detail} also sends the user information to
+    # LaunchDarkly (if events are enabled), so you only need to use {#identify} if you
+    # want to identify the user without evaluating a flag.
+    #
+    # Note that event delivery is asynchronous, so the event may not actually be sent
+    # until later; see {#flush}.
+    #
+    # @param user [Hash] The user to register; this can have all the same user properties
+    #   described in {#variation}
+    # @return [void]
+    #
+    def identify: (Hash[Symbol, untyped] user) -> void
+
+    #
+    # Tracks that a user performed an event. This method creates a "custom" analytics event
+    # containing the specified event name (key), user properties, and optional data.
+    #
+    # Note that event delivery is asynchronous, so the event may not actually be sent
+    # until later; see {#flush}.
+    #
+    # As of this version’s release date, the LaunchDarkly service does not support the `metricValue`
+    # parameter. As a result, specifying `metricValue` will not yet produce any different behavior
+    # from omitting it. Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/features/events#ruby)
+    # for the latest status.
+    #
+    # @param event_name [String] The name of the event
+    # @param user [Hash] The user to register; this can have all the same user properties
+    #   described in {#variation}
+    # @param data [Hash] An optional hash containing any additional data associated with the event
+    # @param metric_value [Number] A numeric value used by the LaunchDarkly experimentation
+    #   feature in numeric custom metrics. Can be omitted if this event is used by only
+    #   non-numeric metrics. This field will also be returned as part of the custom event
+    #   for Data Export.
+    # @return [void]
+    #
+    def track: (String event_name, Hash[Symbol, untyped] user, ?Hash[Symbol, untyped]? data, ?Numeric? metric_value) -> void
+
+    #
+    # Associates a new and old user object for analytics purposes via an alias event.
+    #
+    # @param current_context [Hash] The current version of a user.
+    # @param previous_context [Hash] The previous version of a user.
+    # @return [void]
+    #
+    def alias: (Hash[Symbol, untyped] current_context, Hash[Symbol, untyped] previous_context) -> void
+
+    #
+    # Returns all feature flag values for the given user.
+    #
+    # @deprecated Please use {#all_flags_state} instead. Current versions of the
+    #   client-side SDK will not generate analytics events correctly if you pass the
+    #   result of `all_flags`.
+    #
+    # @param user [Hash] The end user requesting the feature flags
+    # @return [Hash] a hash of feature flag keys to values
+    #
+    def all_flags: (Hash[Symbol, untyped] user) -> Hash[String, untyped]
+
+    #
+    # Returns a {FeatureFlagsState} object that encapsulates the state of all feature flags for a given user,
+    # including the flag values and also metadata that can be used on the front end. This method does not
+    # send analytics events back to LaunchDarkly.
+    #
+    # @param user [Hash] The end user requesting the feature flags
+    # @param options [Hash] Optional parameters to control how the state is generated
+    # @option options [Boolean] :client_side_only (false) True if only flags marked for use with the
+    #   client-side SDK should be included in the state. By default, all flags are included.
+    # @option options [Boolean] :with_reasons (false) True if evaluation reasons should be included
+    #   in the state (see {#variation_detail}). By default, they are not included.
+    # @option options [Boolean] :details_only_for_tracked_flags (false) True if any flag metadata that is
+    #   normally only used for event generation - such as flag versions and evaluation reasons - should be
+    #   omitted for any flag that does not have event tracking or debugging turned on. This reduces the size
+    #   of the JSON data if you are passing the flag state to the front end.
+    # @return [FeatureFlagsState] a {FeatureFlagsState} object which can be serialized to JSON
+    #
+    def all_flags_state: (Hash[Symbol, untyped] user, ?Hash[Symbol, untyped] options) -> FeatureFlagsState
+
+    #
+    # Releases all network connections and other resources held by the client, making it no longer usable.
+    #
+    # @return [void]
+    def close: () -> void
+
+    #
+    # Returns an interface for tracking the status of a Big Segment store.
+    #
+    # The {BigSegmentStoreStatusProvider} has methods for checking whether the Big Segment store
+    # is (as far as the SDK knows) currently operational and tracking changes in this status.
+    #
+    attr_reader big_segment_store_status_provider: Interfaces::BigSegmentStoreStatusProvider
+
+    private
+
+    def create_default_data_source: (untyped sdk_key, untyped config, untyped diagnostic_accumulator) -> untyped
+
+    # @return [EvaluationDetail]
+    def evaluate_internal: (untyped key, untyped user, untyped default, untyped with_reasons) -> untyped
+
+    def record_flag_eval: (untyped flag, untyped user, untyped detail, untyped default, untyped with_reasons) -> untyped
+
+    def record_prereq_flag_eval: (untyped prereq_flag, untyped prereq_of_flag, untyped user, untyped detail, untyped with_reasons) -> untyped
+
+    def record_flag_eval_error: (untyped flag, untyped user, untyped default, untyped reason, untyped with_reasons) -> untyped
+
+    def record_unknown_flag_eval: (untyped flag_key, untyped user, untyped default, untyped reason, untyped with_reasons) -> untyped
+
+    def is_experiment: (untyped flag, untyped reason) -> (false | true | untyped)
+
+    def sanitize_user: (untyped user) -> (untyped | nil)
+  end
+
+  #
+  # Used internally when the client is offline.
+  # @private
+  #
+  class NullUpdateProcessor
+    def start: () -> untyped
+
+    def initialized?: () -> true
+
+    def stop: () -> nil
+  end
+end

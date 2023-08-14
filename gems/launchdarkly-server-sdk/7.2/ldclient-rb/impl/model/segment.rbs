@@ -1,0 +1,94 @@
+module LaunchDarkly
+  module Impl
+    module Model
+      class Segment
+        # @param data [Hash]
+        # @param logger [Logger|nil]
+        def initialize: (untyped data, ?untyped? logger) -> void
+
+        # @return [Hash]
+        attr_reader data: untyped
+
+        # @return [String]
+        attr_reader key: untyped
+
+        # @return [Integer]
+        attr_reader version: untyped
+
+        # @return [Boolean]
+        attr_reader deleted: untyped
+
+        # @return [Array<String>]
+        attr_reader included: untyped
+
+        # @return [Array<String>]
+        attr_reader excluded: untyped
+
+        # @return [Array<LaunchDarkly::Impl::Model::SegmentTarget>]
+        attr_reader included_contexts: untyped
+
+        # @return [Array<LaunchDarkly::Impl::Model::SegmentTarget>]
+        attr_reader excluded_contexts: untyped
+
+        # @return [Array<SegmentRule>]
+        attr_reader rules: untyped
+
+        # @return [Boolean]
+        attr_reader unbounded: untyped
+
+        # @return [String]
+        attr_reader unbounded_context_kind: untyped
+
+        # @return [Integer|nil]
+        attr_reader generation: untyped
+
+        # @return [String]
+        attr_reader salt: untyped
+
+        # This method allows us to read properties of the object as if it's just a hash. Currently this is
+        # necessary because some data store logic is still written to expect hashes; we can remove it once
+        # we migrate entirely to using attributes of the class.
+        def []: (untyped key) -> untyped
+
+        def ==: (untyped other) -> untyped
+
+        def as_json: (*untyped) -> untyped
+
+        # Same as as_json, but converts the JSON structure into a string.
+        def to_json: (*untyped a) -> untyped
+      end
+
+      class SegmentTarget
+        def initialize: (untyped data) -> void
+
+        # @return [Hash]
+        attr_reader data: untyped
+
+        # @return [String]
+        attr_reader context_kind: untyped
+
+        # @return [Set]
+        attr_reader values: untyped
+      end
+
+      class SegmentRule
+        def initialize: (untyped data, ?untyped? errors_out) -> void
+
+        # @return [Hash]
+        attr_reader data: untyped
+
+        # @return [Array<LaunchDarkly::Impl::Model::Clause>]
+        attr_reader clauses: untyped
+
+        # @return [Integer|nil]
+        attr_reader weight: untyped
+
+        # @return [String|nil]
+        attr_reader bucket_by: untyped
+
+        # @return [String|nil]
+        attr_reader rollout_context_kind: untyped
+      end
+    end
+  end
+end

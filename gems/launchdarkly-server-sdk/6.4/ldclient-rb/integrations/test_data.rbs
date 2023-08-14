@@ -1,0 +1,141 @@
+module LaunchDarkly
+  module Integrations
+    #
+    # A mechanism for providing dynamically updatable feature flag state in a simplified form to an SDK
+    # client in test scenarios.
+    #
+    # Unlike {LaunchDarkly::Integrations::FileData}, this mechanism does not use any external resources. It
+    # provides only the data that the application has put into it using the {#update} method.
+    #
+    # @example
+    #     td = LaunchDarkly::Integrations::TestData.data_source
+    #     td.update(td.flag("flag-key-1").variation_for_all_users(true))
+    #     config = LaunchDarkly::Config.new(data_source: td)
+    #     client = LaunchDarkly::LDClient.new('sdkKey', config)
+    #     # flags can be updated at any time:
+    #     td.update(td.flag("flag-key-2")
+    #                 .variation_for_user("some-user-key", true)
+    #                 .fallthrough_variation(false))
+    #
+    # The above example uses a simple boolean flag, but more complex configurations are possible using
+    # the methods of the {FlagBuilder} that is returned by {#flag}. {FlagBuilder}
+    # supports many of the ways a flag can be configured on the LaunchDarkly dashboard, but does not
+    # currently support 1. rule operators other than "in" and "not in", or 2. percentage rollouts.
+    #
+    # If the same `TestData` instance is used to configure multiple `LDClient` instances,
+    # any changes made to the data will propagate to all of the `LDClient`s.
+    #
+    # @since 6.3.0
+    #
+    class TestData
+      # Creates a new instance of the test data source.
+      #
+      # @return [TestData] a new configurable test data source
+      def self.data_source: () -> TestData
+
+      # @private
+      def initialize: () -> void
+
+      #
+      # Called internally by the SDK to determine what arguments to pass to call
+      # You do not need to call this method.
+      #
+      # @private
+      def arity: () -> Integer
+
+      #
+      # Called internally by the SDK to associate this test data source with an {@code LDClient} instance.
+      # You do not need to call this method.
+      #
+      # @private
+      def call: (untyped _, untyped config) -> untyped
+
+      #
+      # Creates or copies a {FlagBuilder} for building a test flag configuration.
+      #
+      # If this flag key has already been defined in this `TestData` instance, then the builder
+      # starts with the same configuration that was last provided for this flag.
+      #
+      # Otherwise, it starts with a new default configuration in which the flag has `true` and
+      # `false` variations, is `true` for all users when targeting is turned on and
+      # `false` otherwise, and currently has targeting turned on. You can change any of those
+      # properties, and provide more complex behavior, using the {FlagBuilder} methods.
+      #
+      # Once you have set the desired configuration, pass the builder to {#update}.
+      #
+      # @param key [String] the flag key
+      # @return [FlagBuilder] a flag configuration builder
+      #
+      def flag: (String key) -> FlagBuilder
+
+      #
+      # Updates the test data with the specified flag configuration.
+      #
+      # This has the same effect as if a flag were added or modified on the LaunchDarkly dashboard.
+      # It immediately propagates the flag change to any `LDClient` instance(s) that you have
+      # already configured to use this `TestData`. If no `LDClient` has been started yet,
+      # it simply adds this flag to the test data which will be provided to any `LDClient` that
+      # you subsequently configure.
+      #
+      # Any subsequent changes to this {FlagBuilder} instance do not affect the test data,
+      # unless you call {#update} again.
+      #
+      # @param flag_builder [FlagBuilder] a flag configuration builder
+      # @return [TestData] the TestData instance
+      #
+      def update: (FlagBuilder flag_builder) -> self
+
+      #
+      # Copies a full feature flag data model object into the test data.
+      #
+      # It immediately propagates the flag change to any `LDClient` instance(s) that you have already
+      # configured to use this `TestData`. If no `LDClient` has been started yet, it simply adds
+      # this flag to the test data which will be provided to any LDClient that you subsequently
+      # configure.
+      #
+      # Use this method if you need to use advanced flag configuration properties that are not supported by
+      # the simplified {FlagBuilder} API. Otherwise it is recommended to use the regular {flag}/{update}
+      # mechanism to avoid dependencies on details of the data model.
+      #
+      # You cannot make incremental changes with {flag}/{update} to a flag that has been added in this way;
+      # you can only replace it with an entirely new flag configuration.
+      #
+      # @param flag [Hash] the flag configuration
+      # @return [TestData] the TestData instance
+      #
+      def use_preconfigured_flag: (untyped flag) -> untyped
+
+      #
+      # Copies a full user segment data model object into the test data.
+      #
+      # It immediately propagates the change to any `LDClient` instance(s) that you have already
+      # configured to use this `TestData`. If no `LDClient` has been started yet, it simply adds
+      # this segment to the test data which will be provided to any LDClient that you subsequently
+      # configure.
+      #
+      # This method is currently the only way to inject user segment data, since there is no builder
+      # API for segments. It is mainly intended for the SDK's own tests of user segment functionality,
+      # since application tests that need to produce a desired evaluation state could do so more easily
+      # by just setting flag values.
+      #
+      # @param segment [Hash] the segment configuration
+      # @return [TestData] the TestData instance
+      #
+      def use_preconfigured_segment: (untyped segment) -> untyped
+
+      private
+
+      def use_preconfigured_item: (untyped kind, untyped item, untyped current) -> self
+
+      def update_item: (untyped kind, untyped item) -> untyped
+
+      public
+
+      # @private
+      def make_init_data: () -> untyped
+
+      # @private
+      def closed_instance: (untyped instance) -> untyped
+    end
+  end
+end
