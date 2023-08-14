@@ -1,0 +1,27 @@
+module LaunchDarkly
+  module Impl
+    class DiagnosticAccumulator
+      def self.create_diagnostic_id: (untyped sdk_key) -> { diagnosticId: untyped, sdkKeySuffix: untyped }
+
+      def initialize: (untyped diagnostic_id) -> void
+
+      def reset: (untyped time) -> untyped
+
+      def create_init_event: (untyped config) -> { kind: "diagnostic-init", creationDate: untyped, id: untyped, configuration: untyped, sdk: untyped, platform: untyped }
+
+      def record_stream_init: (untyped timestamp, untyped failed, untyped duration_millis) -> untyped
+
+      def create_periodic_event_and_reset: (untyped dropped_events, untyped deduplicated_users, untyped events_in_last_batch) -> untyped
+
+      def self.make_config_data: (untyped config) -> untyped
+
+      def self.make_sdk_data: (untyped config) -> untyped
+
+      def self.make_platform_data: () -> { name: "ruby", osArch: untyped, osName: untyped, osVersion: "unknown", rubyVersion: untyped, rubyImplementation: untyped }
+
+      def self.normalize_os_name: (untyped name) -> untyped
+
+      def self.seconds_to_millis: (untyped s) -> untyped
+    end
+  end
+end

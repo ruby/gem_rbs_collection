@@ -1,0 +1,54 @@
+module LaunchDarkly
+  module Impl
+    #
+    # Provides additional behavior that the client requires before or after feature store operations.
+    # This just means sorting the data set for init() and dealing with data store status listeners.
+    #
+    class FeatureStoreClientWrapper
+      include Interfaces::FeatureStore
+
+      def initialize: (untyped store, untyped store_update_sink, untyped logger) -> void
+
+      def init: (untyped all_data) -> untyped
+
+      def get: (untyped kind, untyped key) -> untyped
+
+      def all: (untyped kind) -> untyped
+
+      def upsert: (untyped kind, untyped item) -> untyped
+
+      def delete: (untyped kind, untyped key, untyped version) -> untyped
+
+      def initialized?: () -> untyped
+
+      def stop: () -> (nil | untyped)
+
+      def monitoring_enabled?: () -> untyped
+
+      private
+
+      def wrapper: () { () -> untyped } -> untyped
+
+      def update_availability: (untyped available) -> (nil | untyped)
+
+      def check_availability: () -> untyped
+
+      # This methods determines whether the wrapped store can support enabling monitoring.
+      #
+      # The wrapped store must provide a monitoring_enabled method, which must
+      # be true. But this alone is not sufficient.
+      #
+      # Because this class wraps all interactions with a provided store, it can
+      # technically "monitor" any store. However, monitoring also requires that
+      # we notify listeners when the store is available again.
+      #
+      # We determine this by checking the store's `available?` method, so this
+      # is also a requirement for monitoring support.
+      #
+      # These extra checks won't be necessary once `available` becomes a part
+      # of the core interface requirements and this class no longer wraps every
+      # feature store.
+      def does_store_support_monitoring?: () -> (false | untyped)
+    end
+  end
+end

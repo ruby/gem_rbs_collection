@@ -1,0 +1,53 @@
+module LaunchDarkly
+  module Impl
+    class ContextFilter
+      #
+      # @param all_attributes_private [Boolean]
+      # @param private_attributes [Array<String>]
+      #
+      def initialize: (untyped all_attributes_private, untyped private_attributes) -> void
+
+      #
+      # Return a hash representation of the provided context with attribute
+      # redaction applied.
+      #
+      # @param context [LaunchDarkly::LDContext]
+      # @return [Hash]
+      #
+      def filter: (untyped context) -> untyped
+
+      private
+
+      #
+      # Apply redaction rules for a single context.
+      #
+      # @param context [LaunchDarkly::LDContext]
+      # @param include_kind [Boolean]
+      # @return [Hash]
+      #
+      def filter_single_context: (untyped context, untyped include_kind) -> untyped
+
+      #
+      # Check if an entire attribute should be redacted.
+      #
+      # @param attribute [Symbol]
+      # @param private_attributes [Array<Reference>]
+      # @param redacted [Array<Symbol>]
+      # @return [Boolean]
+      #
+      def check_whole_attribute_private: (untyped attribute, untyped private_attributes, untyped redacted) -> (true | false)
+
+      #
+      # Apply redaction rules to the provided value.
+      #
+      # @param parent_path [Array<String>, nil]
+      # @param name [String]
+      # @param value [any]
+      # @param private_attributes [Array<Reference>]
+      # @param redacted [Array<Symbol>]
+      # @return [any]
+      #
+      def redact_json_value: (untyped parent_path, untyped name, untyped value, untyped private_attributes, untyped redacted) -> untyped
+    end
+  end
+end

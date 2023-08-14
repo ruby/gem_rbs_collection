@@ -1,0 +1,35 @@
+module LaunchDarkly
+  module Impl
+    # Defines the behavior of all operators that can be used in feature flag rules and segment rules.
+    module EvaluatorOperators
+      # Applies an operator to produce a boolean result.
+      #
+      # @param op [Symbol] one of the supported LaunchDarkly operators, as a symbol
+      # @param context_value the value of the context attribute that is referenced in the current clause (left-hand
+      #   side of the expression)
+      # @param clause_value the constant value that `context_value` is being compared to (right-hand side of the
+      #   expression)
+      # @return [Boolean] true if the expression should be considered a match; false if it is not a match, or
+      #   if the values cannot be compared because they are of the wrong types, or if the operator is unknown
+      def self.apply: (untyped op, untyped context_value, untyped clause_value) -> untyped
+
+      private
+
+      NUMERIC_VERSION_COMPONENTS_REGEX: untyped
+
+      def self.string_op: (untyped context_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.numeric_op: (untyped context_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.date_op: (untyped context_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.semver_op: (untyped context_value, untyped clause_value, untyped fn) -> untyped
+
+      def self.to_date: (untyped value) -> (untyped | untyped | nil)
+
+      def self.to_semver: (untyped value) -> (untyped | nil)
+
+      def self.add_zero_version_component: (untyped v) -> untyped
+    end
+  end
+end

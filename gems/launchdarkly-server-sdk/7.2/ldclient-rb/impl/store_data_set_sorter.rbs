@@ -1,0 +1,25 @@
+module LaunchDarkly
+  module Impl
+    #
+    # Implements a dependency graph ordering for data to be stored in a feature store. We must use this
+    # on every data set that will be passed to the feature store's init() method.
+    #
+    class FeatureStoreDataSetSorter
+      #
+      # Returns a copy of the input hash that has the following guarantees: the iteration order of the outer
+      # hash will be in ascending order by the VersionDataKind's :priority property (if any), and for each
+      # data kind that has a :get_dependency_keys function, the inner hash will have an iteration order
+      # where B is before A if A has a dependency on B.
+      #
+      # This implementation relies on the fact that hashes in Ruby have an iteration order that is the same
+      # as the insertion order. Also, due to the way we deserialize JSON received from LaunchDarkly, the
+      # keys in the inner hash will always be symbols.
+      #
+      def self.sort_all_collections: (untyped all_data) -> untyped
+
+      def self.sort_collection: (untyped kind, untyped input) -> untyped
+
+      def self.add_with_dependencies_first: (untyped item, untyped dependency_fn, untyped remaining_items, untyped items_out) -> untyped
+    end
+  end
+end

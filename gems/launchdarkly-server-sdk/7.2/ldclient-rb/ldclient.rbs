@@ -1,0 +1,255 @@
+use LaunchDarkly::LDContext, LaunchDarkly::Config, LaunchDarkly::EvaluationDetail, LaunchDarkly::FeatureFlagsState
+
+module LaunchDarkly
+  #
+  # A client for LaunchDarkly. Client instances are thread-safe. Users
+  # should create a single client instance for the lifetime of the application.
+  #
+  class LDClient
+    include Impl
+
+    #
+    # Creates a new client instance that connects to LaunchDarkly. A custom
+    # configuration parameter can also supplied to specify advanced options,
+    # but for most use cases, the default configuration is appropriate.
+    #
+    # The client will immediately attempt to connect to LaunchDarkly and retrieve
+    # your feature flag data. If it cannot successfully do so within the time limit
+    # specified by `wait_for_sec`, the constructor will return a client that is in
+    # an uninitialized state. See {#initialized?} for more details.
+    #
+    # @param sdk_key [String] the SDK key for your LaunchDarkly account
+    # @param config [Config] an optional client configuration object
+    # @param wait_for_sec [Float] maximum time (in seconds) to wait for initialization
+    #
+    # @return [LDClient] The LaunchDarkly client instance
+    #
+    def initialize: (String sdk_key, ?Config config, ?Integer | Float wait_for_sec) -> void
+
+    #
+    # Tells the client that all pending analytics events should be delivered as soon as possible.
+    #
+    # When the LaunchDarkly client generates analytics events (from {#variation}, {#variation_detail},
+    # {#identify}, or {#track}), they are queued on a worker thread. The event thread normally
+    # sends all queued events to LaunchDarkly at regular intervals, controlled by the
+    # {Config#flush_interval} option. Calling `flush` triggers a send without waiting for the
+    # next interval.
+    #
+    # Flushing is asynchronous, so this method will return before it is complete. However, if you
+    # call {#close}, events are guaranteed to be sent before that method returns.
+    #
+    def flush: () -> void
+
+    #
+    # Creates a hash string that can be used by the JavaScript SDK to identify a context.
+    # For more information, see [Secure mode](https://docs.launchdarkly.com/sdk/features/secure-mode#ruby).
+    #
+    # @param context [Hash, LDContext]
+    # @return [String, nil] a hash string or nil if the provided context was invalid
+    #
+    def secure_mode_hash: (context context) -> String?
+
+    #
+    # Returns whether the client has been initialized and is ready to serve feature flag requests.
+    #
+    # If this returns false, it means that the client did not succeed in connecting to
+    # LaunchDarkly within the time limit that you specified in the constructor. It could
+    # still succeed in connecting at a later time (on another thread), or it could have
+    # given up permanently (for instance, if your SDK key is invalid). In the meantime,
+    # any call to {#variation} or {#variation_detail} will behave as follows:
+    #
+    # 1. It will check whether the feature store already contains data (that is, you
+    # are using a database-backed store and it was populated by a previous run of this
+    # application). If so, it will use the last known feature flag data.
+    #
+    # 2. Failing that, it will return the value that you specified for the `default`
+    # parameter of {#variation} or {#variation_detail}.
+    #
+    # @return [Boolean] true if the client has been initialized
+    #
+    def initialized?: () -> bool
+
+    #
+    # Determines the variation of a feature flag to present for a context.
+    #
+    # @param key [String] the unique feature key for the feature flag, as shown
+    #   on the LaunchDarkly dashboard
+    # @param context [Hash, LDContext] a hash or LDContext instance describing the context requesting the flag
+    # @param default the default value of the flag; this is used if there is an error
+    #   condition making it impossible to find or evaluate the flag
+    #
+    # @return the variation for the provided context, or the default value if there's an an error
+    #
+    def variation: (String key, context context, untyped default) -> untyped
+
+    #
+    # Determines the variation of a feature flag for a context, like {#variation}, but also
+    # provides additional information about how this value was calculated.
+    #
+    # The return value of `variation_detail` is an {EvaluationDetail} object, which has
+    # three properties: the result value, the positional index of this value in the flag's
+    # list of variations, and an object describing the main reason why this value was
+    # selected. See {EvaluationDetail} for more on these properties.
+    #
+    # Calling `variation_detail` instead of `variation` also causes the "reason" data to
+    # be included in analytics events, if you are capturing detailed event data for this flag.
+    #
+    # For more information, see the reference guide on
+    # [Evaluation reasons](https://docs.launchdarkly.com/sdk/concepts/evaluation-reasons).
+    #
+    # @param key [String] the unique feature key for the feature flag, as shown
+    #   on the LaunchDarkly dashboard
+    # @param context [Hash, LDContext] a hash or object describing the context requesting the flag,
+    # @param default the default value of the flag; this is used if there is an error
+    #   condition making it impossible to find or evaluate the flag
+    #
+    # @return [EvaluationDetail] an object describing the result
+    #
+    def variation_detail: (String key, context context, untyped default) -> EvaluationDetail
+
+    #
+    # Registers the context. This method simply creates an analytics event containing the context
+    # properties, so that LaunchDarkly will know about that context if it does not already.
+    #
+    # Calling {#variation} or {#variation_detail} also sends the context information to
+    # LaunchDarkly (if events are enabled), so you only need to use {#identify} if you
+    # want to identify the context without evaluating a flag.
+    #
+    # Note that event delivery is asynchronous, so the event may not actually be sent
+    # until later; see {#flush}.
+    #
+    # @param context [Hash, LDContext] a hash or object describing the context to register
+    # @return [void]
+    #
+    def identify: (context context) -> void
+
+    #
+    # Tracks that a context performed an event. This method creates a "custom" analytics event
+    # containing the specified event name (key), context properties, and optional data.
+    #
+    # Note that event delivery is asynchronous, so the event may not actually be sent
+    # until later; see {#flush}.
+    #
+    # As of this version’s release date, the LaunchDarkly service does not support the `metricValue`
+    # parameter. As a result, specifying `metricValue` will not yet produce any different behavior
+    # from omitting it. Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/features/events#ruby)
+    # for the latest status.
+    #
+    # @param event_name [String] The name of the event
+    # @param context [Hash, LDContext] a hash or object describing the context to track
+    # @param data [Hash] An optional hash containing any additional data associated with the event
+    # @param metric_value [Number] A numeric value used by the LaunchDarkly experimentation
+    #   feature in numeric custom metrics. Can be omitted if this event is used by only
+    #   non-numeric metrics. This field will also be returned as part of the custom event
+    #   for Data Export.
+    # @return [void]
+    #
+    def track: (String event_name, context context, ?Hash[Symbol, untyped]? data, ?Numeric? metric_value) -> void
+
+    #
+    # Returns a {FeatureFlagsState} object that encapsulates the state of all feature flags for a given context,
+    # including the flag values and also metadata that can be used on the front end. This method does not
+    # send analytics events back to LaunchDarkly.
+    #
+    # @param context [Hash, LDContext] a hash or object describing the context requesting the flags,
+    # @param options [Hash] Optional parameters to control how the state is generated
+    # @option options [Boolean] :client_side_only (false) True if only flags marked for use with the
+    #   client-side SDK should be included in the state. By default, all flags are included.
+    # @option options [Boolean] :with_reasons (false) True if evaluation reasons should be included
+    #   in the state (see {#variation_detail}). By default, they are not included.
+    # @option options [Boolean] :details_only_for_tracked_flags (false) True if any flag metadata that is
+    #   normally only used for event generation - such as flag versions and evaluation reasons - should be
+    #   omitted for any flag that does not have event tracking or debugging turned on. This reduces the size
+    #   of the JSON data if you are passing the flag state to the front end.
+    # @return [FeatureFlagsState] a {FeatureFlagsState} object which can be serialized to JSON
+    #
+    def all_flags_state: (context context, ?::Hash[Symbol, untyped] options) -> FeatureFlagsState
+
+    #
+    # Releases all network connections and other resources held by the client, making it no longer usable.
+    #
+    # @return [void]
+    def close: () -> void
+
+    #
+    # Returns an interface for tracking the status of a Big Segment store.
+    #
+    # The {Interfaces::BigSegmentStoreStatusProvider} has methods for checking whether the Big Segment store
+    # is (as far as the SDK knows) currently operational and tracking changes in this status.
+    #
+    attr_reader big_segment_store_status_provider: Interfaces::BigSegmentStoreStatusProvider
+
+    #
+    # Returns an interface for tracking the status of a persistent data store.
+    #
+    # The {LaunchDarkly::Interfaces::DataStore::StatusProvider} has methods for
+    # checking whether the data store is (as far as the SDK knows) currently
+    # operational, tracking changes in this status, and getting cache
+    # statistics. These are only relevant for a persistent data store; if you
+    # are using an in-memory data store, then this method will return a stub
+    # object that provides no information.
+    #
+    # @return [LaunchDarkly::Interfaces::DataStore::StatusProvider]
+    #
+    attr_reader data_store_status_provider: Interfaces::DataStore::StatusProvider
+
+    #
+    # Returns an interface for tracking the status of the data source.
+    #
+    # The data source is the mechanism that the SDK uses to get feature flag
+    # configurations, such as a streaming connection (the default) or poll
+    # requests. The {LaunchDarkly::Interfaces::DataSource::StatusProvider} has
+    # methods for checking whether the data source is (as far as the SDK knows)
+    # currently operational and tracking changes in this status.
+    #
+    # @return [LaunchDarkly::Interfaces::DataSource::StatusProvider]
+    #
+    attr_reader data_source_status_provider: Interfaces::DataSource::StatusProvider
+
+    #
+    # Returns an interface for tracking changes in feature flag configurations.
+    #
+    # The {LaunchDarkly::Interfaces::FlagTracker} contains methods for
+    # requesting notifications about feature flag changes using an event
+    # listener model.
+    #
+    attr_reader flag_tracker: Interfaces::FlagTracker
+
+    private
+
+    def create_default_data_source: (untyped sdk_key, untyped config, untyped diagnostic_accumulator) -> untyped
+
+    # @param context [Hash, LDContext]
+    # @return [EvaluationDetail]
+    def evaluate_internal: (untyped key, untyped context, untyped default, untyped with_reasons) -> untyped
+
+    def record_flag_eval: (untyped flag, untyped context, untyped detail, untyped default, untyped with_reasons) -> untyped
+
+    def record_prereq_flag_eval: (untyped prereq_flag, untyped prereq_of_flag, untyped context, untyped detail, untyped with_reasons) -> untyped
+
+    def record_flag_eval_error: (untyped flag, untyped context, untyped default, untyped reason, untyped with_reasons) -> untyped
+
+    #
+    # @param flag_key [String]
+    # @param context [LaunchDarkly::LDContext]
+    # @param default [any]
+    # @param reason [LaunchDarkly::EvaluationReason]
+    # @param with_reasons [Boolean]
+    #
+    def record_unknown_flag_eval: (untyped flag_key, untyped context, untyped default, untyped reason, untyped with_reasons) -> untyped
+
+    def experiment?: (untyped flag, untyped reason) -> (false | true | untyped)
+  end
+
+  #
+  # Used internally when the client is offline.
+  # @private
+  #
+  class NullUpdateProcessor
+    def start: () -> untyped
+
+    def initialized?: () -> true
+
+    def stop: () -> nil
+  end
+end

@@ -1,0 +1,27 @@
+module LaunchDarkly
+  # @private
+  class UnexpectedResponseError < StandardError
+    def initialize: (untyped status) -> void
+
+    def status: () -> untyped
+  end
+
+  # @private
+  class Requestor
+    CacheEntry: untyped
+
+    def initialize: (untyped sdk_key, untyped config) -> void
+
+    def request_all_data: () -> untyped
+
+    def stop: () -> untyped
+
+    private
+
+    def make_request: (untyped path) -> untyped
+
+    def fix_encoding: (untyped body, untyped content_type) -> untyped
+
+    def parse_content_type: (untyped value) -> (::Array[nil] | ::Array[untyped | nil] | ::Array[untyped])
+  end
+end

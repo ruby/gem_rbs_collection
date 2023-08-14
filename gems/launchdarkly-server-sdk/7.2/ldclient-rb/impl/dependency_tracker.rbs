@@ -1,0 +1,39 @@
+module LaunchDarkly
+  module Impl
+    class DependencyTracker
+      def initialize: () -> void
+
+      #
+      # Updates the dependency graph when an item has changed.
+      #
+      # @param from_kind [Object] the changed item's kind
+      # @param from_key [String] the changed item's key
+      # @param from_item [Object] the changed item
+      #
+      def update_dependencies_from: (untyped from_kind, untyped from_key, untyped from_item) -> untyped
+
+      def self.segment_keys_from_clauses: (untyped clauses) -> untyped
+
+      #
+      # @param from_kind [String]
+      # @param from_item [LaunchDarkly::Impl::Model::FeatureFlag, LaunchDarkly::Impl::Model::Segment]
+      # @return [Set]
+      #
+      def self.compute_dependencies_from: (untyped from_kind, untyped from_item) -> untyped
+
+      #
+      # Clear any tracked dependencies and reset the tracking state to a clean slate.
+      #
+      def reset: () -> untyped
+
+      #
+      # Populates the given set with the union of the initial item and all items that directly or indirectly
+      # depend on it (based on the current state of the dependency graph).
+      #
+      # @param items_out [Set]
+      # @param initial_modified_item [Object]
+      #
+      def add_affected_items: (untyped items_out, untyped initial_modified_item) -> (nil | untyped)
+    end
+  end
+end

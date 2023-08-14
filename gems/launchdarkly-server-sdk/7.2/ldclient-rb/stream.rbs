@@ -1,0 +1,55 @@
+module LaunchDarkly
+  # @private
+  PUT: :put
+
+  # @private
+  PATCH: :patch
+
+  # @private
+  DELETE: :delete
+
+  # @private
+  READ_TIMEOUT_SECONDS: 300
+
+  # @private
+  KEY_PATHS: ::Hash[untyped, "/flags/" | "/segments/"]
+
+  # @private
+  class StreamProcessor
+    def initialize: (untyped sdk_key, untyped config, ?untyped? diagnostic_accumulator) -> void
+
+    def initialized?: () -> untyped
+
+    def start: () -> untyped
+
+    def stop: () -> untyped
+
+    private
+
+    #
+    # @param [LaunchDarkly::Interfaces::DataSource::ErrorInfo, nil] error_info
+    #
+    def stop_with_error_info: (?untyped? error_info) -> (untyped | nil)
+
+    #
+    # The original implementation of this class relied on the feature store
+    # directly, which we are trying to move away from. Customers who might have
+    # instantiated this directly for some reason wouldn't know they have to set
+    # the config's sink manually, so we have to fall back to the store if the
+    # sink isn't present.
+    #
+    # The next major release should be able to simplify this structure and
+    # remove the need for fall back to the data store because the update sink
+    # should always be present.
+    #
+    def update_sink_or_data_store: () -> untyped
+
+    def process_message: (untyped message) -> untyped
+
+    def key_for_path: (untyped kind, untyped path) -> (untyped | nil)
+
+    def log_connection_started: () -> untyped
+
+    def log_connection_result: (untyped is_success) -> (untyped | nil)
+  end
+end

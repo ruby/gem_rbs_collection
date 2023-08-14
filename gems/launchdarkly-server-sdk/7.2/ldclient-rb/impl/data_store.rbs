@@ -1,0 +1,33 @@
+module LaunchDarkly
+  module Impl
+    module DataStore
+      class StatusProvider
+        include LaunchDarkly::Interfaces::DataStore::StatusProvider
+
+        def initialize: (untyped store, untyped update_sink) -> void
+
+        def status: () -> untyped
+
+        def monitoring_enabled?: () -> untyped
+
+        def add_listener: (untyped listener) -> untyped
+
+        def remove_listener: (untyped listener) -> untyped
+      end
+
+      class UpdateSink
+        include LaunchDarkly::Interfaces::DataStore::UpdateSink
+
+        # @return [LaunchDarkly::Impl::Broadcaster]
+        attr_reader broadcaster: untyped
+
+        # @return [Concurrent::AtomicReference]
+        attr_reader last_status: untyped
+
+        def initialize: (untyped broadcaster) -> void
+
+        def update_status: (untyped status) -> (nil | untyped)
+      end
+    end
+  end
+end

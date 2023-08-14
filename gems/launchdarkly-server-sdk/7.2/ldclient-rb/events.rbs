@@ -1,0 +1,151 @@
+module LaunchDarkly
+  module EventProcessorMethods
+    def record_eval_event: (untyped context, untyped key, ?untyped? version, ?untyped? variation, ?untyped? value, ?untyped? reason, ?untyped? default, ?bool track_events, ?untyped? debug_until, ?untyped? prereq_of) -> nil
+
+    def record_identify_event: (untyped context) -> nil
+
+    def record_custom_event: (untyped context, untyped key, ?untyped? data, ?untyped? metric_value) -> nil
+
+    def flush: () -> nil
+
+    def stop: () -> nil
+  end
+
+  MAX_FLUSH_WORKERS: 5
+
+  # @private
+  class NullEventProcessor
+    include EventProcessorMethods
+  end
+
+  # @private
+  class FlushMessage
+  end
+
+  # @private
+  class FlushContextsMessage
+  end
+
+  # @private
+  class DiagnosticEventMessage
+  end
+
+  # @private
+  class SynchronousMessage
+    def initialize: () -> void
+
+    def completed: () -> untyped
+
+    def wait_for_completion: () -> untyped
+  end
+
+  # @private
+  class TestSyncMessage < SynchronousMessage
+  end
+
+  # @private
+  class StopMessage < SynchronousMessage
+  end
+
+  # @private
+  class EventProcessor
+    include EventProcessorMethods
+
+    def initialize: (untyped sdk_key, untyped config, ?untyped? client, ?untyped? diagnostic_accumulator, ?untyped? test_properties) -> void
+
+    def record_eval_event: (untyped context, untyped key, ?untyped? version, ?untyped? variation, ?untyped? value, ?untyped? reason, ?untyped? default, ?bool track_events, ?untyped? debug_until, ?untyped? prereq_of) -> untyped
+
+    def record_identify_event: (untyped context) -> untyped
+
+    def record_custom_event: (untyped context, untyped key, ?untyped? data, ?untyped? metric_value) -> untyped
+
+    def flush: () -> untyped
+
+    def stop: () -> (untyped | nil)
+
+    # exposed only for testing
+    def wait_until_inactive: () -> untyped
+
+    private
+
+    def timestamp: () -> untyped
+
+    def post_to_inbox: (untyped message) -> untyped
+  end
+
+  # @private
+  class EventDispatcher
+    def initialize: (untyped inbox, untyped sdk_key, untyped config, untyped diagnostic_accumulator, untyped event_sender) -> void
+
+    private
+
+    def main_loop: (untyped inbox, untyped outbox, untyped flush_workers, untyped diagnostic_event_workers) -> untyped
+
+    def do_shutdown: (untyped flush_workers, untyped diagnostic_event_workers) -> untyped
+
+    def synchronize_for_testing: (untyped flush_workers, untyped diagnostic_event_workers) -> untyped
+
+    def dispatch_event: (untyped event, untyped outbox) -> (nil | untyped)
+
+    #
+    # Add to the set of contexts we've noticed, and return true if the context
+    # was already known to us.
+    # @param context [LaunchDarkly::LDContext]
+    # @return [Boolean]
+    #
+    def notice_context: (untyped context) -> untyped
+
+    def should_debug_event: (untyped event) -> untyped
+
+    def trigger_flush: (untyped outbox, untyped flush_workers) -> (nil | untyped)
+
+    def send_and_reset_diagnostics: (untyped outbox, untyped diagnostic_event_workers) -> (nil | untyped)
+
+    def send_diagnostic_event: (untyped event, untyped diagnostic_event_workers) -> (nil | untyped)
+  end
+
+  # @private
+  FlushPayload: untyped
+
+  # @private
+  class EventBuffer
+    def initialize: (untyped capacity, untyped logger) -> void
+
+    def add_event: (untyped event) -> untyped
+
+    def add_to_summary: (untyped event) -> untyped
+
+    def get_payload: () -> untyped
+
+    def get_and_clear_dropped_count: () -> untyped
+
+    def clear: () -> untyped
+  end
+
+  # @private
+  class EventOutputFormatter
+    FEATURE_KIND: "feature"
+
+    IDENTIFY_KIND: "identify"
+
+    CUSTOM_KIND: "custom"
+
+    INDEX_KIND: "index"
+
+    DEBUG_KIND: "debug"
+
+    SUMMARY_KIND: "summary"
+
+    def initialize: (untyped config) -> void
+
+    # Transforms events into the format used for event sending.
+    def make_output_events: (untyped events, untyped summary) -> untyped
+
+    private
+
+    def make_output_event: (untyped event) -> untyped
+
+    # Transforms the summary data into the format used for event sending.
+    def make_summary_event: (untyped summary) -> { kind: untyped, startDate: untyped, endDate: untyped, features: untyped }
+  end
+end

@@ -1,0 +1,269 @@
+module LaunchDarkly
+  # LDContext is a collection of attributes that can be referenced in flag
+  # evaluations and analytics events.
+  #
+  # To create an LDContext of a single kind, such as a user, you may use
+  # {LDContext#create} or {LDContext#with_key}.
+  #
+  # To create an LDContext with multiple kinds, use {LDContext#create_multi}.
+  #
+  # Each factory method will always return an LDContext. However, that
+  # LDContext may be invalid. You can check the validity of the resulting
+  # context, and the associated errors by calling {LDContext#valid?} and
+  # {LDContext#error}
+  class LDContext
+    KIND_DEFAULT: String
+
+    KIND_MULTI: String
+
+    ERR_NOT_HASH: String
+
+    ERR_KEY_EMPTY: String
+
+    ERR_KIND_MULTI_NON_CONTEXT_ARRAY: String
+
+    ERR_KIND_MULTI_CANNOT_CONTAIN_MULTI: String
+
+    ERR_KIND_MULTI_WITH_NO_KINDS: String
+
+    ERR_KIND_MULTI_DUPLICATES: String
+
+    ERR_CUSTOM_NON_HASH: String
+
+    ERR_PRIVATE_NON_ARRAY: String
+
+    # @return [String, nil] Returns the key for this context
+    attr_reader key: String?
+
+    # @return [String, nil] Returns the fully qualified key for this context
+    attr_reader fully_qualified_key: String?
+
+    # @return [String, nil] Returns the kind for this context
+    attr_reader kind: String?
+
+    # @return [String, nil] Returns the error associated with this LDContext if invalid
+    attr_reader error: String?
+
+    # @return [Array<Reference>] Returns the private attributes associated with this LDContext
+    attr_reader private_attributes: Array[Reference]
+
+    #
+    # @private
+    # @param key [String, nil]
+    # @param fully_qualified_key [String, nil]
+    # @param kind [String, nil]
+    # @param name [String, nil]
+    # @param anonymous [Boolean, nil]
+    # @param attributes [Hash, nil]
+    # @param private_attributes [Array<String>, nil]
+    # @param error [String, nil]
+    # @param contexts [Array<LDContext>, nil]
+    #
+    def initialize: (
+      String? key,
+      String? fully_qualified_key,
+      String? kind,
+      ?String? name,
+      ?bool? anonymous,
+      ?Hash[Symbol, untyped]? attributes,
+      ?Array[Symbol]? private_attributes,
+      ?String? error,
+      ?Array[LDContext]? contexts
+    ) -> void
+
+    #
+    # @return [Boolean] Is this LDContext a multi-kind context?
+    #
+    def multi_kind?: () -> bool
+
+    #
+    # @return [Boolean] Determine if this LDContext is considered valid
+    #
+    def valid?: () -> bool
+
+    #
+    # Returns a hash mapping each context's kind to its key.
+    #
+    # @return [Hash<Symbol, String>]
+    #
+    def keys: () -> Hash[String, String]
+
+    #
+    # Returns an array of context kinds.
+    #
+    # @return [Array<String>]
+    #
+    def kinds: () -> Array[String]
+
+    #
+    # Return an array of top level attribute keys (excluding built-in attributes)
+    #
+    # @return [Array<Symbol>]
+    #
+    def get_custom_attribute_names: () -> Array[Symbol]
+
+    #
+    # get_value looks up the value of any attribute of the Context by name.
+    # This includes only attributes that are addressable in evaluations-- not
+    # metadata such as private attributes.
+    #
+    # For a single-kind context, the attribute name can be any custom attribute.
+    # It can also be one of the built-in ones like "kind", "key", or "name".
+    #
+    # For a multi-kind context, the only supported attribute name is "kind".
+    # Use {#individual_context} to inspect a Context for a particular kind and
+    # then get its attributes.
+    #
+    # This method does not support complex expressions for getting individual
+    # values out of JSON objects or arrays, such as "/address/street". Use
+    # {#get_value_for_reference} for that purpose.
+    #
+    # If the value is found, the return value is the attribute value;
+    # otherwise, it is nil.
+    #
+    # @param attribute [String, Symbol]
+    # @return [any]
+    #
+    def get_value: (String | Symbol attribute) -> untyped
+
+    #
+    # get_value_for_reference looks up the value of any attribute of the
+    # Context, or a value contained within an attribute, based on a {Reference}
+    # instance. This includes only attributes that are addressable in
+    # evaluations-- not metadata such as private attributes.
+    #
+    # This implements the same behavior that the SDK uses to resolve attribute
+    # references during a flag evaluation. In a single-kind context, the
+    # {Reference} can represent a simple attribute name-- either a built-in one
+    # like "name" or "key", or a custom attribute -- or, it can be a
+    # slash-delimited path using a JSON-Pointer-like syntax. See {Reference}
+    # for more details.
+    #
+    # For a multi-kind context, the only supported attribute name is "kind".
+    # Use {#individual_context} to inspect a Context for a particular kind and
+    # then get its attributes.
+    #
+    # If the value is found, the return value is the attribute value;
+    # otherwise, it is nil.
+    #
+    # @param reference [Reference]
+    # @return [any]
+    #
+    def get_value_for_reference: (Reference reference) -> untyped
+
+    #
+    # Returns the number of context kinds in this context.
+    #
+    # For a valid individual context, this returns 1. For a multi-context, it
+    # returns the number of context kinds. For an invalid context, it returns
+    # zero.
+    #
+    # @return [Integer] the number of context kinds
+    #
+    def individual_context_count: () -> Integer
+
+    #
+    # Returns the single-kind LDContext corresponding to one of the kinds in
+    # this context.
+    #
+    # The `kind` parameter can be either a number representing a zero-based
+    # index, or a string representing a context kind.
+    #
+    # If this method is called on a single-kind LDContext, then the only
+    # allowable value for `kind` is either zero or the same value as {#kind},
+    # and the return value on success is the same LDContext.
+    #
+    # If the method is called on a multi-context, and `kind` is a number, it
+    # must be a non-negative index that is less than the number of kinds (that
+    # is, less than the return value of {#individual_context_count}, and the
+    # return value on success is one of the individual LDContexts within. Or,
+    # if `kind` is a string, it must match the context kind of one of the
+    # individual contexts.
+    #
+    # If there is no context corresponding to `kind`, the method returns nil.
+    #
+    # @param kind [Integer, String] the index or string value of a context kind
+    # @return [LDContext, nil] the context corresponding to that index or kind,
+    #   or null if none.
+    #
+    def individual_context: (Integer | String kind) -> LDContext?
+
+    private
+
+    #
+    # Retrieve the value of any top level, addressable attribute.
+    #
+    # This method returns an array of two values. The first element is the
+    # value of the requested attribute or nil if it does not exist. The second
+    # value will be true if the attribute exists; otherwise, it will be false.
+    #
+    # @param name [Symbol]
+    # @return [any]
+    #
+    def get_top_level_addressable_attribute_single_kind: (Symbol name) -> untyped
+
+    public
+
+    #
+    # Convenience method to create a simple single kind context providing only
+    # a key and kind type.
+    #
+    # @param key [String]
+    # @param kind [String]
+    #
+    def self.with_key: (String key, ?String kind) -> LDContext
+
+    #
+    # Create a single kind context from the provided hash.
+    #
+    # The provided hash must match the format as outlined in the
+    # {https://docs.launchdarkly.com/sdk/features/user-config SDK
+    # documentation}.
+    #
+    # @param data [Hash]
+    # @return [LDContext]
+    #
+    def self.create: (Hash[Symbol, untyped] data) -> LDContext
+
+    private def self.new: () -> LDContext | ...
+
+    #
+    # Create a multi-kind context from the array of LDContexts provided.
+    #
+    # A multi-kind context is comprised of two or more single kind contexts.
+    # You cannot include a multi-kind context instead another multi-kind
+    # context.
+    #
+    # Additionally, the kind of each single-kind context must be unique. For
+    # instance, you cannot create a multi-kind context that includes two user
+    # kind contexts.
+    #
+    # If you attempt to create a multi-kind context from one single-kind
+    # context, this method will return the single-kind context instead of a new
+    # multi-kind context wrapping that one single-kind.
+    #
+    # @param contexts [Array<LDContext>]
+    # @return [LDContext]
+    #
+    def self.create_multi: (Array[LDContext] contexts) -> LDContext
+
+    #
+    # @param error [String]
+    # @return [LDContext]
+    #
+    private def self.create_invalid_context: (String error) -> LDContext
+
+    #
+    # @param data [Hash]
+    # @return [LDContext]
+    #
+    private def self.create_legacy_context: (Hash[Symbol, untyped] data) -> LDContext
+
+    #
+    # @param data [Hash]
+    # @param kind [String]
+    # @return [LaunchDarkly::LDContext]
+    #
+    private def self.create_single_context: (Hash[Symbol, untyped] data, String kind) -> LDContext
+  end
+end

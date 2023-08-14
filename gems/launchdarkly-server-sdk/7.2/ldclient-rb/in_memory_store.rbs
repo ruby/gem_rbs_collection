@@ -1,0 +1,39 @@
+module LaunchDarkly
+  type kind = { namespace: String, priority: Integer, get_dependency_keys: Proc? }
+
+  # @private
+  FEATURES: kind
+
+  # @private
+  SEGMENTS: kind
+
+  # @private
+  ALL_KINDS: Array[kind]
+
+  #
+  # Default implementation of the LaunchDarkly client's feature store, using an in-memory
+  # cache.  This object holds feature flags and related data received from LaunchDarkly.
+  # Database-backed implementations are available in {LaunchDarkly::Integrations}.
+  #
+  class InMemoryFeatureStore
+    include LaunchDarkly::Interfaces::FeatureStore
+
+    def initialize: () -> void
+
+    def monitoring_enabled?: () -> false
+
+    def get: (kind, Symbol key) -> untyped
+
+    def all: (kind) -> Hash[Symbol, untyped]
+
+    def delete: (kind, String key, Integer version) -> void
+
+    def init: (Hash[kind, Hash[Symbol, untyped]] all_data) -> void
+
+    def upsert: (kind, untyped item) -> untyped
+
+    def initialized?: () -> bool
+
+    def stop: () -> void
+  end
+end
