@@ -12,6 +12,19 @@ module Aws
         {{/members}}
       end
       {{/errors}}
+      {{#dynamic_errors?}}
+
+      # Dynamic errors
+      # source: {{dynamic_errors_source}}
+
+      {{#dynamic_errors}}
+      class {{name}} < ServiceError
+        {{#members}}
+        def {{method_name}}: () -> {{returns}}
+        {{/members}}
+      end
+      {{/dynamic_errors}}
+      {{/dynamic_errors?}}
     end
   end
 end
