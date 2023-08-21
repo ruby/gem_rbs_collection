@@ -120,7 +120,8 @@ put base / 'manifest.yaml', <<~'YAML'
 YAML
 
 if git_repo
-  sh! 'git', 'submodule', 'add', git_repo, base.join('_src').to_s
+  src_path = base.join('_src')
+  sh! 'git', 'submodule', 'add', '-f', '--name', src_path.to_s, git_repo, src_path.to_s
 end
 
 if github_account
