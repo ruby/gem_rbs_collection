@@ -42,9 +42,12 @@ module AwsSdkRbsGenerator
           [opt.name, "?#{opt.name}: #{type}#{opt.required ? "" : "?"}", opt.doc_type]
         end
         # Find duplicated key
-        grouped = buffer.group_by { |name, rbs| name }
-        grouped.transform_values(&:count).find_all { |name, v| 1 < v }.each do |name,|
-          warn("Duprecate client option: `#{grouped[name].map { |g| g.values_at(0, 2) }}`", uplevel: 0)
+        grouped = buffer.group_by { |name, _| name }
+        grouped.transform_values(&:count).find_all { |_, c| 1 < c }.each do |name,|
+          # :endpoint is duprecated in all client
+          if name != :endpoint
+            warn("Duprecate client option: `#{grouped[name].map { |g| g.values_at(0, 2) }}`", uplevel: 0)
+          end
         end
         buffer.uniq { |b| b[0] }.map { |b| b[1] }.join(", ")
       end
