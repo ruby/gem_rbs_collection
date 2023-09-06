@@ -1,0 +1,16 @@
+module Protobuf
+  module Rpc
+    class RpcMethod
+      include Optionable
+      extend Optionable::ClassMethods
+
+      attr_reader method: Symbol
+
+      attr_reader request_type: singleton(Message)
+
+      attr_reader response_type: singleton(Message)
+
+      def initialize: (Symbol, singleton(Message), singleton(Message)) ?{ (instance) [self: instance] -> void} -> void
+    end
+  end
+end
