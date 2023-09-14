@@ -1,0 +1,86 @@
+module CarrierWave
+  module ActiveRecord
+    include CarrierWave::Mount
+  end
+
+  module Mount
+    def uploaders: () -> Hash[Symbol, CarrierWave::Uploader::Base]
+    def uploader_options: () -> Hash[untyped, untyped]
+    def uploader_option: (Symbol, Symbol) -> untyped
+    def mount_uploader: (Symbol, singleton(CarrierWave::Uploader::Base), **untyped) ? { () -> void } -> void
+    def mount_uploaders: (Symbol, singleton(CarrierWave::Uploader::Base), **untyped) ? { () -> void } -> void
+  end
+
+  module Uploader
+    module Configuration
+      module ClassMethods
+        def storage: (untyped) -> untyped
+        alias storage= storage
+
+        def cache_storage: (untyped) -> untyped
+        alias cache_storage= cache_storage
+
+        def add_config: (untyped) -> void
+        def add_deprecated_config: (untyped) -> void
+        def configure: () { (self) -> void } -> void
+        def reset_config: () -> void
+      end
+    end
+
+    module Mountable
+      attr_reader model: untyped
+      attr_reader mounted_as: Symbol
+
+      def index: () -> Integer
+    end
+
+    module Processing
+      module ClassMethods
+        def process: (*untyped) -> void
+      end
+
+      def process!: (untyped) -> void
+    end
+
+    module Versions
+      module ClassMethods
+        def version: (String | Symbol name, **untyped) ? { () -> void } -> void
+      end
+
+      def versions: () -> Hash[Symbol, CarrierWave::Uploader::Base]
+      def version_name: () -> String
+      def version_exists?: (String | Symbol) -> bool
+      def cache: (*untyped) -> void
+      def url: (*Symbol) -> String
+             | (Hash[untyped, untyped]) -> String
+      def recreate_versions!: (*untyped) -> void
+    end
+
+    class Base
+      include CarrierWave::Uploader::Configuration
+      extend CarrierWave::Uploader::Configuration::ClassMethods
+
+      include CarrierWave::Uploader::Mountable
+
+      include CarrierWave::Uploader::Processing
+      extend CarrierWave::Uploader::Processing::ClassMethods
+
+      include CarrierWave::Uploader::Versions
+      extend CarrierWave::Uploader::Versions::ClassMethods
+
+      attr_reader file: untyped
+    end
+  end
+end
+
+module CarrierWave
+  module RMagick
+    def manipulate!: (*untyped) ? { (untyped, untyped, untyped) -> void } -> void
+  end
+end
+
+module ActiveRecord
+  class Base
+    extend CarrierWave::ActiveRecord
+  end
+end
