@@ -12,10 +12,7 @@ RBS_DIR=$(cd $(dirname $0)/..; pwd)
 # Set REPO_DIR variable to validate RBS files added to the corresponding folder
 REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
 # Validate RBS files, using the bundler environment present
-bundle exec rbs --repo $REPO_DIR -r activerecord:6.1 \
-  -r activesupport:6.1 -r activemodel:6.1 \
-  -rmonitor -rdate -rerb -rsingleton -rlogger -rmutex_m -rtime \
-  validate --silent
+bundle exec rbs --repo $REPO_DIR -r carrierwave:3.0 validate --silent
 
 cd ${RBS_DIR}/_test
 # Run type checks
