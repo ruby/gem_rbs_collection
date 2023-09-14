@@ -1,5 +1,9 @@
 module Services
   class UserService
-    rpc :find, UserRequest, UserList
+    method = rpc(:find, UserRequest, UserList)
+
+    method.method
+    method.request_type
+    method.response_type
   end
 end

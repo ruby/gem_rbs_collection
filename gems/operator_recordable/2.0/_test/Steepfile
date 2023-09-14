@@ -2,24 +2,21 @@ D = Steep::Diagnostic
 
 target :test do
   check "."
-  signature '.'
+  signature "."
 
   repo_path "../../../"
+  library "operator_recordable"
 
-  library "pathname"
-  library "logger"
-  library "mutex_m"
+  library "activemodel"
+  library "activerecord"
+  library "activesupport"
   library "date"
   library "erb"
+  library "logger"
   library "monitor"
+  library "mutex_m"
   library "singleton"
-  library "tsort"
   library 'time'
-  library "activesupport:6.0"
-
-  library "set"
-
-  library "business_time:0.13"
 
   configure_code_diagnostics(D::Ruby.all_error)
 end
