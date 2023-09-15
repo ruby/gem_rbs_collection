@@ -1,0 +1,18 @@
+module Recaptcha
+  module Adapters
+    module ControllerMethods
+      def verify_recaptcha: (**untyped) -> bool
+      def verify_recaptcha!: (**untyped) -> void
+      def recaptcha_reply: () -> Hash[untyped, untyped]?
+      def recaptcha_error: (untyped model, untyped attribute, untyped message) -> void
+      def recaptcha_flash_supported?: () -> bool
+      def recaptcha_response_token: (?untyped action) -> String
+    end
+  end
+end
+
+module ActionController
+  class Base
+    include Recaptcha::Adapters::ControllerMethods
+  end
+end
