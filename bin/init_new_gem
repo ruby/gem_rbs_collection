@@ -110,7 +110,7 @@ put base / '_scripts/test', <<~BASH
 BASH
 (base / '_scripts/test').chmod(0o755)
 put base / 'manifest.yaml', <<~'YAML'
-  # manifest.yaml describes dependencies which do not appear in the gemspec.
+  # manifest.yaml describes dependencies to stdlib which do not appear in the gemspec.
   # If this gem includes such dependencies, comment-out the following lines and
   # declare the dependencies.
   # If all dependencies appear in the gemspec, you should remove this file.
@@ -129,7 +129,7 @@ if github_account
   update(Pathname('.github/CODEOWNERS')) do |content|
     lines = content.lines
 
-    pre_gems_lines, gems_lines = 
+    pre_gems_lines, gems_lines =
       lines.map(&:chomp).slice_before('# Maintainer of individual gems (alphabetical order)').to_a
     pre_gems_lines << gems_lines.shift
 
