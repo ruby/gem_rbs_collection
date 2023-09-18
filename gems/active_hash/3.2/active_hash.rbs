@@ -41,8 +41,29 @@ module ActiveHash
   end
 
   class Relation[T]
-    def to_a: -> Array[T]
+    include Enumerable[T]
+
+    def each: () { (T) -> untyped } -> self
+    def equal?: (untyped other) -> bool
+    def ==: (untyped other) -> bool
+    def ===: (untyped other) -> bool
+    def eql?: (untyped other) -> bool
+    def sort!: () -> self
+             | () { (T, T) -> Integer } -> self
+    def empty?: () -> bool
+    def length: () -> Integer
+    def first: () -> T?
+             | (Integer n) -> Array[T]
+    def second: () -> T?
+    def third: () -> T?
+    def last: () -> T?
+            | (Integer n) -> Array[T]
+    def sample: () -> T?
+
     def where: (*untyped) -> self
+    def where!: (*untyped) -> self
+    def invert_where: () -> self
+    def invert_where!: () -> self
     def find: (:all) -> self
             | (:first, *untyped args) -> T?
             | (Array[untyped] id) -> Array[T]
@@ -52,13 +73,17 @@ module ActiveHash
     def find_by!: (untyped options) -> T
     def find_by_id: (untyped id) -> T?
     def count: () -> Integer
+    def size: () -> Integer
     def pluck: (Symbol column_names) -> Array[untyped]
              | (*Symbol column_names) -> Array[Array[untyped]]
     def ids: () -> Array[untyped]
     def pick: (Symbol column_names) -> untyped
             | (*Symbol column_names) -> Array[untyped]
-    def first: () -> T?
-    def last: () -> T?
     def order: (*untyped options) -> self
+    def order!: (*untyped options) -> self
+    def reorder: (*untyped options) -> self
+    def reorder!: (*untyped options) -> self
+    def reload: () -> self
+    def all: () -> self
   end
 end
