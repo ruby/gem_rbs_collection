@@ -1,4 +1,28 @@
 module CanCan
+  class Error < StandardError
+  end
+
+  class NotImplemented < Error
+  end
+
+  class ImplementationRemoved < Error
+  end
+
+  class AuthorizationNotPerformed < Error
+  end
+
+  class BlockAndConditionsError < Error
+  end
+
+  class AttributeArgumentError < Error
+  end
+
+  class WrongAssociationName < Error
+  end
+
+  class AccessDenied < Error
+  end
+
   module Ability
     def can: (?(Symbol | Array[Symbol]) action, ?untyped subject, **untyped conditions) -> void
            | (?(Symbol | Array[Symbol]) action, ?untyped subject) ?{ (untyped object) -> bool } -> void
