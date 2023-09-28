@@ -4,14 +4,15 @@
 require 'dotenv'
 
 Dotenv.load
-Dotenv.load('file1.env', 'file2.env')
+Dotenv.load('./env_files/file1.env', './env_files/file2.env')
+Dotenv.load('./env_files/file3.env')
 
 Dotenv.load!
-Dotenv.load!('file1.env', 'file2.env')
+Dotenv.load!('./env_files/file1.env', './env_files/file2.env')
 
 Dotenv.require_keys('KEY1', 'KEY2')
 
-Dotenv.parse('file1.env', 'file2.env')['KEY1']
+pp Dotenv.parse('./env_files/file1.env', './env_files/file2.env')['KEY1']
 
-Dotenv.overload('file1.env', 'file2.env')
-Dotenv.overload!('file1.env', 'file2.env')
+Dotenv.overload('./env_files/file1.env', './env_files/file2.env')
+Dotenv.overload!('./env_files/file1.env', './env_files/file2.env')
