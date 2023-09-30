@@ -95,17 +95,19 @@ module ActionController
 end
 
 module AbstractController::Callbacks::ClassMethods
-  def before_action: (*untyped) -> void
-  def around_action: (*untyped) -> void
-  def after_action: (*untyped) -> void
-  def skip_before_action: (*untyped) -> void
-  def skip_around_action: (*untyped) -> void
-  def skip_after_action: (*untyped) -> void
-  def prepend_before_action: (*untyped) -> void
-  def prepend_around_action: (*untyped) -> void
-  def prepend_after_action: (*untyped) -> void
-  def append_before_action: (*untyped) -> void
-  def append_around_action: (*untyped) -> void
-  def append_after_action: (*untyped) -> void
+  type callback = Symbol | ^() [self: instance] -> void
+  type condition = Symbol | ^() [self: instance] -> bool
+  def before_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def around_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def after_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def skip_before_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def skip_around_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def skip_after_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def prepend_before_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def prepend_around_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def prepend_after_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def append_before_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def append_around_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+  def append_after_action: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
 end
 
