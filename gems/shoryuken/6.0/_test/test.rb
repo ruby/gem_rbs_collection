@@ -3,6 +3,7 @@
 
 require "shoryuken"
 
+# https://github.com/ruby-shoryuken/shoryuken/wiki/Getting-Started
 class HelloWorker
   include Shoryuken::Worker
 
@@ -12,3 +13,10 @@ class HelloWorker
     puts "Hello, #{name}"
   end
 end
+
+# https://github.com/ruby-shoryuken/shoryuken/wiki/FIFO-Queues
+Shoryuken::Client.queues('queue.fifo').send_message(
+  message_body: 'body',
+  message_group_id: 'id',
+  message_deduplication_id: 'id'
+)
