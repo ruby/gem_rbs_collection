@@ -60,7 +60,25 @@ class YARD::CodeObjects::MacroObject < ::YARD::CodeObjects::Base
   # @return [nil] if the +data+ has no macro tag or if the macro is
   #   not new and no macro by the macro name is found.
   def self.find_or_create: (untyped macro_name, untyped data, ?YARD::CodeObjects::Base method_object) -> YARD::CodeObjects::MacroObject?
-  alias self.create_docstring self.find_or_create
+  # Parses a given docstring and determines if the macro is "new" or
+  # not. If the macro has $variable names or if it has a @!macro tag
+  # with the [new] or [attached] flag, it is considered new.
+  #
+  # If a new macro is found, the macro is created and registered. Otherwise
+  # the macro name is searched and returned. If a macro is not found,
+  # nil is returned.
+  # @param [#to_s] macro_name
+  #   the name of the macro
+  # @param [CodeObjects::Base] method_object
+  #   an optional method to attach
+  #   the macro to. Only used if the macro is being created, otherwise
+  #   this argument is ignored.
+  # @return [MacroObject] the newly created or existing macro, depending
+  #   on whether the @!macro tag was a new tag or not.
+  # @return [nil] if the +data+ has no macro tag or if the macro is
+  #   not new and no macro by the macro name is found.
+  #
+  def self.create_docstring: (untyped macro_name, untyped data, ?YARD::CodeObjects::Base method_object) -> YARD::CodeObjects::MacroObject?
   # Expands +macro_data+ using the interpolation parameters.
   #
   # Interpolation rules:
@@ -96,6 +114,10 @@ class YARD::CodeObjects::MacroObject < ::YARD::CodeObjects::Base
   def self.apply_macro: (YARD::CodeObjects::MacroObject macro, untyped docstring, ?Array[String] call_params, ?String full_source, ?String block_source) -> String
   # @return [Boolean] whether this macro is attached to a method
   def attached?: () -> bool
+  # Overrides {Base#path} so the macro path is ".macro.MACRONAME"
+  def path: () -> untyped
+  # Overrides the separator to be '.'
+  def sep: () -> untyped
   # Expands the macro using
   # @param [Array<String>] call_params a list of tokens that are passed
   #   to the method call

@@ -42,4 +42,8 @@ class YARD::Serializers::FileSystemSerializer < ::YARD::Serializers::Base
   private def build_filename_map: () -> untyped
   # @return [String] the filesystem mapped name of a given object.
   private def mapped_name: (untyped object) -> String
+  # Remove special chars from filenames.
+  # Windows disallows \ / : * ? " < > | but we will just remove any
+  # non alphanumeric (plus period, underscore and dash).
+  private def encode_path_components: (*untyped components) -> untyped
 end

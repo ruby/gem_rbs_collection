@@ -15,6 +15,69 @@ class YARD::Server::Commands::StaticFileCommand < ::YARD::Server::Commands::Libr
   def static_template_file?: () -> void
   # @since 0.6.0
   private def find_file: (untyped adapter, untyped url) -> untyped
+  #
+  # Normalizes a request path.  Raises an exception if the path cannot be
+  # normalized.
+  private def normalize_path: (untyped path) -> untyped
+  #
+  # Loads Apache-compatible mime.types in +file+.
+  private def load_mime_types: (untyped file) -> untyped
+  #
+  # Returns the mime type of +filename+ from the list in +mime_tab+.  If no
+  # mime type was found application/octet-stream is returned.
+  private def mime_type: (untyped filename, untyped mime_tab) -> untyped
+  #
+  # Parses an HTTP header +raw+ into a hash of header fields with an Array
+  # of values.
+  private def parse_header: (untyped raw) -> untyped
+  #
+  # Splits a header value +str+ according to HTTP specification.
+  private def split_header_value: (untyped str) -> untyped
+  #
+  # Parses a Range header value +ranges_specifier+
+  private def parse_range_header: (untyped ranges_specifier) -> untyped
+  #
+  # Parses q values in +value+ as used in Accept headers.
+  private def parse_qvalues: (untyped value) -> untyped
+  #
+  # Removes quotes and escapes from +str+
+  private def dequote: (untyped str) -> untyped
+  #
+  # Quotes and escapes quotes in +str+
+  private def quote: (untyped str) -> untyped
+  #
+  # Parses the query component of a URI in +str+
+  private def parse_query: (untyped str) -> untyped
+  #
+  # Parses form data in +io+ with the given +boundary+
+  private def parse_form_data: (untyped io, untyped boundary) -> untyped
+  # :stopdoc:
+  # @since 0.6.0
+  private def _make_regex: (untyped str) -> untyped
+  # @since 0.6.0
+  private def _make_regex!: (untyped str) -> untyped
+  # @since 0.6.0
+  private def _escape: (untyped str, untyped regex) -> untyped
+  # @since 0.6.0
+  private def _unescape: (untyped str, untyped regex) -> untyped
+  # Escapes HTTP reserved and unwise characters in +str+
+  # @since 0.6.0
+  private def escape: (untyped str) -> untyped
+  # Unescapes HTTP reserved and unwise characters in +str+
+  # @since 0.6.0
+  private def unescape: (untyped str) -> untyped
+  # Escapes form reserved characters in +str+
+  # @since 0.6.0
+  private def escape_form: (untyped str) -> untyped
+  # Unescapes form reserved characters in +str+
+  # @since 0.6.0
+  private def unescape_form: (untyped str) -> untyped
+  # Escapes path +str+
+  # @since 0.6.0
+  private def escape_path: (untyped str) -> untyped
+  # Escapes 8 bit characters in +str+
+  # @since 0.6.0
+  private def escape8bit: (untyped str) -> untyped
   # Defines the paths used to search for static assets. To define an
   # extra path, use {YARD::Server.register_static_path} rather than
   # modifying this constant directly. Also note that files in the

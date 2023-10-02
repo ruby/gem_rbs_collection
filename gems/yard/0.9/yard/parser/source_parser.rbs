@@ -36,7 +36,7 @@ class YARD::Parser::SourceParser
   # @param [Fixnum] level the logger level to use during parsing. See
   #   {YARD::Logger}
   # @return [void]
-  def self.parse: (?String | Array[String] paths, ?Array[String | Regexp] excluded, ?Integer level) -> void
+  def self.parse: (?Array[String] | String paths, ?Array[String | Regexp] excluded, ?Integer level) -> void
   # Parses a string +content+
   #
   # @param [String] content the block of code to parse
@@ -64,10 +64,12 @@ class YARD::Parser::SourceParser
   # @private
   # @since 0.5.6
   def self.parser_types: () -> Hash[Symbol, untyped]
+  def self.parser_types=: (untyped value) -> untyped
   # @return [Hash] a list of registered parser type extensions
   # @private
   # @since 0.5.6
   def self.parser_type_extensions: () -> Hash[untyped, untyped]
+  def self.parser_type_extensions=: (untyped value) -> untyped
   # Finds a parser type that is registered for the extension. If no
   # type is found, the default Ruby type is returned.
   #
@@ -239,7 +241,7 @@ class YARD::Parser::SourceParser
   #
   # @param [String, #read, Object] content the source file to parse
   # @return [Object, nil] the parser object used to parse the source
-  def parse: (?String | untyped | untyped content) -> untyped
+  def parse: (?untyped content) -> untyped
   # Tokenizes but does not parse the block of code using the current {#parser_type}
   #
   # @param [String] content the block of code to tokenize

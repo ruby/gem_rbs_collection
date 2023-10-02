@@ -160,7 +160,7 @@ class YARD::CLI::Yardoc < ::YARD::CLI::YardoptsCommand
   # @return [Array<CodeObjects::Base>] a list of code objects to process
   def all_objects: () -> Array[YARD::CodeObjects::Base]
   # Generates output for objects
-  # @param [Hash, nil] checksums if supplied, a list of checkums for files.
+  # @param [Hash, nil] checksums if supplied, a list of checksums for files.
   # @return [void]
   # @since 0.5.1
   private def run_generate: (Hash[untyped, untyped]? checksums) -> void
@@ -206,6 +206,13 @@ class YARD::CLI::Yardoc < ::YARD::CLI::YardoptsCommand
   # @return [void]
   # @since 0.8.3
   private def apply_locale: () -> void
+  # Runs a list of objects against the {Verifier} object passed into the
+  # template and returns the subset of verified objects.
+  #
+  # @param [Array<CodeObjects::Base>] list a list of code objects
+  # @return [Array<CodeObjects::Base>] a list of code objects that match
+  #   the verifier. If no verifier is supplied, all objects are returned.
+  #
   private def run_verifier: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
   # @since 0.6.0
   private def add_tag: (untyped tag_data, ?untyped factory_method) -> untyped

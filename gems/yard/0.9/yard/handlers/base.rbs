@@ -154,8 +154,26 @@ class YARD::Handlers::Base
   def self.clear_subclasses: () -> void
   # Returns all registered handler subclasses.
   # @return [Array<Base>] a list of handlers
-  def self.subclasses: () -> Array[YARD::Handlers::Base]
+  def self.subclasses: () -> Array[YARD::Parser::Base]
   def self.inherited: (untyped subclass) -> untyped
+  # Declares the statement type which will be processed
+  # by this handler.
+  #
+  # A match need not be unique to a handler. Multiple
+  # handlers can process the same statement. However,
+  # in this case, care should be taken to make sure that
+  # {#parse_block} would only be executed by one of
+  # the handlers, otherwise the same code will be parsed
+  # multiple times and slow YARD down.
+  #
+  # @param [Parser::Ruby::Legacy::RubyToken, Symbol, String, Regexp] matches
+  #   statements that match the declaration will be
+  #   processed by this handler. A {String} match is
+  #   equivalent to a +/\Astring/+ regular expression
+  #   (match from the beginning of the line), and all
+  #   token matches match only the first token of the
+  #   statement.
+  #
   def self.handles: (*YARD::Parser::Ruby::Legacy::RubyToken | Symbol | String | Regexp matches) -> untyped
   # This class is implemented by {Ruby::Base} and {Ruby::Legacy::Base}.
   # To implement a base handler class for another language, implement
@@ -203,7 +221,23 @@ class YARD::Handlers::Base
   # @since 0.5.4
   def self.process: () -> void
   def initialize: (untyped source_parser, untyped stmt) -> void
-  def process: () -> (Array[YARD::CodeObjects::Base] | YARD::CodeObjects::Base | untyped)
+  # The main handler method called by the parser on a statement
+  # that matches the {handles} declaration.
+  #
+  # Subclasses should override this method to provide the handling
+  # functionality for the class.
+  #
+  # @return [Array<CodeObjects::Base>, CodeObjects::Base, Object]
+  #   If this method returns a code object (or a list of them),
+  #   they are passed to the +#register+ method which adds basic
+  #   attributes. It is not necessary to return any objects and in
+  #   some cases you may want to explicitly avoid the returning of
+  #   any objects for post-processing by the register method.
+  #
+  # @see handles
+  # @see #register
+  #
+  def process: () -> untyped
   # Parses the semantic "block" contained in the statement node.
   #
   # @abstract Subclasses should call {Processor#process parser.process}
@@ -226,7 +260,19 @@ class YARD::Handlers::Base
   #   the owner object (method) for the duration of the block
   # @yield a block to execute with the given state values.
   def push_state: (?Hash[untyped, untyped] opts) -> untyped
-  def register: (*Array[YARD::CodeObjects::Base] objects) -> (YARD::CodeObjects::Base | Array[YARD::CodeObjects::Base])
+  # Do some post processing on a list of code objects.
+  # Adds basic attributes to the list of objects like
+  # the filename, line number, {CodeObjects::Base#dynamic},
+  # source code and {CodeObjects::Base#docstring},
+  # but only if they don't exist.
+  #
+  # @param [Array<CodeObjects::Base>] objects
+  #   the list of objects to post-process.
+  #
+  # @return [CodeObjects::Base, Array<CodeObjects::Base>]
+  #   returns whatever is passed in, for chainability.
+  #
+  def register: (*Array[YARD::CodeObjects::Base] objects) -> (Array[YARD::CodeObjects::Base] | YARD::CodeObjects::Base)
   # Ensures that the object's namespace is loaded before attaching it
   # to the namespace.
   #
@@ -303,7 +349,7 @@ class YARD::Handlers::Base
   # @raise [NamespaceMissingError] if the object is not resolved within
   #   +max_retries+ attempts, this exception is raised and the handler
   #   finishes processing.
-  def ensure_loaded!: (untyped | YARD::CodeObjects::Base object, ?Integer max_retries) -> untyped
+  def ensure_loaded!: (YARD::CodeObjects::Proxy | YARD::CodeObjects::Base object, ?Integer max_retries) -> untyped
   # @abstract Implement this method to return the parameters in a method call
   #   statement. It should return an empty list if the statement is not a
   #   method call.

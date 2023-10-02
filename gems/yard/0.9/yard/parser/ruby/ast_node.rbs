@@ -37,6 +37,18 @@ class YARD::Parser::Ruby::AstNode < ::Array[untyped]
   attr_accessor type: Symbol
   # @return [AstNode, nil] the node's parent or nil if it is a root node.
   attr_accessor parent: YARD::Parser::Ruby::AstNode?
+  # Returns the value of attribute docstring.
+  #
+  def comments: () -> untyped
+  # Returns the value of attribute docstring_range.
+  #
+  def comments_range: () -> untyped
+  # Returns the value of attribute docstring_hash_flag.
+  #
+  def comments_hash_flag: () -> untyped
+  # Returns the value of attribute source.
+  #
+  def to_s: () -> untyped
   # Finds the node subclass that should be instantiated for a specific
   # node type
   #
@@ -121,6 +133,8 @@ class YARD::Parser::Ruby::AstNode < ::Array[untyped]
   def pretty_print: (untyped q) -> nil
   # @return [String] inspects the object
   def inspect: () -> String
+  # Resets node state in tree
+  def unfreeze: () -> untyped
   # Resets line information
   # @return [void]
   private def reset_line_info: () -> void

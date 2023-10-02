@@ -1,0 +1,56 @@
+# !!! GENERATED FILE !!!
+# Please see generators/yard-generator/README.md
+
+#
+# Stores multipart form data.  FormData objects are created when
+# WEBrick::HTTPUtils.parse_form_data is called.
+class YARD::Server::HTTPUtils::FormData < ::String
+  #
+  # The name of the form data part
+  attr_accessor name: untyped
+  #
+  # The filename of the form data part
+  attr_accessor filename: untyped
+  # :nodoc:
+  attr_accessor next_data: untyped
+  #
+  # Creates a new FormData object.
+  #
+  # +args+ is an Array of form data entries.  One FormData will be created
+  # for each entry.
+  #
+  # This is called by WEBrick::HTTPUtils.parse_form_data for you
+  def initialize: (*untyped args) -> void
+  #
+  # Retrieves the header at the first entry in +key+
+  def []: (*untyped key) -> untyped
+  #
+  # Adds +str+ to this FormData which may be the body, a header or a
+  # header entry.
+  #
+  # This is called by WEBrick::HTTPUtils.parse_form_data for you
+  def <<: (untyped str) -> untyped
+  #
+  # Adds +data+ at the end of the chain of entries
+  #
+  # This is called by WEBrick::HTTPUtils.parse_form_data for you.
+  def append_data: (untyped data) -> untyped
+  #
+  # Yields each entry in this FormData
+  def each_data: () -> untyped
+  #
+  # Returns all the FormData as an Array
+  def list: () -> untyped
+  # Returns all the FormData as an Array
+  # @since 0.6.0
+  #
+  # A FormData will behave like an Array
+  def to_ary: () -> untyped
+  #
+  # This FormData's body
+  def to_s: () -> untyped
+  # :nodoc:
+  EmptyRawHeader: untyped
+  # :nodoc:
+  EmptyHeader: untyped
+end

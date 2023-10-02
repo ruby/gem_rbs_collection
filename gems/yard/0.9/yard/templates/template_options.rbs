@@ -59,7 +59,10 @@ class YARD::Templates::TemplateOptions < ::YARD::Options
   attr_accessor embed_mixins: Array[String]
   # @return [Verifier] the verifier object
   attr_accessor verifier: YARD::Verifier
-  alias __globals globals
+  # @return [OpenStruct] an open struct containing any global state across all
+  #   generated objects in a template.
+  #
+  def __globals: () -> OpenStruct
   # @param [CodeObjects::Base] mixin accepts any code object, but returns
   #   nil unless the object is a module.
   # @return [Boolean] whether a mixin matches the embed_mixins list

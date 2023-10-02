@@ -13,6 +13,11 @@ module YARD::Templates::Template::ClassMethods
   #   after this method is called; call {#reset_full_paths} to reset cache.
   def full_paths: () -> Array[String]
 
+  # Resets cache for {#full_paths}
+  def reset_full_paths: () -> untyped
+
+  def initialize: (untyped path, untyped full_paths) -> void
+
   # Searches for a file identified by +basename+ in the template's
   # path as well as any mixed in template paths. Equivalent to calling
   # {ClassMethods#find_nth_file} with index of 1.
@@ -34,8 +39,22 @@ module YARD::Templates::Template::ClassMethods
 
   def is_a?: (untyped klass) -> bool
 
+  # Creates a new template object to be rendered with {Template#run}
+  def new: (*untyped args) -> untyped
+
+  def run: (*untyped args) -> untyped
+
+  # Alias for creating {Engine.template}.
+  def T: (*untyped path) -> untyped
+
   # Alias for creating a {Section} with arguments
   # @see Section#initialize
   # @since 0.6.0
   def S: (*untyped args) -> untyped
+
+  private def include_parent: () -> untyped
+
+  private def include_inherited: (untyped full_paths) -> untyped
+
+  private def load_setup_rb: () -> untyped
 end

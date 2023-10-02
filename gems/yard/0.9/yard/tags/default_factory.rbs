@@ -35,6 +35,9 @@ class YARD::Tags::DefaultFactory
   # @param [String] text   the raw tag text
   # @return [Tag]          a tag object with the tag_name, name, types and text values filled
   def parse_tag_with_types_and_title: (untyped tag_name, String text) -> YARD::Tags::Tag
+  def parse_tag_with_title_and_text: (untyped tag_name, untyped text) -> untyped
+  def parse_tag_with_types_name_and_default: (untyped tag_name, untyped text) -> untyped
+  def parse_tag_with_options: (untyped tag_name, untyped text) -> untyped
   # Extracts the name from raw tag text returning the name and remaining value
   #
   # @param [String] text the raw tag text
@@ -53,6 +56,7 @@ class YARD::Tags::DefaultFactory
   #   list (or nil), followed by the type list parsed into an array of
   #   strings, followed by the text following the type list.
   private def extract_types_and_name_from_text: (untyped text, ?untyped opening_types, ?untyped closing_types) -> [ String, Array[String], String ]
+  private def extract_types_and_name_from_text_unstripped: (untyped text, ?untyped opening_types, ?untyped closing_types) -> untyped
   TYPELIST_OPENING_CHARS: untyped
   TYPELIST_CLOSING_CHARS: untyped
 end

@@ -12,7 +12,9 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
   attr_reader shebang_line: untyped
   attr_reader encoding_line: untyped
   attr_reader frozen_string_line: untyped
-  alias root ast
+  # @since 0.5.6
+  #
+  def root: () -> untyped
   def initialize: (untyped source, untyped filename, *untyped args) -> void
   def parse: () -> untyped
   def enumerator: () -> untyped
@@ -24,7 +26,9 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
   private def add_token: (untyped token, untyped data) -> untyped
   private def on_program: (*untyped args) -> untyped
   private def on_body_stmt: (*untyped args) -> untyped
-  alias on_bodystmt on_body_stmt
+  # @since 0.5.6
+  #
+  private def on_bodystmt: (*untyped args) -> untyped
   private def on_assoc_new: (*untyped args) -> untyped
   private def on_hash: (*untyped args) -> untyped
   private def on_bare_assoc_hash: (*untyped args) -> untyped
@@ -50,7 +54,10 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
   private def on_embdoc: (untyped text) -> untyped
   private def on_embdoc_end: (untyped text) -> untyped
   private def on_parse_error: (untyped msg) -> untyped
-  alias compile_error on_parse_error
+  # @raise [ParserSyntaxError] 
+  # @since 0.5.6
+  #
+  private def compile_error: (untyped msg) -> untyped
   private def comment_starts_line?: (untyped charno) -> bool
   private def insert_comments: () -> untyped
   private def add_comment: (untyped line, ?untyped node, ?untyped before_node, ?untyped into) -> untyped
@@ -58,4 +65,5 @@ class YARD::Parser::Ruby::RipperParser < ::Ripper
   MAPPINGS: untyped
   REV_MAPPINGS: untyped
   AST_TOKENS: untyped
+  COMMENT_SKIP_NODE_TYPES: untyped
 end

@@ -57,7 +57,9 @@
 # @see define_directive
 # @see Directive
 class YARD::Tags::Library
-  def self.labels: () -> SymbolHash
+  # @return [SymbolHash{Symbol=>String}] the map of tag names and their
+  #   respective display labels.
+  attr_reader self.labels: SymbolHash[Symbol, String]
   # @!attribute instance
   # @return [Library] the main Library instance object.
   attr_accessor self.instance: YARD::Tags::Library
@@ -131,7 +133,7 @@ class YARD::Tags::Library
   # @param [#to_s] tag the tag name to create
   # @param [#to_s, Class<Tag>] meth the {Tag} factory method to call when
   #   creating the tag or the name of the class to directly create a tag for
-  def self.define_tag: (untyped label, untyped tag, ?untyped | singleton(YARD::Tags::Tag) meth) -> untyped
+  def self.define_tag: (untyped label, untyped tag, ?untyped meth) -> untyped
   # @macro [attach] yard.directive
   #   @!method $1_directive
   #   @!visibility private
@@ -148,6 +150,10 @@ class YARD::Tags::Library
   #     directive behaviour
   #   @see define_tag
   def self.define_directive: (untyped tag, ?untyped tag_meth, ?untyped directive_class) -> untyped
+  def self.tag_method_name: (untyped tag_name) -> untyped
+  def self.directive_method_name: (untyped tag_name) -> untyped
+  private def self.tag_or_directive_method_name: (untyped tag_name, ?untyped type) -> untyped
+  private def send_to_factory: (untyped tag_name, untyped meth, untyped text) -> untyped
   # @return [Directive]
   private def directive_call: (untyped tag, untyped parser) -> YARD::Tags::Directive
   def initialize: (?untyped factory) -> void

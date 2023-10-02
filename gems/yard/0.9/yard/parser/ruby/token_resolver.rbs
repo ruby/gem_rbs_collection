@@ -35,6 +35,11 @@ class YARD::Parser::Ruby::TokenResolver
   #   # No object: [:op, "::"]
   #   # :const -> "A::B::C"
   def each: () { ([ Symbol, String, [ Integer, Integer ] ] token, YARD::CodeObjects::Base? object) -> untyped } -> untyped
+  def self.state_attr: (*untyped attrs) -> untyped
+  private def push_state: () -> untyped
+  private def pop_state: () -> untyped
+  private def lookup: (untyped toktype, untyped name) -> untyped
+  private def object_resolved_types: (?untyped obj) -> untyped
   # Registers a separator with an optional set of valid types that
   # must follow the separator lexically.
   #

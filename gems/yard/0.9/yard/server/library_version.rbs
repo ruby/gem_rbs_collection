@@ -1,6 +1,89 @@
 # !!! GENERATED FILE !!!
 # Please see generators/yard-generator/README.md
 
+# A library version encapsulates a library's documentation at a specific version.
+# Although the version is optional, this allows for creating multiple documentation
+# points for a specific library, each representing a unique version. The term
+# "library" used in other parts of the YARD::Server documentation refers to
+# objects of this class unless otherwise noted.
+#
+# A library points to a location where a {#yardoc_file} is located so that
+# its documentation may be loaded and served. Optionally, a {#source_path} is
+# given to point to a location where any extra files (and {YARD::CLI::Yardoc .yardopts})
+# should be loaded from. Both of these methods may not be known immediately,
+# since the yardoc file may not be built until later. Resolving the yardoc
+# file and source path are dependent on the specific library "source type" used.
+# Source types (known as "library source") are discussed in detail below.
+#
+# == Using with Adapters
+# A list of libraries need to be passed into adapters upon creation. In
+# most cases, you will never do this manually, but if you use a {RackMiddleware},
+# you will need to pass in this list yourself. To build this list of libraries,
+# you should create a hash of library names mapped to an *Array* of LibraryVersion
+# objects. For example:
+#
+#   {'mylib' => [LibraryVersion.new('mylib', '1.0', ...),
+#                LibraryVersion.new('mylib', '2.0', ...)]}
+#
+# Note that you can also use {Adapter#add_library} for convenience.
+#
+# The "array" part is required, even for just one library version.
+#
+# == Library Sources
+# The {#source} method represents the library source type, ie. where the
+# library "comes from". It might come from "disk", or it might come from a
+# "gem" (technically the disk, but a separate type nonetheless). In these
+# two cases, the yardoc file sits somewhere on your filesystem, though
+# it may also be built dynamically if it does not yet exist. This behaviour
+# is controlled through the {#prepare!} method, which prepares the yardoc file
+# given a specific library source. We will see how this works in detail in
+# the following section.
+#
+# == Implementing a Custom Library Source
+# YARD can be extended to support custom library sources in order to
+# build or retrieve a yardoc file at runtime from many different locations.
+#
+# To implement this behaviour, 3 methods can be added to the +LibraryVersion+
+# class, +#load_yardoc_from_SOURCE+, +#yardoc_file_for_SOURCE+, and
+# +#source_path_for_SOURCE+. In all cases, "SOURCE" represents the source
+# type used in {#source} when creating the library object. The
+# +#yardoc_file_for_SOURCE+ and +#source_path_for_SOURCE+ methods are called upon
+# creation and should return the location where the source code for the library
+# lives. The load method is called from {#prepare!} if there is no yardoc file
+# and should set {#yardoc_file}. Below is a full example for
+# implementing a custom library source, +:http+, which reads packaged .yardoc
+# databases from zipped archives off of an HTTP server.
+#
+# Note that only +#load_yardoc_from_SOURCE+ is required. The other two
+# methods are optional and can be set manually (via {#source_path=} and
+# {#yardoc_file=}) on the object at any time.
+#
+# @example Implementing a Custom Library Source
+#   # Adds the source type "http" for .yardoc files zipped on HTTP servers
+#   class LibraryVersion
+#     def load_yardoc_from_http
+#       Thread.new do
+#         # zip/unzip method implementations are not shown
+#         download_zip_file("http://mysite.com/yardocs/#{self}.zip")
+#         unzip_file_to("/path/to/yardocs/#{self}")
+#       end
+#
+#       # tell the server it's not ready yet (but it might be next time)
+#       raise LibraryNotPreparedError
+#     end
+#
+#     def yardoc_file_for_http
+#       "/path/to/yardocs/#{self}/.yardoc"
+#     end
+#
+#     def source_path_for_http
+#       File.dirname(yardoc_file)
+#     end
+#   end
+#
+#   # Creating a library of this source type:
+#   LibraryVersion.new('name', '1.0', nil, :http)
+#
 class YARD::Server::LibraryVersion
   # @return [String] the name of the library
   attr_accessor name: String
@@ -40,8 +123,14 @@ class YARD::Server::LibraryVersion
   def hash: () -> Integer
   # @return [Boolean] whether another LibraryVersion is equal to this one
   def eql?: (untyped other) -> bool
-  alias == eql?
-  alias equal? eql?
+  # @return [Boolean] whether another LibraryVersion is equal to this one
+  # @since 0.6.0
+  #
+  def ==: (untyped other) -> bool
+  # @return [Boolean] whether another LibraryVersion is equal to this one
+  # @since 0.6.0
+  #
+  def equal?: (untyped other) -> bool
   # @return [Boolean] whether the library has been completely processed
   #   and is ready to be served
   def ready?: () -> bool

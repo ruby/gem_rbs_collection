@@ -35,8 +35,6 @@ class YARD::Server::Commands::Base
   attr_accessor adapter: YARD::Server::Adapter
   # @return [Boolean] whether to cache
   attr_accessor caching: bool
-  # @return [Rack::Request] request object
-  attr_accessor request: Rack::Request
   # @return [String] the path after the command base URI
   attr_accessor path: String
   # @return [Hash{String => String}] response headers
@@ -73,7 +71,7 @@ class YARD::Server::Commands::Base
   #     def run
   #       self.body = 'ERROR! The System is down!'
   #       self.status = 500
-  #       self.headers['Conten-Type'] = 'text/plain'
+  #       self.headers['Content-Type'] = 'text/plain'
   #     end
   #   end
   #

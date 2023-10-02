@@ -17,12 +17,14 @@ class YARD::Handlers::Ruby::Legacy::Base < ::YARD::Handlers::Base
   # @option opts (see Handlers::Base#push_state)
   # @see Handlers::Base#push_state #push_state
   def parse_block: (?Hash[untyped, untyped] opts) -> untyped
+  def call_params: () -> untyped
+  def caller_method: () -> untyped
   # Extracts method information for macro expansion only
   #
   # @todo This is a duplicate implementation of {MethodHandler}. Refactor.
   # @return [Array<String,Array<Array<String>>>] the method name followed by method
   #   arguments (name and optional value)
-  private def extract_method_details: () -> Array[String | Array[Array[String]]]
+  private def extract_method_details: () -> Array[Array[Array[String]] | String]
   # The string value of a token. For example, the return value for the symbol :sym
   # would be :sym. The return value for a string +"foo #{ bar}"+ would be the literal
   # +"foo #{ bar}"+ without any interpolation. The return value of the identifier
@@ -55,7 +57,7 @@ class YARD::Handlers::Ruby::Legacy::Base < ::YARD::Handlers::Base
   # @return [Object] if the token is one of the accepted types, in its real value form.
   #   It should be noted that identifiers and constants are kept in String form.
   # @return [nil] if the token is not any of the specified accepted types
-  private def tokval: (untyped token, *Array[untyped] | Symbol accepted_types) -> untyped
+  private def tokval: (YARD::Parser::Ruby::Legacy::RubyToken::Token token, *Array[singleton(YARD::Parser::Ruby::Legacy::RubyToken::Token)] | Symbol accepted_types) -> untyped
   # Returns a list of symbols or string values from a statement.
   # The list must be a valid comma delimited list, and values
   # will only be returned to the end of the list only.
@@ -77,7 +79,7 @@ class YARD::Handlers::Ruby::Legacy::Base < ::YARD::Handlers::Base
   # @return [Array<String>] the list of tokvalues in the list.
   # @return [Array<EMPTY>] if there are no symbols or Strings in the list
   # @see #tokval
-  private def tokval_list: (untyped tokenlist, *Array[untyped] accepted_types) -> (Array[String] | Array[untyped])
+  private def tokval_list: (untyped tokenlist, *Array[singleton(YARD::Parser::Ruby::Legacy::RubyToken::Token)] accepted_types) -> Array[untyped]
   # @private
   def set_token_position: (untyped line, untyped char) -> untyped
   # @private
