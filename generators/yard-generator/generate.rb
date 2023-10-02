@@ -17,6 +17,7 @@ notice = "# !!! GENERATED FILE !!!\n# Please see generators/yard-generator/READM
 
 Orthoses::Builder.new do
   use Orthoses::CreateFileByName,
+    depth: 2,
     to: output_dir,
     header: notice,
     rmtree: true
