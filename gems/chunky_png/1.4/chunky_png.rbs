@@ -1,0 +1,52 @@
+module ChunkyPNG
+  COLOR_GRAYSCALE: Integer
+  COLOR_TRUECOLOR: Integer
+  COLOR_INDEXED: Integer
+
+  class Canvas
+    module Operations
+      def compose!: (Canvas other, ?Integer offset_x, ?Integer offset_y) -> self
+      def compose: (Canvas other, ?Integer offset_x, ?Integer offset_y) -> self
+    end
+
+    module PNGDecoding
+      def from_file: (String filename) -> self
+    end
+
+    module PNGEncoding
+      def save: (String Filename, **untyped constraints) -> void
+      def to_blob: (**untyped constraints) -> String
+
+      alias to_string to_blob
+      alias to_s to_blob
+
+      def []=: (Integer x, Integer x, Integer color) -> Integer
+    end
+
+    include PNGEncoding
+    extend PNGDecoding
+    include Operations
+  end
+
+  def self.Color: (Integer r, Integer g, Integer b, Integer a) -> Integer
+                | (Integer r, Integer g, Integer b) -> Integer
+                | (String hex_value, ?Integer opacity) -> Integer
+                | (String | Symbol color_name, ?Integer opacity) -> Integer
+                | (Integer color_value, ?Integer opacity) -> Integer
+
+  class Color
+    BLACK: Integer
+    WHITE: Integer
+    TRANSPARENT: Integer
+
+    def rgba: (Integer r, Integer g, Integer b, Integer a) -> Integer
+    def rgb: (Integer r, Integer g, Integer b) -> Integer
+  end
+
+  class Image < Canvas
+    attr_accessor metadata: Hash[untyped, untyped]
+
+    def initialize: (Integer width, Integer height, ?Integer bg_color, Hash[untyped, untyped] metadata) -> void
+    def initialize_copy: (Image) -> void
+  end
+end
