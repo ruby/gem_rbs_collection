@@ -309,22 +309,22 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def includes: (*String | Symbol | Hash[untyped, untyped]) -> self
   def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> self
   def preload: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def find_by: (*untyped) -> Model?
-  def find_by!: (*untyped) -> Model
+  def find_by: (untyped, *untyped) -> Model?
+  def find_by!: (untyped, *untyped) -> Model
   def find: (PrimaryKey id) -> Model
           | (Array[PrimaryKey]) -> Array[Model]
           | (*PrimaryKey) -> Array[Model]
           | () { (Model) -> boolish } -> Model?
-  def find_or_create_by: (*untyped) -> Model
-                       | (*untyped) { (Model) -> void } -> Model
-  def find_or_create_by!: (*untyped) -> Model
-                        | (*untyped) { (Model) -> void } -> Model
-  def find_or_initialize_by: (*untyped) -> Model
-                           | (*untyped) { (Model) -> void } -> Model
-  def create_or_find_by: (*untyped) -> Model
-                       | (*untyped) { (Model) -> void } -> Model
-  def create_or_find_by!: (*untyped) -> Model
-                        | (*untyped) { (Model) -> void } -> Model
+  def find_or_create_by: (untyped) -> Model
+                       | (untyped) { (Model) -> void } -> Model
+  def find_or_create_by!: (untyped) -> Model
+                        | (untyped) { (Model) -> void } -> Model
+  def find_or_initialize_by: (untyped) -> Model
+                           | (untyped) { (Model) -> void } -> Model
+  def create_or_find_by: (untyped) -> Model
+                       | (untyped) { (Model) -> void } -> Model
+  def create_or_find_by!: (untyped) -> Model
+                        | (untyped) { (Model) -> void } -> Model
   def take: () -> Model
           | (Integer limit) -> Array[Model]
   def take!: () -> Model
@@ -355,7 +355,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
-  def update_all: (*untyped) -> untyped
+  def update_all: (untyped) -> untyped
   def touch_all: (*untyped, ?time: untyped) -> untyped
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
@@ -392,21 +392,21 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def includes: (*String | Symbol | Hash[untyped, untyped]) -> Relation
   def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> Relation
   def preload: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def find_by: (*untyped) -> Model?
-  def find_by!: (*untyped) -> Model
+  def find_by: (untyped) -> Model?
+  def find_by!: (untyped) -> Model
   def find: (PrimaryKey id) -> Model
           | (Array[PrimaryKey]) -> Array[Model]
           | (*PrimaryKey) -> Array[Model]
-  def find_or_create_by: (*untyped) -> Model
-                       | (*untyped) { (Model) -> void } -> Model
-  def find_or_create_by!: (*untyped) -> Model
-                        | (*untyped) { (Model) -> void } -> Model
-  def find_or_initialize_by: (*untyped) -> Model
-                           | (*untyped) { (Model) -> void } -> Model
-  def create_or_find_by: (*untyped) -> Model
-                       | (*untyped) { (Model) -> void } -> Model
-  def create_or_find_by!: (*untyped) -> Model
-                        | (*untyped) { (Model) -> void } -> Model
+  def find_or_create_by: (untyped) -> Model
+                       | (untyped) { (Model) -> void } -> Model
+  def find_or_create_by!: (untyped) -> Model
+                        | (untyped) { (Model) -> void } -> Model
+  def find_or_initialize_by: (untyped) -> Model
+                           | (untyped) { (Model) -> void } -> Model
+  def create_or_find_by: (untyped) -> Model
+                       | (untyped) { (Model) -> void } -> Model
+  def create_or_find_by!: (untyped) -> Model
+                        | (untyped) { (Model) -> void } -> Model
   def take: () -> Model
           | (Integer limit) -> Array[Model]
   def take!: () -> Model
@@ -437,7 +437,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
-  def update_all: (*untyped) -> untyped
+  def update_all: (untyped) -> untyped
   def touch_all: (*untyped, ?time: untyped) -> untyped
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
