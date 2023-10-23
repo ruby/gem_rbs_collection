@@ -75,7 +75,7 @@ module YARD::Registry
   #   exists, any files passed in will be ignored.
   # @return [Registry] the registry object (for chaining)
   # @raise [ArgumentError] if files is not a String or Array
-  def self.load: (?String | Array[untyped] files, ?bool reparse) -> YARD::Registry
+  def self.load: (?Array[untyped] | String files, ?bool reparse) -> YARD::Registry
 
   # Loads a yardoc file directly
   #
@@ -136,7 +136,12 @@ module YARD::Registry
   # @see locked_for_writing?
   def self.lock_for_writing: (?untyped file) -> untyped
 
+  # @return [Boolean] whether the database is currently locked for writing
+  #
   def self.locked_for_writing?: (?untyped file) -> bool
+
+  # Iterates over {all} with no arguments
+  def self.each: () -> untyped
 
   # Returns all objects in the registry that match one of the types provided
   # in the +types+ list (if +types+ is provided).
@@ -164,7 +169,14 @@ module YARD::Registry
   # @return [nil] if no object is found
   def self.at: (untyped path) -> YARD::CodeObjects::Base?
 
-  alias self.[] self.at
+  # Returns the object at a specific path.
+  # @param [String, :root] path
+  #   the pathname to look for. If +path+ is +root+,
+  #   returns the {root} object.
+  # @return [CodeObjects::Base] the object at path
+  # @return [nil] if no object is found
+  #
+  def self.[]: (untyped path) -> YARD::CodeObjects::Base?
 
   # The root namespace object.
   # @return [CodeObjects::RootObject] the root object in the namespace
@@ -231,6 +243,13 @@ module YARD::Registry
   # @param [Symbol, nil] type the {CodeObjects::Base#type} that the resolved
   #   object must be equal to
   private def self.partial_resolve: (YARD::CodeObjects::NamespaceObject namespace, String name, ?Symbol? type) -> untyped
+
+  # @group Retrieving yardoc File Locations
+  private def self.global_yardoc_file: (untyped spec, ?untyped for_writing) -> untyped
+
+  private def self.old_global_yardoc_file: (untyped spec, ?untyped for_writing) -> untyped
+
+  private def self.local_yardoc_file: (untyped spec, ?untyped for_writing) -> untyped
 
   # @since 0.6.5
   private def self.thread_local_store: () -> untyped
