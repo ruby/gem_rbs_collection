@@ -1,0 +1,39 @@
+module RestClient
+  type callback = ^(Response, Request, Net::HTTPResponse, callback) -> void
+
+  class Request
+    def self.execute: (Hash[untyped, untyped] args) ? { (Response, Request, Net::HTTPResponse, callback) -> void } -> untyped
+  end
+
+  class Response < String
+    include AbstractResponse
+
+    def body: () -> String
+    def to_s: () -> String
+    def to_str: () -> String
+  end
+
+  module AbstractResponse
+    attr_reader net_http_res: Net::HTTPResponse
+    attr_reader request: RestClient::Request
+    attr_reader start_time: Time
+    attr_reader end_time: Time
+
+    def code: () -> Integer
+    def history: () -> untyped
+    def headers: () -> untyped
+    def raw_heders: () -> Hash[untyped, untyped]
+    def cookies: () -> Hash[untyped, untyped]
+    def cookie_jar: () -> untyped
+    def return!: () -> untyped
+    def description: () -> String
+  end
+
+  def self.get: (String url, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+  def self.post: (String url, untyped payload, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+  def self.patch: (String url, untyped payload, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+  def self.put: (String url, untyped payload, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+  def self.delete: (String url, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+  def self.head: (String url, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+  def self.options: (String url, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+end

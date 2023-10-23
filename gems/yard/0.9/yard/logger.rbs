@@ -15,11 +15,17 @@ class YARD::Logger < ::Logger
   # @return [IO] the IO object being logged to
   # @since 0.8.2
   def io: () -> IO
+  def io=: (untyped pipe) -> untyped
   # The logger instance
   # @return [Logger] the logger instance
   def self.instance: (?untyped pipe) -> Logger
   # Creates a new logger
   def initialize: (untyped pipe, *untyped args) -> void
+  # Changes the debug level to DEBUG if $DEBUG is set
+  # and writes a debugging message.
+  def debug: (*untyped args) -> untyped
+  # Remembers when a warning occurs and writes a warning message.
+  def warn: (*untyped args) -> untyped
   # Captures the duration of a block of code for benchmark analysis. Also
   # calls {#progress} on the message to display it to the user.
   #
@@ -50,12 +56,19 @@ class YARD::Logger < ::Logger
   # @return [void]
   # @since 0.8.2
   def puts: (?String msg) -> void
+  private def print_no_newline: (untyped msg) -> untyped
   # Displays an unformatted line to the logger output stream.
   # @param [String] msg the message to display
   # @return [void]
   # @since 0.8.2
   def print: (?String msg) -> void
-  alias << print
+  # Displays an unformatted line to the logger output stream.
+  # @param [String] msg
+  #   the message to display
+  # @return [void] 
+  # @since 0.8.2
+  #
+  def <<: (?String msg) -> void
   # Prints the backtrace +exc+ to the logger as error data.
   #
   # @param [Array<String>] exc the backtrace list
@@ -79,6 +92,11 @@ class YARD::Logger < ::Logger
   #   values can be found in Ruby's Logger class.
   # @yield the block with the logger temporarily set to +new_level+
   def enter_level: (?Integer new_level) -> untyped
+  # Override this internal Logger method to clear line
+  private def add: (*untyped args) -> untyped
+  private def clear_line: () -> untyped
+  # Log format (from Logger implementation). Used by Logger internally
+  private def format_log: (untyped sev, untyped _time, untyped _prog, untyped msg) -> untyped
   # The list of characters displayed beside the progress bar to indicate
   # "movement".
   # @since 0.8.2

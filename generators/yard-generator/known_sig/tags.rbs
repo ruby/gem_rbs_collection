@@ -1,0 +1,44 @@
+# @private
+module YARD
+  class DocstringParser
+    # @return [Array<Tags::Tag>] the list of meta-data tags identified
+    #   by the parser
+    attr_accessor tags: Array[YARD::Tags::t]
+  end
+
+  module Tags
+    type t = Tag
+          | OverloadTag
+          | OptionTag
+
+    class OptionTag
+      # Returns the value of attribute pair.
+      attr_accessor pair: YARD::Tags::DefaultTag
+    end
+
+    class TypesExplainer
+      type t = HashCollectionType
+            | FixedCollectionType
+            | CollectionType
+            | Type
+
+      class Type
+        # Returns the value of attribute name.
+        attr_accessor name: String
+      end
+
+      class CollectionType < Type
+        attr_accessor types: Array[YARD::Tags::TypesExplainer::t]
+      end
+
+      class HashCollectionType < Type
+        attr_accessor key_types: Array[YARD::Tags::TypesExplainer::t]
+        attr_accessor value_types: Array[YARD::Tags::TypesExplainer::t]
+      end
+
+      class Parser
+        def self.parse: (String string) -> Array[YARD::Tags::TypesExplainer::t]
+      end
+    end
+  end
+end
