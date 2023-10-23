@@ -1,0 +1,26 @@
+module ChartKick
+  module Helper
+    def line_chart: (untyped data_source, **untyped options) -> void
+    def pie_chart: (untyped data_source, **untyped options) -> void
+    def column_chart: (untyped data_source, **untyped options) -> void
+    def bar_chart: (untyped data_source, **untyped options) -> void
+    def area_chart: (untyped data_source, **untyped options) -> void
+    def scatter_chart: (untyped data_source, **untyped options) -> void
+    def geo_chart: (untyped data_source, **untyped options) -> void
+    def timeline: (untyped data_source, **untyped options) -> void
+  end
+end
+
+module ActionView
+  class Base
+    include ChartKick::Helper
+  end
+end
+
+class Array[unchecked out Elem]
+  def chart_json: () -> String
+end
+
+class Hash[unchecked out K, unchecked out V]
+  def chart_json: () -> String
+end
