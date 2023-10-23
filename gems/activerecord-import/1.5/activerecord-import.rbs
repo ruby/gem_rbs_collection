@@ -1,0 +1,23 @@
+module ActiveRecord
+  class Base
+    def self.bulk_import: (*untyped) -> void
+    alias self.import self.bulk_import
+
+    def self.bulk_import!: (*untyped) -> void
+    alias self.import! self.bulk_import!
+  end
+end
+
+module ActiveRecord
+  module Associations
+    class CollectionProxy
+      def bulk_import: (*untyped) -> void
+      alias import bulk_import
+    end
+
+    class CollectionAssociation
+      def bulk_import: (*untyped) -> void
+      alias import bulk_import
+    end
+  end
+end
