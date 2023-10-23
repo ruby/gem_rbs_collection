@@ -3,7 +3,7 @@
 
 # A subclass of Hash where all keys are converted into Symbols, and
 # optionally, all String values are converted into Symbols.
-class SymbolHash < ::Hash[untyped, untyped]
+class SymbolHash[unchecked out K, unchecked out V] < ::Hash[untyped, untyped]
   # Creates a new SymbolHash object
   #
   # @param [Boolean] symbolize_value converts any String values into Symbols
@@ -42,17 +42,28 @@ class SymbolHash < ::Hash[untyped, untyped]
   # @param [#to_sym] key the key to test
   # @return [Boolean] whether the key exists
   def key?: (untyped key) -> bool
-  alias has_key? key?
+  # Tests if a symbolized key exists
+  # @param [#to_sym] key
+  #   the key to test
+  # @return [Boolean] whether the key exists
+  #
+  def has_key?: (untyped key) -> bool
   # Updates the object with the contents of another Hash object.
   # This method modifies the original SymbolHash object
   #
   # @param [Hash] hash the hash object to copy the values from
   # @return [SymbolHash] self
-  def update: (Hash[untyped, untyped] hash) -> SymbolHash
-  alias merge! update
+  def update: (Hash[untyped, untyped] hash) -> SymbolHash[K, V]
+  # Updates the object with the contents of another Hash object.
+  # This method modifies the original SymbolHash object
+  # @param [Hash] hash
+  #   the hash object to copy the values from
+  # @return [SymbolHash] self
+  #
+  def merge!: (Hash[untyped, untyped] hash) -> SymbolHash[K, V]
   # Merges the contents of another hash into a new SymbolHash object
   #
   # @param [Hash] hash the hash of objects to copy
   # @return [SymbolHash] a new SymbolHash containing the merged data
-  def merge: (Hash[untyped, untyped] hash) -> SymbolHash
+  def merge: (Hash[untyped, untyped] hash) -> SymbolHash[K, V]
 end
