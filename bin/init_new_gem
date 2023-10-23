@@ -107,6 +107,7 @@ put base / '_scripts/test', <<~BASH
   bundle exec steep check
 
   $(git rev-parse --show-toplevel)/bin/check-untyped-call.rb
+  $(git rev-parse --show-toplevel)/bin/check-manifest-yaml.rb
 BASH
 (base / '_scripts/test').chmod(0o755)
 put base / 'manifest.yaml', <<~'YAML'
@@ -129,7 +130,7 @@ if github_account
   update(Pathname('.github/CODEOWNERS')) do |content|
     lines = content.lines
 
-    pre_gems_lines, gems_lines = 
+    pre_gems_lines, gems_lines =
       lines.map(&:chomp).slice_before('# Maintainer of individual gems (alphabetical order)').to_a
     pre_gems_lines << gems_lines.shift
 
