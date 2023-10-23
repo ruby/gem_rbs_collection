@@ -1,0 +1,21 @@
+module Dotenv
+  def self.load: (*String filenames) -> void
+               | () -> void
+  def self.load!: (*String filenames) -> void
+                | () -> void
+
+  def self.require_keys: (*String keys) -> void
+  def self.parse: (*String filenames) -> Environment
+
+  def self.overload: (*String filenames) -> void
+                   | () -> void
+  def self.overload!: (*String filenames) -> void
+                    | () -> void
+
+  class Environment < Hash[String, untyped]
+    attr_reader filename: String
+
+    def initialize: (String filename, boolish is_load) -> void
+    def load: (boolish is_load) -> self
+  end
+end
