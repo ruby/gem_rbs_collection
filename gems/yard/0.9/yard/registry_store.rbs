@@ -24,8 +24,21 @@ class YARD::RegistryStore
   # @param [CodeObjects::Base] value the object to store
   # @return [CodeObjects::Base] returns +value+
   def put: (String | Symbol key, YARD::CodeObjects::Base value) -> YARD::CodeObjects::Base
-  alias [] get
-  alias []= put
+  # Gets a {CodeObjects::Base} from the store
+  # @param [String, Symbol] key
+  #   the path name of the object to look for.
+  #   If it is empty or :root, returns the {#root} object.
+  # @return [CodeObjects::Base, nil] a code object or nil if none is found
+  #
+  def []: (String | Symbol key) -> YARD::CodeObjects::Base?
+  # Associates an object with a path
+  # @param [String, Symbol] key
+  #   the path name (:root or '' for root object)
+  # @param [CodeObjects::Base] value
+  #   the object to store
+  # @return [CodeObjects::Base] returns +value+
+  #
+  def []=: (String | Symbol key, YARD::CodeObjects::Base value) -> YARD::CodeObjects::Base
   # Deletes an object at a given path
   # @param [#to_sym] key the key to delete
   # @return [void]
@@ -98,10 +111,23 @@ class YARD::RegistryStore
   # @return [Boolean] true if the .yardoc database was deleted, false
   #   otherwise.
   def destroy: (?bool force) -> bool
+  def objects_path: () -> untyped
   # @deprecated The registry no longer tracks proxy types
   def proxy_types_path: () -> untyped
+  def checksums_path: () -> untyped
+  def object_types_path: () -> untyped
+  def load_yardoc: () -> untyped
+  private def load_yardoc_old: () -> untyped
   # @deprecated The registry no longer tracks proxy types
   private def load_proxy_types: () -> untyped
+  private def load_object_types: () -> untyped
+  private def load_checksums: () -> untyped
+  private def load_root: () -> untyped
+  private def load_locale: (untyped name) -> untyped
+  private def all_disk_objects: () -> untyped
   # @deprecated The registry no longer tracks proxy types
   private def write_proxy_types: () -> untyped
+  private def write_object_types: () -> untyped
+  private def write_checksums: () -> untyped
+  private def write_complete_lock: () -> untyped
 end

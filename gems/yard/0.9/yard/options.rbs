@@ -78,7 +78,7 @@ class YARD::Options
   # @param [Symbol] key the option key name
   # @param [Object, Proc] default the default object value. If the default
   #   value is a proc, it is executed upon initialization.
-  def self.default_attr: (Symbol key, untyped | Proc default) -> untyped
+  def self.default_attr: (Symbol key, untyped default) -> untyped
   # Delegates calls with Hash syntax to actual method with key name
   #
   # @example Calling on an option key with Hash syntax
@@ -90,7 +90,7 @@ class YARD::Options
   #
   # @example Setting an option with Hash syntax
   #   options[:format] = :html # equivalent to: options.format = :html
-  # @param [Symbol, String] key the optin to set
+  # @param [Symbol, String] key the option to set
   # @param [Object] value the value to set for the option
   # @return [Object] the value being set
   def []=: (Symbol | String key, untyped value) -> untyped
@@ -108,7 +108,7 @@ class YARD::Options
   # @param [Options, Hash] opts
   # @return [Options] the newly created options object
   # @see #update
-  def merge: (YARD::Options | Hash[untyped, untyped] opts) -> YARD::Options
+  def merge: (Hash[untyped, untyped] | YARD::Options opts) -> YARD::Options
   # @return [Hash] Converts options object to an options hash. All keys
   #   will be symbolized.
   def to_hash: () -> Hash[untyped, untyped]
@@ -118,6 +118,8 @@ class YARD::Options
   # @yieldparam [Object] value the option value
   # @return [void]
   def each: () { (Symbol key, untyped value) -> untyped } -> void
+  # Inspects the object
+  def inspect: () -> untyped
   # @return [Boolean] whether another Options object equals the
   #   keys and values of this options object
   def ==: (untyped other) -> bool

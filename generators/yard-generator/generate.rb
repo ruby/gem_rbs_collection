@@ -4,21 +4,12 @@ require 'pathname'
 require 'erb'
 
 stdlib_dependencies = %w[
-  uri
-  cgi
   optparse
   logger
-  monitor
+  ripper
 ]
 
-# Testing of gem_rbs_collection is currently done with rbs2.
-# When it is executed in rbs3, the following should be removed.
-stdlib_dependencies_rbs2 = %w[
-  set
-]
-
-output_dir = '../../gems/yard/0.9'
-FileUtils.rm_rf(output_dir)
+output_dir = 'out'
 Orthoses.logger.level = :warn
 
 gem_path = Gem::Specification.find_by_name("yard").load_paths.first
@@ -26,38 +17,32 @@ notice = "# !!! GENERATED FILE !!!\n# Please see generators/yard-generator/READM
 
 Orthoses::Builder.new do
   use Orthoses::CreateFileByName,
-    base_dir: output_dir,
-    header: notice
+    depth: 2,
+    to: output_dir,
+    header: notice,
+    rmtree: true
   use Orthoses::Filter do |name, content|
     name.start_with?('YARD') ||
-      name.start_with?('Ripper') ||
-      name.start_with?('OpenStruct') ||
-      name.start_with?('SymbolHash') ||
-      name.start_with?('Rake') ||
-      name.start_with?('WEBrick') ||
-      name.start_with?('RDoc')
+      name.start_with?('SymbolHash')
   end
+  use Orthoses::LoadRBS,
+    paths: Dir.glob("known_sig/**/*.rbs")
   use Orthoses::Tap do |store|
-    store['YARD'].header = 'module YARD'
-    store['YARD::CodeObjects'].header = 'module YARD::CodeObjects'
-    store['YARD::Handlers'].header = 'module YARD::Handlers'
-    store['YARD::Handlers::C'].header = 'module YARD::Handlers::C'
-    store['YARD::Handlers::Common'].header = 'module YARD::Handlers::Common'
-    store['YARD::Handlers::Ruby'].header = 'module YARD::Handlers::Ruby'
-    # TODO: support generics
-    store['YARD::Tags::Library'] << 'def self.labels: () -> SymbolHash'
-
+    # remove rack dependency
+    store['YARD::Server::Commands::Base'].delete("# @return [Rack::Request] request object\nattr_accessor request: Rack::Request")
     # FIXME: YARD's issue?
     store['YARD::CLI::YardocOptions'].delete("# @return [Numeric] An index value for rendering sequentially related templates\nattr_accessor index: Numeric")
   end
   use Orthoses::YARD,
     parse: [
-      "#{gem_path}/yard.rb",
-      "#{gem_path}/yard/**/*.rb",
-    ]
+      "#{gem_path}/**/*.rb",
+    ],
+    log_level: :warn,
+    allow_empty_doc: true
   use Orthoses::Autoload
   run -> {
     require 'yard'
+    require "yard/i18n/po_parser"
     YARD::Tags::Library.define_tag("YARD Tag Signature", 'yard.signature'.to_sym, nil)
     YARD::Tags::Library.define_tag("YARD Tag", 'yard.tag'.to_sym, :with_types_and_name)
     YARD::Tags::Library.define_tag("YARD Directive", 'yard.directive'.to_sym, :with_types_and_name)
@@ -77,12 +62,12 @@ out.join("manifest.yaml").write(erb("manifest.yaml", notice: notice, stdlib_depe
 out.join('_scripts').tap do |scripts|
   scripts.mkpath
   scripts.join("test").tap do |test|
-    test.write(erb("_scripts/test", notice: notice, stdlib_dependencies: stdlib_dependencies + stdlib_dependencies_rbs2))
+    test.write(erb("_scripts/test", notice: notice, stdlib_dependencies: stdlib_dependencies))
     test.chmod(0o755)
   end
 end
 out.join('_test').tap do |test|
   test.mkpath
   test.join("yard.rb").write(erb("_test/yard.rb", notice: notice))
-  test.join('Steepfile').write(erb("_test/Steepfile", notice: notice, stdlib_dependencies: stdlib_dependencies + stdlib_dependencies_rbs2))
+  test.join('Steepfile').write(erb("_test/Steepfile", notice: notice, stdlib_dependencies: stdlib_dependencies))
 end
