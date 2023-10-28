@@ -1,0 +1,65 @@
+module JSON
+  module JOSE
+    module ClassMethods
+      def decode: (untyped input, ?untyped key_or_secret, ?untyped algorightms, ?untyped encryption_methods, ?bool allow_blank_payload) -> (JWE | JWS)
+    end
+  end
+
+  class JWE
+    class InvalidFormat < JWT::InvalidFormat
+    end
+
+    class DecryptionFailed < JWT::VerificationFailed
+    end
+
+    class UnexpectedAlgorithm < JWT::UnexpectedAlgorithm
+    end
+
+    include JOSE
+    extend JOSE::ClassMethods
+  end
+
+  class JWK < ActiveSupport::HashWithIndifferentAccess[Symbol, untyped]
+    class UnknownAlgorithm < JWT::Exception
+    end
+
+    def initialize: (OpenSSL::PKey::RSA | OpenSSL::PKey::EC | OpenSSL::PKey::PKey | String | Hash[untyped, untyped] params, Hash[untyped, untyped] ex_params) -> void
+    def content_type: () -> String
+    def thumbprint: (OpenSSL::Digest | String | Symbol digest) -> String
+    def to_key: () -> OpenSSL::PKey::PKey
+    def rsa?: () -> bool
+    def ec?: () -> bool
+    def oct?: () -> bool
+    def normalize: () -> Hash[Symbol, String]
+  end
+
+  class JWS < JWT
+    class InvalidFormat < JWT::InvalidFormat
+    end
+
+    class VerificationFailed < JWT::VerificationFailed
+    end
+
+    class UnexpectedAlgorithm < JWT::UnexpectedAlgorithm
+    end
+  end
+
+  class JWT < ActiveSupport::HashWithIndifferentAccess[Symbol, untyped]
+    class Exception < StandardError
+    end
+
+    class InvalidFormat < Exception
+    end
+
+    class VerificationFailed < Exception
+    end
+
+    class UnexpectedAlgorithm < VerificationFailed
+    end
+
+    include JOSE
+    extend JOSE::ClassMethods
+
+    def sign: (String | OpenSSL::PKey::PKey | JSON::JWK private_key_or_secret, ?Symbol algorithm) -> JWS
+  end
+end
