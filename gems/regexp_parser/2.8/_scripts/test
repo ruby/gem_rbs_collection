@@ -12,11 +12,10 @@ RBS_DIR=$(cd $(dirname $0)/..; pwd)
 # Set REPO_DIR variable to validate RBS files added to the corresponding folder
 REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
 # Validate RBS files, using the bundler environment present
-bundle exec rbs --repo $REPO_DIR -r rest-client:2.1 -r net-http validate --silent
+bundle exec rbs --repo $REPO_DIR -r regexp_parser:2.8 validate --silent
 
 cd ${RBS_DIR}/_test
 # Run type checks
 bundle exec steep check
 
 $(git rev-parse --show-toplevel)/bin/check-untyped-call.rb
-$(git rev-parse --show-toplevel)/bin/check-manifest-yaml.rb
