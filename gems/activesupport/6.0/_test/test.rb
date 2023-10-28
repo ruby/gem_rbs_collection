@@ -30,3 +30,5 @@ hash.deep_stringify_keys!
 
 hash.deep_symbolize_keys
 hash.deep_symbolize_keys!
+
+ActiveSupport::SecurityUtils.secure_compare('tokenA', 'tokenB') === false
