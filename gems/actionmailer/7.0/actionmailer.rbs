@@ -1,12 +1,25 @@
 module ActionMailer
   class Base < AbstractController::Base
+    include AbstractController::Rendering
+    include AbstractController::Helpers
+    extend AbstractController::Helpers::ClassMethods
+    include AbstractController::Translation
+    include AbstractController::AssetPaths
+    include AbstractController::Callbacks
+    extend AbstractController::Callbacks::ClassMethods
+    include AbstractController::Caching
+    extend AbstractController::Caching::ClassMethods
+
+    include ActionView::Layouts
+    extend ActionView::Layouts::ClassMethods
+
     def self.default: (**untyped) -> void
 
     def self.layout: (String) -> void
 
-    def mail: (**untyped) ?{ (untyped) -> void } -> MessageDelivery
+    def mail: (**untyped) ?{ (untyped) -> void } -> Mail::Message
 
-    def self.with: (**untyped) -> instance
+    def self.with: (**untyped) -> untyped
 
     def params: () -> Hash[untyped, untyped]
 

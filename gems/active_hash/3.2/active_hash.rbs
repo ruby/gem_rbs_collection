@@ -22,7 +22,7 @@ module ActiveHash
     def self.find: (:all) -> Relation[instance]
                  | (:first, *untyped args) -> instance?
                  | (Array[untyped] id) -> Array[instance]
-                 | (untyped id) -> instance?
+                 | (untyped id) -> instance
                  | () { (instance) -> boolish } -> instance?
     def self.find_by: (untyped options) -> instance?
     def self.find_by!: (untyped options) -> instance
@@ -68,7 +68,7 @@ module ActiveHash
             | (:first, *untyped args) -> T?
             | (Array[untyped] id) -> Array[T]
             | (untyped id) -> T?
-            | () { (instance) -> boolish } -> T?
+            | () { (T) -> boolish } -> T?
     def find_by: (untyped options) -> T?
     def find_by!: (untyped options) -> T
     def find_by_id: (untyped id) -> T?
