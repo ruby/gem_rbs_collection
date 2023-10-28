@@ -30,6 +30,4 @@ module RailsGuides
   NotifierMailer.welcome("first user").deliver_now
   NotifierMailer.welcome("first user").message
   NotifierMailer.welcome("first user").deliver_later
-
-  UserMailer.with(user: "an user").welcome_email.deliver_later
 end
