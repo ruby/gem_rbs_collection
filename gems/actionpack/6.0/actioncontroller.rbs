@@ -4,14 +4,8 @@ module ActionController
     def flash: () -> untyped
   end
 
-  interface _API_and_Base_singletion
-    def rescue_from: (*Class, ?with: Symbol | Proc) -> void
-                   | (*Class) { (Exception) -> void } -> void
-  end
-
   class Base < Metal
     include _API_and_Base
-    extend _API_and_Base_singletion
 
     # https://github.com/rails/rails/blob/v6.0.3.2/actionpack/lib/action_controller/base.rb#L205-L255
     include AbstractController::Rendering
@@ -59,6 +53,8 @@ module ActionController
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
     include Rescue
+    include ActiveSupport::Rescuable
+    extend ActiveSupport::Rescuable::ClassMethods
     include Instrumentation
     extend Instrumentation::ClassMethods
     include ParamsWrapper
@@ -67,7 +63,6 @@ module ActionController
 
   class API < Metal
     include _API_and_Base
-    extend _API_and_Base_singletion
 
     # https://github.com/rails/rails/blob/v6.0.3.2/actionpack/lib/action_controller/api.rb#L112-L145
     include AbstractController::Rendering
@@ -87,6 +82,8 @@ module ActionController
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
     include Rescue
+    include ActiveSupport::Rescuable
+    extend ActiveSupport::Rescuable::ClassMethods
     include Instrumentation
     extend Instrumentation::ClassMethods
     include ParamsWrapper
