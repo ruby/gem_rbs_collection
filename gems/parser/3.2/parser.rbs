@@ -1,0 +1,65 @@
+module Parser
+  CurrentRuby: Parser::Base
+
+  class Base < Racc::Parser
+    def parse: (String string, ?String file, ?Integer line) -> Parser::AST::Node?
+  end
+
+  class Ruby18 < Base
+  end
+  class Ruby19 < Base
+  end
+  class Ruby20 < Base
+  end
+  class Ruby21 < Base
+  end
+  class Ruby22 < Base
+  end
+  class Ruby23 < Base
+  end
+  class Ruby24 < Base
+  end
+  class Ruby25 < Base
+  end
+  class Ruby26 < Base
+  end
+  class Ruby27 < Base
+  end
+  class Ruby30 < Base
+  end
+  class Ruby31 < Base
+  end
+  class Ruby32 < Base
+  end
+  class Ruby33 < Base
+  end
+
+  module AST
+    class Node < ::AST::Node
+      attr_reader location: Source::Map
+      alias loc location
+    end
+  end
+
+  module Source
+    class Range
+    end
+
+    class Buffer
+    end
+
+    class Map
+      def line: () -> Integer
+      def first_line: () -> Integer
+      def last_line: () -> Integer
+      def column: () -> Integer
+      def first_column: () -> Integer
+      def last_column: () -> Integer
+    end
+
+    class Comment
+      def location: () -> Map
+      alias loc location
+    end
+  end
+end
