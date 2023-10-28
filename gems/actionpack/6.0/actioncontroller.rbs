@@ -92,6 +92,40 @@ module ActionController
     include ParamsWrapper
     extend ParamsWrapper::ClassMethods
   end
+
+  module HttpAuthentication
+    module Token
+      TOKEN_KEY: ::String
+      TOKEN_REGEX: ::Regexp
+      AUTHN_PAIR_DELIMITERS: ::Regexp
+
+      extend ::ActionController::HttpAuthentication::Token
+
+      module ControllerMethods
+        def authenticate_or_request_with_http_token: (?String realm, ?String? message) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> untyped
+
+        def authenticate_with_http_token: () { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> boolish
+
+        def request_http_token_authentication: (?String realm, ?String? message) -> void
+      end
+
+      def authenticate: (instance controller) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> boolish
+
+      def token_and_options: (ActionDispatch::Request request) -> ([String, ActiveSupport::HashWithIndifferentAccess[untyped, untyped]] | nil)
+
+      def token_params_from: (String auth) -> Array[String]
+
+      def raw_params: (String auth) -> Array[String]
+
+      def params_array_from: (Array[String] raw_params) -> Array[String]
+
+      def rewrite_param_values: (Array[String] array_params) -> Array[String]
+
+      def encode_credentials: (String token, ?::Hash[untyped, untyped] options) -> ::String
+
+      def authentication_request: (instance controller, String realm, ?String? message) -> void
+    end
+  end
 end
 
 module AbstractController::Callbacks::ClassMethods
