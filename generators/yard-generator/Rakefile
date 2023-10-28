@@ -2,4 +2,14 @@ task :generate do
   load 'generate.rb'
 end
 
-task default: :generate
+task :validate do
+  sh "bundle exec rbs --repo ../../ -r ripper -I out validate --silent"
+end
+
+task :replace do
+  target = "../../gems/yard/0.9"
+  rm_rf target
+  mv 'out', target
+end
+
+task default: [:generate, :validate, :replace]

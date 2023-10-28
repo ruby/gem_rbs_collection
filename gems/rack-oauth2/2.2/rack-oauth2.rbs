@@ -1,0 +1,39 @@
+module Rack
+  module OAuth2
+    class AccessToken
+      class Bearer < AccessToken
+      end
+
+      attr_accessor access_token: untyped
+      attr_accessor token_type: untyped
+      attr_accessor refresh_token: untyped
+      attr_accessor expires_in: untyped
+      attr_accessor scope: untyped
+    end
+
+    class Client
+      class Error < StandardError
+        attr_accessor status: Integer
+        attr_accessor response: Hash[untyped, untyped]
+      end
+
+      class Grant
+        class AuthorizationCode < Grant
+        end
+
+        class Password < Grant
+        end
+
+        class RefreshToken < Grant
+        end
+      end
+
+      def initialize: (**untyped attributes) -> void
+      def authorization_uri: (**untyped params) -> String
+      def authorization_code=: (String code) -> Grant::AuthorizationCode
+      def resource_owner_credentials=: ([String, String] credentials) -> Grant::Password
+      def refresh_token=: (String token) -> Grant::RefreshToken
+      def access_token!: () -> AccessToken::Bearer
+    end
+  end
+end

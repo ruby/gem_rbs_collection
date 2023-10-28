@@ -1,0 +1,14 @@
+D = Steep::Diagnostic
+
+target :test do
+  check "."
+  signature "."
+
+  repo_path "../../../"
+  library "rest-client"
+
+  library "json"
+  library "net-http"
+
+  configure_code_diagnostics(D::Ruby.all_error)
+end

@@ -49,6 +49,8 @@ class YARD::Verifier
   # @return [void]
   # @since 0.5.6
   def add_expressions: (*Array[String] expressions) -> void
+  # Passes any method calls to the object from the {#call}
+  def method_missing: (untyped sym, *untyped args) -> untyped
   # Tests the expressions on the object.
   #
   # @note If the object is a {CodeObjects::Proxy} the result will always be true.
@@ -62,7 +64,9 @@ class YARD::Verifier
   # @return [Array<CodeObjects::Base>] a list of code objects that match
   #   the verifier.
   def run: (Array[YARD::CodeObjects::Base] list) -> Array[YARD::CodeObjects::Base]
-  alias o object
+  # @return [CodeObjects::Base] the current object being tested
+  #
+  def o: () -> YARD::CodeObjects::Base
   # Modifies nil to not throw NoMethodErrors. This allows
   # syntax like object.tag(:return).text to work if the #tag
   # call returns nil, which means users don't need to perform

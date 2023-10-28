@@ -1,0 +1,74 @@
+class EmailAddress
+  class Address
+    include Rewriter
+
+    attr_accessor original: String
+    attr_accessor local: Local
+    attr_accessor host: Host
+    attr_accessor config: Hash[untyped, untyped]
+    attr_accessor reason: untyped
+    attr_accessor locale: String
+    attr_reader error_message: String?
+
+    def initialize: (String email_address, ?Hash[untyped, untyped] config, ?String locale) -> Address
+    def mailbox: () -> String
+    def tag: () -> String?
+    def host_name: () -> String?
+    def provider: () -> Symbol?
+
+    def normal: () -> String
+    alias to_s normal
+
+    def canonical: () -> String
+    def canonical?: () -> bool
+    def base: () -> String
+    def redact: () -> String
+    def redacted?: () -> bool
+    def munge: () -> String
+
+    def reference: (?Symbol form) -> String
+    alias md5 reference
+
+    def sha1: (?Symbol form) -> String
+    def sha256: (?Symbol form) -> String
+
+    def matches?: (*String | Array[String] rules) -> bool
+    def valid?: (?Hash[untyped, untyped] options) -> bool
+    def error: () -> String?
+  end
+
+  class Config
+  end
+
+  class Exchanger
+    type exchange = { host: String, ip: String, priority: Integer }
+    include Enumerable[exchange]
+
+    def each: () { (exchange) -> void } -> void
+  end
+
+  class Local
+  end
+
+  class Host
+    def valid?: (?Hash[untyped, untyped] rules) -> bool
+    def exchangers: () -> Exchanger
+    def txt_hash: (?String alternate_host) -> Hash[Symbol, String]
+  end
+
+  module Rewriter
+    def srs: (String sending_domain, ?Hash[untyped, untyped] options) ? { (String) -> String } -> String
+  end
+
+  def self.valid?: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> bool
+  def self.error: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String?
+  def self.normal: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String
+  def self.redact: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String
+  def self.munge: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String
+  def self.canonical: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String
+  def self.reference: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String
+  def self.base: (String email_address, ?Hash[untyped, untyped] config, ?String local) -> String
+
+  def self.new: (String email_address, ?Hash[untyped, untyped] config, ?String locale) -> Address
+  def self.matches?: (String email_address, String | Array[String] rules, ?Hash[untyped, untyped] config, ?String locale) -> Address
+end
