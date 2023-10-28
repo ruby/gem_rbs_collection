@@ -10819,7 +10819,8 @@ module ActiveSupport
       #   end
       #
       # Exceptions raised inside exception handlers are not propagated up.
-      def rescue_from: (*untyped klasses, ?with: untyped? with) { () -> untyped } -> untyped
+      def rescue_from: (*Class, ?with: Symbol | Proc) -> void
+                     | (*Class) { (Exception) -> void } -> void
 
       # Matches an exception to a handler based on the exception class.
       #
