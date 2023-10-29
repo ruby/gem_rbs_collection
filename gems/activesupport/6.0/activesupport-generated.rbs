@@ -1846,48 +1846,6 @@ module ActiveSupport
   end
 end
 
-module ActiveSupport
-  # Configurable provides a <tt>config</tt> method to store and retrieve
-  # configuration options as an <tt>OrderedHash</tt>.
-  module Configurable
-    extend ActiveSupport::Concern
-
-    class Configuration[T, U] < ActiveSupport::InheritableOptions[T, U]
-      def compile_methods!: () -> untyped
-
-      # Compiles reader methods so we don't have to go through method_missing.
-      def self.compile_methods!: (untyped keys) -> untyped
-    end
-
-    module ClassMethods
-      def config: () -> untyped
-
-      def configure: () { (untyped) -> untyped } -> untyped
-
-      private
-
-      def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) { () -> untyped } -> untyped
-    end
-
-    # Reads and writes attributes from a configuration <tt>OrderedHash</tt>.
-    #
-    #   require 'active_support/configurable'
-    #
-    #   class User
-    #     include ActiveSupport::Configurable
-    #   end
-    #
-    #   user = User.new
-    #
-    #   user.config.allowed_access = true
-    #   user.config.level = 1
-    #
-    #   user.config.allowed_access # => true
-    #   user.config.level          # => 1
-    def config: () -> untyped
-  end
-end
-
 class Array[unchecked out Elem]
   # Returns the tail of the array from +position+.
   #
@@ -7354,7 +7312,7 @@ module ActiveSupport
 
     private
 
-    def options: () -> untyped
+    def options: () -> InheritableOptions
 
     def deserialize: (untyped config) -> untyped
   end

@@ -12,11 +12,27 @@ module ActiveSupport
   end
 
   module Configurable
-    module ClassMethods
-      # Manual definition to make block optional
-      def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> untyped
-                         | ...
+    extend Concern
+
+    class Configuration < InheritableOptions
+      def compile_methods!: () -> void
+
+      # Compiles reader methods so we don't have to go through method_missing.
+      def self.compile_methods!: (Array[Symbol | String] keys) -> void
     end
+
+    module ClassMethods
+      def config: () -> InheritableOptions
+
+      def configure: () { (InheritableOptions config) -> void } -> void
+
+      private
+
+      # TODO: Fix to use `interned` in names params after releasing ruby/rbs#1499
+      def config_accessor: (*(String | Symbol) names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> void
+    end
+
+    def config: () -> InheritableOptions
   end
 
   class Deprecation
