@@ -152,6 +152,29 @@ module ActiveSupport
     def tv_usec: () -> Integer
     def wednesday?: () -> bool
   end
+
+  class OrderedOptions < Hash[Symbol, untyped]
+    alias _get []
+
+    # TODO: Fix to use `interned` in key params after releasing ruby/rbs#1499
+    def []=: ((String | Symbol) key, untyped value) -> untyped
+
+    # TODO: Fix to use `interned` in key params after releasing ruby/rbs#1499
+    def []: ((String | Symbol) key) -> untyped
+
+    def method_missing: (Symbol name, *untyped args) -> untyped
+
+    def respond_to_missing?: (Symbol name, ?bool include_private) -> true
+
+    def extractable_options?: () -> true
+  end
+
+  class InheritableOptions < OrderedOptions
+    # TODO: Fix to use `interned` in parent params after releasing ruby/rbs#1499
+    def initialize: (?Hash[(String | Symbol), untyped]? parent) -> void
+
+    def inheritable_copy: () -> instance
+  end
 end
 
 class Hash[unchecked out K, unchecked out V]

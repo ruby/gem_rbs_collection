@@ -10541,59 +10541,6 @@ module ActiveSupport
 end
 
 module ActiveSupport
-  # Usually key value pairs are handled something like this:
-  #
-  #   h = {}
-  #   h[:boy] = 'John'
-  #   h[:girl] = 'Mary'
-  #   h[:boy]  # => 'John'
-  #   h[:girl] # => 'Mary'
-  #   h[:dog]  # => nil
-  #
-  # Using +OrderedOptions+, the above code could be reduced to:
-  #
-  #   h = ActiveSupport::OrderedOptions.new
-  #   h.boy = 'John'
-  #   h.girl = 'Mary'
-  #   h.boy  # => 'John'
-  #   h.girl # => 'Mary'
-  #   h.dog  # => nil
-  #
-  # To raise an exception when the value is blank, append a
-  # bang to the key name, like:
-  #
-  #   h.dog! # => raises KeyError: :dog is blank
-  #
-  class OrderedOptions[T, U] < Hash[T, U]
-    alias _get []
-
-    def []=: (untyped key, untyped value) -> untyped
-
-    def []: (untyped key) -> untyped
-
-    def method_missing: (untyped name, *untyped args) -> untyped
-
-    def respond_to_missing?: (untyped name, untyped include_private) -> ::TrueClass
-
-    def extractable_options?: () -> ::TrueClass
-  end
-
-  # +InheritableOptions+ provides a constructor to build an +OrderedOptions+
-  # hash inherited from another hash.
-  #
-  # Use this if you already have some hash and you want to create a new one based on it.
-  #
-  #   h = ActiveSupport::InheritableOptions.new({ girl: 'Mary', boy: 'John' })
-  #   h.girl # => 'Mary'
-  #   h.boy  # => 'John'
-  class InheritableOptions[T, U] < OrderedOptions[T, U]
-    def initialize: (?untyped? parent) -> untyped
-
-    def inheritable_copy: () -> untyped
-  end
-end
-
-module ActiveSupport
   # +ParameterFilter+ allows you to specify keys for sensitive data from
   # hash-like object and replace corresponding value. Filtering only certain
   # sub-keys from a hash is possible by using the dot notation:
