@@ -23,7 +23,8 @@ class Foo
   end
 end
 
-Foo.get('https://reqres.in')
+api_response = Foo.get('https://reqres.in')
+api_response.parse_response
 Foo.mkcol('https://reqris.in')
 Foo.lock('https://reqres.in')
 Foo.unlock('https://reqres.in')
