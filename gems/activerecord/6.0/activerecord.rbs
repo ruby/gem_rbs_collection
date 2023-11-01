@@ -83,14 +83,14 @@ module ActiveRecord
 
     def will_save_change_to_attribute?: (String | Symbol attr_name, ?from: untyped, ?to: untyped) -> bool
 
-    def save!: (?validate: bool, ?touch: bool) -> self
-    def save: () -> bool
+    def save!: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> void
+    def save: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> bool
     def update!: (*untyped) -> self
     def update: (*untyped) -> bool
     def destroy!: () -> self
     def destroy: () -> bool
-    def valid?: () -> bool
-    def invalid?: () -> bool
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
+    def invalid?: (?Symbol | Array[Symbol] context) -> bool
     def errors: () -> untyped
     def []: (Symbol) -> untyped
     def []=: (Symbol, untyped) -> untyped
