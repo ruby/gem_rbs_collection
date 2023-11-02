@@ -1,0 +1,27 @@
+module Octokit
+  class Client
+    module Apps
+      def create_app_installation_access_token: (Integer installation, **untyped) -> untyped
+      def find_organization_installation: (String organization, **untyped) -> untyped
+    end
+
+    module Organizations
+      def organization_member?: (String | Integer org, String user, **untyped options) -> bool
+    end
+
+    module Users
+      def user: (?(Integer | String) user, ?Hash[untyped, untyped] options) -> untyped
+    end
+
+    include Apps
+    include Organizations
+    include Users
+
+    def initialize: (?access_token: untyped, ?api_endpoint: untyped, ?auto_paginate: untyped, ?bearer_token: untyped, ?client_id: untyped, ?client_secret: untyped, ?connection_options: untyped, ?default_media_type: untyped, ?login: untyped, ?management_console_endpoint: untyped, ?management_console_password: untyped, ?middleware: untyped, ?netrc: untyped, ?netrc_file: untyped, ?per_page: untyped, ?password: untyped, ?proxy: untyped, ?ssl_verify_mode: untyped, ?user_agent: untyped, ?web_endpoint: untyped) -> void
+  end
+
+  class Error < StandardError
+  end
+
+  def self.user: (Integer) -> untyped
+end
