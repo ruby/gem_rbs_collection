@@ -51,32 +51,32 @@ module ActiveRecord
     def self.validates: (*untyped) -> void
 
     # callbacks
-    type callback = Symbol | ^(instance) [self: instance] -> void
-    type around_callback = Symbol | ^(instance, Proc) [self: instance] -> void
-    type condition = Symbol | ^() [self: instance] -> boolish
-    def self.after_commit: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_create_commit: (*callback, ?if: condition, ?unless: condition, **untyped) -> void | ...
-    def self.after_update_commit: (*callback, ?if: condition, ?unless: condition, **untyped) -> void | ...
-    def self.after_destroy_commit: (*callback, ?if: condition, ?unless: condition, **untyped) -> void | ...
-    def self.after_save_commit: (*callback, ?if: condition, ?unless: condition, **untyped) -> void | ...
-    def self.after_create: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_destroy: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_rollback: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_save: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_update: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_validation: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_initialize: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_find: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_touch: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.around_create: (*around_callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.around_destroy: (*around_callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.around_save: (*around_callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.around_update: (*around_callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_create: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_destroy: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_save: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_update: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_validation: (*callback, ?if: condition, ?unless: condition, **untyped) ?{ () [self: instance] -> untyped } -> void
+    type callback[T] = Symbol | ^(T) [self: T] -> void
+    type around_callback[T] = Symbol | ^(T, Proc) [self: T] -> void
+    type condition[T] = Symbol | ^() [self: T] -> boolish
+    def self.after_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_create_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
+    def self.after_update_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
+    def self.after_destroy_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
+    def self.after_save_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
+    def self.after_create: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_destroy: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_rollback: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_save: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_update: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_validation: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_initialize: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_find: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_touch: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.around_create: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.around_destroy: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.around_save: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.around_update: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_create: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_destroy: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_save: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_update: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_validation: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
 
     def self.columns: () -> Array[untyped]
     def self.reflect_on_all_associations: (?Symbol) -> Array[untyped]
