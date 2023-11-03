@@ -10,3 +10,7 @@ class User < ActiveRecord::Base
 end
 
 _user = User.new
+
+User.eager_load(:address, friends: [:address, :followers])
+User.includes(:address, :friends).to_a
+User.preload(:address, friends: [:address, :followers])
