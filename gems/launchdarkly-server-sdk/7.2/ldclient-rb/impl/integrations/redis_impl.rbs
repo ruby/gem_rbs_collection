@@ -33,32 +33,32 @@ module LaunchDarkly
 
           def monitoring_enabled?: () -> true
 
-          def available?: () -> untyped
+          def available?: () -> bool
 
           #
           # Default value for the `redis_url` constructor parameter; points to an instance of Redis
           # running at `localhost` with its default port.
           #
-          def self.default_redis_url: () -> untyped
+          def self.default_redis_url: () -> String
 
           #
           # Default value for the `prefix` constructor parameter.
           #
-          def self.default_prefix: () -> untyped
+          def self.default_prefix: () -> String
 
-          def get: (untyped kind, untyped key) -> untyped
+          def get: (kind, String | Symbol key) -> Hash[Symbol, untyped]?
 
-          def all: (untyped kind) -> untyped
+          def all: (kind) -> Hash[Symbol, Hash[Symbol, untyped]]
 
-          def delete: (untyped kind, untyped key, untyped version) -> untyped
+          def delete: (kind, String | Symbol key, Integer version) -> void
 
-          def init: (untyped all_data) -> untyped
+          def init: (Hash[kind, Hash[Symbol, untyped]] all_data) -> void
 
-          def upsert: (untyped kind, untyped item) -> untyped
+          def upsert: (kind, Hash[Symbol, untyped] item) -> void
 
-          def initialized?: () -> untyped
+          def initialized?: () -> bool
 
-          def stop: () -> untyped
+          def stop: () -> void
         end
 
         class RedisStoreImplBase
