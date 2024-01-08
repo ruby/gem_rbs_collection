@@ -1,3 +1,47 @@
 module Shoryuken
-  def self.logger: () -> Logger
+  extend SingleForwardable
+
+  def self?.shoryuken_options: () -> Options
+
+  def self?.healthy?: () -> bool
+
+  # would be great here to somehow annotate delegation...
+
+  def self?.active_job?: () -> boolish
+
+  def self?.add_group: (String group, ?Integer concurrency, ?delay: Numeric) -> void
+
+  def self?.add_queue: (String queue, Integer weight, String group) -> void
+
+  def self?.ungrouped_queues: () -> Array[untyped]
+
+  def self?.active_job_queue_name_prefixing?: () -> bool
+
+  def self?.sqs_client: () -> Aws::SQS::Client
+
+  def self?.options: () -> Hash[Symbol, untyped]
+
+  def self?.logger: () -> Logger
+
+  def self?.register_worker: (*untyped args) -> void
+
+  def self?.configure_server: () { (self) -> void } -> void
+
+  def self?.server?: () -> bool
+
+  def self?.server_middleware: () ?{ (Middleware::Chain) -> void } -> Middleware::Chain
+
+  def self?.configure_client: () { (self) -> void } -> void
+
+  def self?.client_middleware: () ?{ (Middleware::Chain) -> void } -> Middleware::Chain
+
+  def self?.on: (Symbol event) { () -> void } -> void
+
+  def self?.on_start: () { () -> void } -> void
+
+  def self?.on_stop: () { () -> void } -> void
+
+  def self?.delay: (String group) -> Numeric
+
+  VERSION: ::String
 end
