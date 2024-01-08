@@ -12,7 +12,10 @@ def stdlib?(name)
   (RBS::Repository::DEFAULT_STDLIB_ROOT / name / '0').exist?
 end
 
-manifest_file = Pathname('manifest.yaml')
+manifest_file = Pathname.pwd.basename.to_s == "_test" ?
+  Pathname('../manifest.yaml') :
+  Pathname('manifest.yaml')
+
 if manifest_file.exist?
   manifest = YAML.safe_load(manifest_file.read)
 
