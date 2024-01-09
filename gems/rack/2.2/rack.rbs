@@ -64,7 +64,16 @@ module Rack
   def self.release: -> String
 
   type env = Hash[String, untyped]
-  type response = [_ToI, _Each[[String, String]], _Each[String]]
+
+  type string_body = _ToStr
+
+  type enumerable_body = _Each[String]
+
+  interface _StreamingBody
+    def call: (untyped stream) -> void
+  end
+
+  type response = [_ToI, _Each[[String, String]], string_body | enumerable_body | _StreamingBody]
 
   interface _Application
     def call: (env) -> response
