@@ -34,8 +34,8 @@ This script generates an empty RBS to `gems/GEM_NAME/VERSION/GEM_NAME.rbs`, and 
 
 Specify the _major_ and _minor_ version you are using would be great for most cases.
 
-We recommend adding `_scripts`, `_test`, and `_src` directories.
-We assume `_scripts/test` script runs test of the gem, `_test` directory contains files for testing, and `_src` is a git submodule for the source code of the version of the gem.
+We recommend adding `_test`, and `_src` directories.
+We assume `_test` directory contains files for testing, and `_src` is a git submodule for the source code of the version of the gem.
 
 ### Write RBS files
 
@@ -83,14 +83,8 @@ It is important that the testing is to confirm the relationship between RBS and 
 You can test your code with the following steps.
 
 1. Write a Ruby program which uses the gem code
-2. Confirm the consistency between the program and RBS
-
-#### Using Steep
-
-I have been testing with [Steep](https://github.com/soutaro/steep).
-
-Add a `Steepfile` in `_test` directory and write test scripts.
-Then you can run `steep check` to type check the test scripts.
+2. Execute `bin/test gems/GEM_NAME/VERSION` to run test test suites.
+   * It executes `rbs validate` and `steep check`.
 
 See existing gems for examples, like [redis/4.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/redis/4.2/_test) or [listen/3.2](https://github.com/ruby/gem_rbs_collection/tree/main/gems/listen/3.2/_test).
 
