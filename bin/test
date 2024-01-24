@@ -120,7 +120,12 @@ class Runner
   end
 
   def run_steep_check
-    sh 'bundle', 'exec', 'steep', 'check', chdir: test_dir.to_s
+    with_expectation = if test_dir.join('steep_expectations.yml').exist?
+      ['--with-expectation']
+    else
+      []
+    end
+    sh 'bundle', 'exec', 'steep', 'check', *with_expectation, chdir: test_dir.to_s
   end
 
   def check_untyped_call
