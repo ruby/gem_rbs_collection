@@ -2,7 +2,7 @@
 
 require "pathname"
 require "optparse"
-require "open3"
+require 'yaml'
 
 @all = false
 @verbose = false
@@ -75,6 +75,10 @@ class Runner
     test_dir.join('Gemfile').write(<<~RUBY)
       source 'https://rubygems.org'
       gem #{gem_name.dump}, #{v.dump}
+
+      #{
+        additional_gems.map {|name| "gem #{name.dump}" }.join("\n")
+      }
     RUBY
 
     sh! 'bundle', 'lock', chdir: test_dir.to_s
@@ -121,6 +125,13 @@ class Runner
 
   def check_untyped_call
     sh Pathname(__dir__).join("check-untyped-call.rb").to_s, chdir: test_dir.to_s
+  end
+
+  def additional_gems
+    path = test_dir.join('metadata.yaml')
+    return [] unless path.exist?
+    yaml = YAML.load path.read
+    yaml['additional_gems'] || []
   end
 end
 
