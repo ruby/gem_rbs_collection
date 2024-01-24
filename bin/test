@@ -49,7 +49,6 @@ class Runner
     @test_dir = base_dir / "_test"
     @version = base_dir.basename.to_s
     @gem_name = base_dir.parent.basename.to_s
-    @rbs_command = `bundle exec which rbs`.chomp
   end
 
   def run
@@ -69,7 +68,7 @@ class Runner
 
   private
 
-  attr_reader :base_dir, :test_dir, :version, :gem_name, :rbs_command
+  attr_reader :base_dir, :test_dir, :version, :gem_name
 
   def generate_gemfile_lock
     v = "~> #{version}"
@@ -96,7 +95,7 @@ class Runner
   end
 
   def rbs_collection_install
-    sh! rbs_command, 'collection', 'install', chdir: test_dir.to_s
+    sh! 'rbs', 'collection', 'install', chdir: test_dir.to_s
   end
 
   def remove_gemfile_lock
