@@ -52,10 +52,12 @@ class Runner
   end
 
   def run
+    cleanup
+
     generate_gemfile_lock
     generate_rbs_collection_config
     rbs_collection_install
-    remove_gemfile_lock
+    rename_gemfile_lock
 
     generate_steepfile
 
@@ -70,9 +72,15 @@ class Runner
 
   attr_reader :base_dir, :test_dir, :version, :gem_name
 
+  def cleanup
+    collection_yaml.delete if collection_yaml.exist?
+    collection_lock_yaml.delete if collection_lock_yaml.exist?
+    steepfile.delete if steepfile.exist?
+  end
+
   def generate_gemfile_lock
     v = "~> #{version}"
-    test_dir.join('Gemfile').write(<<~RUBY)
+    gemfile.write(<<~RUBY)
       source 'https://rubygems.org'
       gem #{gem_name.dump}, #{v.dump}
 
@@ -85,7 +93,7 @@ class Runner
   end
 
   def generate_rbs_collection_config
-    test_dir.join('rbs_collection.yaml').write(<<~YAML)
+    collection_yaml.write(<<~YAML)
       sources:
         - type: local
           path: #{Pathname(__dir__).join("../gems")}
@@ -98,13 +106,13 @@ class Runner
     sh! 'rbs', 'collection', 'install', chdir: test_dir.to_s
   end
 
-  def remove_gemfile_lock
-    test_dir.join('Gemfile.lock').delete
-    test_dir.join('Gemfile').delete
+  def rename_gemfile_lock
+    gemfile_lock.rename(test_dir / "Gemfile.lock.back")
+    gemfile.rename(test_dir / "Gemfile.back")
   end
 
   def generate_steepfile
-    test_dir.join("Steepfile").write(<<~RUBY)
+    steepfile.write(<<~RUBY)
       D = Steep::Diagnostic
       target :lib do
         check "."
@@ -138,6 +146,12 @@ class Runner
     yaml = YAML.load path.read
     yaml['additional_gems'] || []
   end
+
+  def collection_yaml = test_dir.join('rbs_collection.yaml')
+  def collection_lock_yaml = test_dir.join('rbs_collection.lock.yaml')
+  def gemfile = test_dir.join('Gemfile')
+  def gemfile_lock = test_dir.join('Gemfile.lock')
+  def steepfile = test_dir.join('Steepfile')
 end
 
 failed_gems = []
