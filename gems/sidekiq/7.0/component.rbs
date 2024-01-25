@@ -1,0 +1,23 @@
+module Sidekiq
+  module Component
+    def watchdog: (String last_words) -> void
+
+    def safe_thread: (String name) -> Thread
+
+    def logger: () -> Logger
+
+    def redis: () { (RedisClientAdapter) -> void } -> Hash[String, untyped]
+
+    def tid: () -> String
+
+    def hostname: () -> String
+
+    def process_nonce: () -> String
+
+    def identity: () -> String
+
+    def handle_exception: () -> Proc
+
+    def fire_event: (String event, Hash[Symbol, untyped] options) -> void
+  end
+end
