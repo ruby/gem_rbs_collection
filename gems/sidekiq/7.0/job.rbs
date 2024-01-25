@@ -1,0 +1,81 @@
+module Sidekiq
+  module Job
+    def self.included: (untyped base) -> void
+
+    attr_accessor jid: String
+
+    def logger: () -> Logger
+
+    module ClassMethods
+      def build_client: () -> Client
+
+      def client_push: (Hash[String, untyped] item) -> String
+
+      def delay: (*untyped args) -> void
+
+      def delay_for: (*untyped args) -> void
+
+      def delay_until: (*untyped args) -> void
+
+      def perform_async: (*untyped args) -> void
+
+      alias perform_at perform_in
+
+      def perform_bulk: (untyped args, ?batch_size: Integer) -> Array[String?]
+
+      def perform_in: (Time | Numeric interval, *untyped args) -> boolish
+
+      def perform_inline: (*untyped args) -> boolish
+
+      alias perform_sync perform_inline
+
+      def queue_as: (string q) -> void
+
+      def set: (Hash[Symbol | string, untyped] options) -> Setter
+
+      def sidekiq_options: (?Hash[Symbol | string, untyped] opts) -> void
+    end
+
+    module Options
+      def self.included: (untyped base) -> void
+
+      module ClassMethods
+        def get_sidekiq_options: () -> Hash[String, untyped]
+
+        def sidekiq_class_attribute: (*string attrs) ->void
+
+        def sidekiq_options: (?Hash[Symbol | string, untyped] opts) -> void
+
+        def sidekiq_retries_exhausted: () { (Hash[String, untyped] job, Exception ex) -> void } -> void
+
+        def sidekiq_retry_in: () { (Integer count, Exception ex) -> Integer } -> void
+
+        ACCESSOR_MUTEX: ::Thread::Mutex
+      end
+    end
+
+    class Setter
+      include Sidekiq::JobUtil
+
+      def perform_async: (*untyped args) -> void
+
+      alias perform_at perform_in
+
+      def perform_bulk: (untyped args, ?batch_size: Integer) -> Array[String?]
+
+      def perform_in: (Time | Numeric interval, *untyped args) -> boolish
+
+      def perform_inline: (*untyped args) -> boolish
+
+      alias perform_sync perform_inline
+
+      def set: (Hash[Symbol | string, untyped] options) -> self
+
+      private
+
+      def at: (float interval) -> self
+
+      def initialize: (singleton(Client) klass, Hash[Symbol | string, untyped] opts) -> void
+    end
+  end
+end

@@ -166,7 +166,7 @@ module Rails
 
       attr_accessor ssl_options: untyped
 
-      attr_accessor public_file_server: untyped
+      attr_accessor public_file_server: ActiveSupport::OrderedOptions
 
       attr_accessor session_options: untyped
 
@@ -194,7 +194,7 @@ module Rails
 
       attr_accessor require_master_key: untyped
 
-      attr_accessor credentials: untyped
+      attr_accessor credentials: ActiveSupport::OrderedOptions
 
       attr_accessor disable_sandbox: untyped
 
@@ -551,9 +551,9 @@ module Rails
     #
     # +Rails.application.secrets.namespace+ returns +my_app_production+ in the
     # production environment.
-    def secrets: () -> untyped
+    def secrets: () -> ActiveSupport::OrderedOptions
 
-    attr_writer secrets: untyped
+    attr_writer secrets: ActiveSupport::OrderedOptions
 
     # The secret_key_base is used as the input secret to the application's key generator, which in turn
     # is used to create all MessageVerifiers/MessageEncryptors, including the ones that sign and encrypt cookies.

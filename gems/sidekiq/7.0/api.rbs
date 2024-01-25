@@ -1,0 +1,15 @@
+module Sidekiq
+  class WorkSet
+    include Enumerable[[String, String, work]]
+
+    type work = { 'queue' => String, 'run_at' => Integer, 'payload' => job_hash }
+
+    type job_hash = { 'class' => String, 'args' => Array[untyped] }
+
+    def each: () { ([String, String, work]) -> void } -> void
+
+    def size: () -> Integer
+  end
+
+  class Workers = WorkSet
+end

@@ -68,12 +68,25 @@ class Redis
   # @return [String, Boolean] `"OK"` or true, false if `:nx => true` or `:xx => true`
   def set: ((String | Symbol) key, top value, ?ex: Integer?, ?px: Integer?, ?nx: boolish, ?xx: boolish, ?keepttl: boolish) -> (String | bool)
 
+  # Set the time to live in seconds of a key.
+  #
+  # @param [String] key
+  # @param [Integer] ttl
+  # @param [String] value
+  # @return [String] `"OK"`
+  def setex: (String key, Integer ttl, String value) -> String
+
   # Get the value of a key.
   #
   # @param [String] key
   # @return [String]
   def get: ((String | Symbol) key) -> String?
 
+  # Delete one or more keys.
+  #
+  # @param [String, Array<String>] keys
+  # @return [Integer] number of keys that were deleted
+  def del: (*(String | Array[String]) keys) -> Integer
 
   # Set one or more values.
   #

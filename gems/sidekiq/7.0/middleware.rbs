@@ -1,0 +1,51 @@
+module Sidekiq
+  module Middleware
+    class Chain
+      include Enumerable[untyped]
+
+      def add: (untyped klass, *untyped args) -> untyped
+
+      def clear: () -> untyped
+
+      def copy_for: (untyped capsule) -> untyped
+
+      def each: () { (untyped) -> untyped } -> untyped
+
+      def empty?: () -> untyped
+
+      def entries: () -> untyped
+
+      def exists?: (untyped klass) -> untyped
+
+      alias include? exists?
+
+      def insert_after: (untyped oldklass, untyped newklass, *untyped args) -> untyped
+
+      def insert_before: (untyped oldklass, untyped newklass, *untyped args) -> untyped
+
+      def invoke: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+      def prepend: (untyped klass, *untyped args) -> untyped
+
+      def remove: (untyped klass) -> untyped
+
+      def retrieve: () -> untyped
+
+      private
+
+      def initialize: (?untyped config) ?{ (untyped) -> untyped } -> void
+
+      def traverse: (untyped chain, untyped index, untyped args) { (*untyped) -> untyped } -> untyped
+    end
+
+    class Entry
+      attr_reader klass: untyped
+
+      def make_new: () -> untyped
+
+      private
+
+      def initialize: (untyped config, Class klass, *untyped args) -> void
+    end
+  end
+end

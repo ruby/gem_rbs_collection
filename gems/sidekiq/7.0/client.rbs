@@ -1,0 +1,40 @@
+module Sidekiq
+  class Client
+    type interval = Time | Numeric
+
+    type queue_name = Symbol | String
+
+    include Sidekiq::JobUtil
+
+    attr_accessor redis_pool: ConnectionPool[RedisClientAdapter]
+
+    def self.enqueue: (Class klass, *untyped args) -> void
+
+    def self.enqueue_in: (interval interval, Class klass, *untyped args) -> void
+
+    def self.enqueue_to: (queue_name queue, Class klass, *untyped args) -> void
+
+    def self.enqueue_to_in: (queue_name queue, interval interval, Class klass, *untyped args) -> void
+
+    def self.push: (Hash[String, untyped] item) -> String
+
+    def self.push_bulk: (Hash[Symbol | String, untyped] items) -> Array[String?]
+
+    def self.via: (ConnectionPool[RedisClientAdapter] pool) { () -> void } -> void
+
+    def middleware: () { (Middleware::Chain chain) -> void } -> Middleware::Chain
+
+    def push: (Hash[String, untyped] item) -> String
+
+    def push_bulk: (Hash[Symbol | String, untyped] items) -> Array[String?]
+
+    private
+
+    def atomic_push: (RedisClientAdapter conn, Array[Hash[String, untyped]] payloads) -> void
+
+    def initialize: (?ConnectionPool[RedisClientAdapter] pool) -> void
+                  | (?config: Config, ?pool: ConnectionPool[RedisClientAdapter], ?chain: Middleware::Chain) -> void
+
+    def raw_push: (Array[Hash[String, untyped]] payloads) -> bool
+  end
+end
