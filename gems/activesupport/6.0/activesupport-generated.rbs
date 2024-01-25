@@ -11707,12 +11707,6 @@ module ActiveSupport
 
     def initialize: (untyped utc_time, untyped time_zone, ?untyped? local_time, ?untyped? period) -> untyped
 
-    # Returns a <tt>Time</tt> instance that represents the time in +time_zone+.
-    def time: () -> untyped
-
-    # Returns a <tt>Time</tt> instance of the simultaneous time in the UTC timezone.
-    def utc: () -> untyped
-
     alias comparable_time utc
 
     alias getgm utc
@@ -11728,33 +11722,11 @@ module ActiveSupport
     def in_time_zone: (?(ActiveSupport::TimeZone | String) new_zone) -> ::ActiveSupport::TimeWithZone
                     | (false? zone) -> ::Time
 
-    # Returns a <tt>Time</tt> instance of the simultaneous time in the system timezone.
-    def localtime: (?untyped? utc_offset) -> untyped
-
     alias getlocal localtime
-
-    # Returns true if the current time is within Daylight Savings Time for the
-    # specified time zone.
-    #
-    #   Time.zone = 'Eastern Time (US & Canada)'    # => 'Eastern Time (US & Canada)'
-    #   Time.zone.parse("2012-5-30").dst?           # => true
-    #   Time.zone.parse("2012-11-30").dst?          # => false
-    def dst?: () -> untyped
 
     alias isdst dst?
 
-    # Returns true if the current time zone is set to UTC.
-    #
-    #   Time.zone = 'UTC'                           # => 'UTC'
-    #   Time.zone.now.utc?                          # => true
-    #   Time.zone = 'Eastern Time (US & Canada)'    # => 'Eastern Time (US & Canada)'
-    #   Time.zone.now.utc?                          # => false
-    def utc?: () -> untyped
-
     alias gmt? utc?
-
-    # Returns the offset from current time to UTC time in seconds.
-    def utc_offset: () -> untyped
 
     alias gmt_offset utc_offset
 
@@ -11769,12 +11741,6 @@ module ActiveSupport
     #   Time.zone = 'UTC'                          # => "UTC"
     #   Time.zone.now.formatted_offset(true, "0")  # => "0"
     def formatted_offset: (?bool colon, ?untyped? alternate_utc_string) -> untyped
-
-    # Returns the time zone abbreviation.
-    #
-    #   Time.zone = 'Eastern Time (US & Canada)'   # => "Eastern Time (US & Canada)"
-    #   Time.zone.now.zone # => "EST"
-    def zone: () -> untyped
 
     # Returns a string of the object's date, time, zone, and offset from UTC.
     #
@@ -11809,18 +11775,6 @@ module ActiveSupport
 
     def encode_with: (untyped coder) -> untyped
 
-    # Returns a string of the object's date and time in the format used by
-    # HTTP requests.
-    #
-    #   Time.zone.now.httpdate  # => "Tue, 01 Jan 2013 04:39:43 GMT"
-    def httpdate: () -> untyped
-
-    # Returns a string of the object's date and time in the RFC 2822 standard
-    # format.
-    #
-    #   Time.zone.now.rfc2822  # => "Tue, 01 Jan 2013 04:51:39 +0000"
-    def rfc2822: () -> untyped
-
     alias rfc822 rfc2822
 
     # Returns a string of the object's date and time.
@@ -11831,10 +11785,6 @@ module ActiveSupport
     def to_s: (?::Symbol format) -> untyped
 
     alias to_formatted_s to_s
-
-    # Replaces <tt>%Z</tt> directive with +zone before passing to Time#strftime,
-    # so that zone information is correct.
-    def strftime: (untyped format) -> untyped
 
     # Use the time in UTC for comparisons.
     def <=>: (untyped other) -> untyped
@@ -11972,43 +11922,7 @@ module ActiveSupport
     #   now.advance(years: 1)   # => Mon, 02 Nov 2015 01:26:28 EST -05:00
     def advance: (untyped options) -> TimeWithZone
 
-    # Returns Array of parts of Time in sequence of
-    # [seconds, minutes, hours, day, month, year, weekday, yearday, dst?, zone].
-    #
-    #   now = Time.zone.now     # => Tue, 18 Aug 2015 02:29:27 UTC +00:00
-    #   now.to_a                # => [27, 29, 2, 18, 8, 2015, 2, 230, false, "UTC"]
-    def to_a: () -> ::Array[untyped]
-
-    # Returns the object's date and time as a floating point number of seconds
-    # since the Epoch (January 1, 1970 00:00 UTC).
-    #
-    #   Time.zone.now.to_f # => 1417709320.285418
-    def to_f: () -> untyped
-
-    # Returns the object's date and time as an integer number of seconds
-    # since the Epoch (January 1, 1970 00:00 UTC).
-    #
-    #   Time.zone.now.to_i # => 1417709320
-    def to_i: () -> untyped
-
     alias tv_sec to_i
-
-    # Returns the object's date and time as a rational number of seconds
-    # since the Epoch (January 1, 1970 00:00 UTC).
-    #
-    #   Time.zone.now.to_r # => (708854548642709/500000)
-    def to_r: () -> untyped
-
-    # Returns an instance of DateTime with the timezone's UTC offset
-    #
-    #   Time.zone.now.to_datetime                         # => Tue, 18 Aug 2015 02:32:20 +0000
-    #   Time.current.in_time_zone('Hawaii').to_datetime   # => Mon, 17 Aug 2015 16:32:20 -1000
-    def to_datetime: () -> untyped
-
-    # Returns an instance of +Time+, either with the same UTC offset
-    # as +self+ or in the local system timezone depending on the setting
-    # of +ActiveSupport.to_time_preserves_timezone+.
-    def to_time: () -> untyped
 
     # So that +self+ <tt>acts_like?(:time)</tt>.
     def acts_like_time?: () -> ::TrueClass
