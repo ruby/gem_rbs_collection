@@ -12,11 +12,27 @@ module ActiveSupport
   end
 
   module Configurable
-    module ClassMethods
-      # Manual definition to make block optional
-      def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> untyped
-                         | ...
+    extend Concern
+
+    class Configuration < InheritableOptions
+      def compile_methods!: () -> void
+
+      # Compiles reader methods so we don't have to go through method_missing.
+      def self.compile_methods!: (Array[Symbol | String] keys) -> void
     end
+
+    module ClassMethods
+      def config: () -> InheritableOptions
+
+      def configure: () { (InheritableOptions config) -> void } -> void
+
+      private
+
+      # TODO: Fix to use `interned` in names params after releasing ruby/rbs#1499
+      def config_accessor: (*(String | Symbol) names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> void
+    end
+
+    def config: () -> InheritableOptions
   end
 
   class Deprecation
@@ -238,6 +254,29 @@ module ActiveSupport
     def tv_nsec: () -> Integer
     def tv_usec: () -> Integer
     def wednesday?: () -> bool
+  end
+
+  class OrderedOptions < Hash[Symbol, untyped]
+    alias _get []
+
+    # TODO: Fix to use `interned` in key params after releasing ruby/rbs#1499
+    def []=: ((String | Symbol) key, untyped value) -> untyped
+
+    # TODO: Fix to use `interned` in key params after releasing ruby/rbs#1499
+    def []: ((String | Symbol) key) -> untyped
+
+    def method_missing: (Symbol name, *untyped args) -> untyped
+
+    def respond_to_missing?: (Symbol name, ?bool include_private) -> true
+
+    def extractable_options?: () -> true
+  end
+
+  class InheritableOptions < OrderedOptions
+    # TODO: Fix to use `interned` in parent params after releasing ruby/rbs#1499
+    def initialize: (?Hash[(String | Symbol), untyped]? parent) -> void
+
+    def inheritable_copy: () -> instance
   end
 end
 
