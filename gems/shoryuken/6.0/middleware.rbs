@@ -1,0 +1,39 @@
+module Shoryuken
+  module Middleware
+    class Chain
+      attr_reader entries: Array[Entry]
+
+      def add: (singleton(Class) klass, *untyped args) -> void
+
+      def clear: () -> void
+
+      def exists?: (untyped klass) -> bool
+
+      def insert_after: (untyped oldklass, untyped newklass, *untyped args) -> void
+
+      def insert_before: (untyped oldklass, untyped newklass, *untyped args) -> void
+
+      def invoke: (*untyped args) { () -> void } -> void
+
+      def prepend: (untyped klass, *untyped args) -> void
+
+      def remove: (untyped klass) -> void
+
+      def retrieve: () -> Array[untyped]
+
+      private
+
+      def initialize: () ?{ (self) -> void } -> void
+
+      class Entry
+        attr_reader klass: singleton(Class)
+
+        @args: Array[untyped]
+
+        def initialize: (singleton(Class), *untyped args) -> void
+
+        def make_new: () -> untyped
+      end
+    end
+  end
+end

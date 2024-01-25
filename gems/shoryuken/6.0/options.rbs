@@ -1,0 +1,68 @@
+module Shoryuken
+  class Options
+    type group = { concurrency: Integer, delay: Numeric, queues: Array[String] }
+
+    attr_accessor active_job_queue_name_prefixing: bool
+    attr_accessor cache_visibility_timeout: bool
+    attr_accessor groups: Hash[String, group]
+    attr_accessor exception_handlers: Array[untyped]
+    attr_accessor launcher_executor: untyped
+    attr_accessor worker_executor: untyped
+    attr_accessor worker_registry: untyped
+    attr_accessor start_callback: (^() -> void | nil)
+    attr_accessor stop_callback: (^() -> void | nil)
+    attr_writer default_worker_options: Hash[String, untyped]
+    attr_writer sqs_client: Aws::SQS::Client
+    attr_reader sqs_client_receive_message_opts: Hash[Symbol, untyped]
+
+    def active_job?: () -> boolish
+
+    def active_job_queue_name_prefixing?: () -> bool
+
+    def add_group: (String group, ?Integer concurrency, ?delay: Numeric) -> void
+
+    def add_queue: (String queue, Integer weight, String group) -> void
+
+    def cache_visibility_timeout?: () -> bool
+
+    def client_middleware: () ?{ (Middleware::Chain) -> void } -> Middleware::Chain
+
+    def configure_client: () { (self) -> void } -> void
+
+    def configure_server: () { (self) -> void } -> void
+
+    def delay: (String group) -> Numeric
+
+    def logger: () -> Logger
+
+    def on: (Symbol event) { () -> void } -> void
+
+    def on_start: () { () -> void } -> void
+
+    def on_stop: () { () -> void } -> void
+
+    def options: () -> Hash[Symbol, untyped]
+
+    def polling_strategy: (String group) -> untyped
+
+    def register_worker: (*untyped args) -> void
+
+    def server?: () -> bool
+
+    def server_middleware: () ?{ (Middleware::Chain) -> void } -> Middleware::Chain
+
+    def sqs_client: () -> Aws::SQS::Client
+
+    def ungrouped_queues: () -> Array[untyped]
+
+    private
+
+    def default_client_middleware: () -> Middleware::Chain
+
+    def default_server_middleware: () -> Middleware::Chain
+
+    def initialize: () -> void
+
+    DEFAULTS: ::Hash[Symbol, untyped]
+  end
+end
