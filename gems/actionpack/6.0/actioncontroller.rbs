@@ -104,19 +104,19 @@ module AbstractController::Callbacks::ClassMethods
     def after: (ActionController::Base controller) -> void
   end
 
-  type before_action_callback = Symbol | ^(instance controller) [self: instance] -> void | _BeforeActionCallback
-  type around_action_callback = Symbol | ^(instance controller, ^() -> void) [self: instance] -> void | _AroundActionCallback
-  type after_action_callback = Symbol | ^(instance controller) [self: instance] -> void | _AfterActionCallback
+  type before_action_callback[T] = Symbol | ^(T controller) [self: T] -> void | _BeforeActionCallback
+  type around_action_callback[T] = Symbol | ^(T controller, ^() -> void) [self: T] -> void | _AroundActionCallback
+  type after_action_callback[T] = Symbol | ^(T controller) [self: T] -> void | _AfterActionCallback
 
-  def before_action: (*before_action_callback) ?{ (instance controller) [self: instance] -> void } -> void
-  def around_action: (*around_action_callback) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
-  def after_action: (*after_action_callback) ?{ (instance controller) [self: instance] -> void } -> void
-  def skip_before_action: (*before_action_callback) ?{ (instance controller) [self: instance] -> void } -> void
-  def skip_around_action: (*around_action_callback) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
-  def skip_after_action: (*after_action_callback) ?{ (instance controller) [self: instance] -> void } -> void
-  def prepend_before_action: (*before_action_callback) ?{ (instance controller) [self: instance] -> void } -> void
-  def prepend_around_action: (*around_action_callback) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
-  def prepend_after_action: (*after_action_callback) ?{ (instance controller) [self: instance] -> void } -> void
+  def before_action: (*before_action_callback[instance]) ?{ (instance controller) [self: instance] -> void } -> void
+  def around_action: (*around_action_callback[instance]) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
+  def after_action: (*after_action_callback[instance]) ?{ (instance controller) [self: instance] -> void } -> void
+  def skip_before_action: (*before_action_callback[instance]) ?{ (instance controller) [self: instance] -> void } -> void
+  def skip_around_action: (*around_action_callback[instance]) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
+  def skip_after_action: (*after_action_callback[instance]) ?{ (instance controller) [self: instance] -> void } -> void
+  def prepend_before_action: (*before_action_callback[instance]) ?{ (instance controller) [self: instance] -> void } -> void
+  def prepend_around_action: (*around_action_callback[instance]) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
+  def prepend_after_action: (*after_action_callback[instance]) ?{ (instance controller) [self: instance] -> void } -> void
 
   alias append_before_action before_action
   alias append_around_action around_action
