@@ -12,15 +12,23 @@ module RuboCop
     class Base
       extend AST::NodePattern::Macros
 
-      def add_offense: (untyped node, ?message: String) -> void
+      def add_offense: (untyped node, ?message: String, ?severity: Symbol) -> void |
+                       (untyped node, ?message: String, ?severity: Symbol) {(Corrector) -> void} -> void
       def cop_config: () -> Hash[String, untyped]
       def processed_source: () -> AST::ProcessedSource
     end
 
+    class Corrector < Parser::Source::TreeRewriter
+    end
+
     module RangeHelp
-      def source_range: (Parser::Source::Buffer source_buffer, Integer line_number, Integer column, ?Integer length) -> Parser::Source::Range 
+      def source_range: (Parser::Source::Buffer source_buffer, Integer line_number, Integer column, ?Integer length) -> Parser::Source::Range
     end
   end
 
   class ProcessedSource = AST::ProcessedSource
+
+  module AutoCorrector
+    def support_autocorrect?: () -> true
+  end
 end
