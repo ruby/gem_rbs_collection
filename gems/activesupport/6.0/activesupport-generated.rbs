@@ -3510,28 +3510,6 @@ class Module
   def anonymous?: () -> untyped
 end
 
-class Module
-  # Declares an attribute reader backed by an internally-named instance variable.
-  def attr_internal_reader: (*untyped attrs) -> untyped
-
-  # Declares an attribute writer backed by an internally-named instance variable.
-  def attr_internal_writer: (*untyped attrs) -> untyped
-
-  # Declares an attribute reader and writer backed by an internally-named instance
-  # variable.
-  def attr_internal_accessor: (*untyped attrs) -> untyped
-
-  alias attr_internal attr_internal_accessor
-
-  attr_accessor self.attr_internal_naming_format: untyped
-
-  private
-
-  def attr_internal_ivar_name: (untyped attr) -> untyped
-
-  def attr_internal_define: (untyped attr_name, untyped `type`) -> untyped
-end
-
 # Extends the module object with class/module and instance accessors for
 # class/module attributes, just like the native attr* accessors for instance
 # attributes.

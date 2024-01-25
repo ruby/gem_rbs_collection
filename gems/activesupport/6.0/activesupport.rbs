@@ -320,6 +320,28 @@ class Module
   # Manual definition to make block optional
   def mattr_accessor: (*untyped syms, ?default: untyped? default, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> untyped
                     | ...
+
+  # TODO: Fix to use `interned` in attrs params after releasing ruby/rbs#1499
+  def attr_internal_reader: (*(Symbol | String) attrs) -> void
+
+  # TODO: Fix to use `interned` in attrs params after releasing ruby/rbs#1499
+  def attr_internal_writer: (*(Symbol | String) attrs) -> void
+
+  # TODO: Fix to use `interned` in attrs params after releasing ruby/rbs#1499
+  def attr_internal_accessor: (*(Symbol | String) attrs) -> void
+
+  alias attr_internal attr_internal_accessor
+
+  attr_accessor self.attr_internal_naming_format: String
+
+  private
+
+  # TODO: Fix to use `interned` in attr params after releasing ruby/rbs#1499
+  def attr_internal_ivar_name: ((Symbol | String) attr) -> String
+
+  type access_type = :reader | :writer
+  # TODO: Fix to use `interned` in attr params after releasing ruby/rbs#1499
+  def attr_internal_define: ((Symbol | String) attr_name, access_type `type`) -> void
 end
 
 class Integer

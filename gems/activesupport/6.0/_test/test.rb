@@ -30,3 +30,12 @@ hash.deep_stringify_keys!
 
 hash.deep_symbolize_keys
 hash.deep_symbolize_keys!
+
+class TestAttrInternal
+  attr_internal_reader :internal_variable_reader_1
+  attr_internal_reader 'internal_variable_reader_2', :internal_variable_reader_3
+  attr_internal_writer :internal_variable_writer_1
+  attr_internal_writer 'internal_variable_writer_2'
+  attr_internal_writer :internal_variable_accessor_1
+  attr_internal_writer 'internal_variable_accessor_2'
+end
