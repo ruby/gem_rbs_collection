@@ -8,11 +8,28 @@ require 'yaml'
 @verbose = false
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: bin/test [options] <gem...>"
+  opts.banner = <<~BANNER
+    Usage: bin/test [options] <gem...>
+
+    Examples:
+        # Test a gem
+        $ bin/test gems/rack/2.2
+
+        # Test a gem with verbose messages
+        $ bin/test gems/rack/2.2 -v
+
+        # Test all the gems
+        $ bin/test -a
+
+    Options:
+  BANNER
 
   opts.on("-a", "--all", "Test all gems") do @all = true end
   opts.on("-v", "--verbose", "Print more messages") do @verbose = true end
-end.parse!(ARGV)
+
+  opts.parse!(ARGV)
+  abort opts.help if ARGV.empty? && !@all
+end
 
 dirs =
   if @all
