@@ -31,9 +31,9 @@ module Sidekiq
 
       def queue_as: (string q) -> void
 
-      def set: (Hash[Symbol | string, untyped] options) -> Setter
+      def set: (Hash[interned, untyped] options) -> Setter
 
-      def sidekiq_options: (?Hash[Symbol | string, untyped] opts) -> void
+      def sidekiq_options: (?Hash[interned, untyped] opts) -> void
     end
 
     module Options
@@ -44,7 +44,7 @@ module Sidekiq
 
         def sidekiq_class_attribute: (*string attrs) ->void
 
-        def sidekiq_options: (?Hash[Symbol | string, untyped] opts) -> void
+        def sidekiq_options: (?Hash[interned, untyped] opts) -> void
 
         def sidekiq_retries_exhausted: () { (Hash[String, untyped] job, Exception ex) -> void } -> void
 
@@ -69,13 +69,13 @@ module Sidekiq
 
       alias perform_sync perform_inline
 
-      def set: (Hash[Symbol | string, untyped] options) -> self
+      def set: (Hash[interned, untyped] options) -> self
 
       private
 
       def at: (float interval) -> self
 
-      def initialize: (singleton(Client) klass, Hash[Symbol | string, untyped] opts) -> void
+      def initialize: (singleton(Client) klass, Hash[interned, untyped] opts) -> void
     end
   end
 end

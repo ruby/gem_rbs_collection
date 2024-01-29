@@ -45,7 +45,7 @@ class Circuitbox
 
   extend Configuration
 
-  # def self.circuit: [T] (String | Symbol service_name, Hash[untyped, untyped] options) ?{ () -> T } -> (CircuitBreaker | T)
-  def self.circuit: (String | Symbol service_name, Hash[untyped, untyped] options) -> CircuitBreaker
-                  | [T] (String | Symbol service_name, Hash[untyped, untyped] options) ?{ () -> T } -> T
+  # def self.circuit: [T] (interned service_name, Hash[untyped, untyped] options) ?{ () -> T } -> (CircuitBreaker | T)
+  def self.circuit: (interned service_name, Hash[untyped, untyped] options) -> CircuitBreaker
+                  | [T] (interned service_name, Hash[untyped, untyped] options) ?{ () -> T } -> T
 end

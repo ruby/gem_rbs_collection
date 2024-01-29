@@ -11,9 +11,9 @@ module Sidekiq
 
   def self.`❨╯°□°❩╯︵┻━┻`: () -> nil
 
-  def self.options: () -> Hash[(Symbol | String), untyped]
+  def self.options: () -> Hash[interned, untyped]
 
-  def self.options=: (Hash[(Symbol | String), untyped] opts) -> void
+  def self.options=: (Hash[interned, untyped] opts) -> void
 
   #
   # Configuration for Sidekiq server, use like:
@@ -50,7 +50,7 @@ module Sidekiq
 
   def self.default_server_middleware: () -> Sidekiq::Middleware::Chain
 
-  def self.default_worker_options=: (Hash[(String | Symbol), untyped] hash) -> void
+  def self.default_worker_options=: (Hash[interned, untyped] hash) -> void
 
   def self.default_worker_options: () -> Hash[String, untyped]
 
@@ -211,12 +211,12 @@ module Sidekiq
     # Example usage:
     #   Sidekiq::Client.enqueue_to(:queue_name, MyWorker, 'foo', 1, :bat => 'bar')
     #
-    def self.enqueue_to: ((Symbol | String) queue, Class klass, *untyped args) -> String
+    def self.enqueue_to: (interned queue, Class klass, *untyped args) -> String
 
     # Example usage:
     #   Sidekiq::Client.enqueue_to_in(:queue_name, 3.minutes, MyWorker, 'foo', 1, :bat => 'bar')
     #
-    def self.enqueue_to_in: ((Symbol | String) queue, (Time | untyped) interval, Class klass, *untyped args) -> String
+    def self.enqueue_to_in: (interned queue, (Time | untyped) interval, Class klass, *untyped args) -> String
 
     # Example usage:
     #   Sidekiq::Client.enqueue_in(3.minutes, MyWorker, 'foo', 1, :bat => 'bar')
@@ -237,11 +237,11 @@ module Sidekiq
     end
 
     module ActionMailer
-      def sidekiq_delay: (?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay: (?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
-      def sidekiq_delay_for: ((Time | untyped) interval, ?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay_for: ((Time | untyped) interval, ?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
-      def sidekiq_delay_until: (untyped timestamp, ?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay_until: (untyped timestamp, ?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
       alias delay sidekiq_delay
       alias delay_for sidekiq_delay_for
@@ -255,11 +255,11 @@ module Sidekiq
     end
 
     module ActiveRecord
-      def sidekiq_delay: (?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay: (?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
-      def sidekiq_delay_for: ((Time | untyped) interval, ?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay_for: ((Time | untyped) interval, ?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
-      def sidekiq_delay_until: (untyped timestamp, ?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay_until: (untyped timestamp, ?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
       alias delay sidekiq_delay
       alias delay_for sidekiq_delay_for
@@ -273,11 +273,11 @@ module Sidekiq
     end
 
     module Klass
-      def sidekiq_delay: (?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay: (?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
-      def sidekiq_delay_for: ((Time | untyped) interval, ?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay_for: ((Time | untyped) interval, ?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
-      def sidekiq_delay_until: (untyped timestamp, ?Hash[(String | Symbol), untyped]? options) -> Sidekiq::Extensions::Proxy
+      def sidekiq_delay_until: (untyped timestamp, ?Hash[interned, untyped]? options) -> Sidekiq::Extensions::Proxy
 
       alias delay sidekiq_delay
       alias delay_for sidekiq_delay_for
@@ -285,7 +285,7 @@ module Sidekiq
     end
 
     class Proxy < BasicObject
-      def initialize: (untyped performable, untyped target, ?Hash[(String | Symbol), untyped] options) -> void
+      def initialize: (untyped performable, untyped target, ?Hash[interned, untyped] options) -> void
 
       def method_missing: (String name, *untyped args) -> String
     end
@@ -697,7 +697,7 @@ module Sidekiq
         #
         # In practice, any option is allowed.  This is the main mechanism to configure the
         # options for a specific job.
-        def sidekiq_options: (?Hash[Symbol | String, untyped] opts) -> untyped
+        def sidekiq_options: (?Hash[interned, untyped] opts) -> untyped
                            | (?queue: String, ?retry: (bool | Integer), ?dead: bool, ?backtrace: (bool | Integer), ?pool: untyped, ?tags: Array[String]) -> Hash[String, untyped]
 
         def sidekiq_retry_in: () { (Integer count, Exception exception) -> Integer? } -> void
@@ -758,9 +758,9 @@ module Sidekiq
       #
       # In practice, any option is allowed.  This is the main mechanism to configure the
       # options for a specific job.
-      def sidekiq_options: (?Hash[Symbol | String, untyped] opts) -> Hash[String, untyped]
+      def sidekiq_options: (?Hash[interned, untyped] opts) -> Hash[String, untyped]
 
-      def client_push: (Hash[(Symbol | String), untyped] item) -> String
+      def client_push: (Hash[interned, untyped] item) -> String
     end
   end
 
@@ -780,7 +780,7 @@ module Sidekiq
     def local_level: () -> Integer
 
     def local_level=: (Integer? level) -> void
-                    | ((Symbol | String) level) -> void
+                    | (interned level) -> void
 
     def level: () -> Integer
   end

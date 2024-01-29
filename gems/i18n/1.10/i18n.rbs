@@ -16,7 +16,7 @@ module I18n
     def backend=: (untyped value) -> untyped
     def default_locale: -> Symbol
     def default_locale=: (untyped value) -> untyped
-    def available_locales: -> Array[String | Symbol]
+    def available_locales: -> Array[interned]
     def available_locales=: (untyped value) -> untyped
     def default_separator: -> String
     def default_separator=: (String value) -> String
@@ -29,7 +29,7 @@ module I18n
 
     def reload!: -> void
     def eager_load!: -> void
-    def translate: (String | Symbol | Array[untyped] key, ?throw: bool throw, ?raise: bool raise, ?locale: untyped? locale, **untyped options) -> String
+    def translate: (interned | Array[untyped] key, ?throw: bool throw, ?raise: bool raise, ?locale: untyped? locale, **untyped options) -> String
     alias t translate
     def translate!: (untyped key, **untyped options) -> String
     alias t! translate!
@@ -39,7 +39,7 @@ module I18n
     alias l localize
     def with_locale: (?untyped? tmp_locale) { () -> untyped } -> untyped
     def normalize_keys: (untyped locale, untyped key, untyped scope, ?untyped separator) -> Array[Symbol]
-    def locale_available?: (Symbol | String locale) -> bool
+    def locale_available?: (interned locale) -> bool
     def enforce_available_locales!: (untyped locale) -> nil
     def available_locales_initialized?: -> bool
   end
@@ -51,7 +51,7 @@ module I18n
     def backend=: (untyped backend) -> untyped
     def default_locale: -> Symbol
     def default_locale=: (untyped locale) -> untyped
-    def available_locales: -> Array[String | Symbol]
+    def available_locales: -> Array[interned]
     def available_locales_set: -> untyped
     def available_locales=: (untyped locales) -> void
     def available_locales_initialized?: -> bool

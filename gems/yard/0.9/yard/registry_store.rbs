@@ -18,19 +18,19 @@ class YARD::RegistryStore
   # @param [String, Symbol] key the path name of the object to look for.
   #   If it is empty or :root, returns the {#root} object.
   # @return [CodeObjects::Base, nil] a code object or nil if none is found
-  def get: (String | Symbol key) -> YARD::CodeObjects::Base?
+  def get: (interned key) -> YARD::CodeObjects::Base?
   # Associates an object with a path
   # @param [String, Symbol] key the path name (:root or '' for root object)
   # @param [CodeObjects::Base] value the object to store
   # @return [CodeObjects::Base] returns +value+
-  def put: (String | Symbol key, YARD::CodeObjects::Base value) -> YARD::CodeObjects::Base
+  def put: (interned key, YARD::CodeObjects::Base value) -> YARD::CodeObjects::Base
   # Gets a {CodeObjects::Base} from the store
   # @param [String, Symbol] key
   #   the path name of the object to look for.
   #   If it is empty or :root, returns the {#root} object.
   # @return [CodeObjects::Base, nil] a code object or nil if none is found
   #
-  def []: (String | Symbol key) -> YARD::CodeObjects::Base?
+  def []: (interned key) -> YARD::CodeObjects::Base?
   # Associates an object with a path
   # @param [String, Symbol] key
   #   the path name (:root or '' for root object)
@@ -38,7 +38,7 @@ class YARD::RegistryStore
   #   the object to store
   # @return [CodeObjects::Base] returns +value+
   #
-  def []=: (String | Symbol key, YARD::CodeObjects::Base value) -> YARD::CodeObjects::Base
+  def []=: (interned key, YARD::CodeObjects::Base value) -> YARD::CodeObjects::Base
   # Deletes an object at a given path
   # @param [#to_sym] key the key to delete
   # @return [void]

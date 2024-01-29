@@ -151,7 +151,7 @@ module HTTParty
     #     include HTTParty
     #     format :json
     #   end
-    def format: (?String | Symbol? f) -> void
+    def format: (?interned? f) -> void
 
     # Declare whether or not to follow redirects.  When true, an
     # {HTTParty::RedirectionTooDeep} error will raise upon encountering a
@@ -231,7 +231,7 @@ module HTTParty
     #     include HTTParty
     #     ssl_version :SSLv3
     #   end
-    def ssl_version: (String | Symbol version) -> void
+    def ssl_version: (interned version) -> void
 
     # Allows setting of SSL ciphers to use.  This only works in Ruby 1.9+.
     # You can get a list of valid specific ciphers from OpenSSL::Cipher.ciphers.
@@ -576,7 +576,7 @@ module HTTParty
 
     private
 
-    def from_ruby_version: (String ruby_version, ?option: (Symbol | String)? option, ?warn: bool warn) { () -> untyped } -> void
+    def from_ruby_version: (String ruby_version, ?option: interned? option, ?warn: bool warn) { () -> untyped } -> void
 
     def add_timeout?: (Integer | Float timeout) -> bool
 

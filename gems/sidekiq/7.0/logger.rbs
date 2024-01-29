@@ -43,9 +43,9 @@ module Sidekiq
     def local_level: () -> Integer
 
     def local_level=: (Integer? level) -> void
-                    | ((Symbol | String) level) -> void
+                    | (interned level) -> void
 
-    def log_at: ((Symbol | String | Integer) level) { () -> void } -> void
+    def log_at: ((interned | Integer) level) { () -> void } -> void
 
     LEVELS: ::Hash[String, Integer]
   end

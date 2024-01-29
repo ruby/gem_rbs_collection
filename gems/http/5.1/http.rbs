@@ -1,6 +1,6 @@
 module HTTP
   interface _Callable
-    def call: () -> (Symbol | String)
+    def call: () -> interned
   end
 
   def self.auth: (_ToS) -> HTTP::Client
@@ -21,7 +21,7 @@ module HTTP
       extend Forwardable
       attr_reader headers: Headers
       def []: (_ToS name) -> (nil | String | Array[String])
-      def []=: (String | Symbol name, Array[_ToS] | _ToS value) -> void
+      def []=: (interned name, Array[_ToS] | _ToS value) -> void
     end
 
     extend Forwardable
@@ -57,10 +57,10 @@ module HTTP
     def initialize: () -> void
     def initialize_copy: (instance other) -> void
 
-    def set: (String | Symbol name, Array[_ToS] | _ToS value) -> void
+    def set: (interned name, Array[_ToS] | _ToS value) -> void
     alias []= set
     def delete: (_ToS name) -> void
-    def add: (String | Symbol name, Array[_ToS] | _ToS value) -> void
+    def add: (interned name, Array[_ToS] | _ToS value) -> void
     def get: (_ToS name) -> Array[String]
     def []: (_ToS name) -> (nil | String | Array[String])
 
@@ -118,7 +118,7 @@ module HTTP
 
   class Response
     class Status < ::Delegator
-      def self.coerce: (String | Symbol | Numeric & _ToI object) -> instance
+      def self.coerce: (interned | Numeric & _ToI object) -> instance
       alias self.[] self.coerce
       private
       def self.symbolize: (_ToS str) -> Symbol

@@ -49,19 +49,19 @@ module Faraday
         def initialize: (?strict_mode: bool) ?{ (self) -> void } -> void
         def empty?: () -> bool
         def match: (untyped env) -> ((false | nil) | [Stub, meta]) # TODO: `env` should be Faraday::Env
-        def get: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def head: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def post: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def put: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def patch: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def delete: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def options: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def get: (String | URI | Regexp path, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def head: (String | URI | Regexp path, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def post: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def put: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def patch: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def delete: (String | URI | Regexp path, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def options: (String | URI | Regexp path, ?::Hash[interned, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void # TODO: `env` should be Faraday::Env
         def verify_stubbed_calls: () -> void
         def strict_mode=: (boolish value) -> void
 
         private # protected is not yet supported. See https://github.com/ruby/rbs/issues/579
 
-        def new_stub: (:get | :head | :post | :put | :patch | :delete | :options request_method, String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers, ?(^(String) -> bool | _ToS)? body) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def new_stub: (:get | :head | :post | :put | :patch | :delete | :options request_method, String | URI | Regexp path, ?::Hash[interned, untyped] headers, ?(^(String) -> bool | _ToS)? body) { (untyped env, meta) -> [Integer, ::Hash[interned, untyped], String] } -> void
         def matches?: (::Hash[Symbol, untyped] stack, untyped env) -> ([Stub, meta] | nil) # TODO: `env` should be Faraday::Env
       end
 
@@ -78,7 +78,7 @@ module Faraday
         def matches?: (untyped env) -> [bool, meta] # TODO: `env` should be Faraday::Env
         def path_match?: (String request_path, meta) -> bool
         def params_match?: (untyped env) -> bool # TODO: `env` should be Faraday::Env
-        def headers_match?: (::Hash[String | Symbol, untyped] request_headers) -> bool
+        def headers_match?: (::Hash[interned, untyped] request_headers) -> bool
         def body_match?: (String request_body) -> bool
         def to_s: () -> ::String
       end
@@ -95,7 +95,7 @@ module Faraday
     @constants: Hash[String, untyped]
 
     def initialize: () -> void
-    def get: (Symbol | String name) -> untyped
+    def get: (interned name) -> untyped
     def set: (untyped klass, ?_ToS? name) -> void
   end
 
@@ -224,32 +224,32 @@ module Faraday
   end
 
   module Utils
-    class Headers < ::Hash[Symbol | String, untyped]
+    class Headers < ::Hash[interned, untyped]
       @names: ::Hash[String, String]
 
       def self.from: (untyped value) -> Headers
       def self.allocate: () -> Headers
-      def initialize: (?::Hash[Symbol | String, untyped]? hash) -> void
+      def initialize: (?::Hash[interned, untyped]? hash) -> void
       def initialize_names: () -> void
       def initialize_copy: (self other) -> self
 
       KeyMap: ::Hash[Symbol, String]
 
-      def []: (String | Symbol key) -> untyped?
-      def []=: (String | Symbol key, untyped val) -> untyped
-      def fetch: (String | Symbol key, *untyped args) ?{ () -> untyped } -> untyped
-      def delete: (String | Symbol key) -> untyped?
-      def include?: (String | Symbol key) -> bool
+      def []: (interned key) -> untyped?
+      def []=: (interned key, untyped val) -> untyped
+      def fetch: (interned key, *untyped args) ?{ () -> untyped } -> untyped
+      def delete: (interned key) -> untyped?
+      def include?: (interned key) -> bool
 
       alias has_key? include?
       alias member? include?
       alias key? include?
 
-      def merge!: (::Hash[Symbol | String, untyped] other) -> self
+      def merge!: (::Hash[interned, untyped] other) -> self
       alias update merge!
 
-      def merge: (::Hash[Symbol | String, untyped] other) -> Headers
-      def replace: (::Hash[Symbol | String, untyped] other) -> self
+      def merge: (::Hash[interned, untyped] other) -> Headers
+      def replace: (::Hash[interned, untyped] other) -> self
       def to_hash: () -> Headers
       def parse: (String? header_string) -> Array[untyped]?
 
@@ -257,7 +257,7 @@ module Faraday
 
       private
 
-      def add_parsed: (Symbol | String key, String value) -> untyped
+      def add_parsed: (interned key, String value) -> untyped
     end
   end
 end

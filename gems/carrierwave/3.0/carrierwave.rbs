@@ -44,12 +44,12 @@ module CarrierWave
 
     module Versions
       module ClassMethods
-        def version: (String | Symbol name, **untyped) ? { () -> void } -> void
+        def version: (interned name, **untyped) ? { () -> void } -> void
       end
 
       def versions: () -> Hash[Symbol, CarrierWave::Uploader::Base]
       def version_name: () -> String
-      def version_exists?: (String | Symbol) -> bool
+      def version_exists?: (interned) -> bool
       def cache: (*untyped) -> void
       def url: (*Symbol) -> String
              | (Hash[untyped, untyped]) -> String
