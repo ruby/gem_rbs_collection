@@ -66,7 +66,7 @@ class Redis
   #   - `:xx => true`: Only set the key if it already exist.
   #   - `:keepttl => true`: Retain the time to live associated with the key.
   # @return [String, Boolean] `"OK"` or true, false if `:nx => true` or `:xx => true`
-  def set: ((String | Symbol) key, top value, ?ex: Integer?, ?px: Integer?, ?nx: boolish, ?xx: boolish, ?keepttl: boolish) -> (String | bool)
+  def set: (interned key, top value, ?ex: Integer?, ?px: Integer?, ?nx: boolish, ?xx: boolish, ?keepttl: boolish) -> (String | bool)
 
   # Set the time to live in seconds of a key.
   #
@@ -80,7 +80,7 @@ class Redis
   #
   # @param [String] key
   # @return [String]
-  def get: ((String | Symbol) key) -> String?
+  def get: (interned key) -> String?
 
   # Delete one or more keys.
   #

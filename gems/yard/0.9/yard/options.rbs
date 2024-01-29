@@ -85,7 +85,7 @@ class YARD::Options
   #   options[:format] # equivalent to: options.format
   # @param [Symbol, String] key the option name to access
   # @return the value of the option named +key+
-  def []: (Symbol | String key) -> untyped
+  def []: (interned key) -> untyped
   # Delegates setter calls with Hash syntax to the attribute setter with the key name
   #
   # @example Setting an option with Hash syntax
@@ -93,7 +93,7 @@ class YARD::Options
   # @param [Symbol, String] key the option to set
   # @param [Object] value the value to set for the option
   # @return [Object] the value being set
-  def []=: (Symbol | String key, untyped value) -> untyped
+  def []=: (interned key, untyped value) -> untyped
   # Updates values from an options hash or options object on this object.
   # All keys passed should be key names defined by attributes on the class.
   #
@@ -140,7 +140,7 @@ class YARD::Options
   #
   # @param [Symbol, String] key the key to delete a value for
   # @return [Object] the value that was deleted
-  def delete: (Symbol | String key) -> untyped
+  def delete: (interned key) -> untyped
   # only for 1.8.6
   def tap: () { (YARD::Options _self) -> untyped } -> untyped
 end

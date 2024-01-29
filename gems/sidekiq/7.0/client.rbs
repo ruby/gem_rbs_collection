@@ -2,8 +2,6 @@ module Sidekiq
   class Client
     type interval = Time | Numeric
 
-    type queue_name = Symbol | String
-
     include Sidekiq::JobUtil
 
     attr_accessor redis_pool: ConnectionPool[RedisClientAdapter]
@@ -12,13 +10,13 @@ module Sidekiq
 
     def self.enqueue_in: (interval interval, Class klass, *untyped args) -> void
 
-    def self.enqueue_to: (queue_name queue, Class klass, *untyped args) -> void
+    def self.enqueue_to: (interned queue, Class klass, *untyped args) -> void
 
-    def self.enqueue_to_in: (queue_name queue, interval interval, Class klass, *untyped args) -> void
+    def self.enqueue_to_in: (interned queue, interval interval, Class klass, *untyped args) -> void
 
     def self.push: (Hash[String, untyped] item) -> String
 
-    def self.push_bulk: (Hash[Symbol | String, untyped] items) -> Array[String?]
+    def self.push_bulk: (Hash[interned, untyped] items) -> Array[String?]
 
     def self.via: (ConnectionPool[RedisClientAdapter] pool) { () -> void } -> void
 
@@ -26,7 +24,7 @@ module Sidekiq
 
     def push: (Hash[String, untyped] item) -> String
 
-    def push_bulk: (Hash[Symbol | String, untyped] items) -> Array[String?]
+    def push_bulk: (Hash[interned, untyped] items) -> Array[String?]
 
     private
 

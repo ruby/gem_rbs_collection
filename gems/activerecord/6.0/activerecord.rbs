@@ -81,7 +81,7 @@ module ActiveRecord
     def self.columns: () -> Array[untyped]
     def self.reflect_on_all_associations: (?Symbol) -> Array[untyped]
 
-    def will_save_change_to_attribute?: (String | Symbol attr_name, ?from: untyped, ?to: untyped) -> bool
+    def will_save_change_to_attribute?: (interned attr_name, ?from: untyped, ?to: untyped) -> bool
 
     def save!: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> void
     def save: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> bool
@@ -295,22 +295,22 @@ module ActiveRecord
       def all: () -> self
       def ids: () -> Array[PrimaryKey]
       def none: () -> self
-      def pluck: (Symbol | String column) -> Array[untyped]
-              | (*Symbol | String columns) -> Array[Array[untyped]]
+      def pluck: (interned column) -> Array[untyped]
+              | (*interned columns) -> Array[Array[untyped]]
       def where: (*untyped) -> self
       def not: (*untyped) -> self
       def exists?: (*untyped) -> bool
       def order: (*untyped) -> self
-      def group: (*Symbol | String) -> untyped
+      def group: (*interned) -> untyped
       def distinct: () -> self
       def or: (self) -> self
       def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> self
-      def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def includes: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def preload: (*String | Symbol | Hash[untyped, untyped]) -> self
+      def joins: (*interned | Hash[untyped, untyped]) -> self
+      def left_joins: (*interned | Hash[untyped, untyped]) -> self
+      def left_outer_joins: (*interned | Hash[untyped, untyped]) -> self
+      def includes: (*interned | Hash[untyped, untyped]) -> self
+      def eager_load: (*interned | Hash[untyped, untyped]) -> self
+      def preload: (*interned | Hash[untyped, untyped]) -> self
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
       def find: (PrimaryKey id) -> Model
@@ -362,17 +362,17 @@ module ActiveRecord
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
       def each: () { (Model) -> void } -> self
-      def select: (*Symbol | String) -> self
+      def select: (*interned) -> self
                 | () { (Model) -> boolish } -> Array[Model]
-      def reselect: (*Symbol | String) -> self
+      def reselect: (*interned) -> self
     end
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def all: () -> Relation
       def ids: () -> Array[PrimaryKey]
       def none: () -> Relation
-      def pluck: (Symbol | String column) -> Array[untyped]
-              | (*Symbol | String columns) -> Array[Array[untyped]]
+      def pluck: (interned column) -> Array[untyped]
+              | (*interned columns) -> Array[Array[untyped]]
       def where: (*untyped) -> Relation
       def exists?: (*untyped) -> bool
       def any?: () -> bool
@@ -384,16 +384,16 @@ module ActiveRecord
       def one?: () -> bool
               | () { (Model) -> boolish } -> bool
       def order: (*untyped) -> Relation
-      def group: (*Symbol | String) -> untyped
+      def group: (*interned) -> untyped
       def distinct: () -> Relation
       def or: (Relation) -> Relation
       def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> Relation
-      def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def includes: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def preload: (*String | Symbol | Hash[untyped, untyped]) -> Relation
+      def joins: (*interned | Hash[untyped, untyped]) -> Relation
+      def left_joins: (*interned | Hash[untyped, untyped]) -> Relation
+      def left_outer_joins: (*interned | Hash[untyped, untyped]) -> Relation
+      def includes: (*interned | Hash[untyped, untyped]) -> Relation
+      def eager_load: (*interned | Hash[untyped, untyped]) -> Relation
+      def preload: (*interned | Hash[untyped, untyped]) -> Relation
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
       def find: (PrimaryKey id) -> Model
@@ -443,9 +443,9 @@ module ActiveRecord
       def touch_all: (*untyped, ?time: untyped) -> untyped
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
-      def select: (*Symbol | String) -> Relation
+      def select: (*interned) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
-      def reselect: (*Symbol | String) -> Relation
+      def reselect: (*interned) -> Relation
     end
   end
 end
@@ -454,22 +454,22 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def all: () -> self
   def ids: () -> Array[PrimaryKey]
   def none: () -> self
-  def pluck: (Symbol | String column) -> Array[untyped]
-           | (*Symbol | String columns) -> Array[Array[untyped]]
+  def pluck: (interned column) -> Array[untyped]
+           | (*interned columns) -> Array[Array[untyped]]
   def where: (*untyped) -> self
   def not: (*untyped) -> self
   def exists?: (*untyped) -> bool
   def order: (*untyped) -> self
-  def group: (*Symbol | String) -> untyped
+  def group: (*interned) -> untyped
   def distinct: () -> self
   def or: (self) -> self
   def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> self
-  def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def includes: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def preload: (*String | Symbol | Hash[untyped, untyped]) -> self
+  def joins: (*interned | Hash[untyped, untyped]) -> self
+  def left_joins: (*interned | Hash[untyped, untyped]) -> self
+  def left_outer_joins: (*interned | Hash[untyped, untyped]) -> self
+  def includes: (*interned | Hash[untyped, untyped]) -> self
+  def eager_load: (*interned | Hash[untyped, untyped]) -> self
+  def preload: (*interned | Hash[untyped, untyped]) -> self
   def find_by: (untyped, *untyped) -> Model?
   def find_by!: (untyped, *untyped) -> Model
   def find: (PrimaryKey id) -> Model
@@ -522,17 +522,17 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
   def each: () { (Model) -> void } -> self
-  def select: (*Symbol | String) -> self
+  def select: (*interned) -> self
             | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String) -> self
+  def reselect: (*interned) -> self
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def all: () -> Relation
   def ids: () -> Array[PrimaryKey]
   def none: () -> Relation
-  def pluck: (Symbol | String column) -> Array[untyped]
-           | (*Symbol | String columns) -> Array[Array[untyped]]
+  def pluck: (interned column) -> Array[untyped]
+           | (*interned columns) -> Array[Array[untyped]]
   def where: (*untyped) -> Relation
   def exists?: (*untyped) -> bool
   def any?: () -> bool
@@ -544,16 +544,16 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def one?: () -> bool
           | () { (Model) -> boolish } -> bool
   def order: (*untyped) -> Relation
-  def group: (*Symbol | String) -> untyped
+  def group: (*interned) -> untyped
   def distinct: () -> Relation
   def or: (Relation) -> Relation
   def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> Relation
-  def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def includes: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def preload: (*String | Symbol | Hash[untyped, untyped]) -> Relation
+  def joins: (*interned | Hash[untyped, untyped]) -> Relation
+  def left_joins: (*interned | Hash[untyped, untyped]) -> Relation
+  def left_outer_joins: (*interned | Hash[untyped, untyped]) -> Relation
+  def includes: (*interned | Hash[untyped, untyped]) -> Relation
+  def eager_load: (*interned | Hash[untyped, untyped]) -> Relation
+  def preload: (*interned | Hash[untyped, untyped]) -> Relation
   def find_by: (untyped) -> Model?
   def find_by!: (untyped) -> Model
   def find: (PrimaryKey id) -> Model
@@ -604,9 +604,9 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def touch_all: (*untyped, ?time: untyped) -> untyped
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
-  def select: (*Symbol | String) -> Relation
+  def select: (*interned) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String) -> Relation
+  def reselect: (*interned) -> Relation
   def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
 end
 

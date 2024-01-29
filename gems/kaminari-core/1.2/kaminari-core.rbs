@@ -9,13 +9,13 @@ module Kaminari
     attr_accessor outer_window: Integer
     attr_accessor left: Integer
     attr_accessor right: Integer
-    attr_accessor page_method_name: Symbol | String
+    attr_accessor page_method_name: interned
     attr_accessor max_pages: Integer?
     attr_accessor params_on_first_page: bool
 
-    attr_writer param_name: Symbol | String | _Callable
+    attr_writer param_name: interned | _Callable
 
-    def param_name: () -> (Symbol | String)
+    def param_name: () -> interned
   end
 
   module PageScopeMethods : _Model_Relation
@@ -35,7 +35,7 @@ module Kaminari
   end
 
   interface _Callable
-    def call: () -> (Symbol | String)
+    def call: () -> interned
   end
 
   module ConfigurationMethods

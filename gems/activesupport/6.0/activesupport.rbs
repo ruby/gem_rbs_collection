@@ -18,7 +18,7 @@ module ActiveSupport
       def compile_methods!: () -> void
 
       # Compiles reader methods so we don't have to go through method_missing.
-      def self.compile_methods!: (Array[Symbol | String] keys) -> void
+      def self.compile_methods!: (Array[interned] keys) -> void
     end
 
     module ClassMethods
@@ -28,8 +28,7 @@ module ActiveSupport
 
       private
 
-      # TODO: Fix to use `interned` in names params after releasing ruby/rbs#1499
-      def config_accessor: (*(String | Symbol) names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> void
+      def config_accessor: (*interned names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> void
     end
 
     def config: () -> InheritableOptions
@@ -265,11 +264,9 @@ module ActiveSupport
   class OrderedOptions < Hash[Symbol, untyped]
     alias _get []
 
-    # TODO: Fix to use `interned` in key params after releasing ruby/rbs#1499
-    def []=: ((String | Symbol) key, untyped value) -> untyped
+    def []=: (interned key, untyped value) -> untyped
 
-    # TODO: Fix to use `interned` in key params after releasing ruby/rbs#1499
-    def []: ((String | Symbol) key) -> untyped
+    def []: (interned key) -> untyped
 
     def method_missing: (Symbol name, *untyped args) -> untyped
 
@@ -279,8 +276,7 @@ module ActiveSupport
   end
 
   class InheritableOptions < OrderedOptions
-    # TODO: Fix to use `interned` in parent params after releasing ruby/rbs#1499
-    def initialize: (?Hash[(String | Symbol), untyped]? parent) -> void
+    def initialize: (?Hash[interned, untyped]? parent) -> void
 
     def inheritable_copy: () -> instance
   end
@@ -327,14 +323,11 @@ class Module
   def mattr_accessor: (*untyped syms, ?default: untyped? default, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) ?{ () -> untyped } -> untyped
                     | ...
 
-  # TODO: Fix to use `interned` in attrs params after releasing ruby/rbs#1499
-  def attr_internal_reader: (*(Symbol | String) attrs) -> void
+  def attr_internal_reader: (*interned attrs) -> void
 
-  # TODO: Fix to use `interned` in attrs params after releasing ruby/rbs#1499
-  def attr_internal_writer: (*(Symbol | String) attrs) -> void
+  def attr_internal_writer: (*interned attrs) -> void
 
-  # TODO: Fix to use `interned` in attrs params after releasing ruby/rbs#1499
-  def attr_internal_accessor: (*(Symbol | String) attrs) -> void
+  def attr_internal_accessor: (*interned attrs) -> void
 
   alias attr_internal attr_internal_accessor
 
@@ -342,12 +335,10 @@ class Module
 
   private
 
-  # TODO: Fix to use `interned` in attr params after releasing ruby/rbs#1499
-  def attr_internal_ivar_name: ((Symbol | String) attr) -> String
+  def attr_internal_ivar_name: (interned attr) -> String
 
   type access_type = :reader | :writer
-  # TODO: Fix to use `interned` in attr params after releasing ruby/rbs#1499
-  def attr_internal_define: ((Symbol | String) attr_name, access_type `type`) -> void
+  def attr_internal_define: (interned attr_name, access_type `type`) -> void
 end
 
 class Integer

@@ -31,7 +31,7 @@ module YARD::Templates::Engine
   # @raise [ArgumentError] if the path does not exist within one of the
   #   {template_paths} on disk.
   # @return [Template] the module representing the template
-  def self.template: (*Array[String | Symbol] path) -> YARD::Templates::Template
+  def self.template: (*Array[interned] path) -> YARD::Templates::Template
 
   # Forces creation of a template at +path+ within a +full_path+.
   #
@@ -353,7 +353,7 @@ module YARD::Templates::Helpers::HtmlHelper
   # @param [Symbol, String] type the language type (:ruby, :plain, etc). Use
   #   :plain for no syntax highlighting.
   # @return [String] the highlighted source
-  def html_syntax_highlight: (String source, ?Symbol | String type) -> String
+  def html_syntax_highlight: (String source, ?interned type) -> String
 
   # @return [String] unhighlighted source
   def html_syntax_highlight_plain: (untyped source) -> String
@@ -450,7 +450,7 @@ module YARD::Templates::Helpers::HtmlHelper
   # @param [String, Symbol] type the list type to generate a URL for
   # @return [String] the URL pointing to the list
   # @since 0.8.0
-  def url_for_list: (String | Symbol type) -> String
+  def url_for_list: (interned type) -> String
 
   # Returns the URL for the frameset page
   #
@@ -920,7 +920,7 @@ module YARD::Templates::Template
   #   from the file "name.erb" where name is the section name. For
   #   templates, they will have {Template::ClassMethods#run} called on them.
   #   Any subsections can be yielded to using yield or {#yieldall}
-  def sections: (*Array[Array[untyped] | Symbol | String | YARD::Templates::Template] args) -> untyped
+  def sections: (*Array[Array[untyped] | interned | YARD::Templates::Template] args) -> untyped
 
   # Initialization called on the template. Override this in a 'setup.rb'
   # file in the template's path to implement a template
@@ -942,7 +942,7 @@ module YARD::Templates::Template
   # @param [String, Symbol] section the section name
   # @yield calls subsections to be rendered
   # @return [String] the contents of the ERB rendered section
-  def erb: (String | Symbol section) -> String
+  def erb: (interned section) -> String
 
   # Returns the contents of a file. If +allow_inherited+ is set to +true+,
   # use +{{{__super__}}}+ inside the file contents to insert the contents
@@ -971,7 +971,7 @@ module YARD::Templates::Template
   # @param [Symbol, String] sect if provided, uses a specific section name
   # @return [String] the rendered ERB file in any of the inherited template
   #   paths.
-  def superb: (?Symbol | String sect) -> String
+  def superb: (?interned sect) -> String
 
   def inspect: () -> untyped
 
