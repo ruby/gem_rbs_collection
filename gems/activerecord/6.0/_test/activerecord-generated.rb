@@ -16,3 +16,4 @@ _user = User.new
 User.eager_load(:address, friends: [:address, :followers])
 User.includes(:address, :friends).to_a
 User.preload(:address, friends: [:address, :followers])
+User.in_order_of(:id, [1, 5, 3])
