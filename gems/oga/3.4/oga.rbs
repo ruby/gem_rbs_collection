@@ -127,7 +127,8 @@ module Oga
       def initialize: (?untyped nodes, ?untyped? owner) -> void
 
       # Yields the supplied block for every node.
-      def each: () ?{ (NodeType) -> untyped } -> untyped
+      def each: () -> ::Enumerator[NodeType, untyped]
+              | () { (NodeType) -> untyped } -> untyped
 
       # Returns the last node in the set.
       def last: () -> NodeType
@@ -313,7 +314,8 @@ module Oga
       #  some_element.each_ancestor do |node|
       #    # ...
       #  end
-      def each_ancestor: () ?{ (Node) -> untyped } -> untyped
+      def each_ancestor: () -> ::Enumerator[Node, untyped]
+                       | () { (Node) -> untyped } -> untyped
     end
 
     # Class that contains information about an XML element such as the name,
@@ -595,7 +597,8 @@ module Oga
       def inspect: () -> ::String
 
       # @see [Oga::XML::Node#each_ancestor]
-      def each_ancestor: () ?{ (Node) -> untyped } -> untyped
+      def each_ancestor: () -> ::Enumerator[Node, untyped]
+                       | () { (Node) -> untyped } -> untyped
     end
 
     # The Namespace class contains information about XML namespaces such as the
@@ -722,7 +725,8 @@ module Oga
       #  end
       #
       # @yieldparam [Oga::XML::Node] The current node.
-      def each_node: () ?{ (Node) -> untyped } -> untyped
+      def each_node: () -> ::Enumerator[Node, untyped]
+                   | () { (Node) -> untyped } -> untyped
     end
 
     # Module that provides a `#to_xml` method that serialises the current node

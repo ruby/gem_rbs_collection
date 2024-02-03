@@ -26,3 +26,6 @@ doc.xpath("//li").each do |node|
 end
 doc.at_xpath("//ul")
 puts doc.at_css("#list")&.get("data-attr")
+doc.css("#list").each.with_index { |e, i| p e, i }
+doc.each_node.with_index{ |n, i| p n, i }
+doc.at_css("li")&.each_ancestor&.with_index{ |n, i| p n, i }
