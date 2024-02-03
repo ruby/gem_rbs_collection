@@ -1,0 +1,741 @@
+module Oga
+  # Parses the given XML document.
+  #
+  # @example
+  #  document = Oga.parse_xml('<root>Hello</root>')
+  #
+  # @see [Oga::XML::Lexer#initialize]
+  def self.parse_xml: (::String | ::IO xml, ?::Hash[::Symbol, untyped] options) -> XML::Document
+
+  # Parses the given HTML document.
+  #
+  # @example
+  #  document = Oga.parse_html('<html>...</html>')
+  #
+  # @see [Oga::XML::Lexer#initialize]
+  #
+  def self.parse_html: (::String | ::IO html, ?::Hash[::Symbol, untyped] options) -> XML::Document
+
+  # Parses the given XML document using the SAX parser.
+  #
+  # @example
+  #  handler = SomeSaxHandler.new
+  #
+  #  Oga.sax_parse_html(handler, '<root>Hello</root>')
+  #
+  # @see [Oga::XML::SaxParser#initialize]
+  def self.sax_parse_xml: (untyped handler, ::String | ::IO xml, ?::Hash[::Symbol, untyped] options) -> untyped
+
+  # Parses the given HTML document using the SAX parser.
+  #
+  # @example
+  #  handler = SomeSaxHandler.new
+  #
+  #  Oga.sax_parse_html(handler, '<script>foo()</script>')
+  #
+  # @see [Oga::XML::SaxParser#initialize]
+  def self.sax_parse_html: (untyped handler, ::String | ::IO html, ?::Hash[::Symbol, untyped] options) -> untyped
+
+  module XML
+    # The default XML namespace.
+    DEFAULT_NAMESPACE: Namespace
+
+    # Class used for storing information about an entire XML document. This
+    # includes the doctype, XML declaration, child nodes and more.
+    class Document
+      include Querying
+      include Traversal
+      include ToXML
+
+      # The doctype of the document.
+      #
+      # When parsing a document this attribute will be set automatically if a
+      # doctype resides at the root of the document.
+      attr_accessor doctype: Doctype
+
+      attr_accessor xml_declaration: XmlDeclaration
+
+      # The document type, either `:xml` or `:html`.
+      attr_reader type: :xml | :html
+
+      # @param [Hash] options
+      #
+      # @option options [Oga::XML::NodeSet] :children
+      # @option options [Oga::XML::Doctype] :doctype
+      # @option options [Oga::XML::XmlDeclaration] :xml_declaration
+      # @option options [Symbol] :type
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      def children: () -> NodeSet[Node]
+
+      # Sets the child nodes of the document.
+      #
+      # @param [Oga::XML::NodeSet|Array] nodes
+      def children=: (untyped nodes) -> untyped
+
+      # Returns self.
+      #
+      # This method exists to make this class compatible with Element, which in
+      # turn makes it easier to use both in the XPath compiler.
+      def root_node: () -> self
+
+      def html?: () -> bool
+
+      # Inspects the document and its child nodes. Child nodes are indented for
+      # each nesting level.
+      def inspect: () -> ::String
+
+      def literal_html_name?: () -> false
+    end
+
+    # The NodeSet class contains a set of unique {Oga::XML::Node} instances that
+    # can be queried and modified. Optionally NodeSet instances can take
+    # ownership of a node (besides just containing it). This allows the nodes to
+    # query their previous and next elements.
+    #
+    # There are two types of sets:
+    #
+    # 1. Regular node sets
+    # 2. Owned node sets
+    #
+    # Both behave similar to Ruby's Array class. The difference between an
+    # owned and regular node set is that an owned set modifies nodes that are
+    # added or removed by certain operations. For example, when a node is added
+    # to an owned set the `node_set` attribute of said node points to the set
+    # it was just added to.
+    #
+    # Owned node sets are used when building a DOM tree with
+    # {Oga::XML::Parser}. By taking ownership of nodes in a set Oga makes it
+    # possible to use these sets as following:
+    #
+    #     document = Oga::XML::Document.new
+    #     element  = Oga::XML::Element.new
+    #
+    #     document.children << element
+    #
+    #     element.node_set == document.children # => true
+    #
+    # If ownership was not handled then you'd have to manually set the
+    # `element` variable's `node_set` attribute after pushing it into a set.
+    class NodeSet[NodeType]
+      include ::Enumerable[NodeType]
+
+      attr_accessor owner: Node | nil
+
+      # @param [Array] nodes The nodes to add to the set.
+      # @param [Oga::XML::NodeSet] owner The owner of the set.
+      def initialize: (?untyped nodes, ?untyped? owner) -> void
+
+      # Yields the supplied block for every node.
+      def each: () ?{ (NodeType) -> untyped } -> untyped
+
+      # Returns the last node in the set.
+      def last: () -> NodeType
+
+      # Returns `true` if the set is empty.
+      def empty?: () -> bool
+
+      # Returns the amount of nodes in the set.
+      def length: () -> ::Integer
+
+      alias count length
+
+      alias size length
+
+      # Returns the index of the given node.
+      def index: (NodeType node) -> (::Integer | nil)
+
+      # Pushes the node at the end of the set.
+      #
+      # @param [Oga::XML::Node] node
+      def push: (untyped node) -> untyped
+
+      alias << push
+
+      # Pushes the node at the start of the set.
+      #
+      # @param [Oga::XML::Node] node
+      def unshift: (untyped node) -> untyped
+
+      # Shifts a node from the start of the set.
+      #
+      # @return [Oga::XML::Node]
+      def shift: () -> untyped
+
+      # Pops a node from the end of the set.
+      #
+      # @return [Oga::XML::Node]
+      def pop: () -> untyped
+
+      # Inserts a node into the set at the given index.
+      #
+      # @param [Fixnum] index The index to insert the node at.
+      # @param [Oga::XML::Node] node
+      def insert: (untyped index, untyped node) -> untyped
+
+      # Returns the node for the given index.
+      def []: (::Integer index) -> (NodeType | nil)
+
+      # Converts the current set to an Array.
+      def to_a: () -> ::Array[NodeType]
+
+      # Creates a new set based on the current and the specified set. The newly
+      # created set does not inherit ownership rules of the current set.
+      #
+      # @param [Oga::XML::NodeSet] other
+      # @return [Oga::XML::NodeSet]
+      def +: (untyped other) -> untyped
+
+      # Returns `true` if the current node set and the one given in `other` are
+      # equal to each other.
+      #
+      # @param [Oga::XML::NodeSet] other
+      def ==: (untyped other) -> bool
+
+      # Returns `true` if the nodes given in `nodes` are equal to those
+      # specified in the current `@nodes` variable. This method allows two
+      # NodeSet instances to compare each other without the need of exposing
+      # `@nodes` to the public.
+      #
+      # @param [Array<Oga::XML::Node>] nodes
+      def equal_nodes?: (untyped nodes) -> bool
+
+      # Adds the nodes of the given node set to the current node set.
+      #
+      # @param [Oga::XML::NodeSet] other
+      def concat: (untyped other) -> untyped
+
+      # Removes the current nodes from their owning set. The nodes are *not*
+      # removed from the current set.
+      #
+      # This method is intended to remove nodes from an XML document/node.
+      def remove: () -> untyped
+
+      # Removes a node from the current set only.
+      def delete: (untyped node) -> untyped
+
+      # Returns the values of the given attribute.
+      #
+      # @param [String|Symbol] name The name of the attribute.
+      def attribute: (::String | ::Symbol name) -> ::Array[Attribute | nil]
+
+      alias attr attribute
+
+      # Returns the text of all nodes in the set, ignoring comment nodes.
+      def text: () -> ::String
+
+      def inspect: () -> ::String
+
+      def take_ownership_on_nodes: () -> untyped
+    end
+
+    # A generic XML node. Instances of this class can belong to a
+    # {Oga::XML::NodeSet} and can be used to query surrounding and parent
+    # nodes.
+    class Node
+      include Traversal
+      include ToXML
+
+      attr_reader node_set: NodeSet[Node]
+
+      attr_accessor previous: Node
+
+      attr_accessor next: Node
+
+      # @param [Hash] options
+      #
+      # @option options [Oga::XML::NodeSet] :node_set The node set that this
+      #  node belongs to.
+      #
+      # @option options [Oga::XML::NodeSet|Array] :children The child nodes of
+      #  the current node.
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      # @param [Oga::XML::NodeSet] set
+      def node_set=: (untyped set) -> untyped
+
+      # Returns the child nodes of the current node.
+      def children: () -> NodeSet[Node]
+
+      # Sets the child nodes of the element.
+      #
+      # @param [Oga::XML::NodeSet|Array] nodes
+      def children=: (untyped nodes) -> untyped
+
+      # Returns the parent node of the current node. If there is no parent node
+      # `nil` is returned instead.
+      def parent: () -> (Node | nil)
+
+      # Returns the previous element node or nil if there is none.
+      def previous_element: () -> (Element | nil)
+
+      # Returns the next element node or nil if there is none.
+      def next_element: () -> (Element | nil)
+
+      # Returns the root document/node of the current node. The node is
+      # retrieved by traversing upwards in the DOM tree from the current node.
+      def root_node: () -> (Document | Node)
+
+      # Removes the current node from the owning node set.
+      #
+      # @return [Oga::XML::Node]
+      def remove: () -> untyped
+
+      # Replaces the current node with another.
+      #
+      # @example Replacing with an element
+      #  element = Oga::XML::Element.new(:name => 'div')
+      #  some_node.replace(element)
+      #
+      # @example Replacing with a String
+      #  some_node.replace('this will replace the current node with a text node')
+      #
+      # @param [String|Oga::XML::Node] other
+      def replace: (untyped other) -> untyped
+
+      # Inserts the given node before the current node.
+      #
+      # @param [Oga::XML::Node] other
+      def before: (untyped other) -> untyped
+
+      # Inserts the given node after the current node.
+      #
+      # @param [Oga::XML::Node] other
+      def after: (untyped other) -> untyped
+
+      def html?: () -> bool
+
+      def xml?: () -> bool
+
+      # Yields all ancestor elements of the current node.
+      #
+      # @example
+      #  some_element.each_ancestor do |node|
+      #    # ...
+      #  end
+      def each_ancestor: () ?{ (Node) -> untyped } -> untyped
+    end
+
+    # Class that contains information about an XML element such as the name,
+    # attributes and child nodes.
+    class Element < Node
+      include Querying
+      include ExpandedName
+
+      attr_reader namespace_name: ::String | nil
+
+      attr_accessor name: ::String
+
+      attr_accessor attributes: ::Array[Attribute]
+
+      attr_writer namespaces: ::Hash[::String, Namespace]
+
+      # The attribute prefix/namespace used for registering element namespaces.
+      XMLNS_PREFIX: ::String
+
+      # @param [Hash] options
+      #
+      # @option options [String] :name The name of the element.
+      #
+      # @option options [String] :namespace_name The name of the namespace.
+      #
+      # @option options [Array<Oga::XML::Attribute>] :attributes The attributes
+      #  of the element as an Array.
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      # @param [String] name
+      def namespace_name=: (untyped name) -> untyped
+
+      # Returns an attribute matching the given name (with or without the
+      # namespace).
+      #
+      # @example
+      #  # find an attribute that only has the name "foo"
+      #  attribute('foo')
+      #
+      #  # find an attribute with namespace "foo" and name bar"
+      #  attribute('foo:bar')
+      #
+      # @param [String|Symbol] name The name (with or without the namespace)
+      #  of the attribute.
+      def attribute: (::String | ::Symbol name) -> (Attribute | nil)
+
+      alias attr attribute
+
+      # Returns the value of the given attribute.
+      #
+      # @example
+      #  element.get('class') # => "container"
+      #
+      # @see [#attribute]
+      def get: (::String name) -> (::String | nil)
+
+      alias [] get
+
+      # Adds a new attribute to the element.
+      #
+      # @param [Oga::XML::Attribute] attribute
+      def add_attribute: (untyped attribute) -> untyped
+
+      # Sets the value of an attribute to the given value. If the attribute does
+      # not exist it is created automatically.
+      #
+      # @param [String] name The name of the attribute, optionally including the
+      #  namespace.
+      #
+      # @param [String] value The new value of the attribute.
+      def set: (untyped name, untyped value) -> untyped
+
+      alias []= set
+
+      # Removes an attribute from the element.
+      #
+      # @param [String] name The name (optionally including namespace prefix)
+      #  of the attribute to remove.
+      #
+      # @return [Oga::XML::Attribute]
+      def unset: (untyped name) -> untyped
+
+      # Returns the namespace of the element.
+      def namespace: () -> (Namespace | nil)
+
+      # Returns the namespaces registered on this element, or an empty Hash in
+      # case of an HTML element.
+      def namespaces: () -> ::Hash[::String, Namespace]
+
+      # Returns true if the current element resides in the default XML
+      # namespace.
+      def default_namespace?: () -> bool
+
+      # Returns the text of all child nodes joined together.
+      def text: () -> ::String
+
+      # Returns the text of the current element only.
+      def inner_text: () -> ::String
+
+      # Returns any {Oga::XML::Text} nodes that are a direct child of this
+      # element.
+      def text_nodes: () -> NodeSet[Text]
+
+      # Sets the inner text of the current element to the given String.
+      #
+      # @param [String] text
+      def inner_text=: (untyped text) -> untyped
+
+      def inspect: () -> ::String
+
+      # Registers a new namespace for the current element and its child
+      # elements.
+      #
+      # @param [String] name
+      # @param [String] uri
+      # @param [TrueClass|FalseClass] flush
+      # @see [Oga::XML::Namespace#initialize]
+      def register_namespace: (untyped name, untyped uri, ?bool flush) -> untyped
+
+      # Returns a Hash containing all the namespaces available to the current
+      # element.
+      def available_namespaces: () -> ::Hash[::String, Namespace]
+
+      # Returns `true` if the element is a self-closing element.
+      def self_closing?: () -> bool
+
+      # Flushes the namespaces cache of the current element and all its child
+      # elements.
+      def flush_namespaces_cache: () -> untyped
+
+      # Returns true if the current element name is the name of one of the
+      # literal HTML elements.
+      def literal_html_name?: () -> bool
+    end
+
+    # Class used for storing information about Doctypes.
+    class Doctype < Node
+      # The name of the doctype (e.g. "HTML").
+      attr_accessor name: ::String
+
+      # The type of the doctype (e.g. "PUBLIC").
+      attr_accessor type: ::String
+
+      # The public ID of the doctype.
+      attr_accessor public_id: ::String
+
+      # The system ID of the doctype.
+      attr_accessor system_id: ::String
+
+      # The inline doctype rules.
+      attr_accessor inline_rules: ::String
+
+      # @example
+      #  dtd = Doctype.new(:name => 'html', :type => 'PUBLIC')
+      #
+      # @param [Hash] options
+      #
+      # @option options [String] :name
+      # @option options [String] :type
+      # @option options [String] :public_id
+      # @option options [String] :system_id
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      # Inspects the doctype.
+      def inspect: () -> ::String
+    end
+
+    # Base class for nodes that represent a text-like value such as Text and
+    # Comment nodes.
+    class CharacterNode < Node
+      attr_accessor text: ::String
+
+      # @param [Hash] options
+      #
+      # @option options [String] :text The text of the node.
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      def inspect: () -> ::String
+    end
+
+    # Class containing information about a single text node. Text nodes don't
+    # have any children, attributes and the likes; just text.
+    class Text < CharacterNode
+      def initialize: (*untyped args) -> void
+
+      # @param [String] value
+      def text=: (untyped value) -> untyped
+
+      # Returns the text as a String. Upon the first call any XML/HTML entities
+      # are decoded.
+      def text: () -> ::String
+
+      def decode_entities?: () -> bool
+
+      def inside_literal_html?: () -> bool
+    end
+
+    # Class used for storing information about XML comments.
+    class Comment < CharacterNode
+    end
+
+    # Class used for storing information about CDATA tags.
+    class Cdata < CharacterNode
+    end
+
+    # Class used for storing information about a single processing instruction.
+    class ProcessingInstruction < CharacterNode
+      attr_accessor name: ::String
+
+      # @param [Hash] options
+      #
+      # @option options [String] :name The name of the instruction.
+      # @see [Oga::XML::CharacterNode#initialize]
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      def inspect: () -> ::String
+    end
+
+    # Class containing information about an XML declaration tag.
+    class XmlDeclaration < ProcessingInstruction
+      attr_accessor version: ::String
+
+      attr_accessor encoding: ::String
+
+      # Whether or not the document is a standalone document.
+      attr_accessor standalone: ::String
+
+      # @param [Hash] options
+      #
+      # @option options [String] :version
+      # @option options [String] :encoding
+      # @option options [String] :standalone
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      def inspect: () -> ::String
+    end
+
+    # Class for storing information about a single XML attribute.
+    class Attribute
+      include ExpandedName
+      include ToXML
+
+      # The name of the attribute.
+      attr_accessor name: ::String
+
+      attr_accessor namespace_name: (::String | nil)
+
+      # The element this attribute belongs to.
+      attr_accessor element: Element
+
+      alias parent element
+
+      # The default namespace available to all attributes. This namespace can
+      # not be modified.
+      DEFAULT_NAMESPACE: Namespace
+
+      # @param [Hash] options
+      #
+      # @option options [String] :name
+      # @option options [String] :namespace_name
+      # @option options [String] :value
+      # @option options [Oga::XML::Element] :element
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      # Returns the {Oga::XML::Namespace} instance for the current namespace
+      # name.
+      def namespace: () -> (Namespace | nil)
+
+      # @param [String] value
+      def value=: (untyped value) -> untyped
+
+      # Returns the value of the attribute or nil if no explicit value was set.
+      def value: () -> (::String | nil)
+
+      def text: () -> ::String
+
+      alias to_s text
+
+      def inspect: () -> ::String
+
+      # @see [Oga::XML::Node#each_ancestor]
+      def each_ancestor: () ?{ (Node) -> untyped } -> untyped
+    end
+
+    # The Namespace class contains information about XML namespaces such as the
+    # name and URI.
+    class Namespace
+      attr_accessor name: ::String
+
+      attr_accessor uri: ::String
+
+      # @param [Hash] options
+      #
+      # @option options [String] :name
+      # @option options [String] :uri
+      def initialize: (?::Hash[untyped, untyped] options) -> void
+
+      def to_s: () -> ::String
+
+      def inspect: () -> ::String
+
+      def ==: (Namespace other) -> bool
+    end
+
+    # The Querying module provides methods that make it easy to run XPath/CSS
+    # queries on XML documents/elements.
+    module Querying
+      # Evaluates the given XPath expression.
+      #
+      # Querying a document:
+      #
+      #     document = Oga.parse_xml <<-EOF
+      #     <people>
+      #       <person age="25">Alice</person>
+      #       <ns:person xmlns:ns="http://example.net">Bob</ns:person>
+      #     </people>
+      #     EOF
+      #
+      #     document.xpath('people/person')
+      #
+      # Querying an element:
+      #
+      #     element = document.at_xpath('people')
+      #
+      #     element.xpath('person')
+      #
+      # Using variable bindings:
+      #
+      #     document.xpath('people/person[@age = $age]', 'age' => 25)
+      #
+      # Using namespace aliases:
+      #
+      #     namespaces = {'example' => 'http://example.net'}
+      #     document.xpath('people/example:person', namespaces: namespaces)
+      #
+      # @param [String] expression The XPath expression to run.
+      #
+      # @param [Hash] variables Variables to bind. The keys of this Hash should
+      #  be String values.
+      #
+      # @param [Hash] namespaces Namespace aliases. The keys of this Hash should
+      #  be String values.
+      def xpath: (::String expression, ?::Hash[String, untyped] variables, ?namespaces: ::Hash[String, untyped]?) -> (NodeSet[Node] | NodeSet[Attribute])
+
+      # Evaluates the XPath expression and returns the first matched node.
+      #
+      # Querying a document:
+      #
+      #     document = Oga.parse_xml <<-EOF
+      #     <people>
+      #       <person age="25">Alice</person>
+      #     </people>
+      #     EOF
+      #
+      #     person = document.at_xpath('people/person')
+      #
+      #     person.class # => Oga::XML::Element
+      #
+      # @see [#xpath]
+      def at_xpath: (::String expression, ?::Hash[String, untyped] variables, ?namespaces: ::Hash[String, untyped]?) -> (Node | Attribute | nil)
+
+      # Evaluates the given CSS expression.
+      #
+      # Querying a document:
+      #
+      #     document = Oga.parse_xml <<-EOF
+      #     <people>
+      #       <person age="25">Alice</person>
+      #     </people>
+      #     EOF
+      #
+      #     document.css('people person')
+      #
+      # @param [String] expression The CSS expression to run.
+      def css: (::String expression) -> NodeSet[Element]
+
+      # Evaluates the CSS expression and returns the first matched node.
+      #
+      # @see [#css]
+      def at_css: (::String expression) -> (Element | nil)
+    end
+
+    # Module that provides methods to traverse DOM trees.
+    module Traversal
+      # Traverses through the node and yields every child node to the supplied
+      # block.
+      #
+      # The block's body can also determine whether or not to traverse child
+      # nodes. Preventing a node's children from being traversed can be done by
+      # using `throw :skip_children`
+      #
+      # This method uses a combination of breadth-first and depth-first
+      # traversal to traverse the entire XML tree in document order. See
+      # http://en.wikipedia.org/wiki/Breadth-first_search for more information.
+      #
+      # @example
+      #  document.each_node do |node|
+      #    p node.class
+      #  end
+      #
+      # @example Skipping the children of a certain node
+      #  document.each_node do |node|
+      #    if node.is_a?(Oga::XML::Element) and node.name == 'book'
+      #      throw :skip_children
+      #    end
+      #  end
+      #
+      # @yieldparam [Oga::XML::Node] The current node.
+      def each_node: () ?{ (Node) -> untyped } -> untyped
+    end
+
+    # Module that provides a `#to_xml` method that serialises the current node
+    # back to XML.
+    module ToXML
+      def to_xml: () -> ::String
+
+      alias to_s to_xml
+    end
+
+    module ExpandedName
+      # Returns the expanded name of the current Element or Attribute.
+      def expanded_name: () -> ::String
+    end
+  end
+end
