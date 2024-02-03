@@ -3,17 +3,26 @@
 
 require "oga"
 
+html = <<HTML
+<html>
+<body>
+<ul id="list" data-attr="b">
+  <li data-attr="a">list1</li>
+  <li>list2</li>
+</ul>
+</body>
+</html>
+HTML
+
 Oga.parse_xml("")
 Oga.parse_xml("", strict: true)
-Oga.parse_html("")
-doc = Oga.parse_html(File.open("path"))
+Oga.parse_html(File.open("path"))
+doc = Oga.parse_html(html)
 
-doc.xpath('').each do |node|
+doc.xpath("//li").each do |node|
   if node.is_a?(Oga::XML::Element)
-    node.get('attr')
+    puts node.get("data-attr")
   end
 end
-doc.at_xpath('')
-doc.css('').each do |elem|
-  elem.css('')[0]&.text
-end
+doc.at_xpath("//ul")
+puts doc.at_css("#list")&.get("data-attr")
