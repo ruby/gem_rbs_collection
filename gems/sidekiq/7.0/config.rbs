@@ -1,0 +1,78 @@
+module Sidekiq
+
+  class Config
+    extend Forwardable
+
+    attr_reader capsules: Hash[String, Capsule]
+
+    @options: Hash[Symbol, untyped]
+
+    def []: (Symbol) -> untyped
+
+    def []=: (Symbol) -> void
+
+    def has_key?: (Symbol) -> bool
+
+    def key?: (Symbol) -> bool
+
+    def average_scheduled_poll_interval=: (Numeric interval) -> void
+
+    def capsule: (string name) ?{ (Capsule) -> void } -> Capsule
+
+    def client_middleware: () ?{ (Middleware::Chain) -> untyped } -> Middleware::Chain
+
+    def concurrency: () -> Integer
+
+    def concurrency=: (Integer val) -> void
+
+    def death_handlers: () -> Array[^(Job, Exception) -> void]
+
+    def default_capsule: () ?{ (Capsule) -> void } -> Capsule
+
+    def error_handlers: () -> Array[Proc]
+
+    def fetch: (Symbol) { () -> untyped } -> untyped
+
+    def handle_exception: (Exception ex, ?Hash[Symbol, untyped] ctx) -> untyped
+
+    def logger: () -> Logger
+
+    def logger=: (untyped logger) -> void
+
+    def lookup: (String name, ?singleton(Class) default_class) -> singleton(Class)?
+
+    def merge!: (Hash[Symbol, untyped] other) ?{ (Symbol key, untyped oldval, untyped newval) -> void } -> Hash[Symbol, untyped]
+
+    def new_redis_pool: (Integer size, ?String name) -> ConnectionPool[RedisClientAdapter]
+
+    def on: (Symbol event) { () -> void } -> void
+
+    def queues: () -> Array[String]
+
+    def queues=: (Array[String] val) -> void
+
+    def redis: () { (RedisClientAdapter conn) -> void } -> Hash[String, untyped]
+
+    def redis=: (Hash[Symbol | String, untyped] hash) -> void
+
+    def redis_info: () -> Hash[String, String]
+
+    def redis_pool: () -> ConnectionPool[RedisClientAdapter]
+
+    def register: (String name, singleton(Class) instance) -> void
+
+    def server_middleware: () ?{ (Middleware::Chain) -> void } -> Middleware::Chain
+
+    def total_concurrency: () -> ConnectionPool[RedisClientAdapter]
+
+    private
+
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    def local_redis_pool: () -> untyped
+
+    DEFAULTS: Hash[Symbol, untyped]
+
+    ERROR_HANDLER: Proc
+  end
+end
