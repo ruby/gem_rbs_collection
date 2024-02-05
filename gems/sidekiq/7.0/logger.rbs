@@ -1,0 +1,60 @@
+module Sidekiq
+  class Logger < ::Logger
+    include Sidekiq::LoggingUtils
+
+    module Formatters
+      class Base < ::Logger::Formatter
+        def ctx: () -> Context
+
+        def format_context: () -> String?
+
+        def tid: () -> String
+      end
+
+      class JSON < Base
+        def call: (String severity, Time time, untyped program_name, String message) -> String
+      end
+
+      class Pretty < Base
+        def call: (String severity, Time time, untyped program_name, String message) -> String
+      end
+
+      class WithoutTimestamp < Pretty
+        def call: (String severity, Time time, untyped program_name, String message) -> String
+      end
+    end
+  end
+
+
+
+  module LoggingUtils
+    def debug?: () -> bool
+
+    def info?: () -> bool
+
+    def warn?: () -> bool
+
+    def error?: () -> bool
+
+    def fatal?: () -> bool
+
+    def level: () -> Integer
+
+    def local_level: () -> Integer
+
+    def local_level=: (Integer? level) -> void
+                    | ((Symbol | String) level) -> void
+
+    def log_at: ((Symbol | String | Integer) level) { () -> void } -> void
+
+    LEVELS: ::Hash[String, Integer]
+  end
+
+  module Context
+    def self.add: (string k, untyped v) -> void
+
+    def self.current: () -> Hash[string, untyped]
+
+    def self.with: (Hash[string, untyped] hash) { () ->  void } -> void
+  end
+end

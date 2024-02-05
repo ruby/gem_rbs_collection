@@ -5,11 +5,106 @@ module HTTP
 
   def self.auth: (_ToS) -> HTTP::Client
 
+  class Options
+  end
+
   class Client
     def initialize: (?Hash[untyped, untyped] default_options) -> void
+
+    def close: () -> void
+
+    def request: (_ToS verb, HTTP::URI | _ToS uri, ?Hash[Symbol, untyped] opts) -> Response
+  end
+
+  class Headers
+    module Mixin
+      extend Forwardable
+      attr_reader headers: Headers
+      def []: (_ToS name) -> (nil | String | Array[String])
+      def []=: (String | Symbol name, Array[_ToS] | _ToS value) -> void
+    end
+
+    extend Forwardable
+    include Enumerable[[String, String]]
+
+    ACCEPT: String
+    ACCEPT_ENCODING: String
+    AGE: String
+    AUTHORIZATION: String
+    CACHE_CONTROL: String
+    COOKIE: String
+    CONNECTION: String
+    CONTENT_LENGTH: String
+    CONTENT_TYPE: String
+    DATE: String
+    ETAG: String
+    EXPIRES: String
+    HOST: String
+    IF_MODIFIED_SINCE: String
+    IF_NONE_MATCH: String
+    LAST_MODIFIED: String
+    LOCATION: String
+    PROXY_AUTHORIZATION: String
+    SET_COOKIE: String
+    TRANSFER_ENCODING: String
+    CONTENT_ENCODING: String
+    USER_AGENT: String
+    VARY: String
+
+    CANONICAL_NAME_RE: Regexp
+    COMPLIANT_NAME_RE: Regexp
+
+    def initialize: () -> void
+    def initialize_copy: (instance other) -> void
+
+    def set: (String | Symbol name, Array[_ToS] | _ToS value) -> void
+    alias []= set
+    def delete: (_ToS name) -> void
+    def add: (String | Symbol name, Array[_ToS] | _ToS value) -> void
+    def get: (_ToS name) -> Array[String]
+    def []: (_ToS name) -> (nil | String | Array[String])
+
+    def include?: (_ToS name) -> bool
+
+    def to_h: () -> Hash[String, String | Array[String]]
+    alias to_hash to_h
+    def to_a: () -> Array[[String, String]]
+    def inspect: () -> String
+    def keys: () -> Array[String]
+    def ==: (untyped other) -> bool
+
+    def each: () -> Enumerator[[String, String], self]
+            | () { ([String, String] pair) -> void } -> self
+            | () { (String key, String value) -> void } -> self
+
+    def empty?: () -> bool
+    def hash: () -> Integer
+
+    def merge!: (coercable other) -> void
+    def merge: (coercable other) -> instance
+
+    type coercable = Headers
+                   | hash[String, String | Array[String]]
+                   | _ToH[String, String | Array[String]]
+                   | _ToA[String | Array[String]]
+
+    def self.coerce: (coercable object) -> instance
+    alias self.[] self.coerce
+
+    private
+
+    def normalize_header: (String name) -> String
+    def validate_value: (_ToS value) -> String
+  end
+
+  class Timeout
+    class Global
+    end
   end
 
   class Request
+    include Headers::Mixin
+
     attr_reader verb: _ToS
     attr_reader scheme: Symbol
     attr_reader uri_normalizer: _Callable
@@ -22,7 +117,96 @@ module HTTP
   end
 
   class Response
-    attr_reader status: Integer
+    class Status < ::Delegator
+      def self.coerce: (String | Symbol | Numeric & _ToI object) -> instance
+      alias self.[] self.coerce
+      private
+      def self.symbolize: (_ToS str) -> Symbol
+      public
+
+      SYMBOLS: Hash[Integer, Symbol]
+      SYMBOL_CODES: Hash[Symbol, Integer]
+
+      attr_reader code: Integer
+      def reason: () -> String?
+      def to_s: () -> String
+
+      def informational?: () -> bool
+      def success?: () -> bool
+      def redirect?: () -> bool
+      def client_error?: () -> bool
+      def server_error?: () -> bool
+
+      def to_sym: () -> Symbol?
+      def inspect: () -> String
+
+      def __setobj__: (_ToI obj) -> void
+      attr_reader __getobj__ (@code): Integer
+
+      def continue?: () -> bool
+      def switching_protocols?: () -> bool
+      def processing?: () -> bool
+      def ok?: () -> bool
+      def created?: () -> bool
+      def accepted?: () -> bool
+      def non_authoritative_information?: () -> bool
+      def no_content?: () -> bool
+      def reset_content?: () -> bool
+      def partial_content?: () -> bool
+      def multi_status?: () -> bool
+      def already_reported?: () -> bool
+      def im_used?: () -> bool
+      def multiple_choices?: () -> bool
+      def moved_permanently?: () -> bool
+      def found?: () -> bool
+      def see_other?: () -> bool
+      def not_modified?: () -> bool
+      def use_proxy?: () -> bool
+      def temporary_redirect?: () -> bool
+      def permanent_redirect?: () -> bool
+      def bad_request?: () -> bool
+      def unauthorized?: () -> bool
+      def payment_required?: () -> bool
+      def forbidden?: () -> bool
+      def not_found?: () -> bool
+      def method_not_allowed?: () -> bool
+      def not_acceptable?: () -> bool
+      def proxy_authentication_required?: () -> bool
+      def request_timeout?: () -> bool
+      def conflict?: () -> bool
+      def gone?: () -> bool
+      def length_required?: () -> bool
+      def precondition_failed?: () -> bool
+      def payload_too_large?: () -> bool
+      def uri_too_long?: () -> bool
+      def unsupported_media_type?: () -> bool
+      def range_not_satisfiable?: () -> bool
+      def expectation_failed?: () -> bool
+      def misdirected_request?: () -> bool
+      def unprocessable_entity?: () -> bool
+      def locked?: () -> bool
+      def failed_dependency?: () -> bool
+      def upgrade_required?: () -> bool
+      def precondition_required?: () -> bool
+      def too_many_requests?: () -> bool
+      def request_header_fields_too_large?: () -> bool
+      def unavailable_for_legal_reasons?: () -> bool
+      def internal_server_error?: () -> bool
+      def not_implemented?: () -> bool
+      def bad_gateway?: () -> bool
+      def service_unavailable?: () -> bool
+      def gateway_timeout?: () -> bool
+      def http_version_not_supported?: () -> bool
+      def variant_also_negotiates?: () -> bool
+      def insufficient_storage?: () -> bool
+      def loop_detected?: () -> bool
+      def not_extended?: () -> bool
+      def network_authentication_required?: () -> bool
+    end
+
+    include Headers::Mixin
+
+    attr_reader status: Status
     attr_reader version: String
     attr_reader body: String
     attr_reader request: HTTP::Request
@@ -31,10 +215,21 @@ module HTTP
     def initialize: (Hash[Symbol, untyped] opts) -> void
 
     def code: () -> Integer
+    def reason: () -> String?
+    def flush: () -> self
   end
 
   class URI
     attr_reader host: String
     attr_reader normalized_host: String
   end
+
+  class Error < StandardError end
+  class ConnectionError < Error end
+  class RequestError < Error end
+  class ResponseError < Error end
+  class StateError < ResponseError end
+  class TimeoutError < Error end
+  class ConnectTimeoutError < TimeoutError end
+  class HeaderError < Error end
 end

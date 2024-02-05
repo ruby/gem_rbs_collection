@@ -173,7 +173,7 @@ module ActionView
 
     attr_reader lookup_context: untyped
 
-    attr_accessor config(@_config): untyped
+    attr_accessor config(@_config): ActiveSupport::InheritableOptions
 
     attr_accessor assigns(@_assigns): untyped
 
@@ -10169,7 +10169,7 @@ module ActionView
     class Cache
       # Threadsafe template cache
       # nodoc:
-      class SmallCache < Concurrent::Map
+      class SmallCache < Concurrent::Map[untyped, untyped]
         def initialize: (?::Hash[untyped, untyped] options) -> untyped
       end
 

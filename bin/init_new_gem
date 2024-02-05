@@ -66,50 +66,18 @@ base = Pathname("gems/#{gem_name}/#{version}")
 put base / "#{gem_name}.rbs", <<~RBS
   # Write the type definition here!
 RBS
-put base / "_test/Steepfile", <<~RUBY
-  D = Steep::Diagnostic
-
-  target :test do
-    check "."
-    signature "."
-
-    repo_path "../../../"
-    library "#{gem_name}"
-
-    configure_code_diagnostics(D::Ruby.all_error)
-  end
-RUBY
 put base / "_test/test.rb", <<~RUBY
   # Write Ruby code to test the RBS.
   # It is type checked by `steep check` command.
 
   require "#{gem_name}"
 RUBY
-put base / '_scripts/test', <<~BASH
-  #!/usr/bin/env bash
-
-  # Exit command with non-zero status code, Output logs of every command executed, Treat unset variables as an error when substituting.
-  set -eou pipefail
-  # Internal Field Separator - Linux shell variable
-  IFS=$'\\n\\t'
-  # Print shell input lines
-  set -v
-
-  # Set RBS_DIR variable to change directory to execute type checks using `steep check`
-  RBS_DIR=$(cd $(dirname $0)/..; pwd)
-  # Set REPO_DIR variable to validate RBS files added to the corresponding folder
-  REPO_DIR=$(cd $(dirname $0)/../../..; pwd)
-  # Validate RBS files, using the bundler environment present
-  bundle exec rbs --repo $REPO_DIR -r #{gem_name}:#{version} validate --silent
-
-  cd ${RBS_DIR}/_test
-  # Run type checks
-  bundle exec steep check
-
-  $(git rev-parse --show-toplevel)/bin/check-untyped-call.rb
-  $(git rev-parse --show-toplevel)/bin/check-manifest-yaml.rb
-BASH
-(base / '_scripts/test').chmod(0o755)
+put base / "_test/metadata.yaml", <<~YAML
+  # If the test needs gem's RBS files, declare them here.
+  #
+  # additional_gems:
+  #   - GEM_NAME
+YAML
 put base / 'manifest.yaml', <<~'YAML'
   # manifest.yaml describes dependencies which do not appear in the gemspec.
   # If this gem includes such dependencies, comment-out the following lines and

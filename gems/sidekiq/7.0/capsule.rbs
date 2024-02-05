@@ -1,0 +1,33 @@
+module Sidekiq
+  class Capsule
+    include Sidekiq::Component
+
+    attr_reader name: String
+    attr_reader queues: Array[String]
+    attr_accessor concurrency: Integer
+    attr_reader mode: Symbol
+    attr_reader weights: Hash[String, Integer]
+
+    def client_middleware: () ?{ (Middleware::Chain chain) -> void } -> Middleware::Chain
+
+    def fetcher: () -> untyped
+
+    def local_redis_pool: () -> ConnectionPool[RedisClientAdapter]
+
+    def logger: () -> Logger
+
+    def lookup: (String name) -> singleton(Class)?
+
+    def redis: () { (RedisClientAdapter conn) -> void } -> void
+
+    def redis_pool: () -> ConnectionPool[RedisClientAdapter]
+
+    def server_middleware: () ?{ (Middleware::Chain chain) -> void } -> Middleware::Chain
+
+    def stop: () -> void
+
+    private
+
+    def initialize: (String name, Config config) -> void
+  end
+end

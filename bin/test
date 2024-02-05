@@ -2,25 +2,34 @@
 
 require "pathname"
 require "optparse"
-require "open3"
+require 'yaml'
 
 @all = false
 @verbose = false
-@repo_root = Pathname(__dir__) + "../gems"
-@repos = []
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: bin/test [options] <gem...>"
+  opts.banner = <<~BANNER
+    Usage: bin/test [options] <gem...>
 
-  opts.on("--root=PATH", "Specify repository root") do |path|
-    @repo_root = Pathname(path)
-  end
-  opts.on("--repo=PATH", "Add more repositories") do |path|
-    @repos << Pathname(path)
-  end
+    Examples:
+        # Test a gem
+        $ bin/test gems/rack/2.2
+
+        # Test a gem with verbose messages
+        $ bin/test gems/rack/2.2 -v
+
+        # Test all the gems
+        $ bin/test -a
+
+    Options:
+  BANNER
+
   opts.on("-a", "--all", "Test all gems") do @all = true end
   opts.on("-v", "--verbose", "Print more messages") do @verbose = true end
-end.parse!(ARGV)
+
+  opts.parse!(ARGV)
+  abort opts.help if ARGV.empty? && !@all
+end
 
 dirs =
   if @all
@@ -41,62 +50,157 @@ def putci(message)
   puts message if ENV["CI"]
 end
 
-passed_gems = []
+def sh!(*cmd, **options)
+  putv "$ #{cmd.join(" ")}"
+  system(*cmd, **options, exception: true)
+end
+
+def sh(*cmd, **options)
+  putv "$ #{cmd.join(" ")}"
+  system(*cmd, **options)
+end
+
+class Runner
+  def initialize(base_dir)
+    @base_dir = base_dir
+    @test_dir = base_dir / "_test"
+    @version = base_dir.basename.to_s
+    @gem_name = base_dir.parent.basename.to_s
+  end
+
+  def run
+    cleanup
+
+    generate_gemfile_lock
+    generate_rbs_collection_config
+    rbs_collection_install
+    rename_gemfile_lock
+
+    generate_steepfile
+
+    ok = true
+    ok = run_rbs_validate && ok
+    ok = run_steep_check && ok
+    ok = check_untyped_call && ok
+    ok
+  end
+
+  private
+
+  attr_reader :base_dir, :test_dir, :version, :gem_name
+
+  def cleanup
+    collection_yaml.delete if collection_yaml.exist?
+    collection_lock_yaml.delete if collection_lock_yaml.exist?
+    steepfile.delete if steepfile.exist?
+  end
+
+  def generate_gemfile_lock
+    v = "~> #{version}"
+    gemfile.write(<<~RUBY)
+      source 'https://rubygems.org'
+      gem #{gem_name.dump}, #{v.dump}
+
+      #{
+        additional_gems.map {|name| "gem #{name.dump}" }.join("\n")
+      }
+    RUBY
+
+    sh! 'bundle', 'lock', chdir: test_dir.to_s
+  end
+
+  def generate_rbs_collection_config
+    collection_yaml.write(<<~YAML)
+      sources:
+        - type: local
+          path: #{Pathname(__dir__).join("../gems")}
+
+      path: .gem_rbs_collection
+    YAML
+  end
+
+  def rbs_collection_install
+    sh! 'rbs', 'collection', 'install', chdir: test_dir.to_s
+  end
+
+  def rename_gemfile_lock
+    gemfile_lock.rename(test_dir / "Gemfile.lock.back")
+    gemfile.rename(test_dir / "Gemfile.back")
+  end
+
+  def generate_steepfile
+    steepfile.write(<<~RUBY)
+      D = Steep::Diagnostic
+      target :lib do
+        check "."
+        signature '.'
+
+        configure_code_diagnostics(D::Ruby.all_error)
+      end
+    RUBY
+  end
+
+  def run_rbs_validate
+    sh 'bundle', 'exec', 'rbs', 'validate', chdir: test_dir.to_s
+  end
+
+  def run_steep_check
+    with_expectation = if test_dir.join('steep_expectations.yml').exist?
+      ['--with-expectation']
+    else
+      []
+    end
+    sh 'bundle', 'exec', 'steep', 'check', *with_expectation, chdir: test_dir.to_s
+  end
+
+  def check_untyped_call
+    sh Pathname(__dir__).join("check-untyped-call.rb").to_s, chdir: test_dir.to_s
+  end
+
+  def additional_gems
+    path = test_dir.join('metadata.yaml')
+    return [] unless path.exist?
+    yaml = YAML.load path.read
+    return [] unless yaml
+    yaml['additional_gems'] || []
+  end
+
+  def collection_yaml = test_dir.join('rbs_collection.yaml')
+  def collection_lock_yaml = test_dir.join('rbs_collection.lock.yaml')
+  def gemfile = test_dir.join('Gemfile')
+  def gemfile_lock = test_dir.join('Gemfile.lock')
+  def steepfile = test_dir.join('Steepfile')
+end
+
 failed_gems = []
 
 dirs.each do |dir|
-  test_script = dir + "_scripts/test"
-  case
-  when !dir.exist?
-    puts "Skipping: `#{dir}` is not found..."
-    putci "::warning ::`#{dir}` is not found"
-  when !dir.directory?
-    puts "Skipping: `#{dir}` is not a directory..."
-    putci "::warning ::`#{dir}` is not a directory"
-  when !test_script.exist?
-    puts "Skipping: `#{test_script}` is not found..."
-    putci "::warning ::`#{test_script}` is not found"
-  when !test_script.file?
-    puts "Skipping: `#{test_script}` is not a file..."
-    putci "::warning ::`#{test_script}` is not a file"
-  when !test_script.executable?
-    puts "Skipping: `#{test_script}` is not executable..."
-    putci "::warning ::`#{test_script}` is not executable"
-  else
-    putci "::group::Test for #{dir}"
-    puts "Detected test script: #{test_script}"
+  putci "::group::Test for #{dir}"
+  puts "Testing #{dir}..."
 
-    env = {
-      "REPO_ROOT" => @repo_root.to_s,
-      "REPOS" => @repos.join(File::PATH_SEPARATOR),
-      "RBS_DIR" => dir.to_s
-    }
-    status = Open3.popen2e(env, test_script.to_s) do |_stdin, stdout_stderr, thread|
-      putv stdout_stderr
-      thread.value
-    end
-
-    if status.success?
-      puts " => Success 💪"
-      passed_gems << dir
-    else
-      puts " => Failure 🚨"
-      putci "::error ::`#{dir}` test failed"
-      failed_gems << dir
-    end
-
-    putci "::endgroup::"
+  test_dir = dir.join('_test')
+  unless test_dir.exist?
+    puts "Skipping: `#{test_dir}` is not found..."
+    putci "::warning ::`#{test_dir}` is not found"
+    next
   end
+
+  ok = Runner.new(dir).run
+  if ok
+    puts " => Success 💪"
+  else
+    puts " => Failure 🚨"
+    putci "::error ::`#{dir}` test failed"
+    failed_gems << dir
+  end
+
+ensure
+  putci "::endgroup::"
 end
 
 unless failed_gems.empty?
   puts ""
   puts "# Failed gems"
   failed_gems.each {|gem| puts gem }
-  exit 1
-end
-
-if passed_gems.empty?
-  puts "No succeeded gems"
   exit 1
 end

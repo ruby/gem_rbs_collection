@@ -1846,48 +1846,6 @@ module ActiveSupport
   end
 end
 
-module ActiveSupport
-  # Configurable provides a <tt>config</tt> method to store and retrieve
-  # configuration options as an <tt>OrderedHash</tt>.
-  module Configurable
-    extend ActiveSupport::Concern
-
-    class Configuration[T, U] < ActiveSupport::InheritableOptions[T, U]
-      def compile_methods!: () -> untyped
-
-      # Compiles reader methods so we don't have to go through method_missing.
-      def self.compile_methods!: (untyped keys) -> untyped
-    end
-
-    module ClassMethods
-      def config: () -> untyped
-
-      def configure: () { (untyped) -> untyped } -> untyped
-
-      private
-
-      def config_accessor: (*untyped names, ?instance_accessor: bool instance_accessor, ?instance_writer: bool instance_writer, ?instance_reader: bool instance_reader) { () -> untyped } -> untyped
-    end
-
-    # Reads and writes attributes from a configuration <tt>OrderedHash</tt>.
-    #
-    #   require 'active_support/configurable'
-    #
-    #   class User
-    #     include ActiveSupport::Configurable
-    #   end
-    #
-    #   user = User.new
-    #
-    #   user.config.allowed_access = true
-    #   user.config.level = 1
-    #
-    #   user.config.allowed_access # => true
-    #   user.config.level          # => 1
-    def config: () -> untyped
-  end
-end
-
 class Array[unchecked out Elem]
   # Returns the tail of the array from +position+.
   #
@@ -3550,28 +3508,6 @@ class Module
   #   m.name         # => "M"
   #   m.anonymous?   # => false
   def anonymous?: () -> untyped
-end
-
-class Module
-  # Declares an attribute reader backed by an internally-named instance variable.
-  def attr_internal_reader: (*untyped attrs) -> untyped
-
-  # Declares an attribute writer backed by an internally-named instance variable.
-  def attr_internal_writer: (*untyped attrs) -> untyped
-
-  # Declares an attribute reader and writer backed by an internally-named instance
-  # variable.
-  def attr_internal_accessor: (*untyped attrs) -> untyped
-
-  alias attr_internal attr_internal_accessor
-
-  attr_accessor self.attr_internal_naming_format: untyped
-
-  private
-
-  def attr_internal_ivar_name: (untyped attr) -> untyped
-
-  def attr_internal_define: (untyped attr_name, untyped `type`) -> untyped
 end
 
 # Extends the module object with class/module and instance accessors for
@@ -7354,7 +7290,7 @@ module ActiveSupport
 
     private
 
-    def options: () -> untyped
+    def options: () -> InheritableOptions
 
     def deserialize: (untyped config) -> untyped
   end
@@ -10541,59 +10477,6 @@ module ActiveSupport
 end
 
 module ActiveSupport
-  # Usually key value pairs are handled something like this:
-  #
-  #   h = {}
-  #   h[:boy] = 'John'
-  #   h[:girl] = 'Mary'
-  #   h[:boy]  # => 'John'
-  #   h[:girl] # => 'Mary'
-  #   h[:dog]  # => nil
-  #
-  # Using +OrderedOptions+, the above code could be reduced to:
-  #
-  #   h = ActiveSupport::OrderedOptions.new
-  #   h.boy = 'John'
-  #   h.girl = 'Mary'
-  #   h.boy  # => 'John'
-  #   h.girl # => 'Mary'
-  #   h.dog  # => nil
-  #
-  # To raise an exception when the value is blank, append a
-  # bang to the key name, like:
-  #
-  #   h.dog! # => raises KeyError: :dog is blank
-  #
-  class OrderedOptions[T, U] < Hash[T, U]
-    alias _get []
-
-    def []=: (untyped key, untyped value) -> untyped
-
-    def []: (untyped key) -> untyped
-
-    def method_missing: (untyped name, *untyped args) -> untyped
-
-    def respond_to_missing?: (untyped name, untyped include_private) -> ::TrueClass
-
-    def extractable_options?: () -> ::TrueClass
-  end
-
-  # +InheritableOptions+ provides a constructor to build an +OrderedOptions+
-  # hash inherited from another hash.
-  #
-  # Use this if you already have some hash and you want to create a new one based on it.
-  #
-  #   h = ActiveSupport::InheritableOptions.new({ girl: 'Mary', boy: 'John' })
-  #   h.girl # => 'Mary'
-  #   h.boy  # => 'John'
-  class InheritableOptions[T, U] < OrderedOptions[T, U]
-    def initialize: (?untyped? parent) -> untyped
-
-    def inheritable_copy: () -> untyped
-  end
-end
-
-module ActiveSupport
   # +ParameterFilter+ allows you to specify keys for sensitive data from
   # hash-like object and replace corresponding value. Filtering only certain
   # sub-keys from a hash is possible by using the dot notation:
@@ -10776,98 +10659,6 @@ module ActiveSupport
     def class_unload!: () { () -> untyped } -> untyped
 
     def complete!: () -> untyped
-  end
-end
-
-module ActiveSupport
-  # Rescuable module adds support for easier exception handling.
-  module Rescuable
-    extend Concern
-
-    module ClassMethods
-      # Rescue exceptions raised in controller actions.
-      #
-      # <tt>rescue_from</tt> receives a series of exception classes or class
-      # names, and a trailing <tt>:with</tt> option with the name of a method
-      # or a Proc object to be called to handle them. Alternatively a block can
-      # be given.
-      #
-      # Handlers that take one argument will be called with the exception, so
-      # that the exception can be inspected when dealing with it.
-      #
-      # Handlers are inherited. They are searched from right to left, from
-      # bottom to top, and up the hierarchy. The handler of the first class for
-      # which <tt>exception.is_a?(klass)</tt> holds true is the one invoked, if
-      # any.
-      #
-      #   class ApplicationController < ActionController::Base
-      #     rescue_from User::NotAuthorized, with: :deny_access # self defined exception
-      #     rescue_from ActiveRecord::RecordInvalid, with: :show_errors
-      #
-      #     rescue_from 'MyAppError::Base' do |exception|
-      #       render xml: exception, status: 500
-      #     end
-      #
-      #     private
-      #       def deny_access
-      #         ...
-      #       end
-      #
-      #       def show_errors(exception)
-      #         exception.record.new_record? ? ...
-      #       end
-      #   end
-      #
-      # Exceptions raised inside exception handlers are not propagated up.
-      def rescue_from: (*Class, ?with: Symbol | Proc) -> void
-                     | (*Class) { (Exception) -> void } -> void
-
-      # Matches an exception to a handler based on the exception class.
-      #
-      # If no handler matches the exception, check for a handler matching the
-      # (optional) exception.cause. If no handler matches the exception or its
-      # cause, this returns +nil+, so you can deal with unhandled exceptions.
-      # Be sure to re-raise unhandled exceptions if this is what you expect.
-      #
-      #     begin
-      #       (trim non-ascii characters)
-      #     rescue => exception
-      #       rescue_with_handler(exception) || raise
-      #     end
-      #
-      # Returns the exception if it was handled and +nil+ if it was not.
-      def rescue_with_handler: (untyped exception, ?visited_exceptions: untyped visited_exceptions, ?object: untyped object) -> untyped
-
-      def handler_for_rescue: (untyped exception, ?object: untyped object) -> untyped
-
-      private
-
-      def find_rescue_handler: (untyped exception) -> untyped
-
-      def constantize_rescue_handler_class: (untyped class_or_name) -> untyped
-    end
-
-    # Delegates to the class method, but uses the instance as the subject for
-    # rescue_from handlers (method calls, instance_exec blocks).
-    def rescue_with_handler: (untyped exception) -> untyped
-
-    def handler_for_rescue: (untyped exception) -> untyped
-  end
-end
-
-module ActiveSupport
-  module SecurityUtils
-    # Constant time string comparison, for fixed length strings.
-    #
-    # The values compared should be of fixed length, such as strings
-    # that have already been processed by HMAC. Raises in case of length mismatch.
-    def self?.fixed_length_secure_compare: (untyped a, untyped b) -> untyped
-
-    # Constant time string comparison, for variable length strings.
-    #
-    # The values are first processed by SHA256, so that we don't leak length info
-    # via timing attacks.
-    def self?.secure_compare: (untyped a, untyped b) -> untyped
   end
 end
 
@@ -11707,12 +11498,6 @@ module ActiveSupport
 
     def initialize: (untyped utc_time, untyped time_zone, ?untyped? local_time, ?untyped? period) -> untyped
 
-    # Returns a <tt>Time</tt> instance that represents the time in +time_zone+.
-    def time: () -> untyped
-
-    # Returns a <tt>Time</tt> instance of the simultaneous time in the UTC timezone.
-    def utc: () -> untyped
-
     alias comparable_time utc
 
     alias getgm utc
@@ -11728,33 +11513,11 @@ module ActiveSupport
     def in_time_zone: (?(ActiveSupport::TimeZone | String) new_zone) -> ::ActiveSupport::TimeWithZone
                     | (false? zone) -> ::Time
 
-    # Returns a <tt>Time</tt> instance of the simultaneous time in the system timezone.
-    def localtime: (?untyped? utc_offset) -> untyped
-
     alias getlocal localtime
-
-    # Returns true if the current time is within Daylight Savings Time for the
-    # specified time zone.
-    #
-    #   Time.zone = 'Eastern Time (US & Canada)'    # => 'Eastern Time (US & Canada)'
-    #   Time.zone.parse("2012-5-30").dst?           # => true
-    #   Time.zone.parse("2012-11-30").dst?          # => false
-    def dst?: () -> untyped
 
     alias isdst dst?
 
-    # Returns true if the current time zone is set to UTC.
-    #
-    #   Time.zone = 'UTC'                           # => 'UTC'
-    #   Time.zone.now.utc?                          # => true
-    #   Time.zone = 'Eastern Time (US & Canada)'    # => 'Eastern Time (US & Canada)'
-    #   Time.zone.now.utc?                          # => false
-    def utc?: () -> untyped
-
     alias gmt? utc?
-
-    # Returns the offset from current time to UTC time in seconds.
-    def utc_offset: () -> untyped
 
     alias gmt_offset utc_offset
 
@@ -11769,12 +11532,6 @@ module ActiveSupport
     #   Time.zone = 'UTC'                          # => "UTC"
     #   Time.zone.now.formatted_offset(true, "0")  # => "0"
     def formatted_offset: (?bool colon, ?untyped? alternate_utc_string) -> untyped
-
-    # Returns the time zone abbreviation.
-    #
-    #   Time.zone = 'Eastern Time (US & Canada)'   # => "Eastern Time (US & Canada)"
-    #   Time.zone.now.zone # => "EST"
-    def zone: () -> untyped
 
     # Returns a string of the object's date, time, zone, and offset from UTC.
     #
@@ -11809,18 +11566,6 @@ module ActiveSupport
 
     def encode_with: (untyped coder) -> untyped
 
-    # Returns a string of the object's date and time in the format used by
-    # HTTP requests.
-    #
-    #   Time.zone.now.httpdate  # => "Tue, 01 Jan 2013 04:39:43 GMT"
-    def httpdate: () -> untyped
-
-    # Returns a string of the object's date and time in the RFC 2822 standard
-    # format.
-    #
-    #   Time.zone.now.rfc2822  # => "Tue, 01 Jan 2013 04:51:39 +0000"
-    def rfc2822: () -> untyped
-
     alias rfc822 rfc2822
 
     # Returns a string of the object's date and time.
@@ -11831,10 +11576,6 @@ module ActiveSupport
     def to_s: (?::Symbol format) -> untyped
 
     alias to_formatted_s to_s
-
-    # Replaces <tt>%Z</tt> directive with +zone before passing to Time#strftime,
-    # so that zone information is correct.
-    def strftime: (untyped format) -> untyped
 
     # Use the time in UTC for comparisons.
     def <=>: (untyped other) -> untyped
@@ -11972,43 +11713,7 @@ module ActiveSupport
     #   now.advance(years: 1)   # => Mon, 02 Nov 2015 01:26:28 EST -05:00
     def advance: (untyped options) -> TimeWithZone
 
-    # Returns Array of parts of Time in sequence of
-    # [seconds, minutes, hours, day, month, year, weekday, yearday, dst?, zone].
-    #
-    #   now = Time.zone.now     # => Tue, 18 Aug 2015 02:29:27 UTC +00:00
-    #   now.to_a                # => [27, 29, 2, 18, 8, 2015, 2, 230, false, "UTC"]
-    def to_a: () -> ::Array[untyped]
-
-    # Returns the object's date and time as a floating point number of seconds
-    # since the Epoch (January 1, 1970 00:00 UTC).
-    #
-    #   Time.zone.now.to_f # => 1417709320.285418
-    def to_f: () -> untyped
-
-    # Returns the object's date and time as an integer number of seconds
-    # since the Epoch (January 1, 1970 00:00 UTC).
-    #
-    #   Time.zone.now.to_i # => 1417709320
-    def to_i: () -> untyped
-
     alias tv_sec to_i
-
-    # Returns the object's date and time as a rational number of seconds
-    # since the Epoch (January 1, 1970 00:00 UTC).
-    #
-    #   Time.zone.now.to_r # => (708854548642709/500000)
-    def to_r: () -> untyped
-
-    # Returns an instance of DateTime with the timezone's UTC offset
-    #
-    #   Time.zone.now.to_datetime                         # => Tue, 18 Aug 2015 02:32:20 +0000
-    #   Time.current.in_time_zone('Hawaii').to_datetime   # => Mon, 17 Aug 2015 16:32:20 -1000
-    def to_datetime: () -> untyped
-
-    # Returns an instance of +Time+, either with the same UTC offset
-    # as +self+ or in the local system timezone depending on the setting
-    # of +ActiveSupport.to_time_preserves_timezone+.
-    def to_time: () -> untyped
 
     # So that +self+ <tt>acts_like?(:time)</tt>.
     def acts_like_time?: () -> ::TrueClass
