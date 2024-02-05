@@ -308,9 +308,9 @@ module ActiveRecord
       def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
       def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
       def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def includes: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def preload: (*String | Symbol | Hash[untyped, untyped]) -> self
+      def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
+      def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
+      def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
       def find: (PrimaryKey id) -> Model
@@ -391,9 +391,9 @@ module ActiveRecord
       def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
       def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
       def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def includes: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def preload: (*String | Symbol | Hash[untyped, untyped]) -> Relation
+      def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
+      def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
+      def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
       def find: (PrimaryKey id) -> Model
@@ -467,9 +467,9 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
   def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
   def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def includes: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def preload: (*String | Symbol | Hash[untyped, untyped]) -> self
+  def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
+  def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
+  def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
   def find_by: (untyped, *untyped) -> Model?
   def find_by!: (untyped, *untyped) -> Model
   def find: (PrimaryKey id) -> Model
@@ -551,9 +551,9 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
   def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
   def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def includes: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def eager_load: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def preload: (*String | Symbol | Hash[untyped, untyped]) -> Relation
+  def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
+  def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
+  def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
   def find_by: (untyped) -> Model?
   def find_by!: (untyped) -> Model
   def find: (PrimaryKey id) -> Model
