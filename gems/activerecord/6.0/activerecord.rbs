@@ -1,5 +1,7 @@
 module ActiveRecord
   class Base
+    type condition[T] = Symbol | ^() [self: T] -> boolish
+
     # puts ActiveRecord::Base.singleton_class.ancestors.map(&:to_s).select { |s| /ClassMethods$/.match?(s) }.map{ |s| "extend ::#{s}" }.sort
     extend ::ActiveModel::AttributeMethods::ClassMethods
     extend ::ActiveModel::Conversion::ClassMethods
@@ -47,13 +49,12 @@ module ActiveRecord
     def self.transaction: [T] () { () -> T } -> T
     def self.create: (**untyped) -> instance
     def self.create!: (**untyped) -> instance
-    def self.validate: (*untyped) -> void
-    def self.validates: (*untyped) -> void
+    def self.validate: (*untyped, ?if: condition[instance], ?unless: condition[instance], **untyped) -> void
+    def self.validates: (*untyped, ?if: condition[instance], ?unless: condition[instance], **untyped) -> void
 
     # callbacks
     type callback[T] = Symbol | ^(T) [self: T] -> void
     type around_callback[T] = Symbol | ^(T, Proc) [self: T] -> void
-    type condition[T] = Symbol | ^() [self: T] -> boolish
     def self.after_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_create_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
     def self.after_update_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
