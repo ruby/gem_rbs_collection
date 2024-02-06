@@ -1,0 +1,34 @@
+name: 'Check review status'
+
+on:
+  pull_request: {}
+
+jobs:
+  check_review_status:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      pull-requests: read
+      contents: read
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: 'blob:none'
+          fetch-depth: 0
+          ref: main
+      - name: Changed gems and non gem files
+        id: changes
+        run: |
+          ruby .github/workflows/pr_bot/changed_files.rb
+      - name: Check review status
+        env:
+          CHANGED_GEMS: ${{ steps.changes.outputs.gems }}
+          CHANGED_NON_GEMS: ${{ steps.changes.outputs.non_gems }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ruby .github/workflows/pr_bot/check_review_status.rb "$CHANGED_GEMS" "$CHANGED_NON_GEMS" "$PR_NUMBER"

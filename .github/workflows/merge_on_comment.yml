@@ -1,0 +1,55 @@
+name: 'Merge a PR on a comment'
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  merge:
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
+    runs-on: 'ubuntu-latest'
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: 'blob:none'
+          fetch-depth: 0
+          ref: main
+      - name: Fetch PR information
+        id: pr_info
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          pr="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${GH_REPO}/pulls/${PR_NUMBER})"
+          author="$(echo "$pr" | jq -r .user.login)"
+          head_sha="$(echo "$pr" | jq -r .head.sha)"
+          base_sha="$(echo "$pr" | jq -r .base.sha)"
+
+          echo "author=$author" >> $GITHUB_OUTPUT
+          echo "head_sha=$head_sha" >> $GITHUB_OUTPUT
+          echo "base_sha=$base_sha" >> $GITHUB_OUTPUT
+      - name: Changed gems and non gem files
+        env:
+          BASE_SHA: ${{ steps.pr_info.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.pr_info.outputs.head_sha }}
+        id: changes
+        run: |
+          ruby .github/workflows/pr_bot/changed_files.rb
+      - name: Merge the PR
+        env:
+          BASE_SHA: ${{ steps.pr_info.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.pr_info.outputs.head_sha }}
+          PR_AUTHOR: ${{ steps.pr_info.outputs.author }}
+          CHANGED_GEMS: ${{ steps.changes.outputs.gems }}
+
+          COMMENTED_BY: ${{ github.event.issue.user.login }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ruby .github/workflows/pr_bot/check_merge_ability.rb "$CHANGED_GEMS"
+          gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --merge
