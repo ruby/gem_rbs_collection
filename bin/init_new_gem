@@ -57,7 +57,8 @@ print '> '
 git_repo = normalize_github_url($stdin.gets.chomp)
 
 puts "Your GitHub account if you want to become the maintainer of RBS for this gem (default: skip adding you to the maintainer)"
-puts "See https://github.com/ruby/gem_rbs_collection/blob/main/docs/CONTRIBUTING.md#code-owners"
+puts "We recommentd to add your account to maintain the RBS actively."
+puts "See https://github.com/ruby/gem_rbs_collection/blob/main/docs/CONTRIBUTING.md#gem-reviewer"
 print '> '
 github_account = $stdin.gets.chomp.tap { break if _1.empty? }
 
@@ -94,26 +95,11 @@ if git_repo
 end
 
 if github_account
-  github_account = "@#{github_account}" unless github_account.start_with?('@')
-  update(Pathname('.github/CODEOWNERS')) do |content|
-    lines = content.lines
-
-    pre_gems_lines, gems_lines =
-      lines.map(&:chomp).slice_before('# Maintainer of individual gems (alphabetical order)').to_a
-    pre_gems_lines << gems_lines.shift
-
-    gems_lines << "/gems/#{gem_name} #{github_account}"
-    gems_lines.sort!
-
-    gems = gems_lines.map {|line| line.split }
-    longest_gem_size = gems.map {|gem, _| gem.size }.max
-    gem_lines = gems.map do |gem, owner|
-      space = " " * (longest_gem_size - gem.size)
-      "#{gem}#{space} #{owner}"
-    end
-
-    (pre_gems_lines + gem_lines).join("\n")
-  end
+  github_account = github_account.sub('@', '')
+  put base.parent / '_reviewers.yaml', <<~YAML
+    reviewers:
+      - #{github_account}
+  YAML
 end
 
 puts
