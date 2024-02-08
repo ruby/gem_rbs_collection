@@ -9,9 +9,14 @@ msgs = [<<~MSG]
   @#{PR_AUTHOR} Thanks for your contribution!
 
   Please follow the instructions below for each change.
-MSG
+  See also: https://github.com/ruby/gem_rbs_collection/blob/main/docs/CONTRIBUTING.md
 
-# TODO: when the reviewer includes the author
+  ## Available commands
+
+  You can use the following commands by commenting on this PR.
+
+  * `/merge`: Merge this PR if CI passes
+MSG
 
 changed_gems.each do |gem|
   exist_in_base = git? 'cat-file', '-e', "#{BASE_SHA}:gems/#{gem}"
@@ -38,7 +43,6 @@ changed_gems.each do |gem|
       msg << <<~MSG
         This gem does not have reviewers. So you can merge this PR immediately if the CI passes.
         We recommend you add yourself to the reviewers for this gem.
-        # TODO: add a link to the document
       MSG
     elsif reviewers.include?(PR_AUTHOR)
       msg << <<~MSG
