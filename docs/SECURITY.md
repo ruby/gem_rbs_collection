@@ -12,4 +12,4 @@ But if an attacker can inject malicious code to `bin/test`, `rbs` command or the
 
 ## Reporting a Vulnerability
 
-See https://www.ruby-lang.org/en/security/.
+Report from https://github.com/ruby/gem_rbs_collection/security/advisories.
