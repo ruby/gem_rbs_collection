@@ -13,10 +13,12 @@ jobs:
   syntax_check:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    container:
-      image: rubylang/ruby:3.3-dev-jammy
     steps:
     - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
     - name: 'Install dependencies'
       run: 'gem install rbs'
     - name: 'Test syntax check'
