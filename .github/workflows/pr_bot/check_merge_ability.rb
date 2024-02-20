@@ -1,17 +1,34 @@
 require_relative "./utils"
+require_relative "./merge_ability"
 
-def can_merge?(commented_by, author, gem_reviewers)
-  return true if commented_by == author
-  return true if administorators.include?(commented_by)
-  return true if gem_reviewers.include?(commented_by)
-  return false
+def comment_to_github(body, pr_number)
+  sh! 'gh', 'pr', 'comment', pr_number, '--body', body, '--repo', GH_REPO
 end
 
-def all_gem_reviewers(changed_gems)
-  changed_gems.flat_map { |gem| gem_reviewers(gem, BASE_SHA) }
+changed_gems = JSON.parse(ARGV[0])
+changed_non_gems = JSON.parse(ARGV[1])
+pr_number = ARGV[2]
+
+ability = MergeAbility.new(changed_gems:, changed_non_gems:, pr_number:)
+
+unless ability.can_merge_by?(ENV['COMMENTED_BY'], PR_AUTHOR)
+  body = <<~BODY
+    `/merge` command failed.
+
+    You do not have permission to merge this PR.
+    PR author, reviewers, and administrators can merge this PR.
+  BODY
+  comment_to_github(body, pr_number)
+  exit 1
 end
 
-reviewers = all_gem_reviewers(JSON.parse(ARGV[0]))
-return if can_merge?(ENV['COMMENTED_BY'], PR_AUTHOR, reviewers)
+unless ability.approved?
+  body  = <<~BODY
+    `/merge` command failed.
 
-raise "You do not have permission to merge this PR."
+    This PR is not approved yet by the reviewers. Please get approval from the reviewers.
+    See the Actions tab for detail.
+  BODY
+  comment_to_github(body, pr_number)
+  exit 1
+end

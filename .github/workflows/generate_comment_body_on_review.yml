@@ -1,0 +1,56 @@
+# This workflow generates a comment body on an approval.
+# It generates the body and saves it as an artifact.
+# A following workflow called from `workflow_run` event uses the artifact.
+#
+# These workflows are separated due to GITHUB_TOKEN's permission.
+# GitHub does not allow `write` permission on public fork repositories on `pull_request_review` event.
+# Therefore we need to use `workflow_run` event to permit `write` actions to the token.
+
+name: 'Generate comment body on review'
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  create_comment:
+    if: github.event.review.state != 'CHANGES_REQUESTED'
+    runs-on: 'ubuntu-latest'
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: 'blob:none'
+          fetch-depth: 0
+          ref: main
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Changed gems and non gem files
+        id: changes
+        run: |
+          ruby .github/workflows/pr_bot/changed_files.rb
+      - name: Prepare comment body
+        id: comment-body
+        env:
+          CHANGED_GEMS: ${{ steps.changes.outputs.gems }}
+          CHANGED_NON_GEMS: ${{ steps.changes.outputs.non_gems }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEWED_BY: ${{ github.event.review.user.login }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ruby .github/workflows/pr_bot/review_result_comment_body.rb "$CHANGED_GEMS" "$CHANGED_NON_GEMS" "$PR_NUMBER" COMMENT_BODY.txt
+          echo "$PR_NUMBER" > PR_NUMBER
+      - name: Store comment body
+        uses: actions/upload-artifact@v4
+        with:
+          name: comment_body_on_review
+          path: |
+            COMMENT_BODY.txt
+            PR_NUMBER
+          retention-days: 1

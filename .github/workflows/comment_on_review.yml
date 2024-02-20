@@ -1,0 +1,29 @@
+name: Comment on review
+
+on:
+  workflow_run:
+    workflows: [Generate comment body on review]
+    types: [completed]
+
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      pull-requests: write
+      actions: read
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: comment_body_on_review
+          run-id: ${{ github.event.workflow_run.id}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Send a comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run:
+          gh pr comment "$(cat PR_NUMBER)" --body "$(cat COMMENT_BODY.txt)" --repo "$GH_REPO"
+

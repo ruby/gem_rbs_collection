@@ -55,7 +55,8 @@ changed_gems.each do |gem|
       msg << <<~MSG
         You need to get approval from the reviewers of this gem.
 
-        #{reviewers.map { "@#{_1}" }.join(', ')}, please review and approve the changes.
+        #{reviewers.map { "@#{_1}" }.join(', ')}, please review this pull request.
+        If this change is acceptable, please make a review comment including `APPROVE`.
         After that, the PR author or the reviewers can merge this PR.
         Just comment `/merge` to merge this PR.
       MSG
@@ -76,7 +77,8 @@ changed_gems.each do |gem|
       msg << <<~MSG
         You need to get approval from the reviewers of this gem.
 
-        #{reviewers.map { "@#{_1}" }.join(', ')}, please review and approve the changes.
+        #{reviewers.map { "@#{_1}" }.join(', ')}, please review this pull request.
+        If this change is acceptable, please make a review comment including `APPROVE`.
         After that, the PR author or the reviewers can merge this PR.
         Just comment `/merge` to merge this PR.
       MSG

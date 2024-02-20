@@ -63,7 +63,12 @@ end
 
 def approvements(sha, pr_number)
   reviews = gh_api! "/repos/#{GH_REPO}/pulls/#{pr_number}/reviews"
-  reviews.select { _1['state'] == 'APPROVED' && _1['commit_id'] == sha }
+  reviews.select do
+    _1['commit_id'] == sha && (
+      _1['state'] == 'APPROVED' ||
+        (_1['body'].include?('APPROVE') && _1['state'] == 'COMMENTED')
+    )
+  end
 end
 
 def administorators
