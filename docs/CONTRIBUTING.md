@@ -34,8 +34,8 @@ This script generates an empty RBS to `gems/GEM_NAME/VERSION/GEM_NAME.rbs`, and 
 
 Specify the _major_ and _minor_ version you are using would be great for most cases.
 
-We recommend adding `_test` and `_src` directories.
-We assume `_test` directory contains files for testing, and `_src` is a git submodule for the source code of the version of the gem.
+We recommend adding `_test` directory.
+We assume `_test` directory contains files for testing.
 
 ### Write RBS files
 
