@@ -303,6 +303,7 @@ module ActiveRecord
       def exists?: (*untyped) -> bool
       def order: (*untyped) -> self
       def group: (*Symbol | String) -> untyped
+      def in_order_of: (Symbol, Array[untyped]) -> self
       def distinct: () -> self
       def or: (self) -> self
       def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> self
@@ -386,6 +387,7 @@ module ActiveRecord
               | () { (Model) -> boolish } -> bool
       def order: (*untyped) -> Relation
       def group: (*Symbol | String) -> untyped
+      def in_order_of: (Symbol, Array[untyped]) -> Relation
       def distinct: () -> Relation
       def or: (Relation) -> Relation
       def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> Relation
@@ -462,6 +464,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def exists?: (*untyped) -> bool
   def order: (*untyped) -> self
   def group: (*Symbol | String) -> untyped
+  def in_order_of: (Symbol, Array[untyped]) -> self
   def distinct: () -> self
   def or: (self) -> self
   def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> self
@@ -546,6 +549,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
           | () { (Model) -> boolish } -> bool
   def order: (*untyped) -> Relation
   def group: (*Symbol | String) -> untyped
+  def in_order_of: (Symbol, Array[untyped]) -> Relation
   def distinct: () -> Relation
   def or: (Relation) -> Relation
   def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> Relation
