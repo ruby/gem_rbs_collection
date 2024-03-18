@@ -23,7 +23,7 @@ Adding RBS files for a gem can be done with 4 steps.
 ### Set up environment
 
 Run `bin/setup`.
-It runs `bundle install` with `--gemfile` option for the case the working copy is at under a directory for your application.
+It runs `bundle install` with `--gemfile` option for the case the working copy is under a directory for your application.
 
 `bin/rbs` would also help to run the commands with correct `--gemfile` option.
 
@@ -46,7 +46,7 @@ You can write RBS files.
 You may want to write everything of a gem.
 We don't recommend doing it especially when you are starting.
 
-Writing high-quality type definitions are difficult.
+Writing high-quality type definitions is difficult.
 
 Focus on examples available through the `README` or docs of the gem.
 Focus on the APIs your app is using.
@@ -94,34 +94,37 @@ If this gem includes such dependencies, comment-out the following lines and decl
 If all dependencies appear in the gemspec, you should remove this file.
 See [the documentation](https://github.com/ruby/rbs/blob/master/docs/collection.md) for more information.
 
-## Code Owners
+## Gem Reviewer
 
-Code owners are responsible for maintaining individual gems. They open and review PRs for the owned gems.
+Gem Reviewers are responsible for maintaining individual gems. They open and review PRs for the owned gems.
 
-### What does code owner do
+### What does Gem Reviewer do
 
-Code owners review and update RBS for the owned gems.
+Gem Reviewers review and update RBS for the owned gems.
 
-If a pull request is opened to the owned gem, the code owners are assigned as reviewers to the PR. Code owners review and merge (or reject) the PR.
+If a pull request is opened to the owned gem, the Bot requests the Gem Reviewers to review the PR. The Gem Reviewers review the PR and merge it if it is appropriate.
+The Bot describes the review process as a comment on the PR.
 
-Code owners can update the RBS themselves. Note that they cannot merge a PR themselves due to [GitHub's restriction](https://github.community/t/do-not-require-owner-approval-if-the-pull-request-is-from-an-owner/369), so feel free to ask the repository admin to merge the PR.
+Gem Reviewers also can open PRs to update RBS for the owned gems themselves.
 
-### Become a code owner
+### Become a Gem Reviewer
 
-If you want to become a code owner, read this section.
+Add your GitHub account to the `gems/GEM_NAME/_reviewers.yaml`. For example:
+
+```yaml
+# gems/ast/_reviewers.yaml
+reviewers:
+  - pocke
+```
+
+Then open a pull request containing the change.
 
 Note that if you are the maintainer of the gem, you should consider moving RBS files to the gem's code repository and including them in the gem package instead.
 
-#### If you want to become a code owner of existing gem
+#### If you want to become a Gem Reviewer of existing gem
 
-First, send PRs for the gem you want to maintain. We value your achievements.
-
-Then, request us to you become a code owner in a PR or issue.
-
-If it is accepted, open a PR to add your account into [.github/CODEOWNERS](https://github.com/ruby/gem_rbs_collection/blob/main/.github/CODEOWNERS).
-We merge the PR and invite you as an outside collaborator to this repository.
+If you are the first Gem Reviewer of the gem, you can merge the PR by yourself. Otherwise, the pull request should be reviewed by the existing Gem Reviewers.
 
 #### If you want to become a code owner of new gem
 
-If you want to become a code owner of new gem, which will be added by yourself, you can just add you to CODEOWNERS file.
-The boilerplate generator asks you to become a code owner, so please enter your GitHub account if you'd like.
+Enter your GitHub account to the `bin/init_new_gem` script. The script automatically fills the `_reviewers.yaml` file.
