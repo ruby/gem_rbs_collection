@@ -14,6 +14,7 @@ jobs:
       BASE_SHA: ${{ github.event.pull_request.base.sha }}
       HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
       GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +39,6 @@ jobs:
           ruby .github/workflows/pr_bot/welcome_comment_body.rb "$CHANGED_GEMS" "$CHANGED_NON_GEMS"
       - name: Send a comment
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMENT_BODY: ${{ steps.comment-body.outputs.welcome_comment_body }}
         run:
