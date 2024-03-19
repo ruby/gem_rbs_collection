@@ -22,7 +22,7 @@ unless ability.can_merge_by?(ENV['COMMENTED_BY'], PR_AUTHOR)
   exit 1
 end
 
-unless ability.approved?
+unless ability.approved?(PR_AUTHOR)
   body  = <<~BODY
     `/merge` command failed.
 
