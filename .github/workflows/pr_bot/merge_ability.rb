@@ -9,7 +9,7 @@ class MergeAbility
     @pr_number = pr_number
   end
 
-  def approved?
+  def approved?(pr_author)
     is_approved = true
 
     # Check gem files
@@ -20,7 +20,7 @@ class MergeAbility
     end
 
     # Check non gem files
-    if waiting_admin_approval?
+    if waiting_admin_approval?(pr_author)
       log "The following files are changed, but not approved by the admin yet:"
       log changed_non_gems.join("\n")
       is_approved = false
@@ -40,10 +40,12 @@ class MergeAbility
     @not_approved_gems ||= changed_gems.reject { |gem| gem_accepted?(gem) }
   end
 
-  def waiting_admin_approval?
+  def waiting_admin_approval?(pr_author)
     return false if changed_non_gems.empty?
 
     admins = administorators.map { _1['login'] }
+    return false if admins.include?(pr_author)
+
     (approvers & admins).empty?
   end
 

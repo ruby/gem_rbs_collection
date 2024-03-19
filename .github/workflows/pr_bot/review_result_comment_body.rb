@@ -11,7 +11,7 @@ reviewer = ENV['REVIEWED_BY']
 
 msg = "Thanks for your review, @#{reviewer}!\n\n"
 
-if ability.approved?
+if ability.approved?(PR_AUTHOR)
   msg << <<~MSG
     @#{PR_AUTHOR}, @#{reviewer} This PR is ready to be merged.
     Just comment `/merge` to merge this PR.
@@ -23,7 +23,7 @@ else
       #{ability.not_approved_gems.map { "* `#{_1}`" }.join("\n")}
     MSG
   end
-  if ability.waiting_admin_approval?
+  if ability.waiting_admin_approval?(PR_AUTHOR)
     msg << <<~MSG
       This PR still needs approval from the administrators.
     MSG
