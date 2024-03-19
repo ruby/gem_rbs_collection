@@ -57,6 +57,8 @@ changed_gems.each do |gem|
 
         #{reviewers.map { "@#{_1}" }.join(', ')}, please review this pull request.
         If this change is acceptable, please make a review comment including `APPROVE` from [here](https://github.com/#{GH_REPO}/pull/#{ENV['PR_NUMBER']}/files).
+        ![Screen Shot 2024-03-19 at 14 13 36](https://github.com/ruby/gem_rbs_collection/assets/4361134/c5b73761-1701-4a61-8ef7-526ca6b1d8a6)
+
 
         After that, the PR author or the reviewers can merge this PR.
         Just comment `/merge` to merge this PR.
@@ -80,6 +82,8 @@ changed_gems.each do |gem|
 
         #{reviewers.map { "@#{_1}" }.join(', ')}, please review this pull request.
         If this change is acceptable, please make a review comment including `APPROVE` from [here](https://github.com/#{GH_REPO}/pull/#{ENV['PR_NUMBER']}/files).
+        ![Screen Shot 2024-03-19 at 14 13 36](https://github.com/ruby/gem_rbs_collection/assets/4361134/c5b73761-1701-4a61-8ef7-526ca6b1d8a6)
+
 
         After that, the PR author or the reviewers can merge this PR.
         Just comment `/merge` to merge this PR.
