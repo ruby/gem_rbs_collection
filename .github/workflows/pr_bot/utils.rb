@@ -62,7 +62,7 @@ def gh_api!(*args)
 end
 
 def approvements(sha, pr_number)
-  reviews = gh_api! "/repos/#{GH_REPO}/pulls/#{pr_number}/reviews"
+  reviews = gh_api! "/repos/#{GH_REPO}/pulls/#{pr_number}/reviews", '--paginate'
   reviews.select do
     _1['commit_id'] == sha && (
       _1['state'] == 'APPROVED' ||
@@ -72,6 +72,6 @@ def approvements(sha, pr_number)
 end
 
 def administorators
-  users = gh_api! "/repos/#{GH_REPO}/collaborators"
+  users = gh_api! "/repos/#{GH_REPO}/collaborators", '--paginate'
   users.select { _1['permissions']['admin'] }
 end
