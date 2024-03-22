@@ -7,3 +7,5 @@ seq4 = 'hoga'
 
 lcs = Diff::LCS.LCS(seq1, seq2)
 lcs = Diff::LCS.LCS(seq3, seq4)
+diffs = Diff::LCS.diff(seq1, seq2)
+diffs = Diff::LCS.diff(seq3, seq4)
