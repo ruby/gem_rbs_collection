@@ -59,15 +59,7 @@ end
 out = Pathname(output_dir)
 out.join("EXTERNAL_TODO.rbs").write(erb("EXTERNAL_TODO.rbs", notice: notice))
 out.join("manifest.yaml").write(erb("manifest.yaml", notice: notice, stdlib_dependencies: stdlib_dependencies))
-out.join('_scripts').tap do |scripts|
-  scripts.mkpath
-  scripts.join("test").tap do |test|
-    test.write(erb("_scripts/test", notice: notice, stdlib_dependencies: stdlib_dependencies))
-    test.chmod(0o755)
-  end
-end
 out.join('_test').tap do |test|
   test.mkpath
   test.join("yard.rb").write(erb("_test/yard.rb", notice: notice))
-  test.join('Steepfile').write(erb("_test/Steepfile", notice: notice, stdlib_dependencies: stdlib_dependencies))
 end
