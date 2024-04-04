@@ -13,7 +13,7 @@ output_dir = 'out'
 Orthoses.logger.level = :warn
 
 gem_path = Gem::Specification.find_by_name("yard").load_paths.first
-notice = "# !!! GENERATED FILE !!!\n# Please see generators/yard-generator/README.md\n"
+notice = "# !!! GENERATED FILE !!!\n# Please see yard/0.9/_generators/README.md\n"
 
 Orthoses::Builder.new do
   use Orthoses::CreateFileByName,
