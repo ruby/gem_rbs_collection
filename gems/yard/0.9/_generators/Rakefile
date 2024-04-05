@@ -1,0 +1,24 @@
+task :generate do
+  load 'generate.rb'
+end
+
+task :validate do
+  sh "bundle exec rbs --no-collection -r logger -r optparse -r ripper -I out validate"
+end
+
+task :replace do
+  rm_rf '../_test'
+  sh 'cp -a out/_test ../_test'
+  rm_rf '../yard'
+  sh 'cp -a out/yard ../yard'
+  sh 'cp -a out/EXTERNAL_TODO.rbs ../EXTERNAL_TODO.rbs'
+  sh 'cp -a out/manifest.yaml ../manifest.yaml'
+  sh 'cp -a out/symbol_hash.rbs ../symbol_hash.rbs'
+  sh 'cp -a out/yard.rbs ../yard.rbs'
+end
+
+task :clean do
+  rm_rf 'out'
+end
+
+task default: [:generate, :validate, :replace, :clean]

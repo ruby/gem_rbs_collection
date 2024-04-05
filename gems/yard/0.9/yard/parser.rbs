@@ -1,5 +1,5 @@
 # !!! GENERATED FILE !!!
-# Please see generators/yard-generator/README.md
+# Please see yard/0.9/_generators/README.md
 
 # The parser namespace holds all parsing engines used by YARD.
 # Currently only Ruby and C (Ruby) parsers are implemented.
@@ -291,7 +291,7 @@ class YARD::Parser::Ruby::AstNode < ::Array[untyped]
   # @yield each descendant node in order
   # @yieldparam [AstNode] self, or a child/descendant node
   # @return [void]
-  def traverse: () { (YARD::Parser::Ruby::AstNode self) -> untyped } -> void
+  def traverse: () { (YARD::Parser::Ruby::AstNode `self,`) -> untyped } -> void
   # @return [Boolean] whether the node is a token
   def token?: () -> bool
   # @return [Boolean] whether the node is a reference (variable,
@@ -741,7 +741,7 @@ class YARD::Parser::Ruby::MethodDefinitionNode < ::YARD::Parser::Ruby::AstNode
   def method_name: (?untyped name_only) -> untyped
   def parameters: (?untyped include_block_param) -> untyped
   def signature: () -> untyped
-  def block: (*untyped) -> untyped
+  def block: (?untyped n) -> untyped
   private def index_adjust: () -> untyped
 end
 
