@@ -1,4 +1,9 @@
 module ActiveRecord
+  class Base
+    include Encryption::EncryptableRecord
+    extend ActiveRecord::Encryption::EncryptableRecord::ClassMethods
+  end
+
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
@@ -17,5 +22,27 @@ module ActiveRecord
     def sql_runtime=: (untyped runtime) -> untyped
 
     extend RuntimeRegistry
+  end
+
+  module Encryption
+    module EncryptableRecord
+      module ClassMethods
+        @deterministic_encrypted_attributes: untyped
+
+        def encrypts: (*untyped names, ?key_provider: untyped?, ?key: untyped?, ?deterministic: bool, ?support_unencrypted_data: untyped?, ?downcase: bool, ?ignore_case: bool, ?previous: untyped, **untyped context_properties) -> untyped
+
+        def deterministic_encrypted_attributes: () -> untyped
+
+        def source_attribute_from_preserved_attribute: (untyped attribute_name) -> (untyped | nil)
+      end
+
+      def encrypted_attribute?: (untyped attribute_name) -> (false | untyped)
+
+      def ciphertext_for: (untyped attribute_name) -> untyped
+
+      def encrypt: () -> (untyped | nil)
+
+      def decrypt: () -> (untyped | nil)
+    end
   end
 end
