@@ -18,7 +18,10 @@ module Test
     encrypts :token, deterministic: true
     encrypts :phrase, ignore_case: true
 
-    normalizes :email, with: -> email { email.strip.downcase }
+    normalizes :email, with: -> email {
+      # @type var email: String
+      email.strip.downcase
+    }
   end
 
   User.deterministic_encrypted_attributes
@@ -29,7 +32,7 @@ module Test
   user.decrypt
   user.ciphertext_for(:token)
 
-  user = User.find(1)
+  user = User.new
   user.normalize_attribute(:email)
   User.normalize_value_for(:email, ' CRUISE-CONTROL@EXAMPLE.COM\n')
 end
