@@ -2,6 +2,8 @@ module ActiveRecord
   class Base
     include Encryption::EncryptableRecord
     extend Encryption::EncryptableRecord::ClassMethods
+    include Normalization
+    extend Normalization::ClassMethods
   end
 
   module Inheritance
@@ -43,6 +45,15 @@ module ActiveRecord
       def encrypt: () -> untyped
 
       def decrypt: () -> untyped
+    end
+  end
+
+  module Normalization
+    def normalize_attribute: (untyped name) -> void
+
+    module ClassMethods
+      def normalizes: (*untyped names, with: untyped, ?apply_to_nil: bool) -> void
+      def normalize_value_for: (untyped name, untyped value) -> untyped
     end
   end
 end
