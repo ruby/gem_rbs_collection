@@ -1,29 +1,19 @@
 module Test
   class Article < ActiveModelSerializers::Model
-    module GeneratedAttributeMethods
-      attr_accessor title: String
-      attr_accessor body: String
-      attr_accessor tags: Array[Tag]
+    attr_accessor title: String
+    attr_accessor body: String
+    attr_accessor tags: Array[Tag]
 
-      def initialize: (title: String, body: String, tags: Array[Tag]) -> void
-    end
-    include GeneratedAttributeMethods
+    def initialize: (title: String, body: String, tags: Array[Tag]) -> void
   end
 
   class Tag < ActiveModelSerializers::Model
-    module GeneratedAttributeMethods
-      attr_accessor name: String
+    attr_accessor name: String
 
-      def initialize: (name: String) -> void
-    end
-    include GeneratedAttributeMethods
+    def initialize: (name: String) -> void
   end
 
-  class ArticleSerializer < ActiveModel::Serializer
-    module GeneratdMethods
-      attr_accessor object: Article
-    end
-    include GeneratdMethods
+  class ArticleSerializer < ActiveModel::Serializer[Article]
     def tag_names: () -> Array[String]
   end
 end

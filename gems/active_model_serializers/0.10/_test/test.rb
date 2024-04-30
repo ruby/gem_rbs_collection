@@ -2,10 +2,12 @@ require "active_model_serializers"
 
 module Test
   class Article < ActiveModelSerializers::Model
+    # @dynamic title, title=, body, body=, tags, tags=, initialize
     attributes :title, :body, :tags
   end
 
   class Tag < ActiveModelSerializers::Model
+    # @dynamic name, name=, initialize
     attributes :name
   end
 
