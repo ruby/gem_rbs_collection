@@ -1,0 +1,19 @@
+module Test
+  class Article < ActiveModelSerializers::Model
+    attr_accessor title: String
+    attr_accessor body: String
+    attr_accessor tags: Array[Tag]
+
+    def initialize: (title: String, body: String, tags: Array[Tag]) -> void
+  end
+
+  class Tag < ActiveModelSerializers::Model
+    attr_accessor name: String
+
+    def initialize: (name: String) -> void
+  end
+
+  class ArticleSerializer < ActiveModel::Serializer[Article]
+    def tag_names: () -> Array[String]
+  end
+end
