@@ -46,7 +46,7 @@ module ActiveRecord
     def self.has_many: (Symbol, ?untyped, **untyped) -> void
     def self.has_one: (Symbol, ?untyped, **untyped) -> void
     def self.has_and_belongs_to_many: (untyped name, ?untyped? scope, **untyped options) ?{ () -> untyped } -> untyped
-    def self.transaction: [T] () { () -> T } -> T
+    def self.transaction: [T] (?requires_new: boolish, ?isolation: (:read_uncommitted | :read_committed | :repeatable_read | :serializable)?, ?joinable: boolish) { () -> T } -> T
     def self.create: (**untyped) -> instance
     def self.create!: (**untyped) -> instance
     def self.validate: (*untyped, ?if: condition[instance], ?unless: condition[instance], **untyped) -> void
