@@ -16268,7 +16268,7 @@ module ActiveRecord
       #   User.create([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }]) do |u|
       #     u.is_admin = false
       #   end
-      def create: (?untyped? attributes) { () -> untyped } -> untyped
+      def create: (?untyped? attributes) ?{ () -> untyped } -> untyped
 
       # Creates an object (or multiple objects) and saves it to the database,
       # if validations pass. Raises a RecordInvalid error if validations fail,
@@ -16277,7 +16277,7 @@ module ActiveRecord
       # The +attributes+ parameter can be either a Hash or an Array of Hashes.
       # These describe which attributes to be created on the object, or
       # multiple objects when given an Array of Hashes.
-      def create!: (?untyped? attributes) { () -> untyped } -> untyped
+      def create!: (?untyped? attributes) ?{ () -> untyped } -> untyped
 
       # Inserts a single record into the database in a single SQL INSERT
       # statement. It does not instantiate any models nor does it trigger
@@ -16463,7 +16463,7 @@ module ActiveRecord
       #
       # See <tt>ActiveRecord::Inheritance#discriminate_class_for_record</tt> to see
       # how this "single-table" inheritance mapping is implemented.
-      def instantiate: (untyped attributes, ?::Hash[untyped, untyped] column_types) { () -> untyped } -> untyped
+      def instantiate: (untyped attributes, ?::Hash[untyped, untyped] column_types) ?{ () -> untyped } -> untyped
 
       # Updates an object (or multiple objects) and saves it to the database, if validations pass.
       # The resulting object is returned whether the object was saved successfully to the database or not.
@@ -16544,7 +16544,7 @@ module ActiveRecord
 
       # Given a class, an attributes hash, +instantiate_instance_of+ returns a
       # new instance of the class. Accepts only keys as strings.
-      def instantiate_instance_of: (untyped klass, untyped attributes, ?::Hash[untyped, untyped] column_types) { () -> untyped } -> untyped
+      def instantiate_instance_of: (untyped klass, untyped attributes, ?::Hash[untyped, untyped] column_types) ?{ () -> untyped } -> untyped
 
       # Called by +instantiate+ to decide which class to use for a new
       # record instance.
