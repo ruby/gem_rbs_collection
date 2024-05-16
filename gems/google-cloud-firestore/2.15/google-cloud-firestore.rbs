@@ -1,1 +1,21 @@
-# Write the type definition here!
+module Google
+  module Cloud
+    module Firestore
+      # c.f. https://github.com/googleapis/google-cloud-ruby/blob/google-cloud-firestore/v2.15.0/google-cloud-firestore/lib/google/cloud/firestore.rb#L77
+      def self.new: (
+        ?project_id: String,
+        ?credentials: String | Hash[untyped,untyped] | Google::Auth::Credentials,
+        ?scope: String | Array[String],
+        ?timeout: Integer,
+        ?endpoint: String,
+        ?emulator_host: String,
+        ?database_id: String,
+        ?transport: :grpc | :rest,
+        ?project: String,
+        ?keyfile: String,
+      ) -> Firestore
+
+      def doc: (String document_path) -> DocumentReference
+    end
+  end
+end
