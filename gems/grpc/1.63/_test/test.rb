@@ -1,4 +1,7 @@
-# Write Ruby code to test the RBS.
-# It is type checked by `steep check` command.
-
 require "grpc"
+
+begin
+  raise GRPC::Unavailable
+rescue GRPC::BadStatus => e
+  # nop
+end
