@@ -2,3 +2,5 @@
 # It is type checked by `steep check` command.
 
 require "googleauth"
+
+creds = Google::Auth::Credentials.new
