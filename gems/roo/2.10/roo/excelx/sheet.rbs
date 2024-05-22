@@ -1,0 +1,84 @@
+module Roo
+  class Excelx
+    class Sheet
+      @name: untyped
+
+      @shared: untyped
+
+      @sheet_index: untyped
+
+      @images: untyped
+
+      @rels: untyped
+
+      @comments: untyped
+
+      @sheet: untyped
+
+      @cells: untyped
+
+      @present_cells: untyped
+
+      @first_row: untyped
+
+      @last_row: untyped
+
+      @first_column: untyped
+
+      @last_column: untyped
+
+      @hyperlinks: untyped
+
+      @first_last_row_col: untyped
+
+      extend Forwardable
+
+      attr_reader images: untyped
+
+      def initialize: (untyped name, untyped shared, untyped sheet_index, ?::Hash[untyped, untyped] options) -> void
+
+      def cells: () -> untyped
+
+      def present_cells: () -> untyped
+
+      # Yield each row as array of Excelx::Cell objects
+      # accepts options max_rows (int) (offset by 1 for header),
+      # pad_cells (boolean) and offset (int)
+      def each_row: (?::Hash[untyped, untyped] options) ?{ () -> untyped } -> untyped
+
+      def row: (untyped row_number) -> untyped
+
+      def column: (untyped col_number) -> untyped
+
+      # returns the number of the first non-empty row
+      def first_row: () -> untyped
+
+      def last_row: () -> untyped
+
+      # returns the number of the first non-empty column
+      def first_column: () -> untyped
+
+      # returns the number of the last non-empty column
+      def last_column: () -> untyped
+
+      def excelx_format: (untyped key) -> untyped
+
+      def hyperlinks: () -> untyped
+
+      def comments: () -> untyped
+
+      def dimensions: () -> untyped
+
+      private
+
+      # Take an xml row and return an array of Excelx::Cell objects
+      # optionally pad array to header width(assumed 1st row).
+      # takes option pad_cells (boolean) defaults false
+      def cells_for_row_element: (untyped row_element, ?::Hash[untyped, untyped] options) -> (::Array[untyped] | untyped)
+
+      def pad_cells: (untyped cell, untyped last_column) -> untyped
+
+      def first_last_row_col: () -> untyped
+    end
+  end
+end

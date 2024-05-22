@@ -1,0 +1,51 @@
+# The CSV class can read csv files (must be separated with commas) which then
+# can be handled like spreadsheets. This means you can access cells like A5
+# within these files.
+# The CSV class provides only string objects. If you want conversions to other
+# types you have to do it yourself.
+#
+# You can pass options to the underlying CSV parse operation, via the
+# :csv_options option.
+module Roo
+  class CSV < Roo::Base
+    attr_reader filename: untyped
+
+    # Returns an array with the names of the sheets. In CSV class there is only
+    # one dummy sheet, because a csv file cannot have more than one sheet.
+    def sheets: () -> ::Array["default"]
+
+    def cell: (untyped row, untyped col, ?untyped? sheet) -> untyped
+
+    def celltype: (untyped row, untyped col, ?untyped? sheet) -> untyped
+
+    def cell_postprocessing: (untyped _row, untyped _col, untyped value) -> untyped
+
+    def csv_options: () -> untyped
+
+    def set_value: (untyped row, untyped col, untyped value, untyped _sheet) -> untyped
+
+    def set_type: (untyped row, untyped col, untyped type, untyped _sheet) -> untyped
+
+    private
+
+    TYPE_MAP: ::Hash[untyped, :string | :float | :date | :datetime]
+
+    def celltype_class: (untyped value) -> untyped
+
+    def read_cells: (?untyped sheet) -> (nil | untyped)
+
+    def each_row: (untyped options) { () -> untyped } -> untyped
+
+    def each_row_using_tempdir: (untyped options) { () -> untyped } -> untyped
+
+    def csv_foreach: (untyped path_or_io, untyped options) { () -> untyped } -> untyped
+
+    def set_row_count: (untyped sheet, untyped last_row) -> nil
+
+    def set_column_count: (untyped sheet, untyped last_col) -> nil
+
+    def clean_sheet: (untyped sheet) -> untyped
+
+    alias filename_or_stream filename
+  end
+end

@@ -1,0 +1,78 @@
+module Roo
+  class Excelx
+    class Cell
+      class Base
+        @cell_value: untyped
+
+        @cell_type: untyped
+
+        @formula: untyped
+
+        @style: untyped
+
+        @coordinate: untyped
+
+        @value: untyped
+
+        extend Roo::Helpers::DefaultAttrReader
+
+        attr_reader cell_type: untyped
+
+        attr_reader cell_value: untyped
+
+        attr_reader value: untyped
+
+        # FIXME: Updating a cell's value should be able tochange the cell's type,
+        #        but that isn't currently possible. This will cause weird bugs
+        #        when one changes the value of a Number cell to a String. e.g.
+        #
+        #           cell = Cell::Number(*args)
+        #           cell.value = 'Hello'
+        #           cell.formatted_value # => Some unexpected value
+        #
+        #        Here are two possible solutions to such issues:
+        #        1. Don't allow a cell's value to be updated. Use a method like
+        #          `Sheet.update_cell` instead. The simple solution.
+        #        2. When `cell.value = ` is called, use injection to try and
+        #           change the type of cell on the fly. But deciding what type
+        #           of value to pass to `cell.value=`. isn't always obvious. e.g.
+        #           `cell.value = Time.now` should convert a cell to a DateTime,
+        #           not a Time cell. Time cells would be hard to recognize because
+        #           they are integers. This approach would require a significant
+        #           change to the code as written. The complex solution.
+        #
+        #        If the first solution is used, then this method should be
+        #        deprecated.
+        attr_writer value: untyped
+
+        def initialize: (untyped value, untyped formula, untyped excelx_type, untyped style, untyped link, untyped coordinate) -> void
+
+        def type: () -> (:formula | :link | untyped)
+
+        def formula?: () -> untyped
+
+        def link?: () -> untyped
+
+        alias formatted_value value
+
+        def to_s: () -> untyped
+
+        # DEPRECATED: Please use link? instead.
+        def hyperlink: () -> untyped
+
+        # DEPRECATED: Please use link? instead.
+        def link: () -> untyped
+
+        # DEPRECATED: Please use cell_value instead.
+        def excelx_value: () -> untyped
+
+        # DEPRECATED: Please use cell_type instead.
+        def excelx_type: () -> untyped
+
+        def empty?: () -> false
+
+        def presence: () -> (nil | self)
+      end
+    end
+  end
+end

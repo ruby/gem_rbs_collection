@@ -1,0 +1,188 @@
+# Base class for all other types of spreadsheets
+class Roo::Base
+  @filename: untyped
+
+  @options: untyped
+
+  @cell: untyped
+
+  @cell_type: untyped
+
+  @cells_read: untyped
+
+  @first_row: untyped
+
+  @last_row: untyped
+
+  @first_column: untyped
+
+  @last_column: untyped
+
+  @header_line: untyped
+
+  @default_sheet: untyped
+
+  @first_last_row_cols: untyped
+
+  @cleaned: untyped
+
+  @headers: untyped
+
+  include Enumerable
+
+  include Roo::Formatters::Base
+
+  include Roo::Formatters::CSV
+
+  include Roo::Formatters::Matrix
+
+  include Roo::Formatters::XML
+
+  include Roo::Formatters::YAML
+
+  MAX_ROW_COL: 999999
+
+  MIN_ROW_COL: 0
+
+  attr_reader headers: untyped
+
+  # sets the line with attribute names (default: 1)
+  attr_accessor header_line: untyped
+
+  def self.TEMP_PREFIX: () -> untyped
+
+  def self.finalize: (untyped object_id) -> untyped
+
+  def initialize: (untyped filename, ?::Hash[untyped, untyped] options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
+
+  def close: () -> nil
+
+  def default_sheet: () -> untyped
+
+  # sets the working sheet in the document
+  # 'sheet' can be a number (0 = first sheet) or the name of a sheet.
+  def default_sheet=: (untyped sheet) -> untyped
+
+  # first non-empty column as a letter
+  def first_column_as_letter: (?untyped sheet) -> untyped
+
+  # last non-empty column as a letter
+  def last_column_as_letter: (?untyped sheet) -> untyped
+
+  # Set first/last row/column for sheet
+  def first_last_row_col_for_sheet: (untyped sheet) -> untyped
+
+  # Collect first/last row/column from sheet
+  def collect_last_row_col_for_sheet: (untyped sheet) -> { first_row: untyped, first_column: untyped, last_row: untyped, last_column: untyped }
+
+  def inspect: () -> ::String
+
+  # find a row either by row number or a condition
+  # Caution: this works only within the default sheet -> set default_sheet before you call this method
+  # (experimental. see examples in the test_roo.rb file)
+  def find: (*untyped args) -> untyped
+
+  # returns all values in this row as an array
+  # row numbers are 1,2,3,... like in the spreadsheet
+  def row: (untyped row_number, ?untyped sheet) -> untyped
+
+  # returns all values in this column as an array
+  # column numbers are 1,2,3,... like in the spreadsheet
+  def column: (untyped column_number, ?untyped sheet) -> untyped
+
+  # set a cell to a certain value
+  # (this will not be saved back to the spreadsheet file!)
+  def set: (untyped row, untyped col, untyped value, ?untyped sheet) -> untyped
+
+  def cell_type_by_value: (untyped value) -> untyped
+
+  # reopens and read a spreadsheet document
+  def reload: () -> untyped
+
+  # true if cell is empty
+  def empty?: (untyped row, untyped col, ?untyped sheet) -> untyped
+
+  # returns information of the spreadsheet document and all sheets within
+  # this document.
+  def info: () -> untyped
+
+  # when a method like spreadsheet.a42 is called
+  # convert it to a call of spreadsheet.cell('a',42)
+  def method_missing: (untyped m, *untyped args) -> untyped
+
+  # access different worksheets by calling spreadsheet.sheet(1)
+  # or spreadsheet.sheet('SHEETNAME')
+  def sheet: (untyped index, ?bool name) -> untyped
+
+  # iterate through all worksheets of a document
+  def each_with_pagename: () ?{ (untyped) -> untyped } -> untyped
+
+  def each: (?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+
+  def parse: (?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+
+  def row_with: (untyped query, ?bool return_headers) -> untyped
+
+  def file_type_check: (untyped filename, untyped exts, untyped name, untyped warning_level, ?untyped? packed) -> (nil | untyped)
+
+  # konvertiert einen Key in der Form "12,45" (=row,column) in
+  # ein Array mit numerischen Werten ([12,45])
+  # Diese Methode ist eine temp. Loesung, um zu erforschen, ob der
+  # Zugriff mit numerischen Keys schneller ist.
+  def key_to_num: (untyped str) -> ::Array[untyped]
+
+  # see: key_to_num
+  def key_to_string: (untyped arr) -> ::String
+
+  def is_stream?: (untyped filename_or_stream) -> untyped
+
+  private
+
+  def clean_sheet_if_need: (untyped options) -> (nil | untyped)
+
+  def search_or_set_header: (untyped options) -> untyped
+
+  def local_filename: (untyped filename, untyped tmpdir, untyped packed) -> (nil | untyped)
+
+  def file_type_warning_message: (untyped filename, untyped exts) -> untyped
+
+  def find_by_row: (untyped row_index) -> untyped
+
+  def find_by_conditions: (untyped options) -> untyped
+
+  def without_changing_default_sheet: () { () -> untyped } -> untyped
+
+  def reinitialize: () -> untyped
+
+  def find_basename: (untyped filename) -> (untyped | untyped | nil)
+
+  def make_tmpdir: (?untyped? prefix, ?untyped? root) ?{ () -> untyped } -> untyped
+
+  def clean_sheet: (untyped sheet) -> untyped
+
+  def sanitize_value: (untyped v) -> untyped
+
+  def set_headers: (?::Hash[untyped, untyped] hash) -> untyped
+
+  def header_index: (untyped query) -> untyped
+
+  def set_value: (untyped row, untyped col, untyped value, ?untyped sheet) -> untyped
+
+  def set_type: (untyped row, untyped col, untyped type, ?untyped sheet) -> untyped
+
+  # converts cell coordinate to numeric values of row,col
+  def normalize: (untyped row, untyped col) -> ::Array[untyped]
+
+  def uri?: (untyped filename) -> untyped
+
+  def download_uri: (untyped uri, untyped tmpdir) -> untyped
+
+  def open_from_stream: (untyped stream, untyped tmpdir) -> untyped
+
+  def unzip: (untyped filename, untyped tmpdir) -> untyped
+
+  # check if default_sheet was set and exists in sheets-array
+  def validate_sheet!: (untyped sheet) -> untyped
+
+  def process_zipfile_packed: (untyped zip, untyped tmpdir, ?::String path) -> untyped
+end
