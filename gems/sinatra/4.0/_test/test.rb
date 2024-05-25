@@ -35,6 +35,16 @@ class MyApp < Sinatra::Base
     json(foo: foo, bar: bar)
   end
 
+  get '/test_params/:id' do
+    params[:id]
+    params['id']
+    json(status: 'ok')
+  end
+
+  get '/fail' do
+    halt 500
+  end
+
   post '/' do
     json(foo: foo, bar: bar)
   end
