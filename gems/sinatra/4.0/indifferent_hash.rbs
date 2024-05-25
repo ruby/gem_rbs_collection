@@ -1,0 +1,113 @@
+module Sinatra
+  # A poor man's ActiveSupport::HashWithIndifferentAccess, with all the Rails-y
+  # stuff removed.
+  #
+  # Implements a hash where keys <tt>:foo</tt> and <tt>"foo"</tt> are
+  # considered to be the same.
+  #
+  #   rgb = Sinatra::IndifferentHash.new
+  #
+  #   rgb[:black]    =  '#000000' # symbol assignment
+  #   rgb[:black]  # => '#000000' # symbol retrieval
+  #   rgb['black'] # => '#000000' # string retrieval
+  #
+  #   rgb['white']   =  '#FFFFFF' # string assignment
+  #   rgb[:white]  # => '#FFFFFF' # symbol retrieval
+  #   rgb['white'] # => '#FFFFFF' # string retrieval
+  #
+  # Internally, symbols are mapped to strings when used as keys in the entire
+  # writing interface (calling e.g. <tt>[]=</tt>, <tt>merge</tt>). This mapping
+  # belongs to the public interface. For example, given:
+  #
+  #   hash = Sinatra::IndifferentHash.new
+  #   hash[:a] = 1
+  #
+  # You are guaranteed that the key is returned as a string:
+  #
+  #   hash.keys # => ["a"]
+  #
+  # Technically other types of keys are accepted:
+  #
+  #   hash = Sinatra::IndifferentHash
+  #   hash[:a] = 1
+  #   hash[0] = 0
+  #   hash # => { "a"=>1, 0=>0 }
+  #
+  # But this class is intended for use cases where strings or symbols are the
+  # expected keys and it is convenient to understand both as the same. For
+  # example the +params+ hash in Sinatra.
+  class IndifferentHash < Hash[(String | Symbol), untyped]
+    def self.[]: (*untyped args) -> untyped
+
+    def default: (*untyped args) -> untyped
+
+    def default=: (untyped value) -> untyped
+
+    def assoc: (untyped key) -> untyped
+
+    def rassoc: (untyped value) -> untyped
+
+    def fetch: (untyped key, *untyped args) -> untyped
+
+    def []: (untyped key) -> untyped
+
+    def []=: (untyped key, untyped value) -> untyped
+
+    alias store []=
+
+    def key: (untyped value) -> untyped
+
+    def key?: (untyped key) -> untyped
+
+    alias has_key? key?
+
+    alias include? key?
+
+    alias member? key?
+
+    def value?: (untyped value) -> untyped
+
+    alias has_value? value?
+
+    def delete: (untyped key) -> untyped
+
+    # Added in Ruby 2.3
+    def dig: (untyped key, *untyped other_keys) -> untyped
+
+    def fetch_values: (*untyped keys) -> untyped
+
+    def slice: (*untyped keys) -> untyped
+
+    def values_at: (*untyped keys) -> untyped
+
+    def merge!: (*untyped other_hashes) ?{ (untyped, untyped, untyped) -> untyped } -> self
+
+    alias update merge!
+
+    def merge: (*untyped other_hashes) { () -> untyped } -> untyped
+
+    def replace: (untyped other_hash) -> untyped
+
+    def transform_values: () { () -> untyped } -> untyped
+
+    def transform_values!: () -> untyped
+
+    def transform_keys: () { () -> untyped } -> untyped
+
+    def transform_keys!: () -> untyped
+
+    def select: (*untyped args) ?{ () -> untyped } -> untyped
+
+    def reject: (*untyped args) ?{ () -> untyped } -> untyped
+
+    def compact: () -> untyped
+
+    def except: (*untyped keys) -> untyped
+
+    private
+
+    def convert_key: (untyped key) -> untyped
+
+    def convert_value: (untyped value) -> untyped
+  end
+end

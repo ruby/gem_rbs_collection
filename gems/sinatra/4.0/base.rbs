@@ -1,0 +1,824 @@
+module Sinatra
+  # The request object. See Rack::Request for more info:
+  # https://rubydoc.info/github/rack/rack/main/Rack/Request
+  class Request < Rack::Request
+    HEADER_PARAM: ::Regexp
+
+    HEADER_VALUE_WITH_PARAMS: ::Regexp
+
+    # Returns an array of acceptable media types for the response
+    def accept: () -> untyped
+
+    def accept?: (untyped type) -> untyped
+
+    def preferred_type: (*untyped types) -> untyped
+
+    alias secure? ssl?
+
+    def forwarded?: () -> untyped
+
+    def safe?: () -> untyped
+
+    def idempotent?: () -> untyped
+
+    def link?: () -> untyped
+
+    def unlink?: () -> untyped
+
+    def params: () -> untyped
+
+    class AcceptEntry
+      @entry: untyped
+
+      @type: untyped
+
+      @params: untyped
+
+      @q: untyped
+
+      attr_accessor params: untyped
+
+      attr_reader entry: untyped
+
+      def initialize: (untyped entry) -> void
+
+      def <=>: (untyped other) -> untyped
+
+      def priority: () -> ::Array[untyped]
+
+      def to_str: () -> untyped
+
+      def to_s: (?bool full) -> untyped
+
+      def respond_to?: (*untyped args) -> untyped
+
+      def method_missing: (*untyped args) { () -> untyped } -> untyped
+    end
+
+    class MimeTypeEntry
+      @type: untyped
+
+      @params: untyped
+
+      attr_reader params: untyped
+
+      def initialize: (untyped entry) -> void
+
+      def accepts?: (untyped entry) -> untyped
+
+      def to_str: () -> untyped
+
+      def matches_params?: (untyped params) -> (true | untyped)
+    end
+  end
+
+  # The response object. See Rack::Response and Rack::Response::Helpers for
+  # more info:
+  # https://rubydoc.info/github/rack/rack/main/Rack/Response
+  # https://rubydoc.info/github/rack/rack/main/Rack/Response/Helpers
+  class Response < Rack::Response
+    @body: untyped
+
+    DROP_BODY_RESPONSES: ::Array[204 | 304]
+
+    def body=: (untyped value) -> untyped
+
+    def each: () -> untyped
+
+    def finish: () -> ::Array[untyped]
+
+    private
+
+    def calculate_content_length?: () -> untyped
+
+    def drop_content_info?: () -> untyped
+
+    def drop_body?: () -> untyped
+  end
+
+  # Some Rack handlers implement an extended body object protocol, however,
+  # some middleware (namely Rack::Lint) will break it by not mirroring the methods in question.
+  # This middleware will detect an extended body object and will make sure it reaches the
+  # handler directly. We do this here, so our middleware and middleware set up by the app will
+  # still be able to run.
+  class ExtendedRack
+    def call: (untyped env) -> untyped
+
+    private
+
+    def setup_close: (untyped env, untyped _status, untyped _headers, untyped body) -> (nil | untyped)
+
+    def after_response: () { () -> untyped } -> untyped
+
+    def async?: (untyped status, untyped _headers, untyped body) -> (true | untyped)
+  end
+
+  # Behaves exactly like Rack::CommonLogger with the notable exception that it does nothing,
+  # if another CommonLogger is already in the middleware chain.
+  class CommonLogger < Rack::CommonLogger
+    def call: (untyped env) -> untyped
+  end
+
+  class Error < StandardError
+  end
+
+  class BadRequest < Error
+    def http_status: () -> 400
+  end
+
+  class NotFound < Error
+    def http_status: () -> 404
+  end
+
+  # Methods available to routes, before/after filters, and views.
+  module Helpers
+    @params: untyped
+
+    # Set or retrieve the response status code.
+    def status: (?untyped? value) -> untyped
+    def self.status: (?untyped? value) -> untyped
+
+    # Set or retrieve the response body. When a block is given,
+    # evaluation is deferred until the body is read with #each.
+    def body: (?untyped? value) ?{ (untyped) -> untyped } -> untyped
+
+    def self.each: () { (untyped) -> untyped } -> untyped
+
+    # Halt processing and redirect to the URI provided.
+    def redirect: (untyped uri, *untyped args) -> untyped
+
+    # Generates the absolute URI for a given path in the app.
+    # Takes Rack routers and reverse proxies into account.
+    def uri: (?untyped? addr, ?bool absolute, ?bool add_script_name) -> untyped
+
+    alias url uri
+
+    alias to uri
+
+    # Halt processing and return the error status provided.
+    def error: (untyped code, ?untyped? body) -> untyped
+
+    # Halt processing and return a 404 Not Found.
+    def not_found: (?untyped? body) -> untyped
+
+    # Set multiple response headers with Hash.
+    def headers: (?untyped? hash) -> untyped
+
+    # Access the underlying Rack session.
+    def session: () -> untyped
+
+    # Access shared logger object.
+    def logger: () -> untyped
+
+    # Look up a media type by file extension in Rack's mime registry.
+    def mime_type: (untyped type) -> untyped
+
+    # Set the content-type of the response body given a media type or file
+    # extension.
+    def content_type: (?untyped? type, ?::Hash[untyped, untyped] params) -> untyped
+
+    # https://html.spec.whatwg.org/#multipart-form-data
+    MULTIPART_FORM_DATA_REPLACEMENT_TABLE: ::Hash[::String, "%22" | "%0D" | "%0A"]
+
+    # Set the Content-Disposition to "attachment" with the specified filename,
+    # instructing the user agents to prompt to save.
+    def attachment: (?untyped? filename, ?::Symbol disposition) -> (nil | untyped)
+
+    # Use the contents of the file at +path+ as the response body.
+    def send_file: (untyped path, ?::Hash[untyped, untyped] opts) -> untyped
+
+    # Class of the response body in case you use #stream.
+    #
+    # Three things really matter: The front and back block (back being the
+    # block generating content, front the one sending it to the client) and
+    # the scheduler, integrating with whatever concurrency feature the Rack
+    # handler is using.
+    #
+    # Scheduler has to respond to defer and schedule.
+    class Stream
+      @back: untyped
+
+      @scheduler: untyped
+
+      @keep_open: untyped
+
+      @callbacks: untyped
+
+      @closed: untyped
+
+      @front: untyped
+
+      def self.schedule: (*untyped) { () -> untyped } -> untyped
+
+      def self.defer: (*untyped) { () -> untyped } -> untyped
+
+      def initialize: (?untyped scheduler, ?bool keep_open) { () -> untyped } -> void
+
+      def close: () -> (nil | untyped)
+
+      def each: () { () -> untyped } -> untyped
+
+      def <<: (untyped data) -> self
+
+      def callback: () { () -> untyped } -> untyped
+
+      alias errback callback
+
+      def closed?: () -> untyped
+    end
+
+    # Allows to start sending data to the client even though later parts of
+    # the response body have not yet been generated.
+    #
+    # The close parameter specifies whether Stream#close should be called
+    # after the block has been executed.
+    def stream: (?bool keep_open) { (untyped) -> untyped } -> untyped
+
+    # Specify response freshness policy for HTTP caches (Cache-Control header).
+    # Any number of non-value directives (:public, :private, :no_cache,
+    # :no_store, :must_revalidate, :proxy_revalidate) may be passed along with
+    # a Hash of value directives (:max_age, :s_maxage).
+    #
+    #   cache_control :public, :must_revalidate, :max_age => 60
+    #   => Cache-Control: public, must-revalidate, max-age=60
+    #
+    # See RFC 2616 / 14.9 for more on standard cache control directives:
+    # http://tools.ietf.org/html/rfc2616#section-14.9.1
+    def cache_control: (*untyped values) -> untyped
+
+    # Set the Expires header and Cache-Control/max-age directive. Amount
+    # can be an integer number of seconds in the future or a Time object
+    # indicating when the response should be considered "stale". The remaining
+    # "values" arguments are passed to the #cache_control helper:
+    #
+    #   expires 500, :public, :must_revalidate
+    #   => Cache-Control: public, must-revalidate, max-age=500
+    #   => Expires: Mon, 08 Jun 2009 08:50:17 GMT
+    #
+    def expires: (untyped amount, *untyped values) -> untyped
+
+    # Set the last modified time of the resource (HTTP 'Last-Modified' header)
+    # and halt if conditional GET matches. The +time+ argument is a Time,
+    # DateTime, or other object that responds to +to_time+.
+    #
+    # When the current request includes an 'If-Modified-Since' header that is
+    # equal or later than the time specified, execution is immediately halted
+    # with a '304 Not Modified' response.
+    def last_modified: (untyped time) -> untyped
+
+    ETAG_KINDS: ::Array[:strong | :weak]
+
+    # Set the response entity tag (HTTP 'ETag' header) and halt if conditional
+    # GET matches. The +value+ argument is an identifier that uniquely
+    # identifies the current version of the resource. The +kind+ argument
+    # indicates whether the etag should be used as a :strong (default) or :weak
+    # cache validator.
+    #
+    # When the current request includes an 'If-None-Match' header with a
+    # matching etag, execution is immediately halted. If the request method is
+    # GET or HEAD, a '304 Not Modified' response is sent.
+    def etag: (untyped value, ?::Hash[untyped, untyped] options) -> nil
+
+    # Sugar for redirect (example:  redirect back)
+    def back: () -> untyped
+
+    # whether or not the status is set to 1xx
+    def informational?: () -> untyped
+
+    # whether or not the status is set to 2xx
+    def success?: () -> untyped
+
+    # whether or not the status is set to 3xx
+    def redirect?: () -> untyped
+
+    # whether or not the status is set to 4xx
+    def client_error?: () -> untyped
+
+    # whether or not the status is set to 5xx
+    def server_error?: () -> untyped
+
+    # whether or not the status is set to 404
+    def not_found?: () -> untyped
+
+    # whether or not the status is set to 400
+    def bad_request?: () -> untyped
+
+    # Generates a Time object from the given value.
+    # Used by #expires and #last_modified.
+    def time_for: (untyped value) -> untyped
+
+    private
+
+    # Helper method checking if a ETag value list includes the current ETag.
+    def etag_matches?: (untyped list, ?untyped new_resource) -> untyped
+
+    def with_params: (untyped temp_params) { () -> untyped } -> untyped
+  end
+
+  # Template rendering methods. Each method takes the name of a template
+  # to render as a Symbol and returns a String with the rendered output,
+  # as well as an optional hash with additional options.
+  #
+  # `template` is either the name or path of the template as symbol
+  # (Use `:'subdir/myview'` for views in subdirectories), or a string
+  # that will be rendered.
+  #
+  # Possible options are:
+  #   :content_type   The content type to use, same arguments as content_type.
+  #   :layout         If set to something falsy, no layout is rendered, otherwise
+  #                   the specified layout is used (Ignored for `sass`)
+  #   :layout_engine  Engine to use for rendering the layout.
+  #   :locals         A hash with local variables that should be available
+  #                   in the template
+  #   :scope          If set, template is evaluate with the binding of the given
+  #                   object rather than the application instance.
+  #   :views          Views directory to use.
+  module Templates
+    @default_layout: untyped
+
+    @preferred_extension: untyped
+
+    module ContentTyped
+      attr_accessor content_type: untyped
+    end
+
+    def initialize: () -> void
+
+    def erb: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def haml: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def sass: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    def scss: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    def builder: (?untyped? template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def liquid: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def markdown: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    def rdoc: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    def asciidoc: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    def markaby: (?untyped? template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def nokogiri: (?untyped? template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def slim: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def yajl: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    def rabl: (untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) -> untyped
+
+    # Calls the given block for every possible template file in views,
+    # named name.ext, where ext is registered on engine.
+    def find_template: (untyped views, untyped name, untyped engine) { (untyped) -> untyped } -> untyped
+
+    private
+
+    # logic shared between builder and nokogiri
+    def render_ruby: (untyped engine, untyped template, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def render: (untyped engine, untyped data, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) { () -> untyped } -> untyped
+
+    def compile_template: (untyped engine, untyped data, untyped options, untyped views) -> untyped
+
+    def compile_block_template: (untyped template, untyped options) { () -> untyped } -> untyped
+  end
+
+  # Extremely simple template cache implementation.
+  #   * Not thread-safe.
+  #   * Size is unbounded.
+  #   * Keys are not copied defensively, and should not be modified after
+  #     being passed to #fetch.  More specifically, the values returned by
+  #     key#hash and key#eql? should not change.
+  #
+  # Implementation copied from Tilt::Cache.
+  class TemplateCache
+    @cache: untyped
+
+    def initialize: () -> void
+
+    # Caches a value for key, or returns the previously cached value.
+    # If a value has been previously cached for key then it is
+    # returned. Otherwise, block is yielded to and its return value
+    # which may be nil, is cached under key and returned.
+    def fetch: (*untyped key) { () -> untyped } -> untyped
+
+    # Clears the cache.
+    def clear: () -> untyped
+  end
+
+  # Base class for all Sinatra applications and middleware.
+  class Base
+    @@mutex: untyped
+
+    self.@conditions: untyped
+
+    self.@routes: untyped
+
+    self.@filters: untyped
+
+    self.@errors: untyped
+
+    self.@middleware: untyped
+
+    self.@prototype: untyped
+
+    self.@extensions: untyped
+
+    self.@templates: untyped
+
+    self.@on_start_callback: untyped
+
+    self.@on_stop_callback: untyped
+
+    @app: untyped
+
+    @template_cache: untyped
+
+    @pinned_response: untyped
+
+    @env: Hash[String, untyped]
+
+    @params: IndifferentHash
+
+    @request: untyped
+
+    @response: untyped
+
+    include Rack::Utils
+
+    include Helpers
+    extend Helpers
+
+    include Templates
+
+    URI_INSTANCE: untyped
+
+    attr_accessor app: untyped
+
+    attr_accessor env: Hash[String, untyped]
+
+    attr_accessor request: untyped
+
+    attr_accessor response: untyped
+
+    attr_accessor params: IndifferentHash
+
+    attr_reader template_cache: untyped
+
+    def initialize: (?untyped? app, **untyped _kwargs) ?{ (untyped) -> untyped } -> void
+
+    # Rack call interface.
+    def call: (untyped env) -> untyped
+
+    def call!: (untyped env) -> untyped
+
+    # Access settings defined with Base.set.
+    def self.settings: () -> self
+
+    # Access settings defined with Base.set.
+    def settings: () -> untyped
+
+    # Exit the current block, halts any further processing
+    # of the request, and returns the specified response.
+    def halt: (*untyped response) -> untyped
+
+    # Pass control to the next matching route.
+    # If there are no more matching routes, Sinatra will
+    # return a 404 response.
+    def pass: () { () -> untyped } -> untyped
+
+    # Forward the request to the downstream app -- middleware only.
+    def forward: () -> nil
+
+    private
+
+    # Run filters defined on the class and all superclasses.
+    # Accepts an optional block to call after each filter is applied.
+    def filter!: (untyped type, ?untyped base) ?{ () -> untyped } -> untyped
+
+    # Run routes defined on the class and all superclasses.
+    def route!: (?untyped base, ?untyped? pass_block) -> untyped
+
+    # Run a route block and throw :halt with the result.
+    def route_eval: () { () -> untyped } -> untyped
+
+    # If the current request matches pattern and conditions, fill params
+    # with keys and call the given block.
+    # Revert params afterwards.
+    #
+    # Returns pass block.
+    def process_route: (untyped pattern, untyped conditions, ?untyped? block, ?untyped values) { (untyped, untyped) -> untyped } -> untyped
+
+    # No matching route was found or all routes passed. The default
+    # implementation is to forward the request downstream when running
+    # as middleware (@app is non-nil); when no downstream app is set, raise
+    # a NotFound exception. Subclasses can override this method to perform
+    # custom route miss logic.
+    def route_missing: () -> untyped
+
+    # Attempt to serve static files from public directory. Throws :halt when
+    # a matching file is found, returns nil otherwise.
+    def static!: (?::Hash[untyped, untyped] options) -> (nil | untyped)
+
+    # Run the block with 'throw :halt' support and apply result to the response.
+    def invoke: () { () -> untyped } -> nil
+
+    # Dispatch a request with error handling.
+    def dispatch!: () -> untyped
+
+    # Error handling during requests.
+    def handle_exception!: (untyped boom) -> (untyped | nil)
+
+    # Find an custom error block for the key(s) specified.
+    def error_block!: (untyped key, *untyped block_params) -> (untyped | false)
+
+    def dump_errors!: (untyped boom) -> untyped
+
+    CALLERS_TO_IGNORE: ::Array[::Regexp]
+
+    attr_reader self.routes: untyped
+
+    attr_reader self.filters: untyped
+
+    attr_reader self.templates: untyped
+
+    attr_reader self.errors: untyped
+
+    attr_reader self.on_start_callback: untyped
+
+    attr_reader self.on_stop_callback: untyped
+
+    def self.callers_to_ignore: () -> untyped
+
+    # Removes all routes, filters, middleware and extension hooks from the
+    # current class (not routes/filters/... defined by its superclass).
+    def self.reset!: () -> untyped
+
+    # Extension modules registered on this class and all superclasses.
+    def self.extensions: () -> untyped
+
+    # Middleware used in this class and all superclasses.
+    def self.middleware: () -> untyped
+
+    # Sets an option to the given value.  If the value is a proc,
+    # the proc will be called every time the option is accessed.
+    def self.set: (Symbol option, ?untyped value, ?bool ignore_setter) ?{ () -> untyped } -> (self | untyped)
+
+    # Same as calling `set :option, true` for each of the given options.
+    def self.enable: (*Symbol opts) -> untyped
+
+    # Same as calling `set :option, false` for each of the given options.
+    def self.disable: (*untyped opts) -> untyped
+
+    # Define a custom error handler. Optionally takes either an Exception
+    # class, or an HTTP status code to specify which errors should be
+    # handled.
+    def self.error: (*singleton(Exception) codes) { () -> void } -> void
+
+    # Sugar for `error(404) { ... }`
+    def self.not_found: () { () -> untyped } -> untyped
+
+    # Define a named template. The block must return the template source.
+    def self.template: (untyped name) { () -> untyped } -> untyped
+
+    # Define the layout template. The block must return the template source.
+    def self.layout: (?::Symbol name) { () -> untyped } -> untyped
+
+    # Load embedded templates from the file; uses the caller's __FILE__
+    # when no file is specified.
+    def self.inline_templates=: (?untyped? file) -> (nil | untyped)
+
+    # Lookup or register a mime type in Rack's mime registry.
+    def self.mime_type: (untyped type, ?untyped? value) -> untyped
+
+    # provides all mime types matching type, including deprecated types:
+    #   mime_types :html # => ['text/html']
+    #   mime_types :js   # => ['application/javascript', 'text/javascript']
+    def self.mime_types: (untyped type) -> untyped
+
+    # Define a before filter; runs before all requests within the same
+    # context as route handlers and may access/modify the request and
+    # response.
+    def self.before: (?untyped path, **untyped options) { () -> untyped } -> untyped
+
+    # Define an after filter; runs after all requests within the same
+    # context as route handlers and may access/modify the request and
+    # response.
+    def self.after: (?untyped path, **untyped options) { () -> untyped } -> untyped
+
+    # add a filter
+    def self.add_filter: (untyped type, ?untyped path, **untyped options) { () -> untyped } -> untyped
+
+    def self.on_start: () { () -> untyped } -> untyped
+
+    def self.on_stop: () { () -> untyped } -> untyped
+
+    # Add a route condition. The route is considered non-matching when the
+    # block returns false.
+    def self.condition: (?::String name) { () -> untyped } -> untyped
+
+    def self.public=: (untyped value) -> untyped
+
+    def self.public_dir=: (untyped value) -> untyped
+
+    def self.public_dir: () -> untyped
+
+    # Defining a `GET` handler also automatically defines
+    # a `HEAD` handler.
+    def self.get: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.put: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.post: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.delete: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.head: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.options: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.patch: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.link: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    def self.unlink: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+
+    # Makes the methods defined in the block and in the Modules given
+    # in `extensions` available to the handlers and templates
+    def self.helpers: (*untyped extensions) ?{ () -> void } -> void
+
+    # Register an extension. Alternatively take a block from which an
+    # extension will be created and registered on the fly.
+    def self.register: (*untyped extensions) ?{ () -> untyped } -> untyped
+
+    def self.development?: () -> untyped
+
+    def self.production?: () -> untyped
+
+    def self.test?: () -> untyped
+
+    # Set configuration options for Sinatra and/or the app.
+    # Allows scoping of settings for certain environments.
+    def self.configure: (*untyped envs) { (untyped) -> untyped } -> (untyped | nil)
+
+    # Use the specified Rack middleware
+    def self.use: (untyped middleware, *untyped args) { () -> untyped } -> untyped
+
+    # Stop the self-hosted server if running.
+    def self.quit!: () -> (nil | untyped)
+
+    alias self.stop! self.quit!
+
+    # Run the Sinatra app as a self-hosted server using
+    # Puma, Falcon, or WEBrick (in that order). If given a block, will call
+    # with the constructed handler once we have taken the stage.
+    def self.run!: (?::Hash[untyped, untyped] options) { () -> untyped } -> (nil | untyped)
+
+    alias self.start! self.run!
+
+    # Check whether the self-hosted server is running or not.
+    def self.running?: () -> untyped
+
+    # The prototype instance used to process requests.
+    def self.prototype: () -> untyped
+
+    # Create a new instance without middleware in front of it.
+    alias self.new! self.new
+
+    # Create a new instance of the class fronted by its middleware
+    # pipeline. The object is guaranteed to respond to #call but may not be
+    # an instance of the class new was called on.
+    def self.new: (*untyped args) { () -> untyped } -> untyped
+
+    # Creates a Rack::Builder instance with all the middleware set up and
+    # the given +app+ as end point.
+    def self.build: (untyped app) -> untyped
+
+    def self.call: (untyped env) -> untyped
+
+    # Like Kernel#caller but excluding certain magic entries and without
+    # line / method information; the resulting array contains filenames only.
+    def self.caller_files: () -> untyped
+
+    # Starts the server by running the Rack Handler.
+    def self.start_server: (untyped handler, untyped server_settings, untyped handler_name) ?{ (untyped) -> untyped } -> untyped
+
+    def self.suppress_messages?: () -> untyped
+
+    def self.setup_traps: () -> (nil | untyped)
+
+    # Dynamically defines a method on settings.
+    def self.define_singleton: (untyped name, ?untyped content) -> untyped
+
+    # Condition for matching host name. Parameter might be String or Regexp.
+    def self.host_name: (untyped pattern) -> untyped
+
+    # Condition for matching user agent. Parameter should be Regexp.
+    # Will set params[:agent].
+    def self.user_agent: (untyped pattern) -> untyped
+
+    alias self.agent self.user_agent
+
+    # Condition for matching mimetypes. Accepts file extensions.
+    def self.provides: (*untyped types) -> untyped
+
+    def self.route: (untyped verb, untyped path, ?::Hash[untyped, untyped] options) { () -> untyped } -> untyped
+
+    def self.invoke_hook: (untyped name, *untyped args) -> untyped
+
+    def self.generate_method: (untyped method_name) { () -> untyped } -> untyped
+
+    def self.compile!: (untyped verb, untyped path, untyped block, **untyped options) -> ::Array[untyped]
+
+    def self.compile: (untyped path, ?::Hash[untyped, untyped] route_mustermann_opts) -> untyped
+
+    def self.setup_default_middleware: (untyped builder) -> untyped
+
+    def self.setup_middleware: (untyped builder) -> untyped
+
+    def self.setup_logging: (untyped builder) -> (untyped | untyped | nil)
+
+    def self.setup_null_logger: (untyped builder) -> untyped
+
+    def self.setup_common_logger: (untyped builder) -> untyped
+
+    def self.setup_custom_logger: (untyped builder) -> untyped
+
+    def self.setup_protection: (untyped builder) -> (nil | untyped)
+
+    def self.setup_sessions: (untyped builder) -> (nil | untyped)
+
+    def self.inherited: (untyped subclass) -> untyped
+
+    def self.synchronize: () { () -> untyped } -> untyped
+
+    # used for deprecation warnings
+    def self.warn_for_deprecation: (untyped message) -> untyped
+
+    # Like Kernel#caller but excluding certain magic entries
+    def self.cleaned_caller: (?::Integer keep) -> untyped
+
+    # Force data to specified encoding. It defaults to settings.default_encoding
+    # which is UTF-8 by default
+    def self.force_encoding: (untyped data, ?untyped encoding) -> (nil | untyped)
+
+    def force_encoding: (*untyped args) -> untyped
+
+    # alias self.methodoverride? self.method_override?
+
+    # alias self.methodoverride= self.method_override=
+  end
+
+  # Execution context for classic style (top-level) applications. All
+  # DSL methods executed on main are delegated to this class.
+  #
+  # The Application class should not be subclassed, unless you want to
+  # inherit all settings, routes, handlers, and error pages from the
+  # top-level. Subclassing Sinatra::Base is highly recommended for
+  # modular applications.
+  class Application < Base
+    def self.register: (*untyped extensions) { () -> untyped } -> untyped
+  end
+
+  # Sinatra delegation mixin. Mixing this module into an object causes all
+  # methods to be delegated to the Sinatra::Application class. Used primarily
+  # at the top-level.
+  module Delegator
+    def self.delegate: (*untyped methods) -> untyped
+
+    attr_accessor self.target: untyped
+  end
+
+  class Wrapper
+    @stack: untyped
+
+    @instance: untyped
+
+    def initialize: (untyped stack, untyped instance) -> void
+
+    def settings: () -> untyped
+
+    def helpers: () -> untyped
+
+    def call: (untyped env) -> untyped
+
+    def inspect: () -> ::String
+  end
+
+  # Create a new Sinatra application; the block is evaluated in the class scope.
+  def self.new: (?untyped base) ?{ () -> untyped } -> untyped
+
+  # Extend the top-level DSL with the modules provided.
+  def self.register: (*untyped extensions) { () -> untyped } -> untyped
+
+  # Include the helper modules provided in Sinatra's request context.
+  def self.helpers: (*untyped extensions) { () -> untyped } -> untyped
+
+  # Use the middleware for classic applications.
+  def self.use: (*untyped args) { () -> untyped } -> untyped
+end
