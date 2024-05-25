@@ -461,12 +461,14 @@ module Sinatra
     attr_accessor app: untyped
 
     attr_accessor env: Hash[String, untyped]
+    def self.env: () -> Hash[String, untyped]
 
     attr_accessor request: untyped
 
     attr_accessor response: untyped
 
     attr_accessor params: IndifferentHash
+    def self.params: () -> IndifferentHash
 
     attr_reader template_cache: untyped
 
@@ -486,6 +488,7 @@ module Sinatra
     # Exit the current block, halts any further processing
     # of the request, and returns the specified response.
     def halt: (*untyped response) -> untyped
+    def self.halt: (*untyped response) -> untyped
 
     # Pass control to the next matching route.
     # If there are no more matching routes, Sinatra will
