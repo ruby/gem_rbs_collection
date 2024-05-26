@@ -1,0 +1,42 @@
+module Mysql2
+  class Client
+    self.@default_query_options: untyped
+
+    @read_timeout: untyped
+
+    @query_options: untyped
+
+    attr_reader query_options: untyped
+
+    attr_reader read_timeout: untyped
+
+    def self.default_query_options: () -> untyped
+
+    def initialize: (Hash[(String | Symbol), untyped] opts) -> void
+
+    def parse_ssl_mode: (untyped mode) -> untyped
+
+    def parse_flags_array: (untyped flags, ?::Integer initial) -> untyped
+
+    # Find any default system CA paths to handle system roots
+    # by default if stricter validation is requested and no
+    # path is provide.
+    def find_default_ca_path: () -> untyped
+
+    # Set default program_name in performance_schema.session_connect_attrs
+    # and performance_schema.session_account_connect_attrs
+    def parse_connect_attrs: (untyped conn_attrs) -> (::Hash[untyped, untyped] | untyped)
+
+    def query: (String sql, ?::Hash[untyped, untyped] options) -> Mysql2::result
+
+    def query_info: () -> (::Hash[untyped, untyped] | untyped)
+
+    def info: () -> untyped
+
+    def last_id: () -> Integer
+
+    private
+
+    def self.local_offset: () -> untyped
+  end
+end

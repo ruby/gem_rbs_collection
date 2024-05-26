@@ -1,0 +1,20 @@
+module Mysql2
+  type row_value_type = String | Integer | nil
+  type result = ResultAsHash | ResultAsArray
+
+  class ResultAsHash
+    attr_reader server_flags: untyped
+
+    include Enumerable[Hash[Symbol, row_value_type]]
+
+    def each: () { (Hash[Symbol, row_value_type]) -> void } -> void
+  end
+
+  class ResultAsArray
+    attr_reader server_flags: untyped
+
+    include Enumerable[Array[row_value_type]]
+
+    def each: () { (Array[row_value_type]) -> void } -> void
+  end
+end
