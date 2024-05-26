@@ -12,6 +12,7 @@ BCrypt::Password.new(hashed_password.to_s)
 
 hashed_password == raw_password
 hashed_password == raw_password.to_s
+hashed_password.is_password?(raw_password)
 
 # BCrypt::Engine
 BCrypt::Engine.cost = 5
