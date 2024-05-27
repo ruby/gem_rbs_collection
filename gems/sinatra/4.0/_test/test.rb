@@ -52,4 +52,8 @@ class MyApp < Sinatra::Base
   patch '/' do
     raise HttpError.new(401)
   end
+
+  delete '/' do
+    json([{foo: 'bar'}])
+  end
 end
