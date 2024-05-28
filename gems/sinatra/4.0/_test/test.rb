@@ -20,7 +20,6 @@ class MyApp < Sinatra::Base
     json(error: 'HTTP error')
   end
 
-  # @dynamic self.foo, self.bar
   helpers do
     def foo
       'foo'
