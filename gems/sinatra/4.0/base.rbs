@@ -136,7 +136,6 @@ module Sinatra
 
     # Set or retrieve the response status code.
     def status: (?untyped? value) -> untyped
-    def self.status: (?untyped? value) -> untyped
 
     # Set or retrieve the response body. When a block is given,
     # evaluation is deferred until the body is read with #each.
@@ -461,14 +460,12 @@ module Sinatra
     attr_accessor app: untyped
 
     attr_accessor env: Hash[String, untyped]
-    def self.env: () -> Hash[String, untyped]
 
     attr_accessor request: untyped
 
     attr_accessor response: untyped
 
     attr_accessor params: IndifferentHash
-    def self.params: () -> IndifferentHash
 
     attr_reader template_cache: untyped
 
@@ -488,7 +485,6 @@ module Sinatra
     # Exit the current block, halts any further processing
     # of the request, and returns the specified response.
     def halt: (*untyped response) -> untyped
-    def self.halt: (*untyped response) -> untyped
 
     # Pass control to the next matching route.
     # If there are no more matching routes, Sinatra will
@@ -581,7 +577,7 @@ module Sinatra
     # Define a custom error handler. Optionally takes either an Exception
     # class, or an HTTP status code to specify which errors should be
     # handled.
-    def self.error: (*singleton(Exception) codes) { () -> void } -> void
+    def self.error: (*singleton(Exception) codes) { () [self: instance] -> void } -> void
 
     # Sugar for `error(404) { ... }`
     def self.not_found: () { () -> untyped } -> untyped
@@ -633,23 +629,23 @@ module Sinatra
 
     # Defining a `GET` handler also automatically defines
     # a `HEAD` handler.
-    def self.get: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.get: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.put: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.put: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.post: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.post: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.delete: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.delete: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.head: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.head: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.options: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.options: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.patch: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.patch: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.link: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.link: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
-    def self.unlink: (String path, ?::Hash[untyped, untyped] opts) { () -> void } -> void
+    def self.unlink: (String path, ?::Hash[untyped, untyped] opts) { () [self: instance] -> void } -> void
 
     # Makes the methods defined in the block and in the Modules given
     # in `extensions` available to the handlers and templates
