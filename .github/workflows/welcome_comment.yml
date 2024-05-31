@@ -2,10 +2,13 @@ name: 'Test PR comment'
 
 on:
   pull_request_target:
-    types: [opened]
+    types:
+      - opened
+      - ready_for_review
 
 jobs:
   create_comment:
+    if: github.event.pull_request.draft == false
     runs-on: 'ubuntu-latest'
     permissions:
       pull-requests: write
