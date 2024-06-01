@@ -5326,17 +5326,6 @@ class String
   #   'blargle'.safe_constantize # => nil
   def safe_constantize: () -> untyped
 
-  # By default, +camelize+ converts strings to UpperCamelCase. If the argument to camelize
-  # is set to <tt>:lower</tt> then camelize produces lowerCamelCase.
-  #
-  # +camelize+ will also convert '/' to '::' which is useful for converting paths to namespaces.
-  #
-  #   'active_record'.camelize                # => "ActiveRecord"
-  #   'active_record'.camelize(:lower)        # => "activeRecord"
-  #   'active_record/errors'.camelize         # => "ActiveRecord::Errors"
-  #   'active_record/errors'.camelize(:lower) # => "activeRecord::Errors"
-  def camelize: (?::Symbol first_letter) -> untyped
-
   alias camelcase camelize
 
   # Capitalizes all the words and replaces some characters in the string to create
@@ -5355,19 +5344,6 @@ class String
   def titleize: (?keep_id_suffix: bool keep_id_suffix) -> untyped
 
   alias titlecase titleize
-
-  # The reverse of +camelize+. Makes an underscored, lowercase form from the expression in the string.
-  #
-  # +underscore+ will also change '::' to '/' to convert namespaces to paths.
-  #
-  #   'ActiveModel'.underscore         # => "active_model"
-  #   'ActiveModel::Errors'.underscore # => "active_model/errors"
-  def underscore: () -> untyped
-
-  # Replaces underscores with dashes in the string.
-  #
-  #   'puni_puni'.dasherize # => "puni-puni"
-  def dasherize: () -> untyped
 
   # Removes the module part from the constant expression in the string.
   #

@@ -41,3 +41,5 @@ class TestAttrInternal
   attr_internal_writer :internal_variable_accessor_1
   attr_internal_writer 'internal_variable_accessor_2'
 end
+
+"yukihiro_matz".camelize.underscore.dasherize
