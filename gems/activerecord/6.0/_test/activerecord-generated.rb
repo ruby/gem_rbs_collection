@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
   enum role: { admin: 0, user: 1 }, _prefix: :user_role
 
   validates :name, presence: true, if: -> { something }
+  validates :age, presence: true, if: ->(user) { user.something }
 
   before_save -> (obj) { obj.something; self.something }
   around_save -> (obj, block) { block.call; obj.something }
