@@ -43,3 +43,6 @@ class TestAttrInternal
 end
 
 "yukihiro_matz".camelize.underscore.dasherize
+"rabbit".pluralize.singularize
+"rabbit".pluralize(2).pluralize(:en).pluralize(2, :en)
+"rabbits".singularize(:en)
