@@ -25,5 +25,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run:
-          gh pr comment "$(cat PR_NUMBER)" --body "$(cat COMMENT_BODY.txt)" --repo "$GH_REPO"
+          state="$(gh pr view "$(cat PR_NUMBER)" --json state --jq .state --repo "$GH_REPO")"
+          if [ "$state" = "OPEN"]; then
+            gh pr comment "$(cat PR_NUMBER)" --body "$(cat COMMENT_BODY.txt)" --repo "$GH_REPO"
+          fi
 
