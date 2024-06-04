@@ -1,0 +1,194 @@
+module Sinatra
+  # = Sinatra::Cookies
+  #
+  # Easy way to deal with cookies
+  #
+  # == Usage
+  #
+  # Allows you to read cookies:
+  #
+  #   get '/' do
+  #     "value: #{cookies[:something]}"
+  #   end
+  #
+  # And of course to write cookies:
+  #
+  #   get '/set' do
+  #     cookies[:something] = 'foobar'
+  #     redirect to('/')
+  #   end
+  #
+  # And generally behaves like a hash:
+  #
+  #   get '/demo' do
+  #     cookies.merge! 'foo' => 'bar', 'bar' => 'baz'
+  #     cookies.keep_if { |key, value| key.start_with? 'b' }
+  #     foo, bar = cookies.values_at 'foo', 'bar'
+  #     "size: #{cookies.length}"
+  #   end
+  #
+  # === Classic Application
+  #
+  # In a classic application simply require the helpers, and start using them:
+  #
+  #     require "sinatra"
+  #     require "sinatra/cookies"
+  #
+  #     # The rest of your classic application code goes here...
+  #
+  # === Modular Application
+  #
+  # In a modular application you need to require the helpers, and then tell
+  # the application to use them:
+  #
+  #     require "sinatra/base"
+  #     require "sinatra/cookies"
+  #
+  #     class MyApp < Sinatra::Base
+  #       helpers Sinatra::Cookies
+  #
+  #       # The rest of your modular application code goes here...
+  #     end
+  #
+  module Cookies
+    @cookies: untyped
+
+    class Jar
+      @response_array: untyped
+
+      @response_hash: untyped
+
+      @response: untyped
+
+      @request: untyped
+
+      @deleted: untyped
+
+      @options: untyped
+
+      include Enumerable[Hash[String, String]]
+
+      attr_reader options: untyped
+
+      def initialize: (untyped app) -> void
+
+      def ==: (Jar other) -> bool
+
+      def []: (_ToS key) -> String?
+
+      def []=: (_ToS key, String value) -> void
+
+      def assoc: (untyped key) -> untyped
+
+      def clear: () -> untyped
+
+      def compare_by_identity?: () -> false
+
+      def default: () -> nil
+
+      alias default_proc default
+
+      def delete: (_ToS key) -> untyped
+
+      def delete_if: () ?{ (untyped, untyped) -> untyped } -> (untyped | self)
+
+      def each: () ?{ () -> untyped } -> untyped
+
+      def each_key: () ?{ () -> untyped } -> untyped
+
+      alias each_pair each
+
+      def each_value: () ?{ () -> untyped } -> untyped
+
+      def empty?: () -> untyped
+
+      def fetch: (untyped key) { () -> untyped } -> untyped
+
+      def flatten: () -> untyped
+
+      def has_key?: (untyped key) -> untyped
+
+      def has_value?: (untyped value) -> untyped
+
+      def hash: () -> untyped
+
+      alias include? has_key?
+
+      alias member? has_key?
+
+      def inspect: () -> ::String
+
+      def invert: () -> untyped
+
+      def keep_if: () ?{ (untyped) -> untyped } -> untyped
+
+      def key: (untyped value) -> untyped
+
+      alias key? has_key?
+
+      def keys: () -> Array[String]
+
+      def length: () -> Integer
+
+      def merge: (untyped other) { () -> untyped } -> untyped
+
+      def merge!: (untyped other) ?{ (untyped, untyped, untyped) -> untyped } -> untyped
+
+      def rassoc: (untyped value) -> untyped
+
+      def rehash: () -> self
+
+      def reject: () ?{ () -> untyped } -> untyped
+
+      alias reject! delete_if
+
+      def replace: (untyped other) -> untyped
+
+      def select: () ?{ () -> untyped } -> untyped
+
+      alias select! keep_if
+
+      def set: (_ToS key, ?::Hash[untyped, untyped] options) -> untyped
+
+      def shift: () -> ::Array[untyped]
+
+      alias size length
+
+      def sort: () { () -> untyped } -> untyped
+
+      alias store []=
+
+      def to_hash: () -> untyped
+
+      def to_a: () -> untyped
+
+      def to_s: () -> String
+
+      alias update merge!
+
+      alias value? has_value?
+
+      def values: () -> untyped
+
+      def values_at: (*untyped list) -> untyped
+
+      private
+
+      def warn: (untyped message) -> untyped
+
+      def deleted: () -> untyped
+
+      def response_cookies: () -> untyped
+
+      def parse_response: () -> (nil | untyped)
+
+      def request_cookies: () -> untyped
+    end
+
+    def cookies: () -> Jar
+  end
+
+  class Base
+    include Cookies
+  end
+end
