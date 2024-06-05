@@ -6,6 +6,10 @@ class MyApp < Sinatra::Base
   enable :logging
   set :sessions, domain: 'example.dev', path: '/', expire_after: 1000*60
   helpers Sinatra::Cookies
+  configure :development do
+    require 'sinatra/reloader'
+    register Sinatra::Reloader
+  end
 
   class HttpError < StandardError
     # @dynamic code
