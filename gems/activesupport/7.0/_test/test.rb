@@ -17,3 +17,5 @@ nil.try('round', 2)
 nil.try(:tap) { |n| p n }
 nil.try { p 'hello' }
 nil.try { |n| p n }
+
+"Id".downcase_first
