@@ -390,6 +390,48 @@ class Array[unchecked out Elem]
   def in_groups: (untyped number, ?untyped? fill_with) ?{ (untyped) -> untyped } -> untyped
 end
 
+# active_support/core_ext/object/blank.rb
+class Object
+  def blank?: () -> bool
+  def present?: () -> bool
+  def presence: () -> self?
+end
+
+class NilClass
+  def blank?: () -> true
+end
+
+class FalseClass
+  def blank?: () -> true
+end
+
+class TrueClass
+  def blank?: () -> false
+end
+
+class Array[unchecked out Elem]
+  alias blank? empty?
+end
+
+class Hash[unchecked out K, unchecked out V]
+  alias blank? empty?
+end
+
+class String
+  BLANK_RE: Regexp
+  ENCODED_BLANKS: Concurrent::Map[Encoding, Regexp]
+  def blank?: () -> bool
+end
+
+class Numeric
+  def blank?: () -> false
+end
+
+class Time
+  def blank?: () -> false
+end
+
+# active_support/core_ext/string/inflections.rb
 class String
   def camelize: (?Symbol first_letter) -> String
   def underscore: () -> String
