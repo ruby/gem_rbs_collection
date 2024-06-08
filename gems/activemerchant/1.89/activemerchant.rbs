@@ -1,0 +1,22 @@
+# Write the type definition here!
+
+module ActiveMerchant
+  module Billing
+    class Model
+      def initialize: (?Hash[untyped, untyped] attributes) -> self
+      def validate: -> Hash[Symbol, Array[String]]
+    end
+
+    module CreditCardMethods
+      module ClassMethods
+        def brand?: (String number) -> String?
+        def card_companies: -> Array[String]
+      end
+    end
+
+    class CreditCard < Model
+      include CreditCardMethods
+      extend CreditCardMethods::ClassMethods
+    end
+  end
+end
