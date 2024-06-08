@@ -73,4 +73,4 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           ruby .github/workflows/pr_bot/check_merge_ability.rb "$CHANGED_GEMS" "$CHANGED_NON_GEMS" "$PR_NUMBER"
-          gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --squash
+          gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --squash --match-head-commit $HEAD_SHA
