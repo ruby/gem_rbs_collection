@@ -294,7 +294,7 @@ module ActiveRecord
       include ActiveModel::ForbiddenAttributesProtection
 
       def initialize: (Relation scope) -> void
-                 
+
       def not: (untyped opts, *untyped rest) -> Relation
 
       private
@@ -740,10 +740,76 @@ end
 
 module ActiveRecord
   module Associations
-    class CollectionProxy
-      def build: (?::Hash[untyped, untyped] attributes) -> untyped | ...
-      def create: (?::Hash[untyped, untyped] attributes) -> untyped | ...
-      def create!: (?::Hash[untyped, untyped] attributes) -> untyped | ...
+    class CollectionProxy < Relation
+      # Returns a new object of the collection type that has been instantiated
+      # with +attributes+ and linked to this object, but have not yet been saved.
+      # You can pass an array of attributes hashes, this will return an array
+      # with the new objects.
+      #
+      #   class Person
+      #     has_many :pets
+      #   end
+      #
+      #   person.pets.build
+      #   # => #<Pet id: nil, name: nil, person_id: 1>
+      #
+      #   person.pets.build(name: 'Fancy-Fancy')
+      #   # => #<Pet id: nil, name: "Fancy-Fancy", person_id: 1>
+      #
+      #   person.pets.build([{name: 'Spook'}, {name: 'Choo-Choo'}, {name: 'Brain'}])
+      #   # => [
+      #   #      #<Pet id: nil, name: "Spook", person_id: 1>,
+      #   #      #<Pet id: nil, name: "Choo-Choo", person_id: 1>,
+      #   #      #<Pet id: nil, name: "Brain", person_id: 1>
+      #   #    ]
+      #
+      #   person.pets.size  # => 5 # size of the collection
+      #   person.pets.count # => 0 # count from database
+      def build: (?::Hash[untyped, untyped] attributes) ?{ () -> untyped } -> untyped
+
+      alias new build
+
+      # Returns a new object of the collection type that has been instantiated with
+      # attributes, linked to this object and that has already been saved (if it
+      # passes the validations).
+      #
+      #   class Person
+      #     has_many :pets
+      #   end
+      #
+      #   person.pets.create(name: 'Fancy-Fancy')
+      #   # => #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>
+      #
+      #   person.pets.create([{name: 'Spook'}, {name: 'Choo-Choo'}])
+      #   # => [
+      #   #      #<Pet id: 2, name: "Spook", person_id: 1>,
+      #   #      #<Pet id: 3, name: "Choo-Choo", person_id: 1>
+      #   #    ]
+      #
+      #   person.pets.size  # => 3
+      #   person.pets.count # => 3
+      #
+      #   person.pets.find(1, 2, 3)
+      #   # => [
+      #   #       #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>,
+      #   #       #<Pet id: 2, name: "Spook", person_id: 1>,
+      #   #       #<Pet id: 3, name: "Choo-Choo", person_id: 1>
+      #   #    ]
+      def create: (?::Hash[untyped, untyped] attributes) ?{ () -> untyped } -> untyped
+
+      # Like #create, except that if the record is invalid, raises an exception.
+      #
+      #   class Person
+      #     has_many :pets
+      #   end
+      #
+      #   class Pet
+      #     validates :name, presence: true
+      #   end
+      #
+      #   person.pets.create!(name: nil)
+      #   # => ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
+      def create!: (?::Hash[untyped, untyped] attributes) ?{ () -> untyped } -> untyped
     end
   end
 end
