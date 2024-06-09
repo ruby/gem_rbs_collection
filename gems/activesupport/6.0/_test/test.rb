@@ -46,3 +46,14 @@ end
 "rabbit".pluralize.singularize
 "rabbit".pluralize(2).pluralize(:en).pluralize(2, :en)
 "rabbits".singularize(:en)
+
+itself if Object.new.blank? \
+            ^ nil.blank? \
+            ^ false.blank? \
+            ^ true.blank? \
+            ^ [1].blank? \
+            ^ {a: "hi"}.blank? \
+            ^ "".blank? \
+            ^ 0.blank? \
+            ^ Time.now.blank? \
+            ^ "a".present?
