@@ -434,10 +434,23 @@ end
 # active_support/core_ext/string/inflections.rb
 class String
   def camelize: (?Symbol first_letter) -> String
+  alias camelcase camelize
   def underscore: () -> String
   def dasherize: () -> String
   def pluralize: (?Integer | Symbol? count, ?Symbol locale) -> String
   def singularize: (?Symbol locale) -> String
+  def constantize: () -> untyped
+  def safe_constantize: () -> untyped
+  def titleize: (?keep_id_suffix: boolish) -> String
+  alias titlecase titleize
+  def demodulize: () -> String
+  def deconstantize: () -> String
+  def parameterize: (?separator: String, ?preserve_case: boolish, ?locale: Symbol) -> String
+  def tableize: () -> String
+  def classify: () -> String
+  def humanize: (?capitalize: boolish, ?keep_id_suffix: boolish) -> String
+  def upcase_first: () -> String
+  def foreign_key: (?boolish separate_class_name_and_id_with_underscore) -> String
 end
 
 module ActiveSupport

@@ -42,6 +42,15 @@ class TestAttrInternal
   attr_internal_writer 'internal_variable_accessor_2'
 end
 
+"yukihiro_matz".constantize
+"yukihiro_matz".safe_constantize
+"string_ending_with_id".titleize(keep_id_suffix: true).titleize
+"::Net::HTTP".deconstantize.demodulize
+"Donald E. Knuth".parameterize(separator: ":", preserve_case: true, locale: :en).parameterize
+"ham_and_egg".tableize.classify
+"author_id".humanize(capitalize: false, keep_id_suffix: true).humanize
+"iD".upcase_first
+"User".foreign_key(false).foreign_key
 "yukihiro_matz".camelize.underscore.dasherize
 "rabbit".pluralize.singularize
 "rabbit".pluralize(2).pluralize(:en).pluralize(2, :en)
