@@ -298,7 +298,8 @@ module ActiveRecord
       def none: () -> self
       def pluck: (Symbol | String column) -> Array[untyped]
               | (*Symbol | String columns) -> Array[Array[untyped]]
-      def where: (*untyped) -> self
+      def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+               | (*untyped) -> self
       def not: (*untyped) -> self
       def exists?: (*untyped) -> bool
       def order: (*untyped) -> self
@@ -377,7 +378,8 @@ module ActiveRecord
       def none: () -> Relation
       def pluck: (Symbol | String column) -> Array[untyped]
               | (*Symbol | String columns) -> Array[Array[untyped]]
-      def where: (*untyped) -> Relation
+      def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+               | (*untyped) -> Relation
       def exists?: (*untyped) -> bool
       def any?: () -> bool
               | () { (Model) -> boolish } -> bool
@@ -461,7 +463,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def none: () -> self
   def pluck: (Symbol | String column) -> Array[untyped]
            | (*Symbol | String columns) -> Array[Array[untyped]]
-  def where: (*untyped) -> self
+  def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+           | (*untyped) -> self
   def not: (*untyped) -> self
   def exists?: (*untyped) -> bool
   def order: (*untyped) -> self
@@ -539,7 +542,8 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def none: () -> Relation
   def pluck: (Symbol | String column) -> Array[untyped]
            | (*Symbol | String columns) -> Array[Array[untyped]]
-  def where: (*untyped) -> Relation
+  def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+           | (*untyped) -> Relation
   def exists?: (*untyped) -> bool
   def any?: () -> bool
           | () { (Model) -> boolish } -> bool

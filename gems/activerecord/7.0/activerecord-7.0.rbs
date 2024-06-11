@@ -24,6 +24,12 @@ module ActiveRecord
     extend RuntimeRegistry
   end
 
+  module QueryMethods
+    class WhereChain
+      def missing: (*Symbol associations) -> Relation
+    end
+  end
+
   module Encryption
     module EncryptableRecord
       module ClassMethods
