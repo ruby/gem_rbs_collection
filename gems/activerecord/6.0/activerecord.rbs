@@ -741,6 +741,10 @@ end
 module ActiveRecord
   module Associations
     class CollectionProxy < Relation
+      interface _EachPair
+        def each_pair: () { ([untyped, untyped]) -> untyped } -> self
+      end
+
       # Returns a new object of the collection type that has been instantiated
       # with +attributes+ and linked to this object, but have not yet been saved.
       # You can pass an array of attributes hashes, this will return an array
@@ -765,7 +769,7 @@ module ActiveRecord
       #
       #   person.pets.size  # => 5 # size of the collection
       #   person.pets.count # => 0 # count from database
-      def build: (?::Hash[untyped, untyped] attributes) ?{ () -> untyped } -> untyped
+      def build: (?_EachPair attributes) ?{ () -> untyped } -> untyped
 
       alias new build
 
@@ -795,7 +799,7 @@ module ActiveRecord
       #   #       #<Pet id: 2, name: "Spook", person_id: 1>,
       #   #       #<Pet id: 3, name: "Choo-Choo", person_id: 1>
       #   #    ]
-      def create: (?::Hash[untyped, untyped] attributes) ?{ () -> untyped } -> untyped
+      def create: (?_EachPair attributes) ?{ () -> untyped } -> untyped
 
       # Like #create, except that if the record is invalid, raises an exception.
       #
@@ -809,7 +813,7 @@ module ActiveRecord
       #
       #   person.pets.create!(name: nil)
       #   # => ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
-      def create!: (?::Hash[untyped, untyped] attributes) ?{ () -> untyped } -> untyped
+      def create!: (?_EachPair attributes) ?{ () -> untyped } -> untyped
     end
   end
 end
