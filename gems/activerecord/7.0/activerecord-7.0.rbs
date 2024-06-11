@@ -45,4 +45,19 @@ module ActiveRecord
       def decrypt: () -> untyped
     end
   end
+
+  class ConnectionNotEstablished < ActiveRecordError
+  end
+
+  class StatementInvalid < ActiveRecordError
+    def initialize: (?untyped? message, ?binds: untyped? binds, ?sql: untyped? sql) -> untyped
+
+    attr_reader sql: untyped
+
+    attr_reader binds: untyped
+  end
+
+  class MismatchedForeignKey < StatementInvalid
+    def initialize: (?primary_key_column: untyped? primary_key_column, ?primary_key: untyped? primary_key, ?target_table: untyped? target_table, ?foreign_key: untyped? foreign_key, ?table: untyped? table, ?binds: untyped? binds, ?sql: untyped? sql, ?message: untyped? message) -> untyped
+  end
 end

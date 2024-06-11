@@ -56,4 +56,29 @@ module ActiveRecord
       def normalize_value_for: (untyped name, untyped value) -> untyped
     end
   end
+
+  class AdapterError < ActiveRecordError
+    def initialize: (?untyped? message, ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
+
+    attr_reader connection_pool: ConnectionAdapters::ConnectionPool?
+  end
+
+  class ConnectionNotEstablished < AdapterError
+  end
+
+  class StatementInvalid < AdapterError
+    def initialize: (?untyped? message, ?sql: untyped?, ?binds: untyped?, ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
+
+    attr_reader sql: untyped
+    attr_reader binds: untyped
+
+    def set_query: (untyped sql, untyped binds) -> self
+  end
+
+  class MismatchedForeignKey < StatementInvalid
+    def initialize: (?message: untyped?, ?sql: untyped?, ?binds: untyped?, ?table: untyped?,
+                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?, 
+                     ?primary_key_column: untyped?, ?query_parser: untyped?, 
+                     ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
+  end
 end

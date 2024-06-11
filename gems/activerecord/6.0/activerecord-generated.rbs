@@ -12692,12 +12692,6 @@ module ActiveRecord
   class AdapterNotFound < ActiveRecordError
   end
 
-  # Raised when connection to the database could not been established (for example when
-  # {ActiveRecord::Base.connection=}[rdoc-ref:ConnectionHandling#connection]
-  # is given a +nil+ object).
-  class ConnectionNotEstablished < ActiveRecordError
-  end
-
   # Raised when a write to the database is attempted on a read only connection.
   class ReadOnlyError < ActiveRecordError
   end
@@ -12738,17 +12732,6 @@ module ActiveRecord
     def initialize: (?untyped? message, ?untyped? record) -> untyped
   end
 
-  # Superclass for all database execution errors.
-  #
-  # Wraps the underlying database error as +cause+.
-  class StatementInvalid < ActiveRecordError
-    def initialize: (?untyped? message, ?binds: untyped? binds, ?sql: untyped? sql) -> untyped
-
-    attr_reader sql: untyped
-
-    attr_reader binds: untyped
-  end
-
   # Defunct wrapper class kept for compatibility.
   # StatementInvalid wraps the original exception now.
   class WrappedDatabaseException < StatementInvalid
@@ -12761,11 +12744,6 @@ module ActiveRecord
   # Raised when a record cannot be inserted or updated because it references a non-existent record,
   # or when a record cannot be deleted because a parent record references it.
   class InvalidForeignKey < WrappedDatabaseException
-  end
-
-  # Raised when a foreign key constraint cannot be added because the column type does not match the referenced column type.
-  class MismatchedForeignKey < StatementInvalid
-    def initialize: (?primary_key_column: untyped? primary_key_column, ?primary_key: untyped? primary_key, ?target_table: untyped? target_table, ?foreign_key: untyped? foreign_key, ?table: untyped? table, ?binds: untyped? binds, ?sql: untyped? sql, ?message: untyped? message) -> untyped
   end
 
   # Raised when a record cannot be inserted or updated because it would violate a not null constraint.
