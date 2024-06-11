@@ -27,6 +27,7 @@ unless ability.approved?(PR_AUTHOR)
     `/merge` command failed.
 
     This PR is not approved yet by the reviewers. Please get approval from the reviewers.
+    #{'This PR includes non-gem files changes. `/merge` command does not work if the PR includes non-gem files. Please merge this PR manually.' if ability.admin_review_required?}
     See the Actions tab for detail.
   BODY
   comment_to_github(body, pr_number)
