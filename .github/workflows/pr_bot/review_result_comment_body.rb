@@ -23,9 +23,10 @@ else
       #{ability.not_approved_gems.map { "* `#{_1}`" }.join("\n")}
     MSG
   end
-  if ability.waiting_admin_approval?(PR_AUTHOR)
+  if ability.admin_review_required?
     msg << <<~MSG
       This PR still needs approval from the administrators.
+      The admin should review this PR and merge it manually.
     MSG
   end
 

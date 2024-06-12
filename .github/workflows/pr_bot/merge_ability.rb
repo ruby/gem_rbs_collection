@@ -10,23 +10,18 @@ class MergeAbility
   end
 
   def approved?(pr_author)
-    is_approved = true
+    # Check non gem files
+    if admin_review_required?
+      log "This PR contains non-gem files. Admin approval is required. /merge does not work if the PR contains non-gem files."
+      return false
+    end
 
     # Check gem files
-    unless not_approved_gems.empty?
+    unless is_approved = not_approved_gems.empty?
       log "The following gems are not approved yet:"
       log not_approved_gems.join("\n")
-      is_approved = false
     end
-
-    # Check non gem files
-    if waiting_admin_approval?(pr_author)
-      log "The following files are changed, but not approved by the admin yet:"
-      log changed_non_gems.join("\n")
-      is_approved = false
-    end
-
-    is_approved
+    return is_approved
   end
 
   def can_merge_by?(commented_by, author)
@@ -40,13 +35,8 @@ class MergeAbility
     @not_approved_gems ||= changed_gems.reject { |gem| gem_accepted?(gem) }
   end
 
-  def waiting_admin_approval?(pr_author)
-    return false if changed_non_gems.empty?
-
-    admins = administorators.map { _1['login'] }
-    return false if admins.include?(pr_author)
-
-    (approvers & admins).empty?
+  def admin_review_required?
+    return not changed_non_gems.empty?
   end
 
   private
