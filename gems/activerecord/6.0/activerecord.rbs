@@ -288,6 +288,20 @@ module ActiveRecord
 
     def self.default_scope: (?untyped? scope) -> untyped | ...
   end
+
+  module QueryMethods
+    class WhereChain[Relation]
+      include ActiveModel::ForbiddenAttributesProtection
+
+      def initialize: (Relation scope) -> void
+                 
+      def not: (untyped opts, *untyped rest) -> Relation
+
+      private
+
+      def not_behaves_as_nor?: (untyped opts) -> (::FalseClass | untyped)
+    end
+  end
 end
 
 module ActiveRecord
@@ -298,7 +312,7 @@ module ActiveRecord
       def none: () -> self
       def pluck: (Symbol | String column) -> Array[untyped]
               | (*Symbol | String columns) -> Array[Array[untyped]]
-      def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+      def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
                | (*untyped) -> self
       def not: (*untyped) -> self
       def exists?: (*untyped) -> bool
@@ -378,7 +392,7 @@ module ActiveRecord
       def none: () -> Relation
       def pluck: (Symbol | String column) -> Array[untyped]
               | (*Symbol | String columns) -> Array[Array[untyped]]
-      def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+      def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
                | (*untyped) -> Relation
       def exists?: (*untyped) -> bool
       def any?: () -> bool
@@ -463,7 +477,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def none: () -> self
   def pluck: (Symbol | String column) -> Array[untyped]
            | (*Symbol | String columns) -> Array[Array[untyped]]
-  def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+  def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
            | (*untyped) -> self
   def not: (*untyped) -> self
   def exists?: (*untyped) -> bool
@@ -542,7 +556,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def none: () -> Relation
   def pluck: (Symbol | String column) -> Array[untyped]
            | (*Symbol | String columns) -> Array[Array[untyped]]
-  def where: () -> ::ActiveRecord::QueryMethods::WhereChain
+  def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
            | (*untyped) -> Relation
   def exists?: (*untyped) -> bool
   def any?: () -> bool
