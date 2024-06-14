@@ -31,4 +31,10 @@ module ActiveRecord
   class MismatchedForeignKey < StatementInvalid
     def initialize: (?primary_key_column: untyped? primary_key_column, ?primary_key: untyped? primary_key, ?target_table: untyped? target_table, ?foreign_key: untyped? foreign_key, ?table: untyped? table, ?binds: untyped? binds, ?sql: untyped? sql, ?message: untyped? message) -> untyped
   end
+
+  module QueryMethods
+    class WhereChain[Relation]
+      def missing: (*Symbol associations) -> Relation
+    end
+  end
 end

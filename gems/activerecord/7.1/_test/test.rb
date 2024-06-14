@@ -24,6 +24,7 @@ module Test
     }
   end
 
+  User.where.missing.to_sql
   User.deterministic_encrypted_attributes
   User.source_attribute_from_preserved_attribute(:phrase)
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')

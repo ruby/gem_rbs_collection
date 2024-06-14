@@ -18591,40 +18591,6 @@ module ActiveRecord
 
     include ActiveModel::ForbiddenAttributesProtection
 
-    # WhereChain objects act as placeholder for queries in which #where does not have any parameter.
-    # In this case, #where must be chained with #not to return a new relation.
-    class WhereChain
-      include ActiveModel::ForbiddenAttributesProtection
-
-      def initialize: (untyped scope) -> untyped
-
-      # Returns a new relation expressing WHERE + NOT condition according to
-      # the conditions in the arguments.
-      #
-      # #not accepts conditions as a string, array, or hash. See QueryMethods#where for
-      # more details on each format.
-      #
-      #    User.where.not("name = 'Jon'")
-      #    # SELECT * FROM users WHERE NOT (name = 'Jon')
-      #
-      #    User.where.not(["name = ?", "Jon"])
-      #    # SELECT * FROM users WHERE NOT (name = 'Jon')
-      #
-      #    User.where.not(name: "Jon")
-      #    # SELECT * FROM users WHERE name != 'Jon'
-      #
-      #    User.where.not(name: nil)
-      #    # SELECT * FROM users WHERE name IS NOT NULL
-      #
-      #    User.where.not(name: %w(Ko1 Nobu))
-      #    # SELECT * FROM users WHERE name NOT IN ('Ko1', 'Nobu')
-      def not: (untyped opts, *untyped rest) -> untyped
-
-      private
-
-      def not_behaves_as_nor?: (untyped opts) -> (::FalseClass | untyped)
-    end
-
     FROZEN_EMPTY_ARRAY: untyped
 
     FROZEN_EMPTY_HASH: untyped

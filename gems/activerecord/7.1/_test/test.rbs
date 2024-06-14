@@ -2,6 +2,10 @@ module Test
   class ApplicationRecord < ActiveRecord::Base
   end
 
-  class User < ActiveRecord::Base
+  class User < ApplicationRecord
+    extend ::ActiveRecord::Base::ClassMethods[User, ActiveRecord_Relation, Integer]
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+    end
   end
 end
