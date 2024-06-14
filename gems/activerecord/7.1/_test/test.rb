@@ -22,15 +22,9 @@ module Test
       # @type var email: String
       email.strip.downcase
     }
-
-    has_many :posts
   end
 
-  class Post < ApplicationRecord
-    belongs_to :user
-  end
-
-  User.where.missing(:posts)
+  User.where.missing.to_sql
   User.deterministic_encrypted_attributes
   User.source_attribute_from_preserved_attribute(:phrase)
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')

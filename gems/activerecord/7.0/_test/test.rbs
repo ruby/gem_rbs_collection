@@ -6,25 +6,6 @@ module Test
     extend ::ActiveRecord::Base::ClassMethods[User, ActiveRecord_Relation, Integer]
 
     class ActiveRecord_Relation < ::ActiveRecord::Relation
-      include ::ActiveRecord::Relation::Methods[User, Integer]
-      include Enumerable[User]
-    end
-
-    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
-      include ::ActiveRecord::Relation::Methods[User, Integer]
-    end
-  end
-
-  class Post < ApplicationRecord
-    extend ::ActiveRecord::Base::ClassMethods[Post, ActiveRecord_Relation, Integer]
-
-    class ActiveRecord_Relation < ::ActiveRecord::Relation
-      include ::ActiveRecord::Relation::Methods[Post, Integer]
-      include Enumerable[Post]
-    end
-
-    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
-      include ::ActiveRecord::Relation::Methods[Post, Integer]
     end
   end
 end
