@@ -36,7 +36,7 @@ class MergeAbility
   end
 
   def admin_review_required?
-    return not changed_non_gems.empty?
+    not changed_non_gems.empty?
   end
 
   private
