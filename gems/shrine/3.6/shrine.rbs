@@ -1,0 +1,43 @@
+class Shrine
+  class Error < StandardError
+  end
+
+  class InvalidFile < Error
+    def initialize: (untyped io, untyped missing_methods) -> void
+  end
+
+  class FileNotFound < Error
+  end
+
+  module ClassMethods
+    attr_reader opts: untyped
+    attr_accessor storages: Hash[Symbol, Shrine::Storage::t]
+    attr_accessor logger: untyped
+
+    def inherited: (untyped subclass) -> void
+    def plugin: (untyped plugin, *untyped args, **untyped kwargs) ?{ () -> untyped } -> untyped
+    def find_storage: (Symbol | String name) -> Shrine::Storage::t
+    def Attachment: (Symbol) -> Shrine::Attachment
+    alias attachment Attachment
+    alias [] Attachment
+    def upload: (untyped io, Shrine::Storage::t storage, **untyped options) -> Shrine::UploadedFile
+    def uploaded_file: (String | Hash[untyped, untyped] | Shrine::UploadedFile object) -> Shrine::UploadedFile
+    def with_file: [T](untyped io) { (untyped) -> T } -> T
+    def warn: (String message) -> void
+    def deprecation: (String message) -> void
+  end
+
+  module InstanceMethods
+    attr_reader storage_key: Symbol
+
+    def initialize: (Symbol storage_key) -> void
+    def storage: () -> Shrine::Storage::t
+    def upload: (untyped io, **untyped options) -> Shrine::UploadedFile
+    def generate_location: (untyped io, ?metadata: Hash[untyped, untyped], **untyped options) -> String
+    def extract_metadata: (untyped io, **untyped options) -> Hash[String, untyped]
+    def opt: () -> untyped
+  end
+
+  extend ClassMethods
+  include InstanceMethods
+end

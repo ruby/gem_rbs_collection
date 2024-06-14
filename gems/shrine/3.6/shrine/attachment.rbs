@@ -1,0 +1,18 @@
+class Shrine
+  class Attachment < Module
+    module ClassMethods
+      attr_accessor shrine_class: Shrine
+      def []: (*untyped args, **untyped options) -> instance
+    end
+
+    module InstanceMethods
+      def initialize: (Symbol name, **untyped) -> void
+      def attachment_name: () -> Symbol
+      def options: () -> Hash[untyped, untyped]
+      def shrine_class: () -> Shrine
+    end
+
+    extend ClassMethods
+    include InstanceMethods
+  end
+end

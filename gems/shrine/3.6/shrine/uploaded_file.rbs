@@ -1,0 +1,46 @@
+class Shrine
+  class UploadedFile
+    module ClassMethods
+      attr_accessor shrine_class: Shrine
+    end
+
+    module InstanceMethods
+      attr_reader id: untyped
+      attr_reader storage_key: untyped
+      attr_reader metadata: Hash[String, untyped]
+
+      def initialize: (Hash[Symbol, untyped] data) -> void
+      def original_filename: () -> String?
+      def extension: () -> String?
+      def size: () -> Integer
+      def mime_type: () -> String?
+      alias content_type mime_type
+      def []: (String key) -> untyped
+      def open: (**untyped options) -> IO
+              | [T](**untyped options) { (IO) -> T } -> T
+      def download: (**untyped options) -> Tempfile
+                  | [T](**untyped options) { (Tempfile) -> T } -> T
+      def stream: (String | IO destination, **untyped options) -> void
+      def read: (**untyped args) -> String
+      def eof?: () -> bool
+      def rewind: () -> void
+      def close: () -> void
+      def opened?: () -> bool
+      def url: (**untyped options) -> String
+      def exists?: () -> bool
+      def replace: (IO io, **untyped options) -> void
+      def to_io: () -> IO
+      def to_json: (**untyped args) -> String
+      def as_json: (**untyped args) -> String
+      def data: () -> { "id" => untyped, "storage" => String, "metadata" => Hash[String, untyped] }
+      def ==: (untyped other) -> bool
+      alias eql? ==
+      def uploader: () -> Shrine
+      def storage: () -> Shrine::Storage::t
+      def shrine_class: () -> Shrine
+    end
+
+    extend ClassMethods
+    include InstanceMethods
+  end
+end
