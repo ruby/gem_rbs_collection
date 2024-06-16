@@ -156,3 +156,19 @@ module AbstractController::Callbacks::ClassMethods
   alias append_around_action around_action
   alias append_after_action after_action
 end
+
+module ActionController
+  class Parameters
+    def keys: () -> Array[untyped]
+    def key?: () -> bool
+    def has_key?: () -> bool
+    def values: () -> Array[untyped]
+    def has_value?: () -> bool
+    def empty?: () -> bool
+    def include?: (untyped) -> bool
+    def as_json: () -> String
+    def to_s: () -> String
+    def each_key: () { (untyped) -> untyped} -> Hash[untyped, untyped]
+                | () -> Enumerator[untyped, self]
+  end
+end
