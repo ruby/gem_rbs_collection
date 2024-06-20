@@ -34,6 +34,7 @@ Faraday::ResourceNotFound.new
 Faraday::ProxyAuthError.new
 Faraday::ConflictError.new
 Faraday::UnprocessableEntityError.new
+Faraday::TooManyRequestsError.new
 Faraday::ServerError.new
 Faraday::TimeoutError.new
 Faraday::NilStatusError.new("nil")
