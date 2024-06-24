@@ -71,6 +71,68 @@ put base / 'manifest.yaml', <<~'YAML'
   # dependencies:
   #   - name: pathname
 YAML
+put base.parent / '.rubocop.yml', <<~'YAML'
+  # This configuration inherits from /.rubocop.yml.
+  # You can configure RBS style of this gem.
+  # This file is used on CI. It is configured to automatically
+  # make rubocop suggestions on pull requests for this gem.
+  # If you do not like the style enforcement, you should remove this file.
+  AllCops:
+    NewCops: disable
+
+  RBS/Layout/CommentIndentation:
+    Enabled: true
+  RBS/Layout/EmptyLinesAroundOverloads:
+    Enabled: true
+  RBS/Layout/EndAlignment:
+    Enabled: true
+  RBS/Layout/ExtraSpacing:
+    Enabled: true
+  RBS/Layout/IndentationWidth:
+    Enabled: true
+  RBS/Layout/OverloadIndentation:
+    Enabled: true
+  RBS/Layout/SpaceAroundArrow:
+    Enabled: true
+  RBS/Layout/SpaceAroundBraces:
+    Enabled: true
+  RBS/Layout/SpaceAroundOperators:
+    Enabled: true
+  RBS/Layout/SpaceBeforeColon:
+    Enabled: true
+  RBS/Layout/SpaceBeforeOverload:
+    Enabled: true
+  RBS/Layout/TrailingWhitespace:
+    Enabled: true
+
+  RBS/Lint/DuplicateOverload:
+    Enabled: true
+  RBS/Lint/LiteralIntersection:
+    Enabled: true
+  RBS/Lint/Syntax:
+    Enabled: true
+  RBS/Lint/UselessOverloadTypeParams:
+    Enabled: true
+  RBS/Lint/WillSyntaxError:
+    Enabled: true
+
+  RBS/Style/BlockReturnBoolish:
+    Enabled: true
+  RBS/Style/ClassicType:
+    Enabled: true
+  RBS/Style/DuplicatedType:
+    Enabled: true
+  RBS/Style/EmptyArgument:
+    Enabled: true
+  RBS/Style/InitializeReturnType:
+    Enabled: true
+  RBS/Style/OptionalNil:
+    Enabled: true
+  RBS/Style/RedundantParentheses:
+    Enabled: true
+  RBS/Style/TrueFalse:
+    Enabled: true
+YAML
 
 if github_account
   github_account = github_account.sub('@', '')
