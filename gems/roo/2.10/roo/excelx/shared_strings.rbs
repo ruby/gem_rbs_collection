@@ -1,27 +1,29 @@
 module Roo
   class Excelx
     class SharedStrings < Excelx::Extractor
-      @array: untyped
+      @array: Array[string]
 
-      @html: untyped
+      @html: Array[string]
 
-      def []: (untyped index) -> untyped
+      @options: { disable_html_wrapper: bool }
 
-      def to_a: () -> untyped
+      def []: (int index) -> (string | nil)
 
-      def to_html: () -> untyped
+      def to_a: () -> Array[string]
+
+      def to_html: () -> Array[string]
 
       # Use to_html or to_a for html returns
       # See what is happening with commit???
-      def use_html?: (untyped index) -> (false | untyped)
+      def use_html?: (int index) -> (false | string)
 
       private
 
-      def fix_invalid_shared_strings: (untyped doc) -> untyped
+      def fix_invalid_shared_strings: (Nokogiri::XML::Document doc) -> Nokogiri::XML::Document
 
-      def extract_shared_strings: () -> (::Array[untyped] | untyped)
+      def extract_shared_strings: () -> Array[string]
 
-      def extract_html: () -> (::Array[untyped] | untyped)
+      def extract_html: () -> Array[string]
 
       # The goal of this function is to take the following XML code snippet and create a html tag
       # r_elem ::: XML Element that is in sharedStrings.xml of excel_book.xlsx
@@ -39,10 +41,10 @@ module Roo
       # {code}
       #
       # Expected Output ::: "<html><sub|sup><b><i><u>TEXT</u></i></b></sub|/sup></html>"
-      def extract_html_r: (untyped r_elem) -> untyped
+      def extract_html_r: (Nokogiri::XML::Node r_elem) -> string
 
       # This will return an html string
-      def create_html: (untyped text, untyped formatting) -> untyped
+      def create_html: (string text, { sub: bool, sup: bool, b: bool, i: bool, u: bool } formatting) -> string
     end
   end
 end

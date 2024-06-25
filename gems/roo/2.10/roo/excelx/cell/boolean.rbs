@@ -2,25 +2,35 @@ module Roo
   class Excelx
     class Cell
       class Boolean < Cell::Base
-        @value: untyped
+        @value: Link | bool
 
-        attr_reader value: untyped
+        @default_type: :boolean
 
-        attr_reader formula: untyped
+        @cell_type: :boolean
 
-        attr_reader format: untyped
+        attr_reader value: Link | bool
 
-        attr_reader cell_value: untyped
+        attr_reader formula: string | nil
 
-        attr_reader coordinate: untyped
+        attr_reader format: string | nil
 
-        def initialize: (untyped value, untyped formula, untyped style, untyped link, untyped coordinate) -> void
+        attr_reader cell_value: string
+
+        attr_reader coordinate: ::Roo::Excelx::Coordinate
+
+        def initialize: (string value, string | nil formula, int style, string | nil link, ::Roo::Excelx::Coordinate coordinate) -> void
 
         def formatted_value: () -> ("TRUE" | "FALSE")
 
+        def default_type: () -> :boolean
+
+        def cell_type: () -> :boolean
+
+        def type: () -> (:formula | :link | :boolean)
+
         private
 
-        def create_boolean: (untyped value) -> untyped
+        def create_boolean: (string value) -> bool
       end
     end
   end

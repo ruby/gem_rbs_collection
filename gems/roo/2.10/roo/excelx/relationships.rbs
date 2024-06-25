@@ -1,17 +1,17 @@
 module Roo
   class Excelx
     class Relationships < Excelx::Extractor
-      @relationships: untyped
+      @relationships: Hash[string, Nokogiri::XML::Node]
 
-      def []: (untyped index) -> untyped
+      def []: (string index) -> Nokogiri::XML::Node
 
-      def to_a: () -> untyped
+      def to_a: () -> Hash[string, Nokogiri::XML::Node]
 
-      def include_type?: (untyped type) -> untyped
+      def include_type?: (string type) -> bool
 
       private
 
-      def extract_relationships: () -> (::Hash[untyped, untyped] | untyped)
+      def extract_relationships: () -> Hash[string, Nokogiri::XML::Node]
     end
   end
 end

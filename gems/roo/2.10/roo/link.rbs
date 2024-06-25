@@ -1,6 +1,6 @@
 module Roo
   class Link < String
-    @href: untyped
+    @href: string
 
     # FIXME: Roo::Link inherits from String. A link cell is_a?(Roo::Link). **It is
     #        the only situation where a cells `value` is always a String**. Link
@@ -19,12 +19,12 @@ module Roo
     #        cell.value's class would still be Roo::Link, but the value itself
     #        would depend on what type of cell it is (Numeric, Date, etc.).
     #
-    attr_reader href: untyped
+    attr_reader href: string
 
     alias url href
 
-    def initialize: (?::String href, ?untyped text) -> void
+    def initialize: (?string href, ?string text) -> void
 
-    def to_uri: () -> untyped
+    def to_uri: () -> (::URI::File | ::URI::FTP | ::URI::HTTP | ::URI::HTTPS | ::URI::LDAP | ::URI::LDAPS | ::URI::MailTo | ::URI::WS | ::URI::WSS | ::URI::Generic)
   end
 end

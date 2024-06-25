@@ -1,7 +1,11 @@
 module Roo
   class Spreadsheet
-    def self.open: (untyped path, ?::Hash[untyped, untyped] options) -> untyped
+    interface _Path
+      def path: () -> string
+    end
 
-    def self.extension_for: (untyped path, untyped options) -> untyped
+    def self.open: (string | _Path path, ?::Hash[Symbol, untyped] options) -> (::Roo::OpenOffice | ::Roo::Excelx | ::Roo::CSV)
+
+    def self.extension_for: (string path, ::Hash[Symbol, untyped] options) -> Symbol
   end
 end

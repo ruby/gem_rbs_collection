@@ -1,7 +1,9 @@
 module Roo
-  module Tempdir
-    def finalize_tempdirs: (untyped object_id) -> (untyped | nil)
+  module Tempdir[CellValue]
+    @tempdirs: Hash[int, Array[string]]
 
-    def make_tempdir: (untyped object, untyped prefix, untyped root) -> untyped
+    def finalize_tempdirs: (int object_id) -> void
+
+    def make_tempdir: (::Roo::Base[CellValue] object, string | nil prefix, string | nil root) -> string
   end
 end

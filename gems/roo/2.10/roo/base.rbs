@@ -1,5 +1,5 @@
 # Base class for all other types of spreadsheets
-class Roo::Base
+class Roo::Base[CellValue]
   @filename: untyped
 
   @options: untyped
@@ -8,27 +8,27 @@ class Roo::Base
 
   @cell_type: untyped
 
-  @cells_read: untyped
+  @cells_read: Hash[string | int, bool]
 
-  @first_row: untyped
+  @first_row: Hash[string | int, int | nil]
 
-  @last_row: untyped
+  @last_row: Hash[string | int, int | nil]
 
-  @first_column: untyped
+  @first_column: Hash[string | int, int | nil]
 
-  @last_column: untyped
+  @last_column: Hash[string | int, int | nil]
 
-  @header_line: untyped
+  @header_line: int
 
-  @default_sheet: untyped
+  @default_sheet: string | nil
 
-  @first_last_row_cols: untyped
+  @first_last_row_cols: Hash[string | int, { first_row: int | nil, first_column: int | nil, last_row: int | nil, last_column: int | nil }]
 
-  @cleaned: untyped
+  @cleaned: Hash[string | int, bool]
 
-  @headers: untyped
+  @headers: nil | Array[[CellValue, int]] | Hash[untyped, int]
 
-  include Enumerable
+  include Enumerable[Array[CellValue]]
 
   include Roo::Formatters::Base
 
@@ -44,67 +44,79 @@ class Roo::Base
 
   MIN_ROW_COL: 0
 
-  attr_reader headers: untyped
+  attr_reader headers: nil | Array[[CellValue, int]] | Hash[untyped, int]
 
   # sets the line with attribute names (default: 1)
-  attr_accessor header_line: untyped
+  attr_accessor header_line: int
 
-  def self.TEMP_PREFIX: () -> untyped
+  def self.TEMP_PREFIX: () -> 'roo_'
 
-  def self.finalize: (untyped object_id) -> untyped
+  def self.finalize: (int object_id) -> ^() -> void
 
-  def initialize: (untyped filename, ?::Hash[untyped, untyped] options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
+  def initialize: (string | ::Roo::_Stream filename, ?::Hash[Symbol, untyped] options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
 
   def close: () -> nil
 
-  def default_sheet: () -> untyped
+  def default_sheet: () -> (string | int |  nil)
 
   # sets the working sheet in the document
   # 'sheet' can be a number (0 = first sheet) or the name of a sheet.
-  def default_sheet=: (untyped sheet) -> untyped
+  def default_sheet=: (string | int sheet) -> void
 
   # first non-empty column as a letter
-  def first_column_as_letter: (?untyped sheet) -> untyped
+  def first_column_as_letter: (?(string | int) sheet) -> string
 
   # last non-empty column as a letter
-  def last_column_as_letter: (?untyped sheet) -> untyped
+  def last_column_as_letter: (?(string | int) sheet) -> string
 
   # Set first/last row/column for sheet
-  def first_last_row_col_for_sheet: (untyped sheet) -> untyped
+  def first_last_row_col_for_sheet: (string | int sheet) -> { first_row: int | nil, first_column: int | nil, last_row: int | nil, last_column: int | nil }
 
   # Collect first/last row/column from sheet
-  def collect_last_row_col_for_sheet: (untyped sheet) -> { first_row: untyped, first_column: untyped, last_row: untyped, last_column: untyped }
+  def collect_last_row_col_for_sheet: (string | int sheet) -> { first_row: int, first_column: int, last_row: int, last_column: int }
 
-  def inspect: () -> ::String
+  def first_row: (?string | int sheet) -> (int | nil)
+
+  def last_row: (?string | int sheet) -> (int | nil)
+
+  def first_column: (?string | int sheet) -> (int | nil)
+
+  def last_column: (?string | int sheet) -> (int | nil)
+
+  def inspect: () -> string
 
   # find a row either by row number or a condition
   # Caution: this works only within the default sheet -> set default_sheet before you call this method
   # (experimental. see examples in the test_roo.rb file)
-  def find: (*untyped args) -> untyped
+  def find: (*(int | :all | { ?array: boolish, ?conditions: Hash[CellValue, CellValue] }) args) -> (Array[CellValue] | Hash[CellValue, CellValue])
+  # def find: ([int] options) -> Array[CellValue]
+  #         | ([:all, { array: boolish, ?conditions: Hash[CellValue, CellValue] }] options) -> Array[CellValue]
+  #         | ([:all, { ?conditions: Hash[CellValue, CellValue] }] options) -> Hash[CellValue, CellValue]
 
   # returns all values in this row as an array
   # row numbers are 1,2,3,... like in the spreadsheet
-  def row: (untyped row_number, ?untyped sheet) -> untyped
+  def row: (string | int row_number, ?string | int sheet) -> Array[CellValue]
 
   # returns all values in this column as an array
   # column numbers are 1,2,3,... like in the spreadsheet
-  def column: (untyped column_number, ?untyped sheet) -> untyped
+  def column: (string | int column_number, ?string | int sheet) -> Array[CellValue]
 
   # set a cell to a certain value
   # (this will not be saved back to the spreadsheet file!)
-  def set: (untyped row, untyped col, untyped value, ?untyped sheet) -> untyped
+  def set: (string | int row, string | int col, CellValue value, ?string | int sheet) -> void
 
-  def cell_type_by_value: (untyped value) -> untyped
+  def cell_type_by_value: (int value) -> :float
+                        | (string | float value) -> :string
 
   # reopens and read a spreadsheet document
-  def reload: () -> untyped
+  def reload: () -> void
 
   # true if cell is empty
-  def empty?: (untyped row, untyped col, ?untyped sheet) -> untyped
+  def empty?: (string | int row, string | int col, ?(string | int) sheet) -> bool
 
   # returns information of the spreadsheet document and all sheets within
   # this document.
-  def info: () -> untyped
+  def info: () -> string
 
   # when a method like spreadsheet.a42 is called
   # convert it to a call of spreadsheet.cell('a',42)
@@ -112,77 +124,90 @@ class Roo::Base
 
   # access different worksheets by calling spreadsheet.sheet(1)
   # or spreadsheet.sheet('SHEETNAME')
-  def sheet: (untyped index, ?bool name) -> untyped
+  def sheet: (string | int index, ?false name) -> self
+           | (string | int index, true name) -> [string, self]
 
   # iterate through all worksheets of a document
-  def each_with_pagename: () ?{ (untyped) -> untyped } -> untyped
+  def each_with_pagename: () { ([::String, self] sheet) -> void } -> void
+                        | () -> Enumerator[[::String, self], void]
 
-  def each: (?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+  def each: [HeaderName] (::Hash[:clean | :header_search | HeaderName, untyped] options) { (Hash[:header_search | :headers | HeaderName, CellValue]) -> void } -> void
+          | [HeaderName] (::Hash[:clean | :headers | HeaderName, untyped] options) -> Enumerator[Hash[:header_search | :headers | HeaderName, CellValue], void]
+          | (?{} options) { (Array[CellValue]) -> void } -> void
+          | (?{} options) -> Enumerator[Array[CellValue], void]
 
-  def parse: (?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+  def parse: [HeaderName, Row] (::Hash[:clean | :header_search | HeaderName, untyped] options) { (Hash[:header_search | :headers | HeaderName, CellValue] row) -> Row } -> Array[Row]
+           | [HeaderName] (::Hash[:clean | :header_search | HeaderName, untyped] options) -> Array[Hash[:header_search | :headers | HeaderName, CellValue]]
+           | [Row] (?{} options) { (Array[CellValue]) -> Row } -> Array[Row]
+           | (?{} options) -> Array[CellValue]
 
-  def row_with: (untyped query, ?bool return_headers) -> untyped
+  def row_with: (Array[untyped] query, true return_headers) -> Array[CellValue]
+              | (Array[untyped] query, ?false return_headers) -> int
 
-  def file_type_check: (untyped filename, untyped exts, untyped name, untyped warning_level, ?untyped? packed) -> (nil | untyped)
+  def file_type_check: (string filename, Array[string] | string exts, string name, :error | :warning | :ignore warning_level, ?(:zip)? packed) -> nil
 
   # konvertiert einen Key in der Form "12,45" (=row,column) in
   # ein Array mit numerischen Werten ([12,45])
   # Diese Methode ist eine temp. Loesung, um zu erforschen, ob der
   # Zugriff mit numerischen Keys schneller ist.
-  def key_to_num: (untyped str) -> ::Array[untyped]
+  def key_to_num: (string str) -> [int, int]
 
   # see: key_to_num
-  def key_to_string: (untyped arr) -> ::String
+  def key_to_string: ([int, int] arr) -> string
 
-  def is_stream?: (untyped filename_or_stream) -> untyped
+  def is_stream?: (string | ::Roo::_Stream filename_or_stream) -> bool
 
   private
 
-  def clean_sheet_if_need: (untyped options) -> (nil | untyped)
+  def clean_sheet_if_need: ({ clean: boolish } options) -> void
 
-  def search_or_set_header: (untyped options) -> untyped
+  def search_or_set_header: ({ header_search: boolish } | { headers: true | :first_row } | {} options) -> void
 
-  def local_filename: (untyped filename, untyped tmpdir, untyped packed) -> (nil | untyped)
+  def local_filename: (string filename, string tmpdir, nil | :zip packed) -> string
+                    | (::Roo::_Stream filename, string tmpdir, nil | :zip packed) -> nil
 
-  def file_type_warning_message: (untyped filename, untyped exts) -> untyped
+  def file_type_warning_message: (string filename, Array[string] | string exts) -> string
 
-  def find_by_row: (untyped row_index) -> untyped
+  def find_by_row: (int row_index) -> Array[CellValue]
 
-  def find_by_conditions: (untyped options) -> untyped
+  def find_by_conditions: ({ array: boolish } options) -> Array[CellValue]
+                        | ({ array: boolish, conditions: Hash[CellValue, CellValue] } options) -> Array[CellValue]
+                        | ({ ?conditions: Hash[CellValue, CellValue] } options) -> Hash[CellValue, CellValue]
 
-  def without_changing_default_sheet: () { () -> untyped } -> untyped
+  def without_changing_default_sheet: () { () -> string } -> string
 
-  def reinitialize: () -> untyped
+  def reinitialize: () -> void
 
-  def find_basename: (untyped filename) -> (untyped | untyped | nil)
+  def find_basename: (string filename) -> (string | nil)
 
-  def make_tmpdir: (?untyped? prefix, ?untyped? root) ?{ () -> untyped } -> untyped
+  def make_tmpdir: (?string? prefix, ?string? root) ?{ (string path) -> string } -> string
 
-  def clean_sheet: (untyped sheet) -> untyped
+  def clean_sheet: (string | int | nil sheet) -> void
 
-  def sanitize_value: (untyped v) -> untyped
+  def sanitize_value: (string v) -> string
 
-  def set_headers: (?::Hash[untyped, untyped] hash) -> untyped
+  def set_headers: [HeaderName] (?::Hash[HeaderName, untyped] hash) -> void
 
-  def header_index: (untyped query) -> untyped
+  def header_index: (untyped query) -> int
 
-  def set_value: (untyped row, untyped col, untyped value, ?untyped sheet) -> untyped
+  def set_value: (int row, int col, CellValue value, ?string | int? sheet) -> untyped
 
-  def set_type: (untyped row, untyped col, untyped type, ?untyped sheet) -> untyped
+  def set_type: (int row, int col, :float | :string type, ?string | int? sheet) -> untyped
 
   # converts cell coordinate to numeric values of row,col
-  def normalize: (untyped row, untyped col) -> ::Array[untyped]
+  def normalize: (string row, int col) -> [int, int]
+               | (int row, string | int col) -> [int, int]
 
-  def uri?: (untyped filename) -> untyped
+  def uri?: (string filename) -> bool
 
-  def download_uri: (untyped uri, untyped tmpdir) -> untyped
+  def download_uri: (string uri, string tmpdir) -> string
 
-  def open_from_stream: (untyped stream, untyped tmpdir) -> untyped
+  def open_from_stream: (::Roo::_Stream stream, string tmpdir) -> string
 
-  def unzip: (untyped filename, untyped tmpdir) -> untyped
+  def unzip: (string filename, string tmpdir) -> ::Zip::File
 
   # check if default_sheet was set and exists in sheets-array
-  def validate_sheet!: (untyped sheet) -> untyped
+  def validate_sheet!: (string | int | nil sheet) -> void
 
-  def process_zipfile_packed: (untyped zip, untyped tmpdir, ?::String path) -> untyped
+  def process_zipfile_packed: (::Zip::File zip, string tmpdir, ?string path) -> (string | nil)
 end

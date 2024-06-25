@@ -3,31 +3,39 @@ module Roo
     class Cell
       class Number < Cell::Base
         # FIXME: Excelx_type is an array, but the first value isn't used.
-        @format: untyped
+        @format: string | nil
 
-        @value: untyped
+        @value: (Link | float | int | string)
 
-        attr_reader value: untyped
+        @default_type: :float
 
-        attr_reader formula: untyped
+        attr_reader value: (Link | float | int | string)
 
-        attr_reader format: untyped
+        attr_reader formula: string | nil
 
-        attr_reader cell_value: untyped
+        attr_reader format: string | nil
 
-        attr_reader coordinate: untyped
+        attr_reader cell_type: [:numeric_or_formula, string]
 
-        def initialize: (untyped value, untyped formula, untyped excelx_type, untyped style, untyped link, untyped coordinate) -> void
+        attr_reader cell_value: string
 
-        def create_numeric: (untyped number) -> untyped
+        attr_reader coordinate: ::Roo::Excelx::Coordinate
 
-        def formatted_value: () -> untyped
+        def initialize: (string value, string | nil formula, [:numeric_or_formula, string] excelx_type, string | nil style, string | nil link, ::Roo::Excelx::Coordinate coordinate) -> void
 
-        def generate_formatter: (untyped format) -> untyped
+        def create_numeric: (string number) -> (float | int | string)
+
+        def formatted_value: () -> string
+
+        def generate_formatter: (string | nil format) -> ((^(string number) -> string) | string)
+
+        def default_type: () -> :float
+
+        def type: () -> (:formula | :link | :float)
 
         private
 
-        def number_format: (untyped formatter, ?untyped? negative_formatter) -> untyped
+        def number_format: (string formatter, ?string? negative_formatter) -> ^(string number) -> string
       end
     end
   end

@@ -1,84 +1,85 @@
 module Roo
   class Excelx
     class Sheet
-      @name: untyped
+      @name: string
 
-      @shared: untyped
+      @shared: Shared
 
-      @sheet_index: untyped
+      @sheet_index: int
 
-      @images: untyped
+      @images: Hash[string, string]
 
-      @rels: untyped
+      @rels: Relationships
 
-      @comments: untyped
+      @comments: Comments
 
-      @sheet: untyped
+      @sheet: SheetDoc
 
-      @cells: untyped
+      @cells: Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
-      @present_cells: untyped
+      @present_cells: Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
-      @first_row: untyped
+      @first_row: int | nil
 
-      @last_row: untyped
+      @last_row: int | nil
 
-      @first_column: untyped
+      @first_column: int | nil
 
-      @last_column: untyped
+      @last_column: int | nil
 
-      @hyperlinks: untyped
+      @hyperlinks: Hash[Coordinate, string]
 
-      @first_last_row_col: untyped
+      @first_last_row_col: { first_row: int | nil, last_row: int | nil, first_column: int | nil, last_column: int | nil }
 
       extend Forwardable
 
-      attr_reader images: untyped
+      attr_reader images: Hash[string, string]
 
-      def initialize: (untyped name, untyped shared, untyped sheet_index, ?::Hash[untyped, untyped] options) -> void
+      def initialize: (string name, Shared shared, int sheet_index, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
 
-      def cells: () -> untyped
+      def cells: () -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
-      def present_cells: () -> untyped
+      def present_cells: () -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
       # Yield each row as array of Excelx::Cell objects
       # accepts options max_rows (int) (offset by 1 for header),
       # pad_cells (boolean) and offset (int)
-      def each_row: (?::Hash[untyped, untyped] options) ?{ () -> untyped } -> untyped
+      def each_row: (?::Hash[Symbol, untyped] options) ?{ (Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]) -> void } -> void
 
-      def row: (untyped row_number) -> untyped
+      def row: (string | int row_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | string]
 
-      def column: (untyped col_number) -> untyped
+      def column: (string | int col_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | string]
 
       # returns the number of the first non-empty row
-      def first_row: () -> untyped
+      def first_row: () -> (int | nil)
 
-      def last_row: () -> untyped
+      def last_row: () -> (int | nil)
 
       # returns the number of the first non-empty column
-      def first_column: () -> untyped
+      def first_column: () -> (int | nil)
 
       # returns the number of the last non-empty column
-      def last_column: () -> untyped
+      def last_column: () -> (int | nil)
 
-      def excelx_format: (untyped key) -> untyped
+      def excelx_format: ([int, int] key) -> (string | nil)
 
-      def hyperlinks: () -> untyped
+      def hyperlinks: () -> Hash[Coordinate, string]
 
-      def comments: () -> untyped
+      def comments: () -> Hash[Coordinate, string]
 
-      def dimensions: () -> untyped
+      def dimensions: () -> string
 
       private
 
       # Take an xml row and return an array of Excelx::Cell objects
       # optionally pad array to header width(assumed 1st row).
       # takes option pad_cells (boolean) defaults false
-      def cells_for_row_element: (untyped row_element, ?::Hash[untyped, untyped] options) -> (::Array[untyped] | untyped)
+      def cells_for_row_element: (Nokogiri::XML::Element row_element, ?::Hash[Symbol, untyped] options) -> Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]
+                               | (nil row_element, ?::Hash[Symbol, untyped] options) -> []
 
-      def pad_cells: (untyped cell, untyped last_column) -> untyped
+      def pad_cells: (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time cell, int last_column) -> Array[nil]
 
-      def first_last_row_col: () -> untyped
+      def first_last_row_col: () -> { first_row: int | nil, last_row: int | nil, first_column: int | nil, last_column: int | nil }
     end
   end
 end

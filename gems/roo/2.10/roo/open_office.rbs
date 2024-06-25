@@ -1,36 +1,43 @@
 module Roo
-  class OpenOffice < Roo::Base
-    @only_visible_sheets: untyped
+  type opneoffice_cell_value = float | int | 'true' | 'false' | string
+  class OpenOffice < Roo::Base[opneoffice_cell_value]
+    @only_visible_sheets: boolish
 
     # NOTE: Create temp directory and allow Ruby to cleanup the temp directory
     #       when the object is garbage collected. Initially, the finalizer was
     #       created in the Roo::Tempdir module, but that led to a segfault
     #       when testing in Ruby 2.4.0.
-    @tmpdir: untyped
+    @tmpdir: string
 
-    @filename: untyped
+    @filename: string | nil
 
-    @sheet_names: untyped
+    @sheet_names: Array[string]
 
-    @formula: untyped
+    @formula: Hash[string, Hash[[int, int], string]]
 
-    @style: untyped
+    @style: Hash[string, Hash[[int, int], string]]
 
-    @style_defaults: untyped
+    @style_defaults: Hash[string, Array[string]]
 
-    @table_display: untyped
+    @table_display: Hash[string, bool]
 
-    @font_style_definitions: untyped
+    @font_style_definitions: Hash[string, Font]
 
-    @comment: untyped
+    @comment: Hash[string, Hash[[int, int], string]]
 
     @comments_read: untyped
 
-    @doc: untyped
+    @doc: Nokogiri::XML::Document
 
-    @label: untyped
+    @label: Hash[string, [string, string, string]]
 
-    extend Roo::Tempdir
+    @officeversion: string | nil
+
+    @cell: Hash[string, Hash[[int, int], opneoffice_cell_value]]
+
+    @cell_type: Hash[string, Hash[[int, int], :float | :percentage | :string | :date | :datetime | :time]]
+
+    extend Roo::Tempdir[opneoffice_cell_value]
 
     ERROR_MISSING_CONTENT_XML: "file missing required content.xml"
 
@@ -40,11 +47,11 @@ module Roo
 
     # initialization and opening of a spreadsheet file
     # values for packed: :zip
-    def initialize: (untyped filename, ?::Hash[untyped, untyped] options) -> void
+    def initialize: (string filename, ?{ ?packed: :zip, ?file_warning: :error | :warning | :ignore, ?tmpdir_root: string, ?password: string } options) -> void
 
-    def open_oo_file: (untyped options) -> untyped
+    def open_oo_file: (::Hash[Symbol, untyped] options) -> Zip::File
 
-    def initialize_default_variables: () -> untyped
+    def initialize_default_variables: () -> void
 
     def method_missing: (untyped m, *untyped args) -> untyped
 
@@ -52,24 +59,26 @@ module Roo
     # (1,1) is the upper left corner.
     # (1,1), (1,'A'), ('A',1), ('a',1) all refers to the
     # cell at the first line and first row.
-    def cell: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def cell: (string | int row, string | int col, ?(string | int)? sheet) -> (float | int | 'true' | 'false' | string | ::Date)
 
     # Returns the formula at (row,col).
     # Returns nil if there is no formula.
     # The method #formula? checks if there is a formula.
-    def formula: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def formula: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
     # Predicate methods really should return a boolean
     # value. Hopefully no one was relying on the fact that this
     # previously returned either nil/formula
-    def formula?: (*untyped args) -> untyped
+    def formula?: (*string | int | nil args) -> bool
+    # def formula?: (*[string | int, string | int] args) -> bool
+    #             | (*[string | int, string | int, string | int | nil] args) -> bool
 
     # returns each formula in the selected sheet as an array of elements
     # [row, col, formula]
-    def formulas: (?untyped? sheet) -> (::Array[untyped] | untyped)
+    def formulas: (?(string | int)? sheet) -> Array[[int, int, string]]
 
     # Given a cell, return the cell's style
-    def font: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def font: (string | int row, string | int col, ?(string | int)? sheet) -> (Font | nil)
 
     # returns the type of a cell:
     # * :float
@@ -79,84 +88,84 @@ module Roo
     # * :formula
     # * :time
     # * :datetime
-    def celltype: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def celltype: (string | int row, string | int col, ?(string | int)? sheet) -> (:float | :percentage | :string | :date | :datetime | :time | :formula)
 
-    def sheets: () -> untyped
+    def sheets: () -> Array[string]
 
     # version of the Roo::OpenOffice document
     # at 2007 this is always "1.0"
-    def officeversion: () -> untyped
+    def officeversion: () -> (string | nil)
 
     # shows the internal representation of all cells
     # mainly for debugging purposes
-    def to_s: (?untyped? sheet) -> untyped
+    def to_s: (?(string | int)? sheet) -> string
 
     # returns the row,col values of the labelled cell
     # (nil,nil) if label is not defined
-    def label: (untyped labelname) -> (::Array[nil] | ::Array[untyped])
+    def label: (string labelname) -> ([nil, nil, nil] | [int, int, string])
 
     # Returns an array which all labels. Each element is an array with
     # [labelname, [row,col,sheetname]]
-    def labels: (?untyped? _sheet) -> untyped
+    def labels: (?(string | int)? _sheet) -> Array[[string, [int, int, string]]]
 
     # returns the comment at (row/col)
     # nil if there is no comment
-    def comment: (untyped row, untyped col, ?untyped? sheet) -> (nil | untyped)
+    def comment: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
     # returns each comment in the selected sheet as an array of elements
     # [row, col, comment]
-    def comments: (?untyped? sheet) -> (::Array[untyped] | untyped)
+    def comments: (?(string | int)? sheet) -> Array[[int, int, string]]
 
     private
 
     # If the ODS file has an encryption-data element, then try to decrypt.
     # If successful, the temporary content.xml will be overwritten with
     # decrypted contents.
-    def decrypt_if_necessary: (untyped zip_file, untyped content_entry, untyped roo_content_xml_path, untyped options) -> untyped
+    def decrypt_if_necessary: (Zip::File zip_file, Zip::Entry content_entry, string roo_content_xml_path, Hash[Symbol, untyped] options) -> void
 
     # Process the ODS encryption manifest and perform the decryption
-    def perform_decryption: (untyped encryption_data, untyped password, untyped content_entry, untyped roo_content_xml_path) -> untyped
+    def perform_decryption: (Nokogiri::XML::Node encryption_data, string password, Zip::Entry content_entry, string roo_content_xml_path) -> void
 
     # Create a cipher based on an ODS algorithm URI from manifest.xml
     # params: algorithm, key_derivation_name, hashed_password, salt, iteration_count, iv
-    def find_cipher: (*untyped args) -> untyped
+    def find_cipher: (*[string, string, string, string, int, string] args) -> OpenSSL::Cipher
 
     # Create a cipher key based on an ODS algorithm string from manifest.xml
-    def find_cipher_key: (*untyped args) -> untyped
+    def find_cipher_key: (*[OpenSSL::Cipher, string, string, string, int] args) -> string
 
     # Block decrypt raw bytes from the zip file based on the cipher
-    def decrypt: (untyped content_entry, untyped cipher) -> untyped
+    def decrypt: (Zip::Entry content_entry, OpenSSL::Cipher cipher) -> string
 
-    def doc: () -> untyped
+    def doc: () -> Nokogiri::XML::Document
 
     # read the version of the OO-Version
-    def oo_version: () -> untyped
+    def oo_version: () -> void
 
     # helper function to set the internal representation of cells
-    def set_cell_values: (untyped sheet, untyped x, untyped y, untyped i, untyped v, untyped value_type, untyped formula, untyped table_cell, untyped str_v, untyped style_name) -> untyped
+    def set_cell_values: (string | int | nil sheet, int x, int y, int i, string | nil v, 'string' | 'time' | 'boolean' | '' | nil | 'date' | 'percentage' | 'float' value_type, string | nil formula, Nokogiri::XML::Node table_cell, string str_v, string | nil style_name) -> void
 
     # read all cells in the selected sheet
     # -
     # the following construct means '4 blanks'
     # some content <text:s text:c="3"/>
     # +
-    def read_cells: (?untyped sheet) -> (nil | untyped)
+    def read_cells: (?(string | int)? sheet) -> void
 
     # Only calls read_cells because Roo::Base calls read_comments
     # whereas the reading of comments is done in read_cells for Roo::OpenOffice-objects
-    def read_comments: (?untyped? sheet) -> untyped
+    def read_comments: (?(string | int)? sheet) -> void
 
-    def read_labels: () -> untyped
+    def read_labels: () -> void
 
-    def read_styles: (untyped style_elements) -> untyped
+    def read_styles: (Nokogiri::XML::Node style_elements) -> void
 
-    def read_table_styles: (untyped styles) -> untyped
+    def read_table_styles: (Nokogiri::XML::Node styles) -> void
 
     # helper method to convert compressed spaces and other elements within
     # an text into a string
     # FIXME: add a test for compressed_spaces == 0. It's not currently tested.
-    def children_to_string: (untyped children) -> untyped
+    def children_to_string: (Nokogiri::XML::NodeSet children) -> string
 
-    def attribute: (untyped node, untyped attr_name) -> (untyped | nil)
+    def attribute: (Nokogiri::XML::Node node, string attr_name) -> (string | nil)
   end
 end

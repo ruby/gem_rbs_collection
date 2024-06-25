@@ -2,19 +2,29 @@ module Roo
   class Excelx
     class Cell
       class String < Cell::Base
-        attr_reader value: untyped
+        @default_type: :string
 
-        attr_reader formula: untyped
+        @cell_type: :string
 
-        attr_reader format: untyped
+        attr_reader value: Link | string
 
-        attr_reader cell_value: untyped
+        attr_reader formula: string | nil
 
-        attr_reader coordinate: untyped
+        attr_reader format: string | nil
 
-        def initialize: (untyped value, untyped formula, untyped style, untyped link, untyped coordinate) -> void
+        attr_reader cell_value: string
 
-        def empty?: () -> untyped
+        attr_reader coordinate: ::Roo::Excelx::Coordinate
+
+        def initialize: (string value, string | nil formula, string | nil style, string | nil link, ::Roo::Excelx::Coordinate coordinate) -> void
+
+        def empty?: () -> bool
+
+        def default_type: () -> :string
+
+        def cell_type: () -> :string
+
+        def type: () -> (:formula | :link | :string)
       end
     end
   end

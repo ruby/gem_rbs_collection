@@ -2,23 +2,25 @@ module Roo
   class Excelx
     class Cell
       class DateTime < Cell::Base
-        @format: untyped
+        @format: string | nil
 
-        @value: untyped
+        @value: Link | ::DateTime
 
-        SECONDS_IN_DAY: untyped
+        @default_type: :datetime | :date
 
-        attr_reader value: untyped
+        SECONDS_IN_DAY: 86400
 
-        attr_reader formula: untyped
+        attr_reader value: Link | ::DateTime
 
-        attr_reader format: untyped
+        attr_reader formula: string | nil
 
-        attr_reader cell_value: untyped
+        attr_reader format: string | nil
 
-        attr_reader coordinate: untyped
+        attr_reader cell_value: string
 
-        def initialize: (untyped value, untyped formula, untyped excelx_type, untyped style, untyped link, untyped base_timestamp, untyped coordinate) -> void
+        attr_reader coordinate: ::Roo::Excelx::Coordinate
+
+        def initialize: (string value, string | nil formula, [:numeric_or_formula, string] excelx_type, string | nil style, string | nil link, int base_timestamp, ::Roo::Excelx::Coordinate coordinate) -> void
 
         # Public: Returns formatted value for a datetime. Format's can be an
         #         standard excel format, or a custom format.
@@ -38,17 +40,21 @@ module Roo
         #    formatted_value #=> '01-JAN'
         #
         # Returns a String representation of a cell's value.
-        def formatted_value: () -> untyped
+        def formatted_value: () -> string
+
+        def default_type: () -> :datetime
+
+        def type: () -> (:formula | :link | :datetime)
 
         private
 
-        def parse_date_or_time_format: (untyped part) -> (false | untyped)
+        def parse_date_or_time_format: (string part) -> (false | string)
 
-        DATE_FORMATS: ::Hash[::String, "%Y" | "%y" | "%B" | "%^b" | "%m" | "%-m" | "%A" | "%^a" | "%d" | "%-d"]
+        DATE_FORMATS: ::Hash[string, "%Y" | "%y" | "%B" | "%^b" | "%m" | "%-m" | "%A" | "%^a" | "%d" | "%-d"]
 
-        TIME_FORMATS: ::Hash[::String, "%H" | "%-k" | "%M" | "%-M" | "%S" | "%-S" | "%p" | "%3N" | "%2N" | "%1N"]
+        TIME_FORMATS: ::Hash[string, "%H" | "%-k" | "%M" | "%-M" | "%S" | "%-S" | "%p" | "%3N" | "%2N" | "%1N"]
 
-        def create_datetime: (untyped base_timestamp, untyped value) -> untyped
+        def create_datetime: (int base_timestamp, string value) -> ::DateTime
       end
     end
   end

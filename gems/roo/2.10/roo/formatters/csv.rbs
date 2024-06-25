@@ -1,16 +1,17 @@
 module Roo
   module Formatters
     module CSV
-      def to_csv: (?untyped? filename, ?untyped? old_separator, ?untyped? old_sheet, ?separator: ::String, ?sheet: untyped) -> untyped
+      def to_csv: (string filename, ?string? old_separator, ?(string | int)? old_sheet, ?separator: string, ?sheet: string | int) -> true
+                | (?nil filename, ?string? old_separator, ?(string | int)? old_sheet, ?separator: string, ?sheet: string | int) -> (string | nil)
 
       private
 
       # Write all cells to the csv file. File can be a filename or nil. If the
       # file argument is nil the output goes to STDOUT
-      def write_csv_content: (?untyped? file, ?untyped? sheet, ?::String separator) -> (nil | untyped)
+      def write_csv_content: (?(File | StringIO)? file, ?(string | int | nil)? sheet, ?string separator) -> void
 
       # The content of a cell in the csv output
-      def cell_to_csv: (untyped row, untyped col, untyped sheet) -> ("" | untyped)
+      def cell_to_csv: (int row, int col, string | int | nil sheet) -> string
     end
   end
 end

@@ -1,91 +1,99 @@
 module Roo
-  class Excelx < Roo::Base
+  interface _Stream
+    def seek: (int offset, ?int whence) -> int
+  end
+
+  type excelx_cell_value = nil | ::Roo::Link | bool | ::Date | ::DateTime | ::Time | float | string | int
+  class Excelx < Roo::Base[excelx_cell_value]
     # NOTE: Create temp directory and allow Ruby to cleanup the temp directory
     #       when the object is garbage collected. Initially, the finalizer was
     #       created in the Roo::Tempdir module, but that led to a segfault
     #       when testing in Ruby 2.4.0.
-    @tmpdir: untyped
+    @tmpdir: string
 
-    @shared: untyped
+    @shared: Shared
 
-    @filename: untyped
+    @filename: string | nil
 
-    @sheet_names: untyped
+    @sheet_names: Array[string]
 
-    @sheets: untyped
+    @sheets: Array[Sheet]
 
-    @sheets_by_name: untyped
+    @sheets_by_name: Hash[string, Sheet]
 
-    @labels: untyped
+    @labels: Array[[string, [int, int, string]]]
 
-    @sheet_files: untyped
+    @sheet_files: Array[string]
 
-    extend Roo::Tempdir
+    extend Roo::Tempdir[excelx_cell_value]
 
     extend Forwardable
 
-    ERROR_VALUES: untyped
+    ERROR_VALUES: Set[string]
 
-    ExceedsMaxError: untyped
+    class ExceedsMaxError < StandardError
+    end
 
     # initialization and opening of a spreadsheet file
     # values for packed: :zip
     # optional cell_max (int) parameter for early aborting attempts to parse
     # enormous documents.
-    def initialize: (untyped filename_or_stream, ?::Hash[untyped, untyped] options) -> void
+    def initialize: (string | ::Roo::_Stream filename_or_stream, ?{ ?packed: :zip, ?file_warning: :error | :warning | :ignore, ?cell_max: int, ?expand_merged_ranges: bool, ?no_hyperlinks: bool, ?empty_cell: bool, ?disable_html_wrapper: bool, ?tmpdir_root: string } options, ?only_visible_sheets: bool) -> void
 
     def method_missing: (untyped method, *untyped args) -> untyped
 
-    def sheets: () -> untyped
+    def sheets: () -> Array[string]
 
-    def sheet_for: (untyped sheet) -> untyped
+    def sheet_for: (string | int | nil sheet) -> Sheet
 
-    def images: (?untyped? sheet) -> untyped
+    def images: (?(string | int)? sheet) -> Array[string | nil]
 
     # Returns the content of a spreadsheet-cell.
     # (1,1) is the upper left corner.
     # (1,1), (1,'A'), ('A',1), ('a',1) all refers to the
     # cell at the first line and first row.
-    def cell: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def cell: (string | int row, string | int col, ?(string | int)? sheet) -> (nil | Link | bool | ::Date | ::DateTime | ::Time | float | string | int)
 
-    def row: (untyped rownumber, ?untyped? sheet) -> untyped
+    def row: (string | int rownumber, ?(string | int)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | string | int]
 
     # returns all values in this column as an array
     # column numbers are 1,2,3,... like in the spreadsheet
-    def column: (untyped column_number, ?untyped? sheet) -> untyped
+    def column: (string | int column_number, ?(string | int)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | string | int]
 
     # returns the number of the first non-empty row
-    def first_row: (?untyped? sheet) -> untyped
+    def first_row: (?string | int? sheet) -> (int | nil)
 
     # returns the number of the last non-empty row
-    def last_row: (?untyped? sheet) -> untyped
+    def last_row: (?string | int? sheet) -> (int | nil)
 
     # returns the number of the first non-empty column
-    def first_column: (?untyped? sheet) -> untyped
+    def first_column: (?string | int? sheet) -> (int | nil)
 
     # returns the number of the last non-empty column
-    def last_column: (?untyped? sheet) -> untyped
+    def last_column: (?string | int? sheet) -> (int | nil)
 
     # set a cell to a certain value
     # (this will not be saved back to the spreadsheet file!)
-    def set: (untyped row, untyped col, untyped value, ?untyped? sheet) -> untyped
+    def set: (string | int row, string | int col, string | int | float value, ?(string | int)? sheet) -> void
 
     # Returns the formula at (row,col).
     # Returns nil if there is no formula.
     # The method #formula? checks if there is a formula.
-    def formula: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def formula: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
     # Predicate methods really should return a boolean
     # value. Hopefully no one was relying on the fact that this
     # previously returned either nil/formula
-    def formula?: (*untyped args) -> untyped
+    def formula?: (*(string | int)) -> bool
+    # def formula?: ([(string | int), (string | int)] args) -> bool
+    #             | ([(string | int), (string | int), (string | int)?] args) -> bool
 
     # returns each formula in the selected sheet as an array of tuples in following format
     # [[row, col, formula], [row, col, formula],...]
-    def formulas: (?untyped? sheet) -> untyped
+    def formulas: (?(string | int | nil)? sheet) -> Array[[string | int | nil, string | int | nil, string | nil]]
 
     # Given a cell, return the cell's style
-    def font: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def font: (string | int row, string | int col, ?(string | int)? sheet) -> (::Roo::Font | nil)
 
     # returns the type of a cell:
     # * :float
@@ -95,61 +103,62 @@ module Roo
     # * :formula
     # * :time
     # * :datetime
-    def celltype: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def celltype: (string | int row, string | int col, ?(string | int)? sheet) -> (:float | :string | :date | :percentage | :formula | :time | :datetime | nil)
 
     # returns the internal type of an excel cell
     # * :numeric_or_formula
     # * :string
     # Note: this is only available within the Excelx class
-    def excelx_type: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def excelx_type: (string | int row, string | int col, ?(string | int)? sheet) -> (:boolean | :string | [:numeric_or_formula, string] | nil)
 
     # returns the internal value of an excelx cell
     # Note: this is only available within the Excelx class
-    def excelx_value: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def excelx_value: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
     # returns the internal value of an excelx cell
     # Note: this is only available within the Excelx class
-    def formatted_value: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def formatted_value: (string | int row, string | int col, ?(string | int)? sheet) -> (string | ::Roo::Link | nil)
 
     # returns the internal format of an excel cell
-    def excelx_format: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def excelx_format: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
-    def empty?: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def empty?: (string | int row, string | int col, ?(string | int)? sheet) -> bool
 
     # shows the internal representation of all cells
     # for debugging purposes
-    def to_s: (?untyped? sheet) -> untyped
+    def to_s: (?string | int? sheet) -> string
 
     # returns the row,col values of the labelled cell
     # (nil,nil) if label is not defined
-    def label: (untyped name) -> (::Array[nil] | ::Array[untyped])
+    def label: (string name) -> ([nil, nil, nil] | [string | int, string | int, string | int])
 
     # Returns an array which all labels. Each element is an array with
     # [labelname, [row,col,sheetname]]
-    def labels: () -> untyped
+    def labels: () -> Array[[string, [string | int, string | int, string | int]]]
 
-    def hyperlink?: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def hyperlink?: (string | int row, string | int col, ?(string | int)? sheet) -> bool
 
     # returns the hyperlink at (row/col)
     # nil if there is no hyperlink
-    def hyperlink: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def hyperlink: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
     # returns the comment at (row/col)
     # nil if there is no comment
-    def comment: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def comment: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
 
     # true, if there is a comment
-    def comment?: (untyped row, untyped col, ?untyped? sheet) -> untyped
+    def comment?: (string | int row, string | int col, ?string | int? sheet) -> bool
 
-    def comments: (?untyped? sheet) -> untyped
+    def comments: (?string | int? sheet) -> Array[[untyped, untyped, untyped]]
 
     # Yield an array of Excelx::Cell
     # Takes options for sheet, pad_cells, and max_rows
-    def each_row_streaming: (?::Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> untyped
+    def each_row_streaming: (?::Hash[Symbol, untyped] options) { (Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]) -> void } -> void
+                          | (?::Hash[Symbol, untyped] options) -> Enumerator[Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time], untyped]
 
     private
 
-    def clean_sheet: (untyped sheet) -> untyped
+    def clean_sheet: (string sheet) -> void
 
     # Internal: extracts the worksheet_ids from the workbook.xml file. xlsx
     #           documents require a workbook.xml file, so a if the file is missing
@@ -165,7 +174,7 @@ module Roo
     #   # => ["rId1", "rId2", "rId3"]
     #
     # Returns an Array of Strings.
-    def extract_worksheet_ids: (untyped entries, untyped path) -> untyped
+    def extract_worksheet_ids: (Array[Zip::Entry] entries, string path) -> Array[string]
 
     # Internal
     #
@@ -182,21 +191,29 @@ module Roo
     #        }
     #
     # Returns a Hash.
-    def extract_worksheet_rels: (untyped entries, untyped path) -> untyped
+    def extract_worksheet_rels: (Array[Zip::Entry] entries, string path) -> Hash[string, string]
 
     # Extracts the sheets in order, but it will ignore sheets that are not
     # worksheets.
-    def extract_sheets_in_order: (untyped entries, untyped sheet_ids, untyped sheets, untyped tmpdir) -> untyped
+    def extract_sheets_in_order: (Array[Zip::Entry] entries, Array[string] sheet_ids, Hash[string, string] sheets, string tmpdir) -> void
 
-    def extract_images: (untyped entries, untyped tmpdir) -> untyped
+    def extract_images: (Array[Zip::Entry] entries, string tmpdir) -> void
 
     # Extracts all needed files from the zip file
-    def process_zipfile: (untyped zipfilename_or_stream) -> untyped
+    def process_zipfile: (string | ::Roo::_Stream zipfilename_or_stream) -> void
 
-    def process_zipfile_entries: (untyped entries) -> untyped
+    def process_zipfile_entries: (Array[Zip::Entry] entries) -> void
 
-    def safe_send: (untyped object, untyped method, *untyped args) -> (untyped | nil)
+    def safe_send: ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :value method, *untyped args) -> excelx_cell_value
+                 | ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :type method, *untyped args) -> (:formula | :link | :boolean | :date | :time | :datetime | :float | :string)
+                 | ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :cell_type method, *untyped args) -> (:boolean | :string | [:numeric_or_formula, string] | nil)
+                 | ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :cell_value method, *untyped args) -> (string | nil)
+                 | ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :style method, *untyped args) -> (string | 1 | nil)
+                 | ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :formatted_value method, *untyped args) -> (string | ::Roo::Link | nil)
+                 | ((Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time)? object, :formula method, *untyped args) -> (string | nil)
 
-    def worksheet_types: () -> ::Array["http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" | "http://purl.oclc.org/ooxml/officeDocument/relationships/worksheet"]
+    def worksheet_types: () -> ["http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet", "http://purl.oclc.org/ooxml/officeDocument/relationships/worksheet"]
+
+    def find_by_row: (int row_index) -> Array[excelx_cell_value]
   end
 end

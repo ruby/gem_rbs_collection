@@ -10,9 +10,11 @@ module Roo
 
         @style: untyped
 
-        @coordinate: untyped
+        @coordinate: ::Roo::Excelx::Coordinate
 
         @value: untyped
+
+        @default_type: untyped
 
         extend Roo::Helpers::DefaultAttrReader
 
@@ -45,23 +47,23 @@ module Roo
         #        deprecated.
         attr_writer value: untyped
 
-        def initialize: (untyped value, untyped formula, untyped excelx_type, untyped style, untyped link, untyped coordinate) -> void
+        def initialize: (string | nil value, string | nil formula, [:numeric_or_formula, string] | nil excelx_type, string | 1 | nil style, string | nil link, Excelx::Coordinate coordinate) -> void
 
         def type: () -> (:formula | :link | untyped)
 
-        def formula?: () -> untyped
+        def formula?: () -> bool
 
-        def link?: () -> untyped
+        def link?: () -> bool
 
         alias formatted_value value
 
-        def to_s: () -> untyped
+        def to_s: () -> string
 
         # DEPRECATED: Please use link? instead.
-        def hyperlink: () -> untyped
+        def hyperlink: () -> bool
 
         # DEPRECATED: Please use link? instead.
-        def link: () -> untyped
+        def link: () -> bool
 
         # DEPRECATED: Please use cell_value instead.
         def excelx_value: () -> untyped
@@ -72,6 +74,8 @@ module Roo
         def empty?: () -> false
 
         def presence: () -> (nil | self)
+
+        def style: () -> (string | 1 | nil)
       end
     end
   end

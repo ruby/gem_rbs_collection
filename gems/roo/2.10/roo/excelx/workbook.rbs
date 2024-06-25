@@ -1,42 +1,42 @@
 module Roo
   class Excelx
     class Workbook < Excelx::Extractor
-      @base_timestamp: untyped
+      @base_timestamp: int
 
-      @base_date: untyped
+      @base_date: Date
 
       class Label
-        @name: untyped
+        @name: string
 
-        @sheet: untyped
+        @sheet: string
 
-        @row: untyped
+        @row: int
 
-        @col: untyped
+        @col: int
 
-        attr_reader sheet: untyped
+        attr_reader sheet: string
 
-        attr_reader row: untyped
+        attr_reader row: int
 
-        attr_reader col: untyped
+        attr_reader col: int
 
-        attr_reader name: untyped
+        attr_reader name: string
 
-        def initialize: (untyped name, untyped sheet, untyped row, untyped col) -> void
+        def initialize: (string name, string sheet, string row, string col) -> void
 
-        def key: () -> ::Array[untyped]
+        def key: () -> [int, int]
       end
 
-      def initialize: (untyped path) -> void
+      def initialize: (string path) -> void
 
-      def sheets: () -> untyped
+      def sheets: () -> ::Nokogiri::XML::NodeSet
 
       # aka labels
-      def defined_names: () -> untyped
+      def defined_names: () -> Hash[string, Label]
 
-      def base_timestamp: () -> untyped
+      def base_timestamp: () -> int
 
-      def base_date: () -> untyped
+      def base_date: () -> Date
     end
   end
 end
