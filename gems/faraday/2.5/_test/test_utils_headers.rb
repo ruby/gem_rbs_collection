@@ -2,7 +2,6 @@ Faraday::Utils::Headers.from({}).instance_variable_get(:@names)
 Faraday::Utils::Headers.allocate.instance_variable_get(:@names)
 h = Faraday::Utils::Headers.new
 h.initialize_names
-h.initialize_copy(Faraday::Utils::Headers.new).instance_variable_get(:@names)
 h[:test] = 2134
 h[:test] = :df
 h[:test] = nil
