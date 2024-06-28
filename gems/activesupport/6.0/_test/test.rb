@@ -66,3 +66,5 @@ itself if Object.new.blank? \
             ^ 0.blank? \
             ^ Time.now.blank? \
             ^ "a".present?
+
+"Matz".presence_in("Matzuyama")&.in?(%w[Yukihiro Matz Matsumoto])

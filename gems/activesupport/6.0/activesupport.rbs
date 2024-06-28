@@ -1,4 +1,10 @@
 module ActiveSupport
+  interface _IncludeP
+    def include?: (untyped value) -> bool
+  end
+end
+
+module ActiveSupport
   module Callbacks
     module ClassMethods
       # Manual definition to make block optional
@@ -395,6 +401,12 @@ class Object
   def blank?: () -> bool
   def present?: () -> bool
   def presence: () -> self?
+end
+
+# active_support/core_ext/object/inclusion.rb
+class Object
+  def in?: (ActiveSupport::_IncludeP another_object) -> bool
+  def presence_in: (ActiveSupport::_IncludeP another_object) -> (self | nil)
 end
 
 class NilClass
