@@ -71,14 +71,17 @@ put base / 'manifest.yaml', <<~'YAML'
   # dependencies:
   #   - name: pathname
 YAML
+
 put base.parent / '.rubocop.yml', <<~'YAML'
   # This configuration inherits from /.rubocop.yml.
   # You can configure RBS style of this gem.
   # This file is used on CI. It is configured to automatically
   # make rubocop suggestions on pull requests for this gem.
   # If you do not like the style enforcement, you should remove this file.
-  AllCops:
-    NewCops: disable
+  inherit_from: ../../.rubocop.yml
+
+  ##
+  # If you want to customize the style, please consult with the gem reviewers.
 
   RBS/Layout/CommentIndentation:
     Enabled: true
