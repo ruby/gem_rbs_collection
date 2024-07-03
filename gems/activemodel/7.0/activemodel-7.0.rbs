@@ -52,15 +52,15 @@ module ActiveModel
   class Errors
     @base: untyped
 
-    @errors: untyped
+    @errors: Array[ActiveModel::Error]
 
-    include Enumerable
+    include Enumerable[ActiveModel::Error]
 
     extend Forwardable
 
     # The actual array of +Error+ objects
     # This method is aliased to <tt>objects</tt>.
-    attr_reader errors: untyped
+    attr_reader errors: Array[ActiveModel::Error]
 
     alias objects errors
 
@@ -74,6 +74,18 @@ module ActiveModel
     def initialize: (untyped base) -> void
 
     def initialize_dup: (untyped other) -> untyped
+
+    def each: () -> Enumerator[ActiveModel::Error, untyped]
+            | () { (ActiveModel::Error) -> void } -> void
+
+    def clear: () -> void
+
+    def empty?: () -> bool
+
+    def size: () -> Integer
+
+    def uniq!: () -> self?
+             | () { (ActiveModel::Error) -> untyped } -> self?
 
     # Copies the errors from <tt>other</tt>.
     # For copying errors but keep <tt>@base</tt> as is.
