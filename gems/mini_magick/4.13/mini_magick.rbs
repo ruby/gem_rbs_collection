@@ -1,0 +1,225 @@
+module MiniMagick
+  class Error < RuntimeError
+  end
+
+  class Invalid < StandardError
+  end
+end
+
+module MiniMagick
+  class Image
+    def self.read: (String | _Reader stream, ?String? ext) -> instance
+
+    def self.create: (?String? ext, ?bool validate) ?{ (Tempfile) -> void } -> instance
+
+    def self.open: (string | URI::Generic path_or_url, ?String? ext, ?::Hash[untyped, untyped] options, **untyped) -> instance
+
+    attr_reader path: String
+
+    attr_reader tempfile: Tempfile
+
+    def initialize: (string input_path, ?Tempfile? tempfile) ?{ (MiniMagick::Tool::MogrifyRestricted) -> void } -> void
+
+    def to_blob: () -> String
+
+    def valid?: () -> bool
+
+    def validate!: () -> void
+
+    # Manually define dynamically generated methods with MiniMagick::Image.attribute
+
+    def type: () -> String
+            | (*untyped) -> instance
+
+    def width: () -> Integer
+             | (*untyped) -> instance
+
+    def height: () -> Integer
+              | (*untyped) -> instance
+
+    def dimensions: () -> Array[Integer]
+                  | (*untyped) -> instance
+
+    def size: () -> Integer
+            | (*untyped) -> instance
+
+    def human_size: () -> String
+                  | (*untyped) -> instance
+
+    def colorspace: () -> String
+                  | (*untyped) -> instance
+
+    def exif: () -> Hash[untyped, untyped]
+            | (*untyped) -> instance
+
+    def resolution: (*untyped) -> Array[Integer]
+
+    def signature: () -> String
+                 | (*untyped) -> instance
+
+    def data: () -> Hash[untyped, untyped]
+            | (*untyped) -> instance
+
+    def details: () -> Hash[untyped, untyped]
+               | (*untyped) -> instance
+
+    def []: (string value) -> String
+
+    alias info []
+
+    def layers: () -> Array[instance]
+
+    alias pages layers
+
+    alias frames layers
+
+    def get_pixels: (?::String map) -> Array[untyped]
+
+    def self.get_image_from_pixels: (Array[untyped] pixels, Array[Integer] dimension, String map, Integer depth, String format) -> instance
+
+    def format: (String format, ?::Integer page, ?::Hash[untyped, untyped] read_opts, **untyped) ?{ (MiniMagick::Tool::Convert) -> void } -> instance
+
+    def combine_options: () { (MiniMagick::Tool::MogrifyRestricted) -> void } -> instance
+
+    def write: (String | Pathname | _Writer output_to) -> void
+
+    def composite: (instance other_image, ?String output_extension, ?untyped? mask) ?{ (MiniMagick::Tool::Composite) -> void } -> instance
+
+    def collapse!: (?::Integer frame) -> instance
+
+    def destroy!: () -> void
+
+    def identify: () ?{ (MiniMagick::Tool::Identify) -> void } -> String
+
+    def mogrify: (?Integer? page) ?{ (MiniMagick::Tool::MogrifyRestricted) -> void } -> instance
+
+    def layer?: () -> bool
+
+    def landscape?: () -> bool
+
+    def portrait?: () -> bool
+
+    # If method is not found, the method of Mogrify is called.
+    include MiniMagick::Tool::Mogrify::_InstanceMethods[instance]
+  end
+end
+
+module MiniMagick
+  class Tool
+    def command: () -> Array[String]
+
+    def executable: () -> Array[String]
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Animate < Tool
+    end
+  end
+end
+
+module MiniMagickp
+  class Tool
+    class Compare < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    # see: https://imagemagick.org/script/composite.php
+    class Composite < Tool
+      def compose: (String operator) -> instance
+
+      def geometry: (String geometry) -> instance
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Conjure < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Convert < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Display < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Identify < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Import < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Magick < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    # see: http://www.imagemagick.org/script/mogrify.php
+    class Mogrify < Tool
+      # MiniMagick::Image uses the methods of MiniMagick::Tool::Mogrify when the method is not found,
+      # so it is defined as an interface to be common.
+      # Other Tool methods need not be defined as interfaces.
+      interface _InstanceMethods[T]
+        def contrast: () -> T
+
+        def crop: (String geometry) -> T
+
+        def flip: () -> T
+
+        def resize: (String geometry) -> T
+
+        def rotate: (String degrees) -> T
+      end
+
+      include _InstanceMethods[instance]
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class MogrifyRestricted < Mogrify
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Montage < Tool
+    end
+  end
+end
+
+module MiniMagick
+  class Tool
+    class Stream < Tool
+    end
+  end
+end
