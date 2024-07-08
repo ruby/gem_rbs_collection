@@ -1,0 +1,119 @@
+module Async
+  class Barrier
+    def initialize: (?parent: (Task[untyped] | Semaphore)?) -> void
+
+    def size: () -> ::Integer
+
+    def async: (*untyped arguments, ?parent: (Task[untyped] | Semaphore)?, **untyped options) { (Task[untyped], *untyped) -> untyped } -> Task[untyped]
+
+    def empty?: () -> bool
+
+    def wait: () -> void
+
+    def stop: () -> void
+  end
+
+  class Clock
+    def self.now: () -> ::Numeric
+
+    def self.measure: () { () -> void } -> ::Numeric
+
+    def self.start: () -> Clock
+
+    def initialize: (?::Numeric total) -> void
+
+    def start!: () -> void
+
+    def stop!: () -> ::Numeric
+
+    def total: () -> ::Numeric
+  end
+
+  class Condition
+    def initialize: () -> void
+
+    def wait: () -> untyped
+
+    def empty?: () -> bool
+
+    def signal: (?untyped? value) -> void
+  end
+
+  class Node
+  end
+
+  class Notification < Condition
+    def signal: (?untyped? value, ?task: untyped) -> void
+  end
+
+  class Queue < Notification
+  end
+
+  class LimitedQueue < Queue
+  end
+
+  class Semaphore
+    def initialize: (?::Integer limit, ?parent: (Task[untyped] | Semaphore | Barrier)?) -> void
+
+    def limit=: (::Integer limit) -> void
+
+    def empty?: () -> bool
+
+    def blocking?: () -> bool
+
+    def async: (*untyped arguments, ?parent: (Task[untyped] | Semaphore | Barrier)?, **untyped options) { (Task[untyped], *untyped) -> untyped } -> Task[untyped]
+
+    def acquire: () ?{ () -> untyped } -> void
+
+    def release: () -> void
+  end
+
+  class TimeoutError < StandardError
+  end
+
+  class Task[Result] < Node
+    attr_reader result: Result
+
+    attr_reader status: (:initialized | :running | :failed | :stopped | :completed)
+
+    def initialize: (?Task[untyped] parent, ?finished: untyped?, **untyped options) { (*untyped) -> untyped } -> void
+
+    def yield: () -> untyped
+
+    def with_timeout: (::Numeric duration, ?singleton(StandardError) exception, ?::String message) { (*untyped) -> untyped } -> untyped
+
+    def alive?: () -> bool
+
+    def finished?: () -> bool
+
+    def running?: () -> bool
+
+    def stopped?: () -> bool
+
+    def completed?: () -> bool
+
+    def run: (*untyped arguments) -> void
+
+    def async: [NewResult] (*untyped arguments, **untyped options) { (Task[untyped], *untyped) -> NewResult } -> Task[NewResult]
+
+    def wait: () -> Result
+
+    def stop: (?bool later) -> untyped
+
+    def defer_stop: () { () -> untyped } -> void
+
+    def self.current: () -> Task[untyped]?
+
+    alias complete? completed?
+
+    # @deprecated
+    def self.yield: () -> untyped
+
+    # @deprecated
+    def sleep: (?untyped? duration) -> untyped
+  end
+
+  # @deprecated
+  class Wrapper
+  end
+end
