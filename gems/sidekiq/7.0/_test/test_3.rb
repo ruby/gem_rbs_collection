@@ -61,8 +61,10 @@ class WorkerWithCustomRetry
   # of nil will use the default.
   sidekiq_retry_in do |count, exception|
     case exception
-    when Object
+    when StandardError
       10 * (count + 1) # (i.e. 10, 20, 30, 40, 50)
+    else
+      :kill
     end
   end
 
