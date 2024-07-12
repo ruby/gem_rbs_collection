@@ -48,7 +48,7 @@ module Sidekiq
 
         def sidekiq_retries_exhausted: () { (Hash[String, untyped] job, Exception ex) -> void } -> void
 
-        def sidekiq_retry_in: () { (Integer count, Exception ex) -> Integer } -> void
+        def sidekiq_retry_in: () { (Integer count, Exception ex) -> (Integer | :discard | :kill)? } -> void
 
         ACCESSOR_MUTEX: ::Thread::Mutex
       end
