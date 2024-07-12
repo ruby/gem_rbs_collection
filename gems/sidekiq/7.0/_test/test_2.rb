@@ -10,6 +10,7 @@ class Hook
 end
 
 class Middleware
+  include Sidekiq::ServerMiddleware
 end
 
 HardWorker.perform_async(1, 2, 3)
