@@ -48,6 +48,15 @@ module ActiveSupport
     def self.subscribe: (String | Regexp, _Callable5 | _Callable1) -> Subscriber
                       | ...
   end
+
+  class TimeZone
+    # Locate a specific time zone object. If the argument is a string, it
+    # is interpreted to mean the name of the timezone to locate. If it is a
+    # numeric value it is either the hour offset, or the second offset, of the
+    # timezone to find. (The first one with that offset will be returned.)
+    # Returns +nil+ if no such time zone is known to the system.
+    def self.[]: (instance | TZInfo::Timezone | String | real | Duration) -> instance?
+  end
 end
 
 module Enumerable[unchecked out Elem]
