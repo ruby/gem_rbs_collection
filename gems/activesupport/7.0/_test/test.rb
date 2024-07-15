@@ -19,3 +19,4 @@ nil.try { p 'hello' }
 nil.try { |n| p n }
 
 "Id".downcase_first
+ActiveSupport::TimeZone['Asia/Tokyo'].to_s

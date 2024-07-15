@@ -68,3 +68,4 @@ itself if Object.new.blank? \
             ^ "a".present?
 
 "Matz".presence_in("Matzuyama")&.in?(%w[Yukihiro Matz Matsumoto])
+ActiveSupport::TimeZone['Asia/Tokyo'].to_s
