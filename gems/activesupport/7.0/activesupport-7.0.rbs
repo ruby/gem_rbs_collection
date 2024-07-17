@@ -59,6 +59,29 @@ module ActiveSupport
   end
 end
 
+# activesupport/lib/active_support/core_ext/time/zones.rb
+class Time
+  # Returns a TimeZone instance matching the time zone provided.
+  # Accepts the time zone in any format supported by <tt>Time.zone=</tt>.
+  # Raises an +ArgumentError+ for invalid time zones.
+  #
+  #   Time.find_zone! "America/New_York" # => #<ActiveSupport::TimeZone @name="America/New_York" ...>
+  #   Time.find_zone! "EST"              # => #<ActiveSupport::TimeZone @name="EST" ...>
+  #   Time.find_zone! -5.hours           # => #<ActiveSupport::TimeZone @name="Bogota" ...>
+  #   Time.find_zone! nil                # => nil
+  #   Time.find_zone! false              # => false
+  #   Time.find_zone! "NOT-A-TIMEZONE"   # => ArgumentError: Invalid Timezone: NOT-A-TIMEZONE
+  def self.find_zone!: (ActiveSupport::TimeZone | TZInfo::Timezone | String | real | ActiveSupport::Duration) -> ActiveSupport::TimeZone
+
+  # Returns a TimeZone instance matching the time zone provided.
+  # Accepts the time zone in any format supported by <tt>Time.zone=</tt>.
+  # Returns +nil+ for invalid time zones.
+  #
+  #   Time.find_zone "America/New_York" # => #<ActiveSupport::TimeZone @name="America/New_York" ...>
+  #   Time.find_zone "NOT-A-TIMEZONE"   # => nil
+  def self.find_zone: (ActiveSupport::TimeZone | TZInfo::Timezone | String | real | ActiveSupport::Duration | nil) -> ActiveSupport::TimeZone?
+end
+
 module Enumerable[unchecked out Elem]
   # Returns a new +Array+ without the blank items.
   # Uses Object#blank? for determining if an item is blank.

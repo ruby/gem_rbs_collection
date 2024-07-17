@@ -20,3 +20,4 @@ nil.try { |n| p n }
 
 "Id".downcase_first
 ActiveSupport::TimeZone['Asia/Tokyo'].to_s
+Time.find_zone(Object.name)
