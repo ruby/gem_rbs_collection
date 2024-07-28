@@ -141,86 +141,86 @@ module MiniMagick
 
     def self.create: (?String? ext) { (Tempfile) -> void } -> instance
 
-   attr_reader path: String
+    attr_reader path: String
 
-   attr_reader tempfile: Tempfile
+    attr_reader tempfile: Tempfile
 
-   def initialize: (_ToS input_path, ?Tempfile? tempfile) ?{ (Tool) -> void } -> void
+    def initialize: (_ToS input_path, ?Tempfile? tempfile) ?{ (Tool) -> void } -> void
 
-   def to_blob: () -> String
+    def to_blob: () -> String
 
-   def valid?: () -> bool
+    def valid?: () -> bool
 
-   def validate!: () -> void
+    def validate!: () -> void
 
-   def []: (_ToS value) -> String
+    def []: (_ToS value) -> String
 
-   alias info []
+    alias info []
 
-   def layers: () -> Array[instance]
+    def layers: () -> Array[instance]
 
-   alias pages layers
+    alias pages layers
 
-   alias frames layers
+    alias frames layers
 
-   def get_pixels: (?::String map) -> Array[untyped]
+    def get_pixels: (?::String map) -> Array[untyped]
 
-   def self.get_image_from_pixels: (Array[untyped] pixels, Array[Integer] dimension, String map, Integer depth, String format) -> instance
+    def self.get_image_from_pixels: (Array[untyped] pixels, Array[Integer] dimension, String map, Integer depth, String format) -> instance
 
-   def format: (String format, ?::Integer page, ?::Hash[untyped, untyped] read_opts, **untyped) ?{ (Tool) -> void } -> self
+    def format: (String format, ?::Integer page, ?::Hash[untyped, untyped] read_opts, **untyped) ?{ (Tool) -> void } -> self
 
-   def combine_options: () { (Tool) -> void } -> self
+    def combine_options: () { (Tool) -> void } -> self
 
-   def write: (String | Pathname | _Writer output_to) -> untyped
+    def write: (String | Pathname | _Writer output_to) -> untyped
 
-   def composite: (instance other_image, ?String output_extension, ?untyped? mask) ?{ (Tool) -> void } -> instance
+    def composite: (instance other_image, ?String output_extension, ?untyped? mask) ?{ (Tool) -> void } -> instance
 
-   def collapse!: (?::Integer frame) -> self
+    def collapse!: (?::Integer frame) -> self
 
-   def destroy!: () -> void
+    def destroy!: () -> void
 
-   def identify: () ?{ (Tool) -> void } -> String
+    def identify: () ?{ (Tool) -> void } -> String
 
-   def mogrify: (?Integer? page) ?{ (Tool) -> void } -> self
+    def mogrify: (?Integer? page) ?{ (Tool) -> void } -> self
 
-   def layer?: () -> bool
+    def layer?: () -> bool
 
-   def landscape?: () -> bool
+    def landscape?: () -> bool
 
-   def portrait?: () -> bool
+    def portrait?: () -> bool
 
-   # Define dynamically methods
+    # Define dynamically methods
 
-   def type: () -> String
+    def type: () -> String
             | (*untyped) -> instance
 
-   def width: () -> Integer
-            | (*untyped) -> instance
-
-   def height: () -> Integer
+    def width: () -> Integer
              | (*untyped) -> instance
 
-   def dimensions: () -> Array[Integer]
+    def height: () -> Integer
+              | (*untyped) -> instance
+
+    def dimensions: () -> Array[Integer]
                   | (*untyped) -> instance
 
-   def size: () -> Integer
-           | (*untyped) -> instance
+    def size: () -> Integer
+            | (*untyped) -> instance
 
-   def human_size: () -> String
+    def human_size: () -> String
+                  | (*untyped) -> instance
+
+    def colorspace: () -> String
+                  | (*untyped) -> instance
+
+    def exif: () -> Hash[untyped, untyped]
+            | (*untyped) -> instance
+
+    def resolution: (*untyped) -> Array[Integer]
+
+    def signature: () -> String
                  | (*untyped) -> instance
 
-   def colorspace: () -> String
-                 | (*untyped) -> instance
-
-   def exif: () -> Hash[untyped, untyped]
-           | (*untyped) -> instance
-
-   def resolution: (*untyped) -> Array[Integer]
-
-   def signature: () -> String
-                | (*untyped) -> instance
-
-   def data: () -> Hash[untyped, untyped]
-           | (*untyped) -> instance
+    def data: () -> Hash[untyped, untyped]
+            | (*untyped) -> instance
   end
 end
