@@ -87,4 +87,34 @@ module ActiveRecord
                      ?primary_key_column: untyped?, ?query_parser: untyped?, 
                      ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
   end
+
+  module Persistence
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    end
+  end
+
+  class InsertAll
+    @record_timestamps: bool
+
+    def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+                  
+    def record_timestamps?: () -> bool
+
+    def keys_including_timestamps: () -> Set[String]
+
+    def timestamps_for_create: () -> Hash[String, String]
+  end
 end
