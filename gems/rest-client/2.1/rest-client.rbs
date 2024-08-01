@@ -29,6 +29,44 @@ module RestClient
     def description: () -> String
   end
 
+  class Resource
+    attr_reader url: String
+    attr_reader options: Hash[untyped, untyped]?
+    attr_reader block: Proc
+
+    def initialize: (String url, ?Hash[untyped, untyped] options, ?String backwards_compatability) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> void
+
+    def get: (?Hash[untyped, untyped] additional_headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+
+    def head: (?Hash[untyped, untyped] additional_headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+
+    def post: (untyped payload, ?Hash[untyped, untyped] additional_headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+
+    def put: (untyped payload, ?Hash[untyped, untyped] additional_headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+
+    def patch: (untyped payload, ?Hash[untyped, untyped] additional_headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+
+    def delete: (?Hash[untyped, untyped] additional_headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
+
+    def to_s: -> String
+
+    def user: -> untyped
+
+    def password: -> untyped
+
+    def headers: -> Hash[untyped, untyped]
+
+    def read_timeout: -> Integer
+
+    def open_timeout: -> Integer
+
+    def log: -> untyped
+
+    def []: (String suburl) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> self
+
+    def concat_urls: (untyped url, untyped suburl) -> String
+  end
+
   def self.get: (String url, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
   def self.post: (String url, untyped payload, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
   def self.patch: (String url, untyped payload, ?Hash[untyped, untyped] headers) ?{ (Response, Request, Net::HTTPResponse, callback) -> void } -> Response
