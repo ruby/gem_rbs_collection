@@ -33,3 +33,24 @@ RestClient.get('http://example.com/resource') { |response, request, result, &blo
     response.return!(&block)
   end
 }
+
+resource = RestClient::Resource.new("http://example.com/resource")
+resource.get
+resource.get(params: {id: 50, 'foo' => 'bar'})
+resource.get(accept: :json)
+resource.post(params: 'one', nested: {param2: 'two'})
+resource.post({'x' => 1}.to_json, {content_type: :json, accept: :json})
+resource.delete
+
+resource['nested'] { |response, request, result, &block|
+  case response.code
+  when 200
+    p "It worked !"
+    response
+  when 423
+    raise SomeCustomExceptionIfYouWant
+  else
+    response.return!(&block)
+  end
+}
+
