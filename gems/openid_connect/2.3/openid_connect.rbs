@@ -1,0 +1,67 @@
+module OpenIDConnect
+  class AccessToken < ::Rack::OAuth2::AccessToken::Bearer
+    attr_accessor client: Client
+    attr_accessor id_token: String
+  end
+
+  class Client < ::Rack::OAuth2::Client
+    attr_accessor userinfo_endpoint: String
+    attr_accessor expires_in: Integer?
+
+    def userinfo_uri: () -> String
+    def access_token!: () -> AccessToken
+  end
+
+  class ConnectObject
+  end
+
+  class ResponseObject < ConnectObject
+    class IdToken
+      class InvalidToken < Exception
+      end
+
+      class ExpiredToken < InvalidToken
+      end
+
+      class InvalidIssuer < InvalidToken
+      end
+
+      class InvalidNonce < InvalidToken
+      end
+
+      class InvalidAudience < InvalidToken
+      end
+
+      def self.decode: (String jwt_string, untyped key_or_config) -> instance
+      def self.decode_self_issued: (String jwt_string) -> instance
+      def self.self_issued: (?Hash[untyped, untyped] attributes) -> instance
+
+      attr_accessor iss: String
+      attr_accessor sub: String
+      attr_accessor aud: String
+      attr_accessor exp: Integer
+      attr_accessor iat: Integer
+
+      attr_accessor acr: untyped?
+      attr_accessor amr: untyped?
+      attr_accessor azp: untyped?
+      attr_accessor jti: untyped?
+      attr_accessor sid: untyped?
+      attr_accessor auth_time: untyped?
+      attr_accessor nonce: untyped?
+      attr_accessor sub_jwk: untyped?
+      attr_accessor at_hash: untyped?
+      attr_accessor c_hash: untyped?
+      attr_accessor s_hash: untyped?
+
+      attr_accessor access_token: untyped
+      attr_accessor code: untyped
+      attr_accessor state: untyped
+
+      alias subject sub
+      alias subject= sub=
+
+      def verify!: (?Hash[untyped, untyped] expected) -> true
+    end
+  end
+end
