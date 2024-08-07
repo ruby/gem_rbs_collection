@@ -1,0 +1,22 @@
+name: RuboCop
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+    - name: 'Install dependencies'
+      run: 'bundle install'
+    - name: 'Run RuboCop'
+      run: 'bundle exec rubocop --format github'
