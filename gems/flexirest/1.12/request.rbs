@@ -1,0 +1,85 @@
+module Flexirest
+  class Request
+    attr_accessor post_params: untyped
+    attr_accessor get_params: untyped
+    attr_accessor url: String
+    attr_accessor path: untyped
+    attr_accessor headers: HeadersList
+    attr_accessor method: Hash[untyped, untyped]
+    attr_accessor object: untyped
+    attr_accessor body: String
+    attr_accessor forced_url: String?
+    attr_accessor original_url: String
+    attr_accessor retrying: bool
+  end
+
+  class RequestException < StandardError
+  end
+
+  class InvalidArgumentsException < StandardError
+  end
+
+  class InvalidRequestException < RequestException
+  end
+
+  class MissingParametersException < RequestException
+  end
+
+  class ResponseParseException < RequestException
+  end
+
+  class HTTPException < RequestException
+    attr_reader status: Integer
+    attr_reader result: untyped
+    attr_reader request_url: String
+    attr_reader body: String?
+  end
+
+  class HTTPClientException < HTTPException
+  end
+
+  class HTTPUnauthorisedClientException < HTTPClientException
+  end
+
+  class HTTPBadRequestClientException < HTTPClientException
+  end
+
+  class HTTPForbiddenClientException < HTTPClientException
+  end
+
+  class HTTPMethodNotAllowedClientException < HTTPClientException
+  end
+
+  class HTTPNotAcceptableClientException < HTTPClientException
+  end
+
+  class HTTPTimeoutClientException < HTTPClientException
+  end
+
+  class HTTPConflictClientException < HTTPClientException
+  end
+
+  class HTTPNotFoundClientException < HTTPClientException
+  end
+
+  class HTTPTooManyRequestsClientException < HTTPClientException
+  end
+
+  class HTTPServerException < HTTPException
+  end
+
+  class HTTPInternalServerException < HTTPServerException
+  end
+
+  class HTTPNotImplementedServerException < HTTPServerException
+  end
+
+  class HTTPBadGatewayServerException < HTTPServerException
+  end
+
+  class HTTPServiceUnavailableServerException < HTTPServerException
+  end
+
+  class HTTPGatewayTimeoutServerException < HTTPServerException
+  end
+end
