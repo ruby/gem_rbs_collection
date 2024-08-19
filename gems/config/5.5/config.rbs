@@ -1,0 +1,72 @@
+module Config
+  include Validation::Schema
+
+  def self.setup: () -> void
+  def self.load_files: (*String files) -> Options
+                     | (Array[String] files) -> Options
+  def self.load_and_set_settings: (*String files) -> void
+                                | (Array[String] files) -> void
+  def self.setting_files: (String config_root, String env) -> Array[String]
+  def self.local_setting_files: (String config_root, String env) -> Array[String]
+  def self.reload!: () -> Options
+end
+
+module Config
+  class Options
+    include Enumerable[untyped]
+    include Validation::Validate
+
+    def keys: () -> Array[String]
+    def empty?: () -> bool
+    def add_source!: (String source) -> void
+    def prepend_source!: (String source) -> void
+    def reload!: () -> self
+
+    alias load! reload!
+
+    def reload_from_files: (*String files) -> self
+    def to_hash: () -> Hash[String, untyped]
+    
+    alias to_h to_hash
+
+    def each: (*untyped args) ?{ (untyped) -> void } -> void
+    def to_json: (*untyped args) -> String
+    def as_json: (?untyped options) -> String
+    def merge: (Hash[untyped, untyped] hash) -> self
+    def []: (String | Symbol param) -> untyped
+    def []=: (String | Symbol param, untyped value) -> untyped
+    def select: () -> untyped
+    def collect: () -> untyped
+    def test: () -> untyped
+    def count: () -> untyped
+    def zip: () -> untyped
+    def min: () -> untyped
+    def max: () -> untyped
+    def exit!: () -> untyped
+    def table: () -> untyped
+    def maximum: () -> untyped
+    def minimum: () -> untyped
+    def key?: (String | Symbol key) -> bool
+    def has_key?: (String | Symbol key) -> bool
+
+    # Methods from OpenStruct
+
+    def delete_field: (String | Symbol name) -> untyped
+    def dig: (*(String | Symbol) keys) -> untyped
+    def each_pair: () -> Enumerator[[String, untyped], untyped]
+                 | () { ([String, untyped]) -> void } -> self
+  end
+end
+
+module Config
+  module Validation
+    module Schema
+      def schema=: (untyped value) -> untyped
+      def schema: () ?{ () -> untyped } -> untyped
+    end
+
+    module Validate
+      def validate!: () -> void
+    end
+  end
+end
