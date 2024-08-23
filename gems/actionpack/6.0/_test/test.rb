@@ -20,4 +20,12 @@ class ApplicationController < ActionController::Base
       ActiveSupport::SecurityUtils.secure_compare(token, 'secret')
     end
   end
+
+  def fetch
+    params = ActionController::Parameters.new(person: { name: 'Francesco' })
+    # fetch with block
+    params.fetch(:person) { { name: 'Default Name' } }
+    # fetch without block
+    params.fetch(:person)
+  end
 end
