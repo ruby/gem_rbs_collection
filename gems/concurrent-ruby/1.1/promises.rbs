@@ -58,9 +58,9 @@ module Concurrent
       def zip_events: (*(Event | Future[top, top]) futures_and_or_events) -> Event
       def zip_events_on: (executor default_executor, *(Event | Future[top, top]) futures_and_or_events) -> Event
 
-      def zip_futures: (*Event events) -> Future[Array[nil], bot]
-        | [T, E] (*Future[T, E] futures) -> Future[Array[T], Array[E]]
-        | [T, E] (*(Event | Future[T, E]) futures_and_or_events) -> Future[Array[T | nil], Array[E | nil]]
+      def zip_futures: (*Event events) -> Future[::Array[nil], bot]
+        | [T, E] (*Future[T, E] futures) -> Future[::Array[T], ::Array[E]]
+        | [T, E] (*(Event | Future[T, E]) futures_and_or_events) -> Future[::Array[T | nil], ::Array[E | nil]]
       alias zip zip_futures
       def zip_futures_on: (executor default_executor, *Event events) -> Future[Array[nil], bot]
         | [T, E] (executor default_executor, *Future[T, E] futures) -> Future[Array[T], Array[E]]
