@@ -329,9 +329,9 @@ module ActiveRecord
       def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
-      def find: (PrimaryKey id) -> Model
-              | (Array[PrimaryKey]) -> Array[Model]
-              | (*PrimaryKey) -> Array[Model]
+      def find: (PrimaryKey | _ToI id) -> Model
+              | (Array[PrimaryKey | _ToI]) -> Array[Model]
+              | (*PrimaryKey | _ToI) -> Array[Model]
               | () { (Model) -> boolish } -> Model?
       def find_or_create_by: (*untyped) -> Model
                           | (*untyped) { (Model) -> void } -> Model
@@ -416,9 +416,9 @@ module ActiveRecord
       def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
-      def find: (PrimaryKey id) -> Model
-              | (Array[PrimaryKey]) -> Array[Model]
-              | (*PrimaryKey) -> Array[Model]
+      def find: (PrimaryKey | _ToI id) -> Model
+              | (Array[PrimaryKey | _ToI]) -> Array[Model]
+              | (*PrimaryKey | _ToI) -> Array[Model]
       def find_or_create_by: (*untyped) -> Model
                           | (*untyped) { (Model) -> void } -> Model
       def find_or_create_by!: (*untyped) -> Model
