@@ -9,4 +9,5 @@ class Person
   def foo? = true
 end
 
-Person.new.send(:valid?)
+person = Person.new(name: 'John Doe')
+person.valid?
