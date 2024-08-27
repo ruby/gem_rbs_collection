@@ -27,6 +27,12 @@ module RailsGuides
     end
   end
 
+  class I18nUserMailer < ActionMailer::Base
+    def welcome(email, username)
+      mail(to: email, subject: default_i18n_subject(user: username))
+    end
+  end
+
   NotifierMailer.welcome("first user").deliver_now
   NotifierMailer.welcome("first user").message
   NotifierMailer.welcome("first user").deliver_later
