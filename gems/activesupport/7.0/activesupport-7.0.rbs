@@ -49,6 +49,18 @@ module ActiveSupport
                       | ...
   end
 
+  class TimeWithZone
+    # Returns a string of the object's date and time.
+    #
+    # This method is aliased to <tt>to_formatted_s</tt>.
+    #
+    # Accepts an optional <tt>format</tt>:
+    # * <tt>:default</tt> - default value, mimics Ruby Time#to_s format.
+    # * <tt>:db</tt> - format outputs time in UTC :db time. See Time#to_fs(:db).
+    # * Any key in +Time::DATE_FORMATS+ can be used. See active_support/core_ext/time/conversions.rb.
+    def to_fs: (?Symbol format) -> String
+  end
+
   class TimeZone
     # Locate a specific time zone object. If the argument is a string, it
     # is interpreted to mean the name of the timezone to locate. If it is a
