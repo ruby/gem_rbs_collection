@@ -5,3 +5,6 @@ begin
 rescue Signet::AuthorizationError => e
   # nop
 end
+
+class MyClient < Signet::OAuth2::Client
+end
