@@ -27,6 +27,10 @@ module ActiveRecord
   end
 
   module QueryMethods
+    def with: (*untyped args) -> untyped
+  end
+
+  module QueryMethods
     class WhereChain[Relation]
       def missing: (*Symbol associations) -> Relation
     end
@@ -116,5 +120,19 @@ module ActiveRecord
     def keys_including_timestamps: () -> Set[String]
 
     def timestamps_for_create: () -> Hash[String, String]
+  end
+end
+
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def with: (*untyped args) -> self
+    end
+  end
+
+  class Base
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def with: (*untyped args) -> Relation
+    end
   end
 end
