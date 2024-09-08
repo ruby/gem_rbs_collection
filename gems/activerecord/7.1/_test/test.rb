@@ -18,6 +18,8 @@ module Test
     encrypts :token, deterministic: true
     encrypts :phrase, ignore_case: true
 
+    generates_token_for :password_reset, expires_in: 15.minutes
+
     normalizes :email, with: -> email {
       # @type var email: String
       email.strip.downcase
@@ -42,4 +44,6 @@ module Test
   user = User.new
   user.normalize_attribute(:email)
   User.normalize_value_for(:email, ' CRUISE-CONTROL@EXAMPLE.COM\n')
+
+  user.generate_token_for(:password_reset)
 end
