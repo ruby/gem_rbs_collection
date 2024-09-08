@@ -6,6 +6,26 @@ module ActiveRecord
     extend Normalization::ClassMethods
   end
 
+  class AssociationRelation
+    def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+  end
+
+  module Associations
+    class CollectionProxy
+      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    end
+  end
+
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
