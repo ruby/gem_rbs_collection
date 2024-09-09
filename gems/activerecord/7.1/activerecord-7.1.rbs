@@ -4,6 +4,8 @@ module ActiveRecord
     extend Encryption::EncryptableRecord::ClassMethods
     include Normalization
     extend Normalization::ClassMethods
+    include SecurePassword
+    extend SecurePassword::ClassMethods
   end
 
   module Inheritance
@@ -83,8 +85,8 @@ module ActiveRecord
 
   class MismatchedForeignKey < StatementInvalid
     def initialize: (?message: untyped?, ?sql: untyped?, ?binds: untyped?, ?table: untyped?,
-                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?, 
-                     ?primary_key_column: untyped?, ?query_parser: untyped?, 
+                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?,
+                     ?primary_key_column: untyped?, ?query_parser: untyped?,
                      ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
   end
 
@@ -110,11 +112,25 @@ module ActiveRecord
     @record_timestamps: bool
 
     def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-                  
+
     def record_timestamps?: () -> bool
 
     def keys_including_timestamps: () -> Set[String]
 
     def timestamps_for_create: () -> Hash[String, String]
+  end
+
+  module SecurePassword
+    module ClassMethods
+      def authenticate_by: (untyped attributes) -> instance?
+    end
+  end
+end
+
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def authenticate_by: (untyped attributes) -> Model?
+    end
   end
 end
