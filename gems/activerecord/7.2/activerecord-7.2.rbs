@@ -6,6 +6,15 @@ module ActiveRecord
     extend Normalization::ClassMethods
   end
 
+  class Relation
+    def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+  end
+
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
@@ -83,34 +92,30 @@ module ActiveRecord
 
   class MismatchedForeignKey < StatementInvalid
     def initialize: (?message: untyped?, ?sql: untyped?, ?binds: untyped?, ?table: untyped?,
-                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?, 
-                     ?primary_key_column: untyped?, ?query_parser: untyped?, 
+                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?,
+                     ?primary_key_column: untyped?, ?query_parser: untyped?,
                      ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
   end
 
-  module Persistence
-    extend ActiveSupport::Concern
+  module Querying
+    def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-    module ClassMethods
-      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-
-      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    end
+    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
   end
 
   class InsertAll
     @record_timestamps: bool
 
     def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-                  
+
     def record_timestamps?: () -> bool
 
     def keys_including_timestamps: () -> Set[String]
