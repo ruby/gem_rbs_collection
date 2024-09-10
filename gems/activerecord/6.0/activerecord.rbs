@@ -371,6 +371,7 @@ module ActiveRecord
       def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
+      def sum: (?untyped? column_name) -> Integer
       def destroy_all: () -> untyped
       def delete_all: () -> untyped
       def update_all: (*untyped) -> untyped
@@ -457,6 +458,7 @@ module ActiveRecord
       def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
+      def sum: (?untyped? column_name) -> Integer
       def destroy_all: () -> untyped
       def delete_all: () -> untyped
       def update_all: (*untyped) -> untyped
@@ -466,6 +468,7 @@ module ActiveRecord
       def select: (*Symbol | String) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String) -> Relation
+      def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
     end
   end
 end
