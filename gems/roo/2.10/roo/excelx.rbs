@@ -3,7 +3,7 @@ module Roo
     def seek: (Integer offset, ?Integer whence) -> Integer
   end
 
-  type excelx_cell_value = nil | ::Roo::Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer
+  type excelx_cell_value = nil | ::Roo::Link | bool | ::Date | ::DateTime | ::Time | Float | String | Integer
   class Excelx < Roo::Base[excelx_cell_value]
     # NOTE: Create temp directory and allow Ruby to cleanup the temp directory
     #       when the object is garbage collected. Initially, the finalizer was
@@ -52,13 +52,13 @@ module Roo
     # (1,1) is the upper left corner.
     # (1,1), (1,'A'), ('A',1), ('a',1) all refers to the
     # cell at the first line and first row.
-    def cell: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer)
+    def cell: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (nil | Link | bool | ::Date | ::DateTime | ::Time | Float | String | Integer)
 
-    def row: (String | Integer rownumber, ?(String | Integer)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer]
+    def row: (String | Integer rownumber, ?(String | Integer)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | Float | String | Integer]
 
     # returns all values in this column as an array
     # column numbers are 1,2,3,... like in the spreadsheet
-    def column: (String | Integer column_number, ?(String | Integer)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer]
+    def column: (String | Integer column_number, ?(String | Integer)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | Float | String | Integer]
 
     # returns the number of the first non-empty row
     def first_row: (?String | Integer? sheet) -> (Integer | nil)
@@ -74,7 +74,7 @@ module Roo
 
     # set a cell to a certain value
     # (this will not be saved back to the spreadsheet file!)
-    def set: (String | Integer row, String | Integer col, String | Integer | float value, ?(String | Integer)? sheet) -> void
+    def set: (String | Integer row, String | Integer col, String | Integer | Float value, ?(String | Integer)? sheet) -> void
 
     # Returns the formula at (row,col).
     # Returns nil if there is no formula.
