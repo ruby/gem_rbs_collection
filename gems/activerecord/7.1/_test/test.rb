@@ -42,4 +42,5 @@ module Test
   user = User.new
   user.normalize_attribute(:email)
   User.normalize_value_for(:email, ' CRUISE-CONTROL@EXAMPLE.COM\n')
+  User.authenticate_by(email: "jdoe@example.com", password: "abc123")
 end

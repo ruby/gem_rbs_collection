@@ -4,6 +4,8 @@ module ActiveRecord
     extend Encryption::EncryptableRecord::ClassMethods
     include Normalization
     extend Normalization::ClassMethods
+    include SecurePassword
+    extend SecurePassword::ClassMethods
   end
 
   module Inheritance
@@ -116,6 +118,20 @@ module ActiveRecord
     def keys_including_timestamps: () -> Set[String]
 
     def timestamps_for_create: () -> Hash[String, String]
+  end
+
+  module SecurePassword
+    module ClassMethods
+      def authenticate_by: (untyped attributes) -> instance?
+    end
+  end
+end
+
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def authenticate_by: (untyped attributes) -> Model?
+    end
   end
 end
 
