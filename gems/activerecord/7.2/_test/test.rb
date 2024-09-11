@@ -42,4 +42,5 @@ module Test
   user = User.new
   user.normalize_attribute(:email)
   User.normalize_value_for(:email, ' CRUISE-CONTROL@EXAMPLE.COM\n')
+  User.with_recursive(admin_users: User.where(role: 0))
 end

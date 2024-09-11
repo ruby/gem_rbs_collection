@@ -6,6 +6,13 @@ module ActiveRecord
     extend Normalization::ClassMethods
   end
 
+  class Relation
+    module QueryMethods
+      def with_recursive: (*untyped) -> untyped
+      def with_recursive!: (*untyped) -> untyped
+    end
+  end
+
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
@@ -83,8 +90,8 @@ module ActiveRecord
 
   class MismatchedForeignKey < StatementInvalid
     def initialize: (?message: untyped?, ?sql: untyped?, ?binds: untyped?, ?table: untyped?,
-                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?, 
-                     ?primary_key_column: untyped?, ?query_parser: untyped?, 
+                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?,
+                     ?primary_key_column: untyped?, ?query_parser: untyped?,
                      ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
   end
 
@@ -106,15 +113,34 @@ module ActiveRecord
     end
   end
 
+  module Querying
+    def with_recursive: (*untyped) -> untyped
+  end
+
   class InsertAll
     @record_timestamps: bool
 
     def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-                  
+
     def record_timestamps?: () -> bool
 
     def keys_including_timestamps: () -> Set[String]
 
     def timestamps_for_create: () -> Hash[String, String]
+  end
+end
+
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def with_recursive: (*untyped) -> self
+      def with_recursive!: (*untyped) -> self
+    end
+  end
+
+  class Base
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def with_recursive: (*untyped) -> Relation
+    end
   end
 end
