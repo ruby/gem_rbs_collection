@@ -6,6 +6,8 @@ module ActiveRecord
     extend Normalization::ClassMethods
     include SecurePassword
     extend SecurePassword::ClassMethods
+    include TokenFor
+    extend TokenFor::ClassMethods
   end
 
   class AssociationRelation
@@ -144,6 +146,16 @@ module ActiveRecord
     module ClassMethods
       def authenticate_by: (untyped attributes) -> instance?
     end
+  end
+
+  module TokenFor
+    module ClassMethods
+      def generates_token_for: (Symbol purpose, ?expires_in: ActiveSupport::Duration) ? { () [self: instance] -> untyped } -> untyped
+      def find_by_token_for: (Symbol purpose, String token) -> untyped
+      def find_by_token_for!: (Symbol purpose, String token) -> untyped
+    end
+
+    def generate_token_for: (Symbol purpose) -> String
   end
 end
 
