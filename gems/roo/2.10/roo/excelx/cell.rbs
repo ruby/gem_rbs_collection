@@ -34,15 +34,15 @@ module Roo
       attr_writer value: float | ::Date | ::DateTime | String
 
       # DEPRECATED: Please use Cell.create_cell instead.
-      def initialize: (int | String | float value, :float | :percentage | :date | :datetime | :time type, String | nil formula, untyped excelx_type, untyped excelx_value, String | nil style, String | nil hyperlink, ::Date | nil base_date, Excelx::Coordinate coordinate) -> void
+      def initialize: (Integer | String | float value, :float | :percentage | :date | :datetime | :time type, String | nil formula, untyped excelx_type, untyped excelx_value, String | nil style, String | nil hyperlink, ::Date | nil base_date, Excelx::Coordinate coordinate) -> void
 
       def type: () -> (:float | :percentage | :date | :datetime | :time)
 
       def self.create_cell: (:string type, *[String, String | nil, String | nil, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::String
-                          | (:boolean type, *[String, String | nil, int, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Boolean
+                          | (:boolean type, *[String, String | nil, Integer, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Boolean
                           | (:number type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Number
                           | (:date type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Date
-                          | (:datetime type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, int, ::Roo::Excelx::Coordinate] values) -> Cell::DateTime
+                          | (:datetime type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, Integer, ::Roo::Excelx::Coordinate] values) -> Cell::DateTime
                           | (:time type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Time
                           | (untyped type, *untyped values) -> nil
 
@@ -51,20 +51,20 @@ module Roo
 
       # Deprecated: use Roo::Excelx::Coordinate instead.
       class Coordinate
-        @row: int
+        @row: Integer
 
-        @column: int
+        @column: Integer
 
-        attr_accessor row: int
+        attr_accessor row: Integer
 
-        attr_accessor column: int
+        attr_accessor column: Integer
 
-        def initialize: (int row, int column) -> void
+        def initialize: (Integer row, Integer column) -> void
       end
 
       private
 
-      def type_cast_value: (int | String | float value) -> (float | ::Date | ::DateTime | String)
+      def type_cast_value: (Integer | String | float value) -> (float | ::Date | ::DateTime | String)
 
       def create_date: (::Date date) -> ::Date
 

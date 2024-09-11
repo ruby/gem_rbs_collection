@@ -8,25 +8,25 @@ class Roo::Base[CellValue]
 
   @cell_type: untyped
 
-  @cells_read: Hash[String | int, bool]
+  @cells_read: Hash[String | Integer, bool]
 
-  @first_row: Hash[String | int, int | nil]
+  @first_row: Hash[String | Integer, Integer | nil]
 
-  @last_row: Hash[String | int, int | nil]
+  @last_row: Hash[String | Integer, Integer | nil]
 
-  @first_column: Hash[String | int, int | nil]
+  @first_column: Hash[String | Integer, Integer | nil]
 
-  @last_column: Hash[String | int, int | nil]
+  @last_column: Hash[String | Integer, Integer | nil]
 
-  @header_line: int
+  @header_line: Integer
 
   @default_sheet: String | nil
 
-  @first_last_row_cols: Hash[String | int, { first_row: int | nil, first_column: int | nil, last_row: int | nil, last_column: int | nil }]
+  @first_last_row_cols: Hash[String | Integer, { first_row: Integer | nil, first_column: Integer | nil, last_row: Integer | nil, last_column: Integer | nil }]
 
-  @cleaned: Hash[String | int, bool]
+  @cleaned: Hash[String | Integer, bool]
 
-  @headers: nil | Array[[CellValue, int]] | Hash[untyped, int]
+  @headers: nil | Array[[CellValue, Integer]] | Hash[untyped, Integer]
 
   include Enumerable[Array[CellValue]]
 
@@ -44,75 +44,75 @@ class Roo::Base[CellValue]
 
   MIN_ROW_COL: 0
 
-  attr_reader headers: nil | Array[[CellValue, int]] | Hash[untyped, int]
+  attr_reader headers: nil | Array[[CellValue, Integer]] | Hash[untyped, Integer]
 
   # sets the line with attribute names (default: 1)
-  attr_accessor header_line: int
+  attr_accessor header_line: Integer
 
   def self.TEMP_PREFIX: () -> 'roo_'
 
-  def self.finalize: (int object_id) -> ^() -> void
+  def self.finalize: (Integer object_id) -> ^() -> void
 
   def initialize: (String | ::Roo::_Stream filename, ?::Hash[Symbol, untyped] options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
 
   def close: () -> nil
 
-  def default_sheet: () -> (String | int |  nil)
+  def default_sheet: () -> (String | Integer |  nil)
 
   # sets the working sheet in the document
   # 'sheet' can be a number (0 = first sheet) or the name of a sheet.
-  def default_sheet=: (String | int sheet) -> void
+  def default_sheet=: (String | Integer sheet) -> void
 
   # first non-empty column as a letter
-  def first_column_as_letter: (?(String | int) sheet) -> String
+  def first_column_as_letter: (?(String | Integer) sheet) -> String
 
   # last non-empty column as a letter
-  def last_column_as_letter: (?(String | int) sheet) -> String
+  def last_column_as_letter: (?(String | Integer) sheet) -> String
 
   # Set first/last row/column for sheet
-  def first_last_row_col_for_sheet: (String | int sheet) -> { first_row: int | nil, first_column: int | nil, last_row: int | nil, last_column: int | nil }
+  def first_last_row_col_for_sheet: (String | Integer sheet) -> { first_row: Integer | nil, first_column: Integer | nil, last_row: Integer | nil, last_column: Integer | nil }
 
   # Collect first/last row/column from sheet
-  def collect_last_row_col_for_sheet: (String | int sheet) -> { first_row: int, first_column: int, last_row: int, last_column: int }
+  def collect_last_row_col_for_sheet: (String | Integer sheet) -> { first_row: Integer, first_column: Integer, last_row: Integer, last_column: Integer }
 
-  def first_row: (?String | int sheet) -> (int | nil)
+  def first_row: (?String | Integer sheet) -> (Integer | nil)
 
-  def last_row: (?String | int sheet) -> (int | nil)
+  def last_row: (?String | Integer sheet) -> (Integer | nil)
 
-  def first_column: (?String | int sheet) -> (int | nil)
+  def first_column: (?String | Integer sheet) -> (Integer | nil)
 
-  def last_column: (?String | int sheet) -> (int | nil)
+  def last_column: (?String | Integer sheet) -> (Integer | nil)
 
   def inspect: () -> String
 
   # find a row either by row number or a condition
   # Caution: this works only within the default sheet -> set default_sheet before you call this method
   # (experimental. see examples in the test_roo.rb file)
-  def find: (*(int | :all | { ?array: boolish, ?conditions: Hash[CellValue, CellValue] }) args) -> (Array[CellValue] | Hash[CellValue, CellValue])
-  # def find: ([int] options) -> Array[CellValue]
+  def find: (*(Integer | :all | { ?array: boolish, ?conditions: Hash[CellValue, CellValue] }) args) -> (Array[CellValue] | Hash[CellValue, CellValue])
+  # def find: ([Integer] options) -> Array[CellValue]
   #         | ([:all, { array: boolish, ?conditions: Hash[CellValue, CellValue] }] options) -> Array[CellValue]
   #         | ([:all, { ?conditions: Hash[CellValue, CellValue] }] options) -> Hash[CellValue, CellValue]
 
   # returns all values in this row as an array
   # row numbers are 1,2,3,... like in the spreadsheet
-  def row: (String | int row_number, ?String | int sheet) -> Array[CellValue]
+  def row: (String | Integer row_number, ?String | Integer sheet) -> Array[CellValue]
 
   # returns all values in this column as an array
   # column numbers are 1,2,3,... like in the spreadsheet
-  def column: (String | int column_number, ?String | int sheet) -> Array[CellValue]
+  def column: (String | Integer column_number, ?String | Integer sheet) -> Array[CellValue]
 
   # set a cell to a certain value
   # (this will not be saved back to the spreadsheet file!)
-  def set: (String | int row, String | int col, CellValue value, ?String | int sheet) -> void
+  def set: (String | Integer row, String | Integer col, CellValue value, ?String | Integer sheet) -> void
 
-  def cell_type_by_value: (int value) -> :float
+  def cell_type_by_value: (Integer value) -> :float
                         | (String | float value) -> :string
 
   # reopens and read a spreadsheet document
   def reload: () -> void
 
   # true if cell is empty
-  def empty?: (String | int row, String | int col, ?(String | int) sheet) -> bool
+  def empty?: (String | Integer row, String | Integer col, ?(String | Integer) sheet) -> bool
 
   # returns information of the spreadsheet document and all sheets within
   # this document.
@@ -124,8 +124,8 @@ class Roo::Base[CellValue]
 
   # access different worksheets by calling spreadsheet.sheet(1)
   # or spreadsheet.sheet('SHEETNAME')
-  def sheet: (String | int index, ?false name) -> self
-           | (String | int index, true name) -> [String, self]
+  def sheet: (String | Integer index, ?false name) -> self
+           | (String | Integer index, true name) -> [String, self]
 
   # iterate through all worksheets of a document
   def each_with_pagename: () { ([::String, self] sheet) -> void } -> void
@@ -142,7 +142,7 @@ class Roo::Base[CellValue]
            | (?{} options) -> Array[CellValue]
 
   def row_with: (Array[untyped] query, true return_headers) -> Array[CellValue]
-              | (Array[untyped] query, ?false return_headers) -> int
+              | (Array[untyped] query, ?false return_headers) -> Integer
 
   def file_type_check: (String filename, Array[String] | String exts, String name, :error | :warning | :ignore warning_level, ?(:zip)? packed) -> nil
 
@@ -150,10 +150,10 @@ class Roo::Base[CellValue]
   # ein Array mit numerischen Werten ([12,45])
   # Diese Methode ist eine temp. Loesung, um zu erforschen, ob der
   # Zugriff mit numerischen Keys schneller ist.
-  def key_to_num: (String str) -> [int, int]
+  def key_to_num: (String str) -> [Integer, Integer]
 
   # see: key_to_num
-  def key_to_string: ([int, int] arr) -> String
+  def key_to_string: ([Integer, Integer] arr) -> String
 
   def is_stream?: (String | ::Roo::_Stream filename_or_stream) -> bool
 
@@ -168,7 +168,7 @@ class Roo::Base[CellValue]
 
   def file_type_warning_message: (String filename, Array[String] | String exts) -> String
 
-  def find_by_row: (int row_index) -> Array[CellValue]
+  def find_by_row: (Integer row_index) -> Array[CellValue]
 
   def find_by_conditions: ({ array: boolish } options) -> Array[CellValue]
                         | ({ array: boolish, conditions: Hash[CellValue, CellValue] } options) -> Array[CellValue]
@@ -182,21 +182,21 @@ class Roo::Base[CellValue]
 
   def make_tmpdir: (?String? prefix, ?String? root) ?{ (String path) -> String } -> String
 
-  def clean_sheet: (String | int | nil sheet) -> void
+  def clean_sheet: (String | Integer | nil sheet) -> void
 
   def sanitize_value: (String v) -> String
 
   def set_headers: [HeaderName] (?::Hash[HeaderName, untyped] hash) -> void
 
-  def header_index: (untyped query) -> int
+  def header_index: (untyped query) -> Integer
 
-  def set_value: (int row, int col, CellValue value, ?String | int? sheet) -> untyped
+  def set_value: (Integer row, Integer col, CellValue value, ?String | Integer? sheet) -> untyped
 
-  def set_type: (int row, int col, :float | :string type, ?String | int? sheet) -> untyped
+  def set_type: (Integer row, Integer col, :float | :string type, ?String | Integer? sheet) -> untyped
 
   # converts cell coordinate to numeric values of row,col
-  def normalize: (String row, int col) -> [int, int]
-               | (int row, String | int col) -> [int, int]
+  def normalize: (String row, Integer col) -> [Integer, Integer]
+               | (Integer row, String | Integer col) -> [Integer, Integer]
 
   def uri?: (String filename) -> bool
 
@@ -207,7 +207,7 @@ class Roo::Base[CellValue]
   def unzip: (String filename, String tmpdir) -> ::Zip::File
 
   # check if default_sheet was set and exists in sheets-array
-  def validate_sheet!: (String | int | nil sheet) -> void
+  def validate_sheet!: (String | Integer | nil sheet) -> void
 
   def process_zipfile_packed: (::Zip::File zip, String tmpdir, ?String path) -> (String | nil)
 end

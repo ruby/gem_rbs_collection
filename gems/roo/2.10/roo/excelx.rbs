@@ -1,9 +1,9 @@
 module Roo
   interface _Stream
-    def seek: (int offset, ?int whence) -> int
+    def seek: (Integer offset, ?Integer whence) -> Integer
   end
 
-  type excelx_cell_value = nil | ::Roo::Link | bool | ::Date | ::DateTime | ::Time | float | String | int
+  type excelx_cell_value = nil | ::Roo::Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer
   class Excelx < Roo::Base[excelx_cell_value]
     # NOTE: Create temp directory and allow Ruby to cleanup the temp directory
     #       when the object is garbage collected. Initially, the finalizer was
@@ -21,7 +21,7 @@ module Roo
 
     @sheets_by_name: Hash[String, Sheet]
 
-    @labels: Array[[String, [int, int, String]]]
+    @labels: Array[[String, [Integer, Integer, String]]]
 
     @sheet_files: Array[String]
 
@@ -38,62 +38,62 @@ module Roo
     # values for packed: :zip
     # optional cell_max (int) parameter for early aborting attempts to parse
     # enormous documents.
-    def initialize: (String | ::Roo::_Stream filename_or_stream, ?{ ?packed: :zip, ?file_warning: :error | :warning | :ignore, ?cell_max: int, ?expand_merged_ranges: bool, ?no_hyperlinks: bool, ?empty_cell: bool, ?disable_html_wrapper: bool, ?tmpdir_root: String } options, ?only_visible_sheets: bool) -> void
+    def initialize: (String | ::Roo::_Stream filename_or_stream, ?{ ?packed: :zip, ?file_warning: :error | :warning | :ignore, ?cell_max: Integer, ?expand_merged_ranges: bool, ?no_hyperlinks: bool, ?empty_cell: bool, ?disable_html_wrapper: bool, ?tmpdir_root: String } options, ?only_visible_sheets: bool) -> void
 
     def method_missing: (untyped method, *untyped args) -> untyped
 
     def sheets: () -> Array[String]
 
-    def sheet_for: (String | int | nil sheet) -> Sheet
+    def sheet_for: (String | Integer | nil sheet) -> Sheet
 
-    def images: (?(String | int)? sheet) -> Array[String | nil]
+    def images: (?(String | Integer)? sheet) -> Array[String | nil]
 
     # Returns the content of a spreadsheet-cell.
     # (1,1) is the upper left corner.
     # (1,1), (1,'A'), ('A',1), ('a',1) all refers to the
     # cell at the first line and first row.
-    def cell: (String | int row, String | int col, ?(String | int)? sheet) -> (nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | int)
+    def cell: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer)
 
-    def row: (String | int rownumber, ?(String | int)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | int]
+    def row: (String | Integer rownumber, ?(String | Integer)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer]
 
     # returns all values in this column as an array
     # column numbers are 1,2,3,... like in the spreadsheet
-    def column: (String | int column_number, ?(String | int)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | int]
+    def column: (String | Integer column_number, ?(String | Integer)? sheet) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | String | Integer]
 
     # returns the number of the first non-empty row
-    def first_row: (?String | int? sheet) -> (int | nil)
+    def first_row: (?String | Integer? sheet) -> (Integer | nil)
 
     # returns the number of the last non-empty row
-    def last_row: (?String | int? sheet) -> (int | nil)
+    def last_row: (?String | Integer? sheet) -> (Integer | nil)
 
     # returns the number of the first non-empty column
-    def first_column: (?String | int? sheet) -> (int | nil)
+    def first_column: (?String | Integer? sheet) -> (Integer | nil)
 
     # returns the number of the last non-empty column
-    def last_column: (?String | int? sheet) -> (int | nil)
+    def last_column: (?String | Integer? sheet) -> (Integer | nil)
 
     # set a cell to a certain value
     # (this will not be saved back to the spreadsheet file!)
-    def set: (String | int row, String | int col, String | int | float value, ?(String | int)? sheet) -> void
+    def set: (String | Integer row, String | Integer col, String | Integer | float value, ?(String | Integer)? sheet) -> void
 
     # Returns the formula at (row,col).
     # Returns nil if there is no formula.
     # The method #formula? checks if there is a formula.
-    def formula: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
+    def formula: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (String | nil)
 
     # Predicate methods really should return a boolean
     # value. Hopefully no one was relying on the fact that this
     # previously returned either nil/formula
-    def formula?: (*(String | int)) -> bool
-    # def formula?: ([(String | int), (String | int)] args) -> bool
-    #             | ([(String | int), (String | int), (String | int)?] args) -> bool
+    def formula?: (*(String | Integer)) -> bool
+    # def formula?: ([(String | Integer), (String | Integer)] args) -> bool
+    #             | ([(String | Integer), (String | Integer), (String | Integer)?] args) -> bool
 
     # returns each formula in the selected sheet as an array of tuples in following format
     # [[row, col, formula], [row, col, formula],...]
-    def formulas: (?(String | int | nil)? sheet) -> Array[[String | int | nil, String | int | nil, String | nil]]
+    def formulas: (?(String | Integer | nil)? sheet) -> Array[[String | Integer | nil, String | Integer | nil, String | nil]]
 
     # Given a cell, return the cell's style
-    def font: (String | int row, String | int col, ?(String | int)? sheet) -> (::Roo::Font | nil)
+    def font: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (::Roo::Font | nil)
 
     # returns the type of a cell:
     # * :float
@@ -103,53 +103,53 @@ module Roo
     # * :formula
     # * :time
     # * :datetime
-    def celltype: (String | int row, String | int col, ?(String | int)? sheet) -> (:float | :string | :date | :percentage | :formula | :time | :datetime | nil)
+    def celltype: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (:float | :string | :date | :percentage | :formula | :time | :datetime | nil)
 
     # returns the internal type of an excel cell
     # * :numeric_or_formula
     # * :string
     # Note: this is only available within the Excelx class
-    def excelx_type: (String | int row, String | int col, ?(String | int)? sheet) -> (:boolean | :string | [:numeric_or_formula, String] | nil)
+    def excelx_type: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (:boolean | :string | [:numeric_or_formula, String] | nil)
 
     # returns the internal value of an excelx cell
     # Note: this is only available within the Excelx class
-    def excelx_value: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
+    def excelx_value: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (String | nil)
 
     # returns the internal value of an excelx cell
     # Note: this is only available within the Excelx class
-    def formatted_value: (String | int row, String | int col, ?(String | int)? sheet) -> (String | ::Roo::Link | nil)
+    def formatted_value: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (String | ::Roo::Link | nil)
 
     # returns the internal format of an excel cell
-    def excelx_format: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
+    def excelx_format: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (String | nil)
 
-    def empty?: (String | int row, String | int col, ?(String | int)? sheet) -> bool
+    def empty?: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> bool
 
     # shows the internal representation of all cells
     # for debugging purposes
-    def to_s: (?String | int? sheet) -> String
+    def to_s: (?String | Integer? sheet) -> String
 
     # returns the row,col values of the labelled cell
     # (nil,nil) if label is not defined
-    def label: (String name) -> ([nil, nil, nil] | [String | int, String | int, String | int])
+    def label: (String name) -> ([nil, nil, nil] | [String | Integer, String | Integer, String | Integer])
 
     # Returns an array which all labels. Each element is an array with
     # [labelname, [row,col,sheetname]]
-    def labels: () -> Array[[String, [String | int, String | int, String | int]]]
+    def labels: () -> Array[[String, [String | Integer, String | Integer, String | Integer]]]
 
-    def hyperlink?: (String | int row, String | int col, ?(String | int)? sheet) -> bool
+    def hyperlink?: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> bool
 
     # returns the hyperlink at (row/col)
     # nil if there is no hyperlink
-    def hyperlink: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
+    def hyperlink: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (String | nil)
 
     # returns the comment at (row/col)
     # nil if there is no comment
-    def comment: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
+    def comment: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (String | nil)
 
     # true, if there is a comment
-    def comment?: (String | int row, String | int col, ?String | int? sheet) -> bool
+    def comment?: (String | Integer row, String | Integer col, ?String | Integer? sheet) -> bool
 
-    def comments: (?String | int? sheet) -> Array[[untyped, untyped, untyped]]
+    def comments: (?String | Integer? sheet) -> Array[[untyped, untyped, untyped]]
 
     # Yield an array of Excelx::Cell
     # Takes options for sheet, pad_cells, and max_rows
@@ -214,6 +214,6 @@ module Roo
 
     def worksheet_types: () -> ["http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet", "http://purl.oclc.org/ooxml/officeDocument/relationships/worksheet"]
 
-    def find_by_row: (int row_index) -> Array[excelx_cell_value]
+    def find_by_row: (Integer row_index) -> Array[excelx_cell_value]
   end
 end

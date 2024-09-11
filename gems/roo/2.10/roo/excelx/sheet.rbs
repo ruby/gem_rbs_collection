@@ -5,7 +5,7 @@ module Roo
 
       @shared: Shared
 
-      @sheet_index: int
+      @sheet_index: Integer
 
       @images: Hash[String, String]
 
@@ -19,23 +19,23 @@ module Roo
 
       @present_cells: Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
-      @first_row: int | nil
+      @first_row: Integer | nil
 
-      @last_row: int | nil
+      @last_row: Integer | nil
 
-      @first_column: int | nil
+      @first_column: Integer | nil
 
-      @last_column: int | nil
+      @last_column: Integer | nil
 
       @hyperlinks: Hash[Coordinate, String]
 
-      @first_last_row_col: { first_row: int | nil, last_row: int | nil, first_column: int | nil, last_column: int | nil }
+      @first_last_row_col: { first_row: Integer | nil, last_row: Integer | nil, first_column: Integer | nil, last_column: Integer | nil }
 
       extend Forwardable
 
       attr_reader images: Hash[String, String]
 
-      def initialize: (String name, Shared shared, int sheet_index, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
+      def initialize: (String name, Shared shared, Integer sheet_index, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
 
       def cells: () -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
@@ -46,22 +46,22 @@ module Roo
       # pad_cells (boolean) and offset (int)
       def each_row: (?::Hash[Symbol, untyped] options) ?{ (Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]) -> void } -> void
 
-      def row: (String | int row_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | String]
+      def row: (String | Integer row_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | Integer | String]
 
-      def column: (String | int col_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | String]
+      def column: (String | Integer col_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | Integer | String]
 
       # returns the number of the first non-empty row
-      def first_row: () -> (int | nil)
+      def first_row: () -> (Integer | nil)
 
-      def last_row: () -> (int | nil)
+      def last_row: () -> (Integer | nil)
 
       # returns the number of the first non-empty column
-      def first_column: () -> (int | nil)
+      def first_column: () -> (Integer | nil)
 
       # returns the number of the last non-empty column
-      def last_column: () -> (int | nil)
+      def last_column: () -> (Integer | nil)
 
-      def excelx_format: ([int, int] key) -> (String | nil)
+      def excelx_format: ([Integer, Integer] key) -> (String | nil)
 
       def hyperlinks: () -> Hash[Coordinate, String]
 
@@ -77,9 +77,9 @@ module Roo
       def cells_for_row_element: (Nokogiri::XML::Element row_element, ?::Hash[Symbol, untyped] options) -> Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]
                                | (nil row_element, ?::Hash[Symbol, untyped] options) -> []
 
-      def pad_cells: (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time cell, int last_column) -> Array[nil]
+      def pad_cells: (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time cell, Integer last_column) -> Array[nil]
 
-      def first_last_row_col: () -> { first_row: int | nil, last_row: int | nil, first_column: int | nil, last_column: int | nil }
+      def first_last_row_col: () -> { first_row: Integer | nil, last_row: Integer | nil, first_column: Integer | nil, last_column: Integer | nil }
     end
   end
 end
