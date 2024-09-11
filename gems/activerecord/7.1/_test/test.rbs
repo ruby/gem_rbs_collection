@@ -7,5 +7,18 @@ module Test
 
     class ActiveRecord_Relation < ::ActiveRecord::Relation
     end
+
+    def articles: () -> Article::ActiveRecord_Associations_CollectionProxy
+  end
+
+  class Article < ApplicationRecord
+    extend ::ActiveRecord::Base::ClassMethods[Article, ActiveRecord_Relation, Integer]
+
+    class ActiveRecord_Relation < ActiveRecord::Relation
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::ActiveRecord::Relation::Methods[Article, Integer]
+    end
   end
 end
