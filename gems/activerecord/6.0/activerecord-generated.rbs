@@ -19265,20 +19265,6 @@ module ActiveRecord
 
     def bind_attribute: (untyped name, untyped value) { (untyped, untyped) -> untyped } -> untyped
 
-    # Initializes new record from relation while maintaining the current
-    # scope.
-    #
-    # Expects arguments in the same format as {ActiveRecord::Base.new}[rdoc-ref:Core.new].
-    #
-    #   users = User.where(name: 'DHH')
-    #   user = users.new # => #<User id: nil, name: "DHH", created_at: nil, updated_at: nil>
-    #
-    # You can also pass a block to new with the new record as argument:
-    #
-    #   user = users.new { |user| user.name = 'Oscar' }
-    #   user.name # => Oscar
-    def new: (?untyped? attributes) { () -> untyped } -> untyped
-
     alias build new
 
     # Tries to create a new record with the same scoped attributes
@@ -23507,8 +23493,6 @@ module Arel
 
     # TableAlias and Table both have a #table_name which is the name of the underlying table
     alias table_name name
-
-    def initialize: (untyped name, ?type_caster: untyped? type_caster, ?as: untyped? as) -> untyped
 
     def alias: (?::String name) -> Nodes::TableAlias
 

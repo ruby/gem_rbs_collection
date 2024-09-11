@@ -29,3 +29,13 @@ class ApplicationController < ActionController::Base
     params.fetch(:person)
   end
 end
+
+rs = ActionDispatch::Routing::RouteSet.new
+rs.draw do
+  resource :foo
+  resources :bar, only: %i[index]
+  namespace :baz do
+    get :qux
+    post :quux
+  end
+end

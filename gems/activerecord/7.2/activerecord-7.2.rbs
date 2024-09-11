@@ -2,26 +2,8 @@ module ActiveRecord
   class Base
     include Encryption::EncryptableRecord
     extend Encryption::EncryptableRecord::ClassMethods
-  end
-
-  class AssociationRelation
-    def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-  end
-
-  module Associations
-    class CollectionProxy
-      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    end
+    include Normalization
+    extend Normalization::ClassMethods
   end
 
   module Inheritance
@@ -72,19 +54,38 @@ module ActiveRecord
     end
   end
 
-  class ConnectionNotEstablished < ActiveRecordError
+  module Normalization
+    def normalize_attribute: (untyped name) -> void
+
+    module ClassMethods
+      def normalizes: (*untyped names, with: untyped, ?apply_to_nil: bool) -> void
+      def normalize_value_for: (untyped name, untyped value) -> untyped
+    end
   end
 
-  class StatementInvalid < ActiveRecordError
-    def initialize: (?untyped? message, ?binds: untyped? binds, ?sql: untyped? sql) -> untyped
+  class AdapterError < ActiveRecordError
+    def initialize: (?untyped? message, ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
+
+    attr_reader connection_pool: ConnectionAdapters::ConnectionPool?
+  end
+
+  class ConnectionNotEstablished < AdapterError
+  end
+
+  class StatementInvalid < AdapterError
+    def initialize: (?untyped? message, ?sql: untyped?, ?binds: untyped?, ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
 
     attr_reader sql: untyped
-
     attr_reader binds: untyped
+
+    def set_query: (untyped sql, untyped binds) -> self
   end
 
   class MismatchedForeignKey < StatementInvalid
-    def initialize: (?primary_key_column: untyped? primary_key_column, ?primary_key: untyped? primary_key, ?target_table: untyped? target_table, ?foreign_key: untyped? foreign_key, ?table: untyped? table, ?binds: untyped? binds, ?sql: untyped? sql, ?message: untyped? message) -> untyped
+    def initialize: (?message: untyped?, ?sql: untyped?, ?binds: untyped?, ?table: untyped?,
+                     ?foreign_key: untyped?, ?target_table: untyped?, ?primary_key: untyped?, 
+                     ?primary_key_column: untyped?, ?query_parser: untyped?, 
+                     ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
   end
 
   module Persistence
@@ -109,17 +110,11 @@ module ActiveRecord
     @record_timestamps: bool
 
     def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-
+                  
     def record_timestamps?: () -> bool
 
     def keys_including_timestamps: () -> Set[String]
 
     def timestamps_for_create: () -> Hash[String, String]
-  end
-end
-
-module Arel
-  class Table
-    def initialize: (untyped name, ?type_caster: untyped type_caster, ?as: untyped? as, ?klass: untyped?) -> void
   end
 end

@@ -4,8 +4,30 @@ module ActiveRecord
     extend Encryption::EncryptableRecord::ClassMethods
     include Normalization
     extend Normalization::ClassMethods
+    include SecurePassword
+    extend SecurePassword::ClassMethods
     include TokenFor
     extend TokenFor::ClassMethods
+  end
+
+  class AssociationRelation
+    def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+  end
+
+  module Associations
+    class CollectionProxy
+      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    end
   end
 
   module Inheritance
@@ -120,6 +142,12 @@ module ActiveRecord
     def timestamps_for_create: () -> Hash[String, String]
   end
 
+  module SecurePassword
+    module ClassMethods
+      def authenticate_by: (untyped attributes) -> instance?
+    end
+  end
+
   module TokenFor
     module ClassMethods
       def generates_token_for: (Symbol purpose, ?expires_in: ActiveSupport::Duration) ? { () [self: instance] -> untyped } -> untyped
@@ -128,5 +156,19 @@ module ActiveRecord
     end
 
     def generate_token_for: (Symbol purpose) -> String
+  end
+end
+
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def authenticate_by: (untyped attributes) -> Model?
+    end
+  end
+end
+
+module Arel
+  class Table
+    def initialize: (untyped name, ?type_caster: untyped type_caster, ?as: untyped? as, ?klass: untyped?) -> void
   end
 end
