@@ -6,28 +6,28 @@ module Roo
 
     LETTERS: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
-    def extract_coordinate: (string s) -> ::Roo::Excelx::Coordinate
+    def extract_coordinate: (String s) -> ::Roo::Excelx::Coordinate
 
     alias ref_to_key extract_coordinate
 
-    def split_coordinate: (string str) -> ::Roo::Excelx::Coordinate
+    def split_coordinate: (String str) -> ::Roo::Excelx::Coordinate
 
-    def split_coord: (string str) -> [string, int]
+    def split_coord: (String str) -> [String, int]
 
     # convert a number to something like 'AB' (1 => 'A', 2 => 'B', ...)
-    def number_to_letter: (int num) -> string
+    def number_to_letter: (int num) -> String
 
-    def letter_to_number: (string letters) -> int
+    def letter_to_number: (String letters) -> int
 
     # Compute upper bound for cells in a given cell range.
-    def num_cells_in_range: (string str) -> int
+    def num_cells_in_range: (String str) -> int
 
-    def coordinates_in_range: (string str) ?{ (::Roo::Excelx::Coordinate) -> untyped } -> untyped
+    def coordinates_in_range: (String str) ?{ (::Roo::Excelx::Coordinate) -> untyped } -> untyped
 
-    def load_xml: (string path) -> ::Nokogiri::XML::Document
+    def load_xml: (String path) -> ::Nokogiri::XML::Document
 
     # Yield each element of a given type ('row', 'c', etc.) to caller
-    def each_element: (string path, 'row' | 'dimension' elements) ?{ (Nokogiri::XML::Element | nil) -> void } -> void
+    def each_element: (String path, 'row' | 'dimension' elements) ?{ (Nokogiri::XML::Element | nil) -> void } -> void
 
     private
 

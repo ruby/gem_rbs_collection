@@ -3,7 +3,7 @@ module Roo
     class Cell
       @type: :float | :percentage | :date | :datetime | :time
 
-      @formula: string | nil
+      @formula: String | nil
 
       @base_date: ::Date | nil
 
@@ -11,39 +11,39 @@ module Roo
 
       @excelx_value: untyped
 
-      @style: string | nil
+      @style: String | nil
 
-      @value: float | ::Date | ::DateTime | string
+      @value: float | ::Date | ::DateTime | String
 
       @coordinate: ::Roo::Excelx::Coordinate
 
-      attr_reader formula: string | nil
+      attr_reader formula: String | nil
 
-      attr_reader value: float | ::Date | ::DateTime | string
+      attr_reader value: float | ::Date | ::DateTime | String
 
       attr_reader excelx_type: untyped
 
       attr_reader excelx_value: untyped
 
-      attr_reader style: string | nil
+      attr_reader style: String | nil
 
-      attr_reader hyperlink: string | nil
+      attr_reader hyperlink: String | nil
 
       attr_reader coordinate: ::Roo::Excelx::Coordinate
 
-      attr_writer value: float | ::Date | ::DateTime | string
+      attr_writer value: float | ::Date | ::DateTime | String
 
       # DEPRECATED: Please use Cell.create_cell instead.
-      def initialize: (int | string | float value, :float | :percentage | :date | :datetime | :time type, string | nil formula, untyped excelx_type, untyped excelx_value, string | nil style, string | nil hyperlink, ::Date | nil base_date, Excelx::Coordinate coordinate) -> void
+      def initialize: (int | String | float value, :float | :percentage | :date | :datetime | :time type, String | nil formula, untyped excelx_type, untyped excelx_value, String | nil style, String | nil hyperlink, ::Date | nil base_date, Excelx::Coordinate coordinate) -> void
 
       def type: () -> (:float | :percentage | :date | :datetime | :time)
 
-      def self.create_cell: (:string type, *[string, string | nil, string | nil, string | nil, ::Roo::Excelx::Coordinate] values) -> Cell::String
-                          | (:boolean type, *[string, string | nil, int, string | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Boolean
-                          | (:number type, *[string, string | nil, [:numeric_or_formula, string], string | nil, string | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Number
-                          | (:date type, *[string, string | nil, [:numeric_or_formula, string], string | nil, string | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Date
-                          | (:datetime type, *[string, string | nil, [:numeric_or_formula, string], string | nil, string | nil, int, ::Roo::Excelx::Coordinate] values) -> Cell::DateTime
-                          | (:time type, *[string, string | nil, [:numeric_or_formula, string], string | nil, string | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Time
+      def self.create_cell: (:string type, *[String, String | nil, String | nil, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::String
+                          | (:boolean type, *[String, String | nil, int, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Boolean
+                          | (:number type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Number
+                          | (:date type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Date
+                          | (:datetime type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, int, ::Roo::Excelx::Coordinate] values) -> Cell::DateTime
+                          | (:time type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Time
                           | (untyped type, *untyped values) -> nil
 
       def self.cell_class: (:string | :boolean | :number | :date | :datetime | :time type) -> Class
@@ -64,13 +64,13 @@ module Roo
 
       private
 
-      def type_cast_value: (int | string | float value) -> (float | ::Date | ::DateTime | string)
+      def type_cast_value: (int | String | float value) -> (float | ::Date | ::DateTime | String)
 
       def create_date: (::Date date) -> ::Date
 
       def create_datetime: (::Date date) -> ::DateTime
 
-      def round_datetime: (string datetime_string) -> ::Time
+      def round_datetime: (String datetime_string) -> ::Time
     end
   end
 end

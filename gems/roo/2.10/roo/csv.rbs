@@ -7,32 +7,32 @@
 # You can pass options to the underlying CSV parse operation, via the
 # :csv_options option.
 module Roo
-  type csv_cell_value = string | int | float | nil
+  type csv_cell_value = String | int | float | nil
 
   class CSV < Roo::Base[csv_cell_value]
     @cell: Hash[[int, int], csv_cell_value]
 
     @cell_type: Hash[[int, int], :string | :float | :date | :datetime | nil]
 
-    @filename: string | ::Roo::_Stream
+    @filename: String | ::Roo::_Stream
 
-    attr_reader filename: string | ::Roo::_Stream
+    attr_reader filename: String | ::Roo::_Stream
 
-    def initialize: (string | ::Roo::_Stream filename, ?{ ?csv_options: ::Hash[Symbol, untyped] } options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
+    def initialize: (String | ::Roo::_Stream filename, ?{ ?csv_options: ::Hash[Symbol, untyped] } options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
 
     # Returns an array with the names of the sheets. In CSV class there is only
     # one dummy sheet, because a csv file cannot have more than one sheet.
     def sheets: () -> ["default"]
 
-    def cell: (string | int row, string | int col, ?(string | int)? sheet) -> csv_cell_value
+    def cell: (String | int row, String | int col, ?(String | int)? sheet) -> csv_cell_value
 
-    def celltype: (string | int row, string | int col, ?(string | int)? sheet) -> (:string | :float | :date | :datetime | nil)
+    def celltype: (String | int row, String | int col, ?(String | int)? sheet) -> (:string | :float | :date | :datetime | nil)
 
     def cell_postprocessing: [V] (untyped _row, untyped _col, V value) -> V
 
     def csv_options: () -> Hash[Symbol, untyped]
 
-    def set_value: (int row, int col, string | nil value, untyped _sheet) -> (string | nil)
+    def set_value: (int row, int col, String | nil value, untyped _sheet) -> (String | nil)
 
     def set_type: (int row, int col, :string | :float | :date | :datetime | nil type, untyped _sheet) -> (:string | :float | :date | :datetime | nil)
 
@@ -46,23 +46,23 @@ module Roo
                       | (singleton(::DateTime) value) -> :datetime
                       | (untyped value) -> nil
 
-    def read_cells: (?(string | int)? sheet) -> void
+    def read_cells: (?(String | int)? sheet) -> void
 
     def each_row: (Hash[Symbol, untyped] options) { (::Array[String?] | Array[::CSV::Row] arg0) -> void } -> void
 
     def each_row_using_tempdir: (Hash[Symbol, untyped] options) { (::Array[String?] arg0) -> void } -> void
 
     def csv_foreach: (::Roo::_Stream path_or_io, Hash[Symbol, untyped] options) { (untyped arg0) -> void } -> void
-                   | (string path_or_io, Hash[Symbol, untyped] options) { (::Array[String?] | Array[::CSV::Row] arg0) -> void } -> void
+                   | (String path_or_io, Hash[Symbol, untyped] options) { (::Array[String?] | Array[::CSV::Row] arg0) -> void } -> void
 
-    def set_row_count: (string | int | nil sheet, int last_row) -> void
+    def set_row_count: (String | int | nil sheet, int last_row) -> void
 
-    def set_column_count: (string | int | nil sheet, int last_col) -> void
+    def set_column_count: (String | int | nil sheet, int last_col) -> void
 
-    def clean_sheet: (string | int | nil sheet) -> void
+    def clean_sheet: (String | int | nil sheet) -> void
 
     alias filename_or_stream filename
 
-    def find_by_row: (int row_index) -> Array[string | nil]
+    def find_by_row: (int row_index) -> Array[String | nil]
   end
 end

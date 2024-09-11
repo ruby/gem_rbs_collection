@@ -1,13 +1,13 @@
 module Roo
   class Excelx
     class Sheet
-      @name: string
+      @name: String
 
       @shared: Shared
 
       @sheet_index: int
 
-      @images: Hash[string, string]
+      @images: Hash[String, String]
 
       @rels: Relationships
 
@@ -27,15 +27,15 @@ module Roo
 
       @last_column: int | nil
 
-      @hyperlinks: Hash[Coordinate, string]
+      @hyperlinks: Hash[Coordinate, String]
 
       @first_last_row_col: { first_row: int | nil, last_row: int | nil, first_column: int | nil, last_column: int | nil }
 
       extend Forwardable
 
-      attr_reader images: Hash[string, string]
+      attr_reader images: Hash[String, String]
 
-      def initialize: (string name, Shared shared, int sheet_index, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
+      def initialize: (String name, Shared shared, int sheet_index, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
 
       def cells: () -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
 
@@ -46,9 +46,9 @@ module Roo
       # pad_cells (boolean) and offset (int)
       def each_row: (?::Hash[Symbol, untyped] options) ?{ (Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]) -> void } -> void
 
-      def row: (string | int row_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | string]
+      def row: (String | int row_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | String]
 
-      def column: (string | int col_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | string]
+      def column: (String | int col_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | float | int | String]
 
       # returns the number of the first non-empty row
       def first_row: () -> (int | nil)
@@ -61,13 +61,13 @@ module Roo
       # returns the number of the last non-empty column
       def last_column: () -> (int | nil)
 
-      def excelx_format: ([int, int] key) -> (string | nil)
+      def excelx_format: ([int, int] key) -> (String | nil)
 
-      def hyperlinks: () -> Hash[Coordinate, string]
+      def hyperlinks: () -> Hash[Coordinate, String]
 
-      def comments: () -> Hash[Coordinate, string]
+      def comments: () -> Hash[Coordinate, String]
 
-      def dimensions: () -> string
+      def dimensions: () -> String
 
       private
 

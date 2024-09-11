@@ -10,22 +10,22 @@ module Roo
       @cells: Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time | nil]
 
       # If you're sure you're not going to need this hyperlinks you can discard it
-      @hyperlinks: Hash[Coordinate, string]
+      @hyperlinks: Hash[Coordinate, String]
 
-      @dimensions: string
+      @dimensions: String
 
       extend Forwardable
 
-      def initialize: (string path, Relationships relationships, Shared shared, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
+      def initialize: (String path, Relationships relationships, Shared shared, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
 
       def cells: (Relationships relationships) -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time | nil]
 
-      def hyperlinks: (Relationships relationships) -> Hash[Coordinate, string]
+      def hyperlinks: (Relationships relationships) -> Hash[Coordinate, String]
 
       # Get the dimensions for the sheet.
       # This is the upper bound of cells that might
       # be parsed. (the document may be sparse so cell count is only upper bound)
-      def dimensions: () -> string
+      def dimensions: () -> String
 
       # Yield each row xml element to caller
       def each_row_streaming: { (Nokogiri::XML::Element | nil row) -> void } -> void
@@ -36,11 +36,11 @@ module Roo
 
       private
 
-      def cell_value_type: ('s' type, string | nil format) -> :shared
-                         | ('b' type, string | nil format) -> :boolean
-                         | ('str' type, string | nil format) -> :string
-                         | ('inlineStr' type, string | nil format) -> :inlinestr
-                         | (string type, string | nil format) -> (:date | :float | :datetime | :time | :percentage)
+      def cell_value_type: ('s' type, String | nil format) -> :shared
+                         | ('b' type, String | nil format) -> :boolean
+                         | ('str' type, String | nil format) -> :string
+                         | ('inlineStr' type, String | nil format) -> :inlinestr
+                         | (String type, String | nil format) -> (:date | :float | :datetime | :time | :percentage)
 
       # Internal: Creates a cell based on an XML clell..
       #
@@ -60,28 +60,28 @@ module Roo
       #    # => <Excelx::Cell::String>
       #
       # Returns a type of <Excelx::Cell>.
-      def cell_from_xml: (Nokogiri::XML::Element | Nokogiri::XML::Node cell_xml, string | nil hyperlink, Coordinate coordinate) -> (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time)
-                       | (Nokogiri::XML::Element | Nokogiri::XML::Node cell_xml, string | nil hyperlink, Coordinate coordinate, true empty_cell) -> (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time)
-                       | (Nokogiri::XML::Element | Nokogiri::XML::Node cell_xml, string | nil hyperlink, Coordinate coordinate, false empty_cell) -> (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Number | nil)
+      def cell_from_xml: (Nokogiri::XML::Element | Nokogiri::XML::Node cell_xml, String | nil hyperlink, Coordinate coordinate) -> (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time)
+                       | (Nokogiri::XML::Element | Nokogiri::XML::Node cell_xml, String | nil hyperlink, Coordinate coordinate, true empty_cell) -> (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time)
+                       | (Nokogiri::XML::Element | Nokogiri::XML::Node cell_xml, String | nil hyperlink, Coordinate coordinate, false empty_cell) -> (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Number | nil)
 
       def create_empty_cell: (Coordinate coordinate, true empty_cell) -> Excelx::Cell::Empty
                            | (Coordinate coordinate, false empty_cell) -> nil
 
-      def create_cell_from_value: (:shared | :string value_type, Nokogiri::XML::Node cell, string | nil formula, string | nil format, int style, string | nil hyperlink, Coordinate coordinate) -> Cell::String
-                                | (:boolean value_type, Nokogiri::XML::Node cell, string | nil formula, string | nil format, int style, string | nil hyperlink, Coordinate coordinate) -> Cell::Boolean
-                                | (:time | :datetime value_type, Nokogiri::XML::Node cell, string | nil formula, string | nil format, int style, string | nil hyperlink, Coordinate coordinate) -> (Cell::Time | Cell::DateTime | Cell::Date)
-                                | (:date value_type, Nokogiri::XML::Node cell, string | nil formula, string | nil format, int style, string | nil hyperlink, Coordinate coordinate) -> Cell::Date
-                                | (:inlinestr | :float | :percentage value_type, Nokogiri::XML::Node cell, string | nil formula, string | nil format, int style, string | nil hyperlink, Coordinate coordinate) -> Cell::Number
+      def create_cell_from_value: (:shared | :string value_type, Nokogiri::XML::Node cell, String | nil formula, String | nil format, int style, String | nil hyperlink, Coordinate coordinate) -> Cell::String
+                                | (:boolean value_type, Nokogiri::XML::Node cell, String | nil formula, String | nil format, int style, String | nil hyperlink, Coordinate coordinate) -> Cell::Boolean
+                                | (:time | :datetime value_type, Nokogiri::XML::Node cell, String | nil formula, String | nil format, int style, String | nil hyperlink, Coordinate coordinate) -> (Cell::Time | Cell::DateTime | Cell::Date)
+                                | (:date value_type, Nokogiri::XML::Node cell, String | nil formula, String | nil format, int style, String | nil hyperlink, Coordinate coordinate) -> Cell::Date
+                                | (:inlinestr | :float | :percentage value_type, Nokogiri::XML::Node cell, String | nil formula, String | nil format, int style, String | nil hyperlink, Coordinate coordinate) -> Cell::Number
 
-      def extract_hyperlinks: (Relationships relationships) -> (::Hash[Coordinate, string])
+      def extract_hyperlinks: (Relationships relationships) -> (::Hash[Coordinate, String])
 
       def expand_merged_ranges: (Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time] cells) -> void
 
       def extract_cells: (Relationships relationships) -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time | nil]
 
-      def extract_dimensions: () -> string
+      def extract_dimensions: () -> String
 
-      def style_format: (int style) -> (string | nil)
+      def style_format: (int style) -> (String | nil)
 
       def base_date: () -> Date
 

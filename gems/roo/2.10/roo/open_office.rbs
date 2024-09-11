@@ -1,5 +1,5 @@
 module Roo
-  type opneoffice_cell_value = float | int | 'true' | 'false' | string
+  type opneoffice_cell_value = float | int | 'true' | 'false' | String
   class OpenOffice < Roo::Base[opneoffice_cell_value]
     @only_visible_sheets: boolish
 
@@ -7,35 +7,35 @@ module Roo
     #       when the object is garbage collected. Initially, the finalizer was
     #       created in the Roo::Tempdir module, but that led to a segfault
     #       when testing in Ruby 2.4.0.
-    @tmpdir: string
+    @tmpdir: String
 
-    @filename: string | nil
+    @filename: String | nil
 
-    @sheet_names: Array[string]
+    @sheet_names: Array[String]
 
-    @formula: Hash[string, Hash[[int, int], string]]
+    @formula: Hash[String, Hash[[int, int], String]]
 
-    @style: Hash[string, Hash[[int, int], string]]
+    @style: Hash[String, Hash[[int, int], String]]
 
-    @style_defaults: Hash[string, Array[string]]
+    @style_defaults: Hash[String, Array[String]]
 
-    @table_display: Hash[string, bool]
+    @table_display: Hash[String, bool]
 
-    @font_style_definitions: Hash[string, Font]
+    @font_style_definitions: Hash[String, Font]
 
-    @comment: Hash[string, Hash[[int, int], string]]
+    @comment: Hash[String, Hash[[int, int], String]]
 
     @comments_read: untyped
 
     @doc: Nokogiri::XML::Document
 
-    @label: Hash[string, [string, string, string]]
+    @label: Hash[String, [String, String, String]]
 
-    @officeversion: string | nil
+    @officeversion: String | nil
 
-    @cell: Hash[string, Hash[[int, int], opneoffice_cell_value]]
+    @cell: Hash[String, Hash[[int, int], opneoffice_cell_value]]
 
-    @cell_type: Hash[string, Hash[[int, int], :float | :percentage | :string | :date | :datetime | :time]]
+    @cell_type: Hash[String, Hash[[int, int], :float | :percentage | :string | :date | :datetime | :time]]
 
     extend Roo::Tempdir[opneoffice_cell_value]
 
@@ -47,7 +47,7 @@ module Roo
 
     # initialization and opening of a spreadsheet file
     # values for packed: :zip
-    def initialize: (string filename, ?{ ?packed: :zip, ?file_warning: :error | :warning | :ignore, ?tmpdir_root: string, ?password: string } options) -> void
+    def initialize: (String filename, ?{ ?packed: :zip, ?file_warning: :error | :warning | :ignore, ?tmpdir_root: String, ?password: String } options) -> void
 
     def open_oo_file: (::Hash[Symbol, untyped] options) -> Zip::File
 
@@ -59,26 +59,26 @@ module Roo
     # (1,1) is the upper left corner.
     # (1,1), (1,'A'), ('A',1), ('a',1) all refers to the
     # cell at the first line and first row.
-    def cell: (string | int row, string | int col, ?(string | int)? sheet) -> (float | int | 'true' | 'false' | string | ::Date)
+    def cell: (String | int row, String | int col, ?(String | int)? sheet) -> (float | int | 'true' | 'false' | String | ::Date)
 
     # Returns the formula at (row,col).
     # Returns nil if there is no formula.
     # The method #formula? checks if there is a formula.
-    def formula: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
+    def formula: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
 
     # Predicate methods really should return a boolean
     # value. Hopefully no one was relying on the fact that this
     # previously returned either nil/formula
-    def formula?: (*string | int | nil args) -> bool
-    # def formula?: (*[string | int, string | int] args) -> bool
-    #             | (*[string | int, string | int, string | int | nil] args) -> bool
+    def formula?: (*String | int | nil args) -> bool
+    # def formula?: (*[String | int, String | int] args) -> bool
+    #             | (*[String | int, String | int, String | int | nil] args) -> bool
 
     # returns each formula in the selected sheet as an array of elements
     # [row, col, formula]
-    def formulas: (?(string | int)? sheet) -> Array[[int, int, string]]
+    def formulas: (?(String | int)? sheet) -> Array[[int, int, String]]
 
     # Given a cell, return the cell's style
-    def font: (string | int row, string | int col, ?(string | int)? sheet) -> (Font | nil)
+    def font: (String | int row, String | int col, ?(String | int)? sheet) -> (Font | nil)
 
     # returns the type of a cell:
     # * :float
@@ -88,53 +88,53 @@ module Roo
     # * :formula
     # * :time
     # * :datetime
-    def celltype: (string | int row, string | int col, ?(string | int)? sheet) -> (:float | :percentage | :string | :date | :datetime | :time | :formula)
+    def celltype: (String | int row, String | int col, ?(String | int)? sheet) -> (:float | :percentage | :string | :date | :datetime | :time | :formula)
 
-    def sheets: () -> Array[string]
+    def sheets: () -> Array[String]
 
     # version of the Roo::OpenOffice document
     # at 2007 this is always "1.0"
-    def officeversion: () -> (string | nil)
+    def officeversion: () -> (String | nil)
 
     # shows the internal representation of all cells
     # mainly for debugging purposes
-    def to_s: (?(string | int)? sheet) -> string
+    def to_s: (?(String | int)? sheet) -> String
 
     # returns the row,col values of the labelled cell
     # (nil,nil) if label is not defined
-    def label: (string labelname) -> ([nil, nil, nil] | [int, int, string])
+    def label: (String labelname) -> ([nil, nil, nil] | [int, int, String])
 
     # Returns an array which all labels. Each element is an array with
     # [labelname, [row,col,sheetname]]
-    def labels: (?(string | int)? _sheet) -> Array[[string, [int, int, string]]]
+    def labels: (?(String | int)? _sheet) -> Array[[String, [int, int, String]]]
 
     # returns the comment at (row/col)
     # nil if there is no comment
-    def comment: (string | int row, string | int col, ?(string | int)? sheet) -> (string | nil)
+    def comment: (String | int row, String | int col, ?(String | int)? sheet) -> (String | nil)
 
     # returns each comment in the selected sheet as an array of elements
     # [row, col, comment]
-    def comments: (?(string | int)? sheet) -> Array[[int, int, string]]
+    def comments: (?(String | int)? sheet) -> Array[[int, int, String]]
 
     private
 
     # If the ODS file has an encryption-data element, then try to decrypt.
     # If successful, the temporary content.xml will be overwritten with
     # decrypted contents.
-    def decrypt_if_necessary: (Zip::File zip_file, Zip::Entry content_entry, string roo_content_xml_path, Hash[Symbol, untyped] options) -> void
+    def decrypt_if_necessary: (Zip::File zip_file, Zip::Entry content_entry, String roo_content_xml_path, Hash[Symbol, untyped] options) -> void
 
     # Process the ODS encryption manifest and perform the decryption
-    def perform_decryption: (Nokogiri::XML::Node encryption_data, string password, Zip::Entry content_entry, string roo_content_xml_path) -> void
+    def perform_decryption: (Nokogiri::XML::Node encryption_data, String password, Zip::Entry content_entry, String roo_content_xml_path) -> void
 
     # Create a cipher based on an ODS algorithm URI from manifest.xml
     # params: algorithm, key_derivation_name, hashed_password, salt, iteration_count, iv
-    def find_cipher: (*[string, string, string, string, int, string] args) -> OpenSSL::Cipher
+    def find_cipher: (*[String, String, String, String, int, String] args) -> OpenSSL::Cipher
 
     # Create a cipher key based on an ODS algorithm string from manifest.xml
-    def find_cipher_key: (*[OpenSSL::Cipher, string, string, string, int] args) -> string
+    def find_cipher_key: (*[OpenSSL::Cipher, String, String, String, int] args) -> String
 
     # Block decrypt raw bytes from the zip file based on the cipher
-    def decrypt: (Zip::Entry content_entry, OpenSSL::Cipher cipher) -> string
+    def decrypt: (Zip::Entry content_entry, OpenSSL::Cipher cipher) -> String
 
     def doc: () -> Nokogiri::XML::Document
 
@@ -142,18 +142,18 @@ module Roo
     def oo_version: () -> void
 
     # helper function to set the internal representation of cells
-    def set_cell_values: (string | int | nil sheet, int x, int y, int i, string | nil v, 'string' | 'time' | 'boolean' | '' | nil | 'date' | 'percentage' | 'float' value_type, string | nil formula, Nokogiri::XML::Node table_cell, string str_v, string | nil style_name) -> void
+    def set_cell_values: (String | int | nil sheet, int x, int y, int i, String | nil v, 'string' | 'time' | 'boolean' | '' | nil | 'date' | 'percentage' | 'float' value_type, String | nil formula, Nokogiri::XML::Node table_cell, String str_v, String | nil style_name) -> void
 
     # read all cells in the selected sheet
     # -
     # the following construct means '4 blanks'
     # some content <text:s text:c="3"/>
     # +
-    def read_cells: (?(string | int)? sheet) -> void
+    def read_cells: (?(String | int)? sheet) -> void
 
     # Only calls read_cells because Roo::Base calls read_comments
     # whereas the reading of comments is done in read_cells for Roo::OpenOffice-objects
-    def read_comments: (?(string | int)? sheet) -> void
+    def read_comments: (?(String | int)? sheet) -> void
 
     def read_labels: () -> void
 
@@ -164,8 +164,8 @@ module Roo
     # helper method to convert compressed spaces and other elements within
     # an text into a string
     # FIXME: add a test for compressed_spaces == 0. It's not currently tested.
-    def children_to_string: (Nokogiri::XML::NodeSet children) -> string
+    def children_to_string: (Nokogiri::XML::NodeSet children) -> String
 
-    def attribute: (Nokogiri::XML::Node node, string attr_name) -> (string | nil)
+    def attribute: (Nokogiri::XML::Node node, String attr_name) -> (String | nil)
   end
 end

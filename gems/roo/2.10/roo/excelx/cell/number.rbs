@@ -3,31 +3,31 @@ module Roo
     class Cell
       class Number < Cell::Base
         # FIXME: Excelx_type is an array, but the first value isn't used.
-        @format: string | nil
+        @format: String | nil
 
-        @value: (Link | float | int | string)
+        @value: (Link | float | int | String)
 
         @default_type: :float
 
-        attr_reader value: (Link | float | int | string)
+        attr_reader value: (Link | float | int | String)
 
-        attr_reader formula: string | nil
+        attr_reader formula: String | nil
 
-        attr_reader format: string | nil
+        attr_reader format: String | nil
 
-        attr_reader cell_type: [:numeric_or_formula, string]
+        attr_reader cell_type: [:numeric_or_formula, String]
 
-        attr_reader cell_value: string
+        attr_reader cell_value: String
 
         attr_reader coordinate: ::Roo::Excelx::Coordinate
 
-        def initialize: (string value, string | nil formula, [:numeric_or_formula, string] excelx_type, string | nil style, string | nil link, ::Roo::Excelx::Coordinate coordinate) -> void
+        def initialize: (String value, String | nil formula, [:numeric_or_formula, String] excelx_type, String | nil style, String | nil link, ::Roo::Excelx::Coordinate coordinate) -> void
 
-        def create_numeric: (string number) -> (float | int | string)
+        def create_numeric: (String number) -> (float | int | String)
 
-        def formatted_value: () -> string
+        def formatted_value: () -> String
 
-        def generate_formatter: (string | nil format) -> ((^(string number) -> string) | string)
+        def generate_formatter: (String | nil format) -> ((^(String number) -> String) | String)
 
         def default_type: () -> :float
 
@@ -35,7 +35,7 @@ module Roo
 
         private
 
-        def number_format: (string formatter, ?string? negative_formatter) -> ^(string number) -> string
+        def number_format: (String formatter, ?String? negative_formatter) -> ^(String number) -> String
       end
     end
   end
