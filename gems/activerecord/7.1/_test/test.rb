@@ -21,6 +21,8 @@ module Test
     encrypts :token, deterministic: true
     encrypts :phrase, ignore_case: true
 
+    generates_token_for :password_reset, expires_in: 15.minutes
+
     normalizes :email, with: -> email {
       # @type var email: String
       email.strip.downcase
@@ -50,6 +52,7 @@ module Test
   user.articles.insert_all!([{ id: 1, name: 'James' }], returning: %i[id name], record_timestamps: true)
   user.articles.upsert({ id: 1, name: 'James' }, returning: %i[id name], unique_by: :id, record_timestamps: true)
   user.articles.upsert_all([{ id: 1, name: 'James' }], returning: %i[id name], unique_by: :id, record_timestamps: true)
+  user.generate_token_for(:password_reset)
 
   user = User.new
   user.normalize_attribute(:email)

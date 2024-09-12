@@ -15,6 +15,13 @@ module ActiveRecord
     def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
   end
 
+  class Relation
+    module QueryMethods
+      def with_recursive: (*untyped) -> untyped
+      def with_recursive!: (*untyped) -> untyped
+    end
+  end
+
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
@@ -111,6 +118,10 @@ module ActiveRecord
     def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
   end
 
+  module Querying
+    def with_recursive: (*untyped) -> untyped
+  end
+
   class InsertAll
     @record_timestamps: bool
 
@@ -121,5 +132,20 @@ module ActiveRecord
     def keys_including_timestamps: () -> Set[String]
 
     def timestamps_for_create: () -> Hash[String, String]
+  end
+end
+
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def with_recursive: (*untyped) -> self
+      def with_recursive!: (*untyped) -> self
+    end
+  end
+
+  class Base
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def with_recursive: (*untyped) -> Relation
+    end
   end
 end
