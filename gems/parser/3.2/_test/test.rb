@@ -5,3 +5,6 @@ require "parser"
 
 node = Parser::CurrentRuby.parse("2 + 2") or raise
 node.loc
+
+buffer = Parser::Source::Buffer.new(__FILE__)
+buffer.name
