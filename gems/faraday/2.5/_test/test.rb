@@ -46,7 +46,12 @@ response.success?
 conn = Faraday.new(
   url: 'http://example.com/test2',
   headers: { 'Content-Type' => 'application/json' }
-)
+) do |faraday|
+  faraday.use :raise_error
+  faraday.request :url_encoded
+  faraday.response :logger, bodies: true
+  faraday.adapter :net_http
+end
 conn.post(URI("http://example.com/post"))
 response = conn.post('/post') do |req|
   req.body = "{ query: 'chunky bacon' }"
