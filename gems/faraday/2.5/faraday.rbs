@@ -3,7 +3,15 @@ module Faraday
 
   attr_reader self.default_adapter: Symbol
 
-  def self.new: (?untyped url, ?untyped options) ?{ (?untyped) -> void } -> Faraday::Connection
+  def self.new: (?untyped url, ?untyped options) ?{ (?Faraday::Connection) -> void } -> Faraday::Connection
+
+  interface _BuilderDelegatable
+    def use: (Symbol | Class klass, *untyped args) ?{ (?) -> void } -> void
+    def request: (Symbol | Class klass, *untyped args) ?{ (?) -> void } -> void
+    def response: (Symbol | Class klass, *untyped args) ?{ (?) -> void } -> void
+    def adapter: (Symbol | Class klass, *untyped args) ?{ (?) -> void } -> void
+    def app: () -> untyped
+  end
 
   class Adapter
     extend MiddlewareRegistry
@@ -100,6 +108,8 @@ module Faraday
   end
 
   class Connection
+    include _BuilderDelegatable
+
     attr_reader headers: Hash[String, String]
 
     def get: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
@@ -170,6 +180,10 @@ module Faraday
   end
 
   class ParsingError < Error
+  end
+
+  class RackBuilder
+    include _BuilderDelegatable
   end
 
   class Response
