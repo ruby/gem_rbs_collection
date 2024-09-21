@@ -1,0 +1,85 @@
+module Roo
+  class Excelx
+    class Sheet
+      @name: String
+
+      @shared: Shared
+
+      @sheet_index: Integer
+
+      @images: Hash[String, String]
+
+      @rels: Relationships
+
+      @comments: Comments
+
+      @sheet: SheetDoc
+
+      @cells: Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
+
+      @present_cells: Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
+
+      @first_row: Integer | nil
+
+      @last_row: Integer | nil
+
+      @first_column: Integer | nil
+
+      @last_column: Integer | nil
+
+      @hyperlinks: Hash[Coordinate, String]
+
+      @first_last_row_col: { first_row: Integer | nil, last_row: Integer | nil, first_column: Integer | nil, last_column: Integer | nil }
+
+      extend Forwardable
+
+      attr_reader images: Hash[String, String]
+
+      def initialize: (String name, Shared shared, Integer sheet_index, { expand_merged_ranges: bool, no_hyperlinks: bool, empty_cell: bool } options) -> void
+
+      def cells: () -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
+
+      def present_cells: () -> Hash[Coordinate, Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::String | Cell::Time]
+
+      # Yield each row as array of Excelx::Cell objects
+      # accepts options max_rows (int) (offset by 1 for header),
+      # pad_cells (boolean) and offset (int)
+      def each_row: (?::Hash[Symbol, untyped] options) ?{ (Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]) -> void } -> void
+
+      def row: (String | Integer row_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | Float | Integer | String]
+
+      def column: (String | Integer col_number) -> Array[nil | Link | bool | ::Date | ::DateTime | ::Time | Float | Integer | String]
+
+      # returns the number of the first non-empty row
+      def first_row: () -> (Integer | nil)
+
+      def last_row: () -> (Integer | nil)
+
+      # returns the number of the first non-empty column
+      def first_column: () -> (Integer | nil)
+
+      # returns the number of the last non-empty column
+      def last_column: () -> (Integer | nil)
+
+      def excelx_format: ([Integer, Integer] key) -> (String | nil)
+
+      def hyperlinks: () -> Hash[Coordinate, String]
+
+      def comments: () -> Hash[Coordinate, String]
+
+      def dimensions: () -> String
+
+      private
+
+      # Take an xml row and return an array of Excelx::Cell objects
+      # optionally pad array to header width(assumed 1st row).
+      # takes option pad_cells (boolean) defaults false
+      def cells_for_row_element: (Nokogiri::XML::Element row_element, ?::Hash[Symbol, untyped] options) -> Array[Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time]
+                               | (nil row_element, ?::Hash[Symbol, untyped] options) -> []
+
+      def pad_cells: (Cell::String | Cell::Boolean | Cell::Date | Cell::DateTime | Cell::Empty | Cell::Number | Cell::Time cell, Integer last_column) -> Array[nil]
+
+      def first_last_row_col: () -> { first_row: Integer | nil, last_row: Integer | nil, first_column: Integer | nil, last_column: Integer | nil }
+    end
+  end
+end

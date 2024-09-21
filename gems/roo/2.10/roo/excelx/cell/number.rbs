@@ -1,0 +1,42 @@
+module Roo
+  class Excelx
+    class Cell
+      class Number < Cell::Base
+        # FIXME: Excelx_type is an array, but the first value isn't used.
+        @format: String | nil
+
+        @value: (Link | Float | Integer | String)
+
+        @default_type: :float
+
+        attr_reader value: (Link | Float | Integer | String)
+
+        attr_reader formula: String | nil
+
+        attr_reader format: String | nil
+
+        attr_reader cell_type: [:numeric_or_formula, String]
+
+        attr_reader cell_value: String
+
+        attr_reader coordinate: ::Roo::Excelx::Coordinate
+
+        def initialize: (String value, String | nil formula, [:numeric_or_formula, String] excelx_type, String | nil style, String | nil link, ::Roo::Excelx::Coordinate coordinate) -> void
+
+        def create_numeric: (String number) -> (Float | Integer | String)
+
+        def formatted_value: () -> String
+
+        def generate_formatter: (String | nil format) -> ((^(String number) -> String) | String)
+
+        def default_type: () -> :float
+
+        def type: () -> (:formula | :link | :float)
+
+        private
+
+        def number_format: (String formatter, ?String? negative_formatter) -> ^(String number) -> String
+      end
+    end
+  end
+end

@@ -1,0 +1,76 @@
+module Roo
+  class Excelx
+    class Cell
+      @type: :float | :percentage | :date | :datetime | :time
+
+      @formula: String | nil
+
+      @base_date: ::Date | nil
+
+      @excelx_type: untyped
+
+      @excelx_value: untyped
+
+      @style: String | nil
+
+      @value: Float | ::Date | ::DateTime | String
+
+      @coordinate: ::Roo::Excelx::Coordinate
+
+      attr_reader formula: String | nil
+
+      attr_reader value: Float | ::Date | ::DateTime | String
+
+      attr_reader excelx_type: untyped
+
+      attr_reader excelx_value: untyped
+
+      attr_reader style: String | nil
+
+      attr_reader hyperlink: String | nil
+
+      attr_reader coordinate: ::Roo::Excelx::Coordinate
+
+      attr_writer value: Float | ::Date | ::DateTime | String
+
+      # DEPRECATED: Please use Cell.create_cell instead.
+      def initialize: (Integer | String | Float value, :float | :percentage | :date | :datetime | :time type, String | nil formula, untyped excelx_type, untyped excelx_value, String | nil style, String | nil hyperlink, ::Date | nil base_date, Excelx::Coordinate coordinate) -> void
+
+      def type: () -> (:float | :percentage | :date | :datetime | :time)
+
+      def self.create_cell: (:string type, *[String, String | nil, String | nil, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::String
+                          | (:boolean type, *[String, String | nil, Integer, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Boolean
+                          | (:number type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Roo::Excelx::Coordinate] values) -> Cell::Number
+                          | (:date type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Date
+                          | (:datetime type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, Integer, ::Roo::Excelx::Coordinate] values) -> Cell::DateTime
+                          | (:time type, *[String, String | nil, [:numeric_or_formula, String], String | nil, String | nil, ::Date, ::Roo::Excelx::Coordinate] values) -> Cell::Time
+                          | (untyped type, *untyped values) -> nil
+
+      def self.cell_class: (:string | :boolean | :number | :date | :datetime | :time type) -> Class
+                         | (untyped type) -> nil
+
+      # Deprecated: use Roo::Excelx::Coordinate instead.
+      class Coordinate
+        @row: Integer
+
+        @column: Integer
+
+        attr_accessor row: Integer
+
+        attr_accessor column: Integer
+
+        def initialize: (Integer row, Integer column) -> void
+      end
+
+      private
+
+      def type_cast_value: (Integer | String | Float value) -> (Float | ::Date | ::DateTime | String)
+
+      def create_date: (::Date date) -> ::Date
+
+      def create_datetime: (::Date date) -> ::DateTime
+
+      def round_datetime: (String datetime_string) -> ::Time
+    end
+  end
+end

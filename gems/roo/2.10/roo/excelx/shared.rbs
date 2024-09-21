@@ -1,0 +1,50 @@
+module Roo
+  class Excelx
+    # Public:  Shared class for allowing sheets to share data. This should
+    #          reduce memory usage and reduce the number of objects being passed
+    #          to various inititializers.
+    class Shared
+      @dir: String
+
+      @comments_files: Array[String]
+
+      @sheet_files: Array[String]
+
+      @rels_files: Array[String]
+
+      @options: { disable_html_wrapper: bool }
+
+      @image_rels: Array[String]
+
+      @image_files: Array[String]
+
+      @styles: Styles
+
+      @shared_strings: SharedStrings
+
+      @workbook: Workbook
+
+      attr_accessor comments_files: Array[String]
+
+      attr_accessor sheet_files: Array[String]
+
+      attr_accessor rels_files: Array[String]
+
+      attr_accessor image_rels: Array[String]
+
+      attr_accessor image_files: Array[String]
+
+      def initialize: (String dir, { disable_html_wrapper: bool } options) -> void
+
+      def styles: () -> Styles
+
+      def shared_strings: () -> SharedStrings
+
+      def workbook: () -> Workbook
+
+      def base_date: () -> Date
+
+      def base_timestamp: () -> Integer
+    end
+  end
+end

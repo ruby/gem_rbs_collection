@@ -1,0 +1,17 @@
+module Roo
+  module Formatters
+    module CSV
+      def to_csv: (String filename, ?String? old_separator, ?(String | Integer)? old_sheet, ?separator: String, ?sheet: String | Integer) -> true
+                | (?nil filename, ?String? old_separator, ?(String | Integer)? old_sheet, ?separator: String, ?sheet: String | Integer) -> (String | nil)
+
+      private
+
+      # Write all cells to the csv file. File can be a filename or nil. If the
+      # file argument is nil the output goes to STDOUT
+      def write_csv_content: (?(File | StringIO)? file, ?(String | Integer | nil)? sheet, ?String separator) -> void
+
+      # The content of a cell in the csv output
+      def cell_to_csv: (Integer row, Integer col, String | Integer | nil sheet) -> String
+    end
+  end
+end

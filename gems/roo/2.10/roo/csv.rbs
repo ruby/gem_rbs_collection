@@ -1,0 +1,68 @@
+# The CSV class can read csv files (must be separated with commas) which then
+# can be handled like spreadsheets. This means you can access cells like A5
+# within these files.
+# The CSV class provides only string objects. If you want conversions to other
+# types you have to do it yourself.
+#
+# You can pass options to the underlying CSV parse operation, via the
+# :csv_options option.
+module Roo
+  type csv_cell_value = String | Integer | Float | nil
+
+  class CSV < Roo::Base[csv_cell_value]
+    @cell: Hash[[Integer, Integer], csv_cell_value]
+
+    @cell_type: Hash[[Integer, Integer], :string | :float | :date | :datetime | nil]
+
+    @filename: String | ::Roo::_Stream
+
+    attr_reader filename: String | ::Roo::_Stream
+
+    def initialize: (String | ::Roo::_Stream filename, ?{ ?csv_options: ::Hash[Symbol, untyped] } options, ?::Symbol _file_warning, ?untyped? _tmpdir) -> void
+
+    # Returns an array with the names of the sheets. In CSV class there is only
+    # one dummy sheet, because a csv file cannot have more than one sheet.
+    def sheets: () -> ["default"]
+
+    def cell: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> csv_cell_value
+
+    def celltype: (String | Integer row, String | Integer col, ?(String | Integer)? sheet) -> (:string | :float | :date | :datetime | nil)
+
+    def cell_postprocessing: [V] (untyped _row, untyped _col, V value) -> V
+
+    def csv_options: () -> Hash[Symbol, untyped]
+
+    def set_value: (Integer row, Integer col, String | nil value, untyped _sheet) -> (String | nil)
+
+    def set_type: (Integer row, Integer col, :string | :float | :date | :datetime | nil type, untyped _sheet) -> (:string | :float | :date | :datetime | nil)
+
+    private
+
+    TYPE_MAP: Hash[singleton(::String) | singleton(::Float) | singleton(::Date) | singleton(::DateTime), :string | :float | :date | :datetime]
+
+    def celltype_class: (singleton(::String) value) -> :string
+                      | (singleton(::Float) value) -> :float
+                      | (singleton(::Date) value) -> :date
+                      | (singleton(::DateTime) value) -> :datetime
+                      | (untyped value) -> nil
+
+    def read_cells: (?(String | Integer)? sheet) -> void
+
+    def each_row: (Hash[Symbol, untyped] options) { (::Array[String?] | Array[::CSV::Row] arg0) -> void } -> void
+
+    def each_row_using_tempdir: (Hash[Symbol, untyped] options) { (::Array[String?] arg0) -> void } -> void
+
+    def csv_foreach: (::Roo::_Stream path_or_io, Hash[Symbol, untyped] options) { (untyped arg0) -> void } -> void
+                   | (String path_or_io, Hash[Symbol, untyped] options) { (::Array[String?] | Array[::CSV::Row] arg0) -> void } -> void
+
+    def set_row_count: (String | Integer | nil sheet, Integer last_row) -> void
+
+    def set_column_count: (String | Integer | nil sheet, Integer last_col) -> void
+
+    def clean_sheet: (String | Integer | nil sheet) -> void
+
+    alias filename_or_stream filename
+
+    def find_by_row: (Integer row_index) -> Array[String | nil]
+  end
+end
