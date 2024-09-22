@@ -444,9 +444,9 @@ module Sinatra
 
     @params: IndifferentHash
 
-    @request: untyped
+    @request: Request
 
-    @response: untyped
+    @response: Response
 
     include Rack::Utils
 
@@ -461,9 +461,9 @@ module Sinatra
 
     attr_accessor env: Hash[String, untyped]
 
-    attr_accessor request: untyped
+    attr_accessor request: Request
 
-    attr_accessor response: untyped
+    attr_accessor response: Response
 
     attr_accessor params: IndifferentHash
 
@@ -603,7 +603,7 @@ module Sinatra
     # Define a before filter; runs before all requests within the same
     # context as route handlers and may access/modify the request and
     # response.
-    def self.before: (?untyped path, **untyped options) { () -> untyped } -> untyped
+    def self.before: (?untyped path, **untyped options) { () [self: instance] -> void } -> void
 
     # Define an after filter; runs after all requests within the same
     # context as route handlers and may access/modify the request and
@@ -619,7 +619,7 @@ module Sinatra
 
     # Add a route condition. The route is considered non-matching when the
     # block returns false.
-    def self.condition: (?::String name) { () -> untyped } -> untyped
+    def self.condition: (?::String name) { () [self: instance] -> void } -> void
 
     def self.public=: (untyped value) -> untyped
 
@@ -653,7 +653,7 @@ module Sinatra
 
     # Register an extension. Alternatively take a block from which an
     # extension will be created and registered on the fly.
-    def self.register: (*untyped extensions) ?{ () -> untyped } -> untyped
+    def self.register: (*Module extensions) ?{ () -> untyped } -> untyped
 
     def self.development?: () -> untyped
 
