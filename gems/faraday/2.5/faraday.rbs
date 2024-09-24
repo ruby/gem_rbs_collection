@@ -113,6 +113,10 @@ module Faraday
     attr_reader headers: Hash[String, String]
     attr_reader ssl: SSLOptions
 
+    def options: () -> RequestOptions
+               | ((String | URI)? url, ?untyped params, ?untyped headers) -> Response
+               
+
     def get: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
     def head: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
     def delete: (?String | URI url, ?untyped params, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
@@ -138,6 +142,20 @@ module Faraday
     attr_accessor version: untyped
     attr_accessor min_version: untyped
     attr_accessor max_version: untyped
+  end
+
+  class RequestOptions
+    attr_accessor params_encoder: untyped
+    attr_accessor proxy: untyped
+    attr_accessor bind: untyped
+    attr_accessor timeout: untyped
+    attr_accessor open_timeout: untyped
+    attr_accessor read_timeout: untyped
+    attr_accessor write_timeout: untyped
+    attr_accessor boundary: untyped
+    attr_accessor oauth: untyped
+    attr_accessor context: untyped
+    attr_accessor on_data: untyped
   end
 
   class Error < StandardError

@@ -53,8 +53,12 @@ conn = Faraday.new(
   faraday.adapter :net_http
   faraday.ssl.client_cert = 'client_cert'
   faraday.ssl.client_key = 'client_key'
+  faraday.options.open_timeout = 5
+  faraday.options.read_timeout = 10
+  faraday.options.write_timeout = 5
 end
 conn.post(URI("http://example.com/post"))
+conn.options(URI("http://example.com/options"))
 response = conn.post('/post') do |req|
   req.body = "{ query: 'chunky bacon' }"
 end
