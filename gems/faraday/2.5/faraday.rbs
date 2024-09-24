@@ -111,6 +111,7 @@ module Faraday
     include _BuilderDelegatable
 
     attr_reader headers: Hash[String, String]
+    attr_reader ssl: SSLOptions
 
     def options: () -> RequestOptions
                | ((String | URI)? url, ?untyped params, ?untyped headers) -> Response
@@ -124,6 +125,23 @@ module Faraday
     def post: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
     def put: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
     def patch: (?String | URI url, ?untyped body, ?untyped headers) ?{ (Faraday::Request) -> void } -> Faraday::Response
+  end
+
+  class SSLOptions
+    attr_accessor verify: untyped
+    attr_accessor verify_hostname: untyped
+    attr_accessor ca_file: untyped
+    attr_accessor ca_path: untyped
+    attr_accessor verify_mode: untyped
+    attr_accessor cert_store: untyped
+    attr_accessor client_cert: untyped
+    attr_accessor client_key: untyped
+    attr_accessor certificate: untyped
+    attr_accessor private_key: untyped
+    attr_accessor verify_depth: untyped
+    attr_accessor version: untyped
+    attr_accessor min_version: untyped
+    attr_accessor max_version: untyped
   end
 
   class RequestOptions
