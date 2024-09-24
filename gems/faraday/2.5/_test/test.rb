@@ -51,6 +51,8 @@ conn = Faraday.new(
   faraday.request :url_encoded
   faraday.response :logger, bodies: true
   faraday.adapter :net_http
+  faraday.ssl.client_cert = 'client_cert'
+  faraday.ssl.client_key = 'client_key'
 end
 conn.post(URI("http://example.com/post"))
 response = conn.post('/post') do |req|
