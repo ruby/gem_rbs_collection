@@ -33,14 +33,14 @@ module Faraday
     extend Parallelism
 
     def initialize: (?untyped? _app, ?::Hash[untyped, untyped] opts) ?{ () -> untyped } -> void
-    def connection: (untyped env) ?{ (untyped) -> untyped } -> untyped # TODO: `env` should be Faraday::Env
+    def connection: (Env | Hash[untyped, untyped] env) ?{ (untyped) -> untyped } -> untyped
     def close: () -> void
-    def call: (untyped env) -> Response # TODO: `env` should be Faraday::Env
+    def call: (Env env) -> Response
 
     private
 
     # TODO: The block parameter should be `Utils::Headers`, but it has not yet been defined.
-    def save_response: (untyped env, Integer status, String body, ?Hash[untyped, untyped]? headers, ?String? reason_phrase, ?finished: bool) ?{ (untyped) -> void } -> Response # TODO: `env` should be Faraday::Env
+    def save_response: (Env env, Integer status, String body, ?Hash[untyped, untyped]? headers, ?String? reason_phrase, ?finished: bool) ?{ (untyped) -> void } -> Response
     def request_timeout: (:read | :open | :write `type`, Hash[Symbol, untyped] options) -> Integer?
 
     TIMEOUT_KEYS: { read: :read_timeout, open: :open_timeout, write: :write_timeout }
@@ -56,21 +56,21 @@ module Faraday
 
         def initialize: (?strict_mode: bool) ?{ (self) -> void } -> void
         def empty?: () -> bool
-        def match: (untyped env) -> ((false | nil) | [Stub, meta]) # TODO: `env` should be Faraday::Env
-        def get: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def head: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def post: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def put: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def patch: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def delete: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
-        def options: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void # TODO: `env` should be Faraday::Env
+        def match: (Env env) -> ((false | nil) | [Stub, meta])
+        def get: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def head: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def post: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def put: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def patch: (String | URI | Regexp path, ?(^(String) -> bool | _ToS)? body, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def delete: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
+        def options: (String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers) { (Env env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
         def verify_stubbed_calls: () -> void
         def strict_mode=: (boolish value) -> void
 
         private # protected is not yet supported. See https://github.com/ruby/rbs/issues/579
 
         def new_stub: (:get | :head | :post | :put | :patch | :delete | :options request_method, String | URI | Regexp path, ?::Hash[Symbol | String, untyped] headers, ?(^(String) -> bool | _ToS)? body) { (untyped env, meta) -> [Integer, ::Hash[String | Symbol, untyped], String] } -> void
-        def matches?: (::Hash[Symbol, untyped] stack, untyped env) -> ([Stub, meta] | nil) # TODO: `env` should be Faraday::Env
+        def matches?: (::Hash[Symbol, untyped] stack, Env env) -> ([Stub, meta] | nil)
       end
 
       class Stub
@@ -83,9 +83,9 @@ module Faraday
         attr_accessor block: Proc?
 
         def initialize: (String? host, String? path, String? query, Utils::Headers? headers, String? body, boolish strict_mode, Proc block) -> void
-        def matches?: (untyped env) -> [bool, meta] # TODO: `env` should be Faraday::Env
+        def matches?: (Env env) -> [bool, meta]
         def path_match?: (String request_path, meta) -> bool
-        def params_match?: (untyped env) -> bool # TODO: `env` should be Faraday::Env
+        def params_match?: (Env env) -> bool
         def headers_match?: (::Hash[String | Symbol, untyped] request_headers) -> bool
         def body_match?: (String request_body) -> bool
         def to_s: () -> ::String
@@ -94,7 +94,7 @@ module Faraday
       def initialize: (untyped app) ?{ (Stubs stubs) -> void } -> void
                     | (untyped app, untyped? stubs) ?{ (untyped stubs) -> void } -> void
       def configure: () { (untyped) -> void } -> void
-      def call: (untyped env) -> untyped # TODO: `env` should be Faraday::Env
+      def call: (Env env) -> untyped
     end
   end
 
@@ -258,7 +258,7 @@ module Faraday
     attr_reader options: Hash[untyped, untyped]
 
     def initialize: (?untyped? app, ?::Hash[untyped, untyped] options) -> void
-    def call: (untyped env) -> untyped # TODO: `env` should be Faraday::Env
+    def call: (Env env) -> untyped
     def close: () -> void
   end
 
@@ -309,5 +309,23 @@ module Faraday
 
       def add_parsed: (Symbol | String key, String value) -> untyped
     end
+  end
+
+  class Env
+    attr_accessor method: Symbol
+    attr_accessor request_body: String
+    attr_accessor url: URI::HTTP | URI::HTTPS
+    attr_accessor request: Faraday::RequestOptions
+    attr_accessor request_headers: Hash[String, String]
+    attr_accessor ssl: Faraday::SSLOptions
+    attr_accessor parallel_manager: untyped
+    attr_accessor params: untyped
+    attr_accessor response: untyped
+    attr_accessor response_headers: untyped
+    attr_accessor status: untyped
+    attr_accessor reason_phrase: untyped
+    attr_accessor response_body: untyped
+
+    alias body request_body
   end
 end
