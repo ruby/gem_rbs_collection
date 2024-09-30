@@ -39,6 +39,7 @@ module Test
   User.insert_all!([{ id: 1, name: 'James' }], returning: %i[id name], record_timestamps: true)
   User.upsert({ id: 1, name: 'James' }, returning: %i[id name], unique_by: :id, record_timestamps: true)
   User.upsert_all([{ id: 1, name: 'James' }], returning: %i[id name], unique_by: :id, record_timestamps: true)
+  User.with(admin_users: User.where(role: 0))
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')
   user.encrypt
   user.encrypted_attribute?(:secret)
@@ -50,6 +51,7 @@ module Test
   user.articles.insert_all!([{ id: 1, name: 'James' }], returning: %i[id name], record_timestamps: true)
   user.articles.upsert({ id: 1, name: 'James' }, returning: %i[id name], unique_by: :id, record_timestamps: true)
   user.articles.upsert_all([{ id: 1, name: 'James' }], returning: %i[id name], unique_by: :id, record_timestamps: true)
+  user.generate_token_for(:password_reset)
 
   user = User.new
   user.normalize_attribute(:email)

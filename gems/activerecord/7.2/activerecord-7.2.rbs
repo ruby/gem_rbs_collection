@@ -4,6 +4,10 @@ module ActiveRecord
     extend Encryption::EncryptableRecord::ClassMethods
     include Normalization
     extend Normalization::ClassMethods
+    include SecurePassword
+    extend SecurePassword::ClassMethods
+    include TokenFor
+    extend TokenFor::ClassMethods
   end
 
   class Relation
@@ -133,11 +137,35 @@ module ActiveRecord
 
     def timestamps_for_create: () -> Hash[String, String]
   end
+
+  module SecurePassword
+    module ClassMethods
+      def authenticate_by: (untyped attributes) -> instance?
+    end
+  end
+
+  module TokenFor
+    module ClassMethods
+      def generates_token_for: (Symbol purpose, ?expires_in: ActiveSupport::Duration) ? { () [self: instance] -> untyped } -> untyped
+      def find_by_token_for: (Symbol purpose, String token) -> untyped
+      def find_by_token_for!: (Symbol purpose, String token) -> untyped
+    end
+
+    def generate_token_for: (Symbol purpose) -> String
+  end
+end
+
+module Arel
+  class Table
+    def initialize: (untyped name, ?type_caster: untyped type_caster, ?as: untyped? as, ?klass: untyped?) -> void
+  end
 end
 
 module ActiveRecord
   class Relation
     module Methods[Model, PrimaryKey]
+      def authenticate_by: (untyped attributes) -> Model?
+      def with: (*untyped args) -> self
       def with_recursive: (*untyped) -> self
       def with_recursive!: (*untyped) -> self
     end
@@ -145,6 +173,7 @@ module ActiveRecord
 
   class Base
     module ClassMethods[Model, Relation, PrimaryKey]
+      def with: (*untyped args) -> Relation
       def with_recursive: (*untyped) -> Relation
     end
   end
