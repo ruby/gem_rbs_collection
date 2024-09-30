@@ -319,6 +319,8 @@ module ActiveRecord
     #   user = users.new { |user| user.name = 'Oscar' }
     #   user.name # => Oscar
     def new: (?untyped? attributes) ?{ () -> untyped } -> untyped
+
+    def arel_table: () -> Arel::Table
   end
 end
 
@@ -652,6 +654,12 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String) -> Relation
   def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+end
+
+module Arel
+  class Table
+    def []: (untyped name) -> Arel::Attributes::Attribute
+  end
 end
 
 # https://github.com/rails/rails/blob/fbe2433be6e052a1acac63c7faf287c52ed3c5ba/activerecord/lib/arel/nodes/unary.rb

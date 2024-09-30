@@ -8,6 +8,8 @@ class User < ActiveRecord::Base
   validates :name, presence: true, if: -> { something }
   validates :age, presence: true, if: ->(user) { user.something }
 
+  scope :matured, -> { where(arel_table[:age].gteq(18)) }
+
   before_save -> (obj) { obj.something; self.something }
   around_save -> (obj, block) { block.call; obj.something }
 
