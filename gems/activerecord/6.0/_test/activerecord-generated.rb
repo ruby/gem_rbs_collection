@@ -29,3 +29,6 @@ User.includes(:address, :friends).to_a
 User.preload(:address, friends: [:address, :followers])
 User.in_order_of(:id, [1, 5, 3])
 User.offset(5).limit(10)
+
+t = User.arel_table
+User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
