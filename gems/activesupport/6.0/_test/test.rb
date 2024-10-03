@@ -70,3 +70,8 @@ itself if Object.new.blank? \
 "Matz".presence_in("Matzuyama")&.in?(%w[Yukihiro Matz Matsumoto])
 ActiveSupport::TimeZone['Asia/Tokyo'].to_s
 Time.find_zone(Object.name)
+
+Array.wrap(nil)
+Array.wrap([1, 2, 3])
+Array.wrap("hello")
+Array.wrap({a: 1, b: 2})
