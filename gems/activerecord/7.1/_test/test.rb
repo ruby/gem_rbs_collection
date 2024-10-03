@@ -41,6 +41,7 @@ module Test
   User.insert_all!([{ id: 1, name: 'James' }], returning: %i[id name], record_timestamps: true)
   User.upsert({ id: 1, name: 'James' }, returning: %i[id name], unique_by: :id, record_timestamps: true)
   User.upsert_all([{ id: 1, name: 'James' }], returning: %i[id name], unique_by: :id, record_timestamps: true)
+  User.with(admin_users: User.where(role: 0))
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')
   user.encrypt
   user.encrypted_attribute?(:secret)

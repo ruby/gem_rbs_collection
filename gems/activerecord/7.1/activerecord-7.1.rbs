@@ -51,6 +51,10 @@ module ActiveRecord
   end
 
   module QueryMethods
+    def with: (*untyped args) -> untyped
+  end
+
+  module QueryMethods
     class WhereChain[Relation]
       def missing: (*Symbol associations) -> Relation
     end
@@ -182,5 +186,19 @@ module Arel
 
   class DeleteManager < Arel::TreeManager
     def initialize: (?Arel::Table? table) -> untyped
+  end
+end
+  
+module ActiveRecord
+  class Relation
+    module Methods[Model, PrimaryKey]
+      def with: (*untyped args) -> self
+    end
+  end
+
+  class Base
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def with: (*untyped args) -> Relation
+    end
   end
 end
