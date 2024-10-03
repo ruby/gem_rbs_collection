@@ -12,6 +12,7 @@ module Test
   end
 
   class ArticleSerializer < ActiveModel::Serializer
+    attribute :title
     attribute :title, key: :name
     attributes :body, :tag_names
 
@@ -21,7 +22,12 @@ module Test
   end
 
   resource = Article.new(title: "Hello", body: "World", tags: [Tag.new(name: "foo"), Tag.new(name: "bar")])
-  serialization = ActiveModelSerializers::SerializableResource.new(resource, serializer: ArticleSerializer)
+  ArticleSerializer.new(resource).as_json
+
+  serialization = ActiveModelSerializers::SerializableResource.new(resource)
   serialization.to_json
   serialization.as_json
+
+  serialization_json = ActiveModelSerializers::SerializableResource.new(resource, adapter: :json)
+  serialization_json.to_json
 end
