@@ -1,0 +1,110 @@
+module Stripe
+  # StripeError is the base error from which all other more specific Stripe
+  # errors derive.
+  class StripeError < StandardError
+    attr_reader message: untyped
+    attr_reader code: untyped
+    attr_reader error: untyped
+    attr_reader http_body: untyped
+    attr_reader http_headers: untyped
+    attr_reader http_status: untyped
+    attr_reader json_body: untyped
+    attr_reader request_id: untyped
+
+    # Response contains a StripeResponse object that has some basic information
+    # about the response that conveyed the error.
+    # equivalent to #data
+    attr_accessor response: untyped
+  end
+
+  # AuthenticationError is raised when invalid credentials are used to connect
+  # to Stripe's servers.
+  class AuthenticationError < StripeError
+  end
+
+  # APIConnectionError is raised in the event that the SDK can't connect to
+  # Stripe's servers. That can be for a variety of different reasons from a
+  # downed network to a bad TLS certificate.
+  class APIConnectionError < StripeError
+  end
+
+  # APIError is a generic error that may be raised in cases where none of the
+  # other named errors cover the problem. It could also be raised in the case
+  # that a new error has been introduced in the API, but this version of the
+  # Ruby SDK doesn't know how to handle it.
+  class APIError < StripeError
+  end
+
+  # CardError is raised when a user enters a card that can't be charged for
+  # some reason.
+  class CardError < StripeError
+  end
+
+  # IdempotencyError is raised in cases where an idempotency key was used
+  # improperly.
+  class IdempotencyError < StripeError
+  end
+
+  # InvalidRequestError is raised when a request is initiated with invalid
+  # parameters.
+  class InvalidRequestError < StripeError
+  end
+
+  # PermissionError is raised in cases where access was attempted on a resource
+  # that wasn't allowed.
+  class PermissionError < StripeError
+  end
+
+  # RateLimitError is raised in cases where an account is putting too much load
+  # on Stripe's API servers (usually by performing too many requests). Please
+  # back off on request rate.
+  class RateLimitError < StripeError
+  end
+
+  # SignatureVerificationError is raised when the signature verification for a
+  # webhook fails
+  class SignatureVerificationError < StripeError
+  end
+
+  module OAuth
+    # OAuthError is raised when the OAuth API returns an error.
+    class OAuthError < StripeError
+    end
+
+    # InvalidClientError is raised when the client doesn't belong to you, or
+    # the API key mode (live or test) doesn't match the client mode. Or the
+    # stripe_user_id doesn't exist or isn't connected to your application.
+    class InvalidClientError < OAuthError
+    end
+
+    # InvalidGrantError is raised when a specified code doesn't exist, is
+    # expired, has been used, or doesn't belong to you; a refresh token doesn't
+    # exist, or doesn't belong to you; or if an API key's mode (live or test)
+    # doesn't match the mode of a code or refresh token.
+    class InvalidGrantError < OAuthError
+    end
+
+    # InvalidRequestError is raised when a code, refresh token, or grant type
+    # parameter is not provided, but was required.
+    class InvalidRequestError < OAuthError
+    end
+
+    # InvalidScopeError is raised when an invalid scope parameter is provided.
+    class InvalidScopeError < OAuthError
+    end
+
+    # UnsupportedGrantTypeError is raised when an unuspported grant type
+    # parameter is specified.
+    class UnsupportedGrantTypeError < OAuthError
+    end
+
+    # UnsupportedResponseTypeError is raised when an unsupported response type
+    # parameter is specified.
+    class UnsupportedResponseTypeError < OAuthError
+    end
+  end
+
+  # class definitions: The beginning of the section generated from our OpenAPI spec
+  class TemporarySessionExpiredError < StripeError
+  end
+end

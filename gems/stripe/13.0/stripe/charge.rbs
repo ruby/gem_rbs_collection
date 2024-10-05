@@ -1,0 +1,306 @@
+module Stripe
+  # The `Charge` object represents a single attempt to move money into your Stripe account.
+  # PaymentIntent confirmation is the most common way to create Charges, but transferring
+  # money to a different Stripe account through Connect also creates Charges.
+  # Some legacy payment flows create Charges directly, which is not recommended for new integrations.
+  class Charge < APIResource
+    include _Charge
+
+    def self.object_name: () -> "charge"
+
+    # Capture the payment of an existing, uncaptured charge that was created with the capture option set to false.
+    #
+    # Uncaptured payments expire a set number of days after they are created ([7 by default](https://stripe.com/docs/charges/placing-a-hold)), after which they are marked as refunded and capture attempts will fail.
+    #
+    # Don't use this method to capture a PaymentIntent-initiated charge. Use [Capture a PaymentIntent](https://stripe.com/docs/api/payment_intents/capture).
+    def capture: (?untyped params, ?untyped opts) -> Charge
+
+    # Capture the payment of an existing, uncaptured charge that was created with the capture option set to false.
+    #
+    # Uncaptured payments expire a set number of days after they are created ([7 by default](https://stripe.com/docs/charges/placing-a-hold)), after which they are marked as refunded and capture attempts will fail.
+    #
+    # Don't use this method to capture a PaymentIntent-initiated charge. Use [Capture a PaymentIntent](https://stripe.com/docs/api/payment_intents/capture).
+    def self.capture: (String charge, ?untyped params, ?untyped opts) -> Charge
+
+    # This method is no longer recommended—use the [Payment Intents API](https://stripe.com/docs/api/payment_intents)
+    # to initiate a new payment instead. Confirmation of the PaymentIntent creates the Charge
+    # object used to request payment.
+    def self.create: (?untyped params, ?untyped opts) -> Charge
+
+    # Returns a list of charges you've previously created. The charges are returned in sorted order, with the most recent charges appearing first.
+    def self.list: (?untyped filters, ?untyped opts) -> ListObject[Charge]
+  end
+
+  # https://docs.stripe.com/api/charges/object
+  interface _Charge
+    # Amount intended to be collected by this payment. A positive integer representing how much to charge in the [smallest currency unit](https://stripe.com/docs/currencies#zero-decimal) (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or [equivalent in charge currency](https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts). The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
+    def amount: () -> Integer
+
+    # Amount intended to be collected by this payment. A positive integer representing how much to charge in the [smallest currency unit](https://stripe.com/docs/currencies#zero-decimal) (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or [equivalent in charge currency](https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts). The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
+    def amount=: (Integer) -> Integer
+
+    # Amount in cents (or local equivalent) captured (can be less than the amount attribute on the charge if a partial capture was made).
+    def amount_captured: () -> Integer
+
+    # Amount in cents (or local equivalent) captured (can be less than the amount attribute on the charge if a partial capture was made).
+    def amount_captured=: (Integer) -> Integer
+
+    # Amount in cents (or local equivalent) refunded (can be less than the amount attribute on the charge if a partial refund was issued).
+    def amount_refunded: () -> Integer
+
+    # Amount in cents (or local equivalent) refunded (can be less than the amount attribute on the charge if a partial refund was issued).
+    def amount_refunded=: (Integer) -> Integer
+
+    # ID of the Connect application that created the charge.
+    def application: () -> String?
+
+    # ID of the Connect application that created the charge.
+    def application=: (String?) -> String?
+
+    # The application fee (if any) for the charge. [See the Connect documentation](https://stripe.com/docs/connect/direct-charges#collect-fees) for details.
+    def application_fee: () -> String?
+
+    # The application fee (if any) for the charge. [See the Connect documentation](https://stripe.com/docs/connect/direct-charges#collect-fees) for details.
+    def application_fee=: (String?) -> String?
+
+    # The amount of the application fee (if any) requested for the charge. [See the Connect documentation](https://stripe.com/docs/connect/direct-charges#collect-fees) for details.
+    def application_fee_amount: () -> Integer?
+
+    # The amount of the application fee (if any) requested for the charge. [See the Connect documentation](https://stripe.com/docs/connect/direct-charges#collect-fees) for details.
+    def application_fee_amount=: (Integer?) -> Integer?
+
+    # ID of the balance transaction that describes the impact of this charge on your account balance (not including refunds or disputes).
+    def balance_transaction: () -> String?
+
+    # ID of the balance transaction that describes the impact of this charge on your account balance (not including refunds or disputes).
+    def balance_transaction=: (String?) -> String?
+
+    def billing_details: () -> untyped
+
+    def billing_details=: (untyped) -> untyped
+
+    # The full statement descriptor that is passed to card networks, and that is displayed on your customers' credit card and bank statements. Allows you to see what the statement descriptor looks like after the static and dynamic portions are combined. This value only exists for card payments.
+    def calculated_statement_descriptor: () -> String?
+
+    # The full statement descriptor that is passed to card networks, and that is displayed on your customers' credit card and bank statements. Allows you to see what the statement descriptor looks like after the static and dynamic portions are combined. This value only exists for card payments.
+    def calculated_statement_descriptor=: (String?) -> String?
+
+    # If the charge was created without capturing, this Boolean represents whether it is still uncaptured or has since been captured.
+    def captured: () -> bool
+
+    # If the charge was created without capturing, this Boolean represents whether it is still uncaptured or has since been captured.
+    def captured=: (bool) -> bool
+
+    # Time at which the object was created. Measured in seconds since the Unix epoch.
+    def created: () -> Integer
+
+    # Time at which the object was created. Measured in seconds since the Unix epoch.
+    def created=: (Integer) -> Integer
+
+    # Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+    def currency: () -> String
+
+    # Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+    def currency=: (String) -> String
+
+    # ID of the customer this charge is for if one exists.
+    def customer: () -> String?
+
+    # ID of the customer this charge is for if one exists.
+    def customer=: (String?) -> String?
+
+    # An arbitrary string attached to the object. Often useful for displaying to users.
+    def description: () -> String?
+
+    # An arbitrary string attached to the object. Often useful for displaying to users.
+    def description=: (String?) -> String?
+
+    # Whether the charge has been disputed.
+    def disputed: () -> bool
+
+    # Whether the charge has been disputed.
+    def disputed=: (bool) -> bool
+
+    # ID of the balance transaction that describes the reversal of the balance on your account due to payment failure.
+    def failure_balance_transaction: () -> String?
+
+    # ID of the balance transaction that describes the reversal of the balance on your account due to payment failure.
+    def failure_balance_transaction=: (String?) -> String?
+
+    # Error code explaining reason for charge failure if available (see [the errors section](https://stripe.com/docs/error-codes) for a list of codes).
+    def failure_code: () -> String?
+
+    # Error code explaining reason for charge failure if available (see [the errors section](https://stripe.com/docs/error-codes) for a list of codes).
+    def failure_code=: (String?) -> String?
+
+    # Message to user further explaining reason for charge failure if available.
+    def failure_message: () -> String?
+
+    # Message to user further explaining reason for charge failure if available.
+    def failure_message=: (String?) -> String?
+
+    # Information on fraud assessments for the charge.
+    def fraud_details: () -> untyped?
+
+    # Information on fraud assessments for the charge.
+    def fraud_details=: (untyped?) -> untyped?
+
+    # Unique identifier for the object.
+    def id: () -> String
+
+    # Unique identifier for the object.
+    def id=: (String) -> String
+
+    # ID of the invoice this charge is for if one exists.
+    def invoice: () -> String?
+
+    # ID of the invoice this charge is for if one exists.
+    def invoice=: (String?) -> String?
+
+    # Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
+    def livemode: () -> bool
+
+    # Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
+    def livemode=: (bool) -> bool
+
+    # Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+    def metadata: () -> untyped
+
+    # Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+    def metadata=: (untyped) -> untyped
+
+    # String representing the object's type. Objects of the same type share the same value.
+    def object: () -> "charge"
+
+    # String representing the object's type. Objects of the same type share the same value.
+    def object=: ("charge") -> "charge"
+
+    # The account (if any) the charge was made on behalf of without triggering an automatic transfer. See the [Connect documentation](https://stripe.com/docs/connect/separate-charges-and-transfers) for details.
+    def on_behalf_of: () -> String?
+
+    # The account (if any) the charge was made on behalf of without triggering an automatic transfer. See the [Connect documentation](https://stripe.com/docs/connect/separate-charges-and-transfers) for details.
+    def on_behalf_of=: (String?) -> String?
+
+    # Details about whether the payment was accepted, and why. See [understanding declines](https://stripe.com/docs/declines) for details.
+    def outcome: () -> untyped?
+
+    # Details about whether the payment was accepted, and why. See [understanding declines](https://stripe.com/docs/declines) for details.
+    def outcome=: (untyped?) -> untyped?
+
+    # `true` if the charge succeeded, or was successfully authorized for later capture.
+    def paid: () -> bool
+
+    # `true` if the charge succeeded, or was successfully authorized for later capture.
+    def paid=: (bool) -> bool
+
+    # ID of the PaymentIntent associated with this charge, if one exists.
+    def payment_intent: () -> String?
+
+    # ID of the PaymentIntent associated with this charge, if one exists.
+    def payment_intent=: (String?) -> String?
+
+    # ID of the payment method used in this charge.
+    def payment_method: () -> String?
+
+    # ID of the payment method used in this charge.
+    def payment_method=: (String?) -> String?
+
+    # Details about the payment method at the time of the transaction.
+    def payment_method_details: () -> untyped?
+
+    # Details about the payment method at the time of the transaction.
+    def payment_method_details=: (untyped?) -> untyped?
+
+    def radar_options: () -> untyped
+
+    def radar_options=: (untyped) -> untyped
+
+    # This is the email address that the receipt for this charge was sent to.
+    def receipt_email: () -> String?
+
+    # This is the email address that the receipt for this charge was sent to.
+    def receipt_email=: (String?) -> String?
+
+    # This is the transaction number that appears on email receipts sent for this charge. This attribute will be `null` until a receipt has been sent.
+    def receipt_number: () -> String?
+
+    # This is the transaction number that appears on email receipts sent for this charge. This attribute will be `null` until a receipt has been sent.
+    def receipt_number=: (String?) -> String?
+
+    # This is the URL to view the receipt for this charge. The receipt is kept up-to-date to the latest state of the charge, including any refunds. If the charge is for an Invoice, the receipt will be stylized as an Invoice receipt.
+    def receipt_url: () -> String?
+
+    # This is the URL to view the receipt for this charge. The receipt is kept up-to-date to the latest state of the charge, including any refunds. If the charge is for an Invoice, the receipt will be stylized as an Invoice receipt.
+    def receipt_url=: (String?) -> String?
+
+    # Whether the charge has been fully refunded. If the charge is only partially refunded, this attribute will still be false.
+    def refunded: () -> bool
+
+    # Whether the charge has been fully refunded. If the charge is only partially refunded, this attribute will still be false.
+    def refunded=: (bool) -> bool
+
+    # A list of refunds that have been applied to the charge.
+    def refunds: () -> untyped?
+
+    # A list of refunds that have been applied to the charge.
+    def refunds=: (untyped?) -> untyped?
+
+    # ID of the review associated with this charge if one exists.
+    def review: () -> String?
+
+    # ID of the review associated with this charge if one exists.
+    def review=: (String?) -> String?
+
+    # Shipping information for the charge.
+    def shipping: () -> untyped?
+
+    # Shipping information for the charge.
+    def shipping=: (untyped?) -> untyped?
+
+    # The transfer ID which created this charge. Only present if the charge came from another Stripe account. [See the Connect documentation](https://docs.stripe.com/connect/destination-charges) for details.
+    def source_transfer: () -> String?
+
+    # The transfer ID which created this charge. Only present if the charge came from another Stripe account. [See the Connect documentation](https://docs.stripe.com/connect/destination-charges) for details.
+    def source_transfer=: (String?) -> String?
+
+    # For a non-card charge, text that appears on the customer's statement as the statement descriptor. This value overrides the account's default statement descriptor. For information about requirements, including the 22-character limit, see [the Statement Descriptor docs](https://docs.stripe.com/get-started/account/statement-descriptors).
+    #
+    # For a card charge, this value is ignored unless you don't specify a `statement_descriptor_suffix`, in which case this value is used as the suffix.
+    def statement_descriptor: () -> String?
+
+    # For a non-card charge, text that appears on the customer's statement as the statement descriptor. This value overrides the account's default statement descriptor. For information about requirements, including the 22-character limit, see [the Statement Descriptor docs](https://docs.stripe.com/get-started/account/statement-descriptors).
+    #
+    # For a card charge, this value is ignored unless you don't specify a `statement_descriptor_suffix`, in which case this value is used as the suffix.
+    def statement_descriptor=: (String?) -> String?
+
+    # Provides information about a card charge. Concatenated to the account's [statement descriptor prefix](https://docs.stripe.com/get-started/account/statement-descriptors#static) to form the complete statement descriptor that appears on the customer's statement. If the account has no prefix value, the suffix is concatenated to the account's statement descriptor.
+    def statement_descriptor_suffix: () -> String?
+
+    # Provides information about a card charge. Concatenated to the account's [statement descriptor prefix](https://docs.stripe.com/get-started/account/statement-descriptors#static) to form the complete statement descriptor that appears on the customer's statement. If the account has no prefix value, the suffix is concatenated to the account's statement descriptor.
+    def statement_descriptor_suffix=: (String?) -> String?
+
+    # The status of the payment is either `succeeded`, `pending`, or `failed`.
+    def status: () -> ("failed" | "pending" | "succeeded")
+
+    # The status of the payment is either `succeeded`, `pending`, or `failed`.
+    def status=: (("failed" | "pending" | "succeeded")) -> ("failed" | "pending" | "succeeded")
+
+    # ID of the transfer to the `destination` account (only applicable if the charge was created using the `destination` parameter).
+    def transfer: () -> String
+
+    # ID of the transfer to the `destination` account (only applicable if the charge was created using the `destination` parameter).
+    def transfer=: (String) -> String
+
+    # An optional dictionary including the account to automatically transfer to as part of a destination charge. [See the Connect documentation](https://stripe.com/docs/connect/destination-charges) for details.
+    def transfer_data: () -> untyped?
+
+    # An optional dictionary including the account to automatically transfer to as part of a destination charge. [See the Connect documentation](https://stripe.com/docs/connect/destination-charges) for details.
+    def transfer_data=: (untyped?) -> untyped?
+
+    # A string that identifies this transaction as part of a group. See the [Connect documentation](https://stripe.com/docs/connect/separate-charges-and-transfers#transfer-options) for details.
+    def transfer_group: () -> String?
+
+    # A string that identifies this transaction as part of a group. See the [Connect documentation](https://stripe.com/docs/connect/separate-charges-and-transfers#transfer-options) for details.
+    def transfer_group=: (String?) -> String?
+  end
+end
