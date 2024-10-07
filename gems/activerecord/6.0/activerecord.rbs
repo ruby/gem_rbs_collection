@@ -289,6 +289,12 @@ module ActiveRecord
     def self.default_scope: (?untyped? scope) -> untyped | ...
   end
 
+  module Core
+    module ClassMethods
+      def arel_table: () -> Arel::Table
+    end
+  end
+
   module QueryMethods
     class WhereChain[Relation]
       include ActiveModel::ForbiddenAttributesProtection
@@ -330,8 +336,8 @@ module ActiveRecord
       def all: () -> self
       def ids: () -> Array[PrimaryKey]
       def none: () -> self
-      def pluck: (Symbol | String column) -> Array[untyped]
-              | (*Symbol | String columns) -> Array[Array[untyped]]
+      def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
       def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
                | (*untyped) -> self
       def exists?: (*untyped) -> bool
@@ -401,9 +407,9 @@ module ActiveRecord
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
       def each: () { (Model) -> void } -> self
-      def select: (*Symbol | String) -> self
+      def select: (*Symbol | String | Arel::Nodes::t) -> self
                 | () { (Model) -> boolish } -> Array[Model]
-      def reselect: (*Symbol | String) -> self
+      def reselect: (*Symbol | String | Arel::Nodes::t) -> self
     end
   end
 
@@ -412,8 +418,8 @@ module ActiveRecord
       def all: () -> Relation
       def ids: () -> Array[PrimaryKey]
       def none: () -> Relation
-      def pluck: (Symbol | String column) -> Array[untyped]
-              | (*Symbol | String columns) -> Array[Array[untyped]]
+      def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
       def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
                | (*untyped) -> Relation
       def exists?: (*untyped) -> bool
@@ -488,9 +494,9 @@ module ActiveRecord
       def touch_all: (*untyped, ?time: untyped) -> untyped
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
-      def select: (*Symbol | String) -> Relation
+      def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
-      def reselect: (*Symbol | String) -> Relation
+      def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
       def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
     end
   end
@@ -500,8 +506,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def all: () -> self
   def ids: () -> Array[PrimaryKey]
   def none: () -> self
-  def pluck: (Symbol | String column) -> Array[untyped]
-           | (*Symbol | String columns) -> Array[Array[untyped]]
+  def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+           | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
   def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
            | (*untyped) -> self
   def exists?: (*untyped) -> bool
@@ -571,17 +577,17 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
   def each: () { (Model) -> void } -> self
-  def select: (*Symbol | String) -> self
+  def select: (*Symbol | String | Arel::Nodes::t) -> self
             | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String) -> self
+  def reselect: (*Symbol | String | Arel::Nodes::t) -> self
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def all: () -> Relation
   def ids: () -> Array[PrimaryKey]
   def none: () -> Relation
-  def pluck: (Symbol | String column) -> Array[untyped]
-           | (*Symbol | String columns) -> Array[Array[untyped]]
+  def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+           | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
   def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
            | (*untyped) -> Relation
   def exists?: (*untyped) -> bool
@@ -656,15 +662,23 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def touch_all: (*untyped, ?time: untyped) -> untyped
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
-  def select: (*Symbol | String) -> Relation
+  def select: (*Symbol | String | Arel::Nodes::t) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String) -> Relation
+  def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
   def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
 end
 
 module Arel
   class Table
     def []: (untyped name) -> Arel::Attributes::Attribute
+  end
+end
+
+module Arel
+  module Nodes
+    # https://github.com/rails/rails/blob/v6.0.6.1/activerecord/lib/arel.rb#L45-L47
+
+    type t = Node | Attributes::Attribute | SqlLiteral
   end
 end
 
