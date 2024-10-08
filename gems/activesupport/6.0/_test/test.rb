@@ -71,7 +71,7 @@ itself if Object.new.blank? \
 ActiveSupport::TimeZone['Asia/Tokyo'].to_s
 Time.find_zone(Object.name)
 
-Array.wrap(nil)
-Array.wrap([1, 2, 3])
-Array.wrap("hello")
-Array.wrap({a: 1, b: 2})
+Array.wrap(nil).map(&:to_s)
+Array.wrap([1, 2, 3]).map(&:to_s)
+Array.wrap("hello").map(&:to_s)
+Array.wrap({a: 1, b: 2}).map(&:to_s)
