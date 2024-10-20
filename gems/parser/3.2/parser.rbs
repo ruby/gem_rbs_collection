@@ -45,7 +45,42 @@ module Parser
     class Range
     end
 
+    ##
+    # A buffer with source code. {Buffer} contains the source code itself,
+    # associated location information (name and first line), and takes care
+    # of encoding.
+    #
+    # A source buffer is immutable once populated.
+    #
+    # @!attribute [r] name
+    #  Buffer name. If the buffer was created from a file, the name corresponds
+    #  to relative path to the file.
+    #  @return [String] buffer name
+    #
+    # @!attribute [r] first_line
+    #  First line of the buffer, 1 by default.
+    #  @return [Integer] first line
+    #
+    # @api public
+    #
     class Buffer
+      attr_reader name: String
+      attr_reader first_line: Integer
+
+      def self.recognize_encoding: (String) -> Encoding
+      def self.reencode_string: (String) -> String
+
+      def initialize: (untyped name, ?Integer first_line, ?source: untyped) -> void
+      def read: () -> self
+      def source: () -> String
+      def source=: (String) -> String
+      def raw_source: (String) -> String
+      def decompose_position: (Integer) -> [Integer, Integer]
+      def source_lines: () -> Array[String]
+      def source_line: (Integer) -> String
+      def line_range: (Integer) -> ::Range[Integer]
+      def source_range: () -> ::Range[Integer]
+      def last_line: () -> Integer
     end
 
     class TreeRewriter

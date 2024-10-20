@@ -1,0 +1,70 @@
+module Google
+  module Apis
+    module Core
+      # Support for serializing hashes + property value/nil/unset tracking
+      # To be included in representers as a feature.
+      # @private
+      module JsonRepresentationSupport
+        def self.included: (untyped base) -> untyped
+
+        # @private
+        module JsonSupport
+          # Returns a customized getter function for Representable. Allows
+          # indifferent hash/attribute access.
+          #
+          # @param [String] name Property name
+          # @return [Proc]
+          def getter_fn: (untyped name) -> untyped
+
+          # Returns a customized function for Representable that checks whether or not
+          # an attribute should be serialized. Allows proper patch semantics by distinguishing
+          # between nil & unset values
+          #
+          # @param [String] name Property name
+          # @return [Proc]
+          def if_fn: (untyped name) -> untyped
+
+          def set_default_options: (untyped name, untyped options) -> untyped
+
+          # Define a single value property
+          #
+          # @param [String] name
+          #  Property name
+          # @param [Hash] options
+          def property: (untyped name, ?::Hash[untyped, untyped] options) -> untyped
+
+          # Define a collection property
+          #
+          # @param [String] name
+          #  Property name
+          # @param [Hash] options
+          def collection: (untyped name, ?::Hash[untyped, untyped] options) -> untyped
+
+          # Define a hash property
+          #
+          # @param [String] name
+          #  Property name
+          # @param [Hash] options
+          def hash: (?untyped? name, ?untyped? options) -> untyped
+        end
+      end
+
+      # # Base decorator for JSON representers
+      # #
+      # # @see https://github.com/apotonick/representable
+      # class JsonRepresentation < Representable::Decorator
+      #   include Representable::JSON
+      # end
+
+      module JsonObjectSupport
+        def self.included: (untyped base) -> untyped
+
+        module ClassMethods
+          def from_json: (untyped json) -> untyped
+        end
+
+        def to_json: (*untyped a) -> untyped
+      end
+    end
+  end
+end

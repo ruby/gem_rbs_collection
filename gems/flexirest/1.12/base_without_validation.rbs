@@ -1,0 +1,20 @@
+module Flexirest
+  class BaseWithoutValidation
+    include Mapping
+    extend Mapping::ClassMethods
+    include Configuration
+    extend Configuration::ClassMethods
+    include Callbacks
+    extend Callbacks::ClassMethods
+    include Caching
+    extend Caching::ClassMethods
+
+    def initialize: (?untyped attrs) -> void
+    def self._request: (String, Symbol, *untyped, **untyped) -> untyped
+    def self._plain_request: (String, Symbol, *untyped, **untyped) -> untyped
+    def self.prepare_direct_request: (String, Symbol, **untyped) -> untyped
+    def _attributes: () -> Hash[Symbol, untyped]
+    def []: (String | Symbol key) -> untyped
+    def []=: (String | Symbol key, untyped value) -> untyped
+  end
+end

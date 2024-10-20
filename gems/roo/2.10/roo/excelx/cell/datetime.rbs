@@ -1,0 +1,61 @@
+module Roo
+  class Excelx
+    class Cell
+      class DateTime < Cell::Base
+        @format: String | nil
+
+        @value: Link | ::DateTime
+
+        @default_type: :datetime | :date
+
+        SECONDS_IN_DAY: 86400
+
+        attr_reader value: Link | ::DateTime
+
+        attr_reader formula: String | nil
+
+        attr_reader format: String | nil
+
+        attr_reader cell_value: String
+
+        attr_reader coordinate: ::Roo::Excelx::Coordinate
+
+        def initialize: (String value, String | nil formula, [:numeric_or_formula, String] excelx_type, String | nil style, String | nil link, Integer base_timestamp, ::Roo::Excelx::Coordinate coordinate) -> void
+
+        # Public: Returns formatted value for a datetime. Format's can be an
+        #         standard excel format, or a custom format.
+        #
+        #         Standard formats follow certain conventions. Date fields for
+        #         days, months, and years are separated with hyhens or
+        #         slashes ("-", /") (e.g. 01-JAN, 1/13/15). Time fields for
+        #         hours, minutes, and seconds are separated with a colon (e.g.
+        #         12:45:01).
+        #
+        #         If a custom format follows those conventions, then the custom
+        #         format will be used for the a cell's formatted value.
+        #         Otherwise, the formatted value will be in the following
+        #         format: 'YYYY-mm-dd HH:MM:SS' (e.g. "2015-07-10 20:33:15").
+        #
+        # Examples
+        #    formatted_value #=> '01-JAN'
+        #
+        # Returns a String representation of a cell's value.
+        def formatted_value: () -> String
+
+        def default_type: () -> :datetime
+
+        def type: () -> (:formula | :link | :datetime)
+
+        private
+
+        def parse_date_or_time_format: (String part) -> (false | String)
+
+        DATE_FORMATS: ::Hash[String, "%Y" | "%y" | "%B" | "%^b" | "%m" | "%-m" | "%A" | "%^a" | "%d" | "%-d"]
+
+        TIME_FORMATS: ::Hash[String, "%H" | "%-k" | "%M" | "%-M" | "%S" | "%-S" | "%p" | "%3N" | "%2N" | "%1N"]
+
+        def create_datetime: (Integer base_timestamp, String value) -> ::DateTime
+      end
+    end
+  end
+end

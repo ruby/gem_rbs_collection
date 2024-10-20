@@ -1,8 +1,26 @@
 class User < ActiveRecord::Base
   class ActiveRecord_Relation < ActiveRecord::Relation
+    include ActiveRecord::Relation::Methods[User, Integer]
+  end
+
+  class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+    include ActiveRecord::Relation::Methods[User, Integer]
   end
 
   extend ActiveRecord::Base::ClassMethods[User, ActiveRecord_Relation, Integer]
 
+  def articles: () -> Article::ActiveRecord_Associations_CollectionProxy
+
   def something: () -> untyped
+end
+
+class Article < ActiveRecord::Base
+  class ActiveRecord_Relation < ActiveRecord::Relation
+  end
+
+  class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+    include ActiveRecord::Relation::Methods[Article, Integer]
+  end
+
+  extend ActiveRecord::Base::ClassMethods[Article, ActiveRecord_Relation, Integer]
 end

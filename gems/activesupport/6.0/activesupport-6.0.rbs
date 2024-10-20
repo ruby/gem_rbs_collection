@@ -13,4 +13,36 @@ module ActiveSupport
       end
     end
   end
+
+  class TimeZone
+    # Locate a specific time zone object. If the argument is a string, it
+    # is interpreted to mean the name of the timezone to locate. If it is a
+    # numeric value it is either the hour offset, or the second offset, of the
+    # timezone to find. (The first one with that offset will be returned.)
+    # Returns +nil+ if no such time zone is known to the system.
+    def self.[]: (String | real | Duration) -> instance?
+  end
+end
+
+# activesupport/lib/active_support/core_ext/time/zones.rb
+class Time
+  # Returns a TimeZone instance matching the time zone provided.
+  # Accepts the time zone in any format supported by <tt>Time.zone=</tt>.
+  # Raises an +ArgumentError+ for invalid time zones.
+  #
+  #   Time.find_zone! "America/New_York" # => #<ActiveSupport::TimeZone @name="America/New_York" ...>
+  #   Time.find_zone! "EST"              # => #<ActiveSupport::TimeZone @name="EST" ...>
+  #   Time.find_zone! -5.hours           # => #<ActiveSupport::TimeZone @name="Bogota" ...>
+  #   Time.find_zone! nil                # => nil
+  #   Time.find_zone! false              # => false
+  #   Time.find_zone! "NOT-A-TIMEZONE"   # => ArgumentError: Invalid Timezone: NOT-A-TIMEZONE
+  def self.find_zone!: (String | real | ActiveSupport::Duration) -> ActiveSupport::TimeZone
+
+  # Returns a TimeZone instance matching the time zone provided.
+  # Accepts the time zone in any format supported by <tt>Time.zone=</tt>.
+  # Returns +nil+ for invalid time zones.
+  #
+  #   Time.find_zone "America/New_York" # => #<ActiveSupport::TimeZone @name="America/New_York" ...>
+  #   Time.find_zone "NOT-A-TIMEZONE"   # => nil
+  def self.find_zone: (String | real | ActiveSupport::Duration | nil) -> ActiveSupport::TimeZone?
 end

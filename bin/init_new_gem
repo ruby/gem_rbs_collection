@@ -40,7 +40,7 @@ begin
 end while (version = $stdin.gets.chomp).empty?
 
 puts "Your GitHub account if you want to become the maintainer of RBS for this gem (default: skip adding you to the maintainer)"
-puts "We recommentd to add your account to maintain the RBS actively."
+puts "We recommend to add your account to maintain the RBS actively."
 puts "See https://github.com/ruby/gem_rbs_collection/blob/main/docs/CONTRIBUTING.md#gem-reviewer"
 print '> '
 github_account = $stdin.gets.chomp.tap { break if _1.empty? }
@@ -49,6 +49,9 @@ base = Pathname("gems/#{gem_name}/#{version}")
 
 put base / "#{gem_name}.rbs", <<~RBS
   # Write the type definition here!
+  #
+  # You can write all the definitions in this file,
+  # or you can split the definitions into multiple files by organizing them into classes or modules.
 RBS
 put base / "_test/test.rb", <<~RUBY
   # Write Ruby code to test the RBS.

@@ -48,4 +48,14 @@ module Sidekiq
       def initialize: (untyped config, Class klass, *untyped args) -> void
     end
   end
+
+  module ServerMiddleware
+    attr_accessor config: Config
+    
+    def redis_pool: () -> ConnectionPool[RedisClientAdapter]
+
+    def logger: () -> Logger
+
+    def redis: () { (RedisClientAdapter::CompatClient) -> void } -> void
+  end
 end

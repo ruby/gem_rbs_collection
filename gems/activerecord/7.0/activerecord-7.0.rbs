@@ -4,6 +4,26 @@ module ActiveRecord
     extend Encryption::EncryptableRecord::ClassMethods
   end
 
+  class AssociationRelation
+    def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+  end
+
+  module Associations
+    class CollectionProxy
+      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    end
+  end
+
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
@@ -65,5 +85,53 @@ module ActiveRecord
 
   class MismatchedForeignKey < StatementInvalid
     def initialize: (?primary_key_column: untyped? primary_key_column, ?primary_key: untyped? primary_key, ?target_table: untyped? target_table, ?foreign_key: untyped? foreign_key, ?table: untyped? table, ?binds: untyped? binds, ?sql: untyped? sql, ?message: untyped? message) -> untyped
+  end
+
+  module Persistence
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    end
+  end
+
+  class InsertAll
+    @record_timestamps: bool
+
+    def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+    def record_timestamps?: () -> bool
+
+    def keys_including_timestamps: () -> Set[String]
+
+    def timestamps_for_create: () -> Hash[String, String]
+  end
+end
+
+module Arel
+  class Table
+    def initialize: (untyped name, ?type_caster: untyped type_caster, ?as: untyped? as, ?klass: untyped?) -> void
+  end
+
+  class InsertManager < Arel::TreeManager
+    def initialize: (?Arel::Table? table) -> untyped
+  end
+
+  class UpdateManager < Arel::TreeManager
+    def initialize: (?Arel::Table? table) -> untyped
+  end
+
+  class DeleteManager < Arel::TreeManager
+    def initialize: (?Arel::Table? table) -> untyped
   end
 end

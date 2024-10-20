@@ -1,1 +1,31 @@
-# Write the type definition here!
+module ActiveModel
+  class Error
+    CALLBACKS_OPTIONS: ::Array[:if | :unless | :on | :allow_nil | :allow_blank | :strict]
+
+    MESSAGE_OPTIONS: ::Array[:message]
+
+    attr_reader base: untyped
+
+    attr_reader attribute: Symbol | String
+
+    attr_reader type: Symbol | String
+
+    attr_reader raw_type: (Symbol | String)?
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (untyped base, Symbol | String attribute, ?(Symbol | String)? type, **untyped options) -> void
+
+    def message: () -> String
+
+    def details: () -> Hash[Symbol, untyped]
+
+    alias detail details
+
+    def full_message: () -> String
+
+    def match?: (Symbol | String attribute, ?(Symbol | String)? type, **untyped options) -> bool
+
+    def strict_match?: (Symbol | String attribute, (Symbol | String)? type, **untyped options) -> bool
+  end
+end

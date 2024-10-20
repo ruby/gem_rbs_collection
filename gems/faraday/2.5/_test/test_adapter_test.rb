@@ -1,6 +1,6 @@
 test = Faraday::Adapter::Test.new(Object.new) do |stubs|
   stubs.empty?
-  stub, meta = stubs.match(Object.new)
+  stub, meta = stubs.match(Faraday::Env.new)
   if stub && meta
     meta[:match_data]
   end
@@ -64,10 +64,10 @@ test = Faraday::Adapter::Test.new(Object.new) do |stubs|
   stubs.send(:new_stub, :get, "/path", { x_a: "a" }, nil) { [204, { x: 3 }, ""] }
   stubs.send(:matches?, {}, Object.new)
 end
-test.call(Object.new)
+test.call(Faraday::Env.new)
 
 stub = Faraday::Adapter::Test::Stub.new("example.com", "/path", "a=234", Faraday::Utils::Headers.new, "body", false, -> () { true })
-result, meta = stub.matches?(Object.new)
+result, meta = stub.matches?(Faraday::Env.new)
 if result
   meta.key?(:match_data)
 end
@@ -80,7 +80,7 @@ stub.body = "body"; stub.body&.to_str
 stub.strict_mode = true; stub.strict_mode
 stub.block = -> { true }; stub.block
 stub.path_match?("/request_path", {})
-stub.params_match?(Object.new) ? :ok : :bad
+stub.params_match?(Faraday::Env.new) ? :ok : :bad
 stub.headers_match?({ x_b: "ok" }) ? :ok : :bad
 stub.body_match?("request body") ? :ok : :bad
 stub.to_s

@@ -289,12 +289,18 @@ module ActiveRecord
     def self.default_scope: (?untyped? scope) -> untyped | ...
   end
 
+  module Core
+    module ClassMethods
+      def arel_table: () -> Arel::Table
+    end
+  end
+
   module QueryMethods
     class WhereChain[Relation]
       include ActiveModel::ForbiddenAttributesProtection
 
       def initialize: (Relation scope) -> void
-                 
+
       def not: (untyped opts, *untyped rest) -> Relation
 
       private
@@ -306,12 +312,32 @@ end
 
 module ActiveRecord
   class Relation
+    # Initializes new record from relation while maintaining the current
+    # scope.
+    #
+    # Expects arguments in the same format as {ActiveRecord::Base.new}[rdoc-ref:Core.new].
+    #
+    #   users = User.where(name: 'DHH')
+    #   user = users.new # => #<User id: nil, name: "DHH", created_at: nil, updated_at: nil>
+    #
+    # You can also pass a block to new with the new record as argument:
+    #
+    #   user = users.new { |user| user.name = 'Oscar' }
+    #   user.name # => Oscar
+    def new: (?untyped? attributes) ?{ () -> untyped } -> untyped
+
+    def arel_table: () -> Arel::Table
+  end
+end
+
+module ActiveRecord
+  class Relation
     module Methods[Model, PrimaryKey]
       def all: () -> self
       def ids: () -> Array[PrimaryKey]
       def none: () -> self
-      def pluck: (Symbol | String column) -> Array[untyped]
-              | (*Symbol | String columns) -> Array[Array[untyped]]
+      def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
       def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
                | (*untyped) -> self
       def exists?: (*untyped) -> bool
@@ -368,9 +394,12 @@ module ActiveRecord
       def last!: () -> Model
       def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
       def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
+      def offset: (Integer) -> self
+      def offset!: (Integer) -> self
       def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
+      def sum: (?untyped? column_name) -> Integer
       def destroy_all: () -> untyped
       def delete_all: () -> untyped
       def update_all: (*untyped) -> untyped
@@ -378,9 +407,9 @@ module ActiveRecord
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
       def each: () { (Model) -> void } -> self
-      def select: (*Symbol | String) -> self
+      def select: (*Symbol | String | Arel::Nodes::t) -> self
                 | () { (Model) -> boolish } -> Array[Model]
-      def reselect: (*Symbol | String) -> self
+      def reselect: (*Symbol | String | Arel::Nodes::t) -> self
     end
   end
 
@@ -389,8 +418,8 @@ module ActiveRecord
       def all: () -> Relation
       def ids: () -> Array[PrimaryKey]
       def none: () -> Relation
-      def pluck: (Symbol | String column) -> Array[untyped]
-              | (*Symbol | String columns) -> Array[Array[untyped]]
+      def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
       def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
                | (*untyped) -> Relation
       def exists?: (*untyped) -> bool
@@ -453,19 +482,22 @@ module ActiveRecord
               | (Integer count) -> Array[Model]
       def last!: () -> Model
       def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
+      def offset: (Integer) -> Relation
       def lock: (?untyped locks) -> Relation
       def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
+      def sum: (?untyped? column_name) -> Integer
       def destroy_all: () -> untyped
       def delete_all: () -> untyped
       def update_all: (*untyped) -> untyped
       def touch_all: (*untyped, ?time: untyped) -> untyped
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
-      def select: (*Symbol | String) -> Relation
+      def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
-      def reselect: (*Symbol | String) -> Relation
+      def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
+      def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
     end
   end
 end
@@ -474,8 +506,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def all: () -> self
   def ids: () -> Array[PrimaryKey]
   def none: () -> self
-  def pluck: (Symbol | String column) -> Array[untyped]
-           | (*Symbol | String columns) -> Array[Array[untyped]]
+  def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+           | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
   def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
            | (*untyped) -> self
   def exists?: (*untyped) -> bool
@@ -532,6 +564,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
   def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
+  def offset: (Integer) -> self
+  def offset!: (Integer) -> self
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
@@ -543,17 +577,17 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
   def each: () { (Model) -> void } -> self
-  def select: (*Symbol | String) -> self
+  def select: (*Symbol | String | Arel::Nodes::t) -> self
             | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String) -> self
+  def reselect: (*Symbol | String | Arel::Nodes::t) -> self
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def all: () -> Relation
   def ids: () -> Array[PrimaryKey]
   def none: () -> Relation
-  def pluck: (Symbol | String column) -> Array[untyped]
-           | (*Symbol | String columns) -> Array[Array[untyped]]
+  def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+           | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
   def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
            | (*untyped) -> Relation
   def exists?: (*untyped) -> bool
@@ -616,6 +650,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
            | (Integer count) -> Array[Model]
   def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
+  def offset: (Integer) -> Relation
   def lock: (?untyped locks) -> Relation
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
@@ -627,10 +662,24 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def touch_all: (*untyped, ?time: untyped) -> untyped
   def destroy_by: (*untyped) -> untyped
   def delete_by: (*untyped) -> untyped
-  def select: (*Symbol | String) -> Relation
+  def select: (*Symbol | String | Arel::Nodes::t) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String) -> Relation
+  def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
   def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+end
+
+module Arel
+  class Table
+    def []: (untyped name) -> Arel::Attributes::Attribute
+  end
+end
+
+module Arel
+  module Nodes
+    # https://github.com/rails/rails/blob/v6.0.6.1/activerecord/lib/arel.rb#L45-L47
+
+    type t = Node | Attributes::Attribute | SqlLiteral
+  end
 end
 
 # https://github.com/rails/rails/blob/fbe2433be6e052a1acac63c7faf287c52ed3c5ba/activerecord/lib/arel/nodes/unary.rb
@@ -740,10 +789,82 @@ end
 
 module ActiveRecord
   module Associations
-    class CollectionProxy
-      def build: (?::Hash[untyped, untyped] attributes) -> untyped | ...
-      def create: (?::Hash[untyped, untyped] attributes) -> untyped | ...
-      def create!: (?::Hash[untyped, untyped] attributes) -> untyped | ...
+    class CollectionProxy < Relation
+      interface _EachPair
+        def each_pair: () { ([untyped, untyped]) -> untyped } -> self
+        def each: () { ([untyped, untyped]) -> untyped } -> self
+        def empty?: () -> bool
+      end
+
+      # Returns a new object of the collection type that has been instantiated
+      # with +attributes+ and linked to this object, but have not yet been saved.
+      # You can pass an array of attributes hashes, this will return an array
+      # with the new objects.
+      #
+      #   class Person
+      #     has_many :pets
+      #   end
+      #
+      #   person.pets.build
+      #   # => #<Pet id: nil, name: nil, person_id: 1>
+      #
+      #   person.pets.build(name: 'Fancy-Fancy')
+      #   # => #<Pet id: nil, name: "Fancy-Fancy", person_id: 1>
+      #
+      #   person.pets.build([{name: 'Spook'}, {name: 'Choo-Choo'}, {name: 'Brain'}])
+      #   # => [
+      #   #      #<Pet id: nil, name: "Spook", person_id: 1>,
+      #   #      #<Pet id: nil, name: "Choo-Choo", person_id: 1>,
+      #   #      #<Pet id: nil, name: "Brain", person_id: 1>
+      #   #    ]
+      #
+      #   person.pets.size  # => 5 # size of the collection
+      #   person.pets.count # => 0 # count from database
+      def build: (?_EachPair attributes) ?{ () -> untyped } -> untyped
+
+      alias new build
+
+      # Returns a new object of the collection type that has been instantiated with
+      # attributes, linked to this object and that has already been saved (if it
+      # passes the validations).
+      #
+      #   class Person
+      #     has_many :pets
+      #   end
+      #
+      #   person.pets.create(name: 'Fancy-Fancy')
+      #   # => #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>
+      #
+      #   person.pets.create([{name: 'Spook'}, {name: 'Choo-Choo'}])
+      #   # => [
+      #   #      #<Pet id: 2, name: "Spook", person_id: 1>,
+      #   #      #<Pet id: 3, name: "Choo-Choo", person_id: 1>
+      #   #    ]
+      #
+      #   person.pets.size  # => 3
+      #   person.pets.count # => 3
+      #
+      #   person.pets.find(1, 2, 3)
+      #   # => [
+      #   #       #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>,
+      #   #       #<Pet id: 2, name: "Spook", person_id: 1>,
+      #   #       #<Pet id: 3, name: "Choo-Choo", person_id: 1>
+      #   #    ]
+      def create: (?_EachPair attributes) ?{ () -> untyped } -> untyped
+
+      # Like #create, except that if the record is invalid, raises an exception.
+      #
+      #   class Person
+      #     has_many :pets
+      #   end
+      #
+      #   class Pet
+      #     validates :name, presence: true
+      #   end
+      #
+      #   person.pets.create!(name: nil)
+      #   # => ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
+      def create!: (?_EachPair attributes) ?{ () -> untyped } -> untyped
     end
   end
 end

@@ -1,0 +1,17 @@
+module Roo
+  class Excelx
+    class Relationships < Excelx::Extractor
+      @relationships: Hash[String, Nokogiri::XML::Node]
+
+      def []: (String index) -> Nokogiri::XML::Node
+
+      def to_a: () -> Hash[String, Nokogiri::XML::Node]
+
+      def include_type?: (String type) -> bool
+
+      private
+
+      def extract_relationships: () -> Hash[String, Nokogiri::XML::Node]
+    end
+  end
+end

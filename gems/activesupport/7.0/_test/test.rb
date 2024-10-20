@@ -19,3 +19,11 @@ nil.try { p 'hello' }
 nil.try { |n| p n }
 
 "Id".downcase_first
+ActiveSupport::TimeZone['Asia/Tokyo'].to_s
+Time.find_zone(Object.name)
+Time.zone.now.to_fs
+
+Array.wrap(nil)
+Array.wrap([1, 2, 3])
+Array.wrap("hello")
+Array.wrap({a: 1, b: 2})

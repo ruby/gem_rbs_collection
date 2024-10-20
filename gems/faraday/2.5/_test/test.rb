@@ -11,6 +11,7 @@ conn.headers
 response = conn.get('/get', { param: '1' }, { 'Content-Type' => 'application/json' }) do |req|
   req.path = "/new_get"
   req.path = URI("https://example.com/new_get?abc=m")
+  req.headers["x-foo"] = "OK"
   req.url("/new_url")
   req.url("/new_url", { x_foo: "OK" })
   req.url(URI("https://example.com/new_url?abc=foo"))
@@ -45,8 +46,19 @@ response.success?
 conn = Faraday.new(
   url: 'http://example.com/test2',
   headers: { 'Content-Type' => 'application/json' }
-)
+) do |faraday|
+  faraday.use :raise_error
+  faraday.request :url_encoded
+  faraday.response :logger, bodies: true
+  faraday.adapter :net_http
+  faraday.ssl.client_cert = 'client_cert'
+  faraday.ssl.client_key = 'client_key'
+  faraday.options.open_timeout = 5
+  faraday.options.read_timeout = 10
+  faraday.options.write_timeout = 5
+end
 conn.post(URI("http://example.com/post"))
+conn.options(URI("http://example.com/options"))
 response = conn.post('/post') do |req|
   req.body = "{ query: 'chunky bacon' }"
 end
@@ -102,5 +114,5 @@ Faraday::Middleware.unregister_middleware(:custom)
 custom_middleware = Faraday::Middleware.new(Object.new, { foo: 123 })
 custom_middleware.app
 custom_middleware.options.transform_keys
-custom_middleware.call(Object.new)
+custom_middleware.call(Faraday::Env.new)
 custom_middleware.close

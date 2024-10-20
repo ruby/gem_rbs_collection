@@ -1,0 +1,42 @@
+module Roo
+  class Excelx
+    class Workbook < Excelx::Extractor
+      @base_timestamp: Integer
+
+      @base_date: Date
+
+      class Label
+        @name: String
+
+        @sheet: String
+
+        @row: Integer
+
+        @col: Integer
+
+        attr_reader sheet: String
+
+        attr_reader row: Integer
+
+        attr_reader col: Integer
+
+        attr_reader name: String
+
+        def initialize: (String name, String sheet, String row, String col) -> void
+
+        def key: () -> [Integer, Integer]
+      end
+
+      def initialize: (String path) -> void
+
+      def sheets: () -> ::Nokogiri::XML::NodeSet
+
+      # aka labels
+      def defined_names: () -> Hash[String, Label]
+
+      def base_timestamp: () -> Integer
+
+      def base_date: () -> Date
+    end
+  end
+end

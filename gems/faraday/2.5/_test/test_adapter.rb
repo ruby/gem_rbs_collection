@@ -15,8 +15,8 @@ MyAdapter.supports_parallel?
 MyAdapter.new(Object.new, { test: 1234 })
 MyAdapter.new(Object.new)
 my_adapter = MyAdapter.new(Object.new) {}
-my_adapter.connection(Object.new)
-my_adapter.connection(Object.new) {}
+my_adapter.connection(Faraday::Env.new)
+my_adapter.connection(Faraday::Env.new) {}
 my_adapter.close
 my_adapter.send(:save_response, Object.new, 200, "🚀")
 my_adapter.send(:save_response, Object.new, 200, "🚀", { test: 34 })
@@ -25,7 +25,7 @@ my_adapter.send(:save_response, Object.new, 200, "🚀", { test: 34 }, "No probl
 my_adapter.send(:save_response, Object.new, 200, "🚀", { test: 34 }, "No problem!", true) {}
 my_adapter.send(:request_timeout, :read, { read_timeout: "ok" })
 my_adapter.send(:request_timeout, :open, { timeout: "ok" })
-response = my_adapter.call(Object.new)
+response = my_adapter.call(Faraday::Env.new)
 response.status
 response.headers
 response.success?

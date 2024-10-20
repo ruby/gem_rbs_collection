@@ -7,7 +7,7 @@ require "shoryuken"
 class HelloWorker
   include Shoryuken::Worker
 
-  shoryuken_options queue: 'hello', auto_delete: true
+  shoryuken_options queue: 'hello', auto_delete: true, body_parser: :json
 
   def perform(sqs_msg, name)
     puts "Hello, #{name}"

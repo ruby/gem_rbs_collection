@@ -1129,76 +1129,6 @@ module ActiveRecord
       #   another_person_without.pets.take(2) # => []
       def take: (?untyped? limit) -> untyped
 
-      # Returns a new object of the collection type that has been instantiated
-      # with +attributes+ and linked to this object, but have not yet been saved.
-      # You can pass an array of attributes hashes, this will return an array
-      # with the new objects.
-      #
-      #   class Person
-      #     has_many :pets
-      #   end
-      #
-      #   person.pets.build
-      #   # => #<Pet id: nil, name: nil, person_id: 1>
-      #
-      #   person.pets.build(name: 'Fancy-Fancy')
-      #   # => #<Pet id: nil, name: "Fancy-Fancy", person_id: 1>
-      #
-      #   person.pets.build([{name: 'Spook'}, {name: 'Choo-Choo'}, {name: 'Brain'}])
-      #   # => [
-      #   #      #<Pet id: nil, name: "Spook", person_id: 1>,
-      #   #      #<Pet id: nil, name: "Choo-Choo", person_id: 1>,
-      #   #      #<Pet id: nil, name: "Brain", person_id: 1>
-      #   #    ]
-      #
-      #   person.pets.size  # => 5 # size of the collection
-      #   person.pets.count # => 0 # count from database
-      def build: (?::Hash[untyped, untyped] attributes) { () -> untyped } -> untyped
-
-      alias new build
-
-      # Returns a new object of the collection type that has been instantiated with
-      # attributes, linked to this object and that has already been saved (if it
-      # passes the validations).
-      #
-      #   class Person
-      #     has_many :pets
-      #   end
-      #
-      #   person.pets.create(name: 'Fancy-Fancy')
-      #   # => #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>
-      #
-      #   person.pets.create([{name: 'Spook'}, {name: 'Choo-Choo'}])
-      #   # => [
-      #   #      #<Pet id: 2, name: "Spook", person_id: 1>,
-      #   #      #<Pet id: 3, name: "Choo-Choo", person_id: 1>
-      #   #    ]
-      #
-      #   person.pets.size  # => 3
-      #   person.pets.count # => 3
-      #
-      #   person.pets.find(1, 2, 3)
-      #   # => [
-      #   #       #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>,
-      #   #       #<Pet id: 2, name: "Spook", person_id: 1>,
-      #   #       #<Pet id: 3, name: "Choo-Choo", person_id: 1>
-      #   #    ]
-      def create: (?::Hash[untyped, untyped] attributes) { () -> untyped } -> untyped
-
-      # Like #create, except that if the record is invalid, raises an exception.
-      #
-      #   class Person
-      #     has_many :pets
-      #   end
-      #
-      #   class Pet
-      #     validates :name, presence: true
-      #   end
-      #
-      #   person.pets.create!(name: nil)
-      #   # => ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
-      def create!: (?::Hash[untyped, untyped] attributes) { () -> untyped } -> untyped
-
       # Replaces this collection with +other_array+. This will perform a diff
       # and delete/add only records that have changed.
       #
@@ -12040,8 +11970,6 @@ module ActiveRecord
 
       def ===: (untyped object) -> untyped
 
-      def arel_table: () -> untyped
-
       def arel_attribute: (untyped name, ?untyped table) -> untyped
 
       def predicate_builder: () -> untyped
@@ -13873,8 +13801,6 @@ module ActiveRecord
     attr_reader returning: untyped
 
     attr_reader unique_by: untyped
-
-    def initialize: (untyped model, untyped inserts, on_duplicate: untyped on_duplicate, ?unique_by: untyped? unique_by, ?returning: untyped? returning) -> untyped
 
     def execute: () -> untyped
 
@@ -16256,180 +16182,6 @@ module ActiveRecord
       # These describe which attributes to be created on the object, or
       # multiple objects when given an Array of Hashes.
       def create!: (?untyped? attributes) ?{ () -> untyped } -> untyped
-
-      # Inserts a single record into the database in a single SQL INSERT
-      # statement. It does not instantiate any models nor does it trigger
-      # Active Record callbacks or validations. Though passed values
-      # go through Active Record's type casting and serialization.
-      #
-      # See <tt>ActiveRecord::Persistence#insert_all</tt> for documentation.
-      def insert: (untyped attributes, ?unique_by: untyped? unique_by, ?returning: untyped? returning) -> untyped
-
-      # Inserts multiple records into the database in a single SQL INSERT
-      # statement. It does not instantiate any models nor does it trigger
-      # Active Record callbacks or validations. Though passed values
-      # go through Active Record's type casting and serialization.
-      #
-      # The +attributes+ parameter is an Array of Hashes. Every Hash determines
-      # the attributes for a single row and must have the same keys.
-      #
-      # Rows are considered to be unique by every unique index on the table. Any
-      # duplicate rows are skipped.
-      # Override with <tt>:unique_by</tt> (see below).
-      #
-      # Returns an <tt>ActiveRecord::Result</tt> with its contents based on
-      # <tt>:returning</tt> (see below).
-      #
-      # ==== Options
-      #
-      # [:returning]
-      #   (PostgreSQL only) An array of attributes to return for all successfully
-      #   inserted records, which by default is the primary key.
-      #   Pass <tt>returning: %w[ id name ]</tt> for both id and name
-      #   or <tt>returning: false</tt> to omit the underlying <tt>RETURNING</tt> SQL
-      #   clause entirely.
-      #
-      # [:unique_by]
-      #   (PostgreSQL and SQLite only) By default rows are considered to be unique
-      #   by every unique index on the table. Any duplicate rows are skipped.
-      #
-      #   To skip rows according to just one unique index pass <tt>:unique_by</tt>.
-      #
-      #   Consider a Book model where no duplicate ISBNs make sense, but if any
-      #   row has an existing id, or is not unique by another unique index,
-      #   <tt>ActiveRecord::RecordNotUnique</tt> is raised.
-      #
-      #   Unique indexes can be identified by columns or name:
-      #
-      #     unique_by: :isbn
-      #     unique_by: %i[ author_id name ]
-      #     unique_by: :index_books_on_isbn
-      #
-      # Because it relies on the index information from the database
-      # <tt>:unique_by</tt> is recommended to be paired with
-      # Active Record's schema_cache.
-      #
-      # ==== Example
-      #
-      #   # Insert records and skip inserting any duplicates.
-      #   # Here "Eloquent Ruby" is skipped because its id is not unique.
-      #
-      #   Book.insert_all([
-      #     { id: 1, title: "Rework", author: "David" },
-      #     { id: 1, title: "Eloquent Ruby", author: "Russ" }
-      #   ])
-      def insert_all: (untyped attributes, ?unique_by: untyped? unique_by, ?returning: untyped? returning) -> untyped
-
-      # Inserts a single record into the database in a single SQL INSERT
-      # statement. It does not instantiate any models nor does it trigger
-      # Active Record callbacks or validations. Though passed values
-      # go through Active Record's type casting and serialization.
-      #
-      # See <tt>ActiveRecord::Persistence#insert_all!</tt> for more.
-      def insert!: (untyped attributes, ?returning: untyped? returning) -> untyped
-
-      # Inserts multiple records into the database in a single SQL INSERT
-      # statement. It does not instantiate any models nor does it trigger
-      # Active Record callbacks or validations. Though passed values
-      # go through Active Record's type casting and serialization.
-      #
-      # The +attributes+ parameter is an Array of Hashes. Every Hash determines
-      # the attributes for a single row and must have the same keys.
-      #
-      # Raises <tt>ActiveRecord::RecordNotUnique</tt> if any rows violate a
-      # unique index on the table. In that case, no rows are inserted.
-      #
-      # To skip duplicate rows, see <tt>ActiveRecord::Persistence#insert_all</tt>.
-      # To replace them, see <tt>ActiveRecord::Persistence#upsert_all</tt>.
-      #
-      # Returns an <tt>ActiveRecord::Result</tt> with its contents based on
-      # <tt>:returning</tt> (see below).
-      #
-      # ==== Options
-      #
-      # [:returning]
-      #   (PostgreSQL only) An array of attributes to return for all successfully
-      #   inserted records, which by default is the primary key.
-      #   Pass <tt>returning: %w[ id name ]</tt> for both id and name
-      #   or <tt>returning: false</tt> to omit the underlying <tt>RETURNING</tt> SQL
-      #   clause entirely.
-      #
-      # ==== Examples
-      #
-      #   # Insert multiple records
-      #   Book.insert_all!([
-      #     { title: "Rework", author: "David" },
-      #     { title: "Eloquent Ruby", author: "Russ" }
-      #   ])
-      #
-      #   # Raises ActiveRecord::RecordNotUnique because "Eloquent Ruby"
-      #   # does not have a unique id.
-      #   Book.insert_all!([
-      #     { id: 1, title: "Rework", author: "David" },
-      #     { id: 1, title: "Eloquent Ruby", author: "Russ" }
-      #   ])
-      def insert_all!: (untyped attributes, ?returning: untyped? returning) -> untyped
-
-      # Updates or inserts (upserts) a single record into the database in a
-      # single SQL INSERT statement. It does not instantiate any models nor does
-      # it trigger Active Record callbacks or validations. Though passed values
-      # go through Active Record's type casting and serialization.
-      #
-      # See <tt>ActiveRecord::Persistence#upsert_all</tt> for documentation.
-      def upsert: (untyped attributes, ?unique_by: untyped? unique_by, ?returning: untyped? returning) -> untyped
-
-      # Updates or inserts (upserts) multiple records into the database in a
-      # single SQL INSERT statement. It does not instantiate any models nor does
-      # it trigger Active Record callbacks or validations. Though passed values
-      # go through Active Record's type casting and serialization.
-      #
-      # The +attributes+ parameter is an Array of Hashes. Every Hash determines
-      # the attributes for a single row and must have the same keys.
-      #
-      # Returns an <tt>ActiveRecord::Result</tt> with its contents based on
-      # <tt>:returning</tt> (see below).
-      #
-      # ==== Options
-      #
-      # [:returning]
-      #   (PostgreSQL only) An array of attributes to return for all successfully
-      #   inserted records, which by default is the primary key.
-      #   Pass <tt>returning: %w[ id name ]</tt> for both id and name
-      #   or <tt>returning: false</tt> to omit the underlying <tt>RETURNING</tt> SQL
-      #   clause entirely.
-      #
-      # [:unique_by]
-      #   (PostgreSQL and SQLite only) By default rows are considered to be unique
-      #   by every unique index on the table. Any duplicate rows are skipped.
-      #
-      #   To skip rows according to just one unique index pass <tt>:unique_by</tt>.
-      #
-      #   Consider a Book model where no duplicate ISBNs make sense, but if any
-      #   row has an existing id, or is not unique by another unique index,
-      #   <tt>ActiveRecord::RecordNotUnique</tt> is raised.
-      #
-      #   Unique indexes can be identified by columns or name:
-      #
-      #     unique_by: :isbn
-      #     unique_by: %i[ author_id name ]
-      #     unique_by: :index_books_on_isbn
-      #
-      # Because it relies on the index information from the database
-      # <tt>:unique_by</tt> is recommended to be paired with
-      # Active Record's schema_cache.
-      #
-      # ==== Examples
-      #
-      #   # Inserts multiple records, performing an upsert when records have duplicate ISBNs.
-      #   # Here "Eloquent Ruby" overwrites "Rework" because its ISBN is duplicate.
-      #
-      #   Book.upsert_all([
-      #     { title: "Rework", author: "David", isbn: "1" },
-      #     { title: "Eloquent Ruby", author: "Russ", isbn: "1" }
-      #   ], unique_by: :isbn)
-      #
-      #   Book.find_by(isbn: "1").title # => "Eloquent Ruby"
-      def upsert_all: (untyped attributes, ?unique_by: untyped? unique_by, ?returning: untyped? returning) -> untyped
 
       # Given an attributes hash, +instantiate+ returns a new instance of
       # the appropriate class. Accepts only keys as strings.
@@ -19511,20 +19263,6 @@ module ActiveRecord
 
     def bind_attribute: (untyped name, untyped value) { (untyped, untyped) -> untyped } -> untyped
 
-    # Initializes new record from relation while maintaining the current
-    # scope.
-    #
-    # Expects arguments in the same format as {ActiveRecord::Base.new}[rdoc-ref:Core.new].
-    #
-    #   users = User.where(name: 'DHH')
-    #   user = users.new # => #<User id: nil, name: "DHH", created_at: nil, updated_at: nil>
-    #
-    # You can also pass a block to new with the new record as argument:
-    #
-    #   user = users.new { |user| user.name = 'Oscar' }
-    #   user.name # => Oscar
-    def new: (?untyped? attributes) { () -> untyped } -> untyped
-
     alias build new
 
     # Tries to create a new record with the same scoped attributes
@@ -22555,8 +22293,6 @@ module Arel
   class DeleteManager < Arel::TreeManager
     include TreeManager::StatementMethods
 
-    def initialize: () -> untyped
-
     def from: (untyped relation) -> untyped
   end
 end
@@ -22619,8 +22355,6 @@ end
 module Arel
   # :nodoc: all
   class InsertManager < Arel::TreeManager
-    def initialize: () -> untyped
-
     def into: (untyped table) -> untyped
 
     def columns: () -> untyped
@@ -23754,8 +23488,6 @@ module Arel
     # TableAlias and Table both have a #table_name which is the name of the underlying table
     alias table_name name
 
-    def initialize: (untyped name, ?type_caster: untyped? type_caster, ?as: untyped? as) -> untyped
-
     def alias: (?::String name) -> Nodes::TableAlias
 
     def from: () -> SelectManager
@@ -23777,8 +23509,6 @@ module Arel
     def skip: (untyped amount) -> untyped
 
     def having: (untyped expr) -> untyped
-
-    def []: (untyped name) -> untyped
 
     def hash: () -> untyped
 
@@ -23835,8 +23565,6 @@ module Arel
   # :nodoc: all
   class UpdateManager < Arel::TreeManager
     include TreeManager::StatementMethods
-
-    def initialize: () -> untyped
 
     # #
     # UPDATE +table+
