@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true, if: -> { something }
   validates :age, presence: true, if: ->(user) { user.something }
 
+  scope :name_like, ->(name) { where(arel_table[:name].matches("%#{sanitize_sql_like(name)}%")) }
   scope :matured, -> { where(arel_table[:age].gteq(18)) }
 
   before_save -> (obj) { obj.something; self.something }

@@ -326,6 +326,11 @@ module ActiveRecord
     #   user.name # => Oscar
     def new: (?untyped? attributes) ?{ () -> untyped } -> untyped
 
+    # ActiveRecord::Relation delegates method calls to a ActiveRecord::Base class.
+    # To represent the behavior in the RBS system, we define and include the class methods of ActiveRecord::Base here.
+
+    include Sanitization::ClassMethods
+
     def arel_table: () -> Arel::Table
   end
 end
