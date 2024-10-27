@@ -27,7 +27,7 @@ user.articles.build(ActionController::Parameters.new)
 
 User.eager_load(:address, friends: [:address, :followers])
 User.includes(:address, :friends).to_a
-User.preload(:address, friends: [:address, :followers])
+User.preload(:address, friends: [:address, { followers: :users }]) # steep:ignore FallbackAny
 User.in_order_of(:id, [1, 5, 3])
 User.offset(5).limit(10)
 
