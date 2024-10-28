@@ -1,4 +1,17 @@
 module ActiveModel
+  module API
+    extend ActiveSupport::Concern
+    include ActiveModel::AttributeAssignment
+    include ActiveModel::Validations
+    extend ActiveModel::Validations::ClassMethods
+    include ActiveModel::Conversion
+    extend ActiveModel::Conversion::ClassMethods
+
+    def persisted?: () -> bool
+  end
+end
+
+module ActiveModel
   class Error
     CALLBACKS_OPTIONS: ::Array[:if | :unless | :on | :allow_nil | :allow_blank | :strict]
 
