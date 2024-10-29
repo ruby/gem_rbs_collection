@@ -1,0 +1,50 @@
+module Commonmarker
+  # Public: Parses a CommonMark string into an HTML string.
+  #
+  # text - A {String} of text
+  # options - A {Hash} of render, parse, and extension options to transform the text.
+  #
+  # Returns the `parser` node.
+  def self.parse: (String text, ?Hash[untyped, untyped] options) -> Node
+
+  # Public: Parses a CommonMark string into an HTML string.
+  #
+  # text - A {String} of text
+  # options - A {Hash} of render, parse, and extension options to transform the text.
+  # plugins - A {Hash} of additional plugins.
+  #
+  # Returns a {String} of converted HTML.
+  def self.to_html: (String text, ?Hash[untyped, untyped] options, ?Hash[untyped, untyped] plugins) -> String
+end
+
+module Commonmarker
+  class Node
+    include Enumerable[Node]
+
+    # Public: An iterator that "walks the tree," descending into children recursively.
+    #
+    # blk - A {Proc} representing the action to take for each child
+    def walk: () { (Node) -> void } -> void
+            | () -> Enumerator[Node, void]
+
+    # Public: Iterate over the children (if any) of the current pointer.
+    def each: () { (Node) -> void } -> void
+            | () -> Enumerator[Node, void]
+
+    # Public: Converts a node to an HTML string.
+    #
+    # options - A {Hash} of render, parse, and extension options to transform the text.
+    # plugins - A {Hash} of additional plugins.
+    #
+    # Returns a {String} of HTML.
+    def to_html: (?Hash[untyped, untyped] options, ?Hash[untyped, untyped] plugins) -> String
+
+    # Public: Convert the node to a CommonMark string.
+    #
+    # options - A {Symbol} or {Array of Symbol}s indicating the render options
+    # plugins - A {Hash} of additional plugins.
+    #
+    # Returns a {String}.
+    def to_commonmark: (?Hash[untyped, untyped] options, ?Hash[untyped, untyped] plugins) -> String
+  end
+end
