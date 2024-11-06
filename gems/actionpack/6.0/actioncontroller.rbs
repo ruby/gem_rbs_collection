@@ -25,6 +25,8 @@ module ActionController
     include EtagWithTemplateDigest
     include EtagWithFlash
     include Caching
+    extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::Fragments::ClassMethods
     include MimeResponds
     include ImplicitRender
     include StrongParameters
@@ -324,7 +326,7 @@ module AbstractController
         #       @account.id.odd? ? "v1" : "v2"
         #     end
         #   end
-        def fragment_cache_key: (?untyped? value) { () -> untyped } -> untyped
+        def fragment_cache_key: (?untyped? value) ?{ () -> untyped } -> untyped
       end
 
       # Given a key (as described in +expire_fragment+), returns
@@ -391,6 +393,7 @@ module AbstractController
     include ConfigMethods
 
     include AbstractController::Caching::Fragments
+    extend AbstractController::Caching::Fragments::ClassMethods
 
     extend ConfigMethods
 
@@ -433,6 +436,8 @@ module ActionController
     extend ActiveSupport::Concern
 
     include AbstractController::Caching
+    extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::Fragments::ClassMethods
 
     private
 
