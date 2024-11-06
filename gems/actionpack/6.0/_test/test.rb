@@ -5,6 +5,9 @@ class ApplicationController < ActionController::Base
 
   around_action -> (controller, block) { block.call; controller.controller_instance_method }
 
+  helper :login
+  helper { def hello() "Hello, world!" end }
+
   module After
     def self.after(_) end
   end
