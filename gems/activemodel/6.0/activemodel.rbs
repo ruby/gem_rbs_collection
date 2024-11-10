@@ -251,7 +251,7 @@ module ActiveModel
     #   person = Person.new
     #   person.valid? # => false
     #   person.errors # => #<ActiveModel::Errors:0x007fe603816640 @messages={name:["can't be blank"]}>
-    def errors: () -> untyped
+    def errors: () -> Errors
 
     # Runs all the specified validations and returns +true+ if no errors were
     # added otherwise +false+.
@@ -542,6 +542,6 @@ module ActiveModel
     #   # => {:base=>["either name or email must be present"]}
     #   person.errors.details
     #   # => {:base=>[{error: :name_or_email_blank}]}
-    def add: (untyped attribute, ?::Symbol message, ?::Hash[untyped, untyped] options) -> untyped
+    def add: (untyped attribute, ?::Symbol | ::String | ^(untyped base, ::Hash[untyped, untyped]) -> (::Symbol | ::String) type, ?::Hash[untyped, untyped] options) -> void
   end
 end
