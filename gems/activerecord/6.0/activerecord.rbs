@@ -415,6 +415,9 @@ module ActiveRecord
       def select: (*Symbol | String | Arel::Nodes::t) -> self
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> self
+      def count: () -> ::Integer
+              | () { (Model) -> boolish } -> ::Integer
+              | (Symbol | String column_name) -> ::Integer
     end
   end
 
@@ -503,6 +506,9 @@ module ActiveRecord
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
       def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+      def count: () -> ::Integer
+              | () { (Model) -> boolish } -> ::Integer
+              | (Symbol | String column_name) -> ::Integer
     end
   end
 end
@@ -585,6 +591,9 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def select: (*Symbol | String | Arel::Nodes::t) -> self
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> self
+  def count: () -> ::Integer
+          | () { (Model) -> boolish } -> ::Integer
+          | (Symbol | String column_name) -> ::Integer
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
@@ -671,6 +680,9 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
   def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+  def count: () -> ::Integer
+          | () { (Model) -> boolish } -> ::Integer
+          | (Symbol | String column_name) -> ::Integer
 end
 
 module Arel
