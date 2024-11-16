@@ -1,4 +1,12 @@
 module ActiveModel
+  module Access
+    def slice: (*Symbol | String) -> ActiveSupport::HashWithIndifferentAccess[Symbol, untyped]
+
+    def values_at: (*Symbol | String) -> Array[untyped]
+  end
+end
+
+module ActiveModel
   module API
     extend ActiveSupport::Concern
     include ActiveModel::AttributeAssignment
@@ -40,5 +48,11 @@ module ActiveModel
     def match?: (Symbol | String attribute, ?(Symbol | String)? type, **untyped options) -> bool
 
     def strict_match?: (Symbol | String attribute, (Symbol | String)? type, **untyped options) -> bool
+  end
+end
+
+module ActiveModel
+  module Model
+    include ActiveModel::Access
   end
 end
