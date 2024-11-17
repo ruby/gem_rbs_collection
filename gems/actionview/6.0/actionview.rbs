@@ -105,7 +105,7 @@ module ActionView
       #   <% content_for :script, javascript_include_tag(:defaults) %>
       #
       # WARNING: <tt>content_for</tt> is ignored in caches. So you shouldn't use it for elements that will be fragment cached.
-      def content_for: (untyped name, ?untyped? content, ?::Hash[untyped, untyped] options) { () -> untyped } -> untyped
+      def content_for: (untyped name, ?untyped? content, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> void
     end
   end
 end
@@ -468,7 +468,7 @@ module ActionView
       #   def labelled_form_with(**options, &block)
       #     form_with(**options.merge(builder: LabellingFormBuilder), &block)
       #   end
-      def form_with: (?format: untyped? format, ?url: untyped? url, ?scope: untyped? scope, ?model: untyped? model, **untyped options) { () -> untyped } -> untyped
+      def form_with: (?format: untyped? format, ?url: untyped? url, ?scope: untyped? scope, ?model: untyped? model, **untyped options) { (Helpers::FormBuilder) -> String } -> String
 
       # Returns a label tag tailored for labelling an input field for a specified attribute (identified by +method+) on an object
       # assigned to the template (identified by +object+). The text of label will default to the attribute name unless a translation
@@ -542,7 +542,7 @@ module ActionView
       #
       # If no options hash is passed or :update specified, the default is to render a partial and use the second parameter
       # as the locals hash.
-      def render: (?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) ?{ () -> untyped } -> untyped
+      def render: (?String | ::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) ?{ () -> untyped } -> String
     end
   end
 end
