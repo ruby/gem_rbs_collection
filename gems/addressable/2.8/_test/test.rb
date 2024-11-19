@@ -65,3 +65,9 @@ uri.query_values # => nil
 uri = Addressable::URI.parse("http://example.com/go?a=b&c=d")
 uri.omit(:query).to_s # => "http://example.com/go"
 uri.omit(:scheme, :path, :query).to_s # => "example.com"
+
+uri = Addressable::URI.parse("http://example.com/go?a=b&c=d")
+uri.omit!(:query)
+uri.to_s # => "http://example.com"
+uri.omit!(:scheme, :path)
+uri.to_s # => "example.com"
