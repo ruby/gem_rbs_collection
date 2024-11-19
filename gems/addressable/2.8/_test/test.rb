@@ -46,9 +46,7 @@ template.extract(uri)
 #   "fragment" => "foo"
 # }
 
-uri = Addressable::URI.parse(
-  "http://example.com/a/b/c"
-)
+uri = Addressable::URI.parse("http://example.com/a/b/c")
 uri.query_values # => nil
 uri.query_values = {"one" => "1", "two" => "2"}
 uri.query_values # => {"one" => "1", "two" => "2"}
@@ -62,3 +60,8 @@ uri.query_values = [["seven", "7"], ["andup", ["8", "9", "10"]]]
 uri.query_values # => {"seven"=>"7", "andup"=>"10"}
 uri.query_values = nil
 uri.query_values # => nil
+
+
+uri = Addressable::URI.parse("http://example.com/go?a=b&c=d")
+uri.omit(:query).to_s # => "http://example.com/go"
+uri.omit(:scheme, :path, :query).to_s # => "example.com"
