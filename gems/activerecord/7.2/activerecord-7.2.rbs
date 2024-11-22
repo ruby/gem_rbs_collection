@@ -11,6 +11,8 @@ module ActiveRecord
   end
 
   class Relation
+    include TokenFor::RelationMethods
+
     def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
@@ -146,6 +148,11 @@ module ActiveRecord
   end
 
   module TokenFor
+    module RelationMethods
+      def find_by_token_for: (Symbol purpose, String token) -> untyped
+      def find_by_token_for!: (Symbol purpose, String token) -> untyped
+    end
+
     module ClassMethods
       def generates_token_for: (Symbol purpose, ?expires_in: ActiveSupport::Duration) ? { () [self: instance] -> untyped } -> untyped
       def find_by_token_for: (Symbol purpose, String token) -> untyped
