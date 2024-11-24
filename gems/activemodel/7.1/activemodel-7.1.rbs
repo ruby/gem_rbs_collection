@@ -20,6 +20,21 @@ module ActiveModel
 end
 
 module ActiveModel
+  module Attributes
+    include ActiveModel::AttributeRegistration
+  end
+end
+
+module ActiveModel
+  module AttributeRegistration
+    module ClassMethods
+      def attribute: (untyped name, ?untyped? type, ?default: untyped, **untyped options) -> untyped
+      def attribute_types: () -> Hash[untyped, untyped]
+    end
+  end
+end
+
+module ActiveModel
   class Error
     CALLBACKS_OPTIONS: ::Array[:if | :unless | :on | :allow_nil | :allow_blank | :strict]
 

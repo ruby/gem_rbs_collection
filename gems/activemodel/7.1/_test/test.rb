@@ -1,11 +1,14 @@
 require "active_model"
 
 class Person
+  include ActiveModel::Attributes
   include ActiveModel::Validations
 
   # @dynamic name, name=
-  attr_accessor :name
+  attribute :name, :string
 end
+
+Person.attribute_types
 
 ActiveModel::Error::CALLBACKS_OPTIONS
 ActiveModel::Error::MESSAGE_OPTIONS
