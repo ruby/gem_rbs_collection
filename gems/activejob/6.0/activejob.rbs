@@ -21,3 +21,16 @@ module ActiveJob
     def self.discard_on: (*untyped) -> void | ...
   end
 end
+
+module ActiveJob
+  module Logging
+    # nodoc:
+    extend ActiveSupport::Concern
+
+    private
+
+    def tag_logger: (*untyped tags) { () -> untyped } -> untyped
+
+    def logger_tagged_by_active_job?: () -> untyped
+  end
+end
