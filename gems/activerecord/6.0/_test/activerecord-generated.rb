@@ -1,3 +1,8 @@
+class FunQuery
+  def self.call(*args)
+  end
+end
+
 class User < ActiveRecord::Base
   enum status: { active: 0, inactive: 1 }, _suffix: true
   enum role: { admin: 0, user: 1 }, _prefix: :user_role
@@ -10,6 +15,7 @@ class User < ActiveRecord::Base
 
   scope :name_like, ->(name) { where(arel_table[:name].matches("%#{sanitize_sql_like(name)}%")) }
   scope :matured, -> { where(arel_table[:age].gteq(18)) }
+  scope :fun, FunQuery
 
   before_save -> (obj) { obj.something; self.something }
   around_save -> (obj, block) { block.call; obj.something }
