@@ -52,6 +52,17 @@ module ActiveModel
 end
 
 module ActiveModel
+  class Errors
+    # Delete messages for +key+. Returns the deleted messages.
+    #
+    #   person.errors[:name]        # => ["cannot be nil"]
+    #   person.errors.delete(:name) # => ["cannot be nil"]
+    #   person.errors[:name]        # => []
+    def delete: (untyped key, ?untyped type, **untyped) -> untyped
+  end
+end
+
+module ActiveModel
   module Model
     include ActiveModel::Access
   end
