@@ -261,3 +261,9 @@ module ActionController
     extend AbstractController::Caching::Fragments::ClassMethods
   end
 end
+
+module ActionController
+  class TestSession < Rack::Session::Abstract::PersistedSecure::SecureSessionHash
+    def fetch: (untyped key, *untyped args) ?{ () -> untyped } -> untyped
+  end
+end

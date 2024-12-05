@@ -4223,8 +4223,6 @@ module ActionController
 
     def dig: (*untyped keys) -> untyped
 
-    def fetch: (untyped key, *untyped args) { () -> untyped } -> untyped
-
     private
 
     def load!: () -> untyped
@@ -4830,15 +4828,6 @@ module ActionDispatch
       alias include? key?
 
       DEFAULT: untyped
-
-      # Returns the value for the given key mapped to @env.
-      #
-      # If the key is not found and an optional code block is not provided,
-      # raises a <tt>KeyError</tt> exception.
-      #
-      # If the code block is provided, then it will be run and
-      # its result returned.
-      def fetch: (untyped key, ?untyped default) { () -> untyped } -> untyped
 
       def each: () { (untyped) -> untyped } -> untyped
 
@@ -7290,8 +7279,6 @@ module ActionDispatch
       # Returns the value of the cookie by +name+, or +nil+ if no such cookie exists.
       def []: (untyped name) -> untyped
 
-      def fetch: (untyped name, *untyped args) { () -> untyped } -> untyped
-
       def key?: (untyped name) -> untyped
 
       alias has_key? key?
@@ -8432,22 +8419,6 @@ module ActionDispatch
 
       # Deletes given key from the session.
       def delete: (untyped key) -> untyped
-
-      # Returns value of the given key from the session, or raises +KeyError+
-      # if can't find the given key and no default value is set.
-      # Returns default value if specified.
-      #
-      #   session.fetch(:foo)
-      #   # => KeyError: key not found: "foo"
-      #
-      #   session.fetch(:foo, :bar)
-      #   # => :bar
-      #
-      #   session.fetch(:foo) do
-      #     :bar
-      #   end
-      #   # => :bar
-      def fetch: (untyped key, ?untyped default) { () -> untyped } -> untyped
 
       def inspect: () -> untyped
 

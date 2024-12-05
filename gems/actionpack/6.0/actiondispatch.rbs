@@ -1,4 +1,51 @@
 module ActionDispatch
+  class Cookies
+    class CookieJar
+      def fetch: (untyped name, *untyped args) ?{ () -> untyped } -> untyped
+    end
+  end
+end
+
+module ActionDispatch
+  module Http
+    class Headers
+      # Returns the value for the given key mapped to @env.
+      #
+      # If the key is not found and an optional code block is not provided,
+      # raises a <tt>KeyError</tt> exception.
+      #
+      # If the code block is provided, then it will be run and
+      # its result returned.
+      def fetch: (untyped key) ?{ () -> untyped } -> untyped
+               | (untyped key, untyped default) -> untyped
+    end
+  end
+end
+
+module ActionDispatch
+  class Request
+    class Session
+      # Returns value of the given key from the session, or raises +KeyError+
+      # if can't find the given key and no default value is set.
+      # Returns default value if specified.
+      #
+      #   session.fetch(:foo)
+      #   # => KeyError: key not found: "foo"
+      #
+      #   session.fetch(:foo, :bar)
+      #   # => :bar
+      #
+      #   session.fetch(:foo) do
+      #     :bar
+      #   end
+      #   # => :bar
+      def fetch: (untyped key) ?{ () -> untyped } -> untyped
+               | (untyped key, untyped default) -> untyped
+    end
+  end
+end
+
+module ActionDispatch
   class RequestId
     X_REQUEST_ID: ::String
 
