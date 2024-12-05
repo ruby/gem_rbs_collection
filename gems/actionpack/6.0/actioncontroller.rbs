@@ -263,6 +263,14 @@ module ActionController
 end
 
 module ActionController
+  module ContentSecurityPolicy
+    module ClassMethods
+      def content_security_policy: (?bool enabled, **untyped options) ?{ (untyped) -> untyped } -> untyped
+    end
+  end
+end
+
+module ActionController
   class TestSession < Rack::Session::Abstract::PersistedSecure::SecureSessionHash
     def fetch: (untyped key, *untyped args) ?{ () -> untyped } -> untyped
   end
