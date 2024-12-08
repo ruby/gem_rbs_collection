@@ -326,7 +326,8 @@ module ActionDispatch
       #
       #   get 'accounts/:name' => redirect(SubdomainRedirector.new('api'))
       #
-      def redirect: (*untyped args) ?{ () -> untyped } -> (OptionRedirect | PathRedirect | Redirect)
+      def redirect: (*untyped args) -> (OptionRedirect | PathRedirect | Redirect)
+                  | (?status: untyped) { () -> untyped } -> Redirect
     end
   end
 end
