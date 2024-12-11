@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   validates :age, presence: true, if: ->(user) { user.something }
 
   scope :matured, -> { where(arel_table[:age].gteq(18)) }
+  scope :nowait, -> { lock("FOR UPDATE NOWAIT") }
 
   before_save -> (obj) { obj.something; self.something }
   around_save -> (obj, block) { block.call; obj.something }
