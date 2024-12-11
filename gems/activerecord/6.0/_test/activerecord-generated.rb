@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
 
   scope :name_like, ->(name) { where(arel_table[:name].matches("%#{sanitize_sql_like(name)}%")) }
   scope :matured, -> { where(arel_table[:age].gteq(18)) }
+  scope :nowait, -> { lock("FOR UPDATE NOWAIT") }
 
   before_save -> (obj) { obj.something; self.something }
   around_save -> (obj, block) { block.call; obj.something }
