@@ -422,6 +422,10 @@ module ActiveRecord
   end
 
   class Base
+    interface _Callable[Relation]
+      def call: (*untyped) -> Relation
+    end
+
     module ClassMethods[Model, Relation, PrimaryKey]
       def all: () -> Relation
       def ids: () -> Array[PrimaryKey]
@@ -505,7 +509,7 @@ module ActiveRecord
       def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
-      def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+      def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | _Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
       def count: () -> ::Integer
               | () { (Model) -> boolish } -> ::Integer
               | (Symbol | String column_name) -> ::Integer
@@ -679,7 +683,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def select: (*Symbol | String | Arel::Nodes::t) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
-  def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+  def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | ActiveRecord::Base::_Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
   def count: () -> ::Integer
           | () { (Model) -> boolish } -> ::Integer
           | (Symbol | String column_name) -> ::Integer
