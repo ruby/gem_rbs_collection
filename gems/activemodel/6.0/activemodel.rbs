@@ -1,4 +1,15 @@
 module ActiveModel
+  class Errors
+    # Delete messages for +key+. Returns the deleted messages.
+    #
+    #   person.errors[:name]        # => ["cannot be nil"]
+    #   person.errors.delete(:name) # => ["cannot be nil"]
+    #   person.errors[:name]        # => []
+    def delete: (untyped key, ?untyped type, **untyped) -> untyped
+  end
+end
+
+module ActiveModel
   # == Active \Model \Validations
   #
   # Provides a full validation framework to your objects.
@@ -363,6 +374,13 @@ module ActiveModel
     attr_reader model: untyped
 
     def initialize: (untyped model) -> untyped
+  end
+end
+
+module ActiveModel
+  module Type
+    # Add a new type to the registry, allowing it to be gotten through ActiveModel::Type#lookup
+    def self.register: (untyped type_name, ?untyped? klass, **untyped options) ?{ () -> untyped } -> untyped
   end
 end
 
