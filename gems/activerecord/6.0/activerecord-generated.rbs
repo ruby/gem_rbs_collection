@@ -896,7 +896,7 @@ module ActiveRecord
       # @author.books.delete_all(:delete_all)
       #
       # See delete for more info.
-      def delete_all: (?untyped? dependent) -> untyped
+      def delete_all: (?Symbol dependent) -> Integer
 
       # Destroy all the records from this association.
       #
@@ -1232,7 +1232,7 @@ module ActiveRecord
       #
       #   Pet.find(1, 2, 3)
       #   # => ActiveRecord::RecordNotFound: Couldn't find all Pets with 'id': (1, 2, 3)
-      def delete_all: (?untyped? dependent) -> untyped
+      def delete_all: (?Symbol dependent) -> Integer
 
       # Deletes the records of the collection directly from the database
       # ignoring the +:dependent+ option. Records are instantiated and it
@@ -19574,7 +19574,7 @@ module ActiveRecord
     #
     #   Post.distinct.delete_all
     #   # => ActiveRecord::ActiveRecordError: delete_all doesn't support distinct
-    def delete_all: () -> untyped
+    def delete_all: () -> Integer
 
     # Finds and destroys all records matching the specified conditions.
     # This is short-hand for <tt>relation.where(condition).destroy_all</tt>.
