@@ -21,13 +21,6 @@ module ActiveRecord
     def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
   end
 
-  class Relation
-    module QueryMethods
-      def with_recursive: (*untyped) -> untyped
-      def with_recursive!: (*untyped) -> untyped
-    end
-  end
-
   module Inheritance
     module ClassMethods
       def primary_abstract_class: () -> void
@@ -46,6 +39,11 @@ module ActiveRecord
     def sql_runtime=: (untyped runtime) -> untyped
 
     extend RuntimeRegistry
+  end
+
+  module QueryMethods
+    def with_recursive: (*untyped) -> untyped
+    def with_recursive!: (*untyped) -> untyped
   end
 
   module QueryMethods
