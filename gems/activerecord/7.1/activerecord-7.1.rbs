@@ -8,10 +8,16 @@ module ActiveRecord
     extend SecurePassword::ClassMethods
     include TokenFor
     extend TokenFor::ClassMethods
+
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def strict_loading: (?bool value) -> Relation
+    end
   end
 
   module Core
     def values_at: (*Symbol | String) -> Array[untyped]
+    def strict_loading!: (?bool value, ?mode: Symbol) -> bool
+    def strict_loading?: () -> bool
   end
 
   class AssociationRelation
