@@ -5,6 +5,14 @@ class ApplicationController < ActionController::Base
 
   around_action -> (controller, block) { block.call; controller.controller_instance_method }
 
+  helper :login
+  helper { def hello() "Hello, world!" end }
+
+  fragment_cache_key "v1"
+  fragment_cache_key do
+    Time.current.year > 2023 ? "v1" : "v2"
+  end
+
   module After
     def self.after(_) end
   end

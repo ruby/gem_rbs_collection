@@ -31,6 +31,8 @@ module Addressable
     def domain: () -> String
     def authority: () -> String
     def authority=: (String new_authority) -> String
+    def omit: (*Symbol components) -> URI
+    def omit!: (*Symbol components) -> URI
     def origin: () -> String
     def origin=: (String new_origin) -> String
     attr_reader port: Integer
@@ -49,6 +51,7 @@ module Addressable
                     | (singleton(Array) return_type) -> Array[String]
     def query_values=: (Hash[String, String]? new_query_values) -> Hash[String, String]?
                      | (Array[String] new_query_values) -> Array[String]
+                     | (Array[[String | Array[String]]] new_query_values) -> Array[[String | Array[String]]]
     def request_uri: () -> String
     def request_uri=: (String new_request_uri) -> String
     def fragment: () -> String?

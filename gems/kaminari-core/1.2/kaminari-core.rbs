@@ -47,4 +47,35 @@ module Kaminari
       def max_pages: (Integer | :none val) -> void
     end
   end
+
+  module Helpers
+    module UrlHelper
+      def next_page_url: (untyped scope, **untyped options) -> String?
+      alias url_to_next_page next_page_url
+
+      def prev_page_url: (untyped scope, **untyped options) -> String?
+      alias previous_page_url     prev_page_url
+      alias url_to_prev_page      prev_page_url
+      alias url_to_previous_page  prev_page_url
+
+      def next_page_path: (untyped scope, **untyped options) -> String?
+      alias path_to_next_page next_page_path
+
+      def prev_page_path: (untyped scope, **untyped options) -> String?
+      alias previous_page_path     prev_page_path
+      alias path_to_previous_page  prev_page_path
+      alias path_to_prev_page      prev_page_path
+    end
+
+    module HelperMethods
+      include UrlHelper
+
+      def paginate: (untyped scope, ?paginator_class: Class, ?template: untyped?, **untyped options) -> String
+      def link_to_previous_page: (untyped scope, String name, **untyped options) ?{ () -> untyped } -> String
+      alias link_to_prev_page link_to_previous_page
+      def link_to_next_page: (untyped scope, String name, **untyped options) ?{ () -> untyped } -> String
+      def page_entries_info: (untyped collection, ?entry_name: String?) -> String
+      def rel_next_prev_link_tags: (untyped scope, **untyped options) -> String
+    end
+  end
 end

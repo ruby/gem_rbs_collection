@@ -1,0 +1,84 @@
+module Stripe
+  LEVEL_DEBUG: Integer
+  LEVEL_ERROR: Integer
+  LEVEL_INFO: Integer
+
+  attr_reader self.config: StripeConfiguration
+
+  # Delegate to StripeConfiguration
+  attr_accessor self.api_key: String
+  attr_accessor self.api_version: String
+  attr_accessor self.client_id: untyped
+  attr_accessor self.enable_telemetry: bool
+  attr_accessor self.logger: untyped
+  attr_accessor self.stripe_account: untyped
+  attr_accessor self.stripe_context: untyped
+
+  attr_accessor self.log_level: untyped
+  attr_accessor self.open_timeout: untyped
+  attr_accessor self.read_timeout: untyped
+  attr_accessor self.write_timeout: untyped
+  attr_accessor self.ca_bundle_path: String
+  attr_accessor self.max_network_retries: Integer
+
+  class StripeConfiguration
+    attr_accessor api_key: String
+    attr_accessor api_version: String
+    attr_accessor client_id: untyped
+    attr_accessor enable_telemetry: bool
+    attr_accessor logger: untyped
+    attr_accessor stripe_account: untyped
+    attr_accessor stripe_context: untyped
+
+    attr_accessor log_level: untyped
+    attr_accessor open_timeout: untyped
+    attr_accessor read_timeout: untyped
+    attr_accessor write_timeout: untyped
+    attr_accessor ca_bundle_path: String
+    attr_accessor max_network_retries: Integer
+  end
+
+
+  class StripeObject
+    include Enumerable[untyped]
+
+    def each: () -> Enumerator[[Symbol, untyped], void]
+            | () { ([Symbol, untyped]) -> void } -> void
+  end
+
+  class ListObject[Elem < StripeObject] < StripeObject
+    include Enumerable[untyped]
+
+    def list: (?untyped filters, ?untyped opts) -> self
+    def create: (?untyped params, ?untyped opts) -> Elem
+
+    def data: () -> Array[Elem]
+
+    # An empty list object. This is returned from +next+ when we know that
+    # there isn't a next page in order to replicate the behavior of the API
+    # when it attempts to return a page beyond the last.
+    def self.empty_list: (?untyped opts) -> ListObject[untyped]
+
+    def each: () -> Enumerator[Elem, void]
+            | () { (Elem) -> void } -> void
+
+    # Returns true if the page object contains no elements.
+    def empty?: () -> bool
+  end
+
+  class APIResource < StripeObject
+    def self.retrieve: (untyped id, ?untyped opts) -> instance
+  end
+
+  module Webhook
+    # Initializes an Event object from a JSON payload.
+    #
+    # This may raise JSON::ParserError if the payload is not valid JSON, or
+    # SignatureVerificationError if the signature verification fails.
+    def self.construct_event: (
+      untyped payload,
+      untyped sig_header,
+      untyped secret,
+      ?tolerance: Integer) -> Event
+  end
+end

@@ -1,0 +1,34 @@
+module Kaminari
+  module ActiveRecordRelationMethods
+    def entry_name: (**untyped options) -> String
+    def reset: () -> void
+    def total_count: (?untyped column_name, untyped _options) -> Integer
+    def without_count: () -> void
+  end
+end
+
+module ActiveRecord
+  class Base
+    include Kaminari::ConfigurationMethods
+    extend Kaminari::ConfigurationMethods::ClassMethods
+
+    def self.page: (?Integer num) -> untyped
+  end
+end
+
+
+module ActiveRecord
+  class Base
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def page: (?_ToI num) -> Relation
+    end
+  end
+
+  class Relation
+    module Methods[Model, PrimaryKey]
+      include Kaminari::ActiveRecordRelationMethods
+      include Kaminari::PageScopeMethods
+      def page: (?_ToI num) -> self
+    end
+  end
+end

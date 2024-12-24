@@ -10,20 +10,19 @@ module ActiveRecord
     extend TokenFor::ClassMethods
   end
 
+  module Core
+    def values_at: (*Symbol | String) -> Array[untyped]
+  end
+
   class Relation
+    include TokenFor::RelationMethods
+
     def insert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-  end
-
-  class Relation
-    module QueryMethods
-      def with_recursive: (*untyped) -> untyped
-      def with_recursive!: (*untyped) -> untyped
-    end
   end
 
   module Inheritance
@@ -47,7 +46,13 @@ module ActiveRecord
   end
 
   module QueryMethods
+    def with_recursive: (*untyped) -> untyped
+    def with_recursive!: (*untyped) -> untyped
+  end
+
+  module QueryMethods
     class WhereChain[Relation]
+      def associated: (*Symbol associations) -> Relation
       def missing: (*Symbol associations) -> Relation
     end
   end
@@ -145,6 +150,11 @@ module ActiveRecord
   end
 
   module TokenFor
+    module RelationMethods
+      def find_by_token_for: (Symbol purpose, String token) -> untyped
+      def find_by_token_for!: (Symbol purpose, String token) -> untyped
+    end
+
     module ClassMethods
       def generates_token_for: (Symbol purpose, ?expires_in: ActiveSupport::Duration) ? { () [self: instance] -> untyped } -> untyped
       def find_by_token_for: (Symbol purpose, String token) -> untyped
@@ -170,6 +180,10 @@ module Arel
 
   class DeleteManager < Arel::TreeManager
     def initialize: (?Arel::Table? table) -> untyped
+  end
+
+  module FactoryMethods
+    def cast: (untyped name, untyped type) -> Nodes::NamedFunction
   end
 end
 

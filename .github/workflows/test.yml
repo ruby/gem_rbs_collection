@@ -70,3 +70,14 @@ jobs:
       run: bin/setup
     - name: Run test on all gems
       run: bin/test --all --verbose
+
+  test_rubocop_yml:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+    - name: Check .rubocop.yml
+      run: ruby .github/workflows/pr_bot/strict_rubocop_config.rb

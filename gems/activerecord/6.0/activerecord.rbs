@@ -326,6 +326,11 @@ module ActiveRecord
     #   user.name # => Oscar
     def new: (?untyped? attributes) ?{ () -> untyped } -> untyped
 
+    # ActiveRecord::Relation delegates method calls to a ActiveRecord::Base class.
+    # To represent the behavior in the RBS system, we define and include the class methods of ActiveRecord::Base here.
+
+    include Sanitization::ClassMethods
+
     def arel_table: () -> Arel::Table
   end
 end
@@ -350,9 +355,9 @@ module ActiveRecord
       def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
       def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
       def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-      def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
-      def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
-      def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
+      def includes: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
+      def eager_load: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
+      def preload: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
       def find: (PrimaryKey id) -> Model
@@ -397,6 +402,7 @@ module ActiveRecord
       def offset: (Integer) -> self
       def offset!: (Integer) -> self
       def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
+                   | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
       def sum: (?untyped? column_name) -> Integer
@@ -410,10 +416,17 @@ module ActiveRecord
       def select: (*Symbol | String | Arel::Nodes::t) -> self
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> self
+      def count: () -> ::Integer
+              | () { (Model) -> boolish } -> ::Integer
+              | (Symbol | String column_name) -> ::Integer
     end
   end
 
   class Base
+    interface _Callable[Relation]
+      def call: (*untyped) -> Relation
+    end
+
     module ClassMethods[Model, Relation, PrimaryKey]
       def all: () -> Relation
       def ids: () -> Array[PrimaryKey]
@@ -440,9 +453,9 @@ module ActiveRecord
       def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
       def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
       def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-      def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
-      def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
-      def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
+      def includes: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
+      def eager_load: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
+      def preload: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
       def find_by: (*untyped) -> Model?
       def find_by!: (*untyped) -> Model
       def find: (PrimaryKey id) -> Model
@@ -485,6 +498,7 @@ module ActiveRecord
       def offset: (Integer) -> Relation
       def lock: (?untyped locks) -> Relation
       def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
+                   | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
       def sum: (?untyped? column_name) -> Integer
@@ -497,8 +511,75 @@ module ActiveRecord
       def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
-      def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+      def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | _Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
+      def count: () -> ::Integer
+              | () { (Model) -> boolish } -> ::Integer
+              | (Symbol | String column_name) -> ::Integer
     end
+  end
+end
+
+module ActiveRecord
+  module Batches
+    # Looping through a collection of records from the database
+    # (using the Scoping::Named::ClassMethods.all method, for example)
+    # is very inefficient since it will try to instantiate all the objects at once.
+    #
+    # In that case, batch processing methods allow you to work
+    # with the records in batches, thereby greatly reducing memory consumption.
+    #
+    # The #find_each method uses #find_in_batches with a batch size of 1000 (or as
+    # specified by the +:batch_size+ option).
+    #
+    #   Person.find_each do |person|
+    #     person.do_awesome_stuff
+    #   end
+    #
+    #   Person.where("age > 21").find_each do |person|
+    #     person.party_all_night!
+    #   end
+    #
+    # If you do not provide a block to #find_each, it will return an Enumerator
+    # for chaining with other methods:
+    #
+    #   Person.find_each.with_index do |person, index|
+    #     person.award_trophy(index + 1)
+    #   end
+    #
+    # ==== Options
+    # * <tt>:batch_size</tt> - Specifies the size of the batch. Defaults to 1000.
+    # * <tt>:start</tt> - Specifies the primary key value to start from, inclusive of the value.
+    # * <tt>:finish</tt> - Specifies the primary key value to end at, inclusive of the value.
+    # * <tt>:error_on_ignore</tt> - Overrides the application config to specify if an error should be raised when
+    #   an order is present in the relation.
+    #
+    # Limits are honored, and if present there is no requirement for the batch
+    # size: it can be less than, equal to, or greater than the limit.
+    #
+    # The options +start+ and +finish+ are especially useful if you want
+    # multiple workers dealing with the same processing queue. You can make
+    # worker 1 handle all the records between id 1 and 9999 and worker 2
+    # handle from 10000 and beyond by setting the +:start+ and +:finish+
+    # option on each worker.
+    #
+    #   # In worker 1, let's process until 9999 records.
+    #   Person.find_each(finish: 9_999) do |person|
+    #     person.party_all_night!
+    #   end
+    #
+    #   # In worker 2, let's process from record 10_000 and onwards.
+    #   Person.find_each(start: 10_000) do |person|
+    #     person.party_all_night!
+    #   end
+    #
+    # NOTE: It's not possible to set the order. That is automatically set to
+    # ascending on the primary key ("id ASC") to make the batch ordering
+    # work. This also means that this method only works when the primary key is
+    # orderable (e.g. an integer or string).
+    #
+    # NOTE: By its nature, batch processing is subject to race conditions if
+    # other processes are modifying the database.
+    def find_each: (?error_on_ignore: untyped? error_on_ignore, ?batch_size: ::Integer batch_size, ?finish: untyped? finish, ?start: untyped? start) ?{ (untyped) -> untyped } -> untyped
   end
 end
 
@@ -520,9 +601,9 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
   def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
   def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
-  def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
-  def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> self
+  def includes: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
+  def eager_load: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
+  def preload: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
   def find_by: (untyped, *untyped) -> Model?
   def find_by!: (untyped, *untyped) -> Model
   def find: (PrimaryKey id) -> Model
@@ -567,6 +648,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def offset: (Integer) -> self
   def offset!: (Integer) -> self
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
+               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
   def sum: (?untyped? column_name) -> Integer
@@ -580,6 +662,9 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def select: (*Symbol | String | Arel::Nodes::t) -> self
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> self
+  def count: () -> ::Integer
+          | () { (Model) -> boolish } -> ::Integer
+          | (Symbol | String column_name) -> ::Integer
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
@@ -608,9 +693,9 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
   def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
   def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def includes: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
-  def eager_load: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
-  def preload: (*String | Symbol | Array[String | Symbol] | Hash[untyped, untyped], **(String | Symbol | Array[String | Symbol] | Hash[untyped, untyped])) -> Relation
+  def includes: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
+  def eager_load: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
+  def preload: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
   def find_by: (untyped) -> Model?
   def find_by!: (untyped) -> Model
   def find: (PrimaryKey id) -> Model
@@ -653,6 +738,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def offset: (Integer) -> Relation
   def lock: (?untyped locks) -> Relation
   def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
+               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
   def sum: (?untyped? column_name) -> Integer
@@ -665,7 +751,10 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def select: (*Symbol | String | Arel::Nodes::t) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
-  def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void) ?{ (Module extention) [self: Relation] -> void } -> void
+  def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | ActiveRecord::Base::_Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
+  def count: () -> ::Integer
+          | () { (Model) -> boolish } -> ::Integer
+          | (Symbol | String column_name) -> ::Integer
 end
 
 module Arel
@@ -821,6 +910,7 @@ module ActiveRecord
       #   person.pets.size  # => 5 # size of the collection
       #   person.pets.count # => 0 # count from database
       def build: (?_EachPair attributes) ?{ () -> untyped } -> untyped
+               | (Array[_EachPair] attributes) ?{ () -> untyped } -> Array[untyped]
 
       alias new build
 
@@ -866,5 +956,11 @@ module ActiveRecord
       #   # => ActiveRecord::RecordInvalid: Validation failed: Name can't be blank
       def create!: (?_EachPair attributes) ?{ () -> untyped } -> untyped
     end
+  end
+end
+
+module ActiveRecord
+  module NoTouching
+    def touch: (*untyped, **untyped) -> untyped
   end
 end

@@ -1411,13 +1411,6 @@ module ActiveModel
 
     alias key? include?
 
-    # Delete messages for +key+. Returns the deleted messages.
-    #
-    #   person.errors[:name]        # => ["cannot be nil"]
-    #   person.errors.delete(:name) # => ["cannot be nil"]
-    #   person.errors[:name]        # => []
-    def delete: (untyped key) -> untyped
-
     # When passed a symbol or a name of a method, returns an array of errors
     # for the method.
     #
@@ -2900,9 +2893,6 @@ end
 module ActiveModel
   module Type
     attr_accessor self.registry: untyped
-
-    # Add a new type to the registry, allowing it to be gotten through ActiveModel::Type#lookup
-    def self.register: (untyped type_name, ?untyped? klass, **untyped options) { () -> untyped } -> untyped
 
     def self.lookup: (*untyped args, **untyped kwargs) -> untyped
 
