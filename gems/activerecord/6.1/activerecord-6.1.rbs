@@ -4,10 +4,16 @@ module ActiveRecord
       def delegated_type: (Symbol role, types: Array[String], **untyped options) -> void
     end
     extend DelegatedType
+
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def strict_loading: (?bool value) -> Relation
+    end
   end
 
   module Core
     def values_at: (*Symbol | String) -> Array[untyped]
+    def strict_loading!: () -> bool
+    def strict_loading?: () -> bool
   end
 
   class AssociationRelation
