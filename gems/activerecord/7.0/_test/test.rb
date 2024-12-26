@@ -36,6 +36,8 @@ module Test
   User.upsert_all([{ id: 1, name: 'James' }], returning: %i[id name], unique_by: :id, record_timestamps: true)
   User.strict_loading
   User.strict_loading(false)
+  User.create_with(name: 'name', age: 1)
+  User.create_with(nil)
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')
   user.encrypt
   user.encrypted_attribute?(:secret)
