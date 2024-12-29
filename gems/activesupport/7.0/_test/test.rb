@@ -22,6 +22,19 @@ nil.try { |n| p n }
 ActiveSupport::TimeZone['Asia/Tokyo'].to_s
 Time.find_zone(Object.name)
 Time.zone.now.to_fs
+1234567890.50.to_fs(:currency)
+1234567890.506.to_fs(:currency, precision: 3)
+(1..10).to_fs(:db)
+(1..10).to_fs
+[1,2].to_fs(:db)
+[1,2].to_fs
+Time.now.to_fs(:db)
+Time.now.to_fs
+Date.today.to_fs(:db)
+Date.today.to_fs
+DateTime.today.to_fs(:db)
+DateTime.today.to_fs
+
 
 Array.wrap(nil)
 Array.wrap([1, 2, 3])

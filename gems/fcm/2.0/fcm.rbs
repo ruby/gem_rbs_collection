@@ -1,0 +1,25 @@
+class FCM
+  def initialize: (?String | StringIO json_key_path, ?String project_name, Hash[untyped, untyped] http_options) -> void
+
+  def send_notification_v1: (Hash[untyped, untyped] message) -> Hash[untyped, untyped]
+  alias send_v1 send_notification_v1
+
+  def create_notification_key: (untyped key_name, untyped project_id, ?Array[untyped] registration_ids) -> Hash[untyped, untyped]
+  alias create create_notification_key
+
+  def add_registration_ids: (untyped key_name, untyped project_id, untyped notification_key, untyped registration_ids) -> Hash[untyped, untyped]
+  alias add add_registration_ids
+
+  def remove_registration_ids: (untyped key_name, untyped project_id, untyped notification_key, untyped registration_ids) -> Hash[untyped, untyped]
+  alias remove remove_registration_ids
+
+  def send_to_topic: (untyped topic, ?Hash[untyped, untyped] options) -> Hash[untyped, untyped]?
+  def send_to_topic_condition: (untyped condition, ?Hash[untyped, untyped] options) -> Hash[untyped, untyped]?
+
+  def topic_subscription: (untyped topic, untyped registration_token) -> Hash[untyped, untyped]
+  def topic_unsubscription: (untyped topic, untyped registration_token) -> Hash[untyped, untyped]
+  def batch_topic_subscription: (untyped topic, Array[untyped] registration_tokens) -> Hash[untyped, untyped]
+  def batch_topic_unsubscription: (untyped topic, Array[untyped] registration_tokens) -> Hash[untyped, untyped]
+
+  def get_instance_id_info: (untyped iid_token, ?Hash[untyped, untyped] options) -> Hash[untyped, untyped]
+end

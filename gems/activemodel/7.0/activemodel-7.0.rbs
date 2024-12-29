@@ -89,3 +89,14 @@ module ActiveModel
     def strict_match?: (Symbol | String attribute, (Symbol | String)? type, **untyped options) -> bool
   end
 end
+
+module ActiveModel
+  class Errors
+    # Delete messages for +key+. Returns the deleted messages.
+    #
+    #   person.errors[:name]        # => ["cannot be nil"]
+    #   person.errors.delete(:name) # => ["cannot be nil"]
+    #   person.errors[:name]        # => []
+    def delete: (untyped key, ?untyped type, **untyped) -> untyped
+  end
+end

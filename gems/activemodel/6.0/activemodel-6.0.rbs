@@ -1,5 +1,12 @@
 module ActiveModel
   class Errors
+    # Delete messages for +key+. Returns the deleted messages.
+    #
+    #   person.errors[:name]        # => ["cannot be nil"]
+    #   person.errors.delete(:name) # => ["cannot be nil"]
+    #   person.errors[:name]        # => []
+    def delete: (untyped key) -> untyped
+
     # Adds +message+ to the error messages and used validator type to +details+ on +attribute+.
     # More than one error can be added to the same +attribute+.
     # If no +message+ is supplied, <tt>:invalid</tt> is assumed.
