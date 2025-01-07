@@ -11,3 +11,5 @@ User.strict_loading
 User.strict_loading(false)
 user.strict_loading!
 user.strict_loading?
+User.create_with(secret: 'secret', key: 'key')
+User.create_with(nil)
