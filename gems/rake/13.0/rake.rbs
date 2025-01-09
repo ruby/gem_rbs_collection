@@ -3,6 +3,16 @@ module Rake
     include Rake::DSL
   end
 
+  class Task
+  end
+
+  class TaskArguments
+    include Enumerable[untyped]
+
+    def []: (untyped index) -> untyped
+    def each: () ?{ (untyped, untyped) -> void } -> void
+  end
+
   module DSL
     private
 
@@ -16,7 +26,7 @@ module Rake
     def multitask: (*untyped args) ?{ () -> void } -> void
     def namespace: (?untyped name) ?{ () -> void } -> void
     def rule: (*untyped args) ?{ () -> void } -> void
-    def task: (*untyped args) ?{ () -> void } -> void
+    def task: (*untyped args) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
   end
 end
 
