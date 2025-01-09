@@ -32,6 +32,7 @@ end
 
 module FileUtils
   def sh: (*String cmd, **untyped options) ?{ (bool, Process::Status) -> void } -> void
+    | (Hash[String, String] env, *String cmd, **untyped options) ?{ (bool, Process::Status) -> void } -> void
   def ruby: (*String args, **untyped options) ?{ (bool, Process::Status) -> void } -> void
   def safe_ln: (*untyped args, **untyped options) -> void
   def split_all: (String path) -> Array[String]

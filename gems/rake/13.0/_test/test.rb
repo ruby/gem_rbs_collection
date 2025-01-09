@@ -21,5 +21,12 @@ class Task < Rake::TaskLib
         puts "#{name}=#{value}"
       end
     end
+
+    task :test_with_sh do
+      sh "ruby test/unittest_without_env.rb"
+
+      env = { "RACK_ENV" => "test" }
+      sh env, "ruby test/unittest_with_env.rb"
+    end
   end
 end
