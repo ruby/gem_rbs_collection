@@ -26,6 +26,7 @@ module Test
   end
 
   User.where.missing.to_sql
+  User.where(role: :admin).load_async
   User.deterministic_encrypted_attributes
   User.source_attribute_from_preserved_attribute(:phrase)
   User.insert({ id: 1, name: 'James' }, returning: %i[id name], unique_by: :id, record_timestamps: true)
