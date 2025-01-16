@@ -221,7 +221,7 @@ module ActiveSupport
       def initialize: (untyped cache_path, ?untyped? options) -> untyped
 
       # Advertise cache versioning support.
-      def self.supports_cache_versioning?: () -> ::TrueClass
+      def self.supports_cache_versioning?: () -> true
 
       # Deletes all items from the cache. In this case it deletes all the entries in the specified
       # file store directory except for .keep or .gitkeep. Be careful which directory is specified in your
@@ -245,7 +245,7 @@ module ActiveSupport
 
       def read_entry: (untyped key, **untyped options) -> untyped
 
-      def write_entry: (untyped key, untyped entry, **untyped options) -> (::FalseClass | ::TrueClass)
+      def write_entry: (untyped key, untyped entry, **untyped options) -> bool
 
       def delete_entry: (untyped key, **untyped options) -> untyped
 
@@ -295,7 +295,7 @@ module ActiveSupport
       end
 
       # Advertise cache versioning support.
-      def self.supports_cache_versioning?: () -> ::TrueClass
+      def self.supports_cache_versioning?: () -> true
 
       ESCAPE_KEY_CHARS: untyped
 
@@ -375,7 +375,7 @@ module ActiveSupport
       def initialize: (?untyped? options) -> untyped
 
       # Advertise cache versioning support.
-      def self.supports_cache_versioning?: () -> ::TrueClass
+      def self.supports_cache_versioning?: () -> true
 
       # Delete all data stored in a given cache store.
       def clear: (?untyped? options) -> untyped
@@ -411,7 +411,7 @@ module ActiveSupport
 
       def read_entry: (untyped key, **untyped options) -> untyped
 
-      def write_entry: (untyped key, untyped entry, **untyped options) -> (::FalseClass | untyped)
+      def write_entry: (untyped key, untyped entry, **untyped options) -> (false | untyped)
 
       def delete_entry: (untyped key, **untyped options) -> untyped
 
@@ -431,7 +431,7 @@ module ActiveSupport
     # ActiveSupport::Cache::Strategy::LocalCache for more details.
     class NullStore < Store
       # Advertise cache versioning support.
-      def self.supports_cache_versioning?: () -> ::TrueClass
+      def self.supports_cache_versioning?: () -> true
 
       def clear: (?untyped? options) -> nil
 
@@ -447,9 +447,9 @@ module ActiveSupport
 
       def read_entry: (untyped key, **untyped options) -> nil
 
-      def write_entry: (untyped key, untyped entry, **untyped options) -> ::TrueClass
+      def write_entry: (untyped key, untyped entry, **untyped options) -> true
 
-      def delete_entry: (untyped key, **untyped options) -> ::FalseClass
+      def delete_entry: (untyped key, **untyped options) -> false
     end
   end
 end
@@ -488,7 +488,7 @@ module ActiveSupport
       SCAN_BATCH_SIZE: ::Integer
 
       # Advertise cache versioning support.
-      def self.supports_cache_versioning?: () -> ::TrueClass
+      def self.supports_cache_versioning?: () -> true
 
       module LocalCacheWithRaw
         private
@@ -667,7 +667,7 @@ module ActiveSupport
 
           def read_multi_entries: (untyped keys, **untyped options) -> untyped
 
-          def write_entry: (untyped key, untyped value, **untyped options) -> ::TrueClass
+          def write_entry: (untyped key, untyped value, **untyped options) -> true
 
           def delete_entry: (untyped key, **untyped options) -> untyped
 
@@ -792,15 +792,11 @@ module ActiveSupport
     # The +key+ argument can also respond to +cache_key+ or +to_param+.
     def self.expand_cache_key: (untyped key, ?untyped? namespace) -> untyped
 
-    private
-
     def self.retrieve_cache_key: (untyped key) -> untyped
 
     # Obtains the specified cache store class, given the name of the +store+.
     # Raises an error when the store class cannot be found.
     def self.retrieve_store_class: (untyped store) -> untyped
-
-    public
 
     # An abstract cache store class. There are multiple cache store
     # implementations, each having its own additional features. See the classes
@@ -2170,7 +2166,7 @@ end
 
 class Date
   # Duck-types as a Date-like class. See Object#acts_like?.
-  def acts_like_date?: () -> ::TrueClass
+  def acts_like_date?: () -> true
 end
 
 class Date
@@ -2180,7 +2176,7 @@ class Date
   #   Date.today.blank? # => false
   #
   # @return [false]
-  def blank?: () -> ::FalseClass
+  def blank?: () -> false
 end
 
 class Date
@@ -2591,10 +2587,10 @@ end
 
 class DateTime
   # Duck-types as a Date-like class. See Object#acts_like?.
-  def acts_like_date?: () -> ::TrueClass
+  def acts_like_date?: () -> true
 
   # Duck-types as a Time-like class. See Object#acts_like?.
-  def acts_like_time?: () -> ::TrueClass
+  def acts_like_time?: () -> true
 end
 
 class DateTime
@@ -2604,7 +2600,7 @@ class DateTime
   #   DateTime.now.blank? # => false
   #
   # @return [false]
-  def blank?: () -> ::FalseClass
+  def blank?: () -> false
 end
 
 class DateTime
@@ -4294,7 +4290,7 @@ class Object
   #
   # False for method objects;
   # true otherwise.
-  def duplicable?: () -> ::TrueClass
+  def duplicable?: () -> true
 end
 
 class Method
@@ -4302,7 +4298,7 @@ class Method
   #
   #  method(:puts).duplicable? # => false
   #  method(:puts).dup         # => TypeError: allocator undefined for Method
-  def duplicable?: () -> ::FalseClass
+  def duplicable?: () -> false
 end
 
 class UnboundMethod
@@ -4310,7 +4306,7 @@ class UnboundMethod
   #
   #  method(:puts).unbind.duplicable? # => false
   #  method(:puts).unbind.dup         # => TypeError: allocator undefined for UnboundMethod
-  def duplicable?: () -> ::FalseClass
+  def duplicable?: () -> false
 end
 
 class Object
@@ -4765,7 +4761,7 @@ end
 
 class String
   # Enables more predictable duck-typing on String-like classes. See <tt>Object#acts_like?</tt>.
-  def acts_like_string?: () -> ::TrueClass
+  def acts_like_string?: () -> true
 end
 
 class String
@@ -5078,11 +5074,11 @@ class ERB
 end
 
 class Object
-  def html_safe?: () -> ::FalseClass
+  def html_safe?: () -> false
 end
 
 class Numeric
-  def html_safe?: () -> ::TrueClass
+  def html_safe?: () -> true
 end
 
 module ActiveSupport
@@ -5189,7 +5185,7 @@ end
 
 class Time
   # Duck-types as a Time-like class. See Object#acts_like?.
-  def acts_like_time?: () -> ::TrueClass
+  def acts_like_time?: () -> true
 end
 
 class Time
@@ -5723,8 +5719,6 @@ module ActiveSupport
 
       def self.take_over: (enable_reloading: untyped enable_reloading) -> untyped
 
-      private
-
       def self.setup_autoloaders: (untyped enable_reloading) -> untyped
 
       def self.autoload_once?: (untyped autoload_path) -> untyped
@@ -5967,7 +5961,7 @@ module ActiveSupport
     def safe_constantize: (untyped name) -> untyped
 
     # Determine if the given constant has been automatically loaded.
-    def autoloaded?: (untyped desc) -> (::FalseClass | untyped)
+    def autoloaded?: (untyped desc) -> (false | untyped)
 
     # Will the provided constant descriptor be unloaded?
     def will_unload?: (untyped const_desc) -> untyped
@@ -6485,7 +6479,7 @@ module ActiveSupport
       def raise_parsing_error: (?untyped? reason) -> untyped
 
       # Checks for various semantic errors as stated in ISO 8601 standard.
-      def validate!: () -> ::TrueClass
+      def validate!: () -> true
     end
   end
 end
@@ -7096,7 +7090,7 @@ module ActiveSupport
   class HashWithIndifferentAccess[T, U] < Hash[T, U]
     # Returns +true+ so that <tt>Array#extract_options!</tt> finds members of
     # this class.
-    def extractable_options?: () -> ::TrueClass
+    def extractable_options?: () -> true
 
     def with_indifferent_access: () -> untyped
 
@@ -7907,8 +7901,6 @@ module ActiveSupport
     #     Rails.logger.warn("Attempted to decode invalid JSON: #{some_string}")
     #   end
     def self.parse_error: () -> untyped
-
-    private
 
     def self.convert_dates_from: (untyped data) -> untyped
   end
@@ -9000,9 +8992,9 @@ module ActiveSupport
 
           def publish: (untyped name, *untyped args) -> untyped
 
-          def subscribed_to?: (untyped name) -> ::TrueClass
+          def subscribed_to?: (untyped name) -> true
 
-          def unsubscribe!: () -> ::FalseClass
+          def unsubscribe!: () -> false
 
           alias matches? ===
         end
@@ -9910,7 +9902,7 @@ module ActiveSupport
     def nested_under_indifferent_access: () -> untyped
 
     # Returns true to make sure that this hash is extractable via <tt>Array#extract_options!</tt>
-    def extractable_options?: () -> ::TrueClass
+    def extractable_options?: () -> true
   end
 end
 
@@ -11154,7 +11146,7 @@ module ActiveSupport
     alias tv_sec to_i
 
     # So that +self+ <tt>acts_like?(:time)</tt>.
-    def acts_like_time?: () -> ::TrueClass
+    def acts_like_time?: () -> true
 
     # Say we're a Time to thwart type checking.
     def is_a?: (untyped klass) -> untyped
@@ -11162,7 +11154,7 @@ module ActiveSupport
     alias kind_of? is_a?
 
     # An instance of ActiveSupport::TimeWithZone is never blank
-    def blank?: () -> ::FalseClass
+    def blank?: () -> false
 
     def freeze: () -> untyped
 
@@ -11172,11 +11164,11 @@ module ActiveSupport
 
     # respond_to_missing? is not called in some cases, such as when type conversion is
     # performed with Kernel#String
-    def respond_to?: (untyped sym, ?bool include_priv) -> (::FalseClass | untyped)
+    def respond_to?: (untyped sym, ?bool include_priv) -> (false | untyped)
 
     # Ensure proxy class responds to all methods that underlying time instance
     # responds to.
-    def respond_to_missing?: (untyped sym, untyped include_priv) -> (::FalseClass | untyped)
+    def respond_to_missing?: (untyped sym, untyped include_priv) -> (false | untyped)
 
     # Send the missing method to +time+ instance, and wrap result in a new
     # TimeWithZone with the existing +time_zone+.
@@ -11802,8 +11794,6 @@ class Object
   #   Benchmark.ms { User.all }
   #   # => 0.074
   def self.ms: () { () -> untyped } -> untyped
-
-  public
 
   def unescape: (untyped str, ?untyped escaped) -> untyped
 end
