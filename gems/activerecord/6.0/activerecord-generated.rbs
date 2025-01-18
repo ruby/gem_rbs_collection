@@ -24,7 +24,7 @@
 
 module ActiveRecord
   class AdvisoryLockBase < ActiveRecord::Base
-    def self._internal?: () -> ::TrueClass
+    def self._internal?: () -> true
   end
 end
 
@@ -499,7 +499,7 @@ module ActiveRecord
       #
       # Currently implemented by belongs_to (vanilla and polymorphic) and
       # has_one/has_many :through associations which go through a belongs_to.
-      def foreign_key_present?: () -> ::FalseClass
+      def foreign_key_present?: () -> false
 
       # Raises ActiveRecord::AssociationTypeMismatch unless +record+ is of
       # the kind of the class of the associated objects. Meant to be used as
@@ -1752,7 +1752,7 @@ module ActiveRecord
       def find_target: () -> (::Array[untyped] | untyped)
 
       # NOTE - not sure that we can actually cope with inverses here
-      def invertible_for?: (untyped record) -> ::FalseClass
+      def invertible_for?: (untyped record) -> false
     end
   end
 end
@@ -1821,7 +1821,7 @@ module ActiveRecord
 
         def initialize: (untyped reflection, untyped children) -> untyped
 
-        def match?: (untyped other) -> (::TrueClass | untyped)
+        def match?: (untyped other) -> (true | untyped)
 
         def join_constraints: (untyped foreign_table, untyped foreign_klass, untyped join_type, untyped alias_tracker) -> untyped
 
@@ -1847,7 +1847,7 @@ module ActiveRecord
 
         def initialize: (untyped base_klass, untyped table, untyped children) -> untyped
 
-        def match?: (untyped other) -> (::TrueClass | untyped)
+        def match?: (untyped other) -> (true | untyped)
       end
     end
   end
@@ -4294,7 +4294,7 @@ module ActiveRecord
     module Query
       extend ActiveSupport::Concern
 
-      def query_attribute: (untyped attr_name) -> (::FalseClass | untyped)
+      def query_attribute: (untyped attr_name) -> (false | untyped)
 
       private
 
@@ -4482,7 +4482,7 @@ module ActiveRecord
 
       def initialize_generated_modules: () -> untyped
 
-      def define_attribute_methods: () -> (::FalseClass | untyped)
+      def define_attribute_methods: () -> (false | untyped)
 
       def undefine_attribute_methods: () -> untyped
 
@@ -4575,7 +4575,7 @@ module ActiveRecord
     #   person.respond_to?('age=')   # => true
     #   person.respond_to?('age?')   # => true
     #   person.respond_to?(:nothing) # => false
-    def respond_to?: (untyped name, ?bool include_private) -> (::FalseClass | untyped | ::TrueClass)
+    def respond_to?: (untyped name, ?bool include_private) -> (bool | untyped)
 
     # Returns +true+ if the given attribute is in the attributes hash, otherwise +false+.
     #
@@ -5153,7 +5153,7 @@ module ActiveRecord
 
     # go through nested autosave associations that are loaded in memory (without loading
     # any new ones), and return true if is changed for autosave
-    def nested_records_changed_for_autosave?: () -> (::FalseClass | untyped)
+    def nested_records_changed_for_autosave?: () -> (false | untyped)
 
     # Validate the association if <tt>:validate</tt> or <tt>:autosave</tt> is
     # turned on for the association.
@@ -5167,7 +5167,7 @@ module ActiveRecord
     # Returns whether or not the association is valid and applies any errors to
     # the parent, <tt>self</tt>, if it wasn't. Skips any <tt>:autosave</tt>
     # enabled records if they're marked_for_destruction? or destroyed.
-    def association_valid?: (untyped reflection, untyped record, ?untyped? index) -> (::TrueClass | untyped)
+    def association_valid?: (untyped reflection, untyped record, ?untyped? index) -> (true | untyped)
 
     def normalize_reflection_attribute: (untyped indexed_attribute, untyped reflection, untyped index, untyped attribute) -> untyped
 
@@ -5200,7 +5200,7 @@ module ActiveRecord
     # If the record is new or it has changed, returns true.
     def record_changed?: (untyped reflection, untyped record, untyped key) -> untyped
 
-    def association_foreign_key_changed?: (untyped reflection, untyped record, untyped key) -> (::FalseClass | untyped)
+    def association_foreign_key_changed?: (untyped reflection, untyped record, untyped key) -> (false | untyped)
 
     # Saves the associated record if it's new or <tt>:autosave</tt> is enabled.
     #
@@ -6828,7 +6828,7 @@ module ActiveRecord
 
       # Database adapters can override this method to
       # provide custom cache information.
-      def cache_notification_info: (untyped sql, untyped name, untyped binds) -> { sql: untyped, binds: untyped, type_casted_binds: untyped, name: untyped, connection_id: untyped, connection: untyped, cached: ::TrueClass }
+      def cache_notification_info: (untyped sql, untyped name, untyped binds) -> { sql: untyped, binds: untyped, type_casted_binds: untyped, name: untyped, connection_id: untyped, connection: untyped, cached: true }
 
       # If arel is locked this is a SELECT ... FOR UPDATE or somesuch. Such
       # queries should not be cached.
@@ -6880,11 +6880,11 @@ module ActiveRecord
 
       def quoted_true: () -> "TRUE"
 
-      def unquoted_true: () -> ::TrueClass
+      def unquoted_true: () -> true
 
       def quoted_false: () -> "FALSE"
 
-      def unquoted_false: () -> ::FalseClass
+      def unquoted_false: () -> false
 
       # Quote date/time values for use in SQL input. Includes microseconds
       # if the value is a Time responding to usec.
@@ -7586,7 +7586,7 @@ module ActiveRecord
 
       def default_primary_key?: (untyped column) -> untyped
 
-      def explicit_primary_key_default?: (untyped column) -> ::FalseClass
+      def explicit_primary_key_default?: (untyped column) -> false
 
       def schema_type_with_virtual: (untyped column) -> untyped
 
@@ -8451,7 +8451,7 @@ module ActiveRecord
 
       def dump_schema_information: () -> untyped
 
-      def internal_string_options_for_primary_key: () -> { primary_key: ::TrueClass }
+      def internal_string_options_for_primary_key: () -> { primary_key: true }
 
       def assume_migrated_upto_version: (untyped version, ?untyped? migrations_paths) -> untyped
 
@@ -8601,15 +8601,15 @@ module ActiveRecord
 
     class NullTransaction
       # nodoc:
-      def initialize: () -> nil
+      def initialize: () -> void
 
       def state: () -> nil
 
-      def closed?: () -> ::TrueClass
+      def closed?: () -> true
 
-      def open?: () -> ::FalseClass
+      def open?: () -> false
 
-      def joinable?: () -> ::FalseClass
+      def joinable?: () -> false
 
       def add_record: (untyped record) -> nil
     end
@@ -8644,11 +8644,11 @@ module ActiveRecord
 
       def commit_records: () -> untyped
 
-      def full_rollback?: () -> ::TrueClass
+      def full_rollback?: () -> true
 
       def joinable?: () -> untyped
 
-      def closed?: () -> ::FalseClass
+      def closed?: () -> false
 
       def open?: () -> untyped
     end
@@ -8662,7 +8662,7 @@ module ActiveRecord
 
       def commit: () -> untyped
 
-      def full_rollback?: () -> ::FalseClass
+      def full_rollback?: () -> false
     end
 
     class RealTransaction < Transaction
@@ -8827,96 +8827,96 @@ module ActiveRecord
 
       # Does this adapter support DDL rollbacks in transactions? That is, would
       # CREATE TABLE or ALTER TABLE get rolled back by a transaction?
-      def supports_ddl_transactions?: () -> ::FalseClass
+      def supports_ddl_transactions?: () -> false
 
-      def supports_bulk_alter?: () -> ::FalseClass
+      def supports_bulk_alter?: () -> false
 
       # Does this adapter support savepoints?
-      def supports_savepoints?: () -> ::FalseClass
+      def supports_savepoints?: () -> false
 
       # Does this adapter support application-enforced advisory locking?
-      def supports_advisory_locks?: () -> ::FalseClass
+      def supports_advisory_locks?: () -> false
 
       # Should primary key values be selected from their corresponding
       # sequence before the insert statement? If true, next_sequence_value
       # is called before each insert to set the record's primary key.
-      def prefetch_primary_key?: (?untyped? table_name) -> ::FalseClass
+      def prefetch_primary_key?: (?untyped? table_name) -> false
 
-      def supports_partitioned_indexes?: () -> ::FalseClass
+      def supports_partitioned_indexes?: () -> false
 
       # Does this adapter support index sort order?
-      def supports_index_sort_order?: () -> ::FalseClass
+      def supports_index_sort_order?: () -> false
 
       # Does this adapter support partial indices?
-      def supports_partial_index?: () -> ::FalseClass
+      def supports_partial_index?: () -> false
 
       # Does this adapter support expression indices?
-      def supports_expression_index?: () -> ::FalseClass
+      def supports_expression_index?: () -> false
 
       # Does this adapter support explain?
-      def supports_explain?: () -> ::FalseClass
+      def supports_explain?: () -> false
 
       # Does this adapter support setting the isolation level for a transaction?
-      def supports_transaction_isolation?: () -> ::FalseClass
+      def supports_transaction_isolation?: () -> false
 
       # Does this adapter support database extensions?
-      def supports_extensions?: () -> ::FalseClass
+      def supports_extensions?: () -> false
 
       # Does this adapter support creating indexes in the same statement as
       # creating the table?
-      def supports_indexes_in_create?: () -> ::FalseClass
+      def supports_indexes_in_create?: () -> false
 
       # Does this adapter support creating foreign key constraints?
-      def supports_foreign_keys?: () -> ::FalseClass
+      def supports_foreign_keys?: () -> false
 
       # Does this adapter support creating invalid constraints?
-      def supports_validate_constraints?: () -> ::FalseClass
+      def supports_validate_constraints?: () -> false
 
       # Does this adapter support creating foreign key constraints
       # in the same statement as creating the table?
       def supports_foreign_keys_in_create?: () -> untyped
 
       # Does this adapter support views?
-      def supports_views?: () -> ::FalseClass
+      def supports_views?: () -> false
 
       # Does this adapter support materialized views?
-      def supports_materialized_views?: () -> ::FalseClass
+      def supports_materialized_views?: () -> false
 
       # Does this adapter support datetime with precision?
-      def supports_datetime_with_precision?: () -> ::FalseClass
+      def supports_datetime_with_precision?: () -> false
 
       # Does this adapter support json data type?
-      def supports_json?: () -> ::FalseClass
+      def supports_json?: () -> false
 
       # Does this adapter support metadata comments on database objects (tables, columns, indexes)?
-      def supports_comments?: () -> ::FalseClass
+      def supports_comments?: () -> false
 
       # Can comments for tables, columns, and indexes be specified in create/alter table statements?
-      def supports_comments_in_create?: () -> ::FalseClass
+      def supports_comments_in_create?: () -> false
 
       # Does this adapter support multi-value insert?
-      def supports_multi_insert?: () -> ::TrueClass
+      def supports_multi_insert?: () -> true
 
       # Does this adapter support virtual columns?
-      def supports_virtual_columns?: () -> ::FalseClass
+      def supports_virtual_columns?: () -> false
 
       # Does this adapter support foreign/external tables?
-      def supports_foreign_tables?: () -> ::FalseClass
+      def supports_foreign_tables?: () -> false
 
       # Does this adapter support optimizer hints?
-      def supports_optimizer_hints?: () -> ::FalseClass
+      def supports_optimizer_hints?: () -> false
 
-      def supports_common_table_expressions?: () -> ::FalseClass
+      def supports_common_table_expressions?: () -> false
 
-      def supports_lazy_transactions?: () -> ::FalseClass
+      def supports_lazy_transactions?: () -> false
 
-      def supports_insert_returning?: () -> ::FalseClass
+      def supports_insert_returning?: () -> false
 
-      def supports_insert_on_duplicate_skip?: () -> ::FalseClass
+      def supports_insert_on_duplicate_skip?: () -> false
 
-      def supports_insert_on_duplicate_update?: () -> ::FalseClass
+      def supports_insert_on_duplicate_update?: () -> false
 
-      def supports_insert_conflict_target?: () -> ::FalseClass
+      def supports_insert_conflict_target?: () -> false
 
       # This is meant to be implemented by the adapters that support extensions
       def disable_extension: (untyped name) -> nil
@@ -8973,7 +8973,7 @@ module ActiveRecord
       def clear_cache!: () -> untyped
 
       # Returns true if its required to reload the connection between requests for development mode.
-      def requires_reloading?: () -> ::FalseClass
+      def requires_reloading?: () -> false
 
       # Checks whether the connection to the database is still active (i.e. not stale).
       # This is done under the hood by calling #active?. If the connection
@@ -8996,7 +8996,7 @@ module ActiveRecord
 
       private
 
-      def can_perform_case_insensitive_comparison_for?: (untyped column) -> ::TrueClass
+      def can_perform_case_insensitive_comparison_for?: (untyped column) -> true
 
       public
 
@@ -9075,21 +9075,21 @@ module ActiveRecord
 
       def mariadb?: () -> untyped
 
-      def supports_bulk_alter?: () -> ::TrueClass
+      def supports_bulk_alter?: () -> true
 
       def supports_index_sort_order?: () -> untyped
 
       def supports_expression_index?: () -> untyped
 
-      def supports_transaction_isolation?: () -> ::TrueClass
+      def supports_transaction_isolation?: () -> true
 
-      def supports_explain?: () -> ::TrueClass
+      def supports_explain?: () -> true
 
-      def supports_indexes_in_create?: () -> ::TrueClass
+      def supports_indexes_in_create?: () -> true
 
-      def supports_foreign_keys?: () -> ::TrueClass
+      def supports_foreign_keys?: () -> true
 
-      def supports_views?: () -> ::TrueClass
+      def supports_views?: () -> true
 
       def supports_datetime_with_precision?: () -> untyped
 
@@ -9100,11 +9100,11 @@ module ActiveRecord
 
       def supports_common_table_expressions?: () -> untyped
 
-      def supports_advisory_locks?: () -> ::TrueClass
+      def supports_advisory_locks?: () -> true
 
-      def supports_insert_on_duplicate_skip?: () -> ::TrueClass
+      def supports_insert_on_duplicate_skip?: () -> true
 
-      def supports_insert_on_duplicate_update?: () -> ::TrueClass
+      def supports_insert_on_duplicate_update?: () -> true
 
       def get_advisory_lock: (untyped lock_name, ?::Integer timeout) -> untyped
 
@@ -9858,13 +9858,13 @@ module ActiveRecord
 
       def supports_json?: () -> untyped
 
-      def supports_comments?: () -> ::TrueClass
+      def supports_comments?: () -> true
 
-      def supports_comments_in_create?: () -> ::TrueClass
+      def supports_comments_in_create?: () -> true
 
-      def supports_savepoints?: () -> ::TrueClass
+      def supports_savepoints?: () -> true
 
-      def supports_lazy_transactions?: () -> ::TrueClass
+      def supports_lazy_transactions?: () -> true
 
       def each_hash: (untyped result) { (untyped) -> untyped } -> untyped
 
@@ -11047,33 +11047,33 @@ module ActiveRecord
 
       include PostgreSQL::DatabaseStatements
 
-      def supports_bulk_alter?: () -> ::TrueClass
+      def supports_bulk_alter?: () -> true
 
-      def supports_index_sort_order?: () -> ::TrueClass
+      def supports_index_sort_order?: () -> true
 
       def supports_partitioned_indexes?: () -> untyped
 
-      def supports_partial_index?: () -> ::TrueClass
+      def supports_partial_index?: () -> true
 
-      def supports_expression_index?: () -> ::TrueClass
+      def supports_expression_index?: () -> true
 
-      def supports_transaction_isolation?: () -> ::TrueClass
+      def supports_transaction_isolation?: () -> true
 
-      def supports_foreign_keys?: () -> ::TrueClass
+      def supports_foreign_keys?: () -> true
 
-      def supports_validate_constraints?: () -> ::TrueClass
+      def supports_validate_constraints?: () -> true
 
-      def supports_views?: () -> ::TrueClass
+      def supports_views?: () -> true
 
-      def supports_datetime_with_precision?: () -> ::TrueClass
+      def supports_datetime_with_precision?: () -> true
 
-      def supports_json?: () -> ::TrueClass
+      def supports_json?: () -> true
 
-      def supports_comments?: () -> ::TrueClass
+      def supports_comments?: () -> true
 
-      def supports_savepoints?: () -> ::TrueClass
+      def supports_savepoints?: () -> true
 
-      def supports_insert_returning?: () -> ::TrueClass
+      def supports_insert_returning?: () -> true
 
       def supports_insert_on_conflict?: () -> untyped
 
@@ -11123,27 +11123,27 @@ module ActiveRecord
 
       def set_standard_conforming_strings: () -> untyped
 
-      def supports_ddl_transactions?: () -> ::TrueClass
+      def supports_ddl_transactions?: () -> true
 
-      def supports_advisory_locks?: () -> ::TrueClass
+      def supports_advisory_locks?: () -> true
 
-      def supports_explain?: () -> ::TrueClass
+      def supports_explain?: () -> true
 
-      def supports_extensions?: () -> ::TrueClass
+      def supports_extensions?: () -> true
 
-      def supports_ranges?: () -> ::TrueClass
+      def supports_ranges?: () -> true
 
-      def supports_materialized_views?: () -> ::TrueClass
+      def supports_materialized_views?: () -> true
 
-      def supports_foreign_tables?: () -> ::TrueClass
+      def supports_foreign_tables?: () -> true
 
       def supports_pgcrypto_uuid?: () -> untyped
 
       def supports_optimizer_hints?: () -> untyped
 
-      def supports_common_table_expressions?: () -> ::TrueClass
+      def supports_common_table_expressions?: () -> true
 
-      def supports_lazy_transactions?: () -> ::TrueClass
+      def supports_lazy_transactions?: () -> true
 
       def get_advisory_lock: (untyped lock_id) -> untyped
 
@@ -11581,23 +11581,23 @@ module ActiveRecord
 
       def self.database_exists?: (untyped config) -> untyped
 
-      def supports_ddl_transactions?: () -> ::TrueClass
+      def supports_ddl_transactions?: () -> true
 
-      def supports_savepoints?: () -> ::TrueClass
+      def supports_savepoints?: () -> true
 
-      def supports_partial_index?: () -> ::TrueClass
+      def supports_partial_index?: () -> true
 
       def supports_expression_index?: () -> untyped
 
-      def requires_reloading?: () -> ::TrueClass
+      def requires_reloading?: () -> true
 
-      def supports_foreign_keys?: () -> ::TrueClass
+      def supports_foreign_keys?: () -> true
 
-      def supports_views?: () -> ::TrueClass
+      def supports_views?: () -> true
 
-      def supports_datetime_with_precision?: () -> ::TrueClass
+      def supports_datetime_with_precision?: () -> true
 
-      def supports_json?: () -> ::TrueClass
+      def supports_json?: () -> true
 
       def supports_common_table_expressions?: () -> untyped
 
@@ -11617,7 +11617,7 @@ module ActiveRecord
       # method does nothing.
       def disconnect!: () -> untyped
 
-      def supports_index_sort_order?: () -> ::TrueClass
+      def supports_index_sort_order?: () -> true
 
       # Returns 62. SQLite supports index names up to 64
       # characters. The rest is used by Rails internally to perform
@@ -11629,9 +11629,9 @@ module ActiveRecord
       # Returns the current database encoding format as a string, eg: 'UTF-8'
       def encoding: () -> untyped
 
-      def supports_explain?: () -> ::TrueClass
+      def supports_explain?: () -> true
 
-      def supports_lazy_transactions?: () -> ::TrueClass
+      def supports_lazy_transactions?: () -> true
 
       def disable_referential_integrity: () { () -> untyped } -> untyped
 
@@ -11976,7 +11976,7 @@ module ActiveRecord
 
       def type_caster: () -> TypeCaster::Map
 
-      def _internal?: () -> ::FalseClass
+      def _internal?: () -> false
 
       private
 
@@ -12059,9 +12059,9 @@ module ActiveRecord
     # Allows sort on objects
     def <=>: (untyped other_object) -> untyped
 
-    def present?: () -> ::TrueClass
+    def present?: () -> true
 
-    def blank?: () -> ::FalseClass
+    def blank?: () -> false
 
     # Returns +true+ if the record is read only. Records loaded through joins with piggy-back
     # attributes will be marked as read only since they cannot be saved.
@@ -12135,7 +12135,7 @@ module ActiveRecord
       #   # Like above, but also touch the +updated_at+ and/or +updated_on+
       #   # attributes.
       #   Post.reset_counters(1, :comments, touch: true)
-      def reset_counters: (untyped id, *untyped counters, ?touch: untyped? touch) -> ::TrueClass
+      def reset_counters: (untyped id, *untyped counters, ?touch: untyped? touch) -> true
 
       # A generic "counter updater" implementation, intended primarily to be
       # used by #increment_counter and #decrement_counter, but which may also
@@ -12260,7 +12260,7 @@ module ActiveRecord
 
       def migrations_paths: () -> untyped
 
-      def url_config?: () -> ::FalseClass
+      def url_config?: () -> false
 
       def to_legacy_hash: () -> ::Hash[untyped, untyped]
 
@@ -12346,7 +12346,7 @@ module ActiveRecord
 
       def initialize: (untyped env_name, untyped spec_name, untyped url, ?::Hash[untyped, untyped] config) -> untyped
 
-      def url_config?: () -> ::TrueClass
+      def url_config?: () -> true
 
       # Determines whether a database configuration is for a replica / readonly
       # connection. If the +replica+ key is present in the config, +replica?+ will
@@ -13975,7 +13975,7 @@ end
 
 module ActiveRecord
   class InternalMetadata < ActiveRecord::Base
-    def self._internal?: () -> ::TrueClass
+    def self._internal?: () -> true
 
     def self.primary_key: () -> "key"
 
@@ -16050,7 +16050,7 @@ module ActiveRecord
     # The reject_if option is defined by +accepts_nested_attributes_for+.
     #
     # Returns false if there is a +destroy_flag+ on the attributes.
-    def call_reject_if: (untyped association_name, untyped attributes) -> (::FalseClass | untyped)
+    def call_reject_if: (untyped association_name, untyped attributes) -> (false | untyped)
 
     # Only take into account the destroy flag if <tt>:allow_destroy</tt> is true
     def will_be_destroyed?: (untyped association_name, untyped attributes) -> untyped
@@ -16118,21 +16118,21 @@ module ActiveRecord
 
     def delete: (untyped _id_or_array) -> 0
 
-    def empty?: () -> ::TrueClass
+    def empty?: () -> true
 
-    def none?: () -> ::TrueClass
+    def none?: () -> true
 
-    def any?: () -> ::FalseClass
+    def any?: () -> false
 
-    def one?: () -> ::FalseClass
+    def one?: () -> false
 
-    def many?: () -> ::FalseClass
+    def many?: () -> false
 
     def to_sql: () -> ::String
 
     def calculate: (untyped operation, untyped _column_name) -> untyped
 
-    def exists?: (?::Symbol _conditions) -> ::FalseClass
+    def exists?: (?::Symbol _conditions) -> false
 
     def or: (untyped other) -> untyped
 
@@ -16598,7 +16598,7 @@ module ActiveRecord
 
     def _update_row: (untyped attribute_names, ?::String attempted_action) -> untyped
 
-    def create_or_update: () { () -> untyped } -> (::FalseClass | untyped)
+    def create_or_update: () { () -> untyped } -> (false | untyped)
 
     # Updates the associated record with values matching those of the instance attributes.
     # Returns the number of affected rows.
@@ -16759,11 +16759,7 @@ module ActiveRecord
 
     def self.add_aggregate_reflection: (untyped ar, untyped name, untyped reflection) -> untyped
 
-    private
-
     def self.reflection_class_for: (untyped macro) -> untyped
-
-    public
 
     # \Reflection enables the ability to examine the associations and aggregations of
     # Active Record classes and objects. This information, for example,
@@ -16831,7 +16827,7 @@ module ActiveRecord
       #     PolymorphicReflection
       #     RuntimeReflection
       # :nodoc:
-      def through_reflection?: () -> ::FalseClass
+      def through_reflection?: () -> false
 
       def table_name: () -> untyped
 
@@ -17025,7 +17021,7 @@ module ActiveRecord
 
       def clear_association_scope_cache: () -> untyped
 
-      def nested?: () -> ::FalseClass
+      def nested?: () -> false
 
       def has_scope?: () -> untyped
 
@@ -17041,7 +17037,7 @@ module ActiveRecord
       # Returns whether or not this association reflection is for a collection
       # association. Returns +true+ if the +macro+ is either +has_many+ or
       # +has_and_belongs_to_many+, +false+ otherwise.
-      def collection?: () -> ::FalseClass
+      def collection?: () -> false
 
       # Returns whether or not the association should be validated as part of
       # the parent's validation.
@@ -17055,10 +17051,10 @@ module ActiveRecord
       def validate?: () -> untyped
 
       # Returns +true+ if +self+ is a +belongs_to+ reflection.
-      def belongs_to?: () -> ::FalseClass
+      def belongs_to?: () -> false
 
       # Returns +true+ if +self+ is a +has_one+ reflection.
-      def has_one?: () -> ::FalseClass
+      def has_one?: () -> false
 
       def association_class: () -> untyped
 
@@ -17078,7 +17074,7 @@ module ActiveRecord
 
       private
 
-      def calculate_constructable: (untyped macro, untyped options) -> ::TrueClass
+      def calculate_constructable: (untyped macro, untyped options) -> true
 
       # Attempts to find the inverse association name automatically.
       # If it cannot find a suitable inverse association name, it returns
@@ -17116,7 +17112,7 @@ module ActiveRecord
       # :nodoc:
       def macro: () -> :has_many
 
-      def collection?: () -> ::TrueClass
+      def collection?: () -> true
 
       def association_class: () -> untyped
 
@@ -17127,7 +17123,7 @@ module ActiveRecord
       # :nodoc:
       def macro: () -> :has_one
 
-      def has_one?: () -> ::TrueClass
+      def has_one?: () -> true
 
       def association_class: () -> untyped
 
@@ -17140,7 +17136,7 @@ module ActiveRecord
       # :nodoc:
       def macro: () -> :belongs_to
 
-      def belongs_to?: () -> ::TrueClass
+      def belongs_to?: () -> true
 
       def association_class: () -> untyped
 
@@ -17159,13 +17155,13 @@ module ActiveRecord
       # :nodoc:
       def macro: () -> :has_and_belongs_to_many
 
-      def collection?: () -> ::TrueClass
+      def collection?: () -> true
     end
 
     class ThroughReflection < AbstractReflection
       def initialize: (untyped delegate_reflection) -> untyped
 
-      def through_reflection?: () -> ::TrueClass
+      def through_reflection?: () -> true
 
       def klass: () -> untyped
 
@@ -17966,7 +17962,7 @@ module ActiveRecord
     #   Person.exists?(false)
     #   Person.exists?
     #   Person.where(name: 'Spartacus', rating: 4).exists?
-    def exists?: (?::Symbol conditions) -> (::FalseClass | untyped)
+    def exists?: (?::Symbol conditions) -> (false | untyped)
 
     def raise_record_not_found_exception!: (?untyped? ids, ?untyped? result_size, ?untyped? expected_size, ?untyped key, ?untyped? not_found_ids) -> untyped
 
@@ -18756,9 +18752,9 @@ module ActiveRecord
 
     # Specifies locking settings (default to +true+). For more information
     # on locking, please see ActiveRecord::Locking.
-    def lock: (?(bool|String) locks) -> untyped
+    def lock: (?(bool | String) locks) -> untyped
 
-    def lock!: (?(bool|String) locks) -> untyped
+    def lock!: (?(bool | String) locks) -> untyped
 
     # Returns a chainable relation with zero records.
     #
@@ -19922,7 +19918,7 @@ end
 
 module ActiveRecord
   class SchemaMigration < ActiveRecord::Base
-    def self._internal?: () -> ::TrueClass
+    def self._internal?: () -> true
 
     def self.primary_key: () -> "version"
 
@@ -20407,7 +20403,7 @@ module ActiveRecord
     module ClassMethods
       def store: (untyped store_attribute, ?::Hash[untyped, untyped] options) -> untyped
 
-      def store_accessor: (untyped store_attribute, *untyped keys, ?suffix: untyped? suffix, ?prefix: untyped? prefix) -> (::FalseClass | nil | untyped)
+      def store_accessor: (untyped store_attribute, *untyped keys, ?suffix: untyped? suffix, ?prefix: untyped? prefix) -> (false | nil | untyped)
 
       def _store_accessors_module: () -> untyped
 
@@ -20675,7 +20671,7 @@ module ActiveRecord
 
       def load_schema: (untyped configuration, ?untyped format, ?untyped? file, ?untyped environment, ?::String spec_name) -> untyped
 
-      def schema_up_to_date?: (untyped configuration, ?untyped format, ?untyped? file, ?untyped environment, ?::String spec_name) -> (::TrueClass | ::FalseClass | untyped)
+      def schema_up_to_date?: (untyped configuration, ?untyped format, ?untyped? file, ?untyped environment, ?::String spec_name) -> (bool | untyped)
 
       def reconstruct_from_schema: (untyped configuration, ?untyped format, ?untyped? file, ?untyped environment, ?::String spec_name) -> untyped
 
@@ -21498,7 +21494,7 @@ module ActiveRecord
 
       def inspect: () -> untyped
 
-      def changed_in_place?: (untyped raw_old_value, untyped value) -> (::FalseClass | untyped)
+      def changed_in_place?: (untyped raw_old_value, untyped value) -> (false | untyped)
 
       def accessor: () -> untyped
 
@@ -21590,11 +21586,7 @@ module ActiveRecord
 
     def self.default_value: () -> untyped
 
-    private
-
     def self.current_adapter_name: () -> untyped
-
-    public
 
     class BigInteger < ActiveModel::Type::BigInteger
     end
@@ -22363,9 +22355,9 @@ module Arel
 
       def direction: () -> :asc
 
-      def ascending?: () -> ::TrueClass
+      def ascending?: () -> true
 
-      def descending?: () -> ::FalseClass
+      def descending?: () -> false
     end
   end
 end
@@ -22556,9 +22548,9 @@ module Arel
 
       def direction: () -> :desc
 
-      def ascending?: () -> ::FalseClass
+      def ascending?: () -> false
 
-      def descending?: () -> ::TrueClass
+      def descending?: () -> true
     end
   end
 end

@@ -305,7 +305,7 @@ module ActiveRecord
 
       private
 
-      def not_behaves_as_nor?: (untyped opts) -> (::FalseClass | untyped)
+      def not_behaves_as_nor?: (untyped opts) -> (false | untyped)
     end
   end
 end
@@ -342,7 +342,7 @@ module ActiveRecord
       def ids: () -> Array[PrimaryKey]
       def none: () -> self
       def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
-              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
+               | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
       def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
                | (*untyped) -> self
       def exists?: (*untyped) -> bool
@@ -365,20 +365,20 @@ module ActiveRecord
               | (*PrimaryKey) -> Array[Model]
               | () { (Model) -> boolish } -> Model?
       def find_or_create_by: (*untyped) -> Model
-                          | (*untyped) { (Model) -> void } -> Model
+                           | (*untyped) { (Model) -> void } -> Model
       def find_or_create_by!: (*untyped) -> Model
                             | (*untyped) { (Model) -> void } -> Model
       def find_or_initialize_by: (*untyped) -> Model
-                              | (*untyped) { (Model) -> void } -> Model
+                               | (*untyped) { (Model) -> void } -> Model
       def create_or_find_by: (*untyped) -> Model
-                          | (*untyped) { (Model) -> void } -> Model
+                           | (*untyped) { (Model) -> void } -> Model
       def create_or_find_by!: (*untyped) -> Model
                             | (*untyped) { (Model) -> void } -> Model
       def take: () -> Model
               | (Integer limit) -> Array[Model]
       def take!: () -> Model
       def first: () -> Model?
-              | (Integer count) -> Array[Model]
+               | (Integer count) -> Array[Model]
       def first!: () -> Model
       def second: () -> Model?
       def second!: () -> Model
@@ -417,8 +417,8 @@ module ActiveRecord
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> self
       def count: () -> ::Integer
-              | () { (Model) -> boolish } -> ::Integer
-              | (Symbol | String column_name) -> ::Integer
+               | () { (Model) -> boolish } -> ::Integer
+               | (Symbol | String column_name) -> ::Integer
     end
   end
 
@@ -432,16 +432,16 @@ module ActiveRecord
       def ids: () -> Array[PrimaryKey]
       def none: () -> Relation
       def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
-              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
+               | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
       def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
                | (*untyped) -> Relation
       def exists?: (*untyped) -> bool
       def any?: () -> bool
               | () { (Model) -> boolish } -> bool
       def many?: () -> bool
-              | () { (Model) -> boolish } -> bool
+               | () { (Model) -> boolish } -> bool
       def none?: () -> bool
-              | () { (Model) -> boolish } -> bool
+               | () { (Model) -> boolish } -> bool
       def one?: () -> bool
               | () { (Model) -> boolish } -> bool
       def order: (*untyped) -> Relation
@@ -462,20 +462,20 @@ module ActiveRecord
               | (Array[PrimaryKey]) -> Array[Model]
               | (*PrimaryKey) -> Array[Model]
       def find_or_create_by: (*untyped) -> Model
-                          | (*untyped) { (Model) -> void } -> Model
+                           | (*untyped) { (Model) -> void } -> Model
       def find_or_create_by!: (*untyped) -> Model
                             | (*untyped) { (Model) -> void } -> Model
       def find_or_initialize_by: (*untyped) -> Model
-                              | (*untyped) { (Model) -> void } -> Model
+                               | (*untyped) { (Model) -> void } -> Model
       def create_or_find_by: (*untyped) -> Model
-                          | (*untyped) { (Model) -> void } -> Model
+                           | (*untyped) { (Model) -> void } -> Model
       def create_or_find_by!: (*untyped) -> Model
                             | (*untyped) { (Model) -> void } -> Model
       def take: () -> Model
               | (Integer limit) -> Array[Model]
       def take!: () -> Model
       def first: () -> Model?
-              | (Integer count) -> Array[Model]
+               | (Integer count) -> Array[Model]
       def first!: () -> Model
       def second: () -> Model?
       def second!: () -> Model
@@ -513,8 +513,8 @@ module ActiveRecord
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
       def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | _Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
       def count: () -> ::Integer
-              | () { (Model) -> boolish } -> ::Integer
-              | (Symbol | String column_name) -> ::Integer
+               | () { (Model) -> boolish } -> ::Integer
+               | (Symbol | String column_name) -> ::Integer
       def create_with: (nil | Hash[untyped, untyped]) -> Relation
     end
   end
@@ -642,7 +642,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
   def third_to_last: () -> Model?
   def third_to_last!: () -> Model
   def last: () -> Model?
-           | (Integer count) -> Array[Model]
+          | (Integer count) -> Array[Model]
   def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
   def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
@@ -664,8 +664,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey]
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> self
   def count: () -> ::Integer
-          | () { (Model) -> boolish } -> ::Integer
-          | (Symbol | String column_name) -> ::Integer
+           | () { (Model) -> boolish } -> ::Integer
+           | (Symbol | String column_name) -> ::Integer
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
@@ -733,7 +733,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def third_to_last: () -> Model?
   def third_to_last!: () -> Model
   def last: () -> Model?
-           | (Integer count) -> Array[Model]
+          | (Integer count) -> Array[Model]
   def last!: () -> Model
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
   def offset: (Integer) -> Relation
@@ -754,8 +754,8 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
   def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | ActiveRecord::Base::_Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
   def count: () -> ::Integer
-          | () { (Model) -> boolish } -> ::Integer
-          | (Symbol | String column_name) -> ::Integer
+           | () { (Model) -> boolish } -> ::Integer
+           | (Symbol | String column_name) -> ::Integer
   def create_with: (nil | Hash[untyped, untyped]) -> Relation
 end
 
