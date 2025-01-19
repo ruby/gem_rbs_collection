@@ -140,7 +140,7 @@ module AbstractController
     # a path. A subclass of +AbstractController::Base+
     # may return false. An Email controller for example does not
     # support paths, only full URLs.
-    def self.supports_path?: () -> ::TrueClass
+    def self.supports_path?: () -> true
 
     private
 
@@ -1502,7 +1502,7 @@ module ActionController
     #   render
     #
     # See Rack::Utils::SYMBOL_TO_STATUS_CODE for a full list of valid +status+ symbols.
-    def head: (untyped status, ?::Hash[untyped, untyped] options) -> ::TrueClass
+    def head: (untyped status, ?::Hash[untyped, untyped] options) -> true
 
     private
 
@@ -1762,7 +1762,7 @@ module ActionController
       # Returns false unless the request credentials response value matches the expected value.
       # First try the password as a ha1 digest password. If this fails, then try it as a plain
       # text password.
-      def validate_digest_response: (untyped request, untyped realm) { () -> untyped } -> (::FalseClass | untyped)
+      def validate_digest_response: (untyped request, untyped realm) { () -> untyped } -> (false | untyped)
 
       # Returns the expected response for a request of +http_method+ to +uri+ with the decoded +credentials+ and the expected +password+
       # Optional parameter +password_is_ha1+ is set to +true+ by default, since best practice is to store ha1 digest instead
@@ -1822,7 +1822,7 @@ module ActionController
       # Can be much shorter if the Stale directive is implemented. This would
       # allow a user to use new nonce without prompting the user again for their
       # username and password.
-      def validate_nonce: (untyped secret_key, untyped request, untyped value, ?untyped seconds_to_timeout) -> (::FalseClass | untyped)
+      def validate_nonce: (untyped secret_key, untyped request, untyped value, ?untyped seconds_to_timeout) -> (false | untyped)
 
       # Opaque based on digest of secret key
       def opaque: (untyped secret_key) -> untyped
@@ -2511,7 +2511,7 @@ module ActionController
     def _extract_parameters: (untyped parameters) -> untyped
 
     # Checks if we should perform parameters wrapping.
-    def _wrapper_enabled?: () -> (::FalseClass | untyped)
+    def _wrapper_enabled?: () -> (false | untyped)
 
     def _perform_parameter_wrapping: () -> untyped
   end
@@ -2901,7 +2901,7 @@ module ActionController
           # no-op
           def destroy: () -> nil
 
-          def exists?: () -> ::TrueClass
+          def exists?: () -> true
         end
 
         class NullCookieJar < ActionDispatch::Cookies::CookieJar
@@ -2953,7 +2953,7 @@ module ActionController
 
     def masked_authenticity_token: (untyped session, ?form_options: ::Hash[untyped, untyped] form_options) -> untyped
 
-    def valid_authenticity_token?: (untyped session, untyped encoded_masked_token) -> (::FalseClass | untyped)
+    def valid_authenticity_token?: (untyped session, untyped encoded_masked_token) -> (false | untyped)
 
     def unmask_token: (untyped masked_token) -> untyped
 
@@ -3004,7 +3004,7 @@ module ActionController
     # +consider_all_requests_local+ is +false+. By default, it returns
     # +false+, but someone may set it to <tt>request.local?</tt> so local
     # requests in production still show the detailed exception pages.
-    def show_detailed_exceptions?: () -> ::FalseClass
+    def show_detailed_exceptions?: () -> false
 
     private
 
@@ -3995,7 +3995,7 @@ module ActionController
 
     def self.make_response!: (untyped request) -> untyped
 
-    def self.binary_params_for?: (untyped action) -> ::FalseClass
+    def self.binary_params_for?: (untyped action) -> false
 
     # Delegates to the class' <tt>controller_name</tt>.
     def controller_name: () -> untyped
@@ -4211,7 +4211,7 @@ module ActionController
 
     def initialize: (?::Hash[untyped, untyped] session) -> untyped
 
-    def exists?: () -> ::TrueClass
+    def exists?: () -> true
 
     def keys: () -> untyped
 
@@ -4490,7 +4490,7 @@ module ActionDispatch
         # Check response freshness (Last-Modified and ETag) against request
         # If-Modified-Since and If-None-Match conditions. If both headers are
         # supplied, both must match, or the request is not considered fresh.
-        def fresh?: (untyped response) -> (::FalseClass | untyped)
+        def fresh?: (untyped response) -> (false | untyped)
       end
 
       module Response
@@ -5055,15 +5055,15 @@ module Mime
 
     def ===: (untyped list) -> untyped
 
-    def ==: (untyped mime_type) -> (::FalseClass | untyped)
+    def ==: (untyped mime_type) -> (false | untyped)
 
     def eql?: (untyped other) -> untyped
 
-    def =~: (untyped mime_type) -> (::FalseClass | untyped)
+    def =~: (untyped mime_type) -> (false | untyped)
 
     def html?: () -> untyped
 
-    def all?: () -> ::FalseClass
+    def all?: () -> false
 
     attr_reader string: untyped
 
@@ -5085,9 +5085,9 @@ module Mime
 
     def initialize: () -> untyped
 
-    def all?: () -> ::TrueClass
+    def all?: () -> true
 
-    def html?: () -> ::TrueClass
+    def html?: () -> true
   end
 
   # ALL isn't a real MIME type, so we don't register it for lookup with the
@@ -5098,7 +5098,7 @@ module Mime
   class NullType
     include Singleton
 
-    def nil?: () -> ::TrueClass
+    def nil?: () -> true
 
     def ref: () -> nil
 
@@ -6276,29 +6276,29 @@ module ActionDispatch
 
         def type: () -> untyped
 
-        def symbol?: () -> ::FalseClass
+        def symbol?: () -> false
 
-        def literal?: () -> ::FalseClass
+        def literal?: () -> false
 
-        def terminal?: () -> ::FalseClass
+        def terminal?: () -> false
 
-        def star?: () -> ::FalseClass
+        def star?: () -> false
 
-        def cat?: () -> ::FalseClass
+        def cat?: () -> false
 
-        def group?: () -> ::FalseClass
+        def group?: () -> false
       end
 
       class Terminal < Node
         # :nodoc:
         alias symbol left
 
-        def terminal?: () -> ::TrueClass
+        def terminal?: () -> true
       end
 
       class Literal < Terminal
         # :nodoc:
-        def literal?: () -> ::TrueClass
+        def literal?: () -> true
 
         def type: () -> :LITERAL
       end
@@ -6307,7 +6307,7 @@ module ActionDispatch
         # :nodoc:
         def initialize: (?untyped x) -> untyped
 
-        def literal?: () -> ::FalseClass
+        def literal?: () -> false
       end
 
       class Slash < Terminal
@@ -6336,7 +6336,7 @@ module ActionDispatch
 
         def type: () -> :SYMBOL
 
-        def symbol?: () -> ::TrueClass
+        def symbol?: () -> true
       end
 
       class Unary < Node
@@ -6348,12 +6348,12 @@ module ActionDispatch
         # :nodoc:
         def type: () -> :GROUP
 
-        def group?: () -> ::TrueClass
+        def group?: () -> true
       end
 
       class Star < Unary
         # :nodoc:
-        def star?: () -> ::TrueClass
+        def star?: () -> true
 
         def type: () -> :STAR
 
@@ -6371,7 +6371,7 @@ module ActionDispatch
 
       class Cat < Binary
         # :nodoc:
-        def cat?: () -> ::TrueClass
+        def cat?: () -> true
 
         def type: () -> :CAT
       end
@@ -6575,7 +6575,7 @@ module ActionDispatch
         end
 
         class All
-          def self.call: (untyped _) -> ::TrueClass
+          def self.call: (untyped _) -> true
 
           def self.verb: () -> ::String
         end
@@ -7474,7 +7474,7 @@ module ActionDispatch
 
     def render_details: (untyped req) -> ::Array[200 | ::Hash[::String, "text/plain" | untyped] | ::Array[untyped]]
 
-    def blocked_by?: (untyped victim, untyped blocker, untyped all_threads) -> (::FalseClass | untyped)
+    def blocked_by?: (untyped victim, untyped blocker, untyped all_threads) -> (false | untyped)
   end
 end
 
@@ -7495,7 +7495,7 @@ module ActionDispatch
 
     def render: () -> untyped
 
-    def protect_against_forgery?: () -> ::FalseClass
+    def protect_against_forgery?: () -> false
 
     def params_valid?: () -> untyped
   end
@@ -8171,7 +8171,7 @@ module ActionDispatch
     # Default to 1 year, the minimum for browser preload lists.
     HSTS_EXPIRES_IN: ::Integer
 
-    def self.default_hsts_options: () -> { expires: untyped, subdomains: ::TrueClass, preload: ::FalseClass }
+    def self.default_hsts_options: () -> { expires: untyped, subdomains: true, preload: false }
 
     def initialize: (untyped app, ?secure_cookies: bool secure_cookies, ?hsts: ::Hash[untyped, untyped] hsts, ?redirect: ::Hash[untyped, untyped] redirect) -> untyped
 
@@ -8289,7 +8289,7 @@ module ActionDispatch
     #
     # Used by the +Static+ class to check the existence of a valid file
     # in the server's +public/+ directory (see Static#call).
-    def match?: (untyped path) -> (::FalseClass | untyped)
+    def match?: (untyped path) -> (false | untyped)
 
     def call: (untyped env) -> untyped
 
@@ -8473,11 +8473,11 @@ module ActionDispatch
   module Routing
     class Endpoint
       # :nodoc:
-      def dispatcher?: () -> ::FalseClass
+      def dispatcher?: () -> false
 
-      def redirect?: () -> ::FalseClass
+      def redirect?: () -> false
 
-      def matches?: (untyped req) -> ::TrueClass
+      def matches?: (untyped req) -> true
 
       def app: () -> untyped
 
@@ -9268,7 +9268,7 @@ module ActionDispatch
 
           def shallow?: () -> untyped
 
-          def singleton?: () -> ::FalseClass
+          def singleton?: () -> false
         end
 
         class SingletonResource < Resource
@@ -9289,7 +9289,7 @@ module ActionDispatch
 
           alias nested_scope path
 
-          def singleton?: () -> ::TrueClass
+          def singleton?: () -> true
         end
 
         def resources_path_names: (untyped options) -> untyped
@@ -9356,7 +9356,7 @@ module ActionDispatch
 
         def parent_resource: () -> untyped
 
-        def apply_common_behavior_for: (untyped method, untyped resources, untyped options) { () -> untyped } -> (::TrueClass | ::FalseClass)
+        def apply_common_behavior_for: (untyped method, untyped resources, untyped options) { () -> untyped } -> bool
 
         def apply_action_options: (untyped options) -> untyped
 
@@ -9839,7 +9839,7 @@ module ActionDispatch
 
       def initialize: (untyped status, untyped block) -> untyped
 
-      def redirect?: () -> ::TrueClass
+      def redirect?: () -> true
 
       def call: (untyped env) -> untyped
 
@@ -9896,7 +9896,7 @@ module ActionDispatch
       class Dispatcher < Routing::Endpoint
         def initialize: (untyped raise_on_name_error) -> untyped
 
-        def dispatcher?: () -> ::TrueClass
+        def dispatcher?: () -> true
 
         def serve: (untyped req) -> untyped
 
@@ -10163,7 +10163,7 @@ module ActionDispatch
         # If no route is generated the formatter will raise ActionController::UrlGenerationError
         def generate: () -> untyped
 
-        def different_controller?: () -> (::FalseClass | untyped)
+        def different_controller?: () -> (false | untyped)
 
         private
 
@@ -11023,7 +11023,7 @@ module ActionDispatch
       #
       #   # Asserts that the redirection matches the regular expression
       #   assert_redirected_to %r(\Ahttp://example.org)
-      def assert_redirected_to: (?::Hash[untyped, untyped] options, ?untyped? message) -> (::TrueClass | untyped)
+      def assert_redirected_to: (?::Hash[untyped, untyped] options, ?untyped? message) -> (true | untyped)
 
       private
 
