@@ -88,9 +88,9 @@ module ActiveModel
 
     def type_cast: () -> untyped
 
-    def initialized?: () -> ::TrueClass
+    def initialized?: () -> true
 
-    def came_from_user?: () -> ::FalseClass
+    def came_from_user?: () -> false
 
     def has_been_read?: () -> untyped
 
@@ -136,7 +136,7 @@ module ActiveModel
       # :nodoc:
       def type_cast: (untyped value) -> untyped
 
-      def changed_in_place?: () -> ::FalseClass
+      def changed_in_place?: () -> false
     end
 
     class Null < Attribute
@@ -166,7 +166,7 @@ module ActiveModel
 
       def value_for_database: () -> nil
 
-      def initialized?: () -> ::FalseClass
+      def initialized?: () -> false
 
       def forgetting_assignment: () -> untyped
 
@@ -648,7 +648,7 @@ module ActiveModel
     # :nodoc:
     def initialize: (untyped attributes, ?::Hash[untyped, untyped] forced_changes) -> untyped
 
-    def changed_in_place?: (untyped attr_name) -> ::FalseClass
+    def changed_in_place?: (untyped attr_name) -> false
 
     def change_to_attribute: (untyped attr_name) -> untyped
 
@@ -685,11 +685,11 @@ module ActiveModel
 
     def change_to_attribute: (untyped attr_name) -> nil
 
-    def any_changes?: () -> ::FalseClass
+    def any_changes?: () -> false
 
-    def changed?: (untyped attr_name) -> ::FalseClass
+    def changed?: (untyped attr_name) -> false
 
-    def changed_in_place?: (untyped attr_name) -> ::FalseClass
+    def changed_in_place?: (untyped attr_name) -> false
 
     def original_value: (untyped attr_name) -> nil
   end
@@ -1864,7 +1864,7 @@ module ActiveModel
     #
     #  person = Person.new(id: 1, name: 'bob')
     #  person.persisted? # => false
-    def persisted?: () -> ::FalseClass
+    def persisted?: () -> false
   end
 end
 
@@ -2407,7 +2407,7 @@ module ActiveModel
       # :nodoc:
       def type: () -> :binary
 
-      def binary?: () -> ::TrueClass
+      def binary?: () -> true
 
       def cast: (untyped value) -> untyped
 
@@ -2557,7 +2557,7 @@ module ActiveModel
     module Helpers
       # :nodoc: all
       class AcceptsMultiparameterTime < Module
-        def initialize: (?defaults: ::Hash[untyped, untyped] defaults) -> (nil | untyped)
+        def initialize: (?defaults: ::Hash[untyped, untyped] defaults) -> void
       end
     end
   end
@@ -2800,7 +2800,7 @@ module ActiveModel
 
       def type_cast_for_schema: (untyped value) -> untyped
 
-      def binary?: () -> ::FalseClass
+      def binary?: () -> false
 
       # Determines whether a value has changed for dirty checking. +old_value+
       # and +new_value+ will always be type-cast. Types should not need to
@@ -2824,11 +2824,11 @@ module ActiveModel
       # +deserialize+.
       #
       # +new_value+ The current value, after type casting.
-      def changed_in_place?: (untyped raw_old_value, untyped new_value) -> ::FalseClass
+      def changed_in_place?: (untyped raw_old_value, untyped new_value) -> false
 
-      def value_constructed_by_mass_assignment?: (untyped _value) -> ::FalseClass
+      def value_constructed_by_mass_assignment?: (untyped _value) -> false
 
-      def force_equality?: (untyped _value) -> ::FalseClass
+      def force_equality?: (untyped _value) -> false
 
       def map: (untyped value) { (untyped) -> untyped } -> untyped
 
