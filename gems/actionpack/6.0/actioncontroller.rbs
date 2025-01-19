@@ -145,13 +145,13 @@ module AbstractController::Callbacks::ClassMethods
   type after_action_callback[T] = Symbol | ^(T controller) [self: T] -> void | _AfterActionCallback
 
   def before_action: (*before_action_callback[instance], ?if: before_action_callback[instance], ?unless: before_action_callback[instance], **untyped) ?{ (instance controller) [self: instance] -> void } -> void
-  def around_action: (*around_action_callback[instance], ?if: around_action_callback[instance], ?unless: around_action_callback[instance], **untyped) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
+  def around_action: (*around_action_callback[instance], ?if: around_action_callback[instance], ?unless: around_action_callback[instance], **untyped) ?{ (instance controller, ^() -> void) [self: instance] -> void } -> void
   def after_action: (*after_action_callback[instance], ?if: after_action_callback[instance], ?unless: after_action_callback[instance], **untyped) ?{ (instance controller) [self: instance] -> void } -> void
   def skip_before_action: (*before_action_callback[instance], ?if: before_action_callback[instance], ?unless: before_action_callback[instance], **untyped) ?{ (instance controller) [self: instance] -> void } -> void
-  def skip_around_action: (*around_action_callback[instance], ?if: around_action_callback[instance], ?unless: around_action_callback[instance], **untyped) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
+  def skip_around_action: (*around_action_callback[instance], ?if: around_action_callback[instance], ?unless: around_action_callback[instance], **untyped) ?{ (instance controller, ^() -> void) [self: instance] -> void } -> void
   def skip_after_action: (*after_action_callback[instance], ?if: after_action_callback[instance], ?unless: after_action_callback[instance], **untyped) ?{ (instance controller) [self: instance] -> void } -> void
   def prepend_before_action: (*before_action_callback[instance], ?if: before_action_callback[instance], ?unless: before_action_callback[instance], **untyped) ?{ (instance controller) [self: instance] -> void } -> void
-  def prepend_around_action: (*around_action_callback[instance], ?if: around_action_callback[instance], ?unless: around_action_callback[instance], **untyped) ?{ (instance controller,  ^() -> void) [self: instance] -> void } -> void
+  def prepend_around_action: (*around_action_callback[instance], ?if: around_action_callback[instance], ?unless: around_action_callback[instance], **untyped) ?{ (instance controller, ^() -> void) [self: instance] -> void } -> void
   def prepend_after_action: (*after_action_callback[instance], ?if: after_action_callback[instance], ?unless: after_action_callback[instance], **untyped) ?{ (instance controller) [self: instance] -> void } -> void
 
   alias append_before_action before_action
@@ -176,7 +176,7 @@ module ActionController
     def include?: (untyped key) -> bool
     def as_json: () -> String
     def to_s: () -> String
-    def each_key: () { (untyped) -> untyped} -> Hash[untyped, untyped]
+    def each_key: () { (untyped) -> untyped } -> Hash[untyped, untyped]
                 | () -> Enumerator[untyped, self]
     def fetch: (untyped key, *untyped args) ?{ () -> untyped } -> untyped
   end
