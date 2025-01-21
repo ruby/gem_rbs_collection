@@ -68,6 +68,49 @@ end
 
 module ActiveModel
   class Errors
+    # Adds +message+ to the error messages and used validator type to +details+ on +attribute+.
+    # More than one error can be added to the same +attribute+.
+    # If no +message+ is supplied, <tt>:invalid</tt> is assumed.
+    #
+    #   person.errors.add(:name)
+    #   # => ["is invalid"]
+    #   person.errors.add(:name, :not_implemented, message: "must be implemented")
+    #   # => ["is invalid", "must be implemented"]
+    #
+    #   person.errors.messages
+    #   # => {:name=>["is invalid", "must be implemented"]}
+    #
+    #   person.errors.details
+    #   # => {:name=>[{error: :not_implemented}, {error: :invalid}]}
+    #
+    # If +message+ is a symbol, it will be translated using the appropriate
+    # scope (see +generate_message+).
+    #
+    # If +message+ is a proc, it will be called, allowing for things like
+    # <tt>Time.now</tt> to be used within an error.
+    #
+    # If the <tt>:strict</tt> option is set to +true+, it will raise
+    # ActiveModel::StrictValidationFailed instead of adding the error.
+    # <tt>:strict</tt> option can also be set to any other exception.
+    #
+    #   person.errors.add(:name, :invalid, strict: true)
+    #   # => ActiveModel::StrictValidationFailed: Name is invalid
+    #   person.errors.add(:name, :invalid, strict: NameIsInvalid)
+    #   # => NameIsInvalid: Name is invalid
+    #
+    #   person.errors.messages # => {}
+    #
+    # +attribute+ should be set to <tt>:base</tt> if the error is not
+    # directly associated with a single attribute.
+    #
+    #   person.errors.add(:base, :name_or_email_blank,
+    #     message: "either name or email must be present")
+    #   person.errors.messages
+    #   # => {:base=>["either name or email must be present"]}
+    #   person.errors.details
+    #   # => {:base=>[{error: :name_or_email_blank}]}
+    def add: (untyped attribute, ?::Symbol | ::String | ^(untyped base, ::Hash[untyped, untyped]) -> (::Symbol | ::String) type, ?::Hash[untyped, untyped] options) -> Error
+
     # Delete messages for +key+. Returns the deleted messages.
     #
     #   person.errors[:name]        # => ["cannot be nil"]
