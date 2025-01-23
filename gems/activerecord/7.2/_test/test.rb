@@ -62,6 +62,7 @@ module Test
   user.strict_loading!
   user.strict_loading!(false, mode: :n_plus_one_only)
   user.strict_loading?
+  user.previously_persisted?
 
   user = User.new
   user.normalize_attribute(:email)
