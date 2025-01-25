@@ -11805,22 +11805,6 @@ module ActiveRecord
     # may be returned on an error.
     def establish_connection: (?untyped? config_or_env) -> untyped
 
-    # Connects a model to the databases specified. The +database+ keyword
-    # takes a hash consisting of a +role+ and a +database_key+.
-    #
-    # This will create a connection handler for switching between connections,
-    # look up the config hash using the +database_key+ and finally
-    # establishes a connection to that config.
-    #
-    #   class AnimalsModel < ApplicationRecord
-    #     self.abstract_class = true
-    #
-    #     connects_to database: { writing: :primary, reading: :primary_replica }
-    #   end
-    #
-    # Returns an array of established connections.
-    def connects_to: (?database: ::Hash[untyped, untyped] database) -> untyped
-
     # Connects to a database or role (ex writing, reading, or another
     # custom role) for the duration of the block.
     #
