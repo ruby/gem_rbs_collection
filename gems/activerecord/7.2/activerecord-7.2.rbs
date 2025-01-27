@@ -172,6 +172,8 @@ module ActiveRecord
   end
 
   module ConnectionHandling
+    def connects_to: (?database: ::Hash[Symbol, Symbol]) -> Array[ConnectionAdapters::ConnectionPool]
+                   | (?shards: ::Hash[Symbol, ::Hash[Symbol, Symbol]]) -> Array[ConnectionAdapters::ConnectionPool]
     def lease_connection: () -> ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 end

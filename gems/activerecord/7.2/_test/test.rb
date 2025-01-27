@@ -6,6 +6,12 @@ require "activerecord"
 module Test
   class ApplicationRecord < ActiveRecord::Base
     primary_abstract_class
+
+    connects_to database: { writing: :primary, reading: :primary_replica }
+    connects_to shards: {
+      default: { writing: :primary, reading: :primary_replica },
+      shard_two: { writing: :primary_shard_two, reading: :primary_shard_replica_two }
+    }
   end
 
   class User < ApplicationRecord
