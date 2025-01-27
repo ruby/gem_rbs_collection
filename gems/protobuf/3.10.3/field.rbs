@@ -4,36 +4,36 @@ module Protobuf
     # Enum collections allows receiving String, Symbol, and Integers for updates.
 
     class FieldArray[Elem, WriteElem] < Array[Elem]
-        attr_reader field: untyped
+      attr_reader field: untyped
 
-        def initialize: (untyped field) -> void
+      def initialize: (untyped field) -> void
 
-        def <<: (WriteElem? val) -> self?
+      def <<: (WriteElem? val) -> self?
 
-        def []=: (int index, WriteElem? obj) -> WriteElem?
+      def []=: (int index, WriteElem? obj) -> WriteElem?
 
-        def push: (WriteElem? val) -> self?
+      def push: (WriteElem? val) -> self?
 
-        def replace: (Array[WriteElem] val) -> self
+      def replace: (Array[WriteElem] val) -> self
 
-        # Return a hash-representation of the given values for this field type.
-        # The value in this case would be an array.
-        def to_hash_value: () -> Array[untyped]
+      # Return a hash-representation of the given values for this field type.
+      # The value in this case would be an array.
+      def to_hash_value: () -> Array[untyped]
 
-        # Return a hash-representation of the given values for this field type
-        # that is safe to convert to JSON.
-        # The value in this case would be an array.
-        def to_json_hash_value: () -> Array[untyped]
+      # Return a hash-representation of the given values for this field type
+      # that is safe to convert to JSON.
+      # The value in this case would be an array.
+      def to_json_hash_value: () -> Array[untyped]
 
-        def to_s: () -> String
+      def to_s: () -> String
 
-        def unshift: (WriteElem? val) -> self?
+      def unshift: (WriteElem? val) -> self?
 
-        private
+      private
 
-        def normalize: (untyped value) -> untyped
+      def normalize: (untyped value) -> untyped
 
-        def raise_type_error: (untyped val) -> bot
+      def raise_type_error: (untyped val) -> bot
     end
 
     class FieldHash[Key, Value, WValue] < Hash[Key, Value]
