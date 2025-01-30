@@ -1,0 +1,30 @@
+module ActiveType
+  module RecordExtension
+    module ClassMethods
+      def []: [T < singleton(ActiveRecord::Base)](T) -> T
+    end
+  end
+
+  module ChangeAssociation
+    module ClassMethods
+      def change_association: (String | Symbol association_name, untyped new_scope, ?Hash[untyped, untyped] new_options) -> void
+                            | (String | Symbol association_name, ?Hash[untyped, untyped] new_options) -> void
+    end
+  end
+
+  class Object < ::ActiveRecord::Base
+  end
+
+  class Record < ::ActiveRecord::Base
+    include RecordExtension
+
+    extend ActiveType::ChangeAssociation::ClassMethods
+    extend ActiveType::RecordExtension::ClassMethods
+  end
+
+  interface _ClassLike[T]
+    def new: (?) -> T
+  end
+
+  def self.cast: [S < _ClassLike[T], T < ActiveRecord::Base] (ActiveRecord::Base object, S klass, ?force: bool) -> T
+end

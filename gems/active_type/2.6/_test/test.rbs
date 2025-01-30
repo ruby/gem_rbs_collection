@@ -1,0 +1,22 @@
+class SignIn < ActiveType::Object
+end
+
+class User < ActiveRecord::Base
+  def credentials: () -> Credential::ActiveRecord_Associations_CollectionProxy
+end
+
+class Credential < ActiveRecord::Base
+  class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+    include ::ActiveRecord::Relation::Methods[Credential, Integer]
+  end
+end
+
+class SignUp < User
+  extend ActiveType::ChangeAssociation::ClassMethods
+
+  def sign_up_func: () -> void
+end
+
+class SignUpCredential < User
+  extend ActiveType::ChangeAssociation::ClassMethods
+end
