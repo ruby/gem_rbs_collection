@@ -20,3 +20,8 @@ BigDecimal("1.23").to_r
 12.3.to_d
 12r.to_d(3)
 0i.to_d
+
+require "bigdecimal/math"
+
+BigMath.E(10)
+BigMath.PI(10)
