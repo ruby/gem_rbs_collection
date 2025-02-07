@@ -8,6 +8,13 @@ module Concurrent
     alias get []
     alias put []=
 
+    def compute: (K key) { (V? old_value) -> V } -> V
+               | (K key) { (V? old_value) -> nil } -> nil
+
+    def compute_if_absent: (K key) { () -> V } -> V
+
+    def compute_if_present: (K key) { (V old_value) -> V? } -> V?
+
     def fetch: (untyped key) -> V
              | [D] (untyped key, D default_value) -> (V | D)
              | [T, D] (T key) { (T key) -> D } -> (V | D)
@@ -15,7 +22,7 @@ module Concurrent
     def fetch_or_store: (untyped key) -> V
                       | (K key, V default_value) -> V
                       | (K key) { (K key) -> V } -> V
-    
+
     def put_if_absent: (K key, V value) -> V?
 
     def value?: (untyped value) -> bool
