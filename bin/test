@@ -4,6 +4,10 @@ require "pathname"
 require "optparse"
 require 'yaml'
 
+excluded_gems = %w[
+  sidekiq-pro
+]
+
 @all = false
 @verbose = false
 
@@ -37,6 +41,12 @@ dirs =
   else
     ARGV.map {|path| Pathname(path) }
   end
+
+dirs.reject! do |path|
+  excluded_gems.any? do |gem_name|
+    path.fnmatch?("gems/#{gem_name}/*")
+  end
+end
 
 def putv(message)
   if @verbose
