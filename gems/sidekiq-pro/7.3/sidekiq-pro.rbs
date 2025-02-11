@@ -1,0 +1,937 @@
+# This RBS is unofficial.
+# The above declaration is a requirement for publishing the RBS for sidekiq-pro and sidekiq-ent, so please do not remove it.
+
+module Sidekiq
+  NAME: "Sidekiq Pro"
+
+  LICENSE: ::String
+end
+
+class Sidekiq::CLI
+  def self.banner: () -> untyped
+end
+
+# Enable various reliability add-ons:
+#
+#   Sidekiq.configure_server do |config|
+#     config.super_fetch!
+#     config.reliable_scheduler!
+#     # enable both
+#     config.reliable!
+#   end
+#
+class Sidekiq::Config
+  def super_fetch!: (?::Hash[untyped, untyped] options) { (?) -> untyped } -> nil
+
+  def reliable_scheduler!: () -> untyped
+
+  def reliable!: () -> untyped
+end
+module Sidekiq
+  class Batch
+    @expiry: untyped
+
+    @bid: untyped
+
+    @key: untyped
+
+    @created_f: untyped
+
+    @description: untyped
+
+    @parent_bid: untyped
+
+    @callback_queue: untyped
+
+    @callbacks: untyped
+
+    @mutable: untyped
+
+    @new: untyped
+
+    @added: untyped
+
+    class Empty
+      include Sidekiq::Job
+
+      def perform: () -> nil
+    end
+
+    def self.redis: (untyped bid) { (?) -> untyped } -> untyped
+
+    def self.newbid: () -> untyped
+
+    def redis: (untyped bid) { (?) -> untyped } -> untyped
+
+    class NoSuchBatch < StandardError
+    end
+
+    class Immutable < RuntimeError
+    end
+
+    ONE_DAY: untyped
+
+    EXPIRY: untyped
+
+    # Controls how long a batch record "lingers" in Redis before expiring.
+    # This allows APIs like Status#poll to check batch status even after
+    # the batch succeeds and is no longer needed.  You can lower this
+    # constant if you create lots of batches, want to reclaim the memory
+    # and don't use polling.
+    LINGER: untyped
+
+    # set this per batch to override LINGER, e.g.
+    #   batch = Sidekiq::Batch.new
+    #   batch.linger = 600 # 10 minutes
+    #   batch.jobs { ... }
+    attr_accessor linger: untyped
+
+    VALID_EVENTS: ::Array["complete" | "success" | "death"]
+
+    attr_reader bid: untyped
+
+    attr_reader callbacks: untyped
+
+    attr_reader parent_bid: untyped
+
+    attr_accessor description: untyped
+
+    attr_accessor callback_queue: untyped
+
+    def initialize: (?untyped? bid) -> void
+
+    def parent: () -> (untyped | nil)
+
+    def expiry: () -> untyped
+
+    def created_at: () -> untyped
+
+    def expires_at: () -> untyped
+
+    # Retrieve the current set of JIDs associated with this batch.
+    def jids: () -> untyped
+
+    def include?: (untyped jid) -> untyped
+
+    alias valid? include?
+
+    def invalidate_all: () -> untyped
+
+    def invalidate_jids: (*untyped jids) -> untyped
+
+    def invalidated?: () -> untyped
+
+    def status: () -> untyped
+
+    def mutable?: () -> untyped
+
+    #
+    # Call a method upon completion or success of a batch.  You
+    # may pass a bare Class, which will call "on_#{event}", or a
+    # String with the exact 'Class#method' to call.
+    #
+    #   batch.on(:complete, MyClass)
+    #   batch.on(:success, 'MyClass#foo')
+    #   batch.on(:complete, MyClass, :email => current_user.email)
+    #   batch.on(:death, MyClass, :email => current_user.email)
+    #
+    # The Class should implement a method signature like this:
+    #
+    #   def on_complete(status, options)
+    #   end
+    #
+    def on: (untyped event, untyped call, ?::Hash[untyped, untyped] options) -> untyped
+
+    #
+    # Pass in a block which pushes all the work associated
+    # with this batch to Sidekiq.
+    #
+    # Returns the set of JIDs added to the batch.
+    #
+    # Note: all jobs defined within the block are pushed to Redis atomically
+    # so either the entire set of jobs are defined successfully or none at all.
+    def jobs: () ?{ (?) -> untyped } -> untyped
+
+    # Not a public API
+    def register: (untyped jid) -> untyped
+
+    private
+
+    def immediate_registration?: () -> untyped
+
+    def increment_batch_jobs_to_redis: (untyped conn, untyped jids) -> (nil | untyped)
+  end
+end
+module Sidekiq
+  class Batch
+    class Callback
+      include Sidekiq::Job
+
+      SUCCESS: "success"
+
+      COMPLETE: "complete"
+
+      DEATH: "death"
+
+      def perform: (untyped event, untyped bid, ?::String queue) -> untyped
+
+      private
+
+      def constantize: (untyped str) -> untyped
+
+      def execute_callback: (untyped status, untyped event, untyped target, untyped options) -> untyped
+
+      def death: (untyped status, untyped queue) -> untyped
+
+      def success: (untyped status, untyped queue) -> untyped
+
+      def complete: (untyped status, untyped queue) -> untyped
+
+      def needs_success?: (untyped bid) -> untyped
+
+      def needs_complete?: (untyped bid) -> untyped
+
+      def needs_callback?: (untyped bid, untyped cb, untyped term) -> untyped
+
+      def enqueue_callback: (untyped queue, untyped args) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module BatchClient
+    def flush: (untyped conn) -> (nil | untyped)
+
+    private
+
+    def collected_payloads: () -> untyped
+
+    def raw_push: (untyped payloads) -> (true | untyped)
+
+    def defining_batch?: () -> untyped
+  end
+end
+class Sidekiq::Batch::Status
+  def dead?: () -> untyped
+
+  # Callers can scan the DeadSet for the given JIDs to
+  # find the canonical copy of the job.
+  def dead_jids: () -> untyped
+
+  def death_at: () -> untyped
+end
+
+class Sidekiq::Batch::DeadSet
+  @_size: untyped
+
+  include Enumerable
+
+  def size: () -> untyped
+
+  def each: () { (untyped) -> untyped } -> untyped
+end
+module Sidekiq
+  class Batch
+    class Client
+      include Sidekiq::ClientMiddleware
+
+      def call: (untyped job_class, untyped msg, untyped queue, untyped redis_pool) { () -> untyped } -> untyped
+    end
+
+    class Server
+      include Sidekiq::ServerMiddleware
+
+      def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
+
+      private
+
+      def add_success: (untyped bid, untyped jid, untyped queue) -> untyped
+
+      def needs_success?: (untyped bid) -> untyped
+
+      def needs_complete?: (untyped bid) -> untyped
+
+      def needs_callback?: (untyped bid, untyped cb, untyped term) -> untyped
+
+      def add_failure: (untyped bid, untyped job, untyped queue, untyped ex) -> untyped
+
+      def enqueue_callback: (untyped queue, untyped args) -> untyped
+    end
+  end
+end
+module Sidekiq
+  class Batch
+    #
+    # A snapshot in time of the current Batch status.
+    #
+    # * total - number of jobs in this batch.
+    # * pending - number of jobs which have not reported success yet.
+    # * failures - number of jobs which have failed.
+    #
+    # Batch job(s) can fail and be retried through Sidekiq's retry feature.
+    # For this reason, a batch is considered complete once all jobs have
+    # been executed, even if one or more executions was a failure.
+    class Status
+      @bid: untyped
+
+      @props: untyped
+
+      @failures: untyped
+
+      @completed: untyped
+
+      @pending: untyped
+
+      @total: untyped
+
+      @parent_batch: untyped
+
+      @parent: untyped
+
+      # nil callbacks can happen if your Redis is not using the `noeviction` maxmemory policy.
+      # https://github.com/sidekiq/sidekiq/wiki/Using-Redis#memory
+      @callbacks: untyped
+
+      attr_reader bid: untyped
+
+      attr_reader failures: untyped
+
+      attr_reader pending: untyped
+
+      attr_reader total: untyped
+
+      def initialize: (untyped bid) -> void
+
+      def load_data: (untyped bid) -> untyped
+
+      def parent_bid: () -> untyped
+
+      def parent_batch: () -> (untyped | nil)
+
+      def parent: () -> (untyped | nil)
+
+      def child_count: () -> untyped
+
+      def linger: () -> untyped
+
+      def expiry: () -> untyped
+
+      def description: () -> untyped
+
+      def callbacks: () -> untyped
+
+      def complete_at: () -> untyped
+
+      def success_at: () -> untyped
+
+      def created_at: () -> untyped
+
+      private
+
+      def time_for: (untyped name) -> untyped
+
+      public
+
+      def expires_at: () -> untyped
+
+      # Remove all info about this batch from Redis.  The main batch
+      # data hash is kept around for 24 hours so it can be queried for status
+      # after success.
+      #
+      # Returns the bid if anything was deleted, nil if nothing was deleted.
+      def delete: () -> untyped
+
+      def deleted?: () -> untyped
+
+      def jids: () -> untyped
+
+      def include?: (untyped jid) -> untyped
+
+      # returns true if any or all jids in the batch have been invalidated.
+      def invalidated?: () -> untyped
+
+      def success_pct: () -> (0 | untyped)
+
+      def pending_pct: () -> (0 | untyped)
+
+      def failure_pct: () -> (0 | untyped)
+
+      # A Batch is considered complete when no jobs are pending or
+      # the only pending jobs have already failed.  Any child batches
+      # must have also completed.
+      def complete?: () -> untyped
+
+      def join: () -> untyped
+
+      def poll: (?::Integer polling_sleep) -> true
+
+      Failure: untyped
+
+      # Batches store job failure info in a Hash, keyed off the bid.
+      # The Hash contains { jid => [class name, error message] }
+      def failure_info: () -> untyped
+
+      def data: () -> { is_complete: untyped, bid: untyped, total: untyped, pending: untyped, description: untyped, failures: untyped, created_at: untyped, complete_at: untyped, success_at: untyped, fail_info: untyped }
+
+      def to_json: () -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Middleware
+    module Server
+      #
+      # Send Sidekiq job metrics to a statsd server.
+      #
+      # Sets global metrics for tracking total jobs, all metrics
+      # include queue and worker tags for more context.
+      #
+      #   jobs.count
+      #   jobs.success
+      #   jobs.failure
+      #
+      # To configure the Statsd connection, you set the global:
+      #
+      #   Sidekiq::Pro.dogstatsd = ->{ Datadog::Statsd.new("hostname", 8125) }
+      #
+      class Statsd
+        include Sidekiq::ServerMiddleware
+
+        # override this Proc if you want to add job-specific tags
+        DEFAULT_OPTIONS: untyped
+
+        attr_accessor self.options: untyped
+
+        def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
+
+        def now: () -> untyped
+      end
+    end
+  end
+end
+module Sidekiq
+  # Allows enumeration of all Batches in Redis.
+  # Example:
+  #
+  #   Sidekiq::BatchSet.new.each do |status|
+  #     puts status.bid
+  #   end
+  class BatchSet
+    @_size: untyped
+
+    include Enumerable
+
+    def size: () -> untyped
+
+    def each: () { (untyped) -> untyped } -> untyped
+  end
+
+  class Queue
+    # Delete a job from the given queue.
+    #
+    # If the queue is being modified concurrently (e.g. another process is
+    # pulling jobs from this queue), it is possible for the job to be "missed".
+    # We iterate through the queue backwards to minimize this possibility.
+    def delete_job: (untyped jid) -> untyped
+
+    # Remove all jobs in the queue with the given class.
+    # Accepts a String or Class but make sure to pass the fully
+    # qualified Class name if you use a String.
+    def delete_by_class: (untyped klass) -> untyped
+
+    def unpause!: () -> untyped
+
+    def pause!: () -> untyped
+
+    def paused?: () -> untyped
+  end
+end
+module Sidekiq
+  module Pro
+    # Adds pause queue support to Sidekiq's basic fetch strategy.
+    module BasicFetch
+      @paused: untyped
+
+      @changed: untyped
+
+      @original: untyped
+
+      @evt: untyped
+
+      @queues: untyped
+
+      def initialize: (untyped config) -> void
+
+      def notify: (untyped verb, untyped payload) -> untyped
+
+      def queues_cmd: () -> untyped
+    end
+  end
+
+  class BasicFetch
+    prepend ::Sidekiq::Pro::BasicFetch
+  end
+end
+module Sidekiq
+  module Pro
+    class BatchStatus
+      @app: untyped
+
+      @mount: untyped
+
+      def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> void
+
+      def call: (untyped env) -> untyped
+    end
+  end
+end
+module Sidekiq::Pro
+  Message: untyped
+
+  #
+  # Allows for real-time configuration updates to be published to all
+  # Sidekiq processes cluster-wise.  For example, pausing and unpausing
+  # queues is now instantaneous via this mechanism.
+  #
+  # Event listeners register their interest via #register and must
+  # supply a `notify(verb, payload)` method.
+  #
+  #   Sidekiq::Pro::Config.register(self)
+  #
+  # You can broadcast a config event via `publish`:
+  #
+  #   Sidekiq::Pro::Config.publish(:boom, { 'some' => 'info' })
+  #
+  # The `notify` method on all registered listeners on all Sidekiq processes
+  # will be called.
+  #
+  # NOTE: pubsub is not persistent so you need to ensure that your listeners
+  # can pull the current state of the system from Redis.
+  #
+  class ConfigListener
+    @config: untyped
+
+    @thread: untyped
+
+    @done: untyped
+
+    @handlers: untyped
+
+    @mydb: untyped
+
+    include Sidekiq::Component
+
+    CHANNEL: "sidekiq:config"
+
+    def initialize: (untyped config) -> void
+
+    def register: (untyped handler) -> untyped
+
+    # Takes a connection because it should be called as part of a larger
+    # `multi` block to update Redis.
+    def publish: (untyped conn, untyped verb, untyped payload) -> untyped
+
+    def start: () -> untyped
+
+    def terminate: (?wait: bool) -> untyped
+
+    private
+
+    # NB: this method does not return
+    def event_loop: (untyped pubsub) { (untyped) -> untyped } -> untyped
+
+    def listen: () -> untyped
+  end
+end
+#
+# Require in your initializer:
+#
+#   require 'sidekiq/pro/expiry'
+#
+# Use like:
+#
+#   class MyJob
+#     include Sidekiq::Job
+#     sidekiq_options expires_in: 30.minutes
+#
+module Sidekiq::Middleware::Expiry
+  class Client
+    include Sidekiq::ClientMiddleware
+
+    def call: (untyped inst, untyped job, untyped queue, untyped redis_pool) { () -> untyped } -> untyped
+  end
+
+  class Server
+    include Sidekiq::ServerMiddleware
+
+    def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
+  end
+end
+module Sidekiq
+  module Job
+    @sbatch: untyped
+
+    attr_accessor bid: untyped
+
+    def batch: () -> (untyped | nil)
+
+    # Verify the job is still considered part of the batch.
+    def valid_within_batch?: () -> untyped
+  end
+end
+class Sidekiq::Config
+  def statsd=: (untyped thing) -> untyped
+
+  alias dogstatsd= statsd=
+
+  def metrics: () ?{ (untyped) -> untyped } -> untyped
+end
+
+module Sidekiq
+  # ##########
+  # Provide implicit `metrics` accessor inside server middleware
+  # and server components.
+  module ServerMiddleware
+    def metrics: () { (?) -> untyped } -> untyped
+  end
+
+  module Component
+    def metrics: () { (?) -> untyped } -> untyped
+  end
+
+  module Pro
+    #
+    # Track useful metrics within Sidekiq Pro and Sidekiq Enterprise.
+    # Set to something that quacks like a ::Datadog::Statsd object from the dogstatsd-ruby gem.
+    #
+    # Datadog::Statsd is a big improvement over basic Statsd, it is recommended.
+    # Configure it in your initializer like this:
+    #
+    #   Sidekiq::Pro.dogstatsd = ->{ ::Datadog::Statsd.new("metrics.acmecorp.com", 8125) }
+    #
+    def self.dogstatsd=: (untyped thing) -> untyped
+
+    def self.metrics: () { (?) -> untyped } -> untyped
+
+    module Metrics
+      #
+      # Support for the improved Statsd API published by Datadog in the dogstatsd-ruby gem.
+      class Dogstatsd
+        @config: untyped
+
+        @statsd: untyped
+
+        include Sidekiq::Component
+
+        attr_reader statsd: untyped
+
+        def initialize: (untyped config, untyped statsd) -> void
+
+        def location: () -> untyped
+
+        def increment: (untyped name, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def decrement: (untyped name, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def gauge: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def count: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def histogram: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def distribution: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def distribution_time: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) { () -> untyped } -> untyped
+
+        def timing: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def set: (untyped name, untyped value, ?::Hash[untyped, untyped] opts) -> untyped
+
+        def time: (untyped name, ?::Hash[untyped, untyped] opts) { () -> untyped } -> untyped
+
+        def batch: () { (?) -> untyped } -> untyped
+
+        def enabled?: () -> true
+
+        def now: () -> untyped
+      end
+
+      #
+      # Support for no metrics
+      class Nil
+        @config: untyped
+
+        include Sidekiq::Component
+
+        def initialize: (untyped config) -> void
+
+        def enabled?: () -> false
+
+        def decrement: (untyped name, ?untyped? opts) -> nil
+
+        def increment: (untyped name, ?untyped? opts) -> nil
+
+        def gauge: (untyped name, untyped value, ?untyped? opts) -> nil
+
+        def count: (untyped name, untyped value, ?untyped? opts) -> nil
+
+        def set: (untyped name, untyped value, ?untyped? opts) -> nil
+
+        def histogram: (untyped name, untyped value, ?untyped? opts) -> nil
+
+        def distribution: (untyped name, untyped value, ?untyped? opts) -> nil
+
+        def distribution_time: (untyped name, untyped value, ?untyped? opts) { () -> untyped } -> untyped
+
+        def timing: (untyped name, untyped value, ?untyped? opts) -> nil
+
+        def time: (untyped name, ?untyped? opts) { () -> untyped } -> untyped
+
+        def batch: () { (untyped) -> untyped } -> untyped
+      end
+    end
+  end
+end
+module Sidekiq
+  # Reliable push is designed to handle transient network failures,
+  # which cause the client to fail to deliver jobs to Redis.  It is not
+  # designed to be a perfectly reliable client but rather an incremental
+  # improvement over the existing client which will just fail in the face
+  # of any networking error.
+  #
+  # Each client process has a local queue, used for storage if a network problem
+  # is detected.  Jobs are pushed to that queue if normal delivery fails.  If
+  # normal delivery succeeds, the local queue is drained of any stored jobs.
+  #
+  # The standard `Sidekiq::Client.push` API returns a JID if the push to redis succeeded
+  # or raises an error if there was a problem.  With reliable push activated,
+  # no Redis networking errors will be raised.
+  #
+  module ReliableClient
+    @@local_queue: untyped
+
+    @redis_pool: untyped
+
+    # Raised if we try to save more than `backup_limit` client payloads.
+    class BufferFull < RuntimeError
+    end
+
+    def local_queue: () -> untyped
+
+    def raw_push: (untyped payloads) -> true
+
+    def drain: () -> untyped
+
+    def save_locally: (untyped pool, untyped payloads, untyped ex) -> untyped
+  end
+
+  class Client
+    def self.reliable_push!: () -> true
+  end
+end
+# Implements Lua-based schedule enqueuer
+module Sidekiq
+  module Scheduled
+    class FastEnq < Sidekiq::Scheduled::Enq
+      @config: untyped
+
+      include Sidekiq::Component
+
+      def initialize: (untyped config) -> void
+
+      def enqueue_jobs: (?untyped now, ?untyped sorted_sets) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Pro
+    module Scripting
+      LUA_SCRIPTS: { super_requeue: "          -- foo\n          local val = redis.call('lrem', KEYS[1], -1, ARGV[1])\n          if val == 1 then\n            redis.call('lpush', KEYS[2], ARGV[1])\n          end\n", queue_delete_by_jid: "          local window = 50\n          local cursor = tonumber(ARGV[2])\n          if cursor == -1 then\n            cursor = redis.call('llen', KEYS[1])\n          end\n          cursor = cursor - window\n          if cursor < 0 then\n            cursor = 0\n          end\n\n          local idx = 0\n          local result = nil\n          local jobs = redis.call('lrange', KEYS[1], cursor, cursor+window-1)\n          for _,jobstr in pairs(jobs) do\n            if string.find(jobstr, ARGV[1]) then\n              local job = cjson.decode(jobstr)\n              if job.jid == ARGV[1] then\n                redis.call('lrem', KEYS[1], 1, jobstr)\n                result = jobstr\n                break\n              end\n            end\n          end\n          if result then\n            return result\n          end\n          if cursor == 0 then\n            return nil\n          else\n            return cursor\n          end\n", fast_enqueue: "          --!df flags=allow-undeclared-keys,disable-atomicity\n          local queue = \"queue:\"\n          local jobs = redis.call('zrange', KEYS[1], '-inf', ARGV[1], \"byscore\", \"limit\", \"0\", \"100\")\n          local count = 0\n          local now = ARGV[1]\n          local toremove = {}\n          for _,jobstr in pairs(jobs) do\n            table.insert(toremove, jobstr)\n\n            -- If you get an error decoding a job, that's likely because you have an ill-formed payload\n            -- somehow. Use a JSON library to generate your jobs, don't build strings by hand.\n            local result, job = pcall(cjson.decode, jobstr)\n            if not result then\n              redis.call('zrem', KEYS[1], unpack(toremove))\n              return redis.error_reply('Bad JSON found by reliable scheduler: ' .. jobstr)\n            end\n\n            -- Hideous hack to work around cjson's braindead large number handling\n            -- https://github.com/sidekiq/sidekiq/issues/2478\n            if job.enqueued_at == nil then\n              jobstr = string.sub(jobstr, 1, string.len(jobstr)-1) .. ',\"enqueued_at\":' .. now .. '}'\n            else\n              -- need to find the enqueued_at value so we can mangle in our own value but it can\n              -- be in 3 different formats: 1234567890.123456, \"1234567890.123456\", or \"2023-06-01T14:41:41Z\"\n              -- Lua doesn't have full POSIX regular expressions with a logical OR operator so we\n              -- need to perform the logical OR with the ugly cascade below.\n\n              -- redis.log(redis.LOG_WARNING, \"Before\", jobstr)\n              local mangle = string.gsub(jobstr, '(\"enqueued_at\":)%d+.%d+', '%1' .. now)\n              if mangle == jobstr then\n                mangle = string.gsub(jobstr, '(\"enqueued_at\":)\"[^\"]+\"', '%1' .. now)\n              end\n              jobstr = mangle\n            end\n\n            redis.call('sadd', KEYS[2], job.queue)\n\n            -- WARNING\n            -- We don't know which queues we'll be pushing jobs to until\n            -- we're actually executing so this script technically violates\n            -- the Redis Cluster requirements for Lua since we can't pass in\n            -- the full list of keys we'll be mutating.\n            redis.call('lpush', queue..job.queue, jobstr)\n\n            count = count + 1\n          end\n          if count > 0 then\n            if count == 100 then\n              redis.call('zrem', KEYS[1], unpack(jobs))\n            else\n              redis.call('zremrangebyscore', KEYS[1], '-inf', ARGV[1])\n            end\n          end\n          return count\n", recover_orphan: "          local jobstr = redis.call('lindex', KEYS[1], -1)\n          if not jobstr then\n            return nil\n          end\n          local result, job = pcall(cjson.decode, jobstr)\n          if not result then\n            return redis.call('lmove', KEYS[1], KEYS[2], 'right', 'left')\n          end\n\n          local count = redis.call('incr', 'orphan-'..job.jid)\n          redis.call('expire', 'orphan-'..job.jid, ARGV[2])\n          if count <= tonumber(ARGV[1]) then\n            return redis.call('lmove', KEYS[1], KEYS[2], 'right', 'left')\n          else\n            local jobstr = redis.call('rpop', KEYS[1])\n            redis.call('zadd', KEYS[3], ARGV[3], jobstr)\n            return {job.class, job.jid, jobstr}\n          end\n" }
+
+      SHAS: ::Hash[untyped, untyped]
+
+      def self.bootstrap: (untyped component) -> untyped
+
+      def self.call: (?untyped? conn, untyped name, untyped keys, untyped args, untyped component) -> untyped
+    end
+  end
+end
+module Sidekiq
+  # Allow targeting of Sidekiq API calls within a block
+  # to a specific shard. Usage:
+  #
+  #   Sidekiq.via(SOME_POOL) do
+  #     Sidekiq::Queue.all.sum(&:size)
+  #   end
+  def self.via: (untyped pool) { () -> untyped } -> untyped
+end
+module Sidekiq::Pro
+  #
+  # Provides reliable queue processing via Redis' rpoplpush command.
+  #
+  # 1. retrieve the work while pushing it to our private queue for this process.
+  # 2. process the work
+  # 3. acknowledge the work by removing it from our private queue
+  #
+  # This process naturally has a drawback: if a job leads to the death of a Sidekiq
+  # process we will recover and execute it over and over, killing the process each time. This
+  # is known as a `poison pill`.
+  #
+  # super_fetch accounts for this two ways:
+  #
+  # 1. We run the recovery process intermittently, so we aren't killing processes rapidly.
+  #    By default super_fetch runs the recovery logic at most once per hour.
+  # 2. We track the number of times we've recovered a given JID. After N recoveries, we
+  #    kill the job so it does not poison the system forever.
+  #
+  class SuperFetch
+    @config: untyped
+
+    @capsule: untyped
+
+    @paused: untyped
+
+    @internal: untyped
+
+    @done: untyped
+
+    @changed: untyped
+
+    @algo: untyped
+
+    @pool: untyped
+
+    @orphan_handler: untyped
+
+    # super_fetch will track recovered JIDs, any jobs that are recovered X
+    # times within Y hours will be killed rather than reprocessed. Those
+    # jobs are considered `poison pills` that lead to process death.
+    @max_recoveries: untyped
+
+    @recovery_window: untyped
+
+    @events: untyped
+
+    @queues: untyped
+
+    PoisonPill: untyped
+
+    include Sidekiq::Component
+
+    attr_reader paused: untyped
+
+    attr_accessor orphan_handler: untyped
+
+    def initialize: (untyped capsule) -> void
+
+    def setup: (untyped block) -> untyped
+
+    def startup: () -> untyped
+
+    def terminate: () -> untyped
+
+    def check: () -> (untyped | nil)
+
+    def name: () -> untyped
+
+    def bulk_requeue: (*untyped) -> untyped
+
+    def private_queue: (untyped q) -> ::String
+
+    def queues: () -> untyped
+
+    def orphan_check?: () -> (false | untyped)
+
+    # This method is extra paranoid verification to check Redis for any possible
+    # orphaned queues with jobs. If we change queue names and lose jobs in the meantime,
+    # this will find old queues with jobs and rescue them. This does not happen often
+    # and so this check does not need to run often. Most orphaned jobs will be found
+    # by cleanup_the_dead.
+    def check_for_orphans: () -> untyped
+
+    # this method iterates thru all registered super_processes and, if their heartbeat
+    # does not exist, iterates thru their work queues and re-enqueues any pending jobs
+    def cleanup_the_dead: () -> (0 | untyped)
+
+    def recover_orphan: (untyped conn, untyped working_queue, untyped public_queue) -> (nil | untyped)
+
+    def notify_orphan: (untyped jobstr, ?untyped? pill) -> (nil | untyped)
+
+    def listen_for_pauses: () -> untyped
+
+    def notify: (untyped verb, untyped payload) -> untyped
+
+    def wait_for_heartbeat: () -> untyped
+
+    # This method can run multiple times, needs to be idempotent
+    def register_myself: () -> untyped
+
+    def retrieve_work: () -> (nil | untyped)
+
+    def get_job: () -> (nil | untyped)
+
+    def active_queues: () -> untyped
+
+    private
+
+    # In a weighted ordering, treat the queues like we're drawing
+    # a queue out of a hat: draw a queue, attempt to fetch work.
+    # Draw another queue, attempt to fetch work.
+    def weighted: (untyped queues) -> untyped
+
+    def strict: (untyped queues) -> (untyped | nil)
+
+    class UnitOfWork
+      @queue: untyped
+
+      @job: untyped
+
+      @local_queue: untyped
+
+      @config: untyped
+
+      @done: untyped
+
+      attr_accessor queue: untyped
+
+      attr_accessor job: untyped
+
+      attr_accessor local_queue: untyped
+
+      attr_accessor config: untyped
+
+      def initialize: (untyped queue, untyped job, untyped local_queue, untyped config) -> void
+
+      def acknowledge: () -> (1 | untyped)
+
+      # To ensure consistency in the batch pending counts, we have to move
+      # job acknowledgment inside the batch acknowledgment transaction
+      def super_ack: (untyped conn) -> untyped
+
+      def queue_name: () -> untyped
+
+      def requeue: () -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Pro
+    VERSION: "7.3.5"
+
+    MAJOR: 7
+
+    def self.gem_version: () -> untyped
+  end
+end
+module Sidekiq::Pro
+  module Web
+    ROOT: untyped
+
+    module Helpers
+      def product_version: () -> ::String
+    end
+
+    def self.with: (untyped options) -> untyped
+
+    def self.registered: (untyped app) -> untyped
+  end
+end
