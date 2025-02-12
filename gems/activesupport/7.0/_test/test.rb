@@ -4,8 +4,8 @@
 require 'active_support/all'
 
 # Test ActiveSupport::NumericWithFormat
-42.to_s
-42.to_s(:phone)
+42.to_fs
+42.to_fs(:phone)
 
 5.try(:to_s)
 5.try('round', 2)
