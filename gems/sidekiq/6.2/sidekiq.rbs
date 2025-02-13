@@ -366,7 +366,7 @@ module Sidekiq
     def size: () -> Integer
 
     # Sidekiq Pro overrides this
-    def paused?: () -> FalseClass
+    def paused?: () -> false
 
     #
     # Calculates this queue's latency, the difference in seconds since the oldest
@@ -451,7 +451,7 @@ module Sidekiq
 
     #
     # Place job in the dead set
-    def kill: () -> TrueClass
+    def kill: () -> true
 
     def error?: () -> bool
 
@@ -543,7 +543,7 @@ module Sidekiq
   class DeadSet < JobSet
     def initialize: () -> void
 
-    def kill: (String message, ?Hash[Symbol, untyped] opts) -> TrueClass
+    def kill: (String message, ?Hash[Symbol, untyped] opts) -> true
 
     def retry_all: () -> void
 
@@ -665,8 +665,6 @@ module Sidekiq
       # Return type depends on the type returned by klass.call
       def invoke: (*untyped args) { () -> untyped } -> untyped
     end
-
-    private
 
     class Entry
       attr_reader klass: untyped

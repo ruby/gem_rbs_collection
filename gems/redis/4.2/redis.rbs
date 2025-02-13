@@ -113,7 +113,6 @@ class Redis
   def mget: (*String keys) -> Array[String?]
           | [T] (*String keys) { (Array[String?]) -> T } -> T
 
-
   # Decrement the integer value of a key by one.
   #
   # @example
@@ -214,8 +213,8 @@ class Redis
   def zcard: (_ToS key) -> Integer
   def zadd: (_ToS key, *untyped args, ?nx: bool, ?ch: bool, ?incr: bool) -> (bool | Integer | Float)
           | (_ToS key, *untyped args, ?xx: bool, ?ch: bool, ?incr: bool) -> (bool | Integer | Float)
-  def zincrby: (_ToS key, Integer|Float|"-inf"|"+inf" increment, String member) -> Float
-  def zrem: (_ToS key, String|Array[String] member) -> (bool | Integer)
+  def zincrby: (_ToS key, Integer | Float | "-inf" | "+inf" increment, String member) -> Float
+  def zrem: (_ToS key, String | Array[String] member) -> (bool | Integer)
 
   # Disconnect the client as quickly and silently as possible.
   def close: () -> void
