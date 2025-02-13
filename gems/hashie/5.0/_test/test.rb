@@ -3,4 +3,4 @@
 
 require "hashie"
 
-mash = Hashie::Mash.new(a: 1)
+mash = Hashie::Mash.new
