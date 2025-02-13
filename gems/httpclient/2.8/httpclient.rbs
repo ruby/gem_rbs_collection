@@ -360,19 +360,19 @@ class HTTPClient
   extend _DelegateMethods
 
   def patch: (
-             String | URI uri,
-             ?query: query,
-             ?body: body,
-             ?header: header,
-             ?follow_redirect: bool
-           ) -> HTTP::Message
-         | (
-             String | URI uri,
-             ?query: query,
-             ?body: body,
-             ?header: header,
-             ?follow_redirect: bool
-           ) { (String) -> void } -> HTTP::MessageNil
+               String | URI uri,
+               ?query: query,
+               ?body: body,
+               ?header: header,
+               ?follow_redirect: bool
+             ) -> HTTP::Message
+           | (
+               String | URI uri,
+               ?query: query,
+               ?body: body,
+               ?header: header,
+               ?follow_redirect: bool
+             ) { (String) -> void } -> HTTP::MessageNil
   def initialize: (
                     ?proxy: untyped,
                     ?agent_name: untyped,
@@ -471,8 +471,8 @@ class HTTPClient
                       ) -> Connection
 
   class Connection
-    def pop: -> HTTP::MessageIO
-    def join: -> nil
+    def pop: () -> HTTP::MessageIO
+    def join: () -> nil
   end
 end
 
@@ -482,27 +482,27 @@ module HTTP
       def []: (String key) -> Array[String]
     end
 
-    def status: -> Integer
+    def status: () -> Integer
     alias code status
     alias status_code status
 
-    def http_header: -> Headers
+    def http_header: () -> Headers
     alias header http_header
-    def content: -> String
+    def content: () -> String
     alias body content
 
-    def headers: -> Hash[String, String]
+    def headers: () -> Hash[String, String]
   end
 
   # MessageIO is only rbs class for async reponse
   class MessageIO < Message
-    def content: -> IO
+    def content: () -> IO
     alias body content
   end
 
   # MessageNil is only rbs class for async reponse
   class MessageNil < Message
-    def content: -> nil
+    def content: () -> nil
     alias body content
   end
 end
