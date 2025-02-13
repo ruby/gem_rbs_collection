@@ -40,6 +40,7 @@ User.offset(5).limit(10)
 User.count
 User.create_with(name: 'name', age: 1)
 User.create_with(nil)
+User.find_by_sql("SELECT * FROM users")
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
