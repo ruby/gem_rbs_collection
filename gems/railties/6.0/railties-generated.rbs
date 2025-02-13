@@ -107,8 +107,6 @@ module Rails
 
     def self.app_generator: () -> untyped
 
-    private
-
     def self.generator_options: () -> untyped
   end
 end
@@ -251,7 +249,7 @@ module Rails
 
         def method_missing: (untyped method, *untyped args) -> untyped
 
-        def respond_to_missing?: (untyped symbol) -> ::TrueClass
+        def respond_to_missing?: (untyped symbol) -> true
       end
 
       private
@@ -788,7 +786,7 @@ module Rails
 
       include Actions
 
-      def self.exit_on_failure?: () -> ::FalseClass
+      def self.exit_on_failure?: () -> false
 
       # Returns true when the app is a Rails engine.
       def self.engine?: () -> untyped
@@ -925,8 +923,6 @@ module Rails
     module Spellchecker
       def self.suggest: (untyped word, from: untyped from) -> untyped
 
-      private
-
       def self.levenshtein_distance: (untyped str1, untyped str2) -> untyped
     end
   end
@@ -954,8 +950,6 @@ module Rails
 
     def self.print_commands: () -> untyped
 
-    private
-
     COMMANDS_IN_USAGE: ::Array[untyped]
 
     def self.commands: () -> untyped
@@ -974,7 +968,7 @@ module Rails
       # :nodoc:
       # We want to exit on failure to be kind to other libraries
       # This is only when accessing via CLI
-      def self.exit_on_failure?: () -> ::TrueClass
+      def self.exit_on_failure?: () -> true
     end
   end
 
@@ -1240,8 +1234,6 @@ module Rails
 
       def self.perform: (untyped task) -> untyped
 
-      private
-
       def self.rake_tasks: () -> untyped
 
       def self.formatted_rake_tasks: () -> untyped
@@ -1350,7 +1342,7 @@ module Rails
 
       def perform: () -> untyped
 
-      def server_options: () -> { user_supplied_options: untyped, server: untyped, :log_stdout => untyped, Port: untyped, Host: untyped, DoNotReverseLookup: ::TrueClass, config: untyped, environment: untyped, daemonize: untyped, pid: untyped, caching: untyped, restart_cmd: untyped, early_hints: untyped }
+      def server_options: () -> { user_supplied_options: untyped, server: untyped, :log_stdout => untyped, Port: untyped, Host: untyped, DoNotReverseLookup: true, config: untyped, environment: untyped, daemonize: untyped, pid: untyped, caching: untyped, restart_cmd: untyped, early_hints: untyped }
 
       private
 
@@ -1486,7 +1478,7 @@ module Rails
     def new_session: () { (untyped) -> untyped } -> untyped
 
     # reloads the environment
-    def reload!: (?bool print) -> ::TrueClass
+    def reload!: (?bool print) -> true
   end
 end
 
@@ -1511,8 +1503,6 @@ module Rails
     def self.enable_by_file: () -> untyped
 
     def self.enable_by_argument: (untyped caching) -> untyped
-
-    private
 
     def self.create_cache_file: () -> untyped
 
@@ -2304,7 +2294,7 @@ module Rails
 
       attr_accessor rails_template: untyped
 
-      def self.strict_args_position: () -> ::FalseClass
+      def self.strict_args_position: () -> false
 
       def self.add_shared_options_for: (untyped name) -> untyped
 
@@ -2447,7 +2437,7 @@ module Rails
 
       include Rails::Generators::Actions
 
-      def self.exit_on_failure?: () -> ::FalseClass
+      def self.exit_on_failure?: () -> false
 
       # Returns the source root for this generator using default_source_root as default.
       def self.source_root: (?untyped? path) -> untyped
@@ -4007,8 +3997,6 @@ module Rails
     # commands.
     def self.invoke: (untyped namespace, ?untyped args, ?::Hash[untyped, untyped] config) -> untyped
 
-    private
-
     def self.print_list: (untyped base, untyped namespaces) -> untyped
 
     # Try fallbacks for the given base.
@@ -4570,8 +4558,6 @@ module Rails
 
     def self.read_for_editing: () { () -> untyped } -> untyped
 
-    private
-
     def self.handle_missing_key: () -> untyped
 
     def self.read_key_file: () -> untyped
@@ -4735,8 +4721,6 @@ module Rails
       def self.load_tests: (untyped argv) -> untyped
 
       def self.compose_filter: (untyped runnable, untyped filter) -> untyped
-
-      private
 
       def self.extract_filters: (untyped argv) -> untyped
     end
