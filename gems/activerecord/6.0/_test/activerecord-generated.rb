@@ -4,6 +4,8 @@ class FunQuery
 end
 
 class User < ActiveRecord::Base
+  # @dynamic age
+
   enum status: { active: 0, inactive: 1 }, _suffix: true
   enum role: { admin: 0, user: 1 }, _prefix: :user_role
 
@@ -41,6 +43,10 @@ User.count
 User.create_with(name: 'name', age: 1)
 User.create_with(nil)
 User.find_by_sql("SELECT * FROM users")
+
+users = User.all
+users.sum(:age)
+users.sum(&:age)
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
