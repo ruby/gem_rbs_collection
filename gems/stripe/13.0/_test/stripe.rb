@@ -37,3 +37,6 @@ end
 Stripe::Price.list('price_12345').auto_paging_each do |price|
   price.active
 end
+
+# payment intent
+Stripe::PaymentIntent.cancel('pi_12345')
