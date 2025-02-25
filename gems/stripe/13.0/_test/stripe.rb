@@ -32,3 +32,8 @@ end
 if list.has_more
   list.next_page.each {}
 end
+
+# price
+Stripe::Price.list('price_12345').auto_paging_each do |price|
+  price.active
+end
