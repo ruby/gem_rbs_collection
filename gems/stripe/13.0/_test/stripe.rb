@@ -40,3 +40,8 @@ end
 
 # payment intent
 Stripe::PaymentIntent.cancel('pi_12345')
+
+# product
+Stripe::Product.list.auto_paging_each do |product|
+  product.name
+end
