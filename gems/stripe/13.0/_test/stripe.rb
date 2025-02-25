@@ -23,6 +23,9 @@ end
 
 # payment method
 list = Stripe::Customer.list_payment_methods('cus_12345')
+list.auto_paging_each do |payment_method|
+  payment_method.type.upcase
+end
 list.each do |payment_method|
   payment_method.detach
 end
