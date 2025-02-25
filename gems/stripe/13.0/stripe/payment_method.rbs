@@ -1,0 +1,261 @@
+module Stripe
+  # PaymentMethod objects represent your customer's payment instruments.
+  # You can use them with [PaymentIntents](https://stripe.com/docs/payments/payment-intents) to collect payments or save them to
+  # Customer objects to store instrument details for future payments.
+  #
+  # Related guides: [Payment Methods](https://stripe.com/docs/payments/payment-methods) and [More Payment Scenarios](https://stripe.com/docs/payments/more-payment-scenarios).
+  class PaymentMethod < APIResource
+    include _PaymentMethod
+
+    def self.object_name: () -> "payment_method"
+
+    # Detaches a PaymentMethod object from a Customer. After a PaymentMethod is detached, it can no longer be used for a payment or re-attached to a Customer.
+    def detach: (?untyped params, ?untyped opts) -> untyped
+
+    # Detaches a PaymentMethod object from a Customer. After a PaymentMethod is detached, it can no longer be used for a payment or re-attached to a Customer.
+    def self.detach: (untyped payment_method, ?untyped params, ?untyped opts) -> untyped
+  end
+
+  # https://docs.stripe.com/api/payment_methods/object
+  interface _PaymentMethod
+    def acss_debit: () -> untyped
+
+    def acss_debit=: (untyped) -> untyped
+
+    def affirm: () -> untyped
+
+    def affirm=: (untyped) -> untyped
+
+    def afterpay_clearpay: () -> untyped
+
+    def afterpay_clearpay=: (untyped) -> untyped
+
+    def alipay: () -> untyped
+
+    def alipay=: (untyped) -> untyped
+
+    # This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to “unspecified”.
+    def allow_redisplay: () -> ("always" | "limited" | "unspecified")
+
+    # This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to “unspecified”.
+    def allow_redisplay=: (("always" | "limited" | "unspecified")) -> ("always" | "limited" | "unspecified")
+
+    def alma: () -> untyped
+
+    def alma=: (untyped) -> untyped
+
+    def amazon_pay: () -> untyped
+
+    def amazon_pay=: (untyped) -> untyped
+
+    def au_becs_debit: () -> untyped
+
+    def au_becs_debit=: (untyped) -> untyped
+
+    def bacs_debit: () -> untyped
+
+    def bacs_debit=: (untyped) -> untyped
+
+    def bancontact: () -> untyped
+
+    def bancontact=: (untyped) -> untyped
+
+    def billing_details: () -> untyped
+
+    def billing_details=: (untyped) -> untyped
+
+    def blik: () -> untyped
+
+    def blik=: (untyped) -> untyped
+
+    def boleto: () -> untyped
+
+    def boleto=: (untyped) -> untyped
+
+    def card: () -> untyped
+
+    def card=: (untyped) -> untyped
+
+    def card_present: () -> untyped
+
+    def card_present=: (untyped) -> untyped
+
+    def cashapp: () -> untyped
+
+    def cashapp=: (untyped) -> untyped
+
+    # Time at which the object was created. Measured in seconds since the Unix epoch.
+    def created: () -> Integer
+
+    # Time at which the object was created. Measured in seconds since the Unix epoch.
+    def created=: (Integer) -> Integer
+
+    # The ID of the Customer to which this PaymentMethod is saved. This will not be set when the PaymentMethod has not been saved to a Customer.
+    def customer: () -> String?
+
+    # The ID of the Customer to which this PaymentMethod is saved. This will not be set when the PaymentMethod has not been saved to a Customer.
+    def customer=: (String?) -> String?
+
+    def customer_balance: () -> untyped
+
+    def customer_balance=: (untyped) -> untyped
+
+    def eps: () -> untyped
+
+    def eps=: (untyped) -> untyped
+
+    def fpx: () -> untyped
+
+    def fpx=: (untyped) -> untyped
+
+    def giropay: () -> untyped
+
+    def giropay=: (untyped) -> untyped
+
+    def grabpay: () -> untyped
+
+    def grabpay=: (untyped) -> untyped
+
+    # Unique identifier for the object.
+    def id: () -> String
+
+    # Unique identifier for the object.
+    def id=: (String) -> String
+
+    def ideal: () -> untyped
+
+    def ideal=: (untyped) -> untyped
+
+    def interac_present: () -> untyped
+
+    def interac_present=: (untyped) -> untyped
+
+    def kakao_pay: () -> untyped
+
+    def kakao_pay=: (untyped) -> untyped
+
+    def klarna: () -> untyped
+
+    def klarna=: (untyped) -> untyped
+
+    def konbini: () -> untyped
+
+    def konbini=: (untyped) -> untyped
+
+    def kr_card: () -> untyped
+
+    def kr_card=: (untyped) -> untyped
+
+    def link: () -> untyped
+
+    def link=: (untyped) -> untyped
+
+    # Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
+    def livemode: () -> bool
+
+    # Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
+    def livemode=: (bool) -> bool
+
+    # Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+    def metadata: () -> untyped?
+
+    # Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+    def metadata=: (untyped?) -> untyped?
+
+    def mobilepay: () -> untyped
+
+    def mobilepay=: (untyped) -> untyped
+
+    def multibanco: () -> untyped
+
+    def multibanco=: (untyped) -> untyped
+
+    def naver_pay: () -> untyped
+
+    def naver_pay=: (untyped) -> untyped
+
+    # String representing the object's type. Objects of the same type share the same value.
+    def object: () -> "payment_method"
+
+    # String representing the object's type. Objects of the same type share the same value.
+    def object=: ("payment_method") -> "payment_method"
+
+    def oxxo: () -> untyped
+
+    def oxxo=: (untyped) -> untyped
+
+    def p24: () -> untyped
+
+    def p24=: (untyped) -> untyped
+
+    def pay_by_bank: () -> untyped
+
+    def pay_by_bank=: (untyped) -> untyped
+
+    def payco: () -> untyped
+
+    def payco=: (untyped) -> untyped
+
+    def paynow: () -> untyped
+
+    def paynow=: (untyped) -> untyped
+
+    def paypal: () -> untyped
+
+    def paypal=: (untyped) -> untyped
+
+    def pix: () -> untyped
+
+    def pix=: (untyped) -> untyped
+
+    def promptpay: () -> untyped
+
+    def promptpay=: (untyped) -> untyped
+
+    def radar_options: () -> untyped
+
+    def radar_options=: (untyped) -> untyped
+
+    def revolut_pay: () -> untyped
+
+    def revolut_pay=: (untyped) -> untyped
+
+    def samsung_pay: () -> untyped
+
+    def samsung_pay=: (untyped) -> untyped
+
+    def sepa_debit: () -> untyped
+
+    def sepa_debit=: (untyped) -> untyped
+
+    def sofort: () -> untyped
+
+    def sofort=: (untyped) -> untyped
+
+    def swish: () -> untyped
+
+    def swish=: (untyped) -> untyped
+
+    def twint: () -> untyped
+
+    def twint=: (untyped) -> untyped
+
+    # The type of the PaymentMethod. An additional hash is included on the PaymentMethod with a name matching this value. It contains additional information specific to the PaymentMethod type.
+    def type: () -> ("acss_debit" | "affirm" | "afterpay_clearpay" | "alipay" | "alma" | "amazon_pay" | "au_becs_debit" | "bacs_debit" | "bancontact" | "blik" | "boleto" | "card" | "card_present" | "cashapp" | "customer_balance" | "eps" | "fpx" | "giropay" | "grabpay" | "ideal" | "interac_present" | "kakao_pay" | "klarna" | "konbini" | "kr_card" | "link" | "mobilepay" | "multibanco" | "naver_pay" | "oxxo" | "p24" | "pay_by_bank" | "payco" | "paynow" | "paypal" | "pix" | "promptpay" | "revolut_pay" | "samsung_pay" | "sepa_debit" | "sofort" | "swish" | "twint" | "us_bank_account" | "wechat_pay" | "zip")
+
+    # The type of the PaymentMethod. An additional hash is included on the PaymentMethod with a name matching this value. It contains additional information specific to the PaymentMethod type.
+    def type=: (("acss_debit" | "affirm" | "afterpay_clearpay" | "alipay" | "alma" | "amazon_pay" | "au_becs_debit" | "bacs_debit" | "bancontact" | "blik" | "boleto" | "card" | "card_present" | "cashapp" | "customer_balance" | "eps" | "fpx" | "giropay" | "grabpay" | "ideal" | "interac_present" | "kakao_pay" | "klarna" | "konbini" | "kr_card" | "link" | "mobilepay" | "multibanco" | "naver_pay" | "oxxo" | "p24" | "pay_by_bank" | "payco" | "paynow" | "paypal" | "pix" | "promptpay" | "revolut_pay" | "samsung_pay" | "sepa_debit" | "sofort" | "swish" | "twint" | "us_bank_account" | "wechat_pay" | "zip")) -> ("acss_debit" | "affirm" | "afterpay_clearpay" | "alipay" | "alma" | "amazon_pay" | "au_becs_debit" | "bacs_debit" | "bancontact" | "blik" | "boleto" | "card" | "card_present" | "cashapp" | "customer_balance" | "eps" | "fpx" | "giropay" | "grabpay" | "ideal" | "interac_present" | "kakao_pay" | "klarna" | "konbini" | "kr_card" | "link" | "mobilepay" | "multibanco" | "naver_pay" | "oxxo" | "p24" | "pay_by_bank" | "payco" | "paynow" | "paypal" | "pix" | "promptpay" | "revolut_pay" | "samsung_pay" | "sepa_debit" | "sofort" | "swish" | "twint" | "us_bank_account" | "wechat_pay" | "zip")
+
+    def us_bank_account: () -> untyped
+
+    def us_bank_account=: (untyped) -> untyped
+
+    def wechat_pay: () -> untyped
+
+    def wechat_pay=: (untyped) -> untyped
+
+    def zip: () -> untyped
+
+    def zip=: (untyped) -> untyped
+  end
+end
