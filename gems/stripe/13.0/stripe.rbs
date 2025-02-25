@@ -45,8 +45,13 @@ module Stripe
             | () { ([Symbol, untyped]) -> void } -> void
   end
 
+  interface _HasMore
+    def has_more: () -> bool
+  end
+
   class ListObject[Elem < StripeObject] < StripeObject
     include Enumerable[untyped]
+    include _HasMore
 
     def list: (?untyped filters, ?untyped opts) -> self
     def create: (?untyped params, ?untyped opts) -> Elem
