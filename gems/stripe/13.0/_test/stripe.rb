@@ -20,3 +20,12 @@ refund.status
 customer.sources.each do |source|
   source.id
 end
+
+# payment method
+list = Stripe::Customer.list_payment_methods('cus_12345')
+list.each do |payment_method|
+  payment_method.detach
+end
+if list.has_more
+  list.next_page.each {}
+end

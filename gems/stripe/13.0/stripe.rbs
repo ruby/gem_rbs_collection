@@ -45,8 +45,13 @@ module Stripe
             | () { ([Symbol, untyped]) -> void } -> void
   end
 
+  interface _HasMore
+    def has_more: () -> bool
+  end
+
   class ListObject[Elem < StripeObject] < StripeObject
     include Enumerable[untyped]
+    include _HasMore
 
     def list: (?untyped filters, ?untyped opts) -> self
     def create: (?untyped params, ?untyped opts) -> Elem
@@ -63,6 +68,18 @@ module Stripe
 
     # Returns true if the page object contains no elements.
     def empty?: () -> bool
+
+    # Fetches the next page in the resource list (if there is one).
+    #
+    # This method will try to respect the limit of the current page. If none
+    # was given, the default limit will be fetched again.
+    def next_page: (?untyped params, ?untyped opts) -> self
+
+    # Fetches the previous page in the resource list (if there is one).
+    #
+    # This method will try to respect the limit of the current page. If none
+    # was given, the default limit will be fetched again.
+    def previous_page: (?untyped params, ?untyped opts) -> self
   end
 
   class APIResource < StripeObject
