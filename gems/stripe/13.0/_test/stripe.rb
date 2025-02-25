@@ -32,3 +32,16 @@ end
 if list.has_more
   list.next_page.each {}
 end
+
+# price
+Stripe::Price.list('price_12345').auto_paging_each do |price|
+  price.active
+end
+
+# payment intent
+Stripe::PaymentIntent.cancel('pi_12345')
+
+# product
+Stripe::Product.list.auto_paging_each do |product|
+  product.name
+end
