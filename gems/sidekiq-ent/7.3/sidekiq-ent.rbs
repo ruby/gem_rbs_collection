@@ -1,0 +1,1992 @@
+# This RBS is unofficial.
+# The above declaration is a requirement for publishing the RBS for sidekiq-pro and sidekiq-ent, so please do not remove it.
+
+module Sidekiq
+  NAME: "Sidekiq Enterprise"
+
+  LICENSE: ::String
+end
+
+module Sidekiq::Component
+  def leader?: () -> untyped
+end
+module Sidekiq
+  module Enterprise
+    # The leader runs this code nightly to scan the current Sidekiq
+    # Enterprise cluster and upload census data to contribsys.  This collection
+    # is allowed under Section 11 of the COMM-LICENSE.
+    #
+    # It uploads aggregate metrics and license info, never any source code or user data.
+    #
+    class Census
+      @config: untyped
+
+      @helpers: untyped
+
+      @creds: untyped
+
+      @rver: untyped
+
+      @sver: untyped
+
+      @ever: untyped
+
+      @thread: untyped
+
+      include Sidekiq::Component
+
+      def initialize: (untyped config, ?untyped settings, ?::String hostname, ?untyped helpers) -> void
+
+      def start: () -> (nil | untyped)
+
+      def user: () -> untyped
+
+      def pwd: () -> untyped
+
+      def perform: () -> true
+
+      # Leaders send their daily census report during the hour of 3AM Pacific
+      def pause: (?::Integer hour) -> untyped
+
+      def valid?: () -> (false | true)
+
+      def env: () -> untyped
+
+      def minute: () -> untyped
+
+      def scale_metrics: () -> ::Array[untyped]
+
+      def network_call: (untyped uri) -> untyped
+
+      def fallback: (untyped p) -> nil
+
+      def urlsafe_encode64: (untyped bin) -> untyped
+
+      def parameterize: () -> { v: 1, tag: untyped, rver: untyped, sver: untyped, ever: untyped, threads: untyped, processes: untyped, jobs: untyped, user: untyped }
+
+      def fetch_creds: (untyped settings, untyped hostname) -> (untyped | ::String | nil)
+    end
+  end
+end
+module Sidekiq
+  # keep these names short to minimize overhead
+  Enc: untyped
+
+  module Enterprise
+    # This class can auto-{en,de}crypt a secret argument for
+    # sensitive payloads.  You enable the feature by
+    # initializing it:
+    #
+    #   Sidekiq::Enterprise::Crypto.enable(active_version: 1) do |version|
+    #     <return key>
+    #   end
+    #
+    # where the block must return the bytes of the symmetric key to use
+    # for encryption and decryption of the given version.  With key rotation,
+    # you bump the active_version and supply the new key for that new version.
+    #
+    # You can create a random key using OpenSSL and `irb`:
+    #
+    #   require 'openssl'
+    #   File.open("/tmp/my1.key", "w") { |file| file.write(OpenSSL::Cipher.new("aes-256-cbc").random_key) }
+    #
+    # and now tell Sidekiq about it:
+    #
+    #   Sidekiq::Enterprise::Crypto.enable(active_version: 1) do |version|
+    #     File.read("/tmp/my#{version}.key")
+    #   end
+    #
+    # If using Heroku, you can load the secret key into an ENV var and access that instead.
+    #
+    # Once you've set up the crypto subsystem, you can activate encryption for a
+    # given Job's arguments like so:
+    #
+    #     class MySecretJob
+    #       include Sidekiq::Job
+    #       sidekiq_options encrypt: true
+    #
+    # NOTES
+    # ----------
+    #
+    # * Encryption adds about 100 bytes to the size of arguments.  My MBP can perform about 70,000 enc/dec
+    #   round trips per second.
+    # * **ONLY** the last argument is encrypted.  Any error message and backtrace will still be plaintext within a job.
+    # * The unique jobs feature will not work on encrypted jobs, since all encrypted arguments are unique.
+    #
+    module Crypto
+      def self.enable: (?::Hash[untyped, untyped] opts) { (?) -> untyped } -> untyped
+
+      class Default
+        @version: untyped
+
+        @block: untyped
+
+        @cipher: untyped
+
+        KEYS: ::Hash[untyped, untyped]
+
+        def initialize: (?::Hash[untyped, untyped] opts) { (?) -> untyped } -> void
+
+        def key_for: (untyped version) -> untyped
+
+        # Encrypts `thing`, returns a blob of binary data.
+        def encrypt: (untyped thing) -> untyped
+
+        # Decrypts the blob of data, returning `thing`
+        def decrypt: (untyped blob) -> untyped
+      end
+
+      SCHEMES: ::Hash[untyped, untyped]
+
+      NON_BASE64: ::Regexp
+
+      class Client
+        include Sidekiq::ClientMiddleware
+
+        def call: (untyped job_klass, untyped job, untyped queue, untyped redis_pool) { () -> untyped } -> untyped
+
+        def encrypt: (untyped thing, untyped scheme) -> untyped
+      end
+
+      class Server
+        include Sidekiq::ServerMiddleware
+
+        def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
+
+        def decrypt: (untyped str, untyped scheme) -> untyped
+      end
+    end
+  end
+end
+# This code courtesy of https://github.com/kanwei/algorithms
+#
+# MIT License
+#
+# Copyright (c) 2009 Kanwei Li
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+module Containers
+end
+
+class Containers::Heap
+  @compare_fn: untyped
+
+  @next: untyped
+
+  @size: untyped
+
+  @stored: untyped
+
+  include Enumerable
+
+  # call-seq:
+  #     size -> int
+  #
+  # Return the number of elements in the heap.
+  attr_reader size: untyped
+
+  alias length size
+
+  # call-seq:
+  #     Heap.new(optional_array) { |x, y| optional_comparison_fn } -> new_heap
+  #
+  # If an optional array is passed, the entries in the array are inserted into the heap with
+  # equal key and value fields. Also, an optional block can be passed to define the function
+  # that maintains heap property. For example, a min-heap can be created with:
+  #
+  #     minheap = Heap.new { |x, y| (x <=> y) == -1 }
+  #     minheap.push(6)
+  #     minheap.push(10)
+  #     minheap.pop #=> 6
+  #
+  # Thus, smaller elements will be parent nodes. The heap defaults to a min-heap if no block
+  # is given.
+  def initialize: (?untyped ary) ?{ (?) -> untyped } -> void
+
+  def inspect: () -> ::String
+
+  # call-seq:
+  #     push(key, value) -> value
+  #     push(value) -> value
+  #
+  # Inserts an item with a given key into the heap. If only one parameter is given,
+  # the key is set to the value.
+  #
+  # Complexity: O(1)
+  #
+  #     heap = MinHeap.new
+  #     heap.push(1, "Cat")
+  #     heap.push(2)
+  #     heap.pop #=> "Cat"
+  #     heap.pop #=> 2
+  def push: (untyped key, ?untyped value) -> untyped
+
+  alias << push
+
+  # call-seq:
+  #     has_key?(key) -> true or false
+  #
+  # Returns true if heap contains the key.
+  #
+  # Complexity: O(1)
+  #
+  #     minheap = MinHeap.new([1, 2])
+  #     minheap.has_key?(2) #=> true
+  #     minheap.has_key?(4) #=> false
+  def has_key?: (untyped key) -> (true | false)
+
+  # call-seq:
+  #     next -> value
+  #     next -> nil
+  #
+  # Returns the value of the next item in heap order, but does not remove it.
+  #
+  # Complexity: O(1)
+  #
+  #     minheap = MinHeap.new([1, 2])
+  #     minheap.next #=> 1
+  #     minheap.size #=> 2
+  def next: () -> untyped
+
+  # call-seq:
+  #     next_key -> key
+  #     next_key -> nil
+  #
+  # Returns the key associated with the next item in heap order, but does not remove the value.
+  #
+  # Complexity: O(1)
+  #
+  #     minheap = MinHeap.new
+  #     minheap.push(1, :a)
+  #     minheap.next_key #=> 1
+  #
+  def next_key: () -> untyped
+
+  # call-seq:
+  #     clear -> nil
+  #
+  # Removes all elements from the heap, destructively.
+  #
+  # Complexity: O(1)
+  #
+  def clear: () -> nil
+
+  # call-seq:
+  #     empty? -> true or false
+  #
+  # Returns true if the heap is empty, false otherwise.
+  def empty?: () -> untyped
+
+  # call-seq:
+  #     pop -> value
+  #     pop -> nil
+  #
+  # Returns the value of the next item in heap order and removes it from the heap.
+  #
+  # Complexity: O(1)
+  #
+  #     minheap = MinHeap.new([1, 2])
+  #     minheap.pop #=> 1
+  #     minheap.size #=> 1
+  def pop: () -> (nil | untyped)
+
+  alias next! pop
+
+  # call-seq:
+  #     change_key(key, new_key) -> [new_key, value]
+  #     change_key(key, new_key) -> nil
+  #
+  # Changes the key from one to another. Doing so must not violate the heap property or
+  # an exception will be raised. If the key is found, an array containing the new key and
+  # value pair is returned, otherwise nil is returned.
+  #
+  # In the case of duplicate keys, an arbitrary key is changed. This will be investigated
+  # more in the future.
+  #
+  # Complexity: amortized O(1)
+  #
+  #     minheap = MinHeap.new([1, 2])
+  #     minheap.change_key(2, 3) #=> raise error since we can't increase the value in a min-heap
+  #     minheap.change_key(2, 0) #=> [0, 2]
+  #     minheap.pop #=> 2
+  #     minheap.pop #=> 1
+  def change_key: (untyped key, untyped new_key, ?bool delete) -> (nil | ::Array[untyped])
+
+  # call-seq:
+  #     delete(key) -> value
+  #     delete(key) -> nil
+  #
+  # Deletes the item with associated key and returns it. nil is returned if the key
+  # is not found. In the case of nodes with duplicate keys, an arbitrary one is deleted.
+  #
+  # Complexity: amortized O(log n)
+  #
+  #     minheap = MinHeap.new([1, 2])
+  #     minheap.delete(1) #=> 1
+  #     minheap.size #=> 1
+  def delete: (untyped key) -> (untyped | nil)
+
+  # Node class used internally
+  class Node
+    @key: untyped
+
+    @value: untyped
+
+    @degree: untyped
+
+    @marked: untyped
+
+    @right: untyped
+
+    @left: untyped
+
+    attr_accessor parent: untyped
+
+    attr_accessor child: untyped
+
+    attr_accessor left: untyped
+
+    attr_accessor right: untyped
+
+    attr_accessor key: untyped
+
+    attr_accessor value: untyped
+
+    attr_accessor degree: untyped
+
+    attr_accessor marked: untyped
+
+    def initialize: (untyped key, untyped value) -> void
+
+    def marked?: () -> untyped
+  end
+
+  private
+
+  # make node a child of a parent node
+  def link_nodes: (untyped child, untyped parent) -> untyped
+
+  # Makes sure the structure does not contain nodes in the root list with equal degrees
+  def consolidate: () -> untyped
+
+  def cascading_cut: (untyped node) -> untyped
+
+  # remove x from y's children and add x to the root list
+  def cut: (untyped x, untyped y) -> untyped
+end
+
+# A MinHeap is a heap where the items are returned in ascending order of key value.
+class Containers::MinHeap < Containers::Heap
+  # call-seq:
+  #     MinHeap.new(ary) -> new_heap
+  #
+  # Creates a new MinHeap with an optional array parameter of items to insert into the heap.
+  # A MinHeap is created by calling Heap.new { |x, y| (x <=> y) == -1 }, so this is a convenience class.
+  #
+  #     minheap = MinHeap.new([1, 2, 3, 4])
+  #     minheap.pop #=> 1
+  #     minheap.pop #=> 2
+  def initialize: (?untyped ary) -> void
+
+  # call-seq:
+  #     min -> value
+  #     min -> nil
+  #
+  # Returns the item with the smallest key, but does not remove it from the heap.
+  #
+  #     minheap = MinHeap.new([1, 2, 3, 4])
+  #     minheap.min #=> 1
+  def min: () -> untyped
+
+  # call-seq:
+  #     min! -> value
+  #     min! -> nil
+  #
+  # Returns the item with the smallest key and removes it from the heap.
+  #
+  #     minheap = MinHeap.new([1, 2, 3, 4])
+  #     minheap.min! #=> 1
+  #     minheap.size #=> 3
+  def min!: () -> untyped
+end
+# Implements a simple HTTP-server by using John W. Small's (jsmall@laser.net)
+# ruby-generic-server: GServer.
+class Sidekiq::HttpServer < ::GServer
+  @handler: untyped
+
+  #
+  # +handle_obj+ specifies the object, that receives calls from +request_handler+
+  # and +ip_auth_handler+
+  def initialize: (untyped handle_obj, ?::Integer port, ?untyped host, ?::Integer maxConnections, ?untyped stdlog, ?bool audit, ?bool debug) -> void
+
+  private
+
+  CRLF: "\r\n"
+
+  HTTP_PROTO: "HTTP/1.0"
+
+  SERVER_NAME: ::String
+
+  # Default header for the server name
+  DEFAULT_HEADER: { "Server" => untyped }
+
+  # Mapping of status codes and error messages
+  StatusCodeMapping: { 200 => "OK", 400 => "Bad Request", 403 => "Forbidden", 405 => "Method Not Allowed", 411 => "Length Required", 500 => "Internal Server Error" }
+
+  class Request
+    @header: untyped
+
+    @data: untyped
+
+    @method: untyped
+
+    @path: untyped
+
+    @proto: untyped
+
+    attr_reader data: untyped
+
+    attr_reader header: untyped
+
+    attr_reader method: untyped
+
+    attr_reader path: untyped
+
+    attr_reader proto: untyped
+
+    def initialize: (untyped data, ?untyped? method, ?untyped? path, ?untyped? proto) -> void
+
+    def content_length: () -> (nil | untyped)
+  end
+
+  class Response
+    @status: untyped
+
+    @status_message: untyped
+
+    @header: untyped
+
+    attr_reader header: untyped
+
+    attr_accessor body: untyped
+
+    attr_accessor status: untyped
+
+    attr_accessor status_message: untyped
+
+    def initialize: (?::Integer status) -> void
+  end
+
+  # A case-insensitive Hash class for HTTP header
+  class Table
+    @hash: untyped
+
+    include Enumerable
+
+    def initialize: (?::Hash[untyped, untyped] hash) -> void
+
+    def []: (untyped key) -> untyped
+
+    def []=: (untyped key, untyped value) -> untyped
+
+    def update: (untyped hash) -> self
+
+    def each: () { (untyped, untyped) -> untyped } -> untyped
+
+    # Output the Hash table for the HTTP header
+    def writeTo: (untyped port) -> untyped
+  end
+
+  # Generates a Hash with the HTTP headers
+  def http_header: (?untyped? header) -> untyped
+
+  # Returns a string which represents the time as rfc1123-date of HTTP-date
+  def http_date: (untyped aTime) -> untyped
+
+  # Returns a string which includes the status code message as,
+  # http headers, and body for the response.
+  def http_resp: (untyped status_code, ?untyped? status_message, ?untyped? header, ?untyped? body) -> untyped
+
+  # Handles the HTTP request and writes the response back to the client, +io+.
+  #
+  # If an Exception is raised while handling the request, the client will receive
+  # a 500 "Internal Server Error" message.
+  def serve: (untyped io) -> untyped
+end
+module Sidekiq
+  module Limiter
+    self.@redis: untyped
+
+    LEGAL_NAME: ::Regexp
+
+    DEFAULT_TTL: untyped
+
+    DEFAULT_RESCHEDULE: 20
+
+    DEFAULT_OPTIONS: { lock_timeout: 30, wait_timeout: 5, policy: :raise, ttl: untyped, reschedule: untyped }
+
+    class OverLimit < ::RuntimeError
+      @limiter: untyped
+
+      attr_accessor limiter: untyped
+
+      def initialize: (untyped limiter) -> void
+
+      def to_s: () -> untyped
+    end
+
+    # Globally configure the Limiter subsystem:
+    #
+    # Sidekiq::Limiter.configure do |config|
+    #   config.redis = { url: 'redis://localhost/0' }
+    #   config.errors << Foo::Bar
+    #   config.backoff = ->(limiter, job, ex) do
+    #     10
+    #   end
+    # end
+    def self.configure: () { (untyped) -> untyped } -> untyped
+
+    def self.redis=: (untyped pool) -> untyped
+
+    def self.redis: () ?{ (untyped) -> untyped } -> untyped
+
+    def self.redis_pool: () -> untyped
+
+    def self.logger: () -> untyped
+
+    DEFAULT_BACKOFF: untyped
+
+    attr_accessor self.errors: untyped
+
+    attr_accessor self.backoff: untyped
+
+    #
+    # Register a concurrent rate limiter within Redis.
+    #
+    # Limit to 50 concurrent ERP operations:
+    #
+    #     Sidekiq::Limiter.concurrent(:erp, 50, wait_timeout: 10)
+    #
+    # Options:
+    #   :ttl - time for the data to live in Redis, default 90 days
+    #   :lock_timeout - seconds before a concurrent lock is automatically released, necessary if a
+    #     process crashes while holding a lock, default 30.  **Your concurrent operations
+    #     must take less than this amount of time!**
+    #   :wait_timeout - seconds to wait for the rate limit or raises a
+    #     Sidekiq::Limiter::OverLimit, 0 means never wait, default 5
+    #   :policy - what should the API do if rate limit cannot be met, legal values: [:raise, :skip],
+    #     :raise will raise Sidekiq::Limiter::OverLimit, :skip will return without executing the block,
+    #     defaults to :raise
+    #   :backoff - a Proc(limiter, job, ex) which calculates an integer number of seconds to pause before retrying in case of OverLimit
+    #
+    def self.concurrent: (String name, Integer count, ?Hash[Symbol, untyped] options) -> Sidekiq::Limiter::Concurrent
+
+    #
+    # Register a bucket-based rate limiter within Redis.  Buckets can be
+    # per :second, :minute, :hour or :day.
+    #
+    # Limit Stripe operations to 10 per second:
+    #
+    #     Sidekiq::Limiter.bucket(:stripe, 10, :second)
+    #
+    # Bucket means that you can perform 10 operations at 12:44:03.999 and
+    # then another 10 operations at 12:44:04.000, because each interval is
+    # considered a bucket.
+    #
+    # Options:
+    #   :ttl - time for the data to live in Redis, default 90 days
+    #   :wait_timeout - seconds to wait for the rate limit or raises a
+    #     Sidekiq::Limiter::OverLimit, 0 means never wait, default 5
+    #   :policy - what should the API do if rate limit cannot be met, legal values: [:raise, :skip],
+    #     :raise will raise Sidekiq::Limiter::OverLimit, :skip will return without executing the block,
+    #     defaults to :raise
+    #   :backoff - a Proc(limiter, job, ex) which calculates an integer number of seconds to pause before retrying in case of OverLimit
+    #
+    def self.bucket: (untyped name, untyped count, untyped interval, ?::Hash[untyped, untyped] options) -> untyped
+
+    #
+    # Register a "leaky bucket"-based rate limiter within Redis.
+    # You define it to allow X operations per Y seconds.
+    #
+    # The leaky bucket allows the caller to perform X operations immediately
+    # but then the bucket slowly leaks, emptying over Y seconds.
+    #
+    # Limit Shopify operations to 20 every 5 seconds:
+    #
+    #     Sidekiq::Limiter.leaky(:shopify, 20, 5)
+    #
+    # One important note:
+    #
+    #     Sidekiq::Limiter.leaky(:shopify, 4, :second)
+    #     Sidekiq::Limiter.leaky(:shopify, 240, :minute)
+    #
+    # These are the same ratios (240 / 60) vs (20 / 5) vs (4 / 1) with one important
+    # caveat: the numerator is the burst allowance. The user can only
+    # burst 4 operations before throttling, whereas the previous allows
+    # 20 operations before throttling. The last one allows 240 simultaneous
+    # operations before throttling, it's up to you to determine how much burst leeway
+    # you want to give to your users. Once full, they all drain at the same rate.
+    #
+    # Options:
+    #   :ttl - time for the data to live in Redis, default 24 hours
+    #   :wait_timeout - seconds to wait for the rate limit or raises a
+    #     Sidekiq::Limiter::OverLimit, 0 means never wait, default 5
+    #   :policy - what should the API do if rate limit cannot be met, legal values: [:raise, :skip],
+    #     :raise will raise Sidekiq::Limiter::OverLimit, :skip will return without executing the block,
+    #     defaults to :raise
+    #   :backoff - a Proc(limiter, job, ex) which calculates an integer number of seconds to pause before retrying in case of OverLimit
+    #
+    def self.leaky: (untyped name, untyped count, untyped interval, ?::Hash[untyped, untyped] options) -> untyped
+
+    #
+    # Register a points-based leaky bucket rate limiter within Redis.
+    # This type of limiter is frequently used with GraphQL APIs from
+    # companies like Shopify or GitHub. For example: you get 10,000 points per
+    # minute. An arbitrary GraphQL query might use 300 or 1000 points.
+    # You need to provide an estimate for the number of points which will be consumed by
+    # your operation and the rate limiter will ensure your call has at least that many points
+    # left.
+    #
+    # For Shopify:
+    #
+    #   > Each combination of app and store is given a bucket of 1000 cost points, with a leak rate
+    #   > of 50 cost points per second. This means that the total cost of your queries cannot exceed
+    #   > 1,000 points at any given time, and that room is created in the app’s bucket at a rate of
+    #   > 50 points per second.
+    #
+    #     Sidekiq::Limiter.points(:shopify, 1000, 20)
+    #
+    # Options:
+    #   :ttl - time for the data to live in Redis, default 24 hours
+    #   :wait_timeout - seconds to wait for the rate limit or raises a
+    #     Sidekiq::Limiter::OverLimit, 0 means never wait, default 5
+    #   :policy - what should the API do if rate limit cannot be met, legal values: [:raise, :skip],
+    #     :raise will raise Sidekiq::Limiter::OverLimit, :skip will return without executing the block,
+    #     defaults to :raise
+    #   :backoff - a Proc(limiter, job, ex) which calculates an integer number of seconds to pause before retrying in case of OverLimit
+    #
+    def self.points: (untyped name, untyped count, untyped interval, ?::Hash[untyped, untyped] options) -> untyped
+
+    #
+    # Register a sliding-window-based rate limiter within Redis.  The window can be
+    # per :second, :minute, :hour or :day.
+    #
+    # Limit banking operations to 10 per second:
+    #
+    #     Sidekiq::Limiter.window(:banking, 10, :second)
+    #
+    # Options:
+    #   :ttl - time for the data to live in Redis, default 90 days
+    #   :wait_timeout - seconds to wait for the rate limit or raises a
+    #     Sidekiq::Limiter::OverLimit, 0 means never wait, default 5
+    #   :policy - what should the API do if rate limit cannot be met, legal values: [:raise, :skip],
+    #     :raise will raise Sidekiq::Limiter::OverLimit, :skip will return without executing the block,
+    #     defaults to :raise
+    #   :backoff - a Proc(limiter, job, ex) which calculates an integer number of seconds to pause before retrying in case of OverLimit
+    #
+    def self.window: (untyped name, untyped count, untyped interval, ?::Hash[untyped, untyped] options) -> untyped
+
+    # Provide a simple unlimited rate limiter for test environments and bypassing
+    # an existing rate limit in certain cases.  Allow any args so it can
+    # dynamically swap with a real limiter.
+    def self.unlimited: (*untyped args) -> untyped
+  end
+end
+module Sidekiq::Enterprise
+  class Liveness < Sidekiq::HttpServer
+    @config: untyped
+
+    @key: untyped
+
+    include Sidekiq::Component
+
+    def initialize: (untyped iface, ?untyped cfg) ?{ (untyped) -> untyped } -> void
+
+    def ip_auth_handler: (*untyped) -> true
+
+    def request_handler: (untyped req, untyped res) -> untyped
+  end
+end
+
+class Sidekiq::Config
+  #
+  # Start a simple HTTP server which returns 200/OK and JSON data if the current
+  # process is alive, used for Kubernetes health checks and similar.
+  #
+  # Examples:
+  #   health_check(":7433") # binds to all interfaces, 0.0.0.0
+  #   health_check("127.0.0.1:7433")
+  #   health_check("[::1]:7433")
+  #   health_check(7433) # binds to 127.0.0.1
+  def health_check: (?::Integer iface) { (?) -> untyped } -> untyped
+end
+class Sidekiq::Config
+  def retain_history: (?::Integer interval) { (?) -> untyped } -> untyped
+end
+
+module Sidekiq
+  module Enterprise
+    class History
+      @config: untyped
+
+      @done: untyped
+
+      @interval: untyped
+
+      @thread: untyped
+
+      include Sidekiq::Component
+
+      attr_accessor interval: untyped
+
+      attr_accessor custom: untyped
+
+      def initialize: (untyped config) -> void
+
+      def start: () -> untyped
+
+      def stop: () -> untyped
+
+      def run: () -> untyped
+
+      def capture: () -> untyped
+
+      def capture_default: (untyped stats) -> untyped
+    end
+  end
+end
+class Sidekiq::Config
+  #
+  # A Loop generates jobs on some schedule, e.g. process new orders every 15 minutes.
+  # Loops are registered on startup.
+  #
+  # Here's how to register a loop:
+  #
+  #   Sidekiq.configure_server do |config|
+  #     config.periodic do |mgr|
+  #       mgr.register "*/4 * * * * *", "ProcessOrders", retry: 3
+  #     end
+  #   end
+  #
+  def periodic: () ?{ (untyped) -> untyped } -> (untyped | nil)
+end
+
+module Sidekiq
+  module Periodic
+    class LoopSet
+      @lids: untyped
+
+      include Enumerable
+
+      def initialize: () -> void
+
+      def size: () -> untyped
+
+      def each: () { (untyped) -> untyped } -> untyped
+    end
+
+    class Loop
+      @lid: untyped
+
+      @klass: untyped
+
+      @schedule: untyped
+
+      @tz_name: untyped
+
+      @options: untyped
+
+      @source: untyped
+
+      attr_reader klass: untyped
+
+      attr_reader schedule: untyped
+
+      attr_reader lid: untyped
+
+      attr_reader tz_name: untyped
+
+      attr_reader options: untyped
+
+      def initialize: (untyped lid) -> void
+
+      def next_run: () -> untyped
+
+      def time_source: () -> untyped
+
+      # returns [jid, epoch integer] pairs for each execution
+      def history: () -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Enterprise
+    module Scripting
+      LUA: ::Hash[untyped, untyped]
+
+      SHAS: ::Hash[untyped, untyped]
+
+      def self.bootstrap: (untyped config) -> untyped
+
+      def self.call: (untyped name, untyped keys, untyped args, untyped config) -> untyped
+    end
+  end
+end
+module Sidekiq
+  #
+  # The Senate abstraction allows a cluster of Sidekiq processes,
+  # all talking through a shared Redis instance, to elect and maintain
+  # a leader.
+  #
+  # Leaders renew leadership every 15 seconds.  If they have not renewed within
+  # 60 seconds, any other connected processes can assume leadership.
+  #
+  # When shutting down, the Leader "steps down" so that a new process can immediately
+  # assume leadership upon startup.  Note that a "quiet" leader process still runs
+  # its leadership tasks.  It does not step down until TERM - this is to ensure cron
+  # jobs are still fired even during a long quiet period.
+  #
+  class Senate
+    @config: untyped
+
+    @key: untyped
+
+    @leader_until: untyped
+
+    @keys: untyped
+
+    @args: untyped
+
+    @done: untyped
+
+    @thread: untyped
+
+    @listener: untyped
+
+    @sleeper: untyped
+
+    include Sidekiq::Component
+
+    TTL: 60
+
+    def initialize: (untyped config) -> void
+
+    def terminate: () -> untyped
+
+    def start: () -> untyped
+
+    def stop!: () -> (nil | untyped)
+
+    def leader?: () -> untyped
+
+    def stage_coup!: () -> (false | untyped)
+
+    def cycle: () -> untyped
+
+    def election: () -> untyped
+
+    private
+
+    # You can use this ENV variable to mark a Sidekiq process
+    # unelectable. #5817
+    def apolitical?: () -> untyped
+
+    def update_leader: () -> untyped
+
+    def interval: () -> untyped
+  end
+end
+module Sidekiq
+  module Enterprise
+    class Systemd
+      @active: untyped
+
+      def initialize: () -> void
+
+      def watchdog!: () -> (untyped | nil)
+
+      def stopping: () -> (untyped | nil)
+
+      def ready: () -> (untyped | nil)
+    end
+
+    # Create a set of child Sidekiq processes underneath a parent
+    # process.  We use Bundler.require to pull in the entire set of
+    # gems used by the application so we get benefit of CoW memory sharing.
+    #
+    # Note that we fork the children before loading the app so we won't get
+    # as much memory saving as we could otherwise. App preload is fraught
+    # with peril; gem preload is safer.
+    class Swarm
+      @env: untyped
+
+      @argv: untyped
+
+      @signal: untyped
+
+      @io: untyped
+
+      @ppid: untyped
+
+      @count: untyped
+
+      @children: untyped
+
+      @trackmem: untyped
+
+      @stopping: untyped
+
+      @max_kb: untyped
+
+      @last_spawn: untyped
+
+      @systemd: untyped
+
+      @preload: untyped
+
+      @cmd: untyped
+
+      @memthread: untyped
+
+      BOOT_TIMEOUT: 60
+
+      attr_accessor count: untyped
+
+      attr_accessor children: untyped
+
+      attr_accessor io: untyped
+
+      attr_accessor ppid: untyped
+
+      def initialize: (?untyped env, ?untyped argv, ?untyped signal) -> void
+
+      def start: () -> untyped
+
+      def prepare_for_fork: () -> untyped
+
+      def parse: () -> untyped
+
+      def start_and_monitor: () -> untyped
+
+      def monitor: (?bool wait) -> (nil | untyped)
+
+      def check_children: (untyped last) -> untyped
+
+      def ps_cmd: () -> untyped
+
+      private
+
+      def current_time: () -> untyped
+
+      def log: (untyped str) -> untyped
+
+      def track_memory: () -> untyped
+
+      def ps_output: () -> untyped
+
+      # NB: monkeypatch point
+      def oom_signal: () -> "USR2"
+
+      def terminate_sidekiq: (untyped pid) -> untyped
+
+      def signal: (untyped sig) -> untyped
+
+      def kill: (untyped sig, untyped pid) -> untyped
+
+      def spawn: (untyped idx) -> untyped
+
+      def forkit: () -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Enterprise
+    #
+    # The Unique middleware adds a check before the push of a Sidekiq
+    # job to Redis to see if the same job is already thought to be within Redis.
+    #
+    # This sets a tag in Redis which expires in N seconds. The same job cannot
+    # be enqueued while this tag exists.
+    #
+    # When `perform` returns successfully we clear the tag so another identical
+    # job can be enqueued at that point.  A raised error does **not** clear out
+    # the tag so the same job cannot be pushed while the errored job is pending retry.
+    #
+    # If you are scheduling a unique job to run in the future, the uniqueness
+    # will last until after the job is scheduled to run:
+    #
+    #     class MyUniqueJob
+    #       include Sidekiq::Job
+    #       sidekiq_options unique_for: 5 minutes
+    #     end
+    #     MyUniqueJob.perform_in(1.hour, 1, 2, 3)
+    #
+    # Other duplicate jobs will be ignored for 65 minutes or until the job runs
+    # successfully (in 60 minutes).
+    #
+    # You can "force push" a job to Redis by overriding `unique_for` to false:
+    #
+    #     MyUniqueJob.set(unique_for: false).perform_async(1,2,3)
+    #
+    # There are several caveats with this feature and ways in which it can fail.
+    # Do not depend on it for guaranteed uniqueness but rather as a way to prune
+    # redundant jobs.  Your jobs should still be idempotent.
+    #
+    # Caveats:
+    #
+    # 1. Only works with simple parameters, no symbols, objects, etc, as the parameters
+    #    must go thru the JSON serialization round trip without modification.
+    # 2. If the job raises an error and does not retry, the tag will remain in Redis
+    #    until it expires.  If you don't want jobs to retry, you should also set their
+    #    uniqueness period very short.
+    #
+    # Usage:
+    #
+    # In your initializer:
+    #
+    #     Sidekiq::Enterprise.unique! unless Rails.env.test?
+    #
+    # In your job:
+    #
+    #     sidekiq_options unique_for: 20.minutes
+    #
+    module Unique
+      UNIQUE_KEY: "unique_for"
+
+      UNIQUE_UNTIL: "unique_until"
+
+      LOCKED_KEY: "unlocks_at"
+
+      TOKEN_KEY: "unique_token"
+
+      # Check to see if the unique lock is currently present
+      # for the given (queue, klass, args) tuple.  Keep in mind that
+      # the args must be *exactly* what would be deserialized
+      # from JSON so no symbols, objects or non-JSON datatypes.
+      #
+      # Note this method IS RACY.  It can return false and then another
+      # thread take the lock microseconds later - treat it as advisory only.
+      #
+      # Returns truthy if the unique lock is present.
+      #
+      def self.locked?: (?untyped? queue, untyped klass, untyped args) -> untyped
+
+      # Special case AJ's wrapper class so unique locks can work
+      # with AJ's special argument handling.
+      def self.default_context_for: (untyped _, untyped job) -> ::Array[untyped]
+
+      # If you wish to control the elements which Sidekiq Enterprise
+      # uses to calculate the lock, you can implement `sidekiq_unique_context`
+      # as a class method on your job. This method should return the Array of
+      # elements. See above for the default implementation which handles both
+      # Sidekiq::Job and ActiveJob::Base.
+      def self.context_for: (untyped _, untyped job) -> untyped
+
+      class Client
+        include Sidekiq::ClientMiddleware
+
+        def call: (untyped inst, untyped job, untyped queue, untyped redis_pool) { () -> untyped } -> (untyped | false)
+      end
+
+      def self.unlock: (untyped job, ?untyped cfg) -> (nil | untyped)
+
+      class Server
+        include Sidekiq::ServerMiddleware
+
+        def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
+      end
+    end
+
+    def self.unique!: () -> untyped
+  end
+end
+module Sidekiq
+  module Enterprise
+    VERSION: "7.3.4"
+
+    MAJOR: 7
+
+    def self.gem_version: () -> untyped
+  end
+end
+module Sidekiq::Enterprise
+  module Web
+    ROOT: untyped
+
+    module Helpers
+      def product_version: () -> ::String
+    end
+
+    def self.registered: (untyped app) -> untyped
+
+    class Authorization
+      @app: untyped
+
+      @authorize: untyped
+
+      def initialize: (untyped app) { (?) -> untyped } -> void
+
+      def call: (untyped env) -> untyped
+    end
+  end
+end
+
+class Sidekiq::Web
+  def self.authorize: () { (?) -> untyped } -> untyped
+end
+module Sidekiq
+  module Limiter
+    class Base
+      @name: untyped
+
+      @options: untyped
+
+      @wait_for: untyped
+
+      attr_reader name: untyped
+
+      attr_reader options: untyped
+
+      attr_reader wait_for: untyped
+
+      def initialize: (untyped name, untyped options) -> void
+
+      def key: () -> untyped
+
+      def status: () -> untyped
+
+      def backoff: () -> untyped
+
+      def ttl: () -> untyped
+
+      def policy: () -> untyped
+
+      def reschedule: () -> untyped
+
+      def to_s: () -> untyped
+
+      def pause: (untyped length) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    class Bucket < Base
+      @size: untyped
+
+      @interval: untyped
+
+      # this doesn't need to be thread-safe as this operation
+      # is idempotent so the race condition is fine.
+      @done: untyped
+
+      @key: untyped
+
+      @data_ttl: untyped
+
+      INTERVALS: untyped
+
+      attr_reader interval: untyped
+
+      attr_reader size: untyped
+
+      alias count size
+
+      # Create a rate limiter of +size+ per +interval+, e.g. 5 per second.
+      #
+      # Resets at the start of each interval so it's possible to perform
+      # more than +size+ operations in a given interval, e.g. you can perform 5
+      # operations at 12:03:58.999 and then another 5 operations at 12:03:59.001
+      # since the interval resets at 12:03:59.000.
+      #
+      # Name should be a URL-safe descriptor, i.e. "user_12345", not "Bob's Rate".
+      #
+      def initialize: (untyped name, untyped size, untyped interval, untyped options) -> void
+
+      def establish: () -> untyped
+
+      def key: () -> untyped
+
+      #
+      # Yield if the current interval has not gone over limit.
+      # :used is the number of points used by this call, defaulting to 1.
+      #
+      # If this is a :second-based limiter, will +sleep+ up to
+      # +wait_timeout+ seconds until it can fit within limit or
+      # raise Sidekiq::Limiter::OverLimit.
+      def within_limit: (?used: ::Integer) { () -> void } -> void
+
+      private
+
+      # How long the bucket data will persist.
+      # Note that we store all bucket data for one time
+      # period larger than the interval.  If this is a
+      # :second bucket, we'll store 60 buckets of data for
+      # a minute of data.  If this is an :hour bucket, we'll
+      # store 24 buckets for a day of data.
+      #
+      # This gives us recent usage history that we can display
+      # in the Web UI without having to worry about truly
+      # long term storage.
+      def data_ttl: () -> untyped
+
+      def bucket_name: () -> ::String
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    def self.within_all_limits: (*untyped limiters) { () -> untyped } -> untyped
+  end
+end
+module Sidekiq
+  module Limiter
+    #
+    # A concurrent limiter allows a block to execute iff it can
+    # obtain a token. It tracks the following metrics:
+    #
+    # - Number of times a thread got a token immediately
+    # - Number of times a thread had to wait for a token
+    # - Number of times a thread could not get a token.
+    # - Number of times a thread held a token for more than the locktime
+    # - Total wait time to get a token
+    # - Total held time for a token
+    #
+    # +name+ should be a URL-safe descriptor, i.e. "user_12345", not "Bob's Rate".
+    # +policy+ can be :raise (default) to raise OverLimit if a token cannot be obtained within +wait_timeout+,
+    #   or :ignore if the block should be skipped if the rate limit can't be fulfilled.
+    #
+    class Concurrent < Base
+      @free: untyped
+
+      @pend: untyped
+
+      @used: untyped
+
+      @size: untyped
+
+      # this doesn't need to be thread-safe as this operation
+      # is idempotent so the race condition is fine.
+      @done: untyped
+
+      @lock_for: untyped
+
+      @key: untyped
+
+      attr_reader size: untyped
+
+      def initialize: (untyped name, untyped size, untyped options) -> void
+
+      def establish: () -> untyped
+
+      def lock_for: () -> untyped
+
+      def key: () -> untyped
+
+      def within_limit: () { () -> untyped } -> (nil | untyped)
+
+      private
+
+      def unlock: (untyped lockdata, untyped holdstart) -> untyped
+
+      def lock: () -> (::Array[untyped | ::Float] | ::Array[untyped] | nil)
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    #
+    # Implements a leaky bucket rate limiter.
+    #
+    # Each limiter is bucket which holds X drops. The bucket
+    # drains in Y seconds, a drop every (Y/X) seconds. Callers
+    # may fill up the bucket as fast as they want but once full,
+    # future calls will be throttled based on the drain rate.
+    class LeakyBucket < Base
+      @size: untyped
+
+      @interval: untyped
+
+      @key: untyped
+
+      attr_reader size: untyped
+
+      attr_reader interval: untyped
+
+      def initialize: (untyped name, untyped size, untyped interval, untyped options) -> void
+
+      def key: () -> untyped
+
+      def within_limit: () { () -> untyped } -> (untyped | nil)
+
+      class Result
+        @limiter: untyped
+
+        @next_drip: untyped
+
+        attr_reader next_drip: untyped
+
+        attr_reader limiter: untyped
+
+        def initialize: (untyped limiter, untyped next_drip) -> void
+
+        def method_missing: (*untyped args) -> untyped
+
+        def respond_to_missing?: (untyped name) -> untyped
+      end
+
+      private
+
+      def to_sec: (untyped val) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    class Middleware
+      include Sidekiq::ServerMiddleware
+
+      def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
+
+      private
+
+      def reschedule: (untyped inst, untyped ex, untyped msg, untyped limiter, untyped copy_of_args) -> untyped
+
+      def maximum_reschedules: (untyped limiter, untyped job) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    #
+    # Implements a points-based rate limiter.
+    #
+    # This is an implementation of the leaky-bucket algorithm, wherein a
+    # bucket of fixed size is filled with points at a given rate. Each operation
+    # is associated with a cost, and the operation is only allowed if the total cost
+    # of the operation is less than or equal to the current number of points in the bucket.
+    #
+    # Caller must provide an estimate of the expected cost in points and then use `points_used`
+    # to report the actual number of points consumed. The remote service will typically respond
+    # with the points consumed, e.g. via an HTTP Response Header or within the response payload.
+    #
+    #   limiter.within_limit(estimate: 400) do |result|
+    #     # make call
+    #     actual_pts = 300
+    #     result.points_used(actual_pts)
+    #   end
+    #
+    # To be clear, `points_used` is strictly optional. Using it ensures Sidekiq doesn't prematurely
+    # limit your calls if you are overestimating the cost.
+    class Points < Base
+      @size: untyped
+
+      @interval: untyped
+
+      @key: untyped
+
+      attr_reader size: untyped
+
+      attr_reader interval: untyped
+
+      def initialize: (untyped name, untyped size, untyped interval, ?::Hash[untyped, untyped] options) -> void
+
+      def key: () -> untyped
+
+      def within_limit: (estimate: untyped) { (untyped) -> untyped } -> (untyped | nil)
+
+      class Result
+        @limiter: untyped
+
+        @wait_time: untyped
+
+        @estimate: untyped
+
+        @points_left: untyped
+
+        @actual: untyped
+
+        attr_reader limiter: untyped
+
+        attr_reader wait_time: untyped
+
+        attr_reader estimate: untyped
+
+        attr_reader points_left: untyped
+
+        attr_reader actual: untyped
+
+        def initialize: (untyped limiter, untyped wait_time, untyped estimate, untyped points_left) -> void
+
+        # After making the call to the remote side which consumes the points,
+        # call this method with the actual points consumed so the points tracking
+        # is as accurate as possible.
+        def points_used: (untyped actual_pts) -> nil
+
+        # This is realtime data and can change at any moment based
+        # on usage from other jobs/threads.
+        def current_points: () -> untyped
+
+        def method_missing: (*untyped args) -> untyped
+
+        def respond_to_missing?: (untyped name) -> untyped
+
+        def to_s: () -> ::String
+      end
+
+      private
+
+      def to_sec: (untyped val) -> untyped
+    end
+  end
+end
+module Sidekiq
+  class LimiterSet
+    include Enumerable
+
+    def each: () { (untyped) -> untyped } -> untyped
+
+    def paginate: (untyped cursor, untyped filter) { (?) -> untyped } -> ::Array[untyped]
+  end
+
+  module Limiter
+    class Status
+      @key: untyped
+
+      @type: untyped
+
+      @name: untyped
+
+      @helper: untyped
+
+      class Concurrent
+        @available: untyped
+
+        @used: untyped
+
+        @metrics: untyped
+
+        @size: untyped
+
+        attr_accessor used: untyped
+
+        attr_accessor size: untyped
+
+        attr_accessor available: untyped
+
+        def initialize: (untyped key, untyped name) -> void
+
+        def rate: () -> untyped
+
+        def type: () -> :concurrent
+
+        def type_name: () -> "Concurrent"
+
+        def available_pct: () -> (0 | untyped)
+
+        def used_pct: () -> (0 | untyped)
+
+        def held: () -> untyped
+
+        def held_time: () -> untyped
+
+        def immediate: () -> untyped
+
+        def reclaimed: () -> untyped
+
+        def waited: () -> untyped
+
+        def wait_time: () -> untyped
+
+        def overtime: () -> untyped
+      end
+
+      class Window
+        @size: untyped
+
+        @interval: untyped
+
+        attr_accessor size: untyped
+
+        attr_accessor interval: untyped
+
+        def initialize: (untyped key, untyped name) -> void
+
+        def rate: () -> ::String
+
+        def type: () -> :window
+
+        def type_name: () -> "Window"
+      end
+
+      class Bucket
+        @name: untyped
+
+        @size: untyped
+
+        @interval: untyped
+
+        @incr: untyped
+
+        @count: untyped
+
+        attr_accessor size: untyped
+
+        attr_accessor interval: untyped
+
+        def initialize: (untyped key, untyped name) -> void
+
+        def rate: () -> ::String
+
+        def type: () -> :bucket
+
+        def type_name: () -> "Bucket"
+
+        def history: () -> untyped
+
+        private
+
+        def bucket_name: (?untyped time) -> ::String
+
+        def increment: () -> untyped
+
+        def data_count: () -> untyped
+      end
+
+      class LeakyBucket
+        @size: untyped
+
+        @interval: untyped
+
+        @drops: untyped
+
+        @hit: untyped
+
+        @miss: untyped
+
+        @waited: untyped
+
+        attr_reader size: untyped
+
+        attr_reader interval: untyped
+
+        attr_reader drops: untyped
+
+        attr_reader hit: untyped
+
+        attr_reader miss: untyped
+
+        attr_reader waited: untyped
+
+        def initialize: (untyped key, untyped name) -> void
+
+        def type: () -> :leaky
+
+        def type_name: () -> "Leaky Bucket"
+
+        def rate: () -> ::String
+      end
+
+      class Points
+        @size: untyped
+
+        @interval: untyped
+
+        @points: untyped
+
+        @hit: untyped
+
+        @miss: untyped
+
+        @waited: untyped
+
+        attr_reader size: untyped
+
+        attr_reader interval: untyped
+
+        attr_reader points: untyped
+
+        attr_reader hit: untyped
+
+        attr_reader miss: untyped
+
+        attr_reader waited: untyped
+
+        def initialize: (untyped key, untyped name) -> void
+
+        def type: () -> :points
+
+        def type_name: () -> "Points"
+
+        def rate: () -> ::String
+      end
+
+      attr_accessor key: untyped
+
+      attr_accessor name: untyped
+
+      def initialize: (untyped key) -> void
+
+      def helper: () -> untyped
+
+      def method_missing: (*untyped args) -> untyped
+
+      def respond_to_missing?: (untyped name) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    class Unlimited < Sidekiq::Limiter::Base
+      NONE: ::Hash[untyped, untyped]
+
+      def initialize: (*untyped args) -> void
+
+      def within_limit: (*untyped args, **untyped kwargs) { (untyped) -> untyped } -> untyped
+
+      def key: () -> untyped
+
+      class ResultStub
+        def respond_to_missing?: (*untyped) -> true
+
+        def method_missing: (*untyped) -> nil
+      end
+    end
+  end
+end
+module Sidekiq
+  module Limiter
+    class Window < Base
+      @size: untyped
+
+      @interval: untyped
+
+      @bucket: untyped
+
+      # this doesn't need to be thread-safe as this operation
+      # is idempotent so the race condition is fine.
+      @done: untyped
+
+      @key: untyped
+
+      INTERVALS: untyped
+
+      attr_reader interval: untyped
+
+      attr_reader size: untyped
+
+      attr_reader bucket: untyped
+
+      alias count size
+
+      # Create a rate limiter of +size+ per +interval+, e.g. 5 per second.
+      # +interval+ may be a symbol (:second, :minute) or an integer number
+      # of seconds.
+      #
+      # This implements a "sliding window" limiter so you cannot perform
+      # more than N operations until a full interval has passed.
+      #
+      # Name should be a URL-safe descriptor, i.e. "user_12345", not "Bob's Rate".
+      #
+      # Options:
+      #   :wait_timeout - maximum time to pause while waiting for an available bucket, only applicable
+      #               to :second buckets only.
+      #
+      def initialize: (untyped name, untyped size, untyped interval, untyped options) -> void
+
+      def establish: () -> untyped
+
+      def key: () -> untyped
+
+      #
+      # Yield if the current interval has not gone over quota.
+      # :used is the number of points used by this call, defaulting to 1.
+      #
+      # If this is a :second-based limiter, will +sleep+ up to
+      # +wait_timeout+ seconds until it can fit within quota or
+      # raise Sidekiq::Limiter::OverLimit.
+      def within_limit: (?used: ::Integer) { () -> untyped } -> (untyped | nil)
+    end
+  end
+end
+module Sidekiq
+  module Periodic
+    class Config
+      @config: untyped
+
+      @work: untyped
+
+      @version: untyped
+
+      @locked: untyped
+
+      @tz: untyped
+
+      include Sidekiq::Component
+
+      # Periodic data lives for 90 days by default
+      STATIC_TTL: untyped
+
+      # The version is SHA hash of all statically defined jobs.  If
+      # any job data changes, the version will change also.  In
+      # this way we know when we need to resync job data to Redis
+      # by checking a single key.
+      attr_reader version: untyped
+
+      attr_reader work: untyped
+
+      #
+      # Configure the subsystem to use a specific timezone for
+      # all periodic jobs. This overrides the default of the system's timezone.
+      # The system can be set to "Los Angeles" while this is set to "New York".
+      # Must quack like Time, ActiveSupport::TimeZone or similar.
+      # https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html
+      attr_writer tz: untyped
+
+      def initialize: (untyped config) -> void
+
+      def register: (untyped schedule, untyped klass, ?::Hash[untyped, untyped] options) -> untyped
+
+      def empty?: () -> untyped
+
+      def persist: () -> untyped
+
+      def clear: () -> untyped
+
+      def finish!: () -> untyped
+
+      def queue_for: () -> untyped
+    end
+  end
+end
+# Parses cron expressions and computes the next occurence of the "job"
+#
+module Sidekiq
+  class CronParser
+    @source: untyped
+
+    @time_source: untyped
+
+    @_interpolate_weekdays_cache: untyped
+
+    @time_specs: untyped
+
+    # internal "mutable" time representation
+    class InternalTime
+      @year: untyped
+
+      @month: untyped
+
+      @day: untyped
+
+      @hour: untyped
+
+      @min: untyped
+
+      @gmtoff: untyped
+
+      @time_source: untyped
+
+      attr_accessor year: untyped
+
+      attr_accessor month: untyped
+
+      attr_accessor day: untyped
+
+      attr_accessor hour: untyped
+
+      attr_accessor min: untyped
+
+      attr_accessor time_source: untyped
+
+      def initialize: (untyped time, ?untyped time_source) -> void
+
+      def to_time: () -> untyped
+
+      def inspect: () -> untyped
+    end
+
+    SYMBOLS: { "jan" => "1", "feb" => "2", "mar" => "3", "apr" => "4", "may" => "5", "jun" => "6", "jul" => "7", "aug" => "8", "sep" => "9", "oct" => "10", "nov" => "11", "dec" => "12", "sun" => "0", "mon" => "1", "tue" => "2", "wed" => "3", "thu" => "4", "fri" => "5", "sat" => "6" }
+
+    def initialize: (untyped source, ?untyped time_source) -> void
+
+    def interpret_vixieisms: (untyped spec) -> untyped
+
+    # returns the next occurence after the given date
+    def next: (?untyped now, ?::Integer num) -> untyped
+
+    # returns the last occurence before the given date
+    def last: (?untyped now, ?::Integer num) -> untyped
+
+    SUBELEMENT_REGEX: ::Regexp
+
+    def parse_element: (untyped elem, untyped allowed_range) -> ::Array[untyped]
+
+    def recursive_calculate: (untyped meth, untyped time, untyped num) -> untyped
+
+    # returns a list of days which do both match time_spec[:dom] or time_spec[:dow]
+    def interpolate_weekdays: (untyped year, untyped month) -> untyped
+
+    def interpolate_weekdays_without_cache: (untyped year, untyped month) -> ::Array[untyped]
+
+    def nudge_year: (untyped t, ?::Symbol dir) -> untyped
+
+    def nudge_month: (untyped t, ?::Symbol dir) -> untyped
+
+    def date_valid?: (untyped t, ?::Symbol dir) -> untyped
+
+    def nudge_date: (untyped t, ?::Symbol dir, ?bool can_nudge_month) -> untyped
+
+    def nudge_hour: (untyped t, ?::Symbol dir) -> untyped
+
+    def nudge_minute: (untyped t, ?::Symbol dir) -> untyped
+
+    def time_specs: () -> untyped
+
+    def substitute_parse_symbols: (untyped str) -> untyped
+
+    def stepped_range: (untyped rng, ?::Integer step) -> untyped
+
+    # returns the smallest element from allowed which is greater than current
+    # returns nil if no matching value was found
+    def find_best_next: (untyped current, untyped allowed, untyped dir) -> untyped
+
+    def validate_source: () -> untyped
+  end
+end
+module Sidekiq
+  module Periodic
+    #
+    # We have N sidekiq processes starting up and one shared Redis.
+    # We want to get a common view of the periodic jobs.  It is
+    # assumed that all Sidekiqs are running the same codebase but
+    # we do want to handle the case of old Sidekiqs which are
+    # lingering around.
+    #
+    # To prevent processes from stepping on each other when updating
+    # Redis, we elect a single Sidekiq process as leader to update
+    # the periodic data model.
+    #
+    # Periodic data is versioned so that if any jobs are added, removed
+    # or changed, the data model keys in Redis will change completely.  The
+    # old version will quietly garbage collect when its TTL expires.
+    #
+    # Startup:
+    # 1. register periodic jobs in-memory
+    # 2. generate version SHA from periodic data
+    # 3. elect leader for version
+    # 4. leader pushes periodic data to Redis if version has changed
+    #
+    # Ongoing
+    # 1. All processes run a Periodic Actor every minute:
+    #   a. on the leader, this checks for new periodic jobs to create
+    #   b. creates those jobs
+    # 2. On all others, this checks if leader is still active.
+    #
+    class Manager
+      @config: untyped
+
+      @q: untyped
+
+      @thread: untyped
+
+      @done: untyped
+
+      @sleeper: untyped
+
+      @mutex: untyped
+
+      @reloader: untyped
+
+      @cronconfig: untyped
+
+      include Sidekiq::Component
+
+      SAVE_COUNT: 25
+
+      def initialize: (untyped config) -> void
+
+      def persist: (untyped cronconfig) -> untyped
+
+      def start: () -> untyped
+
+      def terminate: () -> untyped
+
+      def cycle: () -> untyped
+
+      def process: (?untyped now) -> untyped
+
+      private
+
+      def take_lock: (untyped seconds) -> untyped
+
+      def seconds_until_next_minute: (?untyped now) -> untyped
+
+      def job_due: (?untyped now) -> (nil | ::Array[untyped])
+
+      def enqueue_job: (untyped cycle, untyped ts) -> untyped
+
+      def constantize: (untyped str) -> untyped
+    end
+  end
+end
+module Sidekiq
+  module Periodic
+    #
+    # A static loop is a periodic job which is registered with the
+    # system upon startup, e.g. your typical cron job.
+    #
+    class StaticLoop
+      @schedule: untyped
+
+      @klass: untyped
+
+      @options: untyped
+
+      @src: untyped
+
+      @cron: untyped
+
+      @lid: untyped
+
+      attr_accessor schedule: untyped
+
+      attr_accessor options: untyped
+
+      def initialize: (untyped schedule, untyped klass, untyped options, ?untyped time_source) -> void
+
+      def tz_name: () -> untyped
+
+      def next_occurrence: (?untyped now, ?untyped time_now) -> untyped
+
+      def job_hash: () -> untyped
+
+      attr_reader klass: untyped
+
+      def lid: () -> untyped
+    end
+  end
+end
+# Useful for verifying the cron registration block in your initializer.
+#
+#     CRON_BLOCK = ->(mgr) { mgr.register("0 1 * * *", "NoSuchClass") }
+#     ct = Sidekiq::Periodic::ConfigTester.new
+#     ct.verify(CRON_BLOCK) # raises NameError
+class Sidekiq::Periodic::ConfigTester
+  @config: untyped
+
+  @pcfg: untyped
+
+  @constantize: untyped
+
+  include Sidekiq::Component
+
+  def initialize: (?constantize: bool) -> void
+
+  # @returns Array<Sidekiq::Periodic::StaticLoop>
+  def verify: () { (?) -> untyped } -> untyped
+end
