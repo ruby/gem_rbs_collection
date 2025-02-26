@@ -175,8 +175,6 @@ end
 class Containers::Heap
   @compare_fn: untyped
 
-  @next: untyped
-
   @size: untyped
 
   @stored: untyped
@@ -364,19 +362,6 @@ class Containers::Heap
 
     def marked?: () -> untyped
   end
-
-  private
-
-  # make node a child of a parent node
-  def link_nodes: (untyped child, untyped parent) -> untyped
-
-  # Makes sure the structure does not contain nodes in the root list with equal degrees
-  def consolidate: () -> untyped
-
-  def cascading_cut: (untyped node) -> untyped
-
-  # remove x from y's children and add x to the root list
-  def cut: (untyped x, untyped y) -> untyped
 end
 
 # A MinHeap is a heap where the items are returned in ascending order of key value.
@@ -422,100 +407,6 @@ class Sidekiq::HttpServer < ::GServer
   # +handle_obj+ specifies the object, that receives calls from +request_handler+
   # and +ip_auth_handler+
   def initialize: (untyped handle_obj, ?::Integer port, ?untyped host, ?::Integer maxConnections, ?untyped stdlog, ?bool audit, ?bool debug) -> void
-
-  private
-
-  CRLF: "\r\n"
-
-  HTTP_PROTO: "HTTP/1.0"
-
-  SERVER_NAME: ::String
-
-  # Default header for the server name
-  DEFAULT_HEADER: { "Server" => untyped }
-
-  # Mapping of status codes and error messages
-  StatusCodeMapping: { 200 => "OK", 400 => "Bad Request", 403 => "Forbidden", 405 => "Method Not Allowed", 411 => "Length Required", 500 => "Internal Server Error" }
-
-  class Request
-    @header: untyped
-
-    @data: untyped
-
-    @method: untyped
-
-    @path: untyped
-
-    @proto: untyped
-
-    attr_reader data: untyped
-
-    attr_reader header: untyped
-
-    attr_reader method: untyped
-
-    attr_reader path: untyped
-
-    attr_reader proto: untyped
-
-    def initialize: (untyped data, ?untyped? method, ?untyped? path, ?untyped? proto) -> void
-
-    def content_length: () -> (nil | untyped)
-  end
-
-  class Response
-    @status: untyped
-
-    @status_message: untyped
-
-    @header: untyped
-
-    attr_reader header: untyped
-
-    attr_accessor body: untyped
-
-    attr_accessor status: untyped
-
-    attr_accessor status_message: untyped
-
-    def initialize: (?::Integer status) -> void
-  end
-
-  # A case-insensitive Hash class for HTTP header
-  class Table
-    @hash: untyped
-
-    include Enumerable
-
-    def initialize: (?::Hash[untyped, untyped] hash) -> void
-
-    def []: (untyped key) -> untyped
-
-    def []=: (untyped key, untyped value) -> untyped
-
-    def update: (untyped hash) -> self
-
-    def each: () { (untyped, untyped) -> untyped } -> untyped
-
-    # Output the Hash table for the HTTP header
-    def writeTo: (untyped port) -> untyped
-  end
-
-  # Generates a Hash with the HTTP headers
-  def http_header: (?untyped? header) -> untyped
-
-  # Returns a string which represents the time as rfc1123-date of HTTP-date
-  def http_date: (untyped aTime) -> untyped
-
-  # Returns a string which includes the status code message as,
-  # http headers, and body for the response.
-  def http_resp: (untyped status_code, ?untyped? status_message, ?untyped? header, ?untyped? body) -> untyped
-
-  # Handles the HTTP request and writes the response back to the client, +io+.
-  #
-  # If an Exception is raised while handling the request, the client will receive
-  # a 500 "Internal Server Error" message.
-  def serve: (untyped io) -> untyped
 end
 module Sidekiq
   module Limiter
@@ -888,16 +779,6 @@ module Sidekiq
     def cycle: () -> untyped
 
     def election: () -> untyped
-
-    private
-
-    # You can use this ENV variable to mark a Sidekiq process
-    # unelectable. #5817
-    def apolitical?: () -> untyped
-
-    def update_leader: () -> untyped
-
-    def interval: () -> untyped
   end
 end
 module Sidekiq
@@ -934,8 +815,6 @@ module Sidekiq
 
       @count: untyped
 
-      @children: untyped
-
       @trackmem: untyped
 
       @stopping: untyped
@@ -949,8 +828,6 @@ module Sidekiq
       @preload: untyped
 
       @cmd: untyped
-
-      @memthread: untyped
 
       BOOT_TIMEOUT: 60
 
@@ -977,29 +854,6 @@ module Sidekiq
       def check_children: (untyped last) -> untyped
 
       def ps_cmd: () -> untyped
-
-      private
-
-      def current_time: () -> untyped
-
-      def log: (untyped str) -> untyped
-
-      def track_memory: () -> untyped
-
-      def ps_output: () -> untyped
-
-      # NB: monkeypatch point
-      def oom_signal: () -> "USR2"
-
-      def terminate_sidekiq: (untyped pid) -> untyped
-
-      def signal: (untyped sig) -> untyped
-
-      def kill: (untyped sig, untyped pid) -> untyped
-
-      def spawn: (untyped idx) -> untyped
-
-      def forkit: () -> untyped
     end
   end
 end
@@ -1186,8 +1040,6 @@ module Sidekiq
 
       @key: untyped
 
-      @data_ttl: untyped
-
       INTERVALS: untyped
 
       attr_reader interval: untyped
@@ -1219,22 +1071,6 @@ module Sidekiq
       # +wait_timeout+ seconds until it can fit within limit or
       # raise Sidekiq::Limiter::OverLimit.
       def within_limit: (?used: ::Integer) { () -> void } -> void
-
-      private
-
-      # How long the bucket data will persist.
-      # Note that we store all bucket data for one time
-      # period larger than the interval.  If this is a
-      # :second bucket, we'll store 60 buckets of data for
-      # a minute of data.  If this is an :hour bucket, we'll
-      # store 24 buckets for a day of data.
-      #
-      # This gives us recent usage history that we can display
-      # in the Web UI without having to worry about truly
-      # long term storage.
-      def data_ttl: () -> untyped
-
-      def bucket_name: () -> ::String
     end
   end
 end
@@ -1288,12 +1124,6 @@ module Sidekiq
       def key: () -> untyped
 
       def within_limit: () { () -> untyped } -> (nil | untyped)
-
-      private
-
-      def unlock: (untyped lockdata, untyped holdstart) -> untyped
-
-      def lock: () -> (::Array[untyped | ::Float] | ::Array[untyped] | nil)
     end
   end
 end
@@ -1338,10 +1168,6 @@ module Sidekiq
 
         def respond_to_missing?: (untyped name) -> untyped
       end
-
-      private
-
-      def to_sec: (untyped val) -> untyped
     end
   end
 end
@@ -1351,12 +1177,6 @@ module Sidekiq
       include Sidekiq::ServerMiddleware
 
       def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
-
-      private
-
-      def reschedule: (untyped inst, untyped ex, untyped msg, untyped limiter, untyped copy_of_args) -> untyped
-
-      def maximum_reschedules: (untyped limiter, untyped job) -> untyped
     end
   end
 end
@@ -1437,10 +1257,6 @@ module Sidekiq
 
         def to_s: () -> ::String
       end
-
-      private
-
-      def to_sec: (untyped val) -> untyped
     end
   end
 end
@@ -1530,10 +1346,6 @@ module Sidekiq
 
         @interval: untyped
 
-        @incr: untyped
-
-        @count: untyped
-
         attr_accessor size: untyped
 
         attr_accessor interval: untyped
@@ -1547,14 +1359,6 @@ module Sidekiq
         def type_name: () -> "Bucket"
 
         def history: () -> untyped
-
-        private
-
-        def bucket_name: (?untyped time) -> ::String
-
-        def increment: () -> untyped
-
-        def data_count: () -> untyped
       end
 
       class LeakyBucket
@@ -1919,18 +1723,6 @@ module Sidekiq
       def cycle: () -> untyped
 
       def process: (?untyped now) -> untyped
-
-      private
-
-      def take_lock: (untyped seconds) -> untyped
-
-      def seconds_until_next_minute: (?untyped now) -> untyped
-
-      def job_due: (?untyped now) -> (nil | ::Array[untyped])
-
-      def enqueue_job: (untyped cycle, untyped ts) -> untyped
-
-      def constantize: (untyped str) -> untyped
     end
   end
 end
