@@ -23,28 +23,6 @@ class Sidekiq::Config
 end
 module Sidekiq
   class Batch
-    @expiry: untyped
-
-    @bid: untyped
-
-    @key: untyped
-
-    @created_f: untyped
-
-    @description: untyped
-
-    @parent_bid: untyped
-
-    @callback_queue: untyped
-
-    @callbacks: untyped
-
-    @mutable: untyped
-
-    @new: untyped
-
-    @added: untyped
-
     class Empty
       include Sidekiq::Job
 
@@ -148,12 +126,6 @@ module Sidekiq
 
     # Not a public API
     def register: (untyped jid) -> untyped
-
-    private
-
-    def immediate_registration?: () -> untyped
-
-    def increment_batch_jobs_to_redis: (untyped conn, untyped jids) -> (nil | untyped)
   end
 end
 module Sidekiq
@@ -168,40 +140,12 @@ module Sidekiq
       DEATH: "death"
 
       def perform: (untyped event, untyped bid, ?::String queue) -> untyped
-
-      private
-
-      def constantize: (untyped str) -> untyped
-
-      def execute_callback: (untyped status, untyped event, untyped target, untyped options) -> untyped
-
-      def death: (untyped status, untyped queue) -> untyped
-
-      def success: (untyped status, untyped queue) -> untyped
-
-      def complete: (untyped status, untyped queue) -> untyped
-
-      def needs_success?: (untyped bid) -> untyped
-
-      def needs_complete?: (untyped bid) -> untyped
-
-      def needs_callback?: (untyped bid, untyped cb, untyped term) -> untyped
-
-      def enqueue_callback: (untyped queue, untyped args) -> untyped
     end
   end
 end
 module Sidekiq
   module BatchClient
     def flush: (untyped conn) -> (nil | untyped)
-
-    private
-
-    def collected_payloads: () -> untyped
-
-    def raw_push: (untyped payloads) -> (true | untyped)
-
-    def defining_batch?: () -> untyped
   end
 end
 class Sidekiq::Batch::Status
@@ -215,8 +159,6 @@ class Sidekiq::Batch::Status
 end
 
 class Sidekiq::Batch::DeadSet
-  @_size: untyped
-
   include Enumerable[untyped]
 
   def size: () -> untyped
@@ -235,20 +177,6 @@ module Sidekiq
       include Sidekiq::ServerMiddleware
 
       def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
-
-      private
-
-      def add_success: (untyped bid, untyped jid, untyped queue) -> untyped
-
-      def needs_success?: (untyped bid) -> untyped
-
-      def needs_complete?: (untyped bid) -> untyped
-
-      def needs_callback?: (untyped bid, untyped cb, untyped term) -> untyped
-
-      def add_failure: (untyped bid, untyped job, untyped queue, untyped ex) -> untyped
-
-      def enqueue_callback: (untyped queue, untyped args) -> untyped
     end
   end
 end
@@ -265,26 +193,6 @@ module Sidekiq
     # For this reason, a batch is considered complete once all jobs have
     # been executed, even if one or more executions was a failure.
     class Status
-      @bid: untyped
-
-      @props: untyped
-
-      @failures: untyped
-
-      @completed: untyped
-
-      @pending: untyped
-
-      @total: untyped
-
-      @parent_batch: untyped
-
-      @parent: untyped
-
-      # nil callbacks can happen if your Redis is not using the `noeviction` maxmemory policy.
-      # https://github.com/sidekiq/sidekiq/wiki/Using-Redis#memory
-      @callbacks: untyped
-
       attr_reader bid: untyped
 
       attr_reader failures: untyped
@@ -318,12 +226,6 @@ module Sidekiq
       def success_at: () -> untyped
 
       def created_at: () -> untyped
-
-      private
-
-      def time_for: (untyped name) -> untyped
-
-      public
 
       def expires_at: () -> untyped
 
@@ -410,8 +312,6 @@ module Sidekiq
   #     puts status.bid
   #   end
   class BatchSet
-    @_size: untyped
-
     include Enumerable[untyped]
 
     def size: () -> untyped
@@ -443,16 +343,6 @@ module Sidekiq
   module Pro
     # Adds pause queue support to Sidekiq's basic fetch strategy.
     module BasicFetch
-      @paused: untyped
-
-      @changed: untyped
-
-      @original: untyped
-
-      @evt: untyped
-
-      @queues: untyped
-
       def initialize: (untyped config) -> void
 
       def notify: (untyped verb, untyped payload) -> untyped
@@ -468,10 +358,6 @@ end
 module Sidekiq
   module Pro
     class BatchStatus
-      @app: untyped
-
-      @mount: untyped
-
       def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> void
 
       def call: (untyped env) -> untyped
@@ -502,16 +388,6 @@ module Sidekiq::Pro
   # can pull the current state of the system from Redis.
   #
   class ConfigListener
-    @config: untyped
-
-    @thread: untyped
-
-    @done: untyped
-
-    @handlers: untyped
-
-    @mydb: untyped
-
     include Sidekiq::Component
 
     CHANNEL: "sidekiq:config"
@@ -527,13 +403,6 @@ module Sidekiq::Pro
     def start: () -> untyped
 
     def terminate: (?wait: bool) -> untyped
-
-    private
-
-    # NB: this method does not return
-    def event_loop: (untyped pubsub) { (untyped) -> untyped } -> untyped
-
-    def listen: () -> untyped
   end
 end
 #
@@ -562,8 +431,6 @@ module Sidekiq::Middleware::Expiry
 end
 module Sidekiq
   module Job
-    @sbatch: untyped
-
     attr_accessor bid: untyped
 
     def batch: () -> (untyped | nil)
@@ -610,10 +477,6 @@ module Sidekiq
       #
       # Support for the improved Statsd API published by Datadog in the dogstatsd-ruby gem.
       class Dogstatsd
-        @config: untyped
-
-        @statsd: untyped
-
         include Sidekiq::Component
 
         attr_reader statsd: untyped
@@ -652,8 +515,6 @@ module Sidekiq
       #
       # Support for no metrics
       class Nil
-        @config: untyped
-
         include Sidekiq::Component
 
         def initialize: (untyped config) -> void
@@ -701,10 +562,6 @@ module Sidekiq
   # no Redis networking errors will be raised.
   #
   module ReliableClient
-    @@local_queue: untyped
-
-    @redis_pool: untyped
-
     # Raised if we try to save more than `backup_limit` client payloads.
     class BufferFull < RuntimeError
     end
@@ -726,8 +583,6 @@ end
 module Sidekiq
   module Scheduled
     class FastEnq < Sidekiq::Scheduled::Enq
-      @config: untyped
-
       include Sidekiq::Component
 
       def initialize: (untyped config) -> void
@@ -778,35 +633,6 @@ module Sidekiq::Pro
   #    kill the job so it does not poison the system forever.
   #
   class SuperFetch
-    @config: untyped
-
-    @capsule: untyped
-
-    @paused: untyped
-
-    @internal: untyped
-
-    @done: untyped
-
-    @changed: untyped
-
-    @algo: untyped
-
-    @pool: untyped
-
-    @orphan_handler: untyped
-
-    # super_fetch will track recovered JIDs, any jobs that are recovered X
-    # times within Y hours will be killed rather than reprocessed. Those
-    # jobs are considered `poison pills` that lead to process death.
-    @max_recoveries: untyped
-
-    @recovery_window: untyped
-
-    @events: untyped
-
-    @queues: untyped
-
     PoisonPill: untyped
 
     include Sidekiq::Component
@@ -865,26 +691,7 @@ module Sidekiq::Pro
 
     def active_queues: () -> untyped
 
-    private
-
-    # In a weighted ordering, treat the queues like we're drawing
-    # a queue out of a hat: draw a queue, attempt to fetch work.
-    # Draw another queue, attempt to fetch work.
-    def weighted: (untyped queues) -> untyped
-
-    def strict: (untyped queues) -> (untyped | nil)
-
     class UnitOfWork
-      @queue: untyped
-
-      @job: untyped
-
-      @local_queue: untyped
-
-      @config: untyped
-
-      @done: untyped
-
       attr_accessor queue: untyped
 
       attr_accessor job: untyped
