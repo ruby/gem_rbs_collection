@@ -462,8 +462,8 @@ end
 
 # active_support/core_ext/object/blank.rb
 class Object
-  def blank?: () -> bool
-  def present?: () -> bool
+  def blank?: () -> false
+  def present?: () -> true
   def presence: () -> self?
 end
 
@@ -475,22 +475,27 @@ end
 
 class NilClass
   def blank?: () -> true
+  def present?: () -> false
 end
 
 class FalseClass
   def blank?: () -> true
+  def present?: () -> false
 end
 
 class TrueClass
   def blank?: () -> false
+  def present?: () -> true
 end
 
 class Array[unchecked out Elem]
   alias blank? empty?
+  def present?: () -> bool
 end
 
 class Hash[unchecked out K, unchecked out V]
   alias blank? empty?
+  def present?: () -> bool
 
   # Returns a string containing an XML representation of its receiver:
   #
@@ -561,6 +566,7 @@ class String
   BLANK_RE: Regexp
   ENCODED_BLANKS: Concurrent::Map[Encoding, Regexp]
   def blank?: () -> bool
+  def present?: () -> bool
 end
 
 class Numeric
