@@ -44,9 +44,14 @@ User.create_with(name: 'name', age: 1)
 User.create_with(nil)
 User.find_by_sql("SELECT * FROM users")
 
-users = User.all
-users.sum(:age)
-users.sum(&:age)
+User.sum(:age)
+User.sum(&:age).times
+User.sum { |user| user.age }.times
+User.sum(0.0) { |user| user.age.to_f }.next_float
+User.all.sum(:age)
+User.all.sum(&:age).times
+User.all.sum { |user| user.age }.times
+User.all.sum(0.0) { |user| user.age.to_f }.next_float
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
