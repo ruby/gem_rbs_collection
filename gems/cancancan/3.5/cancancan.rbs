@@ -25,11 +25,11 @@ module CanCan
 
   module Ability
     def can: (?(Symbol | Array[Symbol]) action, ?untyped subject, **untyped conditions) -> void
-           | (?(Symbol | Array[Symbol]) action, ?untyped subject) ?{ (untyped object) -> bool } -> void
-           | () { (Symbol action, class object_class, untyped object) -> bool } -> void
+           | (?(Symbol | Array[Symbol]) action, ?untyped subject) ?{ (untyped object) -> boolish } -> void
+           | () { (Symbol action, class object_class, untyped object) -> boolish } -> void
     def cannot: (?(Symbol | Array[Symbol]) action, ?untyped subject, **untyped conditions) -> void
-              | (?(Symbol | Array[Symbol]) action, ?untyped subject) ?{ (untyped object) -> bool } -> void
-              | () { (Symbol action, class object_class, untyped object) -> bool } -> void
+              | (?(Symbol | Array[Symbol]) action, ?untyped subject) ?{ (untyped object) -> boolish } -> void
+              | () { (Symbol action, class object_class, untyped object) -> boolish } -> void
     def can?: (Symbol action, untyped subject, ?untyped attribute, *untyped) -> bool
     def cannot?: (Symbol action, untyped subject, ?untyped attribute, *untyped) -> bool
     def authorize!: (Symbol action, untyped subject, *untyped) -> void
