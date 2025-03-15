@@ -21,5 +21,13 @@ class ApplicationRecord < ActiveRecord::Base
 end
 
 class User < ApplicationRecord
+  # @dynamic avatar
   mount_uploader :avatar, AvatarUploader
 end
+
+avatar = User.new.avatar
+avatar.path
+avatar.blank?
+avatar.url
+avatar.store_path
+avatar.cached?
