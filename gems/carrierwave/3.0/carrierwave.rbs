@@ -56,6 +56,19 @@ module CarrierWave
       def recreate_versions!: (*untyped) -> void
     end
 
+    module Proxy
+      def current_path: () -> String
+      alias path current_path
+    end
+
+    module Cache
+      def cached?: () -> bool
+    end
+
+    module Store
+      def store_path: (?String) -> String
+    end
+
     class Base
       include CarrierWave::Uploader::Configuration
       extend CarrierWave::Uploader::Configuration::ClassMethods
@@ -67,6 +80,12 @@ module CarrierWave
 
       include CarrierWave::Uploader::Versions
       extend CarrierWave::Uploader::Versions::ClassMethods
+
+      include CarrierWave::Uploader::Proxy
+
+      include CarrierWave::Uploader::Cache
+
+      include CarrierWave::Uploader::Store
 
       attr_reader file: untyped
     end
