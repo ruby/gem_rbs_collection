@@ -12,6 +12,8 @@ module Test
   end
 
   class ArticleSerializer < ActiveModel::Serializer
+    type :article
+
     attribute :title
     attribute :title, key: :name
     attributes :body, :tag_names
