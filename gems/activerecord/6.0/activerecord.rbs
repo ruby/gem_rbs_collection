@@ -431,8 +431,8 @@ module ActiveRecord
                    | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
-      def sum: (?untyped? column_name) -> Integer
-             | () { (Model) -> Integer } -> Integer
+      def sum: (?untyped? column_name) -> untyped
+             | [T] (?T initial_value) { (Model) -> T } -> T
       def destroy_all: () -> untyped
       def delete_all: () -> untyped
       def update_all: (*untyped) -> untyped
@@ -528,8 +528,8 @@ module ActiveRecord
                    | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
       def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
-      def sum: (?untyped? column_name) -> Integer
-             | () { (Model) -> Integer } -> Integer
+      def sum: (?untyped? column_name) -> untyped
+             | [T] (?T initial_value) { (Model) -> T } -> T
       def destroy_all: () -> untyped
       def delete_all: () -> untyped
       def update_all: (*untyped) -> untyped
@@ -680,8 +680,8 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
                | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
-  def sum: (?untyped? column_name) -> Integer
-         | () { (Model) -> Integer } -> Integer
+  def sum: (?untyped? column_name) -> untyped
+         | [T] (?T initial_value) { (Model) -> T } -> T
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
   def update_all: (untyped) -> untyped
@@ -771,8 +771,8 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
                | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
   def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
-  def sum: (?untyped? column_name) -> Integer
-         | () { (Model) -> Integer } -> Integer
+  def sum: (?untyped? column_name) -> untyped
+         | [T] (?T initial_value) { (Model) -> T } -> T
   def destroy_all: () -> untyped
   def delete_all: () -> untyped
   def update_all: (untyped) -> untyped
