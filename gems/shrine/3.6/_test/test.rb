@@ -17,3 +17,7 @@ end
 class Photo < ActiveRecord::Base
   include ImageUploader::Attachment(:image) # adds an `image` virtual attribute
 end
+
+attacher = Shrine::Attacher.new
+attacher.assign('{"id":"asdf.jpg","storage":"cache","metadata":{...}}')
+attacher.file
