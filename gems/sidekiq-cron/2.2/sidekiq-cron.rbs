@@ -1,0 +1,55 @@
+module Sidekiq
+  module Cron
+    attr_accessor self.configuration: Configuration
+
+    def self.configure: () ?{ (Configuration) -> void } -> void
+    def self.reset!: () -> void
+
+    module Configuration
+      attr_accessor cron_poll_interval: Integer
+
+      attr_accessor cron_schedule_file: String
+
+      attr_accessor default_namespace: String
+
+      attr_accessor available_namespaces: Array[untyped]?
+
+      attr_reader natural_cron_parsing_mode: (:single | :strict)
+
+      attr_accessor reschedule_grace_period: Integer
+
+      def natural_cron_parsing_mode=: (:single | :strict) -> (:single | :strict)
+    end
+
+    class Job
+      attr_accessor name: untyped
+      attr_accessor namespace: untyped
+      attr_accessor cron: untyped
+      attr_accessor klass: untyped
+      attr_accessor args: untyped
+      attr_accessor message: untyped
+      attr_reader cron_expression_string: untyped
+      attr_reader last_enqueue_time: untyped
+      attr_reader fetch_missing_args: untyped
+      attr_reader source: untyped
+
+      def initialize: (**untyped) -> void
+      def enqueue!: (?Time) -> void
+      def self.all: (?String namespace) -> Array[Job]
+      def self.count: (?String namespace) -> Integer
+      def self.find: (untyped name, ?String namespace) -> Job?
+      def self.create: (untyped hash) -> bool
+      def self.destroy: (untyped name, ?String namespace) -> bool
+      def status: () -> untyped
+      def disable!: () -> bool
+      def enable!: () -> bool
+      def enabled?: () -> bool
+      def disabled?: () -> bool
+      def errors: () -> Array[String]
+      def valid?: () -> bool
+      def save: () -> bool
+      def destroy: () -> void
+      def self.destroy_all!: () -> void
+    end
+  end
+end
