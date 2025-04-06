@@ -6,7 +6,8 @@ class ApplicationController < ActionController::Base
   around_action -> (controller, block) { block.call; controller.controller_instance_method }
 
   helper :login
-  helper { def hello() "Hello, world!" end }
+  # FIXME
+  # helper { def hello() "Hello, world!" end }
 
   fragment_cache_key "v1"
   fragment_cache_key do

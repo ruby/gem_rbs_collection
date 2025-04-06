@@ -21,7 +21,7 @@ Sentry.capture_message("test message")
 Sentry.capture_message("this is not important", level: :info)
 
 
-def do_something(action_name)
+->(action_name) do
   # some code
 rescue => exception
   Sentry.capture_exception(exception, fingerprint: [__method__, action_name])
