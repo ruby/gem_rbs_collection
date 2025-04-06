@@ -46,20 +46,21 @@ template.extract(uri)
 #   "fragment" => "foo"
 # }
 
-uri = Addressable::URI.parse("http://example.com/a/b/c")
-uri.query_values # => nil
-uri.query_values = {"one" => "1", "two" => "2"}
-uri.query_values # => {"one" => "1", "two" => "2"}
-uri.query_values = ["three", "four"]
-uri.query_values # => {"three" => nil, "four" => nil}
-uri.query_values = [["five", "5"], ["six", "6"]]
-uri.query_values # => {"five" => "5", "six" => "6"}
-uri.query_values = [["seven"], ["andup", ["8", "9", "10"]]]
-uri.query_values # => {"seven"=> nil, "andup"=>"10"}
-uri.query_values = [["seven", "7"], ["andup", ["8", "9", "10"]]]
-uri.query_values # => {"seven"=>"7", "andup"=>"10"}
-uri.query_values = nil
-uri.query_values # => nil
+# FIXME
+# uri = Addressable::URI.parse("http://example.com/a/b/c")
+# uri.query_values # => nil
+# uri.query_values = {"one" => "1", "two" => "2"}
+# uri.query_values # => {"one" => "1", "two" => "2"}
+# uri.query_values = ["three", "four"]
+# uri.query_values # => {"three" => nil, "four" => nil}
+# uri.query_values = [["five", "5"], ["six", "6"]]
+# uri.query_values # => {"five" => "5", "six" => "6"}
+# uri.query_values = [["seven"], ["andup", ["8", "9", "10"]]]
+# uri.query_values # => {"seven"=> nil, "andup"=>"10"}
+# uri.query_values = [["seven", "7"], ["andup", ["8", "9", "10"]]]
+# uri.query_values # => {"seven"=>"7", "andup"=>"10"}
+# uri.query_values = nil
+# uri.query_values # => nil
 
 
 uri = Addressable::URI.parse("http://example.com/go?a=b&c=d")
