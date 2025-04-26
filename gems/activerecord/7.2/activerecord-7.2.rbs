@@ -10,6 +10,7 @@ module ActiveRecord
     extend TokenFor::ClassMethods
 
     module ClassMethods[Model, Relation, PrimaryKey]
+      def and: (::ActiveRecord::Relation) -> Relation
       def strict_loading: (?bool value) -> Relation
     end
   end
@@ -207,6 +208,7 @@ end
 module ActiveRecord
   class Relation
     module Methods[Model, PrimaryKey]
+      def and: (::ActiveRecord::Relation) -> self
       def authenticate_by: (untyped attributes) -> Model?
       def with: (*untyped args) -> self
       def with_recursive: (*untyped) -> self
