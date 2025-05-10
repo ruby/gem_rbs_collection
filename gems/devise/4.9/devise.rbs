@@ -7,3 +7,50 @@ end
 # https://github.com/heartcombo/devise/blob/fec67f98f26fcd9a79072e4581b1bd40d0c7fa1d/app/controllers/devise_controller.rb#L4
 class DeviseController
 end
+
+module Devise
+  module Models
+    interface _DeviseClassMethod
+      def devise: (*::Symbol) -> void
+    end
+
+    module DatabaseAuthenticatable
+    end
+
+    module Omniauthable
+    end
+
+    module Confirmable
+    end
+
+    module Recoverable
+    end
+
+    module Registerable
+    end
+
+    module Rememberable
+    end
+
+    module Trackable
+    end
+
+    module Timeoutable
+    end
+
+    module Validatable
+    end
+
+    module Lockable
+    end
+  end
+end
+
+# NOTE: For type checking, we represent the `devise` class method from Devise::Models
+# being available to ActiveRecord models by extending the base class with the interface.
+# See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise/models.rb#L79
+module ActiveRecord
+  class Base
+    extend Devise::Models::_DeviseClassMethod
+  end
+end
