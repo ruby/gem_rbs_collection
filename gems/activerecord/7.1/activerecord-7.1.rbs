@@ -10,6 +10,7 @@ module ActiveRecord
     extend TokenFor::ClassMethods
 
     module ClassMethods[Model, Relation, PrimaryKey]
+      def and: (::ActiveRecord::Relation) -> Relation
       def strict_loading: (?bool value) -> Relation
     end
   end
@@ -186,6 +187,7 @@ module ActiveRecord
     def load_async: () -> Relation
 
     module Methods[Model, PrimaryKey]
+      def and: (::ActiveRecord::Relation) -> self
       def authenticate_by: (untyped attributes) -> Model?
     end
   end
