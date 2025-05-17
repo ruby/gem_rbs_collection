@@ -11,6 +11,7 @@ module ActiveRecord
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def strict_loading: (?bool value) -> Relation
+      def sole: () -> Model
     end
   end
 
@@ -187,6 +188,7 @@ module ActiveRecord
 
     module Methods[Model, PrimaryKey]
       def authenticate_by: (untyped attributes) -> Model?
+      def sole: () -> Model
     end
   end
 end
@@ -310,6 +312,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
   def count: () -> ::Integer
            | () { (Model) -> boolish } -> ::Integer
            | (Symbol | String column_name) -> ::Integer
+  def sole: () -> Model
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rubocop:disable RBS/Lint/TopLevelInterface
@@ -402,4 +405,5 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
            | () { (Model) -> boolish } -> ::Integer
            | (Symbol | String column_name) -> ::Integer
   def create_with: (nil | Hash[untyped, untyped]) -> Relation
+  def sole: () -> Model
 end
