@@ -8,8 +8,10 @@ class TestCallbackObject < ActiveRecord::Base
   around_create ::Callbacks::ClassCallback
   around_save ::Callbacks::ClassCallback
 
-  attr_accessor :my_local_field
-  validate :custom_validation, on: :update, unless: [:my_local_field, Proc.new { |_| false }]
+  attr_accessor :local_field1
+  attr_accessor :local_field2
+  attr_accessor :local_field3
+  validate :custom_validation, on: :update, unless: [:local_field1, Proc.new { |this_rec| this_rec.local_field2 }, ->(my_rec) { my_rec.local_field3 }]
 end
 
 module Callbacks
