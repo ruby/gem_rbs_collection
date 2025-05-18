@@ -39,6 +39,9 @@ module Test
   User.strict_loading(false)
   User.create_with(name: 'name', age: 1)
   User.create_with(nil)
+  User.sole.id
+  User.all.sole.id
+  User.take.articles.sole.id
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')
   user.encrypt
   user.encrypted_attribute?(:secret)

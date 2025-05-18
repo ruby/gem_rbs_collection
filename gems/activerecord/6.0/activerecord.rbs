@@ -53,31 +53,72 @@ module ActiveRecord
     def self.validates: (*untyped, ?if: condition[instance], ?unless: condition[instance], **untyped) -> void
 
     # callbacks
+    interface _AfterCreateCallbackObject
+      def after_create: (untyped) -> void
+    end
+
+    interface _AfterSaveCallbackObject
+      def after_save: (untyped) -> void
+    end
+
+    interface _AfterValidationCallbackObject
+      def after_validation: (untyped) -> void
+    end
+
+    interface _AroundCreateCallbackObject
+      def around_create: (untyped) { () -> void } -> void
+    end
+
+    interface _AroundSaveCallbackObject
+      def around_save: (untyped) { () -> void } -> void
+    end
+
+    interface _BeforeCreateCallbackObject
+      def before_create: (untyped) -> void
+    end
+    interface _BeforeSaveCallbackObject
+      def before_save: (untyped) -> void
+    end
+
+    interface _BeforeValidationCallbackObject
+      def before_validation: (untyped) -> void
+    end
+
     type callback[T] = Symbol | ^(T) [self: T] -> void
     type around_callback[T] = Symbol | ^(T, Proc) [self: T] -> void
+
+    type after_create_callback[T] = callback[T] | _AfterCreateCallbackObject
+    type after_save_callback[T] = callback[T] | _AfterSaveCallbackObject
+    type after_validation_callback[T] = callback[T] | _AfterValidationCallbackObject
+    type around_create_callback[T] = around_callback[T] | _AroundCreateCallbackObject
+    type around_save_callback[T] = around_callback[T] | _AroundSaveCallbackObject
+    type before_create_callback[T] = callback[T] | _BeforeCreateCallbackObject
+    type before_validation_callback[T] = callback[T] | _BeforeValidationCallbackObject
+    type before_save_callback[T] = callback[T] | _BeforeSaveCallbackObject
+
     def self.after_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_create_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
     def self.after_update_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
     def self.after_destroy_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
-    def self.after_save_commit: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
-    def self.after_create: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_save_commit: (*after_save_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) -> void | ...
+    def self.after_create: (*after_create_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_destroy: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_rollback: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_save: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_save: (*after_save_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_update: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.after_validation: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.after_validation: (*after_validation_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_initialize: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_find: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.after_touch: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.around_create: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.around_create: (*around_create_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.around_destroy: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.around_save: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.around_save: (*around_save_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.around_update: (*around_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_create: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_create: (*before_create_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.before_destroy: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_save: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_save: (*before_save_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
     def self.before_update: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
-    def self.before_validation: (*callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
+    def self.before_validation: (*before_validation_callback[instance], ?if: condition[instance], ?unless: condition[instance], **untyped) ?{ () [self: instance] -> untyped } -> void
 
     def self.columns: () -> Array[untyped]
     def self.reflect_on_all_associations: (?Symbol) -> Array[untyped]
@@ -610,183 +651,6 @@ module ActiveRecord
     # other processes are modifying the database.
     def find_each: (?error_on_ignore: untyped? error_on_ignore, ?batch_size: ::Integer batch_size, ?finish: untyped? finish, ?start: untyped? start) ?{ (untyped) -> untyped } -> untyped
   end
-end
-
-interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/TopLevelInterface
-  def all: () -> self
-  def ids: () -> Array[PrimaryKey]
-  def none: () -> self
-  def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
-           | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
-  def where: () -> ::ActiveRecord::QueryMethods::WhereChain[self]
-           | (*untyped) -> self
-  def exists?: (*untyped) -> bool
-  def order: (*untyped) -> self
-  def group: (*Symbol | String) -> untyped
-  def in_order_of: (Symbol, Array[untyped]) -> self
-  def distinct: () -> self
-  def or: (::ActiveRecord::Relation) -> self
-  def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> self
-  def joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> self
-  def includes: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
-  def eager_load: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
-  def preload: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> self
-  def find_by: (untyped, *untyped) -> Model?
-  def find_by!: (untyped, *untyped) -> Model
-  def find: (PrimaryKey id) -> Model
-          | (Array[PrimaryKey]) -> Array[Model]
-          | (*PrimaryKey) -> Array[Model]
-          | () { (Model) -> boolish } -> Model?
-  def find_or_create_by: (untyped) -> Model
-                       | (untyped) { (Model) -> void } -> Model
-  def find_or_create_by!: (untyped) -> Model
-                        | (untyped) { (Model) -> void } -> Model
-  def find_or_initialize_by: (untyped) -> Model
-                           | (untyped) { (Model) -> void } -> Model
-  def create_or_find_by: (untyped) -> Model
-                       | (untyped) { (Model) -> void } -> Model
-  def create_or_find_by!: (untyped) -> Model
-                        | (untyped) { (Model) -> void } -> Model
-  def take: () -> Model
-          | (Integer limit) -> Array[Model]
-  def take!: () -> Model
-  def first: () -> Model?
-           | (Integer count) -> Array[Model]
-  def first!: () -> Model
-  def second: () -> Model?
-  def second!: () -> Model
-  def third: () -> Model?
-  def third!: () -> Model
-  def fourth: () -> Model?
-  def fourth!: () -> Model
-  def fifth: () -> Model?
-  def fifth!: () -> Model
-  def forty_two: () -> Model?
-  def forty_two!: () -> Model
-  def second_to_last: () -> Model?
-  def second_to_last!: () -> Model
-  def third_to_last: () -> Model?
-  def third_to_last!: () -> Model
-  def last: () -> Model?
-          | (Integer count) -> Array[Model]
-  def last!: () -> Model
-  def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
-  def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
-  def offset: (Integer) -> self
-  def offset!: (Integer) -> self
-  def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
-               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
-  def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
-  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
-  def sum: (?untyped? column_name) -> untyped
-         | [T] (?T initial_value) { (Model) -> T } -> T
-  def destroy_all: () -> untyped
-  def delete_all: () -> untyped
-  def update_all: (untyped) -> untyped
-  def touch_all: (*untyped, ?time: untyped) -> untyped
-  def destroy_by: (*untyped) -> untyped
-  def delete_by: (*untyped) -> untyped
-  def each: () { (Model) -> void } -> self
-  def select: (*Symbol | String | Arel::Nodes::t) -> self
-            | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String | Arel::Nodes::t) -> self
-  def count: () -> ::Integer
-           | () { (Model) -> boolish } -> ::Integer
-           | (Symbol | String column_name) -> ::Integer
-end
-
-interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rubocop:disable RBS/Lint/TopLevelInterface
-  def all: () -> Relation
-  def ids: () -> Array[PrimaryKey]
-  def none: () -> Relation
-  def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
-           | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
-  def where: () -> ::ActiveRecord::QueryMethods::WhereChain[Relation]
-           | (*untyped) -> Relation
-  def exists?: (*untyped) -> bool
-  def any?: () -> bool
-          | () { (Model) -> boolish } -> bool
-  def many?: () -> bool
-           | () { (Model) -> boolish } -> bool
-  def none?: () -> bool
-           | () { (Model) -> boolish } -> bool
-  def one?: () -> bool
-          | () { (Model) -> boolish } -> bool
-  def order: (*untyped) -> Relation
-  def group: (*Symbol | String) -> untyped
-  def in_order_of: (Symbol, Array[untyped]) -> Relation
-  def distinct: () -> Relation
-  def or: (::ActiveRecord::Relation) -> Relation
-  def merge: (Array[untyped] | Hash[untyped, untyped] | ActiveRecord::Relation | Proc) -> Relation
-  def joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def left_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def left_outer_joins: (*String | Symbol | Hash[untyped, untyped]) -> Relation
-  def includes: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
-  def eager_load: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
-  def preload: (*String | Symbol | Array[untyped] | Hash[untyped, untyped], **(String | Symbol | Array[untyped] | Hash[untyped, untyped])) -> Relation
-  def find_by: (untyped) -> Model?
-  def find_by!: (untyped) -> Model
-  def find: (PrimaryKey id) -> Model
-          | (Array[PrimaryKey]) -> Array[Model]
-          | (*PrimaryKey) -> Array[Model]
-  def find_or_create_by: (untyped) -> Model
-                       | (untyped) { (Model) -> void } -> Model
-  def find_or_create_by!: (untyped) -> Model
-                        | (untyped) { (Model) -> void } -> Model
-  def find_or_initialize_by: (untyped) -> Model
-                           | (untyped) { (Model) -> void } -> Model
-  def create_or_find_by: (untyped) -> Model
-                       | (untyped) { (Model) -> void } -> Model
-  def create_or_find_by!: (untyped) -> Model
-                        | (untyped) { (Model) -> void } -> Model
-  def take: () -> Model
-          | (Integer limit) -> Array[Model]
-  def take!: () -> Model
-  def first: () -> Model?
-           | (Integer count) -> Array[Model]
-  def first!: () -> Model
-  def second: () -> Model?
-  def second!: () -> Model
-  def third: () -> Model?
-  def third!: () -> Model
-  def fourth: () -> Model?
-  def fourth!: () -> Model
-  def fifth: () -> Model?
-  def fifth!: () -> Model
-  def forty_two: () -> Model?
-  def forty_two!: () -> Model
-  def second_to_last: () -> Model?
-  def second_to_last!: () -> Model
-  def third_to_last: () -> Model?
-  def third_to_last!: () -> Model
-  def last: () -> Model?
-          | (Integer count) -> Array[Model]
-  def last!: () -> Model
-  def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
-  def offset: (Integer) -> Relation
-  def lock: (?untyped locks) -> Relation
-  def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
-               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
-  def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
-  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
-  def sum: (?untyped? column_name) -> untyped
-         | [T] (?T initial_value) { (Model) -> T } -> T
-  def destroy_all: () -> untyped
-  def delete_all: () -> untyped
-  def update_all: (untyped) -> untyped
-  def touch_all: (*untyped, ?time: untyped) -> untyped
-  def destroy_by: (*untyped) -> untyped
-  def delete_by: (*untyped) -> untyped
-  def select: (*Symbol | String | Arel::Nodes::t) -> Relation
-            | () { (Model) -> boolish } -> Array[Model]
-  def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
-  def scope: (Symbol, ^(*untyped, **untyped) [self: Relation] -> void | ActiveRecord::Base::_Callable[Relation]) ?{ (Module extention) [self: Relation] -> void } -> void
-  def count: () -> ::Integer
-           | () { (Model) -> boolish } -> ::Integer
-           | (Symbol | String column_name) -> ::Integer
-  def create_with: (nil | Hash[untyped, untyped]) -> Relation
 end
 
 module Arel

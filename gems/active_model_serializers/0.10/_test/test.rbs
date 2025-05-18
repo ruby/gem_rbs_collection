@@ -1,10 +1,24 @@
 module Test
+  class Author < ActiveModelSerializers::Model
+    attr_accessor name: String
+
+    def initialize: (name: String) -> void
+  end
+
+  class Category < ActiveModelSerializers::Model
+    attr_accessor name: String
+
+    def initialize: (name: String) -> void
+  end
+
   class Article < ActiveModelSerializers::Model
     attr_accessor title: String
     attr_accessor body: String
     attr_accessor tags: Array[Tag]
+    attr_accessor author: Author
+    attr_accessor category: Category
 
-    def initialize: (title: String, body: String, tags: Array[Tag]) -> void
+    def initialize: (title: String, body: String, tags: Array[Tag], author: Author, category: Category) -> void
   end
 
   class Tag < ActiveModelSerializers::Model
@@ -15,5 +29,14 @@ module Test
 
   class ArticleSerializer < ActiveModel::Serializer[Article]
     def tag_names: () -> Array[String]
+  end
+
+  class TagSerializer < ActiveModel::Serializer[Tag]
+  end
+
+  class AuthorSerializer < ActiveModel::Serializer[Author]
+  end
+
+  class CategorySerializer < ActiveModel::Serializer[Category]
   end
 end
