@@ -4,6 +4,7 @@ module ActiveRecord
     extend Encryption::EncryptableRecord::ClassMethods
 
     module ClassMethods[Model, Relation, PrimaryKey]
+      def and: (::ActiveRecord::Relation) -> Relation
       def strict_loading: (?bool value) -> Relation
       def sole: () -> Model
     end
@@ -13,6 +14,7 @@ module ActiveRecord
     def load_async: () -> Relation
 
     module Methods[Model, PrimaryKey]
+      def and: (::ActiveRecord::Relation) -> self
       def sole: () -> Model
     end
   end
