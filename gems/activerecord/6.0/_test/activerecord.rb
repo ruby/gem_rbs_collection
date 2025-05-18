@@ -7,6 +7,9 @@ class TestCallbackObject < ActiveRecord::Base
   after_save ::Callbacks::ClassCallback
   around_create ::Callbacks::ClassCallback
   around_save ::Callbacks::ClassCallback
+
+  attr_accessor :my_local_field
+  validate :custom_validation, on: :update, unless: [:my_local_field, Proc.new { |_| false }]
 end
 
 module Callbacks
