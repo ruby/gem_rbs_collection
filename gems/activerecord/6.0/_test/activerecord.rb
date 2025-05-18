@@ -20,7 +20,7 @@ class TestCallbackObject < ActiveRecord::Base
     [true, false].sample
   end
 
-  validate :custom_validation, on: :update, unless: [:local_field1, proc { |this_rec| this_rec.local_field2 }, ->(my_rec) { my_rec.local_field3 }]
+  validate :custom_validation, on: :update, unless: [:local_condition1, proc { |this_rec| this_rec.local_condition2 }, ->(my_rec) { my_rec.local_condition3 }]
 
   def custom_validation
     if self.class.name != 'TestCallbackObject'
