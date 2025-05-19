@@ -3,54 +3,85 @@
 # If you use Paranoia with `acts_as_paranoid` in some AR classes, you should write rbs file as follows:
 #
 # class Foo < ApplicationRecord
-#   include Paranoia
-#   extend Paranoia::Query
+#   class ActiveRecord_Relation < ::ActiveRecord::Relation
+#     include ::_ActiveRecord_Relation[::Foo, ::Integer]
+#     include ::Enumerable[::Foo]
+#   end
+#
+#   extend Paranoia::ClassMethods[::Foo, ::Foo::ActiveRecord_Relation]
+#   include Paranoia::InstanceMethods[::Foo]
 # end
 #
 module Paranoia
-  module Query
-    def paranoid?: () -> ::TrueClass
+  type restore_opts = {
+      ?recursive: bool,
+      ?recovery_window: ::ActiveSupport::Duration,
+    }
+  type paranoia_callback[T] = Symbol | ^(T) [self: T] -> void
+  type paranoia_condition[T] = Symbol | ^(T) [self: T] -> boolish
 
-    def with_deleted: () -> untyped
+  module ClassMethods[Model, Relation]
+    def paranoid?: () -> bool
 
-    def only_deleted: () -> untyped
+    def with_deleted: () -> Relation
+
+    def only_deleted: () -> Relation
 
     alias deleted only_deleted
 
-    def restore: (untyped id_or_ids, ?::Hash[untyped, untyped] opts) -> untyped
+    def restore: ((::Integer | ::Array[::Integer]) id_or_ids, ?restore_opts opts) -> ::Array[Model]
 
-    def after_restore: (* untyped) -> untyped
-    def after_real_destroy: (* untyped) -> untyped
+    def after_restore: (*paranoia_callback[instance], ?if: paranoia_condition[instance], ?unless: paranoia_condition[instance]) -> void
+
+    def after_real_destroy: (*paranoia_callback[instance], ?if: paranoia_condition[instance], ?unless: paranoia_condition[instance]) -> void
   end
 
-  def paranoia_destroy: () -> untyped
+  module InstanceMethods[Model]
+    def paranoia_destroy: () -> Model
 
-  alias destroy paranoia_destroy
+    alias destroy paranoia_destroy
 
-  def paranoia_destroy!: () -> untyped
+    def paranoia_destroy!: () -> Model
 
-  def trigger_transactional_callbacks?: () -> untyped
+    def trigger_transactional_callbacks?: () -> bool
 
-  def paranoia_delete: () -> untyped
+    def paranoia_delete: () -> Model
 
-  alias delete paranoia_delete
+    alias delete paranoia_delete
 
-  def restore!: (?::Hash[untyped, untyped] opts) -> untyped
+    def restore!: (?restore_opts opts) -> Model
 
-  alias restore restore!
+    alias restore restore!
 
-  def paranoia_destroyed?: () -> untyped
+    def paranoia_destroyed?: () -> bool
 
-  alias deleted? paranoia_destroyed?
+    alias deleted? paranoia_destroyed?
 
-  def really_destroy!: () -> untyped
+    def really_destroy!: () -> Model
+  end
+
+  module Query
+    # Add with `untyped` to avoid braking existing `extend Paranoia::Query` when collection upgraded
+    include ClassMethods[untyped, untyped]
+  end
+  # Add with `untyped` to avoid braking existing `include Paranoia` when collection upgraded
+  include InstanceMethods[untyped]
 
   VERSION: String
 end
 
 class ActiveRecord::Base
-  def self.acts_as_paranoid: (?::Hash[untyped, untyped] options) -> (nil | untyped)
+  type acts_as_paranoid_options = {
+      ?without_default_scope: bool,
+      ?after_restore_commit: bool,
+      ?column: ::Symbol | ::String,
+      ?sentinel_value: bool,
+      ?delete_all_enabled: bool,
+    }
 
-  def self.paranoid?: () -> ::FalseClass
-  def paranoid?: () -> untyped
+  def self.acts_as_paranoid: (?acts_as_paranoid_options options) -> void
+
+  def self.paranoid?: () -> bool
+
+  def paranoid?: () -> bool
 end
