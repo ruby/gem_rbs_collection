@@ -1,6 +1,20 @@
 class Product < ActiveRecord::Base
-  include Paranoia
-  extend Paranoia::Query
+  module RelationMethods
+    def where: (?promoted: bool) -> ::Product::ActiveRecord_Relation
+    def promoted: () -> ::Product::ActiveRecord_Relation
+    def regular: () -> ::Product::ActiveRecord_Relation
+  end
+  extend RelationMethods
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::Product::RelationMethods
+    include ::_ActiveRecord_Relation[::Product, ::Integer]
+    include ::Enumerable[::Product]
+  end
+
+  extend Paranoia::ClassMethods[::Product, ::Product::ActiveRecord_Relation]
+  include Paranoia::InstanceMethods[::Product]
+
+  def requires_search_engine_update?: -> bool
 
   def update_document_in_search_engine: () -> void
 
