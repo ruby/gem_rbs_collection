@@ -17,7 +17,7 @@
 require 'open3'
 require 'yaml'
 
-DISALLOWED_CHARACTERS_RE = /[^a-zA-Z0-9\s_\/#:'".,\-]/
+DISALLOWED_CHARACTERS_RE = /[^a-zA-Z0-9\s_\/#:'".,\-*]/
 
 class InvalidCharacters < StandardError
   def initialize(path:, match:)
@@ -60,13 +60,20 @@ class InvalidFormat < StandardError
   end
 end
 
+class AliasesNotEnabled < StandardError
+end
+
 def validate_rubocop_yml!(path)
   config_str = File.read(path)
   if match = config_str.match(DISALLOWED_CHARACTERS_RE)
     raise InvalidCharacters.new(path:, match:)
   end
 
-  obj = YAML.safe_load(config_str)
+  obj = begin
+    YAML.safe_load(config_str, aliases: false)
+  rescue Psych::AliasesNotEnabled
+    raise AliasesNotEnabled, "The use of alias is explicitly prohibited due to security concerns."
+  end
   raise InvalidFormat unless obj.is_a?(Hash)
 
   obj.each do |key, value|
