@@ -1,1 +1,0 @@
-../../6.0/_test/activerecord-generated.rb
