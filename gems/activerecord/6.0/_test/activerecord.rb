@@ -7,6 +7,26 @@ class TestCallbackObject < ActiveRecord::Base
   after_save ::Callbacks::ClassCallback
   around_create ::Callbacks::ClassCallback
   around_save ::Callbacks::ClassCallback
+
+  def local_condition1
+    [true, false].sample
+  end
+
+  def local_condition2
+    [true, false].sample
+  end
+
+  def local_condition3
+    [true, false].sample
+  end
+
+  validate :custom_validation, on: :update, unless: [:local_condition1, ->(my_rec) { my_rec.local_condition3 }]
+
+  def custom_validation
+    if self.class.name != 'TestCallbackObject'
+      errors.add(:base, 'testing only')
+    end
+  end
 end
 
 module Callbacks
