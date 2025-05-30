@@ -2,10 +2,10 @@
 require "faker"
 
 # https://github.com/faker-ruby/faker/blob/v3.4.2/doc/default/alphanumeric.md
-Faker::Address.alpha(number: 10) + 'string'
-Faker::Address.alphanumeric(number: 10) + 'string'
-Faker::Address.alphanumeric(number: 10, min_alpha: 3) + 'string'
-Faker::Address.alphanumeric(number: 10, min_alpha: 3, min_numeric: 3) + 'string'
+Faker::Alphanumeric.alpha(number: 10) + 'string'
+Faker::Alphanumeric.alphanumeric(number: 10) + 'string'
+Faker::Alphanumeric.alphanumeric(number: 10, min_alpha: 3) + 'string'
+Faker::Alphanumeric.alphanumeric(number: 10, min_alpha: 3, min_numeric: 3) + 'string'
 
 # https://github.com/faker-ruby/faker/blob/v3.4.2/doc/books/book.md
 Faker::Book.title + 'string'
