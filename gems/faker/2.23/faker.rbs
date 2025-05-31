@@ -1,6 +1,6 @@
 module Faker
   class Base
-    def self.unique: () -> UniqueGenerator
+    def self.unique: () -> (UniqueGenerator & class)
   end
 
   class UniqueGenerator
@@ -39,15 +39,13 @@ module Faker
     def self.subject: -> String
   end
 
-  class Name < Base
-    def self.name: () -> String
-  end
-
   class Internet < Base
     # https://github.com/faker-ruby/faker/blob/v2.23.0/lib/faker/default/internet.rb#L4
     def self.email: (?name: String?, ?separators: Array[String]?, ?domain: String?) -> String
     def self.private_ip_v4_address: -> String
+    def self.public_ip_v4_address: -> String
     def self.url: (?host: String, ?path: String, ?scheme: String) -> String
+    def self.uuid: -> String
   end
 
   class Job < Base
@@ -74,6 +72,7 @@ module Faker
 
   class Name < Base
     # https://github.com/faker-ruby/faker/blob/v2.23.0/lib/faker/default/name.rb#L4
+    def self.name: () -> String
     def self.first_name: -> String
     def self.last_name: -> String
   end

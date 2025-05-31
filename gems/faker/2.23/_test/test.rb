@@ -35,7 +35,8 @@ Faker::Internet.url(host: 'example.com') + 'string'
 Faker::Internet.url(host: 'example.com', path: '/foobar.html') + 'string'
 Faker::Internet.url(host: 'example.com', path: '/foobar.html') + 'string'
 Faker::Internet.private_ip_v4_address + 'string'
-
+Faker::Internet.public_ip_v4_address + 'string'
+Faker::Internet.uuid + 'string'
 
 # https://github.com/faker-ruby/faker/blob/v2.23.0/doc/default/job.md
 Faker::Job.title + 'string'
@@ -45,7 +46,7 @@ Faker::Name.first_name + 'string'
 Faker::Name.last_name + 'string'
 
 Faker::Name.name + 'string'
-Faker::Name.unique == Faker::Name
+Faker::Name.unique.first_name + 'string'
 Faker::Name.unique.clear
 Faker::UniqueGenerator.clear
 Faker::Lorem.unique.exclude :string, [number: 6], %w[azerty wxcvbn]
