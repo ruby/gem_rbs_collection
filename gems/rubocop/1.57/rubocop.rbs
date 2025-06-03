@@ -12,6 +12,11 @@ module RuboCop
     class Base
       extend AST::NodePattern::Macros
 
+      def self.exclude_from_registry: () -> void
+      def self.department: () -> Symbol
+      def self.cop_name: () -> String
+      def self.documentation_url: (?Config?) -> String
+
       def add_offense: (untyped node, ?message: String, ?severity: Symbol) -> void
                      | (untyped node, ?message: String, ?severity: Symbol) { (Corrector) -> void } -> void
       def cop_config: () -> Hash[String, untyped]
