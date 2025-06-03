@@ -55,6 +55,11 @@ module Types
     field :article, String, null: false do
       argument :id, ID, required: true
     end
+
+    field :error_field, String, null: false
+    def error_field
+      raise GraphQL::ExecutionError.new("Test error message", ast_node: nil, options: { "custom" => "option" }, extensions: { "code" => "TEST_ERROR" })
+    end
   end
 end
 
