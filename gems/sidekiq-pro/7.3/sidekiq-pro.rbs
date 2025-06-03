@@ -21,6 +21,7 @@ class Sidekiq::Config
 
   def reliable!: () -> untyped
 end
+
 module Sidekiq
   class Batch
     class Empty
@@ -128,6 +129,7 @@ module Sidekiq
     def register: (untyped jid) -> untyped
   end
 end
+
 module Sidekiq
   class Batch
     class Callback
@@ -143,11 +145,13 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module BatchClient
     def flush: (untyped conn) -> (nil | untyped)
   end
 end
+
 class Sidekiq::Batch::Status
   def dead?: () -> untyped
 
@@ -165,6 +169,7 @@ class Sidekiq::Batch::DeadSet
 
   def each: () { (untyped) -> untyped } -> untyped
 end
+
 module Sidekiq
   class Batch
     class Client
@@ -180,6 +185,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   class Batch
     #
@@ -272,6 +278,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Middleware
     module Server
@@ -304,6 +311,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   # Allows enumeration of all Batches in Redis.
   # Example:
@@ -339,6 +347,7 @@ module Sidekiq
     def paused?: () -> untyped
   end
 end
+
 module Sidekiq
   module Pro
     # Adds pause queue support to Sidekiq's basic fetch strategy.
@@ -355,6 +364,7 @@ module Sidekiq
     prepend ::Sidekiq::Pro::BasicFetch
   end
 end
+
 module Sidekiq
   module Pro
     class BatchStatus
@@ -364,6 +374,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq::Pro
   Message: untyped
 
@@ -405,6 +416,7 @@ module Sidekiq::Pro
     def terminate: (?wait: bool) -> untyped
   end
 end
+
 #
 # Require in your initializer:
 #
@@ -429,6 +441,7 @@ module Sidekiq::Middleware::Expiry
     def call: (untyped inst, untyped job, untyped queue) { () -> untyped } -> untyped
   end
 end
+
 module Sidekiq
   module Job
     attr_accessor bid: untyped
@@ -439,6 +452,7 @@ module Sidekiq
     def valid_within_batch?: () -> untyped
   end
 end
+
 class Sidekiq::Config
   def statsd=: (untyped thing) -> untyped
 
@@ -546,6 +560,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   # Reliable push is designed to handle transient network failures,
   # which cause the client to fail to deliver jobs to Redis.  It is not
@@ -579,6 +594,7 @@ module Sidekiq
     def self.reliable_push!: () -> true
   end
 end
+
 # Implements Lua-based schedule enqueuer
 module Sidekiq
   module Scheduled
@@ -591,6 +607,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Pro
     module Scripting
@@ -604,6 +621,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   # Allow targeting of Sidekiq API calls within a block
   # to a specific shard. Usage:
@@ -613,6 +631,7 @@ module Sidekiq
   #   end
   def self.via: (untyped pool) { () -> untyped } -> untyped
 end
+
 module Sidekiq::Pro
   #
   # Provides reliable queue processing via Redis' rpoplpush command.
@@ -714,6 +733,7 @@ module Sidekiq::Pro
     end
   end
 end
+
 module Sidekiq
   module Pro
     VERSION: "7.3.5"
@@ -723,6 +743,7 @@ module Sidekiq
     def self.gem_version: () -> untyped
   end
 end
+
 module Sidekiq::Pro
   module Web
     ROOT: untyped

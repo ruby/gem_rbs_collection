@@ -4,6 +4,7 @@
 module Sidekiq::Component
   def leader?: () -> untyped
 end
+
 module Sidekiq
   module Enterprise
     # The leader runs this code nightly to scan the current Sidekiq
@@ -62,6 +63,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   # keep these names short to minimize overhead
   Enc: untyped
@@ -165,6 +167,7 @@ class Sidekiq::HttpServer # < ::GServer
   # and +ip_auth_handler+
   def initialize: (untyped handle_obj, ?::Integer port, ?untyped host, ?::Integer maxConnections, ?untyped stdlog, ?bool audit, ?bool debug) -> void
 end
+
 module Sidekiq
   module Limiter
     self.@redis: untyped
@@ -344,6 +347,7 @@ module Sidekiq
     def self.unlimited: (*untyped args) -> untyped
   end
 end
+
 module Sidekiq::Enterprise
   class Liveness < Sidekiq::HttpServer
     @config: untyped
@@ -372,6 +376,7 @@ class Sidekiq::Config
   #   health_check(7433) # binds to 127.0.0.1
   def health_check: (?::Integer iface) { (?) -> untyped } -> untyped
 end
+
 class Sidekiq::Config
   def retain_history: (?::Integer interval) { (?) -> untyped } -> untyped
 end
@@ -407,6 +412,7 @@ module Sidekiq
     end
   end
 end
+
 class Sidekiq::Config
   #
   # A Loop generates jobs on some schedule, e.g. process new orders every 15 minutes.
@@ -471,6 +477,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Enterprise
     module Scripting
@@ -484,6 +491,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   #
   # The Senate abstraction allows a cluster of Sidekiq processes,
@@ -538,6 +546,7 @@ module Sidekiq
     def election: () -> untyped
   end
 end
+
 module Sidekiq
   module Enterprise
     class Systemd
@@ -614,6 +623,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Enterprise
     #
@@ -715,6 +725,7 @@ module Sidekiq
     def self.unique!: () -> untyped
   end
 end
+
 module Sidekiq
   module Enterprise
     VERSION: "7.3.4"
@@ -724,6 +735,7 @@ module Sidekiq
     def self.gem_version: () -> untyped
   end
 end
+
 module Sidekiq::Enterprise
   module Web
     ROOT: untyped
@@ -749,6 +761,7 @@ end
 class Sidekiq::Web
   def self.authorize: () { (?) -> untyped } -> untyped
 end
+
 module Sidekiq
   module Limiter
     class Base
@@ -784,6 +797,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     class Bucket < Base
@@ -831,11 +845,13 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     def self.within_all_limits: (*untyped limiters) { () -> untyped } -> untyped
   end
 end
+
 module Sidekiq
   module Limiter
     #
@@ -884,6 +900,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     #
@@ -928,6 +945,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     class Middleware
@@ -937,6 +955,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     #
@@ -1017,6 +1036,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   class LimiterSet
     include Enumerable[untyped]
@@ -1200,6 +1220,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     class Unlimited < Sidekiq::Limiter::Base
@@ -1219,6 +1240,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Limiter
     class Window < Base
@@ -1274,6 +1296,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Periodic
     class Config
@@ -1324,6 +1347,7 @@ module Sidekiq
     end
   end
 end
+
 # Parses cron expressions and computes the next occurence of the "job"
 #
 module Sidekiq
@@ -1419,6 +1443,7 @@ module Sidekiq
     def validate_source: () -> untyped
   end
 end
+
 module Sidekiq
   module Periodic
     #
@@ -1483,6 +1508,7 @@ module Sidekiq
     end
   end
 end
+
 module Sidekiq
   module Periodic
     #
@@ -1520,6 +1546,7 @@ module Sidekiq
     end
   end
 end
+
 # Useful for verifying the cron registration block in your initializer.
 #
 #     CRON_BLOCK = ->(mgr) { mgr.register("0 1 * * *", "NoSuchClass") }
