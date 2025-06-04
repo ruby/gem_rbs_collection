@@ -20,7 +20,10 @@ class TestCallbackObject < ActiveRecord::Base
     [true, false].sample
   end
 
-  validate :custom_validation, on: :update, unless: [:local_condition1, ->(my_rec) { my_rec.local_condition3 }]
+  # https://guides.rubyonrails.org/v6.0/active_record_validations.html#combining-validation-conditions
+  RAILS_60_DOCS_EXAMPLE = [:local_condition1, ->(my_rec) { my_rec.local_condition3 }] #: [Symbol, ^(TestCallbackObject) [self: TestCallbackObject] -> bool]
+
+  validate :custom_validation, on: :update, unless: RAILS_60_DOCS_EXAMPLE
 
   def custom_validation
     if self.class.name != 'TestCallbackObject'
