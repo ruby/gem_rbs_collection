@@ -12,8 +12,14 @@ class TestCallbackObject < ActiveRecord::Base
   end
 
   # https://guides.rubyonrails.org/v6.0/active_record_validations.html#combining-validation-conditions
-  RAILS_60_DOCS_EXAMPLE =
-    [:local_condition1, ->(my_rec) { my_rec.local_condition2 }, Proc.new { |my_rec| my_rec.local_condition3 }]
+  RAILS_60_DOCS_EXAMPLE = [
+    :local_condition1,
+    ->(my_rec) { my_rec.local_condition2 },
+    Proc.new do |my_rec|
+      # @type var my_rec: TestCallbackObject
+      my_rec.local_condition3
+    end
+  ]
 
   validate :custom_validation, on: :update, unless: RAILS_60_DOCS_EXAMPLE
 
