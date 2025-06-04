@@ -18,8 +18,10 @@ class TestCallbackObject < ActiveRecord::Base
   validate :custom_validation, on: :update, unless: RAILS_60_DOCS_EXAMPLE
 
   def custom_validation
-    if self.class.name != 'TestCallbackObject'
-      errors.add(:base, 'testing only')
+    if self.record_timestamps?
+      self.errors.add(:base, 'testing only')
+      self.errors.add(:var1, 'test')
+      self.errors.add(:var2, 'test test')
     end
   end
 end
