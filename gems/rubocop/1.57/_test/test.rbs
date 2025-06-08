@@ -1,0 +1,11 @@
+module RuboCop
+  module Cop
+    class SimplifyNotEmptyWithAny < Base
+      include IgnoredNode
+      MSG: String
+      RESTRICT_ON_SEND: Array[Symbol]
+      def on_send: (RuboCop::AST::Node node) -> void
+      def not_empty_call?: (RuboCop::AST::Node node) -> (RuboCop::AST::Node | nil)
+    end
+  end
+end
