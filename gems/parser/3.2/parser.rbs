@@ -3,6 +3,7 @@ module Parser
 
   class Base < Racc::Parser
     def parse: (String string, ?String file, ?Integer line) -> Parser::AST::Node?
+    def parse_with_comments: (String string, ?String file, ?Integer line) -> [Parser::AST::Node?, Array[Source::Comment]]
   end
 
   class Ruby18 < Base
@@ -43,6 +44,19 @@ module Parser
 
   module Source
     class Range
+      attr_reader source_buffer: Buffer
+      attr_reader begin_pos: Integer
+      attr_reader end_pos: Integer
+      def size: () -> Integer
+      alias length size
+      def line: () -> Integer
+      alias first_line line
+      def column: () -> Integer
+      def last_line: () -> Integer
+      def last_column: () -> Integer
+      def column_range: () -> ::Range[Integer]
+      def source_line: () -> String
+      def source: () -> String
     end
 
     ##
@@ -88,6 +102,8 @@ module Parser
     end
 
     class Map
+      attr_reader node: AST::Node | nil
+      attr_reader expression: Range
       def line: () -> Integer
       def first_line: () -> Integer
       def last_line: () -> Integer
@@ -97,7 +113,8 @@ module Parser
     end
 
     class Comment
-      def location: () -> Map
+      attr_reader text: String
+      attr_reader location: Map
       alias loc location
     end
   end
