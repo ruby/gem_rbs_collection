@@ -4,6 +4,7 @@ module RuboCop
       def raw_source: () -> String
       def buffer: () -> Parser::Source::Buffer
       def comments: () -> Array[Parser::Source::Comment]
+      attr_reader ast: (Node | nil)
     end
 
     module NodePattern
@@ -12,12 +13,27 @@ module RuboCop
       end
     end
 
+    module Descendence
+      def child_nodes: () -> Array[Node]
+    end
+
     class Node < Parser::AST::Node
+      include Descendence
       def source: () -> (String | nil)
     end
 
     class ArrayNode < Node
       alias values children
+    end
+
+    class DefNode < Node
+      def void_context?: () -> bool
+      def argument_forwarding?: () -> bool
+      def method_name: () -> Symbol
+      def arguments: () -> Array[Node]
+      def body: () -> Node
+      def receiver: () -> (Node | nil)
+      def endless?: () -> bool
     end
   end
 end
