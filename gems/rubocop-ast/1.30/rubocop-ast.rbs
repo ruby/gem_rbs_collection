@@ -20,6 +20,11 @@ module RuboCop
                    | () -> ::Enumerator[Node, self]
     end
 
+    module HashElementNode
+      def key: () -> Node
+      def value: () -> Node
+    end
+
     module Traversal
     end
 
@@ -46,8 +51,41 @@ module RuboCop
       def endless?: () -> bool
     end
 
+    class HashNode < Node
+      def pairs: () -> Array[PairNode]
+      def empty?: () -> bool
+      def each_pair: { (Node, Node) -> void } -> self
+                   | () -> ::Enumerator[PairNode, self]
+      def keys: () -> Array[Node]
+      def each_key: { (Node) -> void } -> self
+                  | () -> ::Enumerator[Node, self]
+      def values: () -> Array[Node]
+      def each_value: { (Node) -> void } -> self
+                    | () -> ::Enumerator[Node, self]
+      def pairs_on_same_line?: () -> bool
+      def mixed_delimiters?: () -> bool
+      def braces?: () -> bool
+    end
+
     class IfNode < Node
       def if?: () -> bool
+      def unless?: () -> bool
+      def elsif?: () -> bool
+      def else?: () -> bool
+      def ternary?: () -> bool
+      def keyword: () -> String
+      def inverse_keyword: () -> String
+      def modifier_form?: () -> bool
+      def nested_conditional?: () -> bool
+      def elsif_conditional?: () -> bool
+      def if_branch: () -> Node?
+      def else_branch: () -> Node?
+      def node_parts: () -> Array[Node]
+      def branches: () -> Array[Node]
+    end
+
+    class PairNode < Node
+      include HashElementNode
     end
 
     class SymbolNode < Node

@@ -11,7 +11,40 @@ class MyRule < Parser::AST::Processor
   end
 
   def on_if(node)
-    puts "I found a if! #{node.if?}"
+    node.if?
+    node.if_branch
+    node.else_branch
+    node.elsif_conditional?
+    node.if?
+    node.unless?
+    node.elsif?
+    node.else?
+    node.ternary?
+    node.keyword
+    node.inverse_keyword
+    node.modifier_form?
+    node.nested_conditional?
+    node.elsif_conditional?
+    node.if_branch
+    node.else_branch
+    node.node_parts
+    node.branches
+  end
+
+  def on_hash(node)
+    node.pairs
+    node.empty?
+    node.each_pair {|k, v| puts "#{k}#{v}" }
+    node.each_pair
+    node.keys
+    node.each_key {|n| n }
+    node.each_key
+    node.values
+    node.each_value {|n| n }
+    node.each_value
+    node.pairs_on_same_line?
+    node.mixed_delimiters?
+    node.braces?
   end
 end
 
@@ -24,3 +57,5 @@ ast.each_node { |n| rule.process(n) }
 ast.each_node(:sym) { |n| rule.process(n) }
 ast.each_node(:sym, :if) { |n| rule.process(n) }
 ast.each_node.each {}.each_node
+
+{ this_is: :hash }
