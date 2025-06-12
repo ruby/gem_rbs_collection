@@ -1,0 +1,16 @@
+module Parser
+  module AST
+    class Processor
+      module Mixin
+        def process: (Node? node) ->  Node?
+      end
+      include Mixin
+    end
+  end
+end
+
+class MyRule < Parser::AST::Processor
+  include RuboCop::AST::Traversal
+  def on_sym: (RuboCop::AST::SymbolNode node) -> void
+  def on_if: (RuboCop::AST::IfNode node) -> void
+end

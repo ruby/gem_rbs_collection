@@ -1,6 +1,7 @@
 module RuboCop
   module AST
     class ProcessedSource
+      def initialize: (String source, Float ruby_version, ?path?) -> untyped
       def raw_source: () -> String
       def buffer: () -> Parser::Source::Buffer
       def comments: () -> Array[Parser::Source::Comment]
@@ -15,6 +16,15 @@ module RuboCop
 
     module Descendence
       def child_nodes: () -> Array[Node]
+      def each_node: (*Symbol types) { (Node) -> void } -> void
+                   | () -> ::Enumerator[Node, self]
+    end
+
+    module Traversal
+    end
+
+    module BasicLiteralNode
+      def value: () -> untyped
     end
 
     class Node < Parser::AST::Node
@@ -34,6 +44,14 @@ module RuboCop
       def body: () -> Node
       def receiver: () -> (Node | nil)
       def endless?: () -> bool
+    end
+
+    class IfNode < Node
+      def if?: () -> bool
+    end
+
+    class SymbolNode < Node
+      include BasicLiteralNode
     end
   end
 end
