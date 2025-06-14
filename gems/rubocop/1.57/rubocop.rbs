@@ -12,6 +12,11 @@ module RuboCop
     class Base
       extend AST::NodePattern::Macros
 
+      def self.exclude_from_registry: () -> void
+      def self.department: () -> Symbol
+      def self.cop_name: () -> String
+      def self.documentation_url: (?Config?) -> String
+
       def add_offense: (untyped node, ?message: String, ?severity: Symbol) -> void
                      | (untyped node, ?message: String, ?severity: Symbol) { (Corrector) -> void } -> void
       def cop_config: () -> Hash[String, untyped]
@@ -23,6 +28,11 @@ module RuboCop
 
     module RangeHelp
       def source_range: (Parser::Source::Buffer source_buffer, Integer line_number, Integer column, ?Integer length) -> Parser::Source::Range
+    end
+
+    module IgnoredNode
+      def ignore_node: (RuboCop::AST::Node node) -> void
+      def part_of_ignored_node?: (RuboCop::AST::Node node) -> bool
     end
   end
 
