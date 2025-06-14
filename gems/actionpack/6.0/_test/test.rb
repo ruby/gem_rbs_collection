@@ -48,3 +48,5 @@ rs.draw do
     post :quux
   end
 end
+
+ActionController::Base.new.render_to_string(template: 'sample', locals: { foo: 'bar' })
