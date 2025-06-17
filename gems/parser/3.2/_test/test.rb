@@ -6,6 +6,13 @@ require "parser/current"
 
 node = Parser::CurrentRuby.parse("2 + 2") or raise
 node.loc
+node.loc.node
+node.loc.expression
+node.loc.line
+node.loc.first_line
+node.loc.last_line
+node.loc.column
+node.loc.last_column
 
 buffer = Parser::Source::Buffer.new(__FILE__)
 buffer.name
