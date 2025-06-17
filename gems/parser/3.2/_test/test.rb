@@ -27,6 +27,8 @@ range = comments.first.location.expression
 range.source_buffer
 range.begin_pos
 range.end_pos
+range.begin
+range.end
 range.size
 range.length
 range.line
@@ -37,6 +39,19 @@ range.last_column
 range.column_range
 range.source_line
 range.source
+range.with
+range.with(begin_pos: 1, end_pos: 2)
+range.adjust
+range.adjust(begin_pos: 1, end_pos: 2)
+range.resize(1)
+range.join range
+range.intersect range
+range.disjoint? range
+range.overlaps? range
+range.contains? range
+range.contained? range
+range.crossing? range
+range.empty?
 
 node = Parser::CurrentRuby.parse("[1,2]") or raise
 if node.loc.is_a? Parser::Source::Map::Collection

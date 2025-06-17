@@ -55,6 +55,8 @@ module Parser
       attr_reader source_buffer: Buffer
       attr_reader begin_pos: Integer
       attr_reader end_pos: Integer
+      def begin: () -> Range
+      def end: () -> Range
       def size: () -> Integer
       alias length size
       def line: () -> Integer
@@ -65,6 +67,17 @@ module Parser
       def column_range: () -> ::Range[Integer]
       def source_line: () -> String
       def source: () -> String
+      def with: (?begin_pos: Integer, ?end_pos: Integer) -> Range
+      def adjust: (?begin_pos: Integer, ?end_pos: Integer) -> Range
+      def resize: (Integer new_size) -> Range
+      def join: (Range other) -> Range
+      def intersect: (Range other) -> Range
+      def disjoint?: (Range other) -> bool
+      def overlaps?: (Range other) -> bool
+      def contains?: (Range other) -> bool
+      def contained?: (Range other) -> bool
+      def crossing?: (Range other) -> bool
+      def empty?: () -> bool
     end
 
     ##
