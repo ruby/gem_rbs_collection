@@ -37,3 +37,9 @@ range.last_column
 range.column_range
 range.source_line
 range.source
+
+node = Parser::CurrentRuby.parse("[1,2]") or raise
+if node.loc.is_a? Parser::Source::Map::Collection
+  node.loc.begin
+  node.loc.end
+end
