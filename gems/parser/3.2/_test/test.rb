@@ -58,3 +58,11 @@ if node.loc.is_a? Parser::Source::Map::Collection
   node.loc.begin
   node.loc.end
 end
+
+node = Parser::CurrentRuby.parse("if true then 1 else 2 end") or raise
+if node.loc.is_a? Parser::Source::Map::Condition
+  node.loc.keyword
+  node.loc.begin
+  node.loc.else
+  node.loc.end
+end
