@@ -66,6 +66,19 @@ module ActiveRecord
     end
   end
 
+  module AttributeMethods
+    module Read
+      # Returns the value of the attribute identified by <tt>attr_name</tt> after
+      # it has been typecast (for example, "2004-12-12" in a date column is cast
+      # to a date object, like Date.new(2004, 12, 12)).
+      def read_attribute: (untyped attr_name) ?{ () -> untyped } -> untyped
+
+      def _read_attribute: (untyped attr_name) ?{ () -> untyped } -> untyped
+
+      alias attribute _read_attribute
+    end
+  end
+
   module Encryption
     module EncryptableRecord
       module ClassMethods
