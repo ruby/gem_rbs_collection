@@ -59,3 +59,8 @@ ast.each_node(:sym, :if) { |n| rule.process(n) }
 ast.each_node.each {}.each_node
 
 { this_is: :hash }
+
+code = '!something.empty?'
+source = RuboCop::AST::ProcessedSource.new(code, RUBY_VERSION.to_f)
+node = source.ast
+RuboCop::AST::NodePattern.new('send').match(node)

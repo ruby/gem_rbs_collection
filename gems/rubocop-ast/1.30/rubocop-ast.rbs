@@ -8,10 +8,17 @@ module RuboCop
       attr_reader ast: (Node | nil)
     end
 
-    module NodePattern
+    class NodePattern
       module Macros
         def def_node_matcher: (Symbol, String) -> void
       end
+
+      class Compiler
+      end
+
+      def initialize: (String str, ?Compiler compiler) -> untyped
+      def match: (*untyped, **untyped) -> bool
+               | (*untyped, **untyped) { (*untyped) -> untyped } -> bool
     end
 
     module Descendence
