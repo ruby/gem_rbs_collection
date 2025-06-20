@@ -3,6 +3,12 @@
 module RuboCop
   module Cop
     class SimplifyNotEmptyWithAny < Base
+      extend TargetRubyVersion
+      minimum_target_ruby_version 2.7
+      maximum_target_ruby_version 2.6
+
+      requires_gem "my-gem", ">= 1.2.3", "< 4.5.6"
+
       extend AutoCorrector
       include IgnoredNode
 
@@ -15,6 +21,12 @@ module RuboCop
       PATTERN
 
       def on_send(node)
+        if target_gem_version("my-gem") < "2.0"
+          # ...
+        else
+          # ...
+        end
+
         expression = not_empty_call?(node)
         return unless expression
 
