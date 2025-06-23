@@ -38,6 +38,12 @@ module RuboCop
 
         ignore_node(node)
       end
+
+      def source_location(node)
+        range = node.source_range
+        path = smart_path(range.source_buffer.name)
+        "#{path}:#{range.line}"
+      end
     end
   end
 end

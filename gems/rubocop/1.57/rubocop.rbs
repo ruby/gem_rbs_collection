@@ -11,6 +11,7 @@ module RuboCop
   module Cop
     class Base
       extend AST::NodePattern::Macros
+      include Util
 
       def self.exclude_from_registry: () -> void
       def self.department: () -> Symbol
@@ -41,11 +42,19 @@ module RuboCop
       def minimum_target_ruby_version: (Float) -> void
       def maximum_target_ruby_version: (Float) -> void
     end
+
+    module Util
+      include PathUtil
+    end
   end
 
   class ProcessedSource = AST::ProcessedSource
 
   module AutoCorrector
     def support_autocorrect?: () -> true
+  end
+
+  module PathUtil
+    def smart_path: (String path) -> String
   end
 end

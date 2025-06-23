@@ -32,6 +32,13 @@ module RuboCop
       def value: () -> Node
     end
 
+    module ParameterizedNode
+      def first_argument: () -> Node?
+      module RestArguments
+        include ParameterizedNode
+      end
+    end
+
     module Traversal
     end
 
@@ -41,7 +48,148 @@ module RuboCop
 
     class Node < Parser::AST::Node
       include Descendence
+      def type?: (*Symbol types) -> bool
       def source: () -> (String | nil)
+      def true_type?: () -> bool
+      def false_type?: () -> bool
+      def nil_type?: () -> bool
+      def int_type?: () -> bool
+      def float_type?: () -> bool
+      def str_type?: () -> bool
+      def dstr_type?: () -> bool
+      def sym_type?: () -> bool
+      def dsym_type?: () -> bool
+      def xstr_type?: () -> bool
+      def regopt_type?: () -> bool
+      def regexp_type?: () -> bool
+      def array_type?: () -> bool
+      def splat_type?: () -> bool
+      def pair_type?: () -> bool
+      def kwsplat_type?: () -> bool
+      def hash_type?: () -> bool
+      def irange_type?: () -> bool
+      def erange_type?: () -> bool
+      def self_type?: () -> bool
+      def lvar_type?: () -> bool
+      def ivar_type?: () -> bool
+      def cvar_type?: () -> bool
+      def gvar_type?: () -> bool
+      def const_type?: () -> bool
+      def defined_type?: () -> bool
+      def lvasgn_type?: () -> bool
+      def ivasgn_type?: () -> bool
+      def cvasgn_type?: () -> bool
+      def gvasgn_type?: () -> bool
+      def casgn_type?: () -> bool
+      def mlhs_type?: () -> bool
+      def masgn_type?: () -> bool
+      def op_asgn_type?: () -> bool
+      def and_asgn_type?: () -> bool
+      def ensure_type?: () -> bool
+      def rescue_type?: () -> bool
+      def arg_expr_type?: () -> bool
+      def or_asgn_type?: () -> bool
+      def back_ref_type?: () -> bool
+      def nth_ref_type?: () -> bool
+      def match_with_lvasgn_type?: () -> bool
+      def match_current_line_type?: () -> bool
+      def module_type?: () -> bool
+      def class_type?: () -> bool
+      def sclass_type?: () -> bool
+      def def_type?: () -> bool
+      def defs_type?: () -> bool
+      def undef_type?: () -> bool
+      def alias_type?: () -> bool
+      def args_type?: () -> bool
+      def cbase_type?: () -> bool
+      def arg_type?: () -> bool
+      def optarg_type?: () -> bool
+      def restarg_type?: () -> bool
+      def blockarg_type?: () -> bool
+      def block_pass_type?: () -> bool
+      def kwarg_type?: () -> bool
+      def kwoptarg_type?: () -> bool
+      def kwrestarg_type?: () -> bool
+      def kwnilarg_type?: () -> bool
+      def csend_type?: () -> bool
+      def super_type?: () -> bool
+      def zsuper_type?: () -> bool
+      def yield_type?: () -> bool
+      def block_type?: () -> bool
+      def and_type?: () -> bool
+      def not_type?: () -> bool
+      def or_type?: () -> bool
+      def if_type?: () -> bool
+      def when_type?: () -> bool
+      def case_type?: () -> bool
+      def while_type?: () -> bool
+      def until_type?: () -> bool
+      def while_post_type?: () -> bool
+      def until_post_type?: () -> bool
+      def for_type?: () -> bool
+      def break_type?: () -> bool
+      def next_type?: () -> bool
+      def redo_type?: () -> bool
+      def return_type?: () -> bool
+      def resbody_type?: () -> bool
+      def kwbegin_type?: () -> bool
+      def begin_type?: () -> bool
+      def retry_type?: () -> bool
+      def preexe_type?: () -> bool
+      def postexe_type?: () -> bool
+      def iflipflop_type?: () -> bool
+      def eflipflop_type?: () -> bool
+      def shadowarg_type?: () -> bool
+      def complex_type?: () -> bool
+      def rational_type?: () -> bool
+      def __FILE___type?: () -> bool
+      def __LINE___type?: () -> bool
+      def __ENCODING___type?: () -> bool
+      def ident_type?: () -> bool
+      def lambda_type?: () -> bool
+      def indexasgn_type?: () -> bool
+      def index_type?: () -> bool
+      def procarg0_type?: () -> bool
+      def restarg_expr_type?: () -> bool
+      def blockarg_expr_type?: () -> bool
+      def objc_kwarg_type?: () -> bool
+      def objc_restarg_type?: () -> bool
+      def objc_varargs_type?: () -> bool
+      def numargs_type?: () -> bool
+      def numblock_type?: () -> bool
+      def forward_args_type?: () -> bool
+      def forwarded_args_type?: () -> bool
+      def forward_arg_type?: () -> bool
+      def case_match_type?: () -> bool
+      def in_match_type?: () -> bool
+      def in_pattern_type?: () -> bool
+      def match_var_type?: () -> bool
+      def pin_type?: () -> bool
+      def match_alt_type?: () -> bool
+      def match_as_type?: () -> bool
+      def match_rest_type?: () -> bool
+      def array_pattern_type?: () -> bool
+      def match_with_trailing_comma_type?: () -> bool
+      def array_pattern_with_tail_type?: () -> bool
+      def hash_pattern_type?: () -> bool
+      def const_pattern_type?: () -> bool
+      def if_guard_type?: () -> bool
+      def unless_guard_type?: () -> bool
+      def match_nil_pattern_type?: () -> bool
+      def empty_else_type?: () -> bool
+      def find_pattern_type?: () -> bool
+      def kwargs_type?: () -> bool
+      def match_pattern_p_type?: () -> bool
+      def match_pattern_type?: () -> bool
+      def forwarded_restarg_type?: () -> bool
+      def forwarded_kwrestarg_type?: () -> bool
+      def itarg_type?: () -> bool
+      def itblock_type?: () -> bool
+      def send_type?: () -> bool
+      def parent: () -> Node?
+      def each_ancestor: (*Symbol types) { (Node) -> void } -> self
+                       | () -> ::Enumerator[Node, self]
+      def source_range: () -> Parser::Source::Range
     end
 
     class ArrayNode < Node
@@ -49,6 +197,7 @@ module RuboCop
     end
 
     class DefNode < Node
+      include ParameterizedNode
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
@@ -93,6 +242,10 @@ module RuboCop
 
     class PairNode < Node
       include HashElementNode
+    end
+
+    class SendNode < Node
+      include ParameterizedNode::RestArguments
     end
 
     class SymbolNode < Node
