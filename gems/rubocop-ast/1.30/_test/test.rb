@@ -205,7 +205,9 @@ node&.itblock_type?
 
 node&.parent
 node&.each_ancestor { |node| node.send_type? }
+node&.each_ancestor(:send) { |node| node.send_type? }
 node&.each_ancestor&.each { |node| node.send_type? }&.send_type?
+node&.each_ancestor(:send)&.each { |node| node.send_type? }&.send_type?
 node&.source_range
 
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
