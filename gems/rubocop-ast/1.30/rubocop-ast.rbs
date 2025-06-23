@@ -32,6 +32,13 @@ module RuboCop
       def value: () -> Node
     end
 
+    module ParameterizedNode
+      def first_argument: () -> Node?
+      module RestArguments
+        include ParameterizedNode
+      end
+    end
+
     module Traversal
     end
 
@@ -41,6 +48,7 @@ module RuboCop
 
     class Node < Parser::AST::Node
       include Descendence
+      def type?: (*Symbol types) -> bool
       def source: () -> (String | nil)
       def true_type?: () -> bool
       def false_type?: () -> bool
@@ -177,6 +185,11 @@ module RuboCop
       def forwarded_kwrestarg_type?: () -> bool
       def itarg_type?: () -> bool
       def itblock_type?: () -> bool
+      def send_type?: () -> bool
+      def parent: () -> Node?
+      def each_ancestor: (*Symbol types) { (Node) -> void } -> self
+                       | () -> ::Enumerator[Node, self]
+      def source_range: () -> Parser::Source::Range
     end
 
     class ArrayNode < Node
@@ -184,6 +197,7 @@ module RuboCop
     end
 
     class DefNode < Node
+      include ParameterizedNode
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
@@ -228,6 +242,10 @@ module RuboCop
 
     class PairNode < Node
       include HashElementNode
+    end
+
+    class SendNode < Node
+      include ParameterizedNode::RestArguments
     end
 
     class SymbolNode < Node

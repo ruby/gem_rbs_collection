@@ -65,6 +65,7 @@ source = RuboCop::AST::ProcessedSource.new(code, RUBY_VERSION.to_f)
 node = source.ast
 RuboCop::AST::NodePattern.new('send').match(node)
 
+node&.type?
 # tests for *_type?
 node&.true_type?
 node&.false_type?
@@ -201,3 +202,14 @@ node&.forwarded_restarg_type?
 node&.forwarded_kwrestarg_type?
 node&.itarg_type?
 node&.itblock_type?
+
+node&.parent
+node&.each_ancestor { |node| node.send_type? }
+node&.each_ancestor&.each { |node| node.send_type? }&.send_type?
+node&.source_range
+
+def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
+def_node.first_argument if def_node.is_a?(RuboCop::AST::DefNode)
+
+send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
+send_node&.first_argument if send_node.is_a?(RuboCop::AST::SendNode)
