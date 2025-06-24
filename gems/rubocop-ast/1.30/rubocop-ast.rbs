@@ -32,6 +32,14 @@ module RuboCop
       def value: () -> Node
     end
 
+    module MethodDispatchNode
+      include MethodIdentifierPredicates
+    end
+
+    module MethodIdentifierPredicates
+      def method?: ((Symbol | String) name) -> bool
+    end
+
     module ParameterizedNode
       def first_argument: () -> Node?
       module RestArguments
@@ -250,6 +258,7 @@ module RuboCop
 
     class SendNode < Node
       include ParameterizedNode::RestArguments
+      include MethodDispatchNode
     end
 
     class SymbolNode < Node
