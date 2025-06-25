@@ -215,3 +215,6 @@ def_node.first_argument if def_node.is_a?(RuboCop::AST::DefNode)
 
 send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
 send_node&.first_argument if send_node.is_a?(RuboCop::AST::SendNode)
+
+block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
+block_node.send_node.method?(:tap) if block_node.is_a?(RuboCop::AST::BlockNode)
