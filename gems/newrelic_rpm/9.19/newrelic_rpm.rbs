@@ -1,0 +1,169 @@
+# TypeProf 0.21.7
+
+module NewRelic
+  module VERSION
+    MAJOR: Integer
+    MINOR: Integer
+    TINY: Integer
+    STRING: String
+  end
+
+  module Agent
+    extend ::NewRelic::Agent
+
+    class LicenseException < StandardError
+    end
+
+    class ForceDisconnectException < StandardError
+    end
+
+    class AutomaticTracerParseException < StandardError
+    end
+
+    class AutomaticTracerTraceException < StandardError
+    end
+
+    class ForceRestartException < StandardError
+      def message: () -> String
+    end
+
+    class BusyCalculator
+      def self.busy_count: () -> Integer
+    end
+
+    class UnrecoverableError < StandardError
+    end
+
+    class BackgroundLoadingError < StandardError
+    end
+
+    class InternalAgentError < StandardError
+    end
+
+    TRACE_ID_KEY: String
+    SPAN_ID_KEY: String
+    ENTITY_NAME_KEY: String
+    ENTITY_TYPE_KEY: String
+    ENTITY_GUID_KEY: String
+    HOSTNAME_KEY: String
+    ENTITY_TYPE: String
+    LLM_FEEDBACK_MESSAGE: String
+    SUPPORTABILITY_INCREMENT_METRIC: String
+    EMPTY_STR: String
+
+    # Recording custom metrics
+    def record_metric: (String metric_name, (Numeric | Hash[Symbol, Numeric]) value) -> void
+
+    def increment_metric: (String metric_name, ?Integer amount) -> void
+
+    # Recording custom errors
+    def ignore_error_filter: () { (Exception) -> (Exception | nil) } -> (^(Exception) -> (Exception | nil))
+                            | () -> (^(Exception) -> (Exception | nil))?
+
+    def notice_error: (Exception exception, ?Hash[Symbol, untyped] options) -> nil
+
+    def set_error_group_callback: (^(Hash[Symbol, untyped]) -> String callback_proc) -> void
+
+    # Recording custom Insights events
+    def record_custom_event: ((Symbol | String) event_type, Hash[untyped, untyped] event_attrs) -> nil
+
+    def record_llm_feedback_event: (
+      trace_id: String,
+      rating: (String | Integer),
+      ?category: String?,
+      ?message: String?,
+      ?metadata: Hash[untyped, untyped]
+    ) -> void
+
+    # LLM callbacks
+    def set_llm_token_count_callback: (^(Hash[Symbol, untyped]) -> Integer callback_proc) -> void
+
+    # Manual agent configuration and startup/shutdown
+    def manual_start: (?Hash[Symbol, untyped] options) -> void
+
+    def after_fork: (?Hash[Symbol, untyped] options) -> void
+
+    def shutdown: (?Hash[untyped, untyped] options) -> void
+
+    def drop_buffered_data: () -> void
+
+    def add_instrumentation: (String file_pattern) -> void
+
+    def require_test_helper: () -> void
+
+    def set_sql_obfuscator: (?(:before | :replace | :after) type) { (String) -> String } -> void
+
+    # Ignoring or excluding data
+    def ignore_transaction: () -> void
+
+    def ignore_apdex: () -> void
+
+    def ignore_enduser: () -> void
+
+    def disable_all_tracing: [T] () { () -> T } -> T
+
+    def disable_sql_recording: [T] () { () -> T } -> T
+
+    # Adding custom attributes to traces
+    def add_custom_attributes: (Hash[untyped, untyped] params) -> void
+
+    def add_custom_span_attributes: (Hash[untyped, untyped] params) -> void
+
+    def add_custom_log_attributes: (Hash[untyped, untyped] params) -> void
+
+    def set_user_id: (String user_id) -> void
+
+    # Transaction naming
+    def set_transaction_name: (String name, ?Hash[Symbol, untyped] options) -> void
+
+    def get_transaction_name: () -> String?
+
+    def with_database_metric_name: [T] (untyped model, ?String? method, ?String? product) { () -> T } -> T
+
+    # Trace and Entity metadata
+    def linking_metadata: () -> Hash[String, String]
+
+    # Manual browser monitoring configuration
+    def browser_timing_header: (?String? nonce) -> String
+
+
+    module MethodTracer
+      def trace_execution_scoped: [T] ((String | Array[String]) metric_names, ?Hash[Symbol, untyped] options) { () -> T } -> T
+
+      def trace_execution_unscoped: [T] ((String | Array[String]) metric_names, ?Hash[Symbol, untyped] options) { () -> T } -> T
+
+      module ClassMethods
+        def add_method_tracer: (Symbol method_name, ?String? metric_name, ?Hash[Symbol, untyped] options) -> void
+
+        def remove_method_tracer: (Symbol method_name) -> void
+      end
+
+      def self.included: (Module klass) -> void
+
+      def self.extended: (Module klass) -> void
+    end
+
+    module Instrumentation
+      module ControllerInstrumentation
+        NR_DO_NOT_TRACE_KEY: Symbol
+        NR_IGNORE_APDEX_KEY: Symbol
+        NR_IGNORE_ENDUSER_KEY: Symbol
+        NR_DEFAULT_OPTIONS: Hash[untyped, untyped]
+
+        module ClassMethods
+          def newrelic_ignore: (?Hash[Symbol, untyped] specifiers) -> void
+
+          def newrelic_ignore_apdex: (?Hash[Symbol, untyped] specifiers) -> void
+
+          def newrelic_ignore_enduser: (?Hash[Symbol, untyped] specifiers) -> void
+
+          def add_transaction_tracer: (Symbol method, ?Hash[Symbol, untyped] options) -> void
+        end
+
+        def perform_action_with_newrelic_trace: [T] (?Hash[Symbol, untyped] options) { () -> T } -> T
+
+        def self.included: (Module clazz) -> void
+      end
+    end
+  end
+end
