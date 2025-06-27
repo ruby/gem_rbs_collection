@@ -66,3 +66,9 @@ if node.loc.is_a? Parser::Source::Map::Condition
   node.loc.else
   node.loc.end
 end
+
+node = Parser::CurrentRuby.parse("1.to_s") or raise
+if node.loc.is_a? Parser::Source::Map::Send
+  node.loc.dot
+  node.loc.selector
+end

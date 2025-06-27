@@ -210,11 +210,29 @@ node&.each_ancestor&.each { |node| node.send_type? }&.send_type?
 node&.each_ancestor(:send)&.each { |node| node.send_type? }&.send_type?
 node&.source_range
 
+node&.each_child_node { |node| node.send_type? }
+node&.each_child_node(:send) { |node| node.send_type? }
+node&.each_child_node&.each { |node| node.send_type? }
+node&.each_child_node(:send)&.each { |node| node.send_type? }
+node&.child_nodes
+node&.each_descendant { |node| node.send_type? }
+node&.each_descendant(:send) { |node| node.send_type? }
+node&.each_descendant&.each { |node| node.send_type? }
+node&.each_descendant(:send)&.each { |node| node.send_type? }
+node&.each_node { |node| node.send_type? }
+node&.each_node(:send) { |node| node.send_type? }
+node&.each_node&.each { |node| node.send_type? }
+node&.each_node(:send)&.each { |node| node.send_type? }
+
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
 def_node.first_argument if def_node.is_a?(RuboCop::AST::DefNode)
 
 send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
-send_node&.first_argument if send_node.is_a?(RuboCop::AST::SendNode)
+if send_node.is_a?(RuboCop::AST::SendNode)
+  send_node.first_argument
+  send_node.arguments
+  send_node.method_name
+end
 
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
 block_node.send_node.method?(:tap) if block_node.is_a?(RuboCop::AST::BlockNode)

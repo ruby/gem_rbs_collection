@@ -71,7 +71,7 @@ module Parser
       def adjust: (?begin_pos: Integer, ?end_pos: Integer) -> Range
       def resize: (Integer new_size) -> Range
       def join: (Range other) -> Range
-      def intersect: (Range other) -> Range
+      def intersect: (Range other) -> Range?
       def disjoint?: (Range other) -> bool
       def overlaps?: (Range other) -> bool
       def contains?: (Range other) -> bool
@@ -119,7 +119,9 @@ module Parser
     end
 
     class TreeRewriter
-      def replace: (untyped range, String content) -> self
+      def replace: (Range range, String content) -> self
+      def remove: (Range range) -> self
+      def insert_after: (Range range, String content) -> self
     end
 
     class Map
@@ -142,6 +144,11 @@ module Parser
       attr_reader begin: Range
       attr_reader else: Range
       attr_reader end: Range
+    end
+
+    class Map::Send < Map
+      attr_reader dot: Range
+      attr_reader selector: Range
     end
 
     class Comment
