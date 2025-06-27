@@ -22,9 +22,14 @@ module RuboCop
     end
 
     module Descendence
+      def each_child_node: (*Symbol types) { (Node) -> void } -> self
+                         | (*Symbol types) -> ::Enumerator[Node, self]
       def child_nodes: () -> Array[Node]
-      def each_node: (*Symbol types) { (Node) -> void } -> void
-                   | () -> ::Enumerator[Node, self]
+      def each_descendant: (*Symbol types) { (Node) -> void } -> self
+                         | (*Symbol types) -> ::Enumerator[Node, self]
+      def descendants: () -> Array[Node]
+      def each_node: (*Symbol types) { (Node) -> void } -> self
+                   | (*Symbol types) -> ::Enumerator[Node, self]
     end
 
     module HashElementNode
@@ -34,6 +39,7 @@ module RuboCop
 
     module MethodDispatchNode
       include MethodIdentifierPredicates
+      def method_name: () -> Symbol
     end
 
     module MethodIdentifierPredicates
@@ -42,6 +48,7 @@ module RuboCop
 
     module ParameterizedNode
       def first_argument: () -> Node?
+      def arguments: () -> Array[Node]
       module RestArguments
         include ParameterizedNode
       end
