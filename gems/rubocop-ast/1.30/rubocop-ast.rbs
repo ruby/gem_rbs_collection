@@ -226,6 +226,10 @@ module RuboCop
       def endless?: () -> bool
     end
 
+    class DstrNode < Node
+      def value: () -> String
+    end
+
     class HashNode < Node
       def pairs: () -> Array[PairNode]
       def empty?: () -> bool
@@ -263,13 +267,23 @@ module RuboCop
       include HashElementNode
     end
 
+    class RegexpNode < Node
+      def to_regexp: () -> ::Regexp
+    end
+
     class SendNode < Node
       include ParameterizedNode::RestArguments
       include MethodDispatchNode
     end
 
+    class StrNode < Node
+      include BasicLiteralNode
+      def value: () -> String
+    end
+
     class SymbolNode < Node
       include BasicLiteralNode
+      def value: () -> Symbol
     end
   end
 end

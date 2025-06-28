@@ -236,3 +236,15 @@ end
 
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
 block_node.send_node.method?(:tap) if block_node.is_a?(RuboCop::AST::BlockNode)
+
+str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
+str_node.value if str_node.is_a?(RuboCop::AST::StrNode)
+
+dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
+dstr_node.value if dstr_node.is_a?(RuboCop::AST::DstrNode)
+
+sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
+sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
+
+regexp_node = RuboCop::AST::ProcessedSource.new('/abc/', RUBY_VERSION.to_f).ast
+regexp_node.to_regexp if regexp_node.is_a?(RuboCop::AST::RegexpNode)
