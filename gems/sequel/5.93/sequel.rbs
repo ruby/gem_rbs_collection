@@ -1,0 +1,137 @@
+module Sequel
+  VERSION: String
+
+  # Database connection methods
+  def self.connect: (String uri, ?Hash[Symbol, untyped] opts) -> Database
+                  | (Hash[Symbol, untyped] opts) -> Database
+
+  def self.sqlite: (?String? filename, ?Hash[Symbol, untyped] opts) -> Database
+                 | (Hash[Symbol, untyped] opts) -> Database
+  def self.postgres: (String database, ?Hash[Symbol, untyped] opts) -> Database
+  def self.mysql2: (String database, ?Hash[Symbol, untyped] opts) -> Database
+
+  # Extension loading
+  def self.extension: (*Symbol extensions) -> void
+
+  # Functions and expressions
+  def self.expr: (untyped arg) -> untyped
+  def self.lit: (String lit, *untyped args) -> untyped
+  def self.as: (untyped expression, Symbol | String alias) -> untyped
+  def self.function: (Symbol name, *untyped args) -> untyped
+  def self.cast: (untyped expr, Symbol | String type) -> untyped
+
+  class Database
+    # Dataset creation
+    def []: (Symbol | String table_or_sql) -> Dataset
+    def from: (*Symbol tables) -> Dataset
+    def select: (*Symbol columns) -> Dataset
+
+    # Execute raw SQL
+    def run: (String sql, ?Hash[Symbol, untyped] opts) -> void
+    def execute: (String sql, ?Hash[Symbol, untyped] opts) -> untyped
+
+    # Transaction support
+    def transaction: (?Hash[Symbol, untyped] opts) { () -> untyped } -> untyped
+    def in_transaction?: (?Hash[Symbol, untyped] opts) -> bool
+
+    # Schema methods
+    def create_table: (Symbol table_name, ?Hash[Symbol, untyped] opts) { (untyped) -> void } -> void
+    def drop_table: (*Symbol table_names) -> void
+    def alter_table: (Symbol table_name) { (untyped) -> void } -> void
+    def tables: (?Hash[Symbol, untyped] opts) -> Array[Symbol]
+    def table_exists?: (Symbol table_name) -> bool
+  end
+
+  class Dataset
+    include Enumerable[Hash[Symbol, untyped]]
+
+    # Query building methods
+    def where: (*untyped conditions) -> Dataset
+             | (Hash[Symbol, untyped] conditions) -> Dataset
+    def filter: (*untyped conditions) -> Dataset
+    def exclude: (*untyped conditions) -> Dataset
+    def select: (*Symbol | String columns) -> Dataset
+    def join: (Symbol | String table, ?untyped conditions) -> Dataset
+    def left_join: (Symbol | String table, ?untyped conditions) -> Dataset
+    def order: (*Symbol | String columns) -> Dataset
+    def limit: (Integer n, ?Integer offset) -> Dataset
+    def offset: (Integer n) -> Dataset
+    def distinct: () -> Dataset
+
+    # Data retrieval methods
+    def all: () -> Array[Hash[Symbol, untyped]]
+    def each: () { (Hash[Symbol, untyped]) -> void } -> void
+    def first: () -> Hash[Symbol, untyped]?
+    def count: () -> Integer
+    def empty?: () -> bool
+
+    # Data manipulation methods
+    def insert: (Hash[Symbol | String, untyped] values) -> Integer
+    def update: (Hash[Symbol | String, untyped] values) -> Integer
+    def delete: () -> Integer
+
+    # SQL generation
+    def sql: () -> String
+  end
+
+  class Model
+    # Class methods
+    def self.dataset: () -> Dataset
+    def self.db: () -> Database
+    def self.db=: (Database db) -> void
+    def self.table_name: () -> Symbol
+    def self.set_dataset: (Dataset | Symbol dataset) -> void
+
+    # CRUD class methods
+    def self.create: (Hash[Symbol, untyped] values) -> instance
+    def self.[]: (Integer id) -> instance?
+               | (Hash[Symbol, untyped] conditions) -> instance?
+    def self.find: (Hash[Symbol, untyped] conditions) -> instance?
+    def self.find_or_create: (Hash[Symbol, untyped] conditions) -> instance
+
+    # Query methods (delegated to dataset)
+    def self.all: () -> Array[instance]
+    def self.first: () -> instance?
+    def self.last: () -> instance?
+    def self.where: (*untyped conditions) -> Dataset
+    def self.count: () -> Integer
+
+    # Instance methods
+    def initialize: (Hash[Symbol, untyped] values) -> void
+
+    # Persistence methods
+    def save: () -> self
+    def update: (Hash[Symbol, untyped] values) -> self
+    def delete: () -> self
+    def destroy: () -> self
+    def refresh: () -> self
+
+    # Attribute access
+    def []: (Symbol column) -> untyped
+    def []=: (Symbol column, untyped value) -> untyped
+    def values: () -> Hash[Symbol, untyped]
+
+    # State methods
+    def new?: () -> bool
+    def modified?: (?Symbol column) -> bool
+    def pk: () -> untyped
+
+    # Validation
+    def valid?: () -> bool
+    def errors: () -> Hash[Symbol, Array[String]]
+
+    # Plugin method
+    def self.plugin: (Symbol plugin, *untyped args) -> void
+  end
+
+  # Common exceptions
+  class Error < StandardError
+  end
+
+  class DatabaseError < Error
+  end
+
+  class ValidationFailed < Error
+    def errors: () -> Hash[Symbol, Array[String]]
+  end
+end
