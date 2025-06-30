@@ -54,6 +54,8 @@ module Test
   User.sole.id
   User.all.sole.id
   User.take.articles.sole.id
+  User.from('users AS users')
+  User.from(User.where(:active), :u)
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')
   user.encrypt
   user.encrypted_attribute?(:secret)
