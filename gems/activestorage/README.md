@@ -2,6 +2,7 @@ Maintenance policy for RBS of Rails
 ===
 
 We basically only accept changes for the versions listed under the **"List of currently supported releases"** in the [Rails' maintenance policy](https://rubyonrails.org/maintenance).
+Or support the last version maintained in this repository.
 
 Versions outside of that are generally not accepted for changes. We do not run tests for them, nor do we include them in format detection.
 
