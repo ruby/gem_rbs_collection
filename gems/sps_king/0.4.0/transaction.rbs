@@ -1,0 +1,25 @@
+module SPS
+  class Transaction
+    include ActiveModel::Validations
+    extend ::SPS::Converter
+    include ::SPS::Converter::InstanceMethods
+
+    attr_accessor name: ::String
+    attr_accessor iban: ::String
+    attr_accessor bic: ::String
+    attr_accessor instruction: ::String?
+    attr_accessor reference: ::String?
+    attr_accessor remittance_information: ::String?
+    attr_accessor requested_date: ::Date
+    attr_accessor batch_booking: bool
+    attr_accessor debtor_address: ::SPS::DebtorAddress
+    attr_accessor creditor_address: ::SPS::CreditorAddress
+    attr_accessor amount: ::BigDecimal
+    attr_accessor currency: ::String
+    attr_accessor structured_remittance_information: ::SPS::StructuredRemittanceInformation?
+
+    def initialize: (
+        transaction_attributes_type attributes
+      ) -> void
+  end
+end

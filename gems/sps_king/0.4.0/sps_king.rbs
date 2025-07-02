@@ -1,0 +1,61 @@
+module SPS
+  type address_line_based_type = {
+      address_line1: ::String,
+      address_line2: ::String,
+      country_code: ::String
+    }
+
+  type address_separate_type = {
+      street_name: ::String,
+      post_code: ::String,
+      town_name: ::String,
+      country_code: ::String
+    }
+
+  type transaction_attributes_type = {
+      name: ::String,
+      iban: ::String,
+      amount: (::BigDecimal | ::Integer | ::Float | ::String),
+      ?currency: ::String,
+      ?instruction: ::String?,
+      ?reference: ::String?,
+      ?remittance_information: ::String?,
+      ?structured_remittance_information: ::SPS::StructuredRemittanceInformation?,
+      ?requested_date: ::Date?,
+      debtor_address: ::SPS::DebtorAddress,
+    }
+
+  type service_level_direct_debit_type = 'CHDD' | 'CHTA'
+  type local_instrument_type = 'DDCOR1' | 'DDB2B' | 'LSV+' | 'BDD'
+
+  type direct_debit_transaction_attributes_type = transaction_attributes_type & {
+      ?service_level: service_level_direct_debit_type?,
+      ?local_instrument: local_instrument_type?,
+      ?creditor_account: ::SPS::CreditorAccount?
+    }
+
+  type service_level_credit_transfer_type = 'SEPA' | 'URGP'
+  type charge_bearer_type = 'DEBT' | 'CRED' | 'SHAR' | 'SLEV'
+
+  type credit_transfer_transaction_attributes_type = transaction_attributes_type & {
+      bic: ::String,
+      creditor_address: ::SPS::CreditorAddress,
+      ?batch_booking: bool,
+      ?service_level: service_level_credit_transfer_type?,
+      ?charge_bearer: charge_bearer_type?,
+      ?category_purpose: ::String?
+    }
+
+  type debtor_account_attributes_type = {
+      name: ::String,
+      iban: ::String,
+      bic: ::String
+    }
+  type creditor_account_attributes_type = {
+      name: ::String,
+      iban: ::String,
+      creditor_identifier: ::String,
+      ?isr_participant_number: ::String
+    }
+end
+
