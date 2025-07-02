@@ -1,0 +1,22 @@
+module SPS
+  class CreditTransfer < ::SPS::Message
+    attr_accessor account_class: ::SPS::DebtorAccount
+    attr_accessor transaction_class: ::SPS::CreditTransferTransaction
+    attr_accessor xml_main_tag: 'CstmrCdtTrfInitn'
+    attr_accessor known_schemas: [schema_pain_001_type]
+
+    def initialize: (
+        debtor_account_attributes_type account_options
+      ) -> self
+
+    def add_transaction: (
+        credit_transfer_transaction_attributes_type options
+      ) -> void
+
+    def amount_total: (
+        ?::Array[::SPS::CreditTransferTransaction]? selected_transactions
+      ) -> ::BigDecimal
+
+    def transactions: -> ::Array[::SPS::CreditTransferTransaction]
+  end
+end

@@ -1,0 +1,30 @@
+module SPS
+  type schema_pain_008_type = 'pain.008.001.02.ch.03'
+  type schema_pain_001_type = 'pain.001.001.03.ch.02'
+  type pain_schema_type = schema_pain_008_type | schema_pain_001_type
+  PAIN_008_001_02_CH_03: schema_pain_008_type
+  PAIN_001_001_03_CH_02: schema_pain_001_type
+
+  class Message
+    attr_accessor account_class: ::SPS::CreditorAccount | ::SPS::DebtorAccount
+    attr_accessor transaction_class: ::SPS::DirectDebitTransaction | ::SPS::CreditTransferTransaction
+    attr_accessor xml_main_tag: ::String
+    attr_accessor known_schemas: ::Array[pain_schema_type]
+
+    def initialize: (
+        (debtor_account_attributes_type | creditor_account_attributes_type) account_options
+      ) -> self
+
+    def amount_total: (
+        ?::Array[::SPS::DirectDebitTransaction | ::SPS::CreditTransferTransaction]? selected_transactions
+      ) -> ::BigDecimal
+
+    def creation_date_time: -> ::String
+
+    def creation_date_time=: (::String value)-> ::String
+
+    def message_identification: -> ::String
+
+    def to_xml: -> ::String
+  end
+end

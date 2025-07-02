@@ -1,0 +1,21 @@
+module SPS
+  class CreditorAddress
+    include ActiveModel::Validations
+    extend ::SPS::Converter
+    include ::SPS::Converter::InstanceMethods
+
+    attr_accessor country_code: ::String
+    attr_accessor address_line1: ::String
+    attr_accessor address_line2: ::String
+    attr_accessor street_name: ::String
+    attr_accessor building_number: ::String
+    attr_accessor post_code: ::String
+    attr_accessor town_name: ::String
+
+    type separate_attributes = address_separate_type & {
+        building_number: ::String,
+      }
+
+    def initialize: ((address_line_based_type | separate_attributes) attributes) -> void
+  end
+end
