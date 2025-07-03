@@ -511,18 +511,6 @@ module AbstractController
     # sticks the result in <tt>self.response_body</tt>.
     def render: (*untyped args) { () -> untyped } -> untyped
 
-    # Raw rendering of a template to a string.
-    #
-    # It is similar to render, except that it does not
-    # set the +response_body+ and it should be guaranteed
-    # to always return a string.
-    #
-    # If a component extends the semantics of +response_body+
-    # (as ActionController extends it to be anything that
-    # responds to the method each), this method needs to be
-    # overridden in order to still return a string.
-    def render_to_string: (*untyped args) { () -> untyped } -> untyped
-
     # Performs the actual template rendering.
     def render_to_body: (?::Hash[untyped, untyped] options) -> nil
 
@@ -2747,9 +2735,6 @@ module ActionController
     def process_action: () -> untyped
 
     def render: (*untyped args) -> untyped
-
-    # Overwrite render_to_string because body can now be set to a Rack body.
-    def render_to_string: () -> untyped
 
     def render_to_body: (?::Hash[untyped, untyped] options) -> untyped
 

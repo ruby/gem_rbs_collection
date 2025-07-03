@@ -255,6 +255,12 @@ module AbstractController
   end
 end
 
+module AbstractController
+  module Rendering
+    def render_to_string: (*untyped args) ?{ () -> untyped } -> ::String
+  end
+end
+
 module ActionController
   module Caching
     extend AbstractController::Caching::ClassMethods
@@ -274,5 +280,11 @@ module ActionController
   class TestSession < Rack::Session::Abstract::PersistedSecure::SecureSessionHash
     def fetch: (untyped key) ?{ () -> untyped } -> untyped
              | (untyped key, untyped args) -> untyped
+  end
+end
+
+module ActionController
+  module Rendering
+    def render_to_string: (*untyped args) ?{ () -> untyped } -> ::String
   end
 end
