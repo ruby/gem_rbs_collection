@@ -3,7 +3,7 @@
 
 require "rqrcode"
 
-qr = RQRCode::QRCode.new("https://kyan.com")
+qr = RQRCode::QRCode.new("https://kyan.com", level: :h)
 
 puts qr.to_s
 
