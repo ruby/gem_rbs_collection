@@ -71,4 +71,7 @@ node = Parser::CurrentRuby.parse("1.to_s") or raise
 if node.loc.is_a? Parser::Source::Map::Send
   node.loc.dot
   node.loc.selector
+  node.loc.operator
+  node.loc.begin
+  node.loc.end
 end
