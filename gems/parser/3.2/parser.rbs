@@ -121,6 +121,7 @@ module Parser
     class TreeRewriter
       def replace: (Range range, String content) -> self
       def remove: (Range range) -> self
+      def insert_before: (Range range, String content) -> self
       def insert_after: (Range range, String content) -> self
     end
 
@@ -149,6 +150,9 @@ module Parser
     class Map::Send < Map
       attr_reader dot: Range
       attr_reader selector: Range
+      attr_reader operator: Range?
+      attr_reader begin: Range?
+      attr_reader end: Range?
     end
 
     class Comment

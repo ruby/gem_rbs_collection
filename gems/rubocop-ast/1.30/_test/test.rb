@@ -209,6 +209,11 @@ node&.each_ancestor(:send) { |node| node.send_type? }
 node&.each_ancestor&.each { |node| node.send_type? }&.send_type?
 node&.each_ancestor(:send)&.each { |node| node.send_type? }&.send_type?
 node&.source_range
+node&.sibling_index
+node&.right_sibling
+node&.left_sibling
+node&.left_siblings
+node&.right_siblings
 
 node&.each_child_node { |node| node.send_type? }
 node&.each_child_node(:send) { |node| node.send_type? }
@@ -225,13 +230,56 @@ node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
-def_node.first_argument if def_node.is_a?(RuboCop::AST::DefNode)
+if def_node.is_a?(RuboCop::AST::DefNode)
+  def_node.first_argument
+  def_node.parenthesized?
+  def_node.last_argument
+  def_node.arguments?
+  def_node.splat_argument?
+  def_node.rest_argument?
+  def_node.block_argument?
+end
 
 send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
 if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.first_argument
   send_node.arguments
+  send_node.receiver
   send_node.method_name
+  send_node.selector
+  send_node.block_node
+  send_node.macro?
+  send_node.access_modifier?
+  send_node.bare_access_modifier?
+  send_node.non_bare_access_modifier?
+  send_node.special_modifier?
+  send_node.command?(:a)
+  send_node.setter_method?
+  send_node.assignment?
+  send_node.dot?
+  send_node.double_colon?
+  send_node.safe_navigation?
+  send_node.self_receiver?
+  send_node.const_receiver?
+  send_node.implicit_call?
+  send_node.block_literal?
+  send_node.arithmetic_operation?
+  send_node.def_modifier?
+  send_node.def_modifier
+  send_node.lambda?
+  send_node.lambda_literal?
+  send_node.unary_operation?
+  send_node.binary_operation?
+end
+
+array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
+if array_node.is_a?(RuboCop::AST::ArrayNode)
+  array_node.values
+  array_node.each_value { |node| node }
+  array_node.each_value.each {}
+  array_node.square_brackets?
+  array_node.percent_literal?
+  array_node.bracketed?
 end
 
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast

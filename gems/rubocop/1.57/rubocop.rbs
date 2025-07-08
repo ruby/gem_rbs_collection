@@ -29,6 +29,7 @@ module RuboCop
     class Corrector < Parser::Source::TreeRewriter
       def replace: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
       def remove: ((Parser::Source::Range | RuboCop::AST::Node) range) -> self
+      def insert_before: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
       def insert_after: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
     end
 
@@ -39,6 +40,10 @@ module RuboCop
     module RangeHelp
       def source_range: (Parser::Source::Buffer source_buffer, Integer line_number, Integer column, ?Integer length) -> Parser::Source::Range
       def range_between: (Integer start_pos, Integer end_pos) -> Parser::Source::Range
+      def range_with_surrounding_space: (?Parser::Source::Range range_positional,
+                                         ?range: Parser::Source::Range, ?side: Symbol, ?newlines: bool,
+                                         ?whitespace: bool, ?continuations: bool,
+                                         ?buffer: Parser::Source::Buffer) -> Parser::Source::Range
     end
 
     module IgnoredNode

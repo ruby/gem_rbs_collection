@@ -11,6 +11,7 @@ module RuboCop
     class NodePattern
       module Macros
         def def_node_matcher: (Symbol, String) -> void
+        def def_node_search: (Symbol, String) -> void
       end
 
       class Compiler
@@ -39,7 +40,32 @@ module RuboCop
 
     module MethodDispatchNode
       include MethodIdentifierPredicates
+      def receiver: () -> Node?
       def method_name: () -> Symbol
+      def selector: () -> Parser::Source::Range
+      def block_node: () -> BlockNode?
+      def macro?: () -> bool
+      def access_modifier?: () -> bool
+      def bare_access_modifier?: () -> bool
+      def non_bare_access_modifier?: () -> bool
+      def special_modifier?: () -> bool
+      def command?: (Symbol name) -> bool
+      def setter_method?: () -> bool
+      alias assignment? setter_method?
+      def dot?: () -> bool
+      def double_colon?: () -> bool
+      def safe_navigation?: () -> bool
+      def self_receiver?: () -> bool
+      def const_receiver?: () -> bool
+      def implicit_call?: () -> bool
+      def block_literal?: () -> bool
+      def arithmetic_operation?: () -> bool
+      def def_modifier?: (?Node node) -> bool
+      def def_modifier: (?Node node) -> Node?
+      def lambda?: () -> bool
+      def lambda_literal?: () -> bool
+      def unary_operation?: () -> bool
+      def binary_operation?: () -> bool
     end
 
     module MethodIdentifierPredicates
@@ -47,10 +73,22 @@ module RuboCop
     end
 
     module ParameterizedNode
+      def parenthesized?: () -> bool
       def first_argument: () -> Node?
-      def arguments: () -> Array[Node]
+      def last_argument: () -> Node?
+      def arguments?: () -> bool
+      def splat_argument?: () -> bool
+      alias rest_argument? splat_argument?
+      def block_argument?: () -> bool
+
+      module WrappedArguments
+        include ParameterizedNode
+        def arguments: () -> Array[Node]
+      end
+
       module RestArguments
         include ParameterizedNode
+        def arguments: () -> Array[Node]
       end
     end
 
@@ -205,10 +243,20 @@ module RuboCop
       def each_ancestor: (*Symbol types) { (Node) -> void } -> self
                        | (*Symbol types) -> ::Enumerator[Node, self]
       def source_range: () -> Parser::Source::Range
+      def sibling_index: () -> (Integer | nil)
+      def right_sibling: () -> (Node | nil)
+      def left_sibling: () -> (Node | nil)
+      def left_siblings: () -> Array[Node]
+      def right_siblings: () -> Array[Node]
     end
 
     class ArrayNode < Node
       alias values children
+      def each_value: () { (Node) -> void } -> self
+                    | () -> ::Enumerator[Node, self]
+      def square_brackets?: () -> bool
+      def percent_literal?: (?Symbol type) -> bool
+      def bracketed?: () -> bool
     end
 
     class BlockNode < Node
@@ -278,7 +326,7 @@ module RuboCop
 
     class StrNode < Node
       include BasicLiteralNode
-      def value: () -> String
+      def value: () -> (String | StrNode)
     end
 
     class SymbolNode < Node
