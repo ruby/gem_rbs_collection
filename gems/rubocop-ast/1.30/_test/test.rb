@@ -283,7 +283,25 @@ if array_node.is_a?(RuboCop::AST::ArrayNode)
 end
 
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
-block_node.send_node.method?(:tap) if block_node.is_a?(RuboCop::AST::BlockNode)
+if block_node.is_a?(RuboCop::AST::BlockNode)
+  block_node.send_node.method?(:tap)
+  block_node.first_argument
+  block_node.last_argument
+  block_node.arguments
+  block_node.argument_list
+  block_node.body
+  block_node.method_name
+  block_node.arguments?
+  block_node.braces?
+  block_node.keywords?
+  block_node.delimiters
+  block_node.opening_delimiter
+  block_node.closing_delimiter
+  block_node.single_line?
+  block_node.multiline?
+  block_node.lambda?
+  block_node.void_context?
+end
 
 str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
 str_node.value if str_node.is_a?(RuboCop::AST::StrNode)
