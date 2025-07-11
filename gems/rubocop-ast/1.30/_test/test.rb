@@ -317,7 +317,11 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
 end
 
 str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
-str_node.value if str_node.is_a?(RuboCop::AST::StrNode)
+if str_node.is_a?(RuboCop::AST::StrNode)
+  str_node.value
+  str_node.character_literal?
+  str_node.heredoc?
+end
 
 dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
 dstr_node.value if dstr_node.is_a?(RuboCop::AST::DstrNode)
