@@ -241,6 +241,37 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
+array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
+if array_node.is_a?(RuboCop::AST::ArrayNode)
+  array_node.values
+  array_node.each_value { |node| node }
+  array_node.each_value.each {}
+  array_node.square_brackets?
+  array_node.percent_literal?
+  array_node.bracketed?
+end
+
+block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
+if block_node.is_a?(RuboCop::AST::BlockNode)
+  block_node.send_node.method?(:tap)
+  block_node.first_argument
+  block_node.last_argument
+  block_node.arguments
+  block_node.argument_list
+  block_node.body
+  block_node.method_name
+  block_node.arguments?
+  block_node.braces?
+  block_node.keywords?
+  block_node.delimiters
+  block_node.opening_delimiter
+  block_node.closing_delimiter
+  block_node.single_line?
+  block_node.multiline?
+  block_node.lambda?
+  block_node.void_context?
+end
+
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
 if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.first_argument
@@ -251,6 +282,9 @@ if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.rest_argument?
   def_node.block_argument?
 end
+
+dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
+dstr_node.value if dstr_node.is_a?(RuboCop::AST::DstrNode)
 
 send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
 if send_node.is_a?(RuboCop::AST::SendNode)
@@ -285,46 +319,12 @@ if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.send_type?
 end
 
-array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
-if array_node.is_a?(RuboCop::AST::ArrayNode)
-  array_node.values
-  array_node.each_value { |node| node }
-  array_node.each_value.each {}
-  array_node.square_brackets?
-  array_node.percent_literal?
-  array_node.bracketed?
-end
-
-block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
-if block_node.is_a?(RuboCop::AST::BlockNode)
-  block_node.send_node.method?(:tap)
-  block_node.first_argument
-  block_node.last_argument
-  block_node.arguments
-  block_node.argument_list
-  block_node.body
-  block_node.method_name
-  block_node.arguments?
-  block_node.braces?
-  block_node.keywords?
-  block_node.delimiters
-  block_node.opening_delimiter
-  block_node.closing_delimiter
-  block_node.single_line?
-  block_node.multiline?
-  block_node.lambda?
-  block_node.void_context?
-end
-
 str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
 if str_node.is_a?(RuboCop::AST::StrNode)
   str_node.value
   str_node.character_literal?
   str_node.heredoc?
 end
-
-dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
-dstr_node.value if dstr_node.is_a?(RuboCop::AST::DstrNode)
 
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
