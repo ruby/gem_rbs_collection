@@ -7,7 +7,7 @@ class MyRule < Parser::AST::Processor
   include RuboCop::AST::Traversal
 
   def on_sym(node)
-    puts "I found a symbol! #{node.value}"
+    node.value
   end
 
   def on_if(node)
@@ -34,7 +34,7 @@ class MyRule < Parser::AST::Processor
   def on_hash(node)
     node.pairs
     node.empty?
-    node.each_pair {|k, v| puts "#{k}#{v}" }
+    node.each_pair {|k, v| "#{k}#{v}" }
     node.each_pair
     node.keys
     node.each_key {|n| n }
@@ -45,6 +45,18 @@ class MyRule < Parser::AST::Processor
     node.pairs_on_same_line?
     node.mixed_delimiters?
     node.braces?
+    return if node.pairs.size == 0
+    pair = node.pairs.first
+    pair.key
+    pair.value
+    pair.hash_rocket?
+    pair.colon?
+    pair.delimiter
+    pair.delimiter(with_spacing: true)
+    pair.inverse_delimiter
+    pair.inverse_delimiter(with_spacing: true)
+    pair.value_on_new_line?
+    pair.value_omission?
   end
 end
 
@@ -229,49 +241,6 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
-def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
-if def_node.is_a?(RuboCop::AST::DefNode)
-  def_node.first_argument
-  def_node.parenthesized?
-  def_node.last_argument
-  def_node.arguments?
-  def_node.splat_argument?
-  def_node.rest_argument?
-  def_node.block_argument?
-end
-
-send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
-if send_node.is_a?(RuboCop::AST::SendNode)
-  send_node.first_argument
-  send_node.arguments
-  send_node.receiver
-  send_node.method_name
-  send_node.selector
-  send_node.block_node
-  send_node.macro?
-  send_node.access_modifier?
-  send_node.bare_access_modifier?
-  send_node.non_bare_access_modifier?
-  send_node.special_modifier?
-  send_node.command?(:a)
-  send_node.setter_method?
-  send_node.assignment?
-  send_node.dot?
-  send_node.double_colon?
-  send_node.safe_navigation?
-  send_node.self_receiver?
-  send_node.const_receiver?
-  send_node.implicit_call?
-  send_node.block_literal?
-  send_node.arithmetic_operation?
-  send_node.def_modifier?
-  send_node.def_modifier
-  send_node.lambda?
-  send_node.lambda_literal?
-  send_node.unary_operation?
-  send_node.binary_operation?
-end
-
 array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
 if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.values
@@ -303,14 +272,78 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.void_context?
 end
 
-str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
-str_node.value if str_node.is_a?(RuboCop::AST::StrNode)
+def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
+if def_node.is_a?(RuboCop::AST::DefNode)
+  def_node.first_argument
+  def_node.parenthesized?
+  def_node.last_argument
+  def_node.arguments?
+  def_node.splat_argument?
+  def_node.rest_argument?
+  def_node.block_argument?
+end
 
 dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
 dstr_node.value if dstr_node.is_a?(RuboCop::AST::DstrNode)
+
+send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
+if send_node.is_a?(RuboCop::AST::SendNode)
+  send_node.first_argument
+  send_node.arguments
+  send_node.receiver
+  send_node.method_name
+  send_node.selector
+  send_node.block_node
+  send_node.macro?
+  send_node.access_modifier?
+  send_node.bare_access_modifier?
+  send_node.non_bare_access_modifier?
+  send_node.special_modifier?
+  send_node.command?(:a)
+  send_node.setter_method?
+  send_node.assignment?
+  send_node.dot?
+  send_node.double_colon?
+  send_node.safe_navigation?
+  send_node.self_receiver?
+  send_node.const_receiver?
+  send_node.implicit_call?
+  send_node.block_literal?
+  send_node.arithmetic_operation?
+  send_node.def_modifier?
+  send_node.def_modifier
+  send_node.lambda?
+  send_node.lambda_literal?
+  send_node.unary_operation?
+  send_node.binary_operation?
+  send_node.send_type?
+end
+
+str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
+if str_node.is_a?(RuboCop::AST::StrNode)
+  str_node.value
+  str_node.character_literal?
+  str_node.heredoc?
+end
 
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
 
 regexp_node = RuboCop::AST::ProcessedSource.new('/abc/', RUBY_VERSION.to_f).ast
-regexp_node.to_regexp if regexp_node.is_a?(RuboCop::AST::RegexpNode)
+if regexp_node.is_a?(RuboCop::AST::RegexpNode)
+  regexp_node.to_regexp
+  regexp_node.regopt
+  regexp_node.options
+  regexp_node.content
+  regexp_node.slash_literal?
+  regexp_node.percent_r_literal?
+  regexp_node.delimiters
+  regexp_node.delimiter?('/')
+  regexp_node.interpolation?
+  regexp_node.multiline_mode?
+  regexp_node.extended?
+  regexp_node.ignore_case?
+  regexp_node.single_interpolation?
+  regexp_node.no_encoding?
+  regexp_node.fixed_encoding?
+end

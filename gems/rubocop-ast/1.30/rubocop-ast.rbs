@@ -329,20 +329,43 @@ module RuboCop
 
     class PairNode < Node
       include HashElementNode
+      def hash_rocket?: () -> bool
+      def colon?: () -> bool
+      def delimiter: (?with_spacing: bool) -> String
+      def inverse_delimiter: (?with_spacing: bool) -> String
+      def value_on_new_line?: () -> bool
+      def value_omission?: () -> bool
     end
 
     class RegexpNode < Node
       def to_regexp: () -> ::Regexp
+      def regopt: () -> Node
+      def options: () -> Integer
+      def content: () -> String
+      def slash_literal?: () -> bool
+      def percent_r_literal?: () -> bool
+      def delimiters: () -> String
+      def delimiter?: (String char) -> bool
+      def interpolation?: () -> bool
+      def multiline_mode?: () -> bool
+      def extended?: () -> bool
+      def ignore_case?: () -> bool
+      def single_interpolation?: () -> bool
+      def no_encoding?: () -> bool
+      def fixed_encoding?: () -> bool
     end
 
     class SendNode < Node
       include ParameterizedNode::RestArguments
       include MethodDispatchNode
+      def send_type?: () -> true
     end
 
     class StrNode < Node
       include BasicLiteralNode
       def value: () -> (String | StrNode)
+      def character_literal?: () -> bool
+      def heredoc?: () -> bool
     end
 
     class SymbolNode < Node
