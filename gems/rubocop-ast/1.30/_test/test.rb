@@ -7,7 +7,7 @@ class MyRule < Parser::AST::Processor
   include RuboCop::AST::Traversal
 
   def on_sym(node)
-    puts "I found a symbol! #{node.value}"
+    node.value
   end
 
   def on_if(node)
@@ -34,7 +34,7 @@ class MyRule < Parser::AST::Processor
   def on_hash(node)
     node.pairs
     node.empty?
-    node.each_pair {|k, v| puts "#{k}#{v}" }
+    node.each_pair {|k, v| "#{k}#{v}" }
     node.each_pair
     node.keys
     node.each_key {|n| n }
@@ -45,6 +45,18 @@ class MyRule < Parser::AST::Processor
     node.pairs_on_same_line?
     node.mixed_delimiters?
     node.braces?
+    return if node.pairs.size == 0
+    pair = node.pairs.first
+    pair.key
+    pair.value
+    pair.hash_rocket?
+    pair.colon?
+    pair.delimiter
+    pair.delimiter(with_spacing: true)
+    pair.inverse_delimiter
+    pair.inverse_delimiter(with_spacing: true)
+    pair.value_on_new_line?
+    pair.value_omission?
   end
 end
 
