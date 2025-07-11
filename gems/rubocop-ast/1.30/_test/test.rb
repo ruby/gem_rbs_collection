@@ -325,4 +325,20 @@ sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
 
 regexp_node = RuboCop::AST::ProcessedSource.new('/abc/', RUBY_VERSION.to_f).ast
-regexp_node.to_regexp if regexp_node.is_a?(RuboCop::AST::RegexpNode)
+if regexp_node.is_a?(RuboCop::AST::RegexpNode)
+  regexp_node.to_regexp
+  regexp_node.regopt
+  regexp_node.options
+  regexp_node.content
+  regexp_node.slash_literal?
+  regexp_node.percent_r_literal?
+  regexp_node.delimiters
+  regexp_node.delimiter?('/')
+  regexp_node.interpolation?
+  regexp_node.multiline_mode?
+  regexp_node.extended?
+  regexp_node.ignore_case?
+  regexp_node.single_interpolation?
+  regexp_node.no_encoding?
+  regexp_node.fixed_encoding?
+end
