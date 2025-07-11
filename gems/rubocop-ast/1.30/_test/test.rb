@@ -282,6 +282,7 @@ if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.lambda_literal?
   send_node.unary_operation?
   send_node.binary_operation?
+  send_node.send_type?
 end
 
 array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
