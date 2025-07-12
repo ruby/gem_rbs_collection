@@ -136,23 +136,51 @@ module Parser
     end
 
     class Map::Collection < Map
-      attr_reader begin: Range
-      attr_reader end: Range
+      attr_reader begin: Range?
+      attr_reader end: Range?
     end
 
     class Map::Condition < Map
       attr_reader keyword: Range
-      attr_reader begin: Range
-      attr_reader else: Range
+      attr_reader begin: Range?
+      attr_reader else: Range?
       attr_reader end: Range
     end
 
+    class Map::Heredoc < Map
+      attr_reader heredoc_body: Range
+      attr_reader heredoc_end: Range
+    end
+
+    class Map::Keyword < Map
+      attr_reader keyword: Range
+      attr_reader begin: Range?
+      attr_reader end: Range?
+    end
+
+    class Map::MethodDefinition < Map
+      attr_reader keyword: Range
+      attr_reader operator: Range?
+      attr_reader name: Range?
+      attr_reader end: Range?
+      attr_reader assignment: Range?
+    end
+
+    class Map::Operator < Map
+      attr_reader operator: Range?
+    end
+
     class Map::Send < Map
-      attr_reader dot: Range
+      attr_reader dot: Range?
       attr_reader selector: Range
       attr_reader operator: Range?
       attr_reader begin: Range?
       attr_reader end: Range?
+    end
+
+    class Map::Ternary < Map
+      attr_reader question: Range?
+      attr_reader colon: Range
     end
 
     class Comment

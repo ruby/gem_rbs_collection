@@ -8,6 +8,10 @@ class MyRule < Parser::AST::Processor
 
   def on_sym(node)
     node.value
+    node.location.begin
+    node.location.end
+    node.loc.begin
+    node.loc.end
   end
 
   def on_if(node)
@@ -29,6 +33,36 @@ class MyRule < Parser::AST::Processor
     node.else_branch
     node.node_parts
     node.branches
+    if node.location.is_a?(Parser::Source::Map::Condition)
+      node.location.keyword
+      node.location.begin
+      node.location.else
+      node.location.end
+    end
+    if node.loc.is_a?(Parser::Source::Map::Condition)
+      node.loc.keyword
+      node.loc.begin
+      node.loc.else
+      node.loc.end
+    end
+    if node.location.is_a?(Parser::Source::Map::Keyword)
+      node.location.keyword
+      node.location.begin
+      node.location.end
+    end
+    if node.loc.is_a?(Parser::Source::Map::Keyword)
+      node.loc.keyword
+      node.loc.begin
+      node.loc.end
+    end
+    if node.location.is_a?(Parser::Source::Map::Ternary)
+      node.location.question
+      node.location.colon
+    end
+    if node.loc.is_a?(Parser::Source::Map::Ternary)
+      node.loc.question
+      node.loc.colon
+    end
   end
 
   def on_hash(node)
@@ -45,6 +79,11 @@ class MyRule < Parser::AST::Processor
     node.pairs_on_same_line?
     node.mixed_delimiters?
     node.braces?
+    node.location
+    node.location.begin
+    node.location.end
+    node.loc.begin
+    node.loc.end
     return if node.pairs.size == 0
     pair = node.pairs.first
     pair.key
@@ -57,6 +96,8 @@ class MyRule < Parser::AST::Processor
     pair.inverse_delimiter(with_spacing: true)
     pair.value_on_new_line?
     pair.value_omission?
+    pair.location.operator
+    pair.loc.operator
   end
 end
 
@@ -71,6 +112,7 @@ ast.each_node(:sym, :if) { |n| rule.process(n) }
 ast.each_node.each {}.each_node
 
 { this_is: :hash }
+rand > 0.5 ? 1 : 2
 
 code = '!something.empty?'
 source = RuboCop::AST::ProcessedSource.new(code, RUBY_VERSION.to_f)
@@ -249,6 +291,10 @@ if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.square_brackets?
   array_node.percent_literal?
   array_node.bracketed?
+  array_node.location.begin
+  array_node.location.end
+  array_node.loc.begin
+  array_node.loc.end
 end
 
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
@@ -270,6 +316,10 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.multiline?
   block_node.lambda?
   block_node.void_context?
+  block_node.location.begin
+  block_node.location.end
+  block_node.loc.begin
+  block_node.loc.end
 end
 
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
@@ -281,12 +331,59 @@ if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.splat_argument?
   def_node.rest_argument?
   def_node.block_argument?
+  def_node.location.keyword
+  def_node.location.operator
+  def_node.location.name
+  def_node.location.end
+  def_node.location.assignment
+  def_node.loc.keyword
+  def_node.loc.operator
+  def_node.loc.name
+  def_node.loc.end
+  def_node.loc.assignment
+end
+def_node = RuboCop::AST::ProcessedSource.new('def ! = true', RUBY_VERSION.to_f).ast
+if def_node.is_a?(RuboCop::AST::DefNode)
+  def_node.location.keyword
+  def_node.location.operator
+  def_node.location.name
+  def_node.location.end
+  def_node.location.assignment
+  def_node.loc.keyword
+  def_node.loc.operator
+  def_node.loc.name
+  def_node.loc.end
+  def_node.loc.assignment
 end
 
 dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
-dstr_node.value if dstr_node.is_a?(RuboCop::AST::DstrNode)
+if dstr_node.is_a?(RuboCop::AST::DstrNode)
+  dstr_node.value
+  if dstr_node.location.is_a?(Parser::Source::Map::Collection)
+    dstr_node.location.begin
+    dstr_node.location.end
+  end
+  if dstr_node.loc.is_a?(Parser::Source::Map::Collection)
+    dstr_node.loc.begin
+    dstr_node.loc.end
+  end
+end
+dstr_node = RuboCop::AST::ProcessedSource.new('<<EOM
+dstr#{123}dstr
+EOM', RUBY_VERSION.to_f).ast
+if dstr_node.is_a?(RuboCop::AST::DstrNode)
+  dstr_node.value
+  if dstr_node.location.is_a?(Parser::Source::Map::Heredoc)
+    dstr_node.location.heredoc_body
+    dstr_node.location.heredoc_end
+  end
+  if dstr_node.loc.is_a?(Parser::Source::Map::Heredoc)
+    dstr_node.loc.heredoc_body
+    dstr_node.loc.heredoc_end
+  end
+end
 
-send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
+send_node = RuboCop::AST::ProcessedSource.new('puts("hello")', RUBY_VERSION.to_f).ast
 if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.first_argument
   send_node.arguments
@@ -317,6 +414,29 @@ if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.unary_operation?
   send_node.binary_operation?
   send_node.send_type?
+  send_node.location.dot
+  send_node.location.selector
+  send_node.location.operator
+  send_node.location.begin
+  send_node.location.end
+  send_node.loc.dot
+  send_node.loc.selector
+  send_node.loc.operator
+  send_node.loc.begin
+  send_node.loc.end
+end
+send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
+if send_node.is_a?(RuboCop::AST::SendNode)
+  send_node.location.dot
+  send_node.location.selector
+  send_node.location.operator
+  send_node.location.begin
+  send_node.location.end
+  send_node.loc.dot
+  send_node.loc.selector
+  send_node.loc.operator
+  send_node.loc.begin
+  send_node.loc.end
 end
 
 str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
@@ -324,6 +444,27 @@ if str_node.is_a?(RuboCop::AST::StrNode)
   str_node.value
   str_node.character_literal?
   str_node.heredoc?
+  if str_node.location.is_a?(Parser::Source::Map::Collection)
+    str_node.location.begin
+    str_node.location.end
+  end
+  if str_node.loc.is_a?(Parser::Source::Map::Collection)
+    str_node.loc.begin
+    str_node.loc.end
+  end
+end
+str_node = RuboCop::AST::ProcessedSource.new('<<EOM
+heredoc
+EOM', RUBY_VERSION.to_f).ast
+if str_node.is_a?(RuboCop::AST::StrNode)
+  if str_node.location.is_a?(Parser::Source::Map::Heredoc)
+    str_node.location.heredoc_body
+    str_node.location.heredoc_end
+  end
+  if str_node.loc.is_a?(Parser::Source::Map::Heredoc)
+    str_node.loc.heredoc_body
+    str_node.loc.heredoc_end
+  end
 end
 
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
@@ -346,4 +487,8 @@ if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.single_interpolation?
   regexp_node.no_encoding?
   regexp_node.fixed_encoding?
+  regexp_node.location.begin
+  regexp_node.location.end
+  regexp_node.loc.begin
+  regexp_node.loc.end
 end
