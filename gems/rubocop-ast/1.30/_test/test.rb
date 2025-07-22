@@ -322,6 +322,40 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.loc.end
 end
 
+case_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+case num
+when 1
+  :one
+when 2
+  :two
+else
+  :else
+end
+EOM
+if case_node.is_a?(RuboCop::AST::CaseNode)
+  case_node.single_line_condition?
+  case_node.multiline_condition?
+  case_node.condition
+  case_node.body
+  case_node.keyword
+  case_node.when_branches
+  case_node.branches
+  case_node.else_branch
+  case_node.else?
+  when_node = case_node.when_branches.first
+  if when_node.is_a?(RuboCop::AST::WhenNode)
+    when_node.conditions
+    when_node.branch_index
+    when_node.then?
+    when_node.body
+  end
+end
+
+csend_node = RuboCop::AST::ProcessedSource.new('o&.hoge(1)', RUBY_VERSION.to_f).ast
+if csend_node.is_a?(RuboCop::AST::CsendNode)
+  csend_node.send_type?
+end
+
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
 if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.first_argument
@@ -381,6 +415,18 @@ if dstr_node.is_a?(RuboCop::AST::DstrNode)
     dstr_node.loc.heredoc_body
     dstr_node.loc.heredoc_end
   end
+end
+
+float_node = RuboCop::AST::ProcessedSource.new('1.1', RUBY_VERSION.to_f).ast
+if float_node.is_a?(RuboCop::AST::FloatNode)
+  float_node.sign?
+  float_node.value
+end
+
+int_node = RuboCop::AST::ProcessedSource.new('+1', RUBY_VERSION.to_f).ast
+if int_node.is_a?(RuboCop::AST::IntNode)
+  int_node.sign?
+  int_node.value
 end
 
 send_node = RuboCop::AST::ProcessedSource.new('puts("hello")', RUBY_VERSION.to_f).ast
@@ -469,6 +515,17 @@ end
 
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
+
+irange_node = RuboCop::AST::ProcessedSource.new('1..10', RUBY_VERSION.to_f).ast
+if irange_node.is_a?(RuboCop::AST::RangeNode)
+  irange_node.begin
+  irange_node.end
+end
+erange_node = RuboCop::AST::ProcessedSource.new('1...10', RUBY_VERSION.to_f).ast
+if erange_node.is_a?(RuboCop::AST::RangeNode)
+  erange_node.begin
+  erange_node.end
+end
 
 regexp_node = RuboCop::AST::ProcessedSource.new('/abc/', RUBY_VERSION.to_f).ast
 if regexp_node.is_a?(RuboCop::AST::RegexpNode)
