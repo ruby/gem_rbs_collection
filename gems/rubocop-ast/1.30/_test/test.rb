@@ -322,6 +322,11 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.loc.end
 end
 
+csend_node = RuboCop::AST::ProcessedSource.new('o&.hoge(1)', RUBY_VERSION.to_f).ast
+if csend_node.is_a?(RuboCop::AST::CsendNode)
+  csend_node.send_type?
+end
+
 def_node = RuboCop::AST::ProcessedSource.new('def hoge(a, b); end', RUBY_VERSION.to_f).ast
 if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.first_argument
