@@ -475,6 +475,17 @@ end
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
 
+irange_node = RuboCop::AST::ProcessedSource.new('1..10', RUBY_VERSION.to_f).ast
+if irange_node.is_a?(RuboCop::AST::RangeNode)
+  irange_node.begin
+  irange_node.end
+end
+erange_node = RuboCop::AST::ProcessedSource.new('1...10', RUBY_VERSION.to_f).ast
+if erange_node.is_a?(RuboCop::AST::RangeNode)
+  erange_node.begin
+  erange_node.end
+end
+
 regexp_node = RuboCop::AST::ProcessedSource.new('/abc/', RUBY_VERSION.to_f).ast
 if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.to_regexp
