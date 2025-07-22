@@ -99,6 +99,13 @@ module RuboCop
       def value: () -> untyped
     end
 
+    module ConditionalNode
+      def single_line_condition?: () -> bool
+      def multiline_condition?: () -> bool
+      def condition: () -> Node?
+      def body: () -> Node?
+    end
+
     module NumericNode
       def sign?: () -> bool
     end
@@ -287,6 +294,15 @@ module RuboCop
       alias loc location
     end
 
+    class CaseNode < Node
+      include ConditionalNode
+      def keyword: () -> 'case'
+      def when_branches: () -> Array[WhenNode]
+      def branches: () -> Array[Node | nil]
+      def else_branch: () -> Node?
+      def else?: () -> bool
+    end
+
     class CsendNode < SendNode
       def send_type?: () -> false
     end
@@ -416,6 +432,13 @@ module RuboCop
       def value: () -> Symbol
       attr_reader location: Parser::Source::Map::Collection
       alias loc location
+    end
+
+    class WhenNode < Node
+      def conditions: () -> Array[Node]
+      def branch_index: () -> Integer
+      def then?: () -> bool
+      def body: () -> Node?
     end
   end
 end

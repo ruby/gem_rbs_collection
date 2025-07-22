@@ -322,6 +322,35 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.loc.end
 end
 
+case_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+case num
+when 1
+  :one
+when 2
+  :two
+else
+  :else
+end
+EOM
+if case_node.is_a?(RuboCop::AST::CaseNode)
+  case_node.single_line_condition?
+  case_node.multiline_condition?
+  case_node.condition
+  case_node.body
+  case_node.keyword
+  case_node.when_branches
+  case_node.branches
+  case_node.else_branch
+  case_node.else?
+  when_node = case_node.when_branches.first
+  if when_node.is_a?(RuboCop::AST::WhenNode)
+    when_node.conditions
+    when_node.branch_index
+    when_node.then?
+    when_node.body
+  end
+end
+
 csend_node = RuboCop::AST::ProcessedSource.new('o&.hoge(1)', RUBY_VERSION.to_f).ast
 if csend_node.is_a?(RuboCop::AST::CsendNode)
   csend_node.send_type?
