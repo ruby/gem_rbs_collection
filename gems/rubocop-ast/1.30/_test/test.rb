@@ -388,6 +388,18 @@ if dstr_node.is_a?(RuboCop::AST::DstrNode)
   end
 end
 
+float_node = RuboCop::AST::ProcessedSource.new('1.1', RUBY_VERSION.to_f).ast
+if float_node.is_a?(RuboCop::AST::FloatNode)
+  float_node.sign?
+  float_node.value
+end
+
+int_node = RuboCop::AST::ProcessedSource.new('+1', RUBY_VERSION.to_f).ast
+if int_node.is_a?(RuboCop::AST::IntNode)
+  int_node.sign?
+  int_node.value
+end
+
 send_node = RuboCop::AST::ProcessedSource.new('puts("hello")', RUBY_VERSION.to_f).ast
 if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.first_argument

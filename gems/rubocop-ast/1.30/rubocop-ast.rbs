@@ -99,6 +99,10 @@ module RuboCop
       def value: () -> untyped
     end
 
+    module NumericNode
+      def sign?: () -> bool
+    end
+
     class Node < Parser::AST::Node
       include Descendence
       def type?: (*Symbol types) -> bool
@@ -306,6 +310,11 @@ module RuboCop
       alias loc location
     end
 
+    class FloatNode < Node
+      include BasicLiteralNode
+      include NumericNode
+    end
+
     class HashNode < Node
       def pairs: () -> Array[PairNode]
       def empty?: () -> bool
@@ -341,6 +350,11 @@ module RuboCop
       def branches: () -> Array[Node]
       attr_reader location: (Parser::Source::Map::Condition | Parser::Source::Map::Keyword | Parser::Source::Map::Ternary)
       alias loc location
+    end
+
+    class IntNode < Node
+      include BasicLiteralNode
+      include NumericNode
     end
 
     class PairNode < Node
