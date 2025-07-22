@@ -11,6 +11,7 @@ module RuboCop
     class NodePattern
       module Macros
         def def_node_matcher: (Symbol, String) -> void
+        def def_node_search: (Symbol, String) -> void
       end
 
       class Compiler
@@ -22,14 +23,73 @@ module RuboCop
     end
 
     module Descendence
+      def each_child_node: (*Symbol types) { (Node) -> void } -> self
+                         | (*Symbol types) -> ::Enumerator[Node, self]
       def child_nodes: () -> Array[Node]
-      def each_node: (*Symbol types) { (Node) -> void } -> void
-                   | () -> ::Enumerator[Node, self]
+      def each_descendant: (*Symbol types) { (Node) -> void } -> self
+                         | (*Symbol types) -> ::Enumerator[Node, self]
+      def descendants: () -> Array[Node]
+      def each_node: (*Symbol types) { (Node) -> void } -> self
+                   | (*Symbol types) -> ::Enumerator[Node, self]
     end
 
     module HashElementNode
       def key: () -> Node
       def value: () -> Node
+    end
+
+    module MethodDispatchNode
+      include MethodIdentifierPredicates
+      def receiver: () -> Node?
+      def method_name: () -> Symbol
+      def selector: () -> Parser::Source::Range
+      def block_node: () -> BlockNode?
+      def macro?: () -> bool
+      def access_modifier?: () -> bool
+      def bare_access_modifier?: () -> bool
+      def non_bare_access_modifier?: () -> bool
+      def special_modifier?: () -> bool
+      def command?: (Symbol name) -> bool
+      def setter_method?: () -> bool
+      alias assignment? setter_method?
+      def dot?: () -> bool
+      def double_colon?: () -> bool
+      def safe_navigation?: () -> bool
+      def self_receiver?: () -> bool
+      def const_receiver?: () -> bool
+      def implicit_call?: () -> bool
+      def block_literal?: () -> bool
+      def arithmetic_operation?: () -> bool
+      def def_modifier?: (?Node node) -> bool
+      def def_modifier: (?Node node) -> Node?
+      def lambda?: () -> bool
+      def lambda_literal?: () -> bool
+      def unary_operation?: () -> bool
+      def binary_operation?: () -> bool
+    end
+
+    module MethodIdentifierPredicates
+      def method?: ((Symbol | String) name) -> bool
+    end
+
+    module ParameterizedNode
+      def parenthesized?: () -> bool
+      def first_argument: () -> Node?
+      def last_argument: () -> Node?
+      def arguments?: () -> bool
+      def splat_argument?: () -> bool
+      alias rest_argument? splat_argument?
+      def block_argument?: () -> bool
+
+      module WrappedArguments
+        include ParameterizedNode
+        def arguments: () -> Array[Node]
+      end
+
+      module RestArguments
+        include ParameterizedNode
+        def arguments: () -> Array[Node]
+      end
     end
 
     module Traversal
@@ -41,14 +101,190 @@ module RuboCop
 
     class Node < Parser::AST::Node
       include Descendence
+      def type?: (*Symbol types) -> bool
       def source: () -> (String | nil)
+      def true_type?: () -> bool
+      def false_type?: () -> bool
+      def nil_type?: () -> bool
+      def int_type?: () -> bool
+      def float_type?: () -> bool
+      def str_type?: () -> bool
+      def dstr_type?: () -> bool
+      def sym_type?: () -> bool
+      def dsym_type?: () -> bool
+      def xstr_type?: () -> bool
+      def regopt_type?: () -> bool
+      def regexp_type?: () -> bool
+      def array_type?: () -> bool
+      def splat_type?: () -> bool
+      def pair_type?: () -> bool
+      def kwsplat_type?: () -> bool
+      def hash_type?: () -> bool
+      def irange_type?: () -> bool
+      def erange_type?: () -> bool
+      def self_type?: () -> bool
+      def lvar_type?: () -> bool
+      def ivar_type?: () -> bool
+      def cvar_type?: () -> bool
+      def gvar_type?: () -> bool
+      def const_type?: () -> bool
+      def defined_type?: () -> bool
+      def lvasgn_type?: () -> bool
+      def ivasgn_type?: () -> bool
+      def cvasgn_type?: () -> bool
+      def gvasgn_type?: () -> bool
+      def casgn_type?: () -> bool
+      def mlhs_type?: () -> bool
+      def masgn_type?: () -> bool
+      def op_asgn_type?: () -> bool
+      def and_asgn_type?: () -> bool
+      def ensure_type?: () -> bool
+      def rescue_type?: () -> bool
+      def arg_expr_type?: () -> bool
+      def or_asgn_type?: () -> bool
+      def back_ref_type?: () -> bool
+      def nth_ref_type?: () -> bool
+      def match_with_lvasgn_type?: () -> bool
+      def match_current_line_type?: () -> bool
+      def module_type?: () -> bool
+      def class_type?: () -> bool
+      def sclass_type?: () -> bool
+      def def_type?: () -> bool
+      def defs_type?: () -> bool
+      def undef_type?: () -> bool
+      def alias_type?: () -> bool
+      def args_type?: () -> bool
+      def cbase_type?: () -> bool
+      def arg_type?: () -> bool
+      def optarg_type?: () -> bool
+      def restarg_type?: () -> bool
+      def blockarg_type?: () -> bool
+      def block_pass_type?: () -> bool
+      def kwarg_type?: () -> bool
+      def kwoptarg_type?: () -> bool
+      def kwrestarg_type?: () -> bool
+      def kwnilarg_type?: () -> bool
+      def csend_type?: () -> bool
+      def super_type?: () -> bool
+      def zsuper_type?: () -> bool
+      def yield_type?: () -> bool
+      def block_type?: () -> bool
+      def and_type?: () -> bool
+      def not_type?: () -> bool
+      def or_type?: () -> bool
+      def if_type?: () -> bool
+      def when_type?: () -> bool
+      def case_type?: () -> bool
+      def while_type?: () -> bool
+      def until_type?: () -> bool
+      def while_post_type?: () -> bool
+      def until_post_type?: () -> bool
+      def for_type?: () -> bool
+      def break_type?: () -> bool
+      def next_type?: () -> bool
+      def redo_type?: () -> bool
+      def return_type?: () -> bool
+      def resbody_type?: () -> bool
+      def kwbegin_type?: () -> bool
+      def begin_type?: () -> bool
+      def retry_type?: () -> bool
+      def preexe_type?: () -> bool
+      def postexe_type?: () -> bool
+      def iflipflop_type?: () -> bool
+      def eflipflop_type?: () -> bool
+      def shadowarg_type?: () -> bool
+      def complex_type?: () -> bool
+      def rational_type?: () -> bool
+      def __FILE___type?: () -> bool
+      def __LINE___type?: () -> bool
+      def __ENCODING___type?: () -> bool
+      def ident_type?: () -> bool
+      def lambda_type?: () -> bool
+      def indexasgn_type?: () -> bool
+      def index_type?: () -> bool
+      def procarg0_type?: () -> bool
+      def restarg_expr_type?: () -> bool
+      def blockarg_expr_type?: () -> bool
+      def objc_kwarg_type?: () -> bool
+      def objc_restarg_type?: () -> bool
+      def objc_varargs_type?: () -> bool
+      def numargs_type?: () -> bool
+      def numblock_type?: () -> bool
+      def forward_args_type?: () -> bool
+      def forwarded_args_type?: () -> bool
+      def forward_arg_type?: () -> bool
+      def case_match_type?: () -> bool
+      def in_match_type?: () -> bool
+      def in_pattern_type?: () -> bool
+      def match_var_type?: () -> bool
+      def pin_type?: () -> bool
+      def match_alt_type?: () -> bool
+      def match_as_type?: () -> bool
+      def match_rest_type?: () -> bool
+      def array_pattern_type?: () -> bool
+      def match_with_trailing_comma_type?: () -> bool
+      def array_pattern_with_tail_type?: () -> bool
+      def hash_pattern_type?: () -> bool
+      def const_pattern_type?: () -> bool
+      def if_guard_type?: () -> bool
+      def unless_guard_type?: () -> bool
+      def match_nil_pattern_type?: () -> bool
+      def empty_else_type?: () -> bool
+      def find_pattern_type?: () -> bool
+      def kwargs_type?: () -> bool
+      def match_pattern_p_type?: () -> bool
+      def match_pattern_type?: () -> bool
+      def forwarded_restarg_type?: () -> bool
+      def forwarded_kwrestarg_type?: () -> bool
+      def itarg_type?: () -> bool
+      def itblock_type?: () -> bool
+      def send_type?: () -> bool
+      def parent: () -> Node?
+      def each_ancestor: (*Symbol types) { (Node) -> void } -> self
+                       | (*Symbol types) -> ::Enumerator[Node, self]
+      def source_range: () -> Parser::Source::Range
+      def sibling_index: () -> (Integer | nil)
+      def right_sibling: () -> (Node | nil)
+      def left_sibling: () -> (Node | nil)
+      def left_siblings: () -> Array[Node]
+      def right_siblings: () -> Array[Node]
     end
 
     class ArrayNode < Node
       alias values children
+      def each_value: () { (Node) -> void } -> self
+                    | () -> ::Enumerator[Node, self]
+      def square_brackets?: () -> bool
+      def percent_literal?: (?Symbol type) -> bool
+      def bracketed?: () -> bool
+      attr_reader location: Parser::Source::Map::Collection
+      alias loc location
+    end
+
+    class BlockNode < Node
+      def send_node: () -> SendNode
+      def first_argument: () -> Node?
+      def last_argument: () -> Node?
+      def arguments: () -> Array[Node]
+      def argument_list: () -> Array[Node]
+      def body: () -> Node?
+      def method_name: () -> Symbol
+      def arguments?: () -> bool
+      def braces?: () -> bool
+      def keywords?: () -> bool
+      def delimiters: () -> Array[String]
+      def opening_delimiter: () -> String
+      def closing_delimiter: () -> String
+      def single_line?: () -> bool
+      def multiline?: () -> bool
+      def lambda?: () -> bool
+      def void_context?: () -> bool
+      attr_reader location: Parser::Source::Map::Collection
+      alias loc location
     end
 
     class DefNode < Node
+      include ParameterizedNode
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
@@ -56,6 +292,14 @@ module RuboCop
       def body: () -> Node
       def receiver: () -> (Node | nil)
       def endless?: () -> bool
+      attr_reader location: Parser::Source::Map::MethodDefinition
+      alias loc location
+    end
+
+    class DstrNode < Node
+      def value: () -> String
+      attr_reader location: (Parser::Source::Map::Collection | Parser::Source::Map::Heredoc)
+      alias loc location
     end
 
     class HashNode < Node
@@ -72,6 +316,8 @@ module RuboCop
       def pairs_on_same_line?: () -> bool
       def mixed_delimiters?: () -> bool
       def braces?: () -> bool
+      attr_reader location: Parser::Source::Map::Collection
+      alias loc location
     end
 
     class IfNode < Node
@@ -89,14 +335,64 @@ module RuboCop
       def else_branch: () -> Node?
       def node_parts: () -> Array[Node]
       def branches: () -> Array[Node]
+      attr_reader location: (Parser::Source::Map::Condition | Parser::Source::Map::Keyword | Parser::Source::Map::Ternary)
+      alias loc location
     end
 
     class PairNode < Node
       include HashElementNode
+      def hash_rocket?: () -> bool
+      def colon?: () -> bool
+      def delimiter: (?with_spacing: bool) -> String
+      def inverse_delimiter: (?with_spacing: bool) -> String
+      def value_on_new_line?: () -> bool
+      def value_omission?: () -> bool
+      attr_reader location: Parser::Source::Map::Operator
+      alias loc location
+    end
+
+    class RegexpNode < Node
+      def to_regexp: () -> ::Regexp
+      def regopt: () -> Node
+      def options: () -> Integer
+      def content: () -> String
+      def slash_literal?: () -> bool
+      def percent_r_literal?: () -> bool
+      def delimiters: () -> String
+      def delimiter?: (String char) -> bool
+      def interpolation?: () -> bool
+      def multiline_mode?: () -> bool
+      def extended?: () -> bool
+      def ignore_case?: () -> bool
+      def single_interpolation?: () -> bool
+      def no_encoding?: () -> bool
+      def fixed_encoding?: () -> bool
+      attr_reader location: Parser::Source::Map::Collection
+      alias loc location
+    end
+
+    class SendNode < Node
+      include ParameterizedNode::RestArguments
+      include MethodDispatchNode
+      def send_type?: () -> true
+      attr_reader location: Parser::Source::Map::Send
+      alias loc location
+    end
+
+    class StrNode < Node
+      include BasicLiteralNode
+      def value: () -> (String | StrNode)
+      def character_literal?: () -> bool
+      def heredoc?: () -> bool
+      attr_reader location: (Parser::Source::Map::Collection | Parser::Source::Map::Heredoc)
+      alias loc location
     end
 
     class SymbolNode < Node
       include BasicLiteralNode
+      def value: () -> Symbol
+      attr_reader location: Parser::Source::Map::Collection
+      alias loc location
     end
   end
 end

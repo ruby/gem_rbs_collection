@@ -1,0 +1,650 @@
+module ODBC
+  # Module methods
+  def self.connect: (String dsn, String uid, String pwd) -> Database
+
+  def self.datasources: () -> Array[DSN]
+
+  def self.drivers: () -> Array[Driver]
+
+  def self.error: () -> String?
+
+  def self.info: () -> String?
+
+  def self.clear_error: () -> void
+
+  def self.newenv: () -> Environment
+
+  def self.to_time: (Integer year, Integer month, Integer day, ?Integer hour, ?Integer minute, ?Integer second) -> ::Time
+
+  def self.to_date: (untyped value) -> Date
+
+  def self.connection_pooling: () -> Integer
+                             | (Integer value) -> Integer
+
+  def self.connection_pooling=: (Integer value) -> Integer
+
+  def self.raise: (String message) -> void
+
+  def self.gc_threshold: () -> Integer
+                       | (Integer value) -> Integer
+
+  def self.gc_threshold=: (Integer value) -> Integer
+
+  def self.trace: () -> Integer
+                | (Integer level) -> Integer
+                | (Integer level, String filename) -> Integer
+
+  def self.trace=: (Integer level) -> Integer
+                 | ([Integer, String] value) -> Integer
+
+  # Base class for all ODBC objects
+  class Object
+    @@error: String?
+    @@info: String?
+
+    def self.error: () -> String?
+
+    def self.info: () -> String?
+
+    def self.clear_error: () -> void
+
+    def self.raise: (String message) -> void
+
+    def error: () -> String?
+
+    def info: () -> String?
+
+    def clear_error: () -> void
+
+    def raise: (String message) -> void
+  end
+
+  # Environment represents an ODBC environment
+  class Environment < Object
+    def self.connect: (String dsn, ?String uid, ?String pwd) -> Database
+
+    def connect: (String dsn, ?String uid, ?String pwd) -> Database
+
+    def environment: () -> self
+
+    def transaction: () -> void
+
+    def commit: () -> void
+
+    def rollback: () -> void
+
+    def connection_pooling: () -> Integer
+                          | (Integer value) -> Integer
+
+    def connection_pooling=: (Integer value) -> Integer
+
+    def cp_match: () -> Integer
+                | (Integer value) -> Integer
+
+    def cp_match=: (Integer value) -> Integer
+
+    def odbc_version: () -> Integer
+                    | (Integer value) -> Integer
+
+    def odbc_version=: (Integer value) -> Integer
+  end
+
+  # Database represents a database connection
+  class Database < Environment
+    def self.new: (String dsn, ?String uid, ?String pwd) -> instance
+
+    def initialize: (String dsn, ?String uid, ?String pwd) -> void
+
+    def connect: (String dsn, ?String uid, ?String pwd) -> self
+
+    def connected?: () -> bool
+
+    def drvconnect: (String connection_string) -> self
+
+    def drop_all: () -> void
+
+    def disconnect: () -> void
+                  | (Symbol option) -> void
+
+    def tables: (?String? catalog, ?String? schema, ?String? table, ?String? type) -> Statement
+
+    def columns: (?String? catalog, ?String? schema, ?String? table, ?String? column) -> Statement
+
+    def primary_keys: (?String? catalog, ?String? schema, ?String? table) -> Statement
+
+    def indexes: (?String? catalog, ?String? schema, ?String? table) -> Statement
+
+    def types: (?Integer? sql_type) -> Statement
+
+    def foreign_keys: (String? primary_catalog, String? primary_schema, String? primary_table,
+                      String? foreign_catalog, String? foreign_schema, String? foreign_table) -> Statement
+
+    def table_privileges: (?String? catalog, ?String? schema, ?String? table) -> Statement
+
+    def procedures: (?String? catalog, ?String? schema, ?String? procedure) -> Statement
+
+    def procedure_columns: (?String? catalog, ?String? schema, ?String? procedure, ?String? column) -> Statement
+
+    def special_columns: (Integer column_type, ?String? catalog, ?String? schema, String table,
+                         Integer scope, Integer nullable) -> Statement
+
+    def get_info: (Integer info_type) -> untyped
+
+    def prepare: (String sql) -> Statement
+               | (String sql) { (Statement) -> untyped } -> untyped
+
+    def run: (String sql) -> Statement
+           | (String sql) { (Statement) -> untyped } -> untyped
+
+    def do: (String sql) -> Integer
+
+    def proc: (String sql) -> ODBCProc
+            | (String sql) { (*untyped) -> untyped } -> ODBCProc
+
+    def newstmt: () -> Statement
+
+    def use_time: () -> bool
+                | (bool value) -> bool
+
+    def use_time=: (bool value) -> bool
+
+    def use_utc: () -> bool
+               | (bool value) -> bool
+
+    def use_utc=: (bool value) -> bool
+
+    def use_sql_column_name: () -> bool
+                           | (bool value) -> bool
+
+    def use_sql_column_name=: (bool value) -> bool
+
+    def get_option: (Integer option) -> untyped
+
+    def set_option: (Integer option, untyped value) -> void
+
+    def autocommit: () -> bool
+                  | (bool value) -> bool
+
+    def autocommit=: (bool value) -> bool
+
+    def concurrency: () -> Integer
+                   | (Integer value) -> Integer
+
+    def concurrency=: (Integer value) -> Integer
+
+    def maxrows: () -> Integer
+               | (Integer value) -> Integer
+
+    def maxrows=: (Integer value) -> Integer
+
+    def timeout: () -> Integer
+               | (Integer value) -> Integer
+
+    def timeout=: (Integer value) -> Integer
+
+    def login_timeout: () -> Integer
+                     | (Integer value) -> Integer
+
+    def login_timeout=: (Integer value) -> Integer
+
+    def maxlength: () -> Integer
+                 | (Integer value) -> Integer
+
+    def maxlength=: (Integer value) -> Integer
+
+    def rowsetsize: () -> Integer
+                  | (Integer value) -> Integer
+
+    def cursortype: () -> Integer
+                  | (Integer value) -> Integer
+
+    def cursortype=: (Integer value) -> Integer
+
+    def noscan: () -> bool
+              | (bool value) -> bool
+
+    def noscan=: (bool value) -> bool
+
+    def ignorecase: () -> bool
+                  | (bool value) -> bool
+
+    def ignorecase=: (bool value) -> bool
+  end
+
+  # Statement represents an SQL statement
+  class Statement < Database
+    def drop: () -> void
+
+    def close: () -> void
+
+    def cancel: () -> void
+
+    def column: (Integer index) -> Column
+              | (Integer index, String qualifier) -> Column
+
+    def columns: (?String? qualifier) -> Array[Column]
+
+    def parameter: (Integer index) -> Parameter
+
+    def parameters: () -> Array[Parameter]
+
+    def param_type: (Integer index, ?Integer sql_type) -> Integer
+
+    def param_iotype: (Integer index, ?Integer io_type) -> Integer
+
+    def param_output_size: (Integer index, ?Integer size) -> Integer
+
+    def param_output_type: (Integer index, ?Integer sql_type) -> Integer
+
+    def param_output_value: (Integer index) -> untyped
+
+    def ncols: () -> Integer
+
+    def nrows: () -> Integer
+
+    def nparams: () -> Integer
+
+    def cursorname: () -> String
+                  | (String name) -> String
+
+    def cursorname=: (String name) -> String
+
+    def fetch: () -> Array[untyped]?
+
+    def fetch!: () -> Array[untyped]
+
+    def fetch_first: () -> Array[untyped]?
+
+    def fetch_first!: () -> Array[untyped]
+
+    def fetch_scroll: (Integer direction, ?Integer offset) -> Array[untyped]?
+
+    def fetch_scroll!: (Integer direction, ?Integer offset) -> Array[untyped]
+
+    def fetch_hash: (?Hash[Symbol, untyped] options) -> Hash[String | Symbol, untyped]?
+                  | (bool with_table_names) -> Hash[String | Symbol, untyped]?
+
+    def fetch_hash!: (?Hash[Symbol, untyped] options) -> Hash[String | Symbol, untyped]
+                   | (bool with_table_names) -> Hash[String | Symbol, untyped]
+
+    def fetch_first_hash: (?Hash[Symbol, untyped] options) -> Hash[String | Symbol, untyped]?
+                        | (bool with_table_names) -> Hash[String | Symbol, untyped]?
+
+    def fetch_many: (Integer count) -> Array[Array[untyped]]?
+
+    def fetch_all: () -> Array[Array[untyped]]
+
+    # Alias for fetch_all
+    def entries: () -> Array[Array[untyped]]
+
+    def each: () { (Array[untyped]) -> void } -> self
+            | () -> Enumerator[Array[untyped], self]
+
+    def each_hash: (?Hash[Symbol, untyped] options) { (Hash[String | Symbol, untyped]) -> void } -> self
+                 | (bool with_table_names) { (Hash[String | Symbol, untyped]) -> void } -> self
+                 | (?Hash[Symbol, untyped] options) -> Enumerator[Hash[String | Symbol, untyped], self]
+                 | (bool with_table_names) -> Enumerator[Hash[String | Symbol, untyped], self]
+
+    def execute: (*untyped params) -> self
+               | (*untyped params) { (self) -> untyped } -> untyped
+
+    def make_proc: (?Integer mode) -> ODBCProc
+
+    def more_results: () -> bool
+
+    def prepare: (String sql) -> self
+
+    def run: (String sql) -> self
+           | (String sql) { (self) -> untyped } -> untyped
+
+    def param_bind: (*untyped) -> void
+  end
+
+  # Column metadata
+  class Column < Object
+    attr_reader name: String
+    attr_reader table: String
+    attr_reader type: Integer
+    attr_reader length: Integer
+    attr_reader precision: Integer
+    attr_reader scale: Integer
+    attr_reader nullable: Integer
+    attr_reader searchable: Integer
+    attr_reader unsigned: bool
+    attr_reader money: bool
+    attr_reader updatable: Integer
+    attr_reader auto_increment: bool
+  end
+
+  # Parameter metadata
+  class Parameter < Object
+    attr_reader type: Integer
+    attr_reader precision: Integer
+    attr_reader scale: Integer
+    attr_reader nullable: Integer
+  end
+
+  # Data Source Name information
+  class DSN < Object
+    def initialize: () -> void
+
+    attr_reader name: String
+    attr_reader descr: String
+  end
+
+  # Driver information
+  class Driver < Object
+    def initialize: () -> void
+
+    attr_reader name: String
+    attr_reader attrs: Hash[String, String]
+  end
+
+  # Error class
+  class Error < StandardError
+  end
+
+  # Date type
+  class Date < Object
+    attr_accessor year: Integer
+    attr_accessor month: Integer
+    attr_accessor day: Integer
+
+    def initialize: (Integer year, Integer month, Integer day) -> void
+
+    def to_s: () -> String
+
+    def to_a: () -> [Integer, Integer, Integer]
+  end
+
+  # Time type
+  class Time < Object
+    attr_accessor hour: Integer
+    attr_accessor minute: Integer
+    attr_accessor second: Integer
+
+    def initialize: (Integer hour, Integer minute, Integer second) -> void
+
+    def to_s: () -> String
+
+    def to_a: () -> [Integer, Integer, Integer]
+  end
+
+  # TimeStamp type
+  class TimeStamp < Object
+    attr_accessor year: Integer
+    attr_accessor month: Integer
+    attr_accessor day: Integer
+    attr_accessor hour: Integer
+    attr_accessor minute: Integer
+    attr_accessor second: Integer
+    attr_accessor fraction: Integer
+
+    def initialize: (Integer year, Integer month, Integer day,
+                    Integer hour, Integer minute, Integer second,
+                    ?Integer fraction) -> void
+
+    def to_s: () -> String
+
+    def to_a: () -> [Integer, Integer, Integer, Integer, Integer, Integer, Integer]
+  end
+
+  # SQL Type Constants
+  SQL_CHAR: Integer
+  SQL_VARCHAR: Integer
+  SQL_LONGVARCHAR: Integer
+  SQL_WCHAR: Integer
+  SQL_WVARCHAR: Integer
+  SQL_WLONGVARCHAR: Integer
+  SQL_DECIMAL: Integer
+  SQL_NUMERIC: Integer
+  SQL_SMALLINT: Integer
+  SQL_INTEGER: Integer
+  SQL_REAL: Integer
+  SQL_FLOAT: Integer
+  SQL_DOUBLE: Integer
+  SQL_BIT: Integer
+  SQL_TINYINT: Integer
+  SQL_BIGINT: Integer
+  SQL_BINARY: Integer
+  SQL_VARBINARY: Integer
+  SQL_LONGVARBINARY: Integer
+  SQL_TYPE_DATE: Integer
+  SQL_TYPE_TIME: Integer
+  SQL_TYPE_TIMESTAMP: Integer
+  SQL_DATE: Integer
+  SQL_TIME: Integer
+  SQL_TIMESTAMP: Integer
+  SQL_GUID: Integer
+
+  # Fetch directions
+  SQL_FETCH_NEXT: Integer
+  SQL_FETCH_FIRST: Integer
+  SQL_FETCH_LAST: Integer
+  SQL_FETCH_PRIOR: Integer
+  SQL_FETCH_ABSOLUTE: Integer
+  SQL_FETCH_RELATIVE: Integer
+  SQL_FETCH_BOOKMARK: Integer
+
+  # Transaction isolation levels
+  SQL_TXN_READ_UNCOMMITTED: Integer
+  SQL_TXN_READ_COMMITTED: Integer
+  SQL_TXN_REPEATABLE_READ: Integer
+  SQL_TXN_SERIALIZABLE: Integer
+
+  # Options
+  SQL_AUTOCOMMIT: Integer
+  SQL_LOGIN_TIMEOUT: Integer
+  SQL_OPT_TRACE: Integer
+  SQL_OPT_TRACEFILE: Integer
+  SQL_QUERY_TIMEOUT: Integer
+  SQL_MAX_ROWS: Integer
+  SQL_NOSCAN: Integer
+  SQL_MAX_LENGTH: Integer
+  SQL_ASYNC_ENABLE: Integer
+  SQL_BIND_TYPE: Integer
+  SQL_CURSOR_TYPE: Integer
+  SQL_CONCURRENCY: Integer
+  SQL_KEYSET_SIZE: Integer
+  SQL_ROWSET_SIZE: Integer
+  SQL_SIMULATE_CURSOR: Integer
+  SQL_RETRIEVE_DATA: Integer
+  SQL_USE_BOOKMARKS: Integer
+  SQL_GET_BOOKMARK: Integer
+  SQL_ROW_NUMBER: Integer
+
+  # Connection pooling
+  SQL_CP_OFF: Integer
+  SQL_CP_ONE_PER_DRIVER: Integer
+  SQL_CP_ONE_PER_HENV: Integer
+  SQL_CP_DRIVER_AWARE: Integer
+  SQL_CP_STRICT_MATCH: Integer
+  SQL_CP_RELAXED_MATCH: Integer
+  SQL_CP_MATCH_DEFAULT: Integer
+
+  # Cursor types
+  SQL_CURSOR_FORWARD_ONLY: Integer
+  SQL_CURSOR_KEYSET_DRIVEN: Integer
+  SQL_CURSOR_DYNAMIC: Integer
+  SQL_CURSOR_STATIC: Integer
+  SQL_CURSOR_TYPE_DEFAULT: Integer
+
+  # Concurrency control
+  SQL_CONCUR_READ_ONLY: Integer
+  SQL_CONCUR_LOCK: Integer
+  SQL_CONCUR_ROWVER: Integer
+  SQL_CONCUR_VALUES: Integer
+  SQL_CONCUR_DEFAULT: Integer
+
+  # Special columns
+  SQL_BEST_ROWID: Integer
+  SQL_ROWVER: Integer
+  SQL_SCOPE_CURROW: Integer
+  SQL_SCOPE_TRANSACTION: Integer
+  SQL_SCOPE_SESSION: Integer
+  SQL_NO_NULLS: Integer
+  SQL_NULLABLE: Integer
+  SQL_NULLABLE_UNKNOWN: Integer
+
+  # Info types
+  SQL_ACCESSIBLE_PROCEDURES: Integer
+  SQL_ACCESSIBLE_TABLES: Integer
+  SQL_ACTIVE_CONNECTIONS: Integer
+  SQL_ACTIVE_STATEMENTS: Integer
+  SQL_ALTER_TABLE: Integer
+  SQL_BOOKMARK_PERSISTENCE: Integer
+  SQL_CATALOG_LOCATION: Integer
+  SQL_CATALOG_NAME: Integer
+  SQL_CATALOG_NAME_SEPARATOR: Integer
+  SQL_CATALOG_TERM: Integer
+  SQL_COLLATION_SEQ: Integer
+  SQL_COLUMN_ALIAS: Integer
+  SQL_CONCAT_NULL_BEHAVIOR: Integer
+  SQL_CONVERT_BIGINT: Integer
+  SQL_CONVERT_BINARY: Integer
+  SQL_CONVERT_BIT: Integer
+  SQL_CONVERT_CHAR: Integer
+  SQL_CONVERT_DATE: Integer
+  SQL_CONVERT_DECIMAL: Integer
+  SQL_CONVERT_DOUBLE: Integer
+  SQL_CONVERT_FLOAT: Integer
+  SQL_CONVERT_INTEGER: Integer
+  SQL_CONVERT_LONGVARCHAR: Integer
+  SQL_CONVERT_NUMERIC: Integer
+  SQL_CONVERT_REAL: Integer
+  SQL_CONVERT_SMALLINT: Integer
+  SQL_CONVERT_TIME: Integer
+  SQL_CONVERT_TIMESTAMP: Integer
+  SQL_CONVERT_TINYINT: Integer
+  SQL_CONVERT_VARBINARY: Integer
+  SQL_CONVERT_VARCHAR: Integer
+  SQL_CONVERT_FUNCTIONS: Integer
+  SQL_CORRELATION_NAME: Integer
+  SQL_CREATE_ASSERTION: Integer
+  SQL_CREATE_CHARACTER_SET: Integer
+  SQL_CREATE_COLLATION: Integer
+  SQL_CREATE_DOMAIN: Integer
+  SQL_CREATE_SCHEMA: Integer
+  SQL_CREATE_TABLE: Integer
+  SQL_CREATE_TRANSLATION: Integer
+  SQL_CREATE_VIEW: Integer
+  SQL_CURSOR_COMMIT_BEHAVIOR: Integer
+  SQL_CURSOR_ROLLBACK_BEHAVIOR: Integer
+  SQL_DATA_SOURCE_NAME: Integer
+  SQL_DATA_SOURCE_READ_ONLY: Integer
+  SQL_DATABASE_NAME: Integer
+  SQL_DATETIME_LITERALS: Integer
+  SQL_DBMS_NAME: Integer
+  SQL_DBMS_VER: Integer
+  SQL_DDL_INDEX: Integer
+  SQL_DEFAULT_TXN_ISOLATION: Integer
+  SQL_DESCRIBE_PARAMETER: Integer
+  SQL_DM_VER: Integer
+  SQL_DRIVER_HDBC: Integer
+  SQL_DRIVER_HENV: Integer
+  SQL_DRIVER_HLIB: Integer
+  SQL_DRIVER_HSTMT: Integer
+  SQL_DRIVER_NAME: Integer
+  SQL_DRIVER_ODBC_VER: Integer
+  SQL_DRIVER_VER: Integer
+  SQL_DROP_ASSERTION: Integer
+  SQL_DROP_CHARACTER_SET: Integer
+  SQL_DROP_COLLATION: Integer
+  SQL_DROP_DOMAIN: Integer
+  SQL_DROP_SCHEMA: Integer
+  SQL_DROP_TABLE: Integer
+  SQL_DROP_TRANSLATION: Integer
+  SQL_DROP_VIEW: Integer
+  SQL_EXPRESSIONS_IN_ORDERBY: Integer
+  SQL_FILE_USAGE: Integer
+  SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1: Integer
+  SQL_GETDATA_EXTENSIONS: Integer
+  SQL_GROUP_BY: Integer
+  SQL_IDENTIFIER_CASE: Integer
+  SQL_IDENTIFIER_QUOTE_CHAR: Integer
+  SQL_INDEX_KEYWORDS: Integer
+  SQL_INFO_SCHEMA_VIEWS: Integer
+  SQL_INSERT_STATEMENT: Integer
+  SQL_INTEGRITY: Integer
+  SQL_KEYWORDS: Integer
+  SQL_LIKE_ESCAPE_CLAUSE: Integer
+  SQL_MAX_ASYNC_CONCURRENT_STATEMENTS: Integer
+  SQL_MAX_BINARY_LITERAL_LEN: Integer
+  SQL_MAX_CATALOG_NAME_LEN: Integer
+  SQL_MAX_CHAR_LITERAL_LEN: Integer
+  SQL_MAX_COLUMN_NAME_LEN: Integer
+  SQL_MAX_COLUMNS_IN_GROUP_BY: Integer
+  SQL_MAX_COLUMNS_IN_INDEX: Integer
+  SQL_MAX_COLUMNS_IN_ORDER_BY: Integer
+  SQL_MAX_COLUMNS_IN_SELECT: Integer
+  SQL_MAX_COLUMNS_IN_TABLE: Integer
+  SQL_MAX_CONCURRENT_ACTIVITIES: Integer
+  SQL_MAX_CURSOR_NAME_LEN: Integer
+  SQL_MAX_DRIVER_CONNECTIONS: Integer
+  SQL_MAX_IDENTIFIER_LEN: Integer
+  SQL_MAX_INDEX_SIZE: Integer
+  SQL_MAX_PROCEDURE_NAME_LEN: Integer
+  SQL_MAX_ROW_SIZE: Integer
+  SQL_MAX_ROW_SIZE_INCLUDES_LONG: Integer
+  SQL_MAX_SCHEMA_NAME_LEN: Integer
+  SQL_MAX_STATEMENT_LEN: Integer
+  SQL_MAX_TABLE_NAME_LEN: Integer
+  SQL_MAX_TABLES_IN_SELECT: Integer
+  SQL_MAX_USER_NAME_LEN: Integer
+  SQL_MULT_RESULT_SETS: Integer
+  SQL_MULTIPLE_ACTIVE_TXN: Integer
+  SQL_NEED_LONG_DATA_LEN: Integer
+  SQL_NON_NULLABLE_COLUMNS: Integer
+  SQL_NULL_COLLATION: Integer
+  SQL_NUMERIC_FUNCTIONS: Integer
+  SQL_ODBC_INTERFACE_CONFORMANCE: Integer
+  SQL_ODBC_VER: Integer
+  SQL_OJ_CAPABILITIES: Integer
+  SQL_ORDER_BY_COLUMNS_IN_SELECT: Integer
+  SQL_PARAM_ARRAY_ROW_COUNTS: Integer
+  SQL_PARAM_ARRAY_SELECTS: Integer
+  SQL_PROCEDURE_TERM: Integer
+  SQL_PROCEDURES: Integer
+  SQL_QUOTED_IDENTIFIER_CASE: Integer
+  SQL_ROW_UPDATES: Integer
+  SQL_SCHEMA_TERM: Integer
+  SQL_SCHEMA_USAGE: Integer
+  SQL_SCROLL_OPTIONS: Integer
+  SQL_SEARCH_PATTERN_ESCAPE: Integer
+  SQL_SERVER_NAME: Integer
+  SQL_SPECIAL_CHARACTERS: Integer
+  SQL_SQL_CONFORMANCE: Integer
+  SQL_SQL92_DATETIME_FUNCTIONS: Integer
+  SQL_SQL92_FOREIGN_KEY_DELETE_RULE: Integer
+  SQL_SQL92_FOREIGN_KEY_UPDATE_RULE: Integer
+  SQL_SQL92_GRANT: Integer
+  SQL_SQL92_NUMERIC_VALUE_FUNCTIONS: Integer
+  SQL_SQL92_PREDICATES: Integer
+  SQL_SQL92_RELATIONAL_JOIN_OPERATORS: Integer
+  SQL_SQL92_REVOKE: Integer
+  SQL_SQL92_ROW_VALUE_CONSTRUCTOR: Integer
+  SQL_SQL92_STRING_FUNCTIONS: Integer
+  SQL_SQL92_VALUE_EXPRESSIONS: Integer
+  SQL_STANDARD_CLI_CONFORMANCE: Integer
+  SQL_STATIC_CURSOR_ATTRIBUTES1: Integer
+  SQL_STATIC_CURSOR_ATTRIBUTES2: Integer
+  SQL_STRING_FUNCTIONS: Integer
+  SQL_SUBQUERIES: Integer
+  SQL_SYSTEM_FUNCTIONS: Integer
+  SQL_TABLE_TERM: Integer
+  SQL_TIMEDATE_ADD_INTERVALS: Integer
+  SQL_TIMEDATE_DIFF_INTERVALS: Integer
+  SQL_TIMEDATE_FUNCTIONS: Integer
+  SQL_TXN_CAPABLE: Integer
+  SQL_TXN_ISOLATION_OPTION: Integer
+  SQL_UNION: Integer
+  SQL_USER_NAME: Integer
+  SQL_XOPEN_CLI_YEAR: Integer
+end
+
+# Callable procedure object
+class ODBCProc < Proc
+  def call: (*untyped params) -> untyped
+
+  alias [] call
+end

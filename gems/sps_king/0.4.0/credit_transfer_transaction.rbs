@@ -1,0 +1,15 @@
+module SPS
+  class CreditTransferTransaction < ::SPS::Transaction
+    include ActiveModel::Validations
+    extend ::SPS::Converter
+    include ::SPS::Converter::InstanceMethods
+
+    attr_accessor charge_bearer: charge_bearer_type
+    attr_accessor service_level: ::String?
+    attr_accessor category_purpose: ::String?
+
+    def initialize: (
+        credit_transfer_transaction_attributes_type attributes
+      ) -> void
+  end
+end

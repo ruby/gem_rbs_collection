@@ -11,6 +11,7 @@ module RuboCop
   module Cop
     class Base
       extend AST::NodePattern::Macros
+      include Util
 
       def self.exclude_from_registry: () -> void
       def self.department: () -> Symbol
@@ -26,10 +27,23 @@ module RuboCop
     end
 
     class Corrector < Parser::Source::TreeRewriter
+      def replace: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
+      def remove: ((Parser::Source::Range | RuboCop::AST::Node) range) -> self
+      def insert_before: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
+      def insert_after: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
+    end
+
+    module ConfigurableEnforcedStyle
+      def style: () -> Symbol
     end
 
     module RangeHelp
       def source_range: (Parser::Source::Buffer source_buffer, Integer line_number, Integer column, ?Integer length) -> Parser::Source::Range
+      def range_between: (Integer start_pos, Integer end_pos) -> Parser::Source::Range
+      def range_with_surrounding_space: (?Parser::Source::Range range_positional,
+                                         ?range: Parser::Source::Range, ?side: Symbol, ?newlines: bool,
+                                         ?whitespace: bool, ?continuations: bool,
+                                         ?buffer: Parser::Source::Buffer) -> Parser::Source::Range
     end
 
     module IgnoredNode
@@ -41,11 +55,19 @@ module RuboCop
       def minimum_target_ruby_version: (Float) -> void
       def maximum_target_ruby_version: (Float) -> void
     end
+
+    module Util
+      include PathUtil
+    end
   end
 
   class ProcessedSource = AST::ProcessedSource
 
   module AutoCorrector
     def support_autocorrect?: () -> true
+  end
+
+  module PathUtil
+    def smart_path: (String path) -> String
   end
 end

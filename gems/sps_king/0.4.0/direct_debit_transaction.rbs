@@ -1,0 +1,17 @@
+module SPS
+  class DirectDebitTransaction < ::SPS::Transaction
+    include ActiveModel::Validations
+    extend ::SPS::Converter
+    include ::SPS::Converter::InstanceMethods
+
+    attr_accessor local_instrument: local_instrument_type
+    attr_accessor service_level: service_level_direct_debit_type
+    attr_accessor creditor_account: ::SPS::CreditorAccount?
+    attr_accessor structured_remittance_information: ::SPS::StructuredRemittanceInformation
+    attr_accessor instruction: ::String
+
+    def initialize: (
+        direct_debit_transaction_attributes_type attributes
+      ) -> void
+  end
+end
