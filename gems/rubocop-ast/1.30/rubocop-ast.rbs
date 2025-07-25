@@ -303,6 +303,16 @@ module RuboCop
       def else?: () -> bool
     end
 
+    class ConstNode < Node
+      def namespace: () -> Node?
+      def short_name: () -> Symbol
+      def module_name?: () -> bool
+      alias class_name? module_name?
+      def absolute?: () -> bool
+      def relative?: () -> bool
+      def each_path: () { (Node) -> void } -> self
+    end
+
     class CsendNode < SendNode
       def send_type?: () -> false
     end

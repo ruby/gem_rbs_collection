@@ -351,6 +351,17 @@ if case_node.is_a?(RuboCop::AST::CaseNode)
   end
 end
 
+const_node = RuboCop::AST::ProcessedSource.new('::Foo::Bar::BAZ', RUBY_VERSION.to_f).ast
+if const_node.is_a?(RuboCop::AST::ConstNode)
+  const_node.namespace
+  const_node.short_name
+  const_node.module_name?
+  const_node.class_name?
+  const_node.absolute?
+  const_node.relative?
+  const_node.each_path { |node| node.type }
+end
+
 csend_node = RuboCop::AST::ProcessedSource.new('o&.hoge(1)', RUBY_VERSION.to_f).ast
 if csend_node.is_a?(RuboCop::AST::CsendNode)
   csend_node.send_type?
