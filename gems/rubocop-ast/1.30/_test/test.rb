@@ -292,6 +292,12 @@ if def_node.is_a?(RuboCop::AST::DefNode)
   if args_node.is_a?(RuboCop::AST::ArgsNode)
     args_node.empty_and_without_delimiters?
     args_node.argument_list
+    arg_node = args_node.child_nodes.first
+    if arg_node.is_a?(RuboCop::AST::ArgNode)
+      arg_node.name
+      arg_node.default_value
+      arg_node.default?
+    end
   end
 end
 
