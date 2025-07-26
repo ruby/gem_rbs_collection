@@ -283,6 +283,18 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
+def_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+def m(a, b, c)
+end
+EOM
+if def_node.is_a?(RuboCop::AST::DefNode)
+  args_node = def_node.arguments
+  if args_node.is_a?(RuboCop::AST::ArgsNode)
+    args_node.empty_and_without_delimiters?
+    args_node.argument_list
+  end
+end
+
 array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
 if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.values

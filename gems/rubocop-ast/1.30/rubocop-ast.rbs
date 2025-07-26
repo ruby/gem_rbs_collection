@@ -277,6 +277,11 @@ module RuboCop
       def right_siblings: () -> Array[Node]
     end
 
+    class ArgsNode < Node
+      def empty_and_without_delimiters?: () -> bool
+      def argument_list: () -> Array[Node]
+    end
+
     class ArrayNode < Node
       alias values children
       def each_value: () { (Node) -> void } -> self
@@ -349,7 +354,7 @@ module RuboCop
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
-      def arguments: () -> Array[Node]
+      def arguments: () -> ArgsNode
       def body: () -> Node
       def receiver: () -> (Node | nil)
       def endless?: () -> bool
