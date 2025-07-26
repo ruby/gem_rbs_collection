@@ -297,6 +297,12 @@ if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.loc.end
 end
 
+asgn_node = RuboCop::AST::ProcessedSource.new('x = 1', RUBY_VERSION.to_f).ast
+if asgn_node.is_a?(RuboCop::AST::AsgnNode)
+  asgn_node.name
+  asgn_node.expression
+end
+
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
 if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.send_node.method?(:tap)
