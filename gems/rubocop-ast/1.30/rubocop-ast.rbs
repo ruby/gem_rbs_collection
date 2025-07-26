@@ -277,6 +277,13 @@ module RuboCop
       def right_siblings: () -> Array[Node]
     end
 
+    class AndNode < Node
+      include BinaryOperatorNode
+      include PredicateOperatorNode
+      def alternate_operator: () -> String
+      def inverse_operator: () -> String
+    end
+
     class ArgNode < Node
       def name: () -> Symbol?
       def default_value: () -> Node?

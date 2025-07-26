@@ -283,6 +283,18 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
+and_node = RuboCop::AST::ProcessedSource.new('1 and 2', RUBY_VERSION.to_f).ast
+if and_node.is_a?(RuboCop::AST::AndNode)
+  and_node.lhs
+  and_node.rhs
+  and_node.conditions
+  and_node.operator
+  and_node.logical_operator?
+  and_node.semantic_operator?
+  and_node.alternate_operator
+  and_node.inverse_operator
+end
+
 def_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
 def m(a, b, c)
 end
