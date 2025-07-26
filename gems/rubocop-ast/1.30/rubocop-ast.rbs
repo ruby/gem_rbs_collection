@@ -419,6 +419,17 @@ module RuboCop
       include NumericNode
     end
 
+    class OpAsgnNode < Node
+      def assignment_node: () -> AsgnNode
+      def name: () -> Symbol
+      def operator: () -> Symbol
+      def expression: () -> Node
+    end
+
+    class OrAsgnNode < OpAsgnNode
+      def operator: () -> :'||'
+    end
+
     class OrNode < Node
       include BinaryOperatorNode
       include PredicateOperatorNode

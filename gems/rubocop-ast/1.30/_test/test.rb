@@ -467,6 +467,14 @@ if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.value
 end
 
+or_asgn_node = RuboCop::AST::ProcessedSource.new('a ||= 1', RUBY_VERSION.to_f).ast
+if or_asgn_node.is_a?(RuboCop::AST::OrAsgnNode)
+  or_asgn_node.assignment_node
+  or_asgn_node.name
+  or_asgn_node.operator
+  or_asgn_node.expression
+end
+
 or_node = RuboCop::AST::ProcessedSource.new('1 or 2', RUBY_VERSION.to_f).ast
 if or_node.is_a?(RuboCop::AST::OrNode)
   or_node.lhs
