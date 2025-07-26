@@ -644,6 +644,11 @@ if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.loc.end
 end
 
+return_node = RuboCop::AST::ProcessedSource.new('return 1', RUBY_VERSION.to_f).ast
+if return_node.is_a?(RuboCop::AST::ReturnNode)
+  return_node.arguments
+end
+
 until_node = RuboCop::AST::ProcessedSource.new('1 until true', RUBY_VERSION.to_f).ast
 if until_node.is_a?(RuboCop::AST::UntilNode)
   until_node.single_line_condition?
