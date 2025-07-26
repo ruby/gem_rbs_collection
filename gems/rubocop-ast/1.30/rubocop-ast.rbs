@@ -99,6 +99,12 @@ module RuboCop
       def value: () -> untyped
     end
 
+    module BinaryOperatorNode
+      def lhs: () -> Node
+      def rhs: () -> Node
+      def conditions: () -> Array[Node]
+    end
+
     module ConditionalNode
       def single_line_condition?: () -> bool
       def multiline_condition?: () -> bool
@@ -112,6 +118,12 @@ module RuboCop
 
     module NumericNode
       def sign?: () -> bool
+    end
+
+    module PredicateOperatorNode
+      def operator: () -> String
+      def logical_operator?: () -> bool
+      def semantic_operator?: () -> bool
     end
 
     class Node < Parser::AST::Node
@@ -394,6 +406,13 @@ module RuboCop
     class IntNode < Node
       include BasicLiteralNode
       include NumericNode
+    end
+
+    class OrNode < Node
+      include BinaryOperatorNode
+      include PredicateOperatorNode
+      def alternate_operator: () -> String
+      def inverse_operator: () -> String
     end
 
     class PairNode < Node

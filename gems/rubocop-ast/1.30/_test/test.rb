@@ -454,6 +454,18 @@ if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.value
 end
 
+or_node = RuboCop::AST::ProcessedSource.new('1 or 2', RUBY_VERSION.to_f).ast
+if or_node.is_a?(RuboCop::AST::OrNode)
+  or_node.lhs
+  or_node.rhs
+  or_node.conditions
+  or_node.operator
+  or_node.logical_operator?
+  or_node.semantic_operator?
+  or_node.alternate_operator
+  or_node.inverse_operator
+end
+
 send_node = RuboCop::AST::ProcessedSource.new('puts("hello")', RUBY_VERSION.to_f).ast
 if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.first_argument
