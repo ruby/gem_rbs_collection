@@ -99,6 +99,12 @@ module RuboCop
       def value: () -> untyped
     end
 
+    module BinaryOperatorNode
+      def lhs: () -> Node
+      def rhs: () -> Node
+      def conditions: () -> Array[Node]
+    end
+
     module ConditionalNode
       def single_line_condition?: () -> bool
       def multiline_condition?: () -> bool
@@ -106,8 +112,18 @@ module RuboCop
       def body: () -> Node?
     end
 
+    module ModifierNode
+      def modifier_form?: () -> bool
+    end
+
     module NumericNode
       def sign?: () -> bool
+    end
+
+    module PredicateOperatorNode
+      def operator: () -> String
+      def logical_operator?: () -> bool
+      def semantic_operator?: () -> bool
     end
 
     class Node < Parser::AST::Node
@@ -261,6 +277,24 @@ module RuboCop
       def right_siblings: () -> Array[Node]
     end
 
+    class AndNode < Node
+      include BinaryOperatorNode
+      include PredicateOperatorNode
+      def alternate_operator: () -> String
+      def inverse_operator: () -> String
+    end
+
+    class ArgNode < Node
+      def name: () -> Symbol?
+      def default_value: () -> Node?
+      def default?: () -> bool
+    end
+
+    class ArgsNode < Node
+      def empty_and_without_delimiters?: () -> bool
+      def argument_list: () -> Array[Node]
+    end
+
     class ArrayNode < Node
       alias values children
       def each_value: () { (Node) -> void } -> self
@@ -270,6 +304,11 @@ module RuboCop
       def bracketed?: () -> bool
       attr_reader location: Parser::Source::Map::Collection
       alias loc location
+    end
+
+    class AsgnNode < Node
+      def name: () -> Symbol
+      def expression: () -> Node
     end
 
     class BlockNode < Node
@@ -303,6 +342,28 @@ module RuboCop
       def else?: () -> bool
     end
 
+    class CasgnNode < Node
+      def namespace: () -> Node?
+      def name: () -> Symbol
+      def expression: () -> Node
+    end
+
+    class ClassNode < Node
+      def identifier: () -> Node
+      def parent_class: () -> Node?
+      def body: () -> Node?
+    end
+
+    class ConstNode < Node
+      def namespace: () -> Node?
+      def short_name: () -> Symbol
+      def module_name?: () -> bool
+      alias class_name? module_name?
+      def absolute?: () -> bool
+      def relative?: () -> bool
+      def each_path: () { (Node) -> void } -> self
+    end
+
     class CsendNode < SendNode
       def send_type?: () -> false
     end
@@ -312,7 +373,7 @@ module RuboCop
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
-      def arguments: () -> Array[Node]
+      def arguments: () -> ArgsNode
       def body: () -> Node
       def receiver: () -> (Node | nil)
       def endless?: () -> bool
@@ -329,6 +390,15 @@ module RuboCop
     class FloatNode < Node
       include BasicLiteralNode
       include NumericNode
+    end
+
+    class ForNode < Node
+      def keyword: () -> 'for'
+      def do?: () -> bool
+      def void_context?: () -> true
+      def variable: () -> Node
+      def collection: () -> Node
+      def body: () -> Node?
     end
 
     class HashNode < Node
@@ -373,6 +443,29 @@ module RuboCop
       include NumericNode
     end
 
+    class ModuleNode < Node
+      def identifier: () -> Node
+      def body: () -> Node?
+    end
+
+    class OpAsgnNode < Node
+      def assignment_node: () -> AsgnNode
+      def name: () -> Symbol
+      def operator: () -> Symbol
+      def expression: () -> Node
+    end
+
+    class OrAsgnNode < OpAsgnNode
+      def operator: () -> :'||'
+    end
+
+    class OrNode < Node
+      include BinaryOperatorNode
+      include PredicateOperatorNode
+      def alternate_operator: () -> String
+      def inverse_operator: () -> String
+    end
+
     class PairNode < Node
       include HashElementNode
       def hash_rocket?: () -> bool
@@ -410,6 +503,10 @@ module RuboCop
       alias loc location
     end
 
+    class ReturnNode < Node
+      include ParameterizedNode::WrappedArguments
+    end
+
     class SendNode < Node
       include ParameterizedNode::RestArguments
       include MethodDispatchNode
@@ -427,6 +524,13 @@ module RuboCop
       alias loc location
     end
 
+    class SuperNode < Node
+      include ParameterizedNode
+      include MethodDispatchNode
+      def node_parts: () -> Array[untyped]
+      alias arguments children
+    end
+
     class SymbolNode < Node
       include BasicLiteralNode
       def value: () -> Symbol
@@ -434,11 +538,34 @@ module RuboCop
       alias loc location
     end
 
+    class UntilNode < Node
+      include ConditionalNode
+      include ModifierNode
+      def keyword: () -> 'until'
+      def inverse_keyword: () -> 'while'
+      def do?: () -> bool
+    end
+
     class WhenNode < Node
       def conditions: () -> Array[Node]
       def branch_index: () -> Integer
       def then?: () -> bool
       def body: () -> Node?
+    end
+
+    class WhileNode < Node
+      include ConditionalNode
+      include ModifierNode
+      def keyword: () -> 'while'
+      def inverse_keyword: () -> 'until'
+      def do?: () -> bool
+    end
+
+    class YieldNode < Node
+      include ParameterizedNode
+      include MethodDispatchNode
+      def node_parts: () -> Array[untyped]
+      alias arguments children
     end
   end
 end

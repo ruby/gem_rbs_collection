@@ -283,6 +283,36 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
+and_node = RuboCop::AST::ProcessedSource.new('1 and 2', RUBY_VERSION.to_f).ast
+if and_node.is_a?(RuboCop::AST::AndNode)
+  and_node.lhs
+  and_node.rhs
+  and_node.conditions
+  and_node.operator
+  and_node.logical_operator?
+  and_node.semantic_operator?
+  and_node.alternate_operator
+  and_node.inverse_operator
+end
+
+def_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+def m(a, b, c)
+end
+EOM
+if def_node.is_a?(RuboCop::AST::DefNode)
+  args_node = def_node.arguments
+  if args_node.is_a?(RuboCop::AST::ArgsNode)
+    args_node.empty_and_without_delimiters?
+    args_node.argument_list
+    arg_node = args_node.child_nodes.first
+    if arg_node.is_a?(RuboCop::AST::ArgNode)
+      arg_node.name
+      arg_node.default_value
+      arg_node.default?
+    end
+  end
+end
+
 array_node = RuboCop::AST::ProcessedSource.new('[1,2,3]', RUBY_VERSION.to_f).ast
 if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.values
@@ -295,6 +325,12 @@ if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.location.end
   array_node.loc.begin
   array_node.loc.end
+end
+
+asgn_node = RuboCop::AST::ProcessedSource.new('x = 1', RUBY_VERSION.to_f).ast
+if asgn_node.is_a?(RuboCop::AST::AsgnNode)
+  asgn_node.name
+  asgn_node.expression
 end
 
 block_node = RuboCop::AST::ProcessedSource.new('1.tap { |n| n }', RUBY_VERSION.to_f).ast
@@ -349,6 +385,36 @@ if case_node.is_a?(RuboCop::AST::CaseNode)
     when_node.then?
     when_node.body
   end
+end
+
+casgn_node = RuboCop::AST::ProcessedSource.new('::Foo::Bar::BAZ = 1', RUBY_VERSION.to_f).ast
+if casgn_node.is_a?(RuboCop::AST::CasgnNode)
+  casgn_node.namespace
+  casgn_node.name
+  casgn_node.expression
+end
+
+class_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+class Foo < Super
+  def test
+  end
+end
+EOM
+if class_node.is_a?(RuboCop::AST::ClassNode)
+  class_node.identifier
+  class_node.parent_class
+  class_node.body
+end
+
+const_node = RuboCop::AST::ProcessedSource.new('::Foo::Bar::BAZ', RUBY_VERSION.to_f).ast
+if const_node.is_a?(RuboCop::AST::ConstNode)
+  const_node.namespace
+  const_node.short_name
+  const_node.module_name?
+  const_node.class_name?
+  const_node.absolute?
+  const_node.relative?
+  const_node.each_path { |node| node.type }
 end
 
 csend_node = RuboCop::AST::ProcessedSource.new('o&.hoge(1)', RUBY_VERSION.to_f).ast
@@ -423,10 +489,55 @@ if float_node.is_a?(RuboCop::AST::FloatNode)
   float_node.value
 end
 
+for_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+for i in [1, 2, 3]
+  print i*2, "\n"
+end
+EOM
+if for_node.is_a?(RuboCop::AST::ForNode)
+  for_node.keyword
+  for_node.do?
+  for_node.void_context?
+  for_node.variable
+  for_node.collection
+  for_node.body
+end
+
 int_node = RuboCop::AST::ProcessedSource.new('+1', RUBY_VERSION.to_f).ast
 if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.sign?
   int_node.value
+end
+
+module_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+module Foo
+  def test
+  end
+end
+EOM
+if module_node.is_a?(RuboCop::AST::ModuleNode)
+  module_node.identifier
+  module_node.body
+end
+
+or_asgn_node = RuboCop::AST::ProcessedSource.new('a ||= 1', RUBY_VERSION.to_f).ast
+if or_asgn_node.is_a?(RuboCop::AST::OrAsgnNode)
+  or_asgn_node.assignment_node
+  or_asgn_node.name
+  or_asgn_node.operator
+  or_asgn_node.expression
+end
+
+or_node = RuboCop::AST::ProcessedSource.new('1 or 2', RUBY_VERSION.to_f).ast
+if or_node.is_a?(RuboCop::AST::OrNode)
+  or_node.lhs
+  or_node.rhs
+  or_node.conditions
+  or_node.operator
+  or_node.logical_operator?
+  or_node.semantic_operator?
+  or_node.alternate_operator
+  or_node.inverse_operator
 end
 
 send_node = RuboCop::AST::ProcessedSource.new('puts("hello")', RUBY_VERSION.to_f).ast
@@ -513,6 +624,12 @@ if str_node.is_a?(RuboCop::AST::StrNode)
   end
 end
 
+super_node = RuboCop::AST::ProcessedSource.new('super 1, 2, 3', RUBY_VERSION.to_f).ast
+if super_node.is_a?(RuboCop::AST::SuperNode)
+  super_node.node_parts
+  super_node.arguments
+end
+
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
 
@@ -548,4 +665,73 @@ if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.location.end
   regexp_node.loc.begin
   regexp_node.loc.end
+end
+
+return_node = RuboCop::AST::ProcessedSource.new('return 1', RUBY_VERSION.to_f).ast
+if return_node.is_a?(RuboCop::AST::ReturnNode)
+  return_node.arguments
+end
+
+until_node = RuboCop::AST::ProcessedSource.new('1 until true', RUBY_VERSION.to_f).ast
+if until_node.is_a?(RuboCop::AST::UntilNode)
+  until_node.single_line_condition?
+  until_node.multiline_condition?
+  until_node.condition
+  until_node.body
+  until_node.modifier_form?
+  until_node.keyword
+  until_node.inverse_keyword
+  until_node.do?
+end
+
+while_node = RuboCop::AST::ProcessedSource.new('1 while true', RUBY_VERSION.to_f).ast
+if while_node.is_a?(RuboCop::AST::WhileNode)
+  while_node.single_line_condition?
+  while_node.multiline_condition?
+  while_node.condition
+  while_node.body
+  while_node.modifier_form?
+  while_node.keyword
+  while_node.inverse_keyword
+  while_node.do?
+end
+
+yield_node = RuboCop::AST::ProcessedSource.new('yield 1', RUBY_VERSION.to_f).ast
+if yield_node.is_a?(RuboCop::AST::YieldNode)
+  yield_node.parenthesized?
+  yield_node.first_argument
+  yield_node.last_argument
+  yield_node.arguments?
+  yield_node.splat_argument?
+  yield_node.rest_argument?
+  yield_node.block_argument?
+  yield_node.method?(:yield)
+  yield_node.receiver
+  yield_node.method_name
+  yield_node.selector
+  yield_node.block_node
+  yield_node.macro?
+  yield_node.access_modifier?
+  yield_node.bare_access_modifier?
+  yield_node.non_bare_access_modifier?
+  yield_node.special_modifier?
+  yield_node.command?(:yield)
+  yield_node.setter_method?
+  yield_node.assignment?
+  yield_node.dot?
+  yield_node.double_colon?
+  yield_node.safe_navigation?
+  yield_node.self_receiver?
+  yield_node.const_receiver?
+  yield_node.implicit_call?
+  yield_node.block_literal?
+  yield_node.arithmetic_operation?
+  yield_node.def_modifier?
+  yield_node.def_modifier
+  yield_node.lambda?
+  yield_node.lambda_literal?
+  yield_node.unary_operation?
+  yield_node.binary_operation?
+  yield_node.node_parts
+  yield_node.arguments
 end
