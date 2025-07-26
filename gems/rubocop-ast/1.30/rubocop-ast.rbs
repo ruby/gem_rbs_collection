@@ -502,6 +502,13 @@ module RuboCop
       alias loc location
     end
 
+    class SuperNode < Node
+      include ParameterizedNode
+      include MethodDispatchNode
+      def node_parts: () -> Array[untyped]
+      alias arguments children
+    end
+
     class SymbolNode < Node
       include BasicLiteralNode
       def value: () -> Symbol

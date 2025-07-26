@@ -589,6 +589,12 @@ if str_node.is_a?(RuboCop::AST::StrNode)
   end
 end
 
+super_node = RuboCop::AST::ProcessedSource.new('super 1, 2, 3', RUBY_VERSION.to_f).ast
+if super_node.is_a?(RuboCop::AST::SuperNode)
+  super_node.node_parts
+  super_node.arguments
+end
+
 sym_node = RuboCop::AST::ProcessedSource.new(':sym', RUBY_VERSION.to_f).ast
 sym_node.value if sym_node.is_a?(RuboCop::AST::SymbolNode)
 
