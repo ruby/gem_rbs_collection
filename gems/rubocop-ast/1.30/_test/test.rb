@@ -351,6 +351,13 @@ if case_node.is_a?(RuboCop::AST::CaseNode)
   end
 end
 
+casgn_node = RuboCop::AST::ProcessedSource.new('::Foo::Bar::BAZ = 1', RUBY_VERSION.to_f).ast
+if casgn_node.is_a?(RuboCop::AST::CasgnNode)
+  casgn_node.namespace
+  casgn_node.name
+  casgn_node.expression
+end
+
 const_node = RuboCop::AST::ProcessedSource.new('::Foo::Bar::BAZ', RUBY_VERSION.to_f).ast
 if const_node.is_a?(RuboCop::AST::ConstNode)
   const_node.namespace
