@@ -106,6 +106,10 @@ module RuboCop
       def body: () -> Node?
     end
 
+    module ModifierNode
+      def modifier_form?: () -> bool
+    end
+
     module NumericNode
       def sign?: () -> bool
     end
@@ -442,6 +446,14 @@ module RuboCop
       def value: () -> Symbol
       attr_reader location: Parser::Source::Map::Collection
       alias loc location
+    end
+
+    class UntilNode < Node
+      include ConditionalNode
+      include ModifierNode
+      def keyword: () -> 'until'
+      def inverse_keyword: () -> 'while'
+      def do?: () -> bool
     end
 
     class WhenNode < Node

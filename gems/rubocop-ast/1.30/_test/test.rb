@@ -560,3 +560,15 @@ if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.loc.begin
   regexp_node.loc.end
 end
+
+until_node = RuboCop::AST::ProcessedSource.new('1 until true', RUBY_VERSION.to_f).ast
+if until_node.is_a?(RuboCop::AST::UntilNode)
+  until_node.single_line_condition?
+  until_node.multiline_condition?
+  until_node.condition
+  until_node.body
+  until_node.modifier_form?
+  until_node.keyword
+  until_node.inverse_keyword
+  until_node.do?
+end
