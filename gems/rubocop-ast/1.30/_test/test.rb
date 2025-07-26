@@ -509,6 +509,17 @@ if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.value
 end
 
+module_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+module Foo
+  def test
+  end
+end
+EOM
+if module_node.is_a?(RuboCop::AST::ModuleNode)
+  module_node.identifier
+  module_node.body
+end
+
 or_asgn_node = RuboCop::AST::ProcessedSource.new('a ||= 1', RUBY_VERSION.to_f).ast
 if or_asgn_node.is_a?(RuboCop::AST::OrAsgnNode)
   or_asgn_node.assignment_node
