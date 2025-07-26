@@ -394,6 +394,18 @@ if casgn_node.is_a?(RuboCop::AST::CasgnNode)
   casgn_node.expression
 end
 
+class_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+class Foo < Super
+  def test
+  end
+end
+EOM
+if class_node.is_a?(RuboCop::AST::ClassNode)
+  class_node.identifier
+  class_node.parent_class
+  class_node.body
+end
+
 const_node = RuboCop::AST::ProcessedSource.new('::Foo::Bar::BAZ', RUBY_VERSION.to_f).ast
 if const_node.is_a?(RuboCop::AST::ConstNode)
   const_node.namespace
