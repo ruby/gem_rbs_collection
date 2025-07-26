@@ -572,3 +572,15 @@ if until_node.is_a?(RuboCop::AST::UntilNode)
   until_node.inverse_keyword
   until_node.do?
 end
+
+while_node = RuboCop::AST::ProcessedSource.new('1 while true', RUBY_VERSION.to_f).ast
+if while_node.is_a?(RuboCop::AST::WhileNode)
+  puts while_node.single_line_condition?
+  puts while_node.multiline_condition?
+  puts while_node.condition
+  puts while_node.body
+  puts while_node.modifier_form?
+  puts while_node.keyword
+  puts while_node.inverse_keyword
+  puts while_node.do?
+end
