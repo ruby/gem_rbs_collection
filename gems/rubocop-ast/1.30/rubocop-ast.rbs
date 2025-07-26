@@ -520,5 +520,12 @@ module RuboCop
       def inverse_keyword: () -> 'until'
       def do?: () -> bool
     end
+
+    class YieldNode < Node
+      include ParameterizedNode
+      include MethodDispatchNode
+      def node_parts: () -> Array[untyped]
+      alias arguments children
+    end
   end
 end

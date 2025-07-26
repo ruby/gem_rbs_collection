@@ -631,3 +631,43 @@ if while_node.is_a?(RuboCop::AST::WhileNode)
   while_node.inverse_keyword
   while_node.do?
 end
+
+yield_node = RuboCop::AST::ProcessedSource.new('yield 1', RUBY_VERSION.to_f).ast
+if yield_node.is_a?(RuboCop::AST::YieldNode)
+  yield_node.parenthesized?
+  yield_node.first_argument
+  yield_node.last_argument
+  yield_node.arguments?
+  yield_node.splat_argument?
+  yield_node.rest_argument?
+  yield_node.block_argument?
+  yield_node.method?(:yield)
+  yield_node.receiver
+  yield_node.method_name
+  yield_node.selector
+  yield_node.block_node
+  yield_node.macro?
+  yield_node.access_modifier?
+  yield_node.bare_access_modifier?
+  yield_node.non_bare_access_modifier?
+  yield_node.special_modifier?
+  yield_node.command?(:yield)
+  yield_node.setter_method?
+  yield_node.assignment?
+  yield_node.dot?
+  yield_node.double_colon?
+  yield_node.safe_navigation?
+  yield_node.self_receiver?
+  yield_node.const_receiver?
+  yield_node.implicit_call?
+  yield_node.block_literal?
+  yield_node.arithmetic_operation?
+  yield_node.def_modifier?
+  yield_node.def_modifier
+  yield_node.lambda?
+  yield_node.lambda_literal?
+  yield_node.unary_operation?
+  yield_node.binary_operation?
+  yield_node.node_parts
+  yield_node.arguments
+end
