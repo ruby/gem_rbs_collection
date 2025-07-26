@@ -345,6 +345,15 @@ module RuboCop
       include NumericNode
     end
 
+    class ForNode < Node
+      def keyword: () -> 'for'
+      def do?: () -> bool
+      def void_context?: () -> true
+      def variable: () -> Node
+      def collection: () -> Node
+      def body: () -> Node?
+    end
+
     class HashNode < Node
       def pairs: () -> Array[PairNode]
       def empty?: () -> bool

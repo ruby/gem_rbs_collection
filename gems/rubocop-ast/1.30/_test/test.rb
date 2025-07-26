@@ -434,6 +434,20 @@ if float_node.is_a?(RuboCop::AST::FloatNode)
   float_node.value
 end
 
+for_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+for i in [1, 2, 3]
+  print i*2, "\n"
+end
+EOM
+if for_node.is_a?(RuboCop::AST::ForNode)
+  for_node.keyword
+  for_node.do?
+  for_node.void_context?
+  for_node.variable
+  for_node.collection
+  for_node.body
+end
+
 int_node = RuboCop::AST::ProcessedSource.new('+1', RUBY_VERSION.to_f).ast
 if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.sign?
@@ -575,12 +589,12 @@ end
 
 while_node = RuboCop::AST::ProcessedSource.new('1 while true', RUBY_VERSION.to_f).ast
 if while_node.is_a?(RuboCop::AST::WhileNode)
-  puts while_node.single_line_condition?
-  puts while_node.multiline_condition?
-  puts while_node.condition
-  puts while_node.body
-  puts while_node.modifier_form?
-  puts while_node.keyword
-  puts while_node.inverse_keyword
-  puts while_node.do?
+  while_node.single_line_condition?
+  while_node.multiline_condition?
+  while_node.condition
+  while_node.body
+  while_node.modifier_form?
+  while_node.keyword
+  while_node.inverse_keyword
+  while_node.do?
 end
