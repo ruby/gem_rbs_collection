@@ -6,6 +6,8 @@ module RuboCop
 
   class Config
     def initialize: (Hash[untyped, untyped], String) -> void
+    def for_cop: (String cop) -> Hash[String, untyped]
+    def for_enabled_cop: (String cop) -> Hash[String, untyped]
   end
 
   module Cop
@@ -20,9 +22,12 @@ module RuboCop
       def self.documentation_url: (?Config?) -> String
       def self.requires_gem: (String gem_name, *String version_requirements) -> void
 
+      attr_reader config: Config
+
       def add_offense: (untyped node, ?message: String, ?severity: Symbol) -> void
                      | (untyped node, ?message: String, ?severity: Symbol) { (Corrector) -> void } -> void
       def cop_config: () -> Hash[String, untyped]
+      def target_ruby_version: () -> Float
       def processed_source: () -> AST::ProcessedSource
       def target_gem_version: (String gem_name) -> Gem::Version
     end
@@ -37,6 +42,12 @@ module RuboCop
       def remove_leading: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range, Integer size) -> self
       def remove_trailing: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range, Integer size) -> self
       def swap: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range1, (Parser::Source::Range | RuboCop::AST::Node) node_or_range2) -> self
+    end
+
+    module Alignment
+      def configured_indentation_width: () -> Integer
+      def indentation: (RuboCop::AST::Node node) -> String
+      def offset: (RuboCop::AST::Node node) -> String
     end
 
     module ConfigurableEnforcedStyle
@@ -57,6 +68,9 @@ module RuboCop
                                          ?range: Parser::Source::Range, ?side: Symbol, ?newlines: bool,
                                          ?whitespace: bool, ?continuations: bool,
                                          ?buffer: Parser::Source::Buffer) -> Parser::Source::Range
+      def range_by_whole_lines: (Parser::Source::Range range,
+                                 ?include_final_newline: bool,
+                                 ?buffer: Parser::Source::Buffer) -> Parser::Source::Range
     end
 
     module IgnoredNode
