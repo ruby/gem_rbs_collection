@@ -28,9 +28,14 @@ module RuboCop
 
     class Corrector < Parser::Source::TreeRewriter
       def replace: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
+      def wrap: ((Parser::Source::Range | RuboCop::AST::Node) range, String? insert_before, String? insert_after) -> self
       def remove: ((Parser::Source::Range | RuboCop::AST::Node) range) -> self
       def insert_before: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
       def insert_after: ((Parser::Source::Range | RuboCop::AST::Node) range, String content) -> self
+      def remove_preceding: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range, Integer size) -> self
+      def remove_leading: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range, Integer size) -> self
+      def remove_trailing: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range, Integer size) -> self
+      def swap: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range1, (Parser::Source::Range | RuboCop::AST::Node) node_or_range2) -> self
     end
 
     module ConfigurableEnforcedStyle
