@@ -72,6 +72,23 @@ module RuboCop
 
     module Util
       include PathUtil
+      def line_range: (RuboCop::AST::Node node) -> ::Range[Integer]
+      def parentheses?: (RuboCop::AST::Node node) -> bool
+      def add_parentheses: (RuboCop::AST::Node node, Corrector corrector) -> void
+      def any_descendant?: (RuboCop::AST::Node node, *Symbol types) -> bool
+      def args_begin: (RuboCop::AST::Node node) -> Parser::Source::Range
+      def args_end: (RuboCop::AST::Node node) -> Parser::Source::Range
+      def begins_its_line?: (Parser::Source::Range range) -> bool
+      def first_part_of_call_chain: (RuboCop::AST::Node node) -> RuboCop::AST::Node
+      def double_quotes_required?: (String string) -> bool
+      def needs_escaping?: (String string) -> bool
+      def escape_string: (String string) -> String
+      def to_string_literal: (String string) -> String
+      def trim_string_interpolation_escape_character: (String str) -> String
+      def interpret_string_escapes: (String string) -> String
+      def line: ((RuboCop::AST::Node | Parser::Source::Range) node_or_range) -> Integer
+      def same_line?: ((RuboCop::AST::Node | Parser::Source::Range) node1, (RuboCop::AST::Node | Parser::Source::Range) node2) -> bool
+      def indent: (RuboCop::AST::Node node, ?offset: Integer) -> String
     end
   end
 
