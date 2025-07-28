@@ -43,6 +43,13 @@ module RuboCop
       def style: () -> Symbol
     end
 
+    module CommentsHelp
+      def source_range_with_comment: (RuboCop::AST::Node node) -> Parser::Source::Range
+      def contains_comments?: (RuboCop::AST::Node node) -> bool
+      def comments_in_range: (RuboCop::AST::Node node) -> Array[Parser::Source::Comment]
+      def comments_contain_disables?: (RuboCop::AST::Node node, String cop_name) -> bool
+    end
+
     module RangeHelp
       def source_range: (Parser::Source::Buffer source_buffer, Integer line_number, Integer column, ?Integer length) -> Parser::Source::Range
       def range_between: (Integer start_pos, Integer end_pos) -> Parser::Source::Range
