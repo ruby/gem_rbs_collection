@@ -129,7 +129,6 @@ module RuboCop
     class Node < Parser::AST::Node
       include Descendence
       def type?: (*Symbol types) -> bool
-      def source: () -> (String | nil)
       def true_type?: () -> bool
       def false_type?: () -> bool
       def nil_type?: () -> bool
@@ -267,9 +266,70 @@ module RuboCop
       def itblock_type?: () -> bool
       def send_type?: () -> bool
       def parent: () -> Node?
+      def parent?: () -> bool
+      def root?: () -> bool
+      def to_a: () -> Array[Node]
+      alias node_parts to_a
       def each_ancestor: (*Symbol types) { (Node) -> void } -> self
                        | (*Symbol types) -> ::Enumerator[Node, self]
+      def ancestors: () -> Array[Node]
+      def source: () -> String?
       def source_range: () -> Parser::Source::Range
+      def first_line: () -> Integer
+      def last_line: () -> Integer
+      def line_count: () -> Integer
+      def nonempty_line_count: () -> Integer
+      def source_length: () -> Integer
+      def receiver: () -> Node?
+      def str_content: () -> (String | false)
+      def const_name: () -> String?
+      def defined_module: () -> ConstNode?
+      def defined_module_name: () -> String?
+      def parent_module_name: () -> String
+      def multiline?: () -> bool
+      def single_line?: () -> bool
+      def empty_source?: () -> bool
+      def assignment_or_similar?: () -> bool
+      def literal?: () -> bool
+      def basic_literal?: () -> bool
+      def truthy_literal?: () -> bool
+      def falsey_literal?: () -> bool
+      def mutable_literal?: () -> bool
+      def immutable_literal?: () -> bool
+      def recursive_literal?: () -> bool
+      def recursive_basic_literal?: () -> bool
+      def variable?: () -> bool
+      def reference?: () -> bool
+      def equals_asgn?: () -> bool
+      def shorthand_asgn?: () -> bool
+      def assignment?: () -> bool
+      def basic_conditional?: () -> bool
+      def conditional?: () -> bool
+      def post_condition_loop?: () -> bool
+      def loop_keyword?: () -> bool
+      def keyword?: () -> bool
+      def special_keyword?: () -> bool
+      def operator_keyword?: () -> bool
+      def parenthesized_call?: () -> bool
+      def call_type?: () -> bool
+      def chained?: () -> bool
+      def argument?: () -> bool
+      def argument_type?: () -> bool
+      def boolean_type?: () -> bool
+      def numeric_type?: () -> bool
+      def range_type?: () -> bool
+      def guard_clause?: () -> bool
+      def match_guard_clause?: () -> bool
+      def proc?: () -> bool
+      def lambda?: () -> bool
+      def lambda_or_proc?: () -> bool
+      def global_const?: (untyped) -> bool
+      def class_constructor?: () -> bool
+      def struct_constructor?: () -> bool
+      def class_definition?: () -> bool
+      def module_definition?: () -> bool
+      def value_used?: () -> bool
+      def pure?: () -> bool
       def sibling_index: () -> (Integer | nil)
       def right_sibling: () -> (Node | nil)
       def left_sibling: () -> (Node | nil)
