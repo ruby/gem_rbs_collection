@@ -44,6 +44,12 @@ module RuboCop
       def swap: ((Parser::Source::Range | RuboCop::AST::Node) node_or_range1, (Parser::Source::Range | RuboCop::AST::Node) node_or_range2) -> self
     end
 
+    module Alignment
+      def configured_indentation_width: () -> Integer
+      def indentation: (RuboCop::AST::Node node) -> String
+      def offset: (RuboCop::AST::Node node) -> String
+    end
+
     module ConfigurableEnforcedStyle
       def style: () -> Symbol
     end
