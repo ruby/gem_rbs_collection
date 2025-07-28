@@ -12,6 +12,7 @@ module RuboCop
     class Base
       extend AST::NodePattern::Macros
       include Util
+      include IgnoredNode
 
       def self.exclude_from_registry: () -> void
       def self.department: () -> Symbol
@@ -54,6 +55,7 @@ module RuboCop
     module IgnoredNode
       def ignore_node: (RuboCop::AST::Node node) -> void
       def part_of_ignored_node?: (RuboCop::AST::Node node) -> bool
+      def ignored_node?: (RuboCop::AST::Node node) -> bool
     end
 
     module TargetRubyVersion
