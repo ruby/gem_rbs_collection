@@ -15,6 +15,7 @@ module RuboCop
       extend AST::NodePattern::Macros
       include Util
       include IgnoredNode
+      include AutocorrectLogic
 
       def self.exclude_from_registry: () -> void
       def self.department: () -> Symbol
@@ -30,6 +31,16 @@ module RuboCop
       def target_ruby_version: () -> Float
       def processed_source: () -> AST::ProcessedSource
       def target_gem_version: (String gem_name) -> Gem::Version
+    end
+
+    module AutocorrectLogic
+      def autocorrect?: () -> bool
+      def autocorrect_with_disable_uncorrectable?: () -> bool
+      def autocorrect_requested?: () -> bool
+      def correctable?: () -> bool
+      def disable_uncorrectable?: () -> bool
+      def safe_autocorrect?: () -> bool
+      def autocorrect_enabled?: () -> bool
     end
 
     class Corrector < Parser::Source::TreeRewriter
