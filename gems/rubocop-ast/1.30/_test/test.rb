@@ -344,6 +344,12 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
+alias_node = RuboCop::AST::ProcessedSource.new('alias :new :old', RUBY_VERSION.to_f).ast
+if alias_node.is_a?(RuboCop::AST::AliasNode)
+  alias_node.old_identifier
+  alias_node.new_identifier
+end
+
 and_node = RuboCop::AST::ProcessedSource.new('1 and 2', RUBY_VERSION.to_f).ast
 if and_node.is_a?(RuboCop::AST::AndNode)
   and_node.lhs
