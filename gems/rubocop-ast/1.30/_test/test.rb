@@ -430,6 +430,11 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.loc.end
 end
 
+break_node = RuboCop::AST::ProcessedSource.new('break 1, 2', RUBY_VERSION.to_f).ast
+if break_node.is_a?(RuboCop::AST::BreakNode)
+  break_node.arguments
+end
+
 case_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
 case num
 when 1
