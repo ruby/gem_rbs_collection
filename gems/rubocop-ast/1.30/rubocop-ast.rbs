@@ -337,6 +337,15 @@ module RuboCop
       def right_siblings: () -> Array[Node]
     end
 
+    class AliasNode < Node
+      def old_identifier: () -> SymbolNode
+      def new_identifier: () -> SymbolNode
+    end
+
+    class AndAsgnNode < OpAsgnNode
+      def operator: () -> :'&&'
+    end
+
     class AndNode < Node
       include BinaryOperatorNode
       include PredicateOperatorNode
@@ -391,6 +400,10 @@ module RuboCop
       def void_context?: () -> bool
       attr_reader location: Parser::Source::Map::Collection
       alias loc location
+    end
+
+    class BreakNode < Node
+      include ParameterizedNode::WrappedArguments
     end
 
     class CaseNode < Node
@@ -480,6 +493,8 @@ module RuboCop
     end
 
     class IfNode < Node
+      include ConditionalNode
+      include ModifierNode
       def if?: () -> bool
       def unless?: () -> bool
       def elsif?: () -> bool

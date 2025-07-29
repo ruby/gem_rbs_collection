@@ -344,6 +344,17 @@ node&.each_node(:send) { |node| node.send_type? }
 node&.each_node&.each { |node| node.send_type? }
 node&.each_node(:send)&.each { |node| node.send_type? }
 
+alias_node = RuboCop::AST::ProcessedSource.new('alias :new :old', RUBY_VERSION.to_f).ast
+if alias_node.is_a?(RuboCop::AST::AliasNode)
+  alias_node.old_identifier
+  alias_node.new_identifier
+end
+
+and_asgn_node = RuboCop::AST::ProcessedSource.new('a &&= 1', RUBY_VERSION.to_f).ast
+if and_asgn_node.is_a?(RuboCop::AST::AndAsgnNode)
+  and_asgn_node.operator
+end
+
 and_node = RuboCop::AST::ProcessedSource.new('1 and 2', RUBY_VERSION.to_f).ast
 if and_node.is_a?(RuboCop::AST::AndNode)
   and_node.lhs
@@ -417,6 +428,11 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.location.end
   block_node.loc.begin
   block_node.loc.end
+end
+
+break_node = RuboCop::AST::ProcessedSource.new('break 1, 2', RUBY_VERSION.to_f).ast
+if break_node.is_a?(RuboCop::AST::BreakNode)
+  break_node.arguments
 end
 
 case_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
