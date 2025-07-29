@@ -350,6 +350,11 @@ if alias_node.is_a?(RuboCop::AST::AliasNode)
   alias_node.new_identifier
 end
 
+and_asgn_node = RuboCop::AST::ProcessedSource.new('a &&= 1', RUBY_VERSION.to_f).ast
+if and_asgn_node.is_a?(RuboCop::AST::AndAsgnNode)
+  and_asgn_node.operator
+end
+
 and_node = RuboCop::AST::ProcessedSource.new('1 and 2', RUBY_VERSION.to_f).ast
 if and_node.is_a?(RuboCop::AST::AndNode)
   and_node.lhs
