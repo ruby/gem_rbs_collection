@@ -463,10 +463,21 @@ module RuboCop
       alias loc location
     end
 
+    class DefinedNode < Node
+      include ParameterizedNode
+      include MethodDispatchNode
+      def node_parts: () -> Array[Node | nil]
+      alias arguments children
+    end
+
     class DstrNode < Node
       def value: () -> String
       attr_reader location: (Parser::Source::Map::Collection | Parser::Source::Map::Heredoc)
       alias loc location
+    end
+
+    class EnsureNode < Node
+      def body: () -> Node?
     end
 
     class FloatNode < Node
@@ -481,6 +492,10 @@ module RuboCop
       def variable: () -> Node
       def collection: () -> Node
       def body: () -> Node?
+    end
+
+    class ForwardArgsNode < Node
+      def to_a: () -> [self]
     end
 
     class HashNode < Node
@@ -529,9 +544,45 @@ module RuboCop
       def body: () -> Node?
     end
 
+    class IndexNode < Node
+      include ParameterizedNode::RestArguments
+      include MethodDispatchNode
+      def attribute_accessor?: () -> false
+      def assignment_method?: () -> false
+      def method_name: () -> :[]
+    end
+
+    class IndexasgnNode < Node
+      include ParameterizedNode::RestArguments
+      include MethodDispatchNode
+      def attribute_accessor?: () -> false
+      def assignment_method?: () -> true
+      def method_name: () -> :[]=
+    end
+
     class IntNode < Node
       include BasicLiteralNode
       include NumericNode
+    end
+
+    class KeywordSplatNode < Node
+      include HashElementNode
+      def hash_rocket?: () -> false
+      def colon?: () -> false
+      def operator: () -> String
+      def node_parts: () -> [self, self]
+      def kwsplat_type?: () -> true
+    end
+
+    class LambdaNode < Node
+      include ParameterizedNode::RestArguments
+      include MethodDispatchNode
+      def lambda?: () -> true
+      def lambda_literal?: () -> true
+      def attribute_accessor?: () -> false
+      def assignment_method?: () -> false
+      def receiver: () -> nil
+      def method_name: () -> :lambda
     end
 
     class ModuleNode < Node

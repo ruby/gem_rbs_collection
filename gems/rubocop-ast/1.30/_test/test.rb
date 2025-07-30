@@ -563,6 +563,14 @@ if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.loc.assignment
 end
 
+defined_node = RuboCop::AST::ProcessedSource.new('defined? print', RUBY_VERSION.to_f).ast
+if defined_node.is_a?(RuboCop::AST::DefinedNode)
+  defined_node.parenthesized?
+  defined_node.method_name
+  defined_node.node_parts
+  defined_node.arguments
+end
+
 dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
 if dstr_node.is_a?(RuboCop::AST::DstrNode)
   dstr_node.value
@@ -590,6 +598,19 @@ if dstr_node.is_a?(RuboCop::AST::DstrNode)
   end
 end
 
+ensure_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast&.child_nodes&.first
+begin
+  do_something
+rescue
+  recover
+ensure
+  must_to_do
+end
+EOM
+if ensure_node.is_a?(RuboCop::AST::EnsureNode)
+  ensure_node.child_nodes
+end
+
 float_node = RuboCop::AST::ProcessedSource.new('1.1', RUBY_VERSION.to_f).ast
 if float_node.is_a?(RuboCop::AST::FloatNode)
   float_node.sign?
@@ -614,6 +635,17 @@ int_node = RuboCop::AST::ProcessedSource.new('+1', RUBY_VERSION.to_f).ast
 if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.sign?
   int_node.value
+end
+
+keyword_splat_node = RuboCop::AST::ProcessedSource.new('a(**{a: 1})', RUBY_VERSION.to_f).ast&.child_nodes&.first&.child_nodes&.first
+if keyword_splat_node.is_a?(RuboCop::AST::KeywordSplatNode)
+  keyword_splat_node.key
+  keyword_splat_node.value
+  keyword_splat_node.hash_rocket?
+  keyword_splat_node.colon?
+  keyword_splat_node.operator
+  keyword_splat_node.node_parts
+  keyword_splat_node.kwsplat_type?
 end
 
 module_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
