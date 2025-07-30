@@ -406,6 +406,15 @@ module RuboCop
       include ParameterizedNode::WrappedArguments
     end
 
+    class CaseMatchNode < Node
+      include ConditionalNode
+      def keyword: () -> 'case'
+      def in_pattern_branches: () -> Array[InPatternNode]
+      def branches: () -> Array[Node | nil]
+      def else_branch: () -> Node?
+      def else?: () -> bool
+    end
+
     class CaseNode < Node
       include ConditionalNode
       def keyword: () -> 'case'
@@ -511,6 +520,13 @@ module RuboCop
       def branches: () -> Array[Node]
       attr_reader location: (Parser::Source::Map::Condition | Parser::Source::Map::Keyword | Parser::Source::Map::Ternary)
       alias loc location
+    end
+
+    class InPatternNode < Node
+      def pattern: () -> Node
+      def branch_index: () -> Integer
+      def then?: () -> bool
+      def body: () -> Node?
     end
 
     class IntNode < Node
