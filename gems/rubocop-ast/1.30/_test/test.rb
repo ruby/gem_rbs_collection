@@ -598,6 +598,19 @@ if dstr_node.is_a?(RuboCop::AST::DstrNode)
   end
 end
 
+ensure_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast&.child_nodes&.first
+begin
+  do_something
+rescue
+  recover
+ensure
+  must_to_do
+end
+EOM
+if ensure_node.is_a?(RuboCop::AST::EnsureNode)
+  ensure_node.body
+end
+
 float_node = RuboCop::AST::ProcessedSource.new('1.1', RUBY_VERSION.to_f).ast
 if float_node.is_a?(RuboCop::AST::FloatNode)
   float_node.sign?
