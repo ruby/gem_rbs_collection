@@ -608,7 +608,7 @@ ensure
 end
 EOM
 if ensure_node.is_a?(RuboCop::AST::EnsureNode)
-  ensure_node.body
+  ensure_node.child_nodes
 end
 
 float_node = RuboCop::AST::ProcessedSource.new('1.1', RUBY_VERSION.to_f).ast
@@ -635,6 +635,17 @@ int_node = RuboCop::AST::ProcessedSource.new('+1', RUBY_VERSION.to_f).ast
 if int_node.is_a?(RuboCop::AST::IntNode)
   int_node.sign?
   int_node.value
+end
+
+keyword_splat_node = RuboCop::AST::ProcessedSource.new('a(**{a: 1})', RUBY_VERSION.to_f).ast&.child_nodes&.first&.child_nodes&.first
+if keyword_splat_node.is_a?(RuboCop::AST::KeywordSplatNode)
+  keyword_splat_node.key
+  keyword_splat_node.value
+  keyword_splat_node.hash_rocket?
+  keyword_splat_node.colon?
+  keyword_splat_node.operator
+  keyword_splat_node.node_parts
+  keyword_splat_node.kwsplat_type?
 end
 
 module_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast

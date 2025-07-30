@@ -565,6 +565,15 @@ module RuboCop
       include NumericNode
     end
 
+    class KeywordSplatNode < Node
+      include HashElementNode
+      def hash_rocket?: () -> false
+      def colon?: () -> false
+      def operator: () -> String
+      def node_parts: () -> [self, self]
+      def kwsplat_type?: () -> true
+    end
+
     class ModuleNode < Node
       def identifier: () -> Node
       def body: () -> Node?
