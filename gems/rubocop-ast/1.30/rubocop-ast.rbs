@@ -544,6 +544,14 @@ module RuboCop
       def body: () -> Node?
     end
 
+    class IndexNode < Node
+      include ParameterizedNode::RestArguments
+      include MethodDispatchNode
+      def attribute_accessor?: () -> false
+      def assignment_method?: () -> false
+      def method_name: () -> :[]
+    end
+
     class IntNode < Node
       include BasicLiteralNode
       include NumericNode
