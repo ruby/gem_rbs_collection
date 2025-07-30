@@ -435,6 +435,36 @@ if break_node.is_a?(RuboCop::AST::BreakNode)
   break_node.arguments
 end
 
+_, case_match_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast&.child_nodes
+config = {db: {user: 'admin', password: 'abc123'}}
+case config
+in db: {user:}
+  puts "Connect with user " + user
+in connection: {username: }
+  puts "Connect with user " + username
+else
+  puts "Unrecognized structure of config"
+end
+EOM
+if case_match_node.is_a?(RuboCop::AST::CaseMatchNode)
+  case_match_node.single_line_condition?
+  case_match_node.multiline_condition?
+  case_match_node.condition
+  case_match_node.body
+  case_match_node.keyword
+  case_match_node.in_pattern_branches
+  case_match_node.branches
+  case_match_node.else_branch
+  case_match_node.else?
+  in_pattern_node = case_match_node.in_pattern_branches.first
+  if in_pattern_node.is_a?(RuboCop::AST::InPatternNode)
+    in_pattern_node.pattern
+    in_pattern_node.branch_index
+    in_pattern_node.then?
+    in_pattern_node.body
+  end
+end
+
 case_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
 case num
 when 1
