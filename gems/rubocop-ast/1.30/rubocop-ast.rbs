@@ -463,6 +463,13 @@ module RuboCop
       alias loc location
     end
 
+    class DefinedNode < Node
+      include ParameterizedNode
+      include MethodDispatchNode
+      def node_parts: () -> Array[Node | nil]
+      alias arguments children
+    end
+
     class DstrNode < Node
       def value: () -> String
       attr_reader location: (Parser::Source::Map::Collection | Parser::Source::Map::Heredoc)

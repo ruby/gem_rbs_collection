@@ -563,6 +563,14 @@ if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.loc.assignment
 end
 
+defined_node = RuboCop::AST::ProcessedSource.new('defined? print', RUBY_VERSION.to_f).ast
+if defined_node.is_a?(RuboCop::AST::DefinedNode)
+  defined_node.parenthesized?
+  defined_node.method_name
+  defined_node.node_parts
+  defined_node.arguments
+end
+
 dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
 if dstr_node.is_a?(RuboCop::AST::DstrNode)
   dstr_node.value
