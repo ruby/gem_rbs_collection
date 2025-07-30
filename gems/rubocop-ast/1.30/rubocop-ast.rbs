@@ -574,6 +574,17 @@ module RuboCop
       def kwsplat_type?: () -> true
     end
 
+    class LambdaNode < Node
+      include ParameterizedNode::RestArguments
+      include MethodDispatchNode
+      def lambda?: () -> true
+      def lambda_literal?: () -> true
+      def attribute_accessor?: () -> false
+      def assignment_method?: () -> false
+      def receiver: () -> nil
+      def method_name: () -> :lambda
+    end
+
     class ModuleNode < Node
       def identifier: () -> Node
       def body: () -> Node?
