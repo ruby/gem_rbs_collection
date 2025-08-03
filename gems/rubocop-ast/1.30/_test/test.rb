@@ -811,6 +811,28 @@ if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.loc.end
 end
 
+rescue_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast&.child_nodes&.first
+begin
+  do_something
+rescue
+  retry
+end
+EOM
+if rescue_node.is_a?(RuboCop::AST::RescueNode)
+  rescue_node.body
+  rescue_node.resbody_branches
+  rescue_node.branches
+  rescue_node.else_branch
+  rescue_node.else?
+  resbody_node = rescue_node.resbody_branches.first
+  if resbody_node.is_a?(RuboCop::AST::ResbodyNode)
+    resbody_node.body
+    resbody_node.exceptions
+    resbody_node.exception_variable
+    resbody_node.branch_index
+  end
+end
+
 return_node = RuboCop::AST::ProcessedSource.new('return 1', RUBY_VERSION.to_f).ast
 if return_node.is_a?(RuboCop::AST::ReturnNode)
   return_node.arguments

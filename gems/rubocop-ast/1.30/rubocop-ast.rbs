@@ -653,6 +653,21 @@ module RuboCop
       alias loc location
     end
 
+    class ResbodyNode < Node
+      def body: () -> Node?
+      def exceptions: () -> Array[Node]
+      def exception_variable: () -> Node?
+      def branch_index: () -> Integer
+    end
+
+    class RescueNode < Node
+      def body: () -> Node?
+      def resbody_branches: () -> Array[ResbodyNode]
+      def branches: () -> Array[Node | nil]
+      def else_branch: () -> Node?
+      def else?: () -> bool
+    end
+
     class ReturnNode < Node
       include ParameterizedNode::WrappedArguments
     end
