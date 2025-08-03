@@ -838,6 +838,17 @@ if return_node.is_a?(RuboCop::AST::ReturnNode)
   return_node.arguments
 end
 
+self_class_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast
+class << self
+  def foo
+  end
+end
+EOM
+if self_class_node.is_a?(RuboCop::AST::SelfClassNode)
+  self_class_node.identifier
+  self_class_node.body
+end
+
 until_node = RuboCop::AST::ProcessedSource.new('1 until true', RUBY_VERSION.to_f).ast
 if until_node.is_a?(RuboCop::AST::UntilNode)
   until_node.single_line_condition?
