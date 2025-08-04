@@ -590,6 +590,10 @@ module RuboCop
       def body: () -> Node?
     end
 
+    class NextNode < Node
+      include ParameterizedNode::WrappedArguments
+    end
+
     class OpAsgnNode < Node
       def assignment_node: () -> AsgnNode
       def name: () -> Symbol
@@ -620,6 +624,10 @@ module RuboCop
       alias loc location
     end
 
+    class Procarg0Node < ArgNode
+      def name: () -> Symbol?
+    end
+
     class RangeNode < Node
       def begin: () -> Node?
       def end: () -> Node?
@@ -645,8 +653,28 @@ module RuboCop
       alias loc location
     end
 
+    class ResbodyNode < Node
+      def body: () -> Node?
+      def exceptions: () -> Array[Node]
+      def exception_variable: () -> Node?
+      def branch_index: () -> Integer
+    end
+
+    class RescueNode < Node
+      def body: () -> Node?
+      def resbody_branches: () -> Array[ResbodyNode]
+      def branches: () -> Array[Node | nil]
+      def else_branch: () -> Node?
+      def else?: () -> bool
+    end
+
     class ReturnNode < Node
       include ParameterizedNode::WrappedArguments
+    end
+
+    class SelfClassNode < Node
+      def identifier: () -> Node
+      def body: () -> Node?
     end
 
     class SendNode < Node
