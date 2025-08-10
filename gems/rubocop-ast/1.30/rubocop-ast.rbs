@@ -22,6 +22,29 @@ module RuboCop
                | (*untyped, **untyped) { (*untyped) -> untyped } -> bool
     end
 
+    module Traversal
+    end
+
+    module BasicLiteralNode
+      def value: () -> untyped
+    end
+
+    module BinaryOperatorNode
+      def lhs: () -> Node
+      def rhs: () -> Node
+      def conditions: () -> Array[Node]
+    end
+
+    module CollectionNode
+    end
+
+    module ConditionalNode
+      def single_line_condition?: () -> bool
+      def multiline_condition?: () -> bool
+      def condition: () -> Node?
+      def body: () -> Node?
+    end
+
     module Descendence
       def each_child_node: (*Symbol types) { (Node) -> void } -> self
                          | (*Symbol types) -> ::Enumerator[Node, self]
@@ -72,6 +95,14 @@ module RuboCop
       def method?: ((Symbol | String) name) -> bool
     end
 
+    module ModifierNode
+      def modifier_form?: () -> bool
+    end
+
+    module NumericNode
+      def sign?: () -> bool
+    end
+
     module ParameterizedNode
       def parenthesized?: () -> bool
       def first_argument: () -> Node?
@@ -90,37 +121,6 @@ module RuboCop
         include ParameterizedNode
         def arguments: () -> Array[Node]
       end
-    end
-
-    module Traversal
-    end
-
-    module BasicLiteralNode
-      def value: () -> untyped
-    end
-
-    module BinaryOperatorNode
-      def lhs: () -> Node
-      def rhs: () -> Node
-      def conditions: () -> Array[Node]
-    end
-
-    module CollectionNode
-    end
-
-    module ConditionalNode
-      def single_line_condition?: () -> bool
-      def multiline_condition?: () -> bool
-      def condition: () -> Node?
-      def body: () -> Node?
-    end
-
-    module ModifierNode
-      def modifier_form?: () -> bool
-    end
-
-    module NumericNode
-      def sign?: () -> bool
     end
 
     module PredicateOperatorNode
