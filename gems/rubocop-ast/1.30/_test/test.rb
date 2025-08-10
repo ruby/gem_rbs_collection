@@ -88,6 +88,10 @@ class MyRule < Parser::AST::Processor
     pair = node.pairs.first
     pair.key
     pair.value
+    pair.same_line?(pair)
+    pair.key_delta(pair)
+    pair.value_delta(pair)
+    pair.delimiter_delta(pair)
     pair.hash_rocket?
     pair.colon?
     pair.delimiter
