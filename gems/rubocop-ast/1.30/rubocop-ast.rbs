@@ -22,6 +22,29 @@ module RuboCop
                | (*untyped, **untyped) { (*untyped) -> untyped } -> bool
     end
 
+    module Traversal
+    end
+
+    module BasicLiteralNode
+      def value: () -> untyped
+    end
+
+    module BinaryOperatorNode
+      def lhs: () -> Node
+      def rhs: () -> Node
+      def conditions: () -> Array[Node]
+    end
+
+    module CollectionNode
+    end
+
+    module ConditionalNode
+      def single_line_condition?: () -> bool
+      def multiline_condition?: () -> bool
+      def condition: () -> Node?
+      def body: () -> Node?
+    end
+
     module Descendence
       def each_child_node: (*Symbol types) { (Node) -> void } -> self
                          | (*Symbol types) -> ::Enumerator[Node, self]
@@ -36,6 +59,10 @@ module RuboCop
     module HashElementNode
       def key: () -> Node
       def value: () -> Node
+      def same_line?: (Node other) -> bool
+      def key_delta: (Node other, ?Symbol alignment) -> Integer
+      def value_delta: (Node other) -> Integer
+      def delimiter_delta: (Node other) -> Integer
     end
 
     module MethodDispatchNode
@@ -70,6 +97,33 @@ module RuboCop
 
     module MethodIdentifierPredicates
       def method?: ((Symbol | String) name) -> bool
+      def operator_method?: () -> bool
+      def nonmutating_binary_operator_method?: () -> bool
+      def nonmutating_unary_operator_method?: () -> bool
+      def nonmutating_operator_method?: () -> bool
+      def nonmutating_array_method?: () -> bool
+      def nonmutating_hash_method?: () -> bool
+      def nonmutating_string_method?: () -> bool
+      def comparison_method?: () -> bool
+      def assignment_method?: () -> bool
+      def enumerator_method?: () -> bool
+      def enumerable_method?: () -> bool
+      def predicate_method?: () -> bool
+      def bang_method?: () -> bool
+      def camel_case_method?: () -> boolish
+      def self_receiver?: () -> boolish
+      def const_receiver?: () -> boolish
+      def negation_method?: () -> boolish
+      def prefix_not?: () -> boolish
+      def prefix_bang?: () -> boolish
+    end
+
+    module ModifierNode
+      def modifier_form?: () -> bool
+    end
+
+    module NumericNode
+      def sign?: () -> bool
     end
 
     module ParameterizedNode
@@ -90,34 +144,6 @@ module RuboCop
         include ParameterizedNode
         def arguments: () -> Array[Node]
       end
-    end
-
-    module Traversal
-    end
-
-    module BasicLiteralNode
-      def value: () -> untyped
-    end
-
-    module BinaryOperatorNode
-      def lhs: () -> Node
-      def rhs: () -> Node
-      def conditions: () -> Array[Node]
-    end
-
-    module ConditionalNode
-      def single_line_condition?: () -> bool
-      def multiline_condition?: () -> bool
-      def condition: () -> Node?
-      def body: () -> Node?
-    end
-
-    module ModifierNode
-      def modifier_form?: () -> bool
-    end
-
-    module NumericNode
-      def sign?: () -> bool
     end
 
     module PredicateOperatorNode
@@ -360,6 +386,7 @@ module RuboCop
     end
 
     class ArgsNode < Node
+      include CollectionNode
       def empty_and_without_delimiters?: () -> bool
       def argument_list: () -> Array[Node]
     end
@@ -381,6 +408,7 @@ module RuboCop
     end
 
     class BlockNode < Node
+      include MethodIdentifierPredicates
       def send_node: () -> SendNode
       def first_argument: () -> Node?
       def last_argument: () -> Node?
@@ -452,6 +480,7 @@ module RuboCop
 
     class DefNode < Node
       include ParameterizedNode
+      include MethodIdentifierPredicates
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
@@ -495,6 +524,7 @@ module RuboCop
     end
 
     class ForwardArgsNode < Node
+      include CollectionNode
       def to_a: () -> [self]
     end
 
