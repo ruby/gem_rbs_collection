@@ -105,6 +105,9 @@ module RuboCop
       def conditions: () -> Array[Node]
     end
 
+    module CollectionNode
+    end
+
     module ConditionalNode
       def single_line_condition?: () -> bool
       def multiline_condition?: () -> bool
@@ -360,6 +363,7 @@ module RuboCop
     end
 
     class ArgsNode < Node
+      include CollectionNode
       def empty_and_without_delimiters?: () -> bool
       def argument_list: () -> Array[Node]
     end
@@ -381,6 +385,7 @@ module RuboCop
     end
 
     class BlockNode < Node
+      include MethodIdentifierPredicates
       def send_node: () -> SendNode
       def first_argument: () -> Node?
       def last_argument: () -> Node?
@@ -452,6 +457,7 @@ module RuboCop
 
     class DefNode < Node
       include ParameterizedNode
+      include MethodIdentifierPredicates
       def void_context?: () -> bool
       def argument_forwarding?: () -> bool
       def method_name: () -> Symbol
@@ -495,6 +501,7 @@ module RuboCop
     end
 
     class ForwardArgsNode < Node
+      include CollectionNode
       def to_a: () -> [self]
     end
 
