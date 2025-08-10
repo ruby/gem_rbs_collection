@@ -718,6 +718,26 @@ if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.lambda_literal?
   send_node.unary_operation?
   send_node.binary_operation?
+  send_node.method?(:puts)
+  send_node.operator_method?
+  send_node.nonmutating_binary_operator_method?
+  send_node.nonmutating_unary_operator_method?
+  send_node.nonmutating_operator_method?
+  send_node.nonmutating_array_method?
+  send_node.nonmutating_hash_method?
+  send_node.nonmutating_string_method?
+  send_node.comparison_method?
+  send_node.assignment_method?
+  send_node.enumerator_method?
+  send_node.enumerable_method?
+  send_node.predicate_method?
+  send_node.bang_method?
+  send_node.camel_case_method?
+  send_node.self_receiver?
+  send_node.const_receiver?
+  send_node.negation_method?
+  send_node.prefix_not?
+  send_node.prefix_bang?
   send_node.send_type?
   send_node.location.dot
   send_node.location.selector
