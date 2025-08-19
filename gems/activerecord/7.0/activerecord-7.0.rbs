@@ -249,6 +249,12 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
            | () { (Model) -> boolish } -> ::Integer
            | (Symbol | String column_name) -> ::Integer
   def sole: () -> Model
+
+  # https://github.com/rails/rails/blob/v7.0.8.7/activerecord/lib/active_record/relation/query_methods.rb#L151
+  # https://github.com/rails/rails/blob/v7.0.8.7/activerecord/lib/active_record/relation.rb#L7 
+  attr_reader order_values: Array[String | Symbol]?
+  attr_reader joins_values: Array[String | Symbol]?
+  attr_reader left_outer_joins_values: Array[String | Symbol]?
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rubocop:disable RBS/Lint/TopLevelInterface
