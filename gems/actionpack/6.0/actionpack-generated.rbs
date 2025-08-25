@@ -9995,6 +9995,12 @@ module ActionDispatch
         def define_url_helper: (untyped mod, untyped route, untyped name, untyped opts, untyped route_key, untyped url_strategy) -> untyped
       end
 
+      class RouteSet_AnonymousModule
+        include ActiveSupport::Concern
+        include UrlFor
+        # https://github.com/rails/rails/blob/v6.0.6.1/actionpack/lib/action_dispatch/routing/route_set.rb#L478
+      end
+
       # strategy for building URLs to send to the client
       PATH: untyped
 
@@ -10078,7 +10084,7 @@ module ActionDispatch
 
       def define_mounted_helper: (untyped name, ?untyped? script_namer) -> (nil | untyped)
 
-      def url_helpers: (?bool supports_path) -> untyped
+      def url_helpers: (?bool supports_path) -> RouteSet_AnonymousModule
 
       def empty?: () -> untyped
 
