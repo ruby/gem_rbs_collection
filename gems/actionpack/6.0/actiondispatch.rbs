@@ -65,12 +65,14 @@ module ActionDispatch
   module Routing
     class RouteSet
       def draw: () { () [self: Mapper] -> untyped } -> nil
-    end
-  end
-end
 
-module ActionDispatch
-  module Routing
+      class RouteSet_AnonymousModule
+        include ActiveSupport::Concern
+        include UrlFor
+        # https://github.com/rails/rails/blob/v6.0.6.1/actionpack/lib/action_dispatch/routing/route_set.rb#L478
+      end
+    end
+
     class Mapper
       module HttpHelpers
         # Define a route that only recognizes HTTP GET.
