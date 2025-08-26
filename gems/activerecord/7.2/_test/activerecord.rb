@@ -7,6 +7,36 @@ class TestCallbackObject < ActiveRecord::Base
   after_save ::Callbacks::ClassCallback
   around_create ::Callbacks::ClassCallback
   around_save ::Callbacks::ClassCallback
+
+  def local_condition1
+    [true, false].sample
+  end
+
+  def local_condition2
+    [true, false].sample
+  end
+
+  def local_condition3
+    [true, false].sample
+  end
+
+  # https://guides.rubyonrails.org/v7.2/active_record_validations.html#combining-validation-conditions
+  RAILS_72_DOCS_EXAMPLE = [
+    :local_condition1,
+    ->(my_rec) { my_rec.local_condition2 },
+    Proc.new do |my_rec|
+      # @type var my_rec: TestCallbackObject
+      my_rec.local_condition3
+    end
+  ]
+
+  validate :custom_validation, on: :update, unless: RAILS_72_DOCS_EXAMPLE
+
+  def custom_validation
+    if self.record_timestamps?
+      self.errors.add(:base, 'testing only')
+    end
+  end
 end
 
 module Callbacks
