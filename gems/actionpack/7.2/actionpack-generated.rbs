@@ -9704,54 +9704,6 @@ module ActionDispatch
     #   form_for([blog, @post])         # => "/blog/posts/1"
     #
     module PolymorphicRoutes
-      # Constructs a call to a named RESTful route for the given record and returns the
-      # resulting URL string. For example:
-      #
-      #   # calls post_url(post)
-      #   polymorphic_url(post) # => "http://example.com/posts/1"
-      #   polymorphic_url([blog, post]) # => "http://example.com/blogs/1/posts/1"
-      #   polymorphic_url([:admin, blog, post]) # => "http://example.com/admin/blogs/1/posts/1"
-      #   polymorphic_url([user, :blog, post]) # => "http://example.com/users/1/blog/posts/1"
-      #   polymorphic_url(Comment) # => "http://example.com/comments"
-      #
-      # ==== Options
-      #
-      # * <tt>:action</tt> - Specifies the action prefix for the named route:
-      #   <tt>:new</tt> or <tt>:edit</tt>. Default is no prefix.
-      # * <tt>:routing_type</tt> - Allowed values are <tt>:path</tt> or <tt>:url</tt>.
-      #   Default is <tt>:url</tt>.
-      #
-      # Also includes all the options from <tt>url_for</tt>. These include such
-      # things as <tt>:anchor</tt> or <tt>:trailing_slash</tt>. Example usage
-      # is given below:
-      #
-      #   polymorphic_url([blog, post], anchor: 'my_anchor')
-      #     # => "http://example.com/blogs/1/posts/1#my_anchor"
-      #   polymorphic_url([blog, post], anchor: 'my_anchor', script_name: "/my_app")
-      #     # => "http://example.com/my_app/blogs/1/posts/1#my_anchor"
-      #
-      # For all of these options, see the documentation for {url_for}[rdoc-ref:ActionDispatch::Routing::UrlFor].
-      #
-      # ==== Functionality
-      #
-      #   # an Article record
-      #   polymorphic_url(record)  # same as article_url(record)
-      #
-      #   # a Comment record
-      #   polymorphic_url(record)  # same as comment_url(record)
-      #
-      #   # it recognizes new records and maps to the collection
-      #   record = Comment.new
-      #   polymorphic_url(record)  # same as comments_url()
-      #
-      #   # the class of a record will also map to the collection
-      #   polymorphic_url(Comment) # same as comments_url()
-      #
-      def polymorphic_url: (untyped record_or_hash_or_array, ?::Hash[untyped, untyped] options) -> untyped
-
-      # Returns the path component of a URL for the given record.
-      def polymorphic_path: (untyped record_or_hash_or_array, ?::Hash[untyped, untyped] options) -> untyped
-
       private
 
       def polymorphic_url_for_action: (untyped action, untyped record_or_hash, untyped options) -> untyped
@@ -10077,8 +10029,6 @@ module ActionDispatch
       def mounted_helpers: () -> untyped
 
       def define_mounted_helper: (untyped name, ?untyped? script_namer) -> (nil | untyped)
-
-      def url_helpers: (?bool supports_path) -> untyped
 
       def empty?: () -> untyped
 
