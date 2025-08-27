@@ -73,6 +73,7 @@ module Mutations
 
   # sample mutation
   class Ping < BaseMutation
+    null true
     description "ping"
     argument :arg1, String, required: true, description: "arg1"
     argument :arg2, Boolean, required: true, description: "arg2"
