@@ -46,7 +46,7 @@ module ActiveModel
     attr_accessor validation_context: untyped
 
     module ClassMethods
-      type condition[T] = Symbol | ^(T) [self: T] -> boolish
+      type condition[T] = Symbol | ^(T) [self: T] -> boolish | Proc
       type conditions[T] = condition[T] | Array[condition[T]]
 
       # Validates each attribute against a block.
