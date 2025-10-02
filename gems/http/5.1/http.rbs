@@ -5,6 +5,36 @@ module HTTP
 
   def self.auth: (_ToS) -> HTTP::Client
 
+  def self.get: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.head: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.post: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.put: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.patch: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.delete: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.options: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.trace: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+  def self.connect: (String uri, ?Hash[Symbol, untyped] opts) -> Response
+
+  def self.headers: (Hash[String, String?]) -> Client
+  def self.[]: (Hash[String, String?]) -> Client
+
+  def self.basic_auth: (Hash[Symbol, String] credentials) -> Client
+
+  def self.cookies: (Hash[String | Symbol, String]) -> Client
+
+  def self.follow: (?Hash[Symbol, untyped] options) -> Client
+
+  def self.timeout: (?connect: Numeric, ?write: Numeric, ?read: Numeric) -> Client
+                  | (Numeric timeout) -> Client
+
+  def self.via: (String host, Integer port, ?String username, ?String password) -> Client
+              | (String host, Integer port, Hash[String, String] headers) -> Client
+
+  def self.use: (*untyped args, **untyped kwargs) -> Client
+
+  def self.persistent: (String host) -> Client
+                     | (String host) { (Client) -> untyped } -> untyped
+
   class Options
   end
 
@@ -14,6 +44,36 @@ module HTTP
     def close: () -> void
 
     def request: (_ToS verb, HTTP::URI | _ToS uri, ?Hash[Symbol, untyped] opts) -> Response
+
+    def get: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def head: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def post: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def put: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def patch: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def delete: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def options: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def trace: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+    def connect: (String | URI uri, ?Hash[Symbol, untyped] opts) -> Response
+
+    def headers: (Hash[String, String?]) -> Client
+    def []: (Hash[String, String?]) -> Client
+
+    def auth: (_ToS) -> Client
+    def basic_auth: (Hash[Symbol, String] credentials) -> Client
+
+    def cookies: (Hash[String | Symbol, String]) -> Client
+
+    def follow: (?Hash[Symbol, untyped] options) -> Client
+
+    def timeout: (?connect: Numeric, ?write: Numeric, ?read: Numeric) -> Client
+               | (Numeric timeout) -> Client
+
+    def via: (String host, Integer port, ?String username, ?String password) -> Client
+           | (String host, Integer port, Hash[String, String] headers) -> Client
+
+    def use: (*untyped args, **untyped kwargs) -> Client
+
+    def persistent?: () -> bool
   end
 
   class Headers
@@ -217,6 +277,9 @@ module HTTP
     def code: () -> Integer
     def reason: () -> String?
     def flush: () -> self
+    def parse: (?String type) -> untyped
+    def to_s: () -> String
+    def to_str: () -> String
   end
 
   class URI
