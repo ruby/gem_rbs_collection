@@ -976,7 +976,7 @@ class Nokogiri::XML::Document < Nokogiri::XML::Node
 
   def dup: (*untyped) -> untyped
 
-  def encoding: () -> untyped
+  def encoding: () -> String?
 
   def encoding=: (untyped) -> untyped
 
@@ -992,7 +992,7 @@ class Nokogiri::XML::Document < Nokogiri::XML::Node
 
   def remove_namespaces!: () -> untyped
 
-  def root: () -> untyped
+  def root: () -> Nokogiri::XML::Element?
 
   def root=: (untyped) -> untyped
 
@@ -1006,7 +1006,7 @@ class Nokogiri::XML::Document < Nokogiri::XML::Node
 
   def validate: () -> untyped
 
-  def version: () -> untyped
+  def version: () -> String?
 
   private
 
@@ -1189,7 +1189,7 @@ class Nokogiri::XML::Node
 
   def >: (untyped selector) -> untyped
 
-  def []: (untyped name) -> untyped
+  def []: (String name) -> String?
 
   def []=: (untyped name, untyped value) -> untyped
 
@@ -1215,13 +1215,13 @@ class Nokogiri::XML::Node
 
   alias attr []
 
-  def attribute: (untyped) -> untyped
+  def attribute: (String name) -> Nokogiri::XML::Attr?
 
   def attribute_nodes: () -> untyped
 
   def attribute_with_ns: (untyped, untyped) -> untyped
 
-  def attributes: () -> untyped
+  def attributes: () -> Hash[String, Nokogiri::XML::Attr]
 
   def before: (untyped node_or_tags) -> untyped
 
@@ -1275,7 +1275,7 @@ class Nokogiri::XML::Node
 
   def element?: () -> untyped
 
-  def element_children: () -> untyped
+  def element_children: () -> Nokogiri::XML::NodeSet
 
   alias elements element_children
 
@@ -1607,7 +1607,7 @@ class Nokogiri::XML::NodeSet
 
   def append_class: (untyped name) -> untyped
 
-  def at: (*untyped args) -> untyped
+  def at: (*untyped args) -> Nokogiri::XML::Node?
 
   def attr: (untyped key, ?untyped value) { (*untyped) -> untyped } -> untyped
 
@@ -1692,7 +1692,7 @@ class Nokogiri::XML::NodeSet
 
   def wrap: (untyped html) -> untyped
 
-  def xpath: (*untyped args) -> untyped
+  def xpath: (*untyped args) -> Nokogiri::XML::NodeSet
 
   def |: (untyped) -> untyped
 
@@ -2204,7 +2204,7 @@ module Nokogiri::XML::Searchable
 
   alias / search
 
-  def at: (*untyped args) -> untyped
+  def at: (*untyped args) -> Nokogiri::XML::Node?
 
   def at_css: (*untyped args) -> untyped
 
