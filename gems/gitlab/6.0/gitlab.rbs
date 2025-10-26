@@ -1,4 +1,61 @@
-# Write the type definition here!
-#
-# You can write all the definitions in this file,
-# or you can split the definitions into multiple files by organizing them into classes or modules.
+module Gitlab
+  type project = Integer | String
+
+  module Error
+    class Error < StandardError
+    end
+
+    class ResponseError < Error
+    end
+
+    class MethodNotAllowed < ResponseError
+    end
+
+    class NotAcceptable < ResponseError
+    end
+
+    class Unprocessable < ResponseError
+    end
+
+    class NotFound < ResponseError
+    end
+  end
+
+  class ObjectifiedHash
+    def []: (untyped key) -> untyped
+  end
+
+  class Client
+    module Branches
+      def branch: (project project, String branch) -> ObjectifiedHash
+    end
+
+    module Commits
+      def create_commit: (project project, String branch, String message, Array[Hash[Symbol, untyped]] actions, ?Hash[Symbol, untyped] options) -> ObjectifiedHash
+    end
+
+    module MergeRequests
+      def create_merge_request: (project project, String title, ?Hash[Symbol, untyped] options) -> ObjectifiedHash
+
+      def accept_merge_request: (project project, Integer id, ?Hash[Symbol, untyped] options) -> ObjectifiedHash
+    end
+
+    module Projects
+      def project: (project id, ?Hash[Symbol, untyped] options) -> ObjectifiedHash
+    end
+
+    module Users
+      def users: (?Hash[Symbol, untyped] options) -> Array[ObjectifiedHash]
+
+      def user: (?Integer id) -> ObjectifiedHash
+    end
+
+    include Branches
+    include Commits
+    include MergeRequests
+    include Projects
+    include Users
+  end
+
+  def self.client: (?Hash[Symbol, untyped] options) -> Client
+end
