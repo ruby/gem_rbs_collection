@@ -12,4 +12,33 @@ class Thor
 
   class Error
   end
+
+  module Base
+    attr_accessor options: Hash[String | Symbol,untyped]
+  end
+
+  include Base
+
+  def self.desc: (
+      String usage,
+      String description,
+      ?options: Hash[Symbol, untyped]
+    ) -> void
+
+  def self.method_option: (
+      Symbol | String name,
+      ?aliases: String | Symbol | Array[String | Symbol],
+      ?banner: String,
+      ?default: untyped,
+      ?lazy_default: untyped,
+      ?desc: String,
+      ?required: bool,
+      ?type: :string | :hash | :array | :numeric | :boolean,
+      ?enum: untyped,
+      ?repeatable: bool,
+      **untyped
+    ) -> void
+  alias self.option self.method_option
+
+  def self.no_commands: () { () -> void } -> void
 end
