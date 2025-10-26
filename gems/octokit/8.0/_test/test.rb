@@ -11,3 +11,6 @@ client = Octokit::Client.new(:access_token => 'personal_access_token')
 
 # Fetch the current user
 client.user
+
+repo_name = "ruby/gem_rbs_collection"
+repo = client.repository()
