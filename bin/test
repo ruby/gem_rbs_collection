@@ -177,9 +177,8 @@ end
 
 failed_gems = []
 
+dirs.select!(&:directory?)
 dirs.each do |dir|
-  next unless dir.directory?
-
   putci "::group::Test for #{dir}"
   puts "Testing #{dir}..."
 
@@ -198,7 +197,6 @@ dirs.each do |dir|
     putci "::error ::`#{dir}` test failed"
     failed_gems << dir
   end
-
 ensure
   putci "::endgroup::"
 end
