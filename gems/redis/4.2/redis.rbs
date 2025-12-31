@@ -1,4 +1,5 @@
 class Redis
+  type arg = String | Symbol | Integer | Float
   type time = Integer | Float
 
   type sentinel = { host: String, port: Integer?, password: String? }
@@ -278,4 +279,70 @@ class Redis
   def script: (Symbol, *untyped) -> untyped
 
   def with: [T] () { (self) -> T } -> T
+
+  def hdel: (arg key, *arg fields) -> Integer
+          | (arg key, Array[arg]) -> Integer
+  def hexists: (arg key, arg field) -> bool
+  def hget: (arg key, arg field) -> String?
+  def hgetall: (arg key) -> Hash[String, String?]
+  def hincrby: (arg key, arg field, _ToI | _ToInt increment) -> Integer
+  def hincrbyfloat: (arg key, arg field, _ToF increment) -> Float
+  def hkeys: (arg key) -> Array[String]
+  def hlen: (arg key) -> Integer
+
+  def hmget: (arg key, arg field1) -> [String?]
+           | (arg key, [arg]) -> [String?]
+           | (arg key, arg field1, arg field2) -> [String?, String?]
+           | (arg key, [arg, arg]) -> [String?, String?]
+           | (arg key, arg field1, arg field2, arg field3) -> [String?, String?, String?]
+           | (arg key, [arg, arg, arg]) -> [String?, String?, String?]
+           | (arg key, arg field1, arg field2, arg field3, arg field4) -> [String?, String?, String?, String?]
+           | (arg key, [arg, arg, arg, arg]) -> [String?, String?, String?, String?]
+           | (arg key, arg field1, arg field2, arg field3, arg field4, arg field5) -> [String?, String?, String?, String?, String?]
+           | (arg key, [arg, arg, arg, arg, arg]) -> [String?, String?, String?, String?, String?]
+           | (arg key, arg field1, arg field2, arg field3, arg field4, arg field5, arg field6) -> [String?, String?, String?, String?, String?, String?]
+           | (arg key, [arg, arg, arg, arg, arg, arg]) -> [String?, String?, String?, String?, String?, String?]
+           | (arg key, arg field1, arg field2, arg field3, arg field4, arg field5, arg field6, arg field7) -> [String?, String?, String?, String?, String?, String?, String?]
+           | (arg key, [arg, arg, arg, arg, arg, arg, arg]) -> [String?, String?, String?, String?, String?, String?, String?]
+           | (arg key, *arg) -> Array[String?]
+           | (arg key, Array[arg]) -> Array[String?]
+
+  def hmset: (arg key, arg field1, arg value1) -> "OK"
+           | (arg key, [arg, arg]) -> "OK"
+           | (arg key, arg field1, arg value1, arg field2, arg value2) -> "OK"
+           | (arg key, [arg, arg, arg, arg]) -> "OK"
+           | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3) -> "OK"
+           | (arg key, [arg, arg, arg, arg, arg, arg]) -> "OK"
+           | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4) -> "OK"
+           | (arg key, [arg, arg, arg, arg, arg, arg, arg, arg]) -> "OK"
+           | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4, arg field5, arg value5) -> "OK"
+           | (arg key, [arg, arg, arg, arg, arg, arg, arg, arg, arg, arg]) -> "OK"
+           | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4, arg field5, arg value5, arg field6, arg value6) -> "OK"
+           | (arg key, [arg, arg, arg, arg, arg, arg, arg, arg, arg, arg, arg, arg]) -> "OK"
+           | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4, arg field5, arg value5, arg field6, arg value6, *arg) -> "OK"
+           | (arg key, Array[arg]) -> "OK"
+           | (arg key, Hash[arg, arg]) -> "OK"
+
+  def hrandfield: (arg key) -> String?
+                | (arg key, Integer count) -> Array[String]
+                | (arg key, Integer count, with_values: false) -> Array[String]
+                | (arg key, Integer count, with_values: true) -> Array[[String, String]]
+
+  def hset: (arg key, arg field1, arg value1) -> Integer
+          | (arg key, arg field1, arg value1, arg field2, arg value2) -> Integer
+          | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3) -> Integer
+          | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4) -> Integer
+          | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4, arg field5, arg value5) -> Integer
+          | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4, arg field5, arg value5, arg field6, arg value6) -> Integer
+          | (arg key, arg field1, arg value1, arg field2, arg value2, arg field3, arg value3, arg field4, arg value4, arg field5, arg value5, arg field6, arg value6, *arg) -> Integer
+          | (arg key, Hash[arg, arg]) -> Integer
+
+  def hsetnx: (arg key, arg field, arg value) -> bool
+
+  def hvals: (arg key) -> Array[String]
+
+  def mapped_hmget: (arg key, *arg keys) -> Hash[String, String?]
+                  | (arg key, Array[arg] keys) -> Hash[String, String?]
+
+  def mapped_hmset: (arg key, Hash[arg, arg]) -> "OK"
 end
