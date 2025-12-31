@@ -1,4 +1,13 @@
-# Write the type definition here!
-#
-# You can write all the definitions in this file,
-# or you can split the definitions into multiple files by organizing them into classes or modules.
+module ApmTraceable
+  interface _Name
+    def name: () -> String
+  end
+
+  interface _Trace
+    def trace: [R] (String | Symbol trace_name, context_class: _Name?, **untyped _options) ?{ (?) -> R } -> R
+  end
+
+  def self.configure: [R] () { (Configuration configuration) -> R } -> R
+
+  def self.configuration: () -> Configuration
+end
