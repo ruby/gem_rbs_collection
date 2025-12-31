@@ -1,0 +1,17 @@
+module Audited
+  attr_accessor self.auditing_enabled: bool
+  attr_accessor self.current_user_method: String | Symbol
+  attr_accessor self.ignored_attributes: Array[String]
+  attr_accessor self.ignored_default_callbacks: Array[:create | :update | :touch | :destroy]
+  attr_accessor self.max_audits: Integer
+  attr_accessor self.store_synthesized_enums: bool
+  attr_writer self.audit_class (@audit_class): untyped
+
+  def self.audit_class: () -> untyped
+
+  alias self.audit_model self.audit_class
+
+  def self.store: () -> Hash[untyped, untyped]
+
+  def self.config: [R] () { (self) -> R } -> R
+end
