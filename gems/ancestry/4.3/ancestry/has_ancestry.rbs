@@ -1,0 +1,20 @@
+module Ancestry
+  module HasAncestry
+    def has_ancestry: (?{
+        ?ancestry_column: String | Symbol,
+        ?orphan_strategy: :destroy | :rootify | :restrict | :adopt,
+        ?cache_depth: bool,
+        ?depth_cache_column: String | Symbol,
+        ?touch: bool,
+        ?counter_cache: bool | String | Symbol,
+        ?primary_key_format: '[0-9]+' | '[-A-Fa-f0-9]{36}',
+        ?update_strategy: :sql | :ruby,
+        ?ancestry_format: :materialized_path | :materialized_path2 } options) -> void
+
+    def acts_as_tree: (*untyped args) -> void
+
+    def self.ancestry_format_module: (:materialized_path2 ancestry_format) -> singleton(MaterializedPath2)
+                                   | (:materialized_path ancestry_format) -> singleton(MaterializedPath)
+                                   | (nil ancestry_format) -> (singleton(MaterializedPath2) | singleton(MaterializedPath))
+  end
+end

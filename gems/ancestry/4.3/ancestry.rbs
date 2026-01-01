@@ -1,4 +1,15 @@
-# Write the type definition here!
-#
-# You can write all the definitions in this file,
-# or you can split the definitions into multiple files by organizing them into classes or modules.
+module Ancestry
+  type depth_options = Hash[:before_depth | :to_depth | :at_depth | :from_depth | :after_depth, Integer]
+
+  def self.default_update_strategy: () -> (:sql | :ruby)
+
+  def self.default_update_strategy=: (:sql | :ruby value) -> void
+
+  def self.default_ancestry_format: () -> (:materialized_path | :materialized_path2)
+
+  def self.default_ancestry_format=: (:materialized_path | :materialized_path2 value) -> void
+
+  def self.default_primary_key_format: () -> ('[0-9]+' | '[-A-Fa-f0-9]{36}')
+
+  def self.default_primary_key_format=: ('[0-9]+' | '[-A-Fa-f0-9]{36}' value) -> void
+end

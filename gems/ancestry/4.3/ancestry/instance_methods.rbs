@@ -1,0 +1,139 @@
+module Ancestry
+  module InstanceMethods[AncestryBaseClass, Relation, PrimaryKey]
+    def ancestry_exclude_self: () -> void
+
+    def update_descendants_with_new_ancestry: () -> void
+
+    def apply_orphan_strategy: () -> void
+
+    def touch_ancestors_callback: () -> void
+
+    def increase_parent_counter_cache: () -> boolish
+
+    def decrease_parent_counter_cache: () -> void
+
+    def update_parent_counter_cache: () -> void
+
+    # Ancestors
+
+    def has_parent?: () -> bool
+
+    alias ancestors? has_parent?
+
+    def ancestry_changed?: () -> bool
+
+    def sane_ancestor_ids?: () -> bool
+
+    def ancestors: (?depth_options depth_options) -> Relation
+
+    def path_ids: () -> Array[PrimaryKey]
+
+    def path_ids_before_last_save: () -> Array[PrimaryKey]
+
+    def path_ids_in_database: () -> Array[PrimaryKey]
+
+    def path: (?depth_options depth_options) -> Relation
+
+    def depth: () -> Integer
+
+    def cache_depth: () -> void
+
+    def ancestor_of?: (AncestryBaseClass node) -> bool
+
+    # Parent
+
+    def parent=: (AncestryBaseClass? parent) -> void
+
+    def parent_id=: (PrimaryKey? new_parent_id) -> void
+
+    def parent_id: () -> PrimaryKey?
+
+    alias parent_id? ancestors?
+
+    def parent: () -> AncestryBaseClass?
+
+    def parent_of?: (AncestryBaseClass node) -> bool
+
+    # Root
+
+    def root_id: () -> PrimaryKey
+
+    def root: () -> AncestryBaseClass
+
+    def is_root?: () -> bool
+
+    alias root? is_root?
+
+    def root_of?: (AncestryBaseClass node) -> bool
+
+    # Children
+
+    def children: () -> Relation
+
+    def child_ids: () -> Array[PrimaryKey]
+
+    def has_children?: () -> bool
+
+    alias children? has_children?
+
+    def is_childless?: () -> bool
+
+    alias childless? is_childless?
+
+    def child_of?: (AncestryBaseClass node) -> bool
+
+    # Siblings
+
+    def siblings: () -> Relation
+
+    def sibling_ids: () -> Array[PrimaryKey]
+
+    def has_siblings?: () -> bool
+
+    alias siblings? has_siblings?
+
+    def is_only_child?: () -> bool
+
+    alias only_child? is_only_child?
+
+    def sibling_of?: (AncestryBaseClass node) -> bool
+
+    # Descendants
+
+    def descendants: (?depth_options depth_options) -> Relation
+
+    def descendant_ids: (?depth_options depth_options) -> Array[PrimaryKey]
+
+    def descendant_of?: (AncestryBaseClass node) -> bool
+
+    # Indirects
+
+    def indirects: (?depth_options depth_options) -> Relation
+
+    def indirect_ids: (?depth_options depth_options) -> Array[PrimaryKey]
+
+    def indirect_of?: (AncestryBaseClass node) -> bool
+
+    # Subtree
+
+    def subtree: (?depth_options depth_options) -> Relation
+
+    def subtree_ids: (?depth_options depth_options) -> Array[PrimaryKey]
+
+    def without_ancestry_callbacks: [R] () { () -> R } -> R
+
+    def ancestry_callbacks_disabled?: () -> bool
+
+    private
+
+    def unscoped_descendants: () -> Relation
+
+    def unscoped_descendants_before_last_save: () -> Relation
+
+    def unscoped_current_and_previous_ancestors: () -> Relation
+
+    def unscoped_find: (PrimaryKey id) -> AncestryBaseClass
+
+    def unscoped_where: [R] () { (Relation scope) -> R } -> R
+  end
+end
