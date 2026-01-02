@@ -1,0 +1,69 @@
+module Ancestry
+  module MaterializedPath[AncestryBaseClass, Relation, PrimaryKey]
+    def path_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def roots: () -> Relation
+
+    def ancestors_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def inpath_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def children_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def indirects_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def descendants_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def descendants_by_ancestry: (String ancestry) -> Arel::Nodes::Matches
+
+    def descendant_conditions: (AncestryBaseClass | PrimaryKey object) -> Arel::Nodes::Matches
+
+    def descendant_before_save_conditions: (AncestryBaseClass | PrimaryKey object) -> Arel::Nodes::Matches
+
+    def subtree_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def siblings_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def ordered_by_ancestry: (?untyped? order) -> Relation
+
+    def ordered_by_ancestry_and: (untyped? order) -> Relation
+
+    def ancestry_root: () -> nil
+
+    private
+
+    def ancestry_validation_options: () -> { format: { with: Regexp }, allow_nil: bool }
+
+    def ancestry_nil_allowed?: () -> true
+
+    def ancestry_format_regexp: () -> Regexp
+
+    module InstanceMethods[AncestryBaseClass, PrimaryKey]
+      def ancestors?: () -> bool
+
+      alias has_parent? ancestors?
+
+      def ancestor_ids=: (Array[PrimaryKey]? value) -> void
+
+      def ancestor_ids: () -> Array[PrimaryKey]
+
+      def ancestor_ids_in_database: () -> Array[PrimaryKey]
+
+      def ancestor_ids_before_last_save: () -> Array[PrimaryKey]
+
+      def parent_id_in_database: () -> PrimaryKey?
+
+      def parent_id_before_last_save: () -> PrimaryKey?
+
+      def sibling_of?: (AncestryBaseClass node) -> bool
+
+      def child_ancestry: () -> String
+
+      def child_ancestry_before_save: () -> String
+
+      def parse_ancestry_column: (String? obj) -> Array[PrimaryKey]
+
+      def generate_ancestry: (Array[PrimaryKey]? ancestor_ids) -> String?
+    end
+  end
+end
