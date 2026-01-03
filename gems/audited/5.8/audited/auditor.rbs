@@ -36,13 +36,7 @@ module Audited
       def set_auited_options: (audited_options options) -> void
     end
 
-    module AuditedInstanceMethods
-      interface _AuditsToCombine
-        def last: () -> untyped
-        def pluck: (*untyped keys) -> Array[untyped]
-        def unscope: (*untyped args) -> untyped
-      end
-
+    module AuditedInstanceMethods[AuditableClass, AuditClass, AuditClassRelation]
       REDACTED: "[REDACTED]"
 
       def save_without_auditing: () -> bool
@@ -53,33 +47,33 @@ module Audited
 
       def with_auditing: [R] () { () -> R } -> R
 
-      def revisions: (?Integer from_version) -> Array[untyped]
+      def revisions: (?Integer from_version) -> Array[AuditableClass]
 
-      def revision: (Integer | :previous version) -> void
+      def revision: (Integer | :previous version) -> AuditableClass?
 
-      def revision_at: (ActiveSupport::TimeWithZone | Date | DateTime | Time | String date_or_time) -> void
+      def revision_at: (ActiveSupport::TimeWithZone | Date | DateTime | Time | String date_or_time) -> AuditableClass?
 
-      def audited_attributes: () -> Hash[untyped, untyped]
+      def audited_attributes: () -> Hash[String, untyped]
 
-      def own_and_associated_audits: () -> untyped
+      def own_and_associated_audits: () -> AuditClassRelation
 
-      def combine_audits: (_AuditsToCombine audits_to_combine) -> void
+      def combine_audits: (AuditClassRelation audits_to_combine) -> void
 
       private
 
       def audited_changes: (?for_touch: bool, ?exclude_readonly_attrs: bool) -> Hash[String, untyped]
 
-      def normalize_enum_changes: (Hash[untyped, untyped] changes) -> Hash[untyped, untyped]
+      def normalize_enum_changes: (Hash[String, untyped] changes) -> Hash[String, untyped]
 
-      def redact_values: (Hash[untyped, untyped] filtered_changes) -> Hash[untyped, untyped]
+      def redact_values: (Hash[String, untyped] filtered_changes) -> Hash[String, untyped]
 
-      def filter_encrypted_attrs: (Hash[untyped, untyped] filtered_changes) -> Hash[untyped, untyped]
+      def filter_encrypted_attrs: (Hash[String, untyped] filtered_changes) -> Hash[String, untyped]
 
-      def filter_attr_values: (?audited_changes: Hash[untyped, untyped], ?attrs: Array[untyped], ?placeholder: String) -> Hash[untyped, untyped]
+      def filter_attr_values: (?audited_changes: Hash[String, untyped], ?attrs: Array[String], ?placeholder: String) -> Hash[String, untyped]
 
       def rails_below?: (String rails_version) -> bool
 
-      def audits_to: (?(Integer | :previous)? version) -> untyped
+      def audits_to: (?(Integer | :previous)? version) -> AuditClassRelation
 
       def audit_create: () -> void
 
@@ -103,9 +97,9 @@ module Audited
 
       def auditing_enabled: () -> bool
 
-      def run_conditional_check: (untyped condition, ?matching: bool) -> bool
+      def run_conditional_check: (bool | String | Symbol | _Callable condition, ?matching: bool) -> bool
 
-      def reconstruct_attributes: (Array[untyped] audits) -> Hash[untyped, untyped]
+      def reconstruct_attributes: (AuditClassRelation | Array[AuditClass] audits) -> Hash[String, untyped]
     end
 
     module AuditedClassMethods

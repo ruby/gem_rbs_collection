@@ -11,6 +11,8 @@ class Post < ActiveRecord::Base
   belongs_to :user
 
   audited only: :title, associated_with: :user, max_audits: 10, comment_required: false
+
+  def draft? = false
 end
 
 class Comment < ActiveRecord::Base
@@ -62,4 +64,20 @@ Post.default_ignored_attributes
 post = Post.new
 post.revisions
 post.revision(1)
+post.revisions - [Post.new]
+post.revision(1)
+post.revision(:previous)&.draft?
 post.revision_at(Date.parse('2016-01-01'))
+post.revision_at(Date.parse('2016-01-01'))&.draft?
+post.audited_attributes['published_at']
+post.own_and_associated_audits.audited_classes
+post.combine_audits(post.own_and_associated_audits)
+
+audit = Audited::Audit.new
+audit.ancestors.find(1)
+audit.undo
+audit.new_attributes['action']
+audit.old_attributes['action']
+Audited::Audit.as_user(User.new) do
+  Post.create!(title: 'Post audited as user')
+end
