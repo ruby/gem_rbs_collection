@@ -1,0 +1,26 @@
+class Post
+end
+
+class PostPolicy
+  @user: untyped
+  @record: untyped
+
+  def initialize: (untyped user, untyped record) -> void
+
+  def update?: () -> bool
+
+  class Scope
+    @user: untyped
+    @scope: untyped
+
+    def initialize: (untyped user, untyped scope) -> void
+
+    def resolve: () -> untyped
+  end
+end
+
+class ApplicationController < ActionController::Base
+  include Pundit::Authorization
+
+  def show: () -> untyped
+end
