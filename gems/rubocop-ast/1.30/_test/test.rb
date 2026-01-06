@@ -8,10 +8,6 @@ class MyRule < Parser::AST::Processor
 
   def on_sym(node)
     node.value
-    node.location.begin
-    node.location.end
-    node.loc.begin
-    node.loc.end
   end
 
   def on_if(node)
@@ -79,11 +75,6 @@ class MyRule < Parser::AST::Processor
     node.pairs_on_same_line?
     node.mixed_delimiters?
     node.braces?
-    node.location
-    node.location.begin
-    node.location.end
-    node.loc.begin
-    node.loc.end
     return if node.pairs.size == 0
     pair = node.pairs.first
     pair.key
@@ -100,8 +91,6 @@ class MyRule < Parser::AST::Processor
     pair.inverse_delimiter(with_spacing: true)
     pair.value_on_new_line?
     pair.value_omission?
-    pair.location.operator
-    pair.loc.operator
   end
 end
 
@@ -397,10 +386,6 @@ if array_node.is_a?(RuboCop::AST::ArrayNode)
   array_node.square_brackets?
   array_node.percent_literal?
   array_node.bracketed?
-  array_node.location.begin
-  array_node.location.end
-  array_node.loc.begin
-  array_node.loc.end
 end
 
 asgn_node = RuboCop::AST::ProcessedSource.new('x = 1', RUBY_VERSION.to_f).ast
@@ -428,10 +413,6 @@ if block_node.is_a?(RuboCop::AST::BlockNode)
   block_node.multiline?
   block_node.lambda?
   block_node.void_context?
-  block_node.location.begin
-  block_node.location.end
-  block_node.loc.begin
-  block_node.loc.end
 end
 
 break_node = RuboCop::AST::ProcessedSource.new('break 1, 2', RUBY_VERSION.to_f).ast
@@ -542,30 +523,8 @@ if def_node.is_a?(RuboCop::AST::DefNode)
   def_node.splat_argument?
   def_node.rest_argument?
   def_node.block_argument?
-  def_node.location.keyword
-  def_node.location.operator
-  def_node.location.name
-  def_node.location.end
-  def_node.location.assignment
-  def_node.loc.keyword
-  def_node.loc.operator
-  def_node.loc.name
-  def_node.loc.end
-  def_node.loc.assignment
 end
 def_node = RuboCop::AST::ProcessedSource.new('def ! = true', RUBY_VERSION.to_f).ast
-if def_node.is_a?(RuboCop::AST::DefNode)
-  def_node.location.keyword
-  def_node.location.operator
-  def_node.location.name
-  def_node.location.end
-  def_node.location.assignment
-  def_node.loc.keyword
-  def_node.loc.operator
-  def_node.loc.name
-  def_node.loc.end
-  def_node.loc.assignment
-end
 
 defined_node = RuboCop::AST::ProcessedSource.new('defined? print', RUBY_VERSION.to_f).ast
 if defined_node.is_a?(RuboCop::AST::DefinedNode)
@@ -739,30 +698,8 @@ if send_node.is_a?(RuboCop::AST::SendNode)
   send_node.prefix_not?
   send_node.prefix_bang?
   send_node.send_type?
-  send_node.location.dot
-  send_node.location.selector
-  send_node.location.operator
-  send_node.location.begin
-  send_node.location.end
-  send_node.loc.dot
-  send_node.loc.selector
-  send_node.loc.operator
-  send_node.loc.begin
-  send_node.loc.end
 end
 send_node = RuboCop::AST::ProcessedSource.new('1 + 2', RUBY_VERSION.to_f).ast
-if send_node.is_a?(RuboCop::AST::SendNode)
-  send_node.location.dot
-  send_node.location.selector
-  send_node.location.operator
-  send_node.location.begin
-  send_node.location.end
-  send_node.loc.dot
-  send_node.loc.selector
-  send_node.loc.operator
-  send_node.loc.begin
-  send_node.loc.end
-end
 
 str_node = RuboCop::AST::ProcessedSource.new('"str"', RUBY_VERSION.to_f).ast
 if str_node.is_a?(RuboCop::AST::StrNode)
@@ -829,10 +766,6 @@ if regexp_node.is_a?(RuboCop::AST::RegexpNode)
   regexp_node.single_interpolation?
   regexp_node.no_encoding?
   regexp_node.fixed_encoding?
-  regexp_node.location.begin
-  regexp_node.location.end
-  regexp_node.loc.begin
-  regexp_node.loc.end
 end
 
 rescue_node = RuboCop::AST::ProcessedSource.new(<<EOM, RUBY_VERSION.to_f).ast&.child_nodes&.first
