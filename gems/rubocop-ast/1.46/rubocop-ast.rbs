@@ -409,6 +409,8 @@ module RuboCop
       def square_brackets?: () -> bool
       def percent_literal?: (?Symbol type) -> bool
       def bracketed?: () -> bool
+      def location: () -> Parser::Source::Map::Collection
+      alias loc location
     end
 
     class AsgnNode < Node
@@ -437,6 +439,8 @@ module RuboCop
       def multiline?: () -> bool
       def lambda?: () -> bool
       def void_context?: () -> bool
+      def location: () -> Parser::Source::Map::Collection
+      alias loc location
     end
 
     class BreakNode < Node
@@ -498,6 +502,8 @@ module RuboCop
       def body: () -> Node
       def receiver: () -> (Node | nil)
       def endless?: () -> bool
+      def location: () -> Parser::Source::Map::MethodDefinition
+      alias loc location
     end
 
     class DefinedNode < Node
@@ -509,6 +515,8 @@ module RuboCop
 
     class DstrNode < Node
       def value: () -> String
+      def location: () -> (Parser::Source::Map::Collection | Parser::Source::Map::Heredoc)
+      alias loc location
     end
 
     class EnsureNode < Node
@@ -551,6 +559,8 @@ module RuboCop
       def pairs_on_same_line?: () -> bool
       def mixed_delimiters?: () -> bool
       def braces?: () -> bool
+      def location: () -> Parser::Source::Map::Collection
+      alias loc location
     end
 
     class IfNode < Node
@@ -571,6 +581,8 @@ module RuboCop
       def else_branch: () -> Node?
       def node_parts: () -> Array[Node]
       def branches: () -> Array[Node]
+      def location: () -> (Parser::Source::Map::Condition | Parser::Source::Map::Keyword | Parser::Source::Map::Ternary)
+      alias loc location
     end
 
     class InPatternNode < Node
@@ -682,6 +694,8 @@ module RuboCop
       def inverse_delimiter: (?with_spacing: bool) -> String
       def value_on_new_line?: () -> bool
       def value_omission?: () -> bool
+      def location: () -> Parser::Source::Map::Operator
+      alias loc location
     end
 
     class Procarg0Node < ArgNode
@@ -709,6 +723,8 @@ module RuboCop
       def single_interpolation?: () -> bool
       def no_encoding?: () -> bool
       def fixed_encoding?: () -> bool
+      def location: () -> Parser::Source::Map::Collection
+      alias loc location
     end
 
     class ResbodyNode < Node
@@ -739,6 +755,8 @@ module RuboCop
       include ParameterizedNode::RestArguments
       include MethodDispatchNode
       def send_type?: () -> true
+      def location: () -> Parser::Source::Map::Send
+      alias loc location
     end
 
     class StrNode < Node
@@ -749,6 +767,8 @@ module RuboCop
       def character_literal?: () -> bool
       def heredoc?: () -> bool
       def percent_literal?: (?Symbol type) -> bool
+      def location: () -> (Parser::Source::Map::Collection | Parser::Source::Map::Heredoc)
+      alias loc location
     end
 
     class SuperNode < Node
@@ -761,6 +781,8 @@ module RuboCop
     class SymbolNode < Node
       include BasicLiteralNode
       def value: () -> Symbol
+      def location: () -> Parser::Source::Map::Collection
+      alias loc location
     end
 
     class UntilNode < Node
