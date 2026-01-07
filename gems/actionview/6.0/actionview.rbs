@@ -220,6 +220,431 @@ module ActionView
       #   end
       #   # => <label for="post_terms">Accept <a href="/terms">Terms</a>.</label>
       def label: (untyped method, ?untyped? text, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> untyped
+
+      # Wraps ActionView::Helpers::FormOptionsHelper#select for form builders:
+      #
+      #   <%= form_for @post do |f| %>
+      #     <%= f.select :person_id, Person.all.collect { |p| [ p.name, p.id ] }, include_blank: true %>
+      #     <%= f.submit %>
+      #   <% end %>
+      #
+      # Please refer to the documentation of the base helper for details.
+      def select: (untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> untyped
+
+      # Wraps ActionView::Helpers::FormOptionsHelper#collection_check_boxes for form builders:
+      #
+      #   <%= form_for @post do |f| %>
+      #     <%= f.collection_check_boxes :author_ids, Author.all, :id, :name_with_initial %>
+      #     <%= f.submit %>
+      #   <% end %>
+      #
+      # Please refer to the documentation of the base helper for details.
+      def collection_check_boxes: (untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (ActionView::Helpers::Tags::CollectionCheckBoxes::CheckBoxBuilder) -> String } -> String
+
+      # Wraps ActionView::Helpers::FormOptionsHelper#collection_radio_buttons for form builders:
+      #
+      #   <%= form_for @post do |f| %>
+      #     <%= f.collection_radio_buttons :author_id, Author.all, :id, :name_with_initial %>
+      #     <%= f.submit %>
+      #   <% end %>
+      #
+      # Please refer to the documentation of the base helper for details.
+      def collection_radio_buttons: (untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (ActionView::Helpers::Tags::CollectionRadioButtons::RadioButtonBuilder) -> String } -> String
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    # = Action View Form Option Helpers
+    # nodoc:
+    # Provides a number of methods for turning different kinds of containers into a set of option tags.
+    #
+    # The <tt>collection_select</tt>, <tt>select</tt> and <tt>time_zone_select</tt> methods take an <tt>options</tt> parameter, a hash:
+    #
+    # * <tt>:include_blank</tt> - set to true or a prompt string if the first option element of the select element is a blank. Useful if there is not a default value required for the select element.
+    #
+    #     select("post", "category", Post::CATEGORIES, { include_blank: true })
+    #
+    #   could become:
+    #
+    #     <select name="post[category]" id="post_category">
+    #       <option value=""></option>
+    #       <option value="joke">joke</option>
+    #       <option value="poem">poem</option>
+    #     </select>
+    #
+    #   Another common case is a select tag for a <tt>belongs_to</tt>-associated object.
+    #
+    #   Example with <tt>@post.person_id => 2</tt>:
+    #
+    #     select("post", "person_id", Person.all.collect { |p| [ p.name, p.id ] }, { include_blank: 'None' })
+    #
+    #   could become:
+    #
+    #     <select name="post[person_id]" id="post_person_id">
+    #       <option value="">None</option>
+    #       <option value="1">David</option>
+    #       <option value="2" selected="selected">Eileen</option>
+    #       <option value="3">Rafael</option>
+    #     </select>
+    #
+    # * <tt>:prompt</tt> - set to true or a prompt string. When the select element doesn't have a value yet, this prepends an option with a generic prompt -- "Please select" -- or the given prompt string.
+    #
+    #     select("post", "person_id", Person.all.collect { |p| [ p.name, p.id ] }, { prompt: 'Select Person' })
+    #
+    #   could become:
+    #
+    #     <select name="post[person_id]" id="post_person_id">
+    #       <option value="">Select Person</option>
+    #       <option value="1">David</option>
+    #       <option value="2">Eileen</option>
+    #       <option value="3">Rafael</option>
+    #     </select>
+    #
+    # * <tt>:index</tt> - like the other form helpers, +select+ can accept an <tt>:index</tt> option to manually set the ID used in the resulting output. Unlike other helpers, +select+ expects this
+    #   option to be in the +html_options+ parameter.
+    #
+    #     select("album[]", "genre", %w[rap rock country], {}, { index: nil })
+    #
+    #   becomes:
+    #
+    #     <select name="album[][genre]" id="album__genre">
+    #       <option value="rap">rap</option>
+    #       <option value="rock">rock</option>
+    #       <option value="country">country</option>
+    #     </select>
+    #
+    # * <tt>:disabled</tt> - can be a single value or an array of values that will be disabled options in the final output.
+    #
+    #     select("post", "category", Post::CATEGORIES, { disabled: 'restricted' })
+    #
+    #   could become:
+    #
+    #     <select name="post[category]" id="post_category">
+    #       <option value=""></option>
+    #       <option value="joke">joke</option>
+    #       <option value="poem">poem</option>
+    #       <option disabled="disabled" value="restricted">restricted</option>
+    #     </select>
+    #
+    #   When used with the <tt>collection_select</tt> helper, <tt>:disabled</tt> can also be a Proc that identifies those options that should be disabled.
+    #
+    #     collection_select(:post, :category_id, Category.all, :id, :name, { disabled: -> (category) { category.archived? } })
+    #
+    #   If the categories "2008 stuff" and "Christmas" return true when the method <tt>archived?</tt> is called, this would return:
+    #     <select name="post[category_id]" id="post_category_id">
+    #       <option value="1" disabled="disabled">2008 stuff</option>
+    #       <option value="2" disabled="disabled">Christmas</option>
+    #       <option value="3">Jokes</option>
+    #       <option value="4">Poems</option>
+    #     </select>
+    #
+    module FormOptionsHelper
+      # ERB::Util can mask some helpers like textilize. Make sure to include them.
+      include TextHelper
+
+      # Create a select tag and a series of contained option tags for the provided object and method.
+      # The option currently held by the object will be selected, provided that the object is available.
+      #
+      # There are two possible formats for the +choices+ parameter, corresponding to other helpers' output:
+      #
+      # * A flat collection (see +options_for_select+).
+      #
+      # * A nested collection (see +grouped_options_for_select+).
+      #
+      # For example:
+      #
+      #   select("post", "person_id", Person.all.collect { |p| [ p.name, p.id ] }, { include_blank: true })
+      #
+      # would become:
+      #
+      #   <select name="post[person_id]" id="post_person_id">
+      #     <option value=""></option>
+      #     <option value="1" selected="selected">David</option>
+      #     <option value="2">Eileen</option>
+      #     <option value="3">Rafael</option>
+      #   </select>
+      #
+      # assuming the associated person has ID 1.
+      #
+      # This can be used to provide a default set of options in the standard way: before rendering the create form, a
+      # new model instance is assigned the default options and bound to @model_name. Usually this model is not saved
+      # to the database. Instead, a second model object is created when the create request is received.
+      # This allows the user to submit a form page more than once with the expected results of creating multiple records.
+      # In addition, this allows a single partial to be used to generate form inputs for both edit and create forms.
+      #
+      # By default, <tt>post.person_id</tt> is the selected option. Specify <tt>selected: value</tt> to use a different selection
+      # or <tt>selected: nil</tt> to leave all options unselected. Similarly, you can specify values to be disabled in the option
+      # tags by specifying the <tt>:disabled</tt> option. This can either be a single value or an array of values to be disabled.
+      #
+      # A block can be passed to +select+ to customize how the options tags will be rendered. This
+      # is useful when the options tag has complex attributes.
+      #
+      #   select(report, "campaign_ids") do
+      #     available_campaigns.each do |c|
+      #       content_tag(:option, c.name, value: c.id, data: { tags: c.tags.to_json })
+      #     end
+      #   end
+      #
+      # ==== Gotcha
+      #
+      # The HTML specification says when +multiple+ parameter passed to select and all options got deselected
+      # web browsers do not send any value to server. Unfortunately this introduces a gotcha:
+      # if an +User+ model has many +roles+ and have +role_ids+ accessor, and in the form that edits roles of the user
+      # the user deselects all roles from +role_ids+ multiple select box, no +role_ids+ parameter is sent. So,
+      # any mass-assignment idiom like
+      #
+      #   @user.update(params[:user])
+      #
+      # wouldn't update roles.
+      #
+      # To prevent this the helper generates an auxiliary hidden field before
+      # every multiple select. The hidden field has the same name as multiple select and blank value.
+      #
+      # <b>Note:</b> The client either sends only the hidden field (representing
+      # the deselected multiple select box), or both fields. This means that the resulting array
+      # always contains a blank string.
+      #
+      # In case if you don't want the helper to generate this hidden field you can specify
+      # <tt>include_hidden: false</tt> option.
+      #
+      def select: (untyped object, untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> untyped
+
+      # Returns radio button tags for the collection of existing return values
+      # of +method+ for +object+'s class. The value returned from calling
+      # +method+ on the instance +object+ will be selected. If calling +method+
+      # returns +nil+, no selection is made.
+      #
+      # The <tt>:value_method</tt> and <tt>:text_method</tt> parameters are
+      # methods to be called on each member of +collection+. The return values
+      # are used as the +value+ attribute and contents of each radio button tag,
+      # respectively. They can also be any object that responds to +call+, such
+      # as a +proc+, that will be called for each member of the +collection+ to
+      # retrieve the value/text.
+      #
+      # Example object structure for use with this method:
+      #   class Post < ActiveRecord::Base
+      #     belongs_to :author
+      #   end
+      #   class Author < ActiveRecord::Base
+      #     has_many :posts
+      #     def name_with_initial
+      #       "#{first_name.first}. #{last_name}"
+      #     end
+      #   end
+      #
+      # Sample usage (selecting the associated Author for an instance of Post, <tt>@post</tt>):
+      #   collection_radio_buttons(:post, :author_id, Author.all, :id, :name_with_initial)
+      #
+      # If <tt>@post.author_id</tt> is already <tt>1</tt>, this would return:
+      #   <input id="post_author_id_1" name="post[author_id]" type="radio" value="1" checked="checked" />
+      #   <label for="post_author_id_1">D. Heinemeier Hansson</label>
+      #   <input id="post_author_id_2" name="post[author_id]" type="radio" value="2" />
+      #   <label for="post_author_id_2">D. Thomas</label>
+      #   <input id="post_author_id_3" name="post[author_id]" type="radio" value="3" />
+      #   <label for="post_author_id_3">M. Clark</label>
+      #
+      # It is also possible to customize the way the elements will be shown by
+      # giving a block to the method:
+      #   collection_radio_buttons(:post, :author_id, Author.all, :id, :name_with_initial) do |b|
+      #     b.label { b.radio_button }
+      #   end
+      #
+      # The argument passed to the block is a special kind of builder for this
+      # collection, which has the ability to generate the label and radio button
+      # for the current item in the collection, with proper text and value.
+      # Using it, you can change the label and radio button display order or
+      # even use the label as wrapper, as in the example above.
+      #
+      # The builder methods <tt>label</tt> and <tt>radio_button</tt> also accept
+      # extra HTML options:
+      #   collection_radio_buttons(:post, :author_id, Author.all, :id, :name_with_initial) do |b|
+      #     b.label(class: "radio_button") { b.radio_button(class: "radio_button") }
+      #   end
+      #
+      # There are also three special methods available: <tt>object</tt>, <tt>text</tt> and
+      # <tt>value</tt>, which are the current item being rendered, its text and value methods,
+      # respectively. You can use them like this:
+      #   collection_radio_buttons(:post, :author_id, Author.all, :id, :name_with_initial) do |b|
+      #      b.label(:"data-value" => b.value) { b.radio_button + b.text }
+      #   end
+      #
+      # ==== Gotcha
+      #
+      # The HTML specification says when nothing is selected on a collection of radio buttons
+      # web browsers do not send any value to server.
+      # Unfortunately this introduces a gotcha:
+      # if a +User+ model has a +category_id+ field and in the form no category is selected, no +category_id+ parameter is sent. So,
+      # any strong parameters idiom like:
+      #
+      #   params.require(:user).permit(...)
+      #
+      # will raise an error since no <tt>{user: ...}</tt> will be present.
+      #
+      # To prevent this the helper generates an auxiliary hidden field before
+      # every collection of radio buttons. The hidden field has the same name as collection radio button and blank value.
+      #
+      # In case if you don't want the helper to generate this hidden field you can specify
+      # <tt>include_hidden: false</tt> option.
+      def collection_radio_buttons: (untyped object, untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (ActionView::Helpers::Tags::CollectionRadioButtons::RadioButtonBuilder) -> String } -> String
+
+      # Returns check box tags for the collection of existing return values of
+      # +method+ for +object+'s class. The value returned from calling +method+
+      # on the instance +object+ will be selected. If calling +method+ returns
+      # +nil+, no selection is made.
+      #
+      # The <tt>:value_method</tt> and <tt>:text_method</tt> parameters are
+      # methods to be called on each member of +collection+. The return values
+      # are used as the +value+ attribute and contents of each check box tag,
+      # respectively. They can also be any object that responds to +call+, such
+      # as a +proc+, that will be called for each member of the +collection+ to
+      # retrieve the value/text.
+      #
+      # Example object structure for use with this method:
+      #   class Post < ActiveRecord::Base
+      #     has_and_belongs_to_many :authors
+      #   end
+      #   class Author < ActiveRecord::Base
+      #     has_and_belongs_to_many :posts
+      #     def name_with_initial
+      #       "#{first_name.first}. #{last_name}"
+      #     end
+      #   end
+      #
+      # Sample usage (selecting the associated Author for an instance of Post, <tt>@post</tt>):
+      #   collection_check_boxes(:post, :author_ids, Author.all, :id, :name_with_initial)
+      #
+      # If <tt>@post.author_ids</tt> is already <tt>[1]</tt>, this would return:
+      #   <input id="post_author_ids_1" name="post[author_ids][]" type="checkbox" value="1" checked="checked" />
+      #   <label for="post_author_ids_1">D. Heinemeier Hansson</label>
+      #   <input id="post_author_ids_2" name="post[author_ids][]" type="checkbox" value="2" />
+      #   <label for="post_author_ids_2">D. Thomas</label>
+      #   <input id="post_author_ids_3" name="post[author_ids][]" type="checkbox" value="3" />
+      #   <label for="post_author_ids_3">M. Clark</label>
+      #   <input name="post[author_ids][]" type="hidden" value="" />
+      #
+      # It is also possible to customize the way the elements will be shown by
+      # giving a block to the method:
+      #   collection_check_boxes(:post, :author_ids, Author.all, :id, :name_with_initial) do |b|
+      #     b.label { b.check_box }
+      #   end
+      #
+      # The argument passed to the block is a special kind of builder for this
+      # collection, which has the ability to generate the label and check box
+      # for the current item in the collection, with proper text and value.
+      # Using it, you can change the label and check box display order or even
+      # use the label as wrapper, as in the example above.
+      #
+      # The builder methods <tt>label</tt> and <tt>check_box</tt> also accept
+      # extra HTML options:
+      #   collection_check_boxes(:post, :author_ids, Author.all, :id, :name_with_initial) do |b|
+      #     b.label(class: "check_box") { b.check_box(class: "check_box") }
+      #   end
+      #
+      # There are also three special methods available: <tt>object</tt>, <tt>text</tt> and
+      # <tt>value</tt>, which are the current item being rendered, its text and value methods,
+      # respectively. You can use them like this:
+      #   collection_check_boxes(:post, :author_ids, Author.all, :id, :name_with_initial) do |b|
+      #      b.label(:"data-value" => b.value) { b.check_box + b.text }
+      #   end
+      #
+      # ==== Gotcha
+      #
+      # When no selection is made for a collection of checkboxes most
+      # web browsers will not send any value.
+      #
+      # For example, if we have a +User+ model with +category_ids+ field and we
+      # have the following code in our update action:
+      #
+      #   @user.update(params[:user])
+      #
+      # If no +category_ids+ are selected then we can safely assume this field
+      # will not be updated.
+      #
+      # This is possible thanks to a hidden field generated by the helper method
+      # for every collection of checkboxes.
+      # This hidden field is given the same field name as the checkboxes with a
+      # blank value.
+      #
+      # In the rare case you don't want this hidden field, you can pass the
+      # <tt>include_hidden: false</tt> option to the helper method.
+      def collection_check_boxes: (untyped object, untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (ActionView::Helpers::Tags::CollectionCheckBoxes::CheckBoxBuilder) -> String } -> String
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module FormTagHelper
+      # Creates a label element. Accepts a block.
+      #
+      # ==== Options
+      # * Creates standard HTML attributes for the tag.
+      #
+      # ==== Examples
+      #   label_tag 'name'
+      #   # => <label for="name">Name</label>
+      #
+      #   label_tag 'name', 'Your name'
+      #   # => <label for="name">Your name</label>
+      #
+      #   label_tag 'name', nil, class: 'small_label'
+      #   # => <label for="name" class="small_label">Name</label>
+      def label_tag: (?untyped? name, ?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> untyped
+
+      # Creates a button element that defines a <tt>submit</tt> button,
+      # <tt>reset</tt> button or a generic button which can be used in
+      # JavaScript, for example. You can use the button tag as a regular
+      # submit tag but it isn't supported in legacy browsers. However,
+      # the button tag does allow for richer labels such as images and emphasis,
+      # so this helper will also accept a block. By default, it will create
+      # a button tag with type <tt>submit</tt>, if type is not given.
+      #
+      # ==== Options
+      # * <tt>:data</tt> - This option can be used to add custom data attributes.
+      # * <tt>:disabled</tt> - If true, the user will not be able to
+      #   use this input.
+      # * Any other key creates standard HTML options for the tag.
+      #
+      # ==== Data attributes
+      #
+      # * <tt>confirm: 'question?'</tt> - If present, the
+      #   unobtrusive JavaScript drivers will provide a prompt with
+      #   the question specified. If the user accepts, the form is
+      #   processed normally, otherwise no action is taken.
+      # * <tt>:disable_with</tt> - Value of this parameter will be
+      #   used as the value for a disabled version of the submit
+      #   button when the form is submitted. This feature is provided
+      #   by the unobtrusive JavaScript driver.
+      #
+      # ==== Examples
+      #   button_tag
+      #   # => <button name="button" type="submit">Button</button>
+      #
+      #   button_tag 'Reset', type: 'reset'
+      #   # => <button name="button" type="reset">Reset</button>
+      #
+      #   button_tag 'Button', type: 'button'
+      #   # => <button name="button" type="button">Button</button>
+      #
+      #   button_tag 'Reset', type: 'reset', disabled: true
+      #   # => <button name="button" type="reset" disabled="disabled">Reset</button>
+      #
+      #   button_tag(type: 'button') do
+      #     content_tag(:strong, 'Ask me!')
+      #   end
+      #   # => <button name="button" type="button">
+      #   #     <strong>Ask me!</strong>
+      #   #    </button>
+      #
+      #   button_tag "Save", data: { confirm: "Are you sure?" }
+      #   # => <button name="button" type="submit" data-confirm="Are you sure?">Save</button>
+      #
+      #   button_tag "Checkout", data: { disable_with: "Please wait..." }
+      #   # => <button data-disable-with="Please wait..." name="button" type="submit">Checkout</button>
+      #
+      def button_tag: (?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> untyped
     end
   end
 end
@@ -1114,7 +1539,7 @@ module ActionView
       #
       # If no options hash is passed or :update specified, the default is to render a partial and use the second parameter
       # as the locals hash.
-      def render: (?String | ::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) ?{ () -> untyped } -> String
+      def render: (?(String | Symbol) | ::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] locals) ?{ () -> untyped } -> String
     end
   end
 end

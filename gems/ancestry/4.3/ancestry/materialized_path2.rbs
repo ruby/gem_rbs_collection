@@ -1,0 +1,27 @@
+module Ancestry
+  module MaterializedPath2[AncestryBaseClass, Relation, PrimaryKey]
+    include MaterializedPath[AncestryBaseClass, Relation, PrimaryKey]
+
+    def indirects_of: (AncestryBaseClass | PrimaryKey object) -> Relation
+
+    def ordered_by_ancestry: (?untyped? order) -> Relation
+
+    def descendants_by_ancestry: (String ancestry) -> Arel::Nodes::Matches
+
+    def ancestry_root: () -> String
+
+    private
+
+    def ancestry_nil_allowed?: () -> false
+
+    def ancestry_format_regexp: () -> Regexp
+
+    module InstanceMethods[PrimaryKey]
+      def child_ancestry: () -> String
+
+      def child_ancestry_before_save: () -> String
+
+      def generate_ancestry: (Array[PrimaryKey]? ancestor_ids) -> String
+    end
+  end
+end

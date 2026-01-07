@@ -324,6 +324,10 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
            | () { (Model) -> boolish } -> ::Integer
            | (Symbol | String column_name) -> ::Integer
   def sole: () -> Model
+
+  def order_values: () -> Array[String | Symbol]?
+  def joins_values: () -> Array[String | Symbol]?
+  def left_outer_joins_values: () -> Array[String | Symbol]?
 end
 
 interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rubocop:disable RBS/Lint/TopLevelInterface

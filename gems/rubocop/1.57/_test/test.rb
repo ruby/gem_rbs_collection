@@ -34,6 +34,15 @@ module RuboCop
           next if part_of_ignored_node?(node)
 
           corrector.replace(node, "#{expression.source}.any?")
+          # tests for Corrector
+          corrector.wrap(node, '"', '"')
+          corrector.remove(node)
+          corrector.insert_before(node, 'content')
+          corrector.insert_after(node, 'content')
+          corrector.remove_preceding(node, 1)
+          corrector.remove_leading(node, 1)
+          corrector.remove_trailing(node, 1)
+          corrector.swap(node, node)
         end
 
         ignore_node(node)

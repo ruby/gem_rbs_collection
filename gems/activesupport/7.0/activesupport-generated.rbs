@@ -8455,42 +8455,6 @@ end
 
 module ActiveSupport
   module Messages
-    class Metadata
-      # nodoc:
-      # nodoc:
-      def initialize: (untyped message, ?untyped? expires_at, ?untyped? purpose) -> untyped
-
-      def as_json: (?::Hash[untyped, untyped] options) -> { _rails: { message: untyped, exp: untyped, pur: untyped } }
-
-      def self.wrap: (untyped message, ?purpose: untyped? purpose, ?expires_in: untyped? expires_in, ?expires_at: untyped? expires_at) -> untyped
-
-      def self.verify: (untyped message, untyped purpose) -> untyped
-
-      private
-
-      def self.pick_expiry: (untyped expires_at, untyped expires_in) -> untyped
-
-      def self.extract_metadata: (untyped message) -> untyped
-
-      def self.encode: (untyped message) -> untyped
-
-      def self.decode: (untyped message) -> untyped
-
-      public
-
-      def verify: (untyped purpose) -> untyped
-
-      private
-
-      def match?: (untyped purpose) -> untyped
-
-      def fresh?: () -> untyped
-    end
-  end
-end
-
-module ActiveSupport
-  module Messages
     class RotationConfiguration
       # :nodoc:
       attr_reader signed: untyped
@@ -8771,8 +8735,6 @@ module ActiveSupport
     #
     # This class is thread safe. All methods are reentrant.
     class Fanout
-      include Mutex_m
-
       def initialize: () -> untyped
 
       def subscribe: (?untyped? pattern, ?untyped? callable) { () -> untyped } -> untyped

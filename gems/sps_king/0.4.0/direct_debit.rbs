@@ -1,0 +1,22 @@
+module SPS
+  class DirectDebit < ::SPS::Message
+    attr_accessor account_class: ::SPS::CreditorAccount
+    attr_accessor transaction_class: ::SPS::DirectDebitTransaction
+    attr_accessor xml_main_tag: 'CstmrDrctDbtInitn'
+    attr_accessor known_schemas: [schema_pain_008_type]
+
+    def initialize: (
+        creditor_account_attributes_type account_options
+      ) -> self
+
+    def add_transaction: (
+        direct_debit_transaction_attributes_type options
+      ) -> void
+
+    def amount_total: (
+        ?::Array[::SPS::DirectDebitTransaction]? selected_transactions
+      ) -> ::BigDecimal
+
+    def transactions: -> ::Array[::SPS::DirectDebitTransaction]
+  end
+end

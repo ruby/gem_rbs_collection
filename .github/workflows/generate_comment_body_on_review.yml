@@ -22,14 +22,14 @@ jobs:
       PR_AUTHOR: ${{ github.event.pull_request.user.login }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           filter: 'blob:none'
           fetch-depth: 0
           ref: main
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: ruby
           bundler-cache: false
       - name: Changed gems and non gem files
         id: changes

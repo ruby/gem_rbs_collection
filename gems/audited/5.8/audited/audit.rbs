@@ -1,0 +1,43 @@
+module Audited
+  class YAMLIfTextColumnType
+    def self.load: (untyped obj) -> untyped
+
+    def self.dump: (untyped obj) -> untyped
+
+    def self.text_column?: () -> bool
+  end
+
+  class Audit < ActiveRecord::Base
+    def ancestors: () -> ActiveRecord_Relation
+
+    def revision: () -> untyped
+
+    def new_attributes: () -> ActiveSupport::HashWithIndifferentAccess[String, untyped]
+
+    def old_attributes: () -> ActiveSupport::HashWithIndifferentAccess[String, untyped]
+
+    def undo: () -> void
+
+    private
+
+    def set_version_number: () -> void
+
+    def set_audit_user: () -> void
+
+    def set_request_uuid: () -> void
+
+    def set_remote_address: () -> void
+
+    module ClassMethods
+      def as_user: [R] (untyped user) { () -> R } -> R
+
+      def audited_classes: () -> Array[untyped]
+    end
+
+    extend ClassMethods
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ClassMethods
+    end
+  end
+end
