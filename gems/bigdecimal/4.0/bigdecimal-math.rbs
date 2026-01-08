@@ -139,20 +139,20 @@ module BigMath
   #
   def self?.cosh: (BigDecimal, Numeric) -> BigDecimal
 
-  # Computes the error function of +decimal+ to the specified number of digits of
-  # precision, +numeric+.
+  # Computes the error function of `decimal` to the specified number of digits of
+  # precision, `numeric`.
   #
-  # If +decimal+ is NaN, returns NaN.
+  # If `decimal` is NaN, returns NaN.
   #
   #   BigMath.erf(BigDecimal('1'), 32).to_s
   #   #=> "0.84270079294971486934122063508261e0"
   #
   def self?.erf: (BigDecimal, Numeric) -> BigDecimal
 
-  # Computes the complementary error function of +decimal+ to the specified number of digits of
-  # precision, +numeric+.
+  # Computes the complementary error function of `decimal` to the specified number of digits of
+  # precision, `numeric`.
   #
-  # If +decimal+ is NaN, returns NaN.
+  # If `decimal` is NaN, returns NaN.
   #
   #   BigMath.erfc(BigDecimal('10'), 32).to_s
   #   #=> "0.20884875837625447570007862949578e-44"
@@ -168,6 +168,13 @@ module BigMath
   #
   def self?.exp: (BigDecimal, Numeric prec) -> BigDecimal
 
+  # Computes exp(decimal) - 1 to the specified number of digits of precision, `numeric`.
+  #
+  #   BigMath.expm1(BigDecimal('0.1'), 32).to_s
+  #   #=> "0.10517091807564762481170782649025e0"
+  #
+  def self?.expm1: (BigDecimal, Numeric prec) -> BigDecimal
+
   # Decomposes +x+ into a normalized fraction and an integral power of ten.
   #
   #   BigMath.frexp(BigDecimal(123.456))
@@ -175,8 +182,8 @@ module BigMath
   #
   def self?.frexp: (BigDecimal) -> [ BigDecimal, Integer ]
 
-  # Computes the gamma function of +decimal+ to the specified number of
-  # digits of precision, +numeric+.
+  # Computes the gamma function of `decimal` to the specified number of
+  # digits of precision, `numeric`.
   #
   #   BigMath.gamma(BigDecimal('0.5'), 32).to_s
   #   #=> "0.17724538509055160272981674833411e1"
@@ -200,12 +207,12 @@ module BigMath
   def self?.ldexp: (BigDecimal, Integer) -> BigDecimal
 
   # Computes the natural logarithm of the absolute value of the gamma function
-  # of +decimal+ to the specified number of digits of precision, +numeric+ and its sign.
+  # of `decimal` to the specified number of digits of precision, `numeric` and its sign.
   #
   #   BigMath.lgamma(BigDecimal('0.5'), 32)
   #   #=> [0.57236494292470008707171367567653e0, 1]
   #
-  def self?.lgamma: (BigDecimal, Numeric) -> [BigDecimal, Integer]
+  def self?.lgamma: (BigDecimal, Numeric) -> [ BigDecimal, Integer ]
 
   # Computes the natural logarithm of `decimal` to the specified number of digits
   # of precision, `numeric`.
@@ -217,6 +224,27 @@ module BigMath
   # If `decimal` is NaN, returns NaN.
   #
   def self?.log: (BigDecimal, Numeric prec) -> BigDecimal
+
+  # Computes the base 10 logarithm of `decimal` to the specified number of
+  # digits of precision, `numeric`.
+  #
+  # If `decimal` is zero or negative, raises Math::DomainError.
+  #
+  # If `decimal` is positive infinity, returns Infinity.
+  #
+  # If `decimal` is NaN, returns NaN.
+  #
+  #   BigMath.log10(BigDecimal('3'), 32).to_s
+  #   #=> "0.47712125471966243729502790325512e0"
+  #
+  def self?.log10: (BigDecimal, Numeric prec) -> BigDecimal
+
+  # Computes log(1 + decimal) to the specified number of digits of precision, `numeric`.
+  #
+  #   BigMath.log1p(BigDecimal('0.1'), 32).to_s
+  #   #=> "0.95310179804324860043952123280765e-1"
+  #
+  def self?.log1p: (BigDecimal, Numeric prec) -> BigDecimal
 
   # Computes the base 2 logarithm of `decimal` to the specified number of digits
   # of precision, `numeric`.
@@ -267,6 +295,19 @@ module BigMath
   #     #=> "0.1414213562373095048801688724e1"
   #
   def self?.sqrt: (BigDecimal x, Numeric prec) -> BigDecimal
+
+  # Computes the tangent of `decimal` to the specified number of digits of
+  # precision, `numeric`.
+  #
+  # If `decimal` is Infinity or NaN, returns NaN.
+  #
+  #   BigMath.tan(BigDecimal("0.0"), 4).to_s
+  #   #=> "0.0"
+  #
+  #   BigMath.tan(BigMath.PI(24) / 4, 32).to_s
+  #   #=> "0.99999999999999999999999830836025e0"
+  #
+  def self?.tan: (BigDecimal x, Numeric prec) -> BigDecimal
 
   # Computes the hyperbolic tangent of `decimal` to the specified number of digits
   # of precision, `numeric`.
