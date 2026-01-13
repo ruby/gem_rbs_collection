@@ -1,0 +1,47 @@
+module Concurrent
+  interface _Observer[T]
+    def update: (Time, T? result, StandardError? exception) -> void
+  end
+
+  interface _Dereferenceable[T]
+    def value: -> T
+    def deref: -> T
+  end
+
+  interface _Observable[T]
+    def add_observer: (_Observer[T]) -> _Observer[T] #  Typed: observer with standard `update` method
+                    | () { (?Time, ?T?, ?StandardError?) -> void } -> ^(?Time, ?T?, ?StandardError?) -> void # Typed: block form
+                    | (untyped observer, Symbol func) -> untyped # Untyped: custom method name
+    def count_observers: -> Integer
+    def delete_observer: (_Observer[T]) -> _Observer[T]
+                       | (^(?Time, ?T?, ?StandardError?) -> void) -> ^(?Time, ?T?, ?StandardError?) -> void
+                       | (untyped observer) -> untyped
+    def delete_observers: -> self
+    def with_observer: (_Observer[T]) -> self
+                     | () { (?Time, ?T?, ?StandardError?) -> void } -> self
+                     | (untyped observer, Symbol func) -> self
+  end
+
+  class TimerTask[T]
+    include _Observable[T]
+    include _Dereferenceable[T]
+
+    def initialize: (
+      ?execution_interval: Float | Integer,
+      ?run_now: bool,
+      ?executor: executor,
+      ?dup_on_deref: bool,
+      ?freeze_on_deref: bool,
+      ?copy_on_deref: (^(T) -> T)?,
+      ?interval_type: :fixed_rate | :fixed_delay
+    ) { (instance) -> T } -> void
+
+    def execute: -> self
+    def execution_interval: -> (Float | Integer)
+    def execution_interval=: (Float | Integer) -> void
+    def shutdown: -> bool
+    def interval_type: -> (:fixed_rate | :fixed_delay)
+    def timeout_interval: -> Float
+    def running?: -> bool
+  end
+end
