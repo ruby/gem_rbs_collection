@@ -5,12 +5,13 @@ module RuboCop
       def raw_source: () -> String
       def buffer: () -> Parser::Source::Buffer
       def comments: () -> Array[Parser::Source::Comment]
-      attr_reader ast: (Node | nil)
+      attr_reader ast: Node | nil
     end
 
     class NodePattern
       module Macros
         def def_node_matcher: (Symbol, String) -> void
+
         def def_node_search: (Symbol, String) -> void
       end
 
@@ -31,7 +32,9 @@ module RuboCop
 
     module BinaryOperatorNode
       def lhs: () -> Node
+
       def rhs: () -> Node
+
       def conditions: () -> Array[Node]
     end
 
@@ -40,81 +43,138 @@ module RuboCop
 
     module ConditionalNode
       def single_line_condition?: () -> bool
+
       def multiline_condition?: () -> bool
+
       def condition: () -> Node?
+
       def body: () -> Node?
     end
 
     module Descendence
       def each_child_node: (*Symbol types) { (Node) -> void } -> self
                          | (*Symbol types) -> ::Enumerator[Node, self]
+
       def child_nodes: () -> Array[Node]
+
       def each_descendant: (*Symbol types) { (Node) -> void } -> self
                          | (*Symbol types) -> ::Enumerator[Node, self]
+
       def descendants: () -> Array[Node]
+
       def each_node: (*Symbol types) { (Node) -> void } -> self
                    | (*Symbol types) -> ::Enumerator[Node, self]
     end
 
     module HashElementNode
       def key: () -> Node
+
       def value: () -> Node
+
       def same_line?: (Node other) -> bool
+
       def key_delta: (Node other, ?Symbol alignment) -> Integer
+
       def value_delta: (Node other) -> Integer
+
       def delimiter_delta: (Node other) -> Integer
     end
 
     module MethodDispatchNode
       include MethodIdentifierPredicates
+
       def receiver: () -> Node?
+
       def method_name: () -> Symbol
+
       def selector: () -> Parser::Source::Range
+
       def block_node: () -> BlockNode?
+
       def macro?: () -> bool
+
       def access_modifier?: () -> bool
+
       def bare_access_modifier?: () -> bool
+
       def non_bare_access_modifier?: () -> bool
+
       def special_modifier?: () -> bool
+
       def command?: (Symbol name) -> bool
+
       def setter_method?: () -> bool
+
       alias assignment? setter_method?
+
       def dot?: () -> bool
+
       def double_colon?: () -> bool
+
       def safe_navigation?: () -> bool
+
       def self_receiver?: () -> bool
+
       def const_receiver?: () -> bool
+
       def implicit_call?: () -> bool
+
       def block_literal?: () -> bool
+
       def arithmetic_operation?: () -> bool
+
       def def_modifier?: (?Node node) -> bool
+
       def def_modifier: (?Node node) -> Node?
+
       def lambda?: () -> bool
+
       def lambda_literal?: () -> bool
+
       def unary_operation?: () -> bool
+
       def binary_operation?: () -> bool
     end
 
     module MethodIdentifierPredicates
-      def method?: ((Symbol | String) name) -> bool
+      def method?: (Symbol | String name) -> bool
+
       def operator_method?: () -> bool
+
       def nonmutating_binary_operator_method?: () -> bool
+
       def nonmutating_unary_operator_method?: () -> bool
+
       def nonmutating_operator_method?: () -> bool
+
       def nonmutating_array_method?: () -> bool
+
       def nonmutating_hash_method?: () -> bool
+
       def nonmutating_string_method?: () -> bool
+
       def comparison_method?: () -> bool
+
       def assignment_method?: () -> bool
+
       def enumerator_method?: () -> bool
+
       def enumerable_method?: () -> bool
+
       def predicate_method?: () -> bool
+
       def bang_method?: () -> bool
+
       def camel_case_method?: () -> boolish
+
       def self_receiver?: () -> boolish
+
       def const_receiver?: () -> boolish
+
       def negation_method?: () -> boolish
+
       def prefix_not?: () -> boolish
+
       def prefix_bang?: () -> boolish
     end
 
@@ -128,27 +188,37 @@ module RuboCop
 
     module ParameterizedNode
       def parenthesized?: () -> bool
+
       def first_argument: () -> Node?
+
       def last_argument: () -> Node?
+
       def arguments?: () -> bool
+
       def splat_argument?: () -> bool
+
       alias rest_argument? splat_argument?
+
       def block_argument?: () -> bool
 
       module WrappedArguments
         include ParameterizedNode
+
         def arguments: () -> Array[Node]
       end
 
       module RestArguments
         include ParameterizedNode
+
         def arguments: () -> Array[Node]
       end
     end
 
     module PredicateOperatorNode
       def operator: () -> String
+
       def logical_operator?: () -> bool
+
       def semantic_operator?: () -> bool
     end
 
@@ -369,7 +439,7 @@ module RuboCop
     end
 
     class AndAsgnNode < OpAsgnNode
-      def operator: () -> :'&&'
+      def operator: () -> :"&&"
     end
 
     class AndNode < Node
@@ -436,7 +506,7 @@ module RuboCop
 
     class CaseMatchNode < Node
       include ConditionalNode
-      def keyword: () -> 'case'
+      def keyword: () -> "case"
       def in_pattern_branches: () -> Array[InPatternNode]
       def branches: () -> Array[Node | nil]
       def else_branch: () -> Node?
@@ -445,7 +515,7 @@ module RuboCop
 
     class CaseNode < Node
       include ConditionalNode
-      def keyword: () -> 'case'
+      def keyword: () -> "case"
       def when_branches: () -> Array[WhenNode]
       def branches: () -> Array[Node | nil]
       def else_branch: () -> Node?
@@ -515,7 +585,7 @@ module RuboCop
     end
 
     class ForNode < Node
-      def keyword: () -> 'for'
+      def keyword: () -> "for"
       def do?: () -> bool
       def void_context?: () -> true
       def variable: () -> Node
@@ -525,7 +595,7 @@ module RuboCop
 
     class ForwardArgsNode < Node
       include CollectionNode
-      def to_a: () -> [self]
+      def to_a: () -> [ self ]
     end
 
     class HashNode < Node
@@ -600,7 +670,7 @@ module RuboCop
       def hash_rocket?: () -> false
       def colon?: () -> false
       def operator: () -> String
-      def node_parts: () -> [self, self]
+      def node_parts: () -> [ self, self ]
       def kwsplat_type?: () -> true
     end
 
@@ -632,7 +702,7 @@ module RuboCop
     end
 
     class OrAsgnNode < OpAsgnNode
-      def operator: () -> :'||'
+      def operator: () -> :"||"
     end
 
     class OrNode < Node
@@ -741,8 +811,8 @@ module RuboCop
     class UntilNode < Node
       include ConditionalNode
       include ModifierNode
-      def keyword: () -> 'until'
-      def inverse_keyword: () -> 'while'
+      def keyword: () -> "until"
+      def inverse_keyword: () -> "while"
       def do?: () -> bool
     end
 
@@ -756,8 +826,8 @@ module RuboCop
     class WhileNode < Node
       include ConditionalNode
       include ModifierNode
-      def keyword: () -> 'while'
-      def inverse_keyword: () -> 'until'
+      def keyword: () -> "while"
+      def inverse_keyword: () -> "until"
       def do?: () -> bool
     end
 
