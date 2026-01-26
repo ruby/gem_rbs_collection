@@ -83,6 +83,9 @@ class Runner
     ok = run_steep_check && ok
     ok = check_untyped_call && ok
     ok
+  rescue => error
+    puts error.full_message
+    false
   end
 
   private
@@ -145,12 +148,11 @@ class Runner
   end
 
   def run_steep_check
-    with_expectation = if test_dir.join('steep_expectations.yml').exist?
-      ['--with-expectation']
-    else
-      []
+    options = ['--validate=library']
+    if test_dir.join('steep_expectations.yml').exist?
+      options.concat ['--with-expectation']
     end
-    sh 'bundle', 'exec', 'steep', 'check', *with_expectation, chdir: test_dir.to_s
+    sh 'bundle', 'exec', 'steep', 'check', *options, chdir: test_dir.to_s
   end
 
   def check_untyped_call
@@ -174,6 +176,7 @@ end
 
 failed_gems = []
 
+dirs.select!(&:directory?)
 dirs.each do |dir|
   putci "::group::Test for #{dir}"
   puts "Testing #{dir}..."
@@ -193,7 +196,6 @@ dirs.each do |dir|
     putci "::error ::`#{dir}` test failed"
     failed_gems << dir
   end
-
 ensure
   putci "::endgroup::"
 end

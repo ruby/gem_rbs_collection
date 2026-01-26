@@ -54,6 +54,7 @@ module Types
 
     field :article, String, null: false do
       argument :id, ID, required: true
+      argument :external_id, ID, required: false, as: :internal_id
     end
 
     field :error_field, String, null: false
