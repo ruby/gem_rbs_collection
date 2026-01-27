@@ -108,19 +108,19 @@ module RuboCop
 
       def block_node: () -> BlockNode?
 
-      def macro?: () -> bool
+      def macro?: () -> boolish
 
-      def access_modifier?: () -> bool
+      def access_modifier?: () -> boolish
 
-      def bare_access_modifier?: () -> bool
+      def bare_access_modifier?: () -> boolish
 
-      def non_bare_access_modifier?: () -> bool
+      def non_bare_access_modifier?: () -> boolish
 
-      def special_modifier?: () -> bool
+      def special_modifier?: () -> boolish
 
-      def command?: (Symbol name) -> bool
+      def command?: (Symbol name) -> boolish
 
-      def setter_method?: () -> bool
+      def setter_method?: () -> boolish
 
       alias assignment? setter_method?
 
@@ -130,13 +130,13 @@ module RuboCop
 
       def safe_navigation?: () -> bool
 
-      def self_receiver?: () -> bool
+      def self_receiver?: () -> boolish
 
-      def const_receiver?: () -> bool
+      def const_receiver?: () -> boolish
 
       def implicit_call?: () -> bool
 
-      def block_literal?: () -> bool
+      def block_literal?: () -> boolish
 
       def arithmetic_operation?: () -> bool
 
@@ -144,7 +144,7 @@ module RuboCop
 
       def def_modifier: (?Node node) -> Node?
 
-      def lambda?: () -> bool
+      def lambda?: () -> boolish
 
       def lambda_literal?: () -> bool
 
@@ -381,7 +381,7 @@ module RuboCop
       def parent: () -> Node?
       def parent?: () -> bool
       def root?: () -> bool
-      def to_a: () -> Array[Node]
+      def to_a: () -> Array[untyped]
       alias node_parts to_a
       def each_ancestor: (*Symbol types) { (Node) -> void } -> self
                        | (*Symbol types) -> ::Enumerator[Node, self]
@@ -394,7 +394,7 @@ module RuboCop
       def nonempty_line_count: () -> Integer
       def source_length: () -> Integer
       def receiver: () -> Node?
-      def str_content: () -> (String | false)
+      def str_content: () -> (String | false)?
       def const_name: () -> String?
       def defined_module: () -> ConstNode?
       def defined_module_name: () -> String?
@@ -402,7 +402,7 @@ module RuboCop
       def multiline?: () -> bool
       def single_line?: () -> bool
       def empty_source?: () -> bool
-      def assignment_or_similar?: () -> bool
+      def assignment_or_similar?: () -> boolish
       def literal?: () -> bool
       def basic_literal?: () -> bool
       def truthy_literal?: () -> bool
@@ -425,22 +425,22 @@ module RuboCop
       def operator_keyword?: () -> bool
       def parenthesized_call?: () -> bool
       def call_type?: () -> bool
-      def chained?: () -> bool
-      def argument?: () -> bool
+      def chained?: () -> boolish
+      def argument?: () -> boolish
       def argument_type?: () -> bool
       def boolean_type?: () -> bool
       def numeric_type?: () -> bool
       def range_type?: () -> bool
-      def guard_clause?: () -> bool
-      def match_guard_clause?: () -> bool
-      def proc?: () -> bool
+      def guard_clause?: () -> boolish
+      def match_guard_clause?: () -> boolish
+      def proc?: () -> boolish
       def lambda?: () -> bool
-      def lambda_or_proc?: () -> bool
-      def global_const?: (untyped) -> bool
-      def class_constructor?: () -> bool
-      def struct_constructor?: () -> bool
-      def class_definition?: () -> bool
-      def module_definition?: () -> bool
+      def lambda_or_proc?: () -> boolish
+      def global_const?: (untyped, ?untyped) -> boolish
+      def class_constructor?: () -> boolish
+      def struct_constructor?: () -> boolish
+      def class_definition?: () -> boolish
+      def module_definition?: () -> boolish
       def value_used?: () -> bool
       def pure?: () -> bool
       def sibling_index: () -> (Integer | nil)
@@ -483,8 +483,8 @@ module RuboCop
       def each_value: () { (Node) -> void } -> self
                     | () -> ::Enumerator[Node, self]
       def square_brackets?: () -> bool
-      def percent_literal?: (?Symbol type) -> bool
-      def bracketed?: () -> bool
+      def percent_literal?: (?Symbol type) -> boolish
+      def bracketed?: () -> boolish
       def location: () -> Parser::Source::Map::Collection
       alias loc location
     end
@@ -501,7 +501,7 @@ module RuboCop
       def send_node: () -> SendNode
       def first_argument: () -> Node?
       def last_argument: () -> Node?
-      def arguments: () -> Array[Node]
+      def arguments: () -> ArgsNode
       def argument_list: () -> Array[Node]
       def body: () -> Node?
       def method_name: () -> Symbol
@@ -529,7 +529,7 @@ module RuboCop
       def in_pattern_branches: () -> Array[InPatternNode]
       def branches: () -> Array[Node | nil]
       def else_branch: () -> Node?
-      def else?: () -> bool
+      def else?: () -> boolish
     end
 
     class CaseNode < Node
@@ -538,7 +538,7 @@ module RuboCop
       def when_branches: () -> Array[WhenNode]
       def branches: () -> Array[Node | nil]
       def else_branch: () -> Node?
-      def else?: () -> bool
+      def else?: () -> boolish
     end
 
     class CasgnNode < Node
@@ -585,7 +585,7 @@ module RuboCop
     class DefinedNode < Node
       include ParameterizedNode
       include MethodDispatchNode
-      def node_parts: () -> Array[Node | nil]
+      def node_parts: () -> Array[Node | Symbol | nil]
       alias arguments children
     end
 
@@ -628,10 +628,10 @@ module RuboCop
                    | () -> ::Enumerator[PairNode, self]
       def keys: () -> Array[Node]
       def each_key: () { (Node) -> void } -> self
-                  | () -> ::Enumerator[Node, self]
+                  | () -> ::Enumerator[Node, untyped]
       def values: () -> Array[Node]
       def each_value: () { (Node) -> void } -> self
-                    | () -> ::Enumerator[Node, self]
+                    | () -> ::Enumerator[Node, untyped]
       def pairs_on_same_line?: () -> bool
       def mixed_delimiters?: () -> bool
       def braces?: () -> bool
@@ -652,10 +652,10 @@ module RuboCop
       def inverse_keyword: () -> String
       def modifier_form?: () -> bool
       def nested_conditional?: () -> bool
-      def elsif_conditional?: () -> bool
+      def elsif_conditional?: () -> boolish
       def if_branch: () -> Node?
       def else_branch: () -> Node?
-      def node_parts: () -> Array[Node]
+      def node_parts: () -> Array[Node | nil]
       def branches: () -> Array[Node]
       def location: () -> (Parser::Source::Map::Condition | Parser::Source::Map::Keyword | Parser::Source::Map::Ternary)
       alias loc location
@@ -790,7 +790,7 @@ module RuboCop
       def content: () -> String
       def slash_literal?: () -> bool
       def percent_r_literal?: () -> bool
-      def delimiters: () -> String
+      def delimiters: () -> [String, String]
       def delimiter?: (String char) -> bool
       def interpolation?: () -> bool
       def multiline_mode?: () -> bool
@@ -815,7 +815,7 @@ module RuboCop
       def resbody_branches: () -> Array[ResbodyNode]
       def branches: () -> Array[Node | nil]
       def else_branch: () -> Node?
-      def else?: () -> bool
+      def else?: () -> boolish
     end
 
     class ReturnNode < Node
