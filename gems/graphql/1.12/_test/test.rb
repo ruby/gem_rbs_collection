@@ -24,6 +24,12 @@ module Types
   end
   class BaseEnum < GraphQL::Schema::Enum
   end
+  class MediaCategory < Types::BaseEnum
+    value 'AUDIO', value: 'audio'
+    value 'IMAGE', value: 'image'
+    value 'TEXT', value: 'text'
+    value 'VIDEO', value: 'video'
+  end
   class BaseInputObject < GraphQL::Schema::InputObject
     argument_class Types::BaseArgument
   end
@@ -98,3 +104,5 @@ class MyDataloader < GraphQL::Dataloader::Source
     keys.map { |key| nil }
   end
 end
+
+Types::MediaCategory.values['AUDIO'].value

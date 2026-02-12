@@ -22,9 +22,11 @@ module GraphQL
     class Argument
     end
     class EnumValue < Member
+      def value: (?untyped? new_val) -> untyped
     end
     class Enum < Member
       def self.value: (String graphql_name, ?String? desc, ?ast_node: untyped, ?directives: untyped, ?description: untyped, ?value: untyped, ?deprecation_reason: untyped) ?{ () -> void } -> void
+      def self.values: () -> Hash[String, GraphQL::Schema::EnumValue]
     end
     class Field
       include Member::HasArguments
