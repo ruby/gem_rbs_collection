@@ -192,7 +192,7 @@ class BigDecimal < Numeric
   #     `:ceil`.
   # *   `ROUND_FLOOR`: Round toward negative infinity. Aliased as `:floor:`.
   #
-  def self.mode: (Integer mode, ?Integer? value) -> Integer?
+  def self.mode: (Integer mode, ?(Integer | Symbol | nil) value) -> Integer?
 
   # <!--
   #   rdoc-file=ext/bigdecimal/bigdecimal.c
@@ -839,7 +839,7 @@ class BigDecimal < Numeric
   # is performed; see BigDecimal.mode.
   #
   def round: () -> Integer
-           | (Numeric n, ?Integer mode) -> BigDecimal
+           | (Numeric n, ?(Integer | Symbol) mode) -> BigDecimal
 
   # <!--
   #   rdoc-file=ext/bigdecimal/bigdecimal.c

@@ -21,6 +21,10 @@ BigDecimal("1.23").to_r
 12r.to_d(3)
 0i.to_d
 
+BigDecimal("1.234").round(2)
+BigDecimal("1.234").round(2, BigDecimal::ROUND_UP)
+BigDecimal("1.234").round(2, :up)
+
 require "bigdecimal/math"
 
 BigMath.E(10)
