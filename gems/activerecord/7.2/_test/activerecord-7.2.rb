@@ -89,4 +89,6 @@ module Test
   User.order(:id).unscope(:order)
   User.reorder(id: :asc)
   User.order(id: :asc).reorder(id: :desc)
+
+  User.all.table_name
 end
