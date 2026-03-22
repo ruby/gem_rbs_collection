@@ -1,11 +1,15 @@
 module RuboCop
   module AST
     class ProcessedSource
-      def initialize: (String source, Float ruby_version, ?path?) -> untyped
+      attr_reader path: String?
+      attr_reader ast: Node?
+      attr_reader ruby_version: Float
+      attr_reader parser_engine: Symbol
+
+      def initialize: (String source, Float ruby_version, ?path?, ?parser_engine: Symbol, ?prism_result: untyped) -> untyped
       def raw_source: () -> String
       def buffer: () -> Parser::Source::Buffer
       def comments: () -> Array[Parser::Source::Comment]
-      attr_reader ast: Node | nil
     end
 
     class NodePattern
