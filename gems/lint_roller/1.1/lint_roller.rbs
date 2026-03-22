@@ -1,0 +1,48 @@
+module LintRoller
+  class About
+    attr_accessor name: String?
+    attr_accessor version: String?
+    attr_accessor homepage: String?
+    attr_accessor description: String?
+
+    def initialize: (?String name, ?String version, ?String homepage, ?String description) -> void
+                  | (?name: String, ?version: String, ?homepage: String, ?description: String) -> void
+  end
+
+  class Context
+    attr_accessor runner: Symbol?
+    attr_accessor runner_version: String?
+    attr_accessor engine: Symbol?
+    attr_accessor engine_version: String?
+    attr_accessor rule_format: Symbol?
+    attr_accessor target_ruby_version: Gem::Version?
+
+    def initialize: (?Symbol runner, ?String runner_version, ?Symbol engine, ?String engine_version, ?Symbol rule_format, ?Gem::Version target_ruby_version) -> void
+                  | (?runner: Symbol, ?runner_version: String, ?engine: Symbol, ?engine_version: String, ?rule_format: Symbol, ?target_ruby_version: Gem::Version) -> void
+  end
+
+  class Plugin
+    def initialize: (?Hash[String, untyped] config) -> void
+    def about: () -> About
+    def supported?: (Context context) -> bool
+    def rules: (Context context) -> Rules
+  end
+
+  class Rules
+    type t = :path | :object | :error
+
+    attr_accessor type: t?
+    attr_accessor config_format: Symbol | String | Pathname?
+    attr_accessor value: untyped
+    attr_accessor error: untyped
+
+    def initialize: (:path type, ?Symbol config_format, String | Pathname value) -> void
+                  | (type: :path, ?config_format: Symbol, value: String | Pathname) -> void
+                  | (:object type, ?config_format: Symbol, value: untyped) -> void
+                  | (type: :object, ?config_format: Symbol, value: untyped) -> void
+                  | (:error type, ?Symbol config_format, error: untyped) -> void
+                  | (type: :error, ?config_format: Symbol, error: untyped) -> void
+                  | (?t type, ?Symbol config_format, ?value: untyped, ?error: untyped) -> void
+                  | (?type: t, ?config_format: Symbol, ?value: untyped, ?error: untyped) -> void
+  end
+end
