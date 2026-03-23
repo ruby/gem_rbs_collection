@@ -56,3 +56,12 @@ module RuboCop
     end
   end
 end
+
+class MyExtractor
+  def self.call(processed_source)
+    [{
+      offset: 0,
+      processed_source: processed_source
+    }]
+  end
+end
