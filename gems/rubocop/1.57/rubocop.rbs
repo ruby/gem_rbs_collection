@@ -35,6 +35,9 @@ module RuboCop
 
       attr_reader config: Config
 
+      def on_new_investigation: () -> void
+      def on_investigation_end: () -> void
+      def on_other_file: () -> void
       def add_offense: (untyped node, ?message: String, ?severity: Symbol) -> void
                      | (untyped node, ?message: String, ?severity: Symbol) { (Corrector) -> void } -> void
       def cop_config: () -> Hash[String, untyped]
@@ -72,6 +75,11 @@ module RuboCop
     end
 
     module ConfigurableEnforcedStyle
+      def opposite_style_detected: () -> void
+      def correct_style_detected: () -> void
+      def unexpected_style_detected: (Symbol unexpected) -> void
+      def ambiguous_style_detected: (*Symbol possibilities) -> void
+      def style_detected: (Symbol detected) -> void
       def style: () -> Symbol
     end
 
@@ -150,6 +158,11 @@ module RuboCop
   end
 
   module Ext
+    module Comment
+      def source: () -> String
+      def source_range: () -> Parser::Source::Range
+    end
+
     module ProcessedSource
       attr_accessor registry: Cop::Registry
       attr_accessor config: Config
@@ -180,10 +193,14 @@ module RuboCop
   end
 end
 
-# Patch to RuboCop::AST::ProcessedSource
+# Patch to RuboCop::AST::*
 
 module RuboCop
   module AST
+    class Comment
+      include Ext::Comment
+    end
+
     class ProcessedSource
       include Ext::ProcessedSource
     end
