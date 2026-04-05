@@ -1,0 +1,31 @@
+module Zip
+  class EntrySet
+    include Enumerable[Entry]
+
+    def initialize: (?Array[Entry]) -> void
+
+    def include?: (Entry | String entry) -> bool
+
+    def find_entry: (Entry | String entry) -> Entry?
+
+    def <<: (Entry entry) -> void
+    alias push <<
+
+    def size: -> Integer
+    alias length size
+
+    def delete: (Entry | String entry) -> Entry?
+
+    def each: { (Entry) -> void } -> void
+
+    def entries: -> Array[Entry]
+
+    def dup: -> EntrySet
+
+    def ==: (untyped other) -> bool
+
+    def parent: (Entry entry) -> Entry?
+
+    def glob: (String pattern, ?Integer flags) ?{ (Entry) -> void } -> Array[Entry]
+  end
+end

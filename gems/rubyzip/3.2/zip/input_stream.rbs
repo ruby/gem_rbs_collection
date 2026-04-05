@@ -1,0 +1,21 @@
+module Zip
+  class InputStream
+    include IOExtras::AbstractInputStream
+
+    CHUNK_SIZE: Integer
+
+    def self.open: (String | IO filename_or_io, ?offset: Integer, ?decrypter: Decrypter?) ?{ (InputStream) -> void } -> (InputStream | void)
+
+    def initialize: (String | IO context, ?offset: Integer, ?decrypter: Decrypter?) -> void
+
+    def close: -> void
+
+    def get_next_entry: -> Entry?
+
+    def rewind: -> void
+
+    def sysread: (?Integer? length, ?String outbuf) -> String?
+
+    def size: -> Integer?
+  end
+end

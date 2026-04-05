@@ -1,0 +1,31 @@
+module Zip
+  module TraditionalEncryption
+    def initialize: (String password) -> void
+
+    def header_bytesize: -> Integer
+
+    def gp_flags: -> Integer
+  end
+
+  class TraditionalEncrypter < Encrypter
+    include TraditionalEncryption
+
+    def header: (Time mtime) -> String
+
+    def encrypt: (String data) -> String
+
+    def data_descriptor: (Integer crc, Integer compressed_size, Integer size) -> String
+
+    def reset!: -> void
+  end
+
+  class TraditionalDecrypter < Decrypter
+    include TraditionalEncryption
+
+    def decrypt: (String data) -> String
+
+    def reset!: (String header) -> void
+
+    def check_integrity!: (IO io) -> void
+  end
+end

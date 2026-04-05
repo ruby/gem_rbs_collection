@@ -1,0 +1,29 @@
+module Zip
+  module IOExtras
+    module AbstractInputStream
+      include Enumerable[String]
+      include FakeIO
+
+      attr_accessor lineno: Integer
+      attr_reader pos: Integer
+
+      def read: (?Integer? number_of_bytes, ?String buf) -> String?
+
+      def readlines: (?String a_sep_string) -> Array[String]
+
+      def gets: (?String a_sep_string, ?Integer? number_of_bytes) -> String?
+
+      def readline: (?String a_sep_string) -> String
+
+      def ungetc: (Integer byte) -> void
+
+      def flush: -> void
+
+      def each_line: (?String a_sep_string) { (String) -> void } -> void
+      alias each each_line
+
+      def eof?: -> bool
+      alias eof eof?
+    end
+  end
+end

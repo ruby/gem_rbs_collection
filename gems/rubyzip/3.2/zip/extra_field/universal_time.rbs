@@ -1,0 +1,30 @@
+module Zip
+  class ExtraField
+    class UniversalTime < ExtraField::Generic
+      HEADER_ID: String
+      MTIME_MASK: Integer
+      ATIME_MASK: Integer
+      CTIME_MASK: Integer
+
+      attr_reader mtime: Time?
+      attr_reader atime: Time?
+      attr_reader ctime: Time?
+
+      def initialize: (?String? binstr) -> void
+
+      def mtime=: (Time value) -> Time
+
+      def atime=: (Time value) -> Time
+
+      def ctime=: (Time value) -> Time
+
+      def merge: (String binstr) -> void
+
+      def pack_for_local: -> String
+
+      def pack_for_c_dir: -> String
+
+      def ==: (untyped other) -> bool
+    end
+  end
+end
