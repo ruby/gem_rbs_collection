@@ -63,10 +63,5 @@ Zip::OutputStream.open('large_zip_file.zip') do |zos|
 end
 
 # Splitting created large zip file
-part_zips_count = Zip::File.split('large_zip_file.zip', 2_097_152, false)
+part_zips_count = Zip::File.split('large_zip_file.zip', segment_size: 2_097_152, delete_original: false, partial_zip_file_name: 'part_zip_file')
 puts "Zip file splitted in #{part_zips_count} parts"
-
-# Track splitting an archive
-Zip::File.split('large_zip_file.zip', 1_048_576, true, 'part_zip_file') do |part_count, part_index, chunk_bytes, segment_bytes|
-  puts "#{part_index} of #{part_count} part splitting: #{(chunk_bytes.to_f / segment_bytes * 100).to_i}%"
-end
