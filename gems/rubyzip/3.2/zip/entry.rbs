@@ -48,47 +48,47 @@ module Zip
       ?extra: ExtraField
     ) -> void
 
-    def size: -> Integer
+    def size: () -> Integer
 
     def time: (?component: Symbol) -> (Time | DOSTime)
     def mtime: (?component: Symbol) -> (Time | DOSTime)
-    def atime: -> Time?
-    def ctime: -> Time?
+    def atime: () -> Time?
+    def ctime: () -> Time?
 
     def time=: (Time | DOSTime value, ?component: Symbol) -> (Time | DOSTime)
     def mtime=: (Time | DOSTime value, ?component: Symbol) -> (Time | DOSTime)
     def atime=: (Time | DOSTime value) -> (Time | DOSTime)
     def ctime=: (Time | DOSTime value) -> (Time | DOSTime)
 
-    def absolute_time?: -> bool
+    def absolute_time?: () -> bool
 
-    def compression_method: -> Integer
+    def compression_method: () -> Integer
     def compression_method=: (Integer method) -> Integer
 
-    def encrypted?: -> bool
+    def encrypted?: () -> bool
 
-    def zip64?: -> bool
-    def aes?: -> bool
+    def zip64?: () -> bool
+    def aes?: () -> bool
 
-    def directory?: -> bool
-    def file?: -> bool
-    def symlink?: -> bool
+    def directory?: () -> bool
+    def file?: () -> bool
+    def symlink?: () -> bool
 
-    def name_safe?: -> bool
+    def name_safe?: () -> bool
 
-    def extract: (?String entry_path, ?destination_directory: String) ?{ (Entry, String) -> bool } -> self
+    def extract: (?String entry_path, ?destination_directory: String) ?{ (Entry, String) -> boolish } -> self
 
-    def get_input_stream: ?{ (IO) -> void } -> IO
+    def get_input_stream: () ?{ (IO) -> void } -> IO
 
     def write_to_zip_output_stream: (OutputStream zip_output_stream) -> void
 
-    def parent_as_string: -> String?
+    def parent_as_string: () -> String?
 
     def get_extra_attributes_from_path: (String src_path) -> void
 
     def ==: (untyped other) -> bool
     def <=>: (Entry other) -> Integer?
 
-    def to_s: -> String
+    def to_s: () -> String
   end
 end
