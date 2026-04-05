@@ -1,0 +1,30 @@
+module Zip
+  module AESEncryption
+    VERIFIER_LENGTH: Integer
+    BLOCK_SIZE: Integer
+    AUTHENTICATION_CODE_LENGTH: Integer
+    VERSION_AE_1: Integer
+    VERSION_AE_2: Integer
+    VERSIONS: Array[Integer]
+    STRENGTHS: Array[Integer]
+    BITS: Hash[Integer, Integer]
+    KEY_LENGTHS: Hash[Integer, Integer]
+    SALT_LENGTHS: Hash[Integer, Integer]
+
+    def initialize: (String password, Integer strength) -> void
+
+    def header_bytesize: () -> Integer
+
+    def gp_flags: () -> Integer
+  end
+
+  class AESDecrypter < Decrypter
+    include AESEncryption
+
+    def decrypt: (String encrypted_data) -> String
+
+    def reset!: (String header) -> void
+
+    def check_integrity!: (IO io) -> void
+  end
+end

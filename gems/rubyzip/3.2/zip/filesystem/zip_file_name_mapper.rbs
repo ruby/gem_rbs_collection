@@ -1,0 +1,33 @@
+module Zip
+  module FileSystem
+    class ZipFileNameMapper
+      include Enumerable[String]
+
+      attr_accessor pwd: String
+
+      def initialize: (Zip::File zip_file) -> void
+
+      def find_entry: (String filename) -> Entry?
+
+      def get_entry: (String filename) -> Entry
+
+      def get_input_stream: (String filename) ?{ (IO) -> void } -> IO?
+
+      def get_output_stream: (String filename, ?Integer? permissions) ?{ (IO) -> void } -> IO?
+
+      def glob: (String pattern, *untyped flags) ?{ (String) -> void } -> Array[String]
+
+      def read: (String filename) -> String
+
+      def remove: (String filename) -> void
+
+      def rename: (String filename, String new_name) ?{ () -> boolish } -> void
+
+      def mkdir: (String filename, ?Integer permissions) -> void
+
+      def each: () { (String) -> void } -> void
+
+      def expand_path: (String path) -> String
+    end
+  end
+end

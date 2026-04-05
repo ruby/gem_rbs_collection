@@ -1,0 +1,42 @@
+module Zip
+  class CentralDirectory
+    include Dirtyable
+
+    END_OF_CD_SIG: Integer
+    ZIP64_END_OF_CD_SIG: Integer
+    ZIP64_EOCD_LOCATOR_SIG: Integer
+    STATIC_EOCD_SIZE: Integer
+    ZIP64_STATIC_EOCD_SIZE: Integer
+    ZIP64_EOCD_LOC_SIZE: Integer
+    MAX_FILE_COMMENT_SIZE: Integer
+    MAX_END_OF_CD_SIZE: Integer
+
+    attr_accessor comment: String
+
+    def initialize: (?EntrySet entries, ?String comment) -> void
+
+    def <<: (Entry entry) -> void
+
+    def delete: (Entry | String entry) -> Entry?
+
+    def each: () { (Entry) -> void } -> void
+
+    def entries: () -> Array[Entry]
+
+    def find_entry: (String | Entry entry_name) -> Entry?
+
+    def glob: (String pattern, ?Integer flags) ?{ (Entry) -> void } -> Array[Entry]
+
+    def include?: (Entry | String entry) -> bool
+
+    def size: () -> Integer
+
+    def read_from_stream: (IO io) -> void
+
+    def write_to_stream: (IO io, ?suppress_extra_fields: bool) -> void
+
+    def count_entries: (IO io) -> Integer
+
+    def ==: (untyped other) -> bool
+  end
+end

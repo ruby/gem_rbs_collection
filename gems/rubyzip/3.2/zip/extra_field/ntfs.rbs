@@ -1,0 +1,23 @@
+module Zip
+  class ExtraField
+    class NTFS < ExtraField::Generic
+      HEADER_ID: String
+      WINDOWS_TICK: Float
+      SEC_TO_UNIX_EPOCH: Integer
+
+      attr_accessor mtime: Time?
+      attr_accessor atime: Time?
+      attr_accessor ctime: Time?
+
+      def initialize: (?String? binstr) -> void
+
+      def merge: (String binstr) -> void
+
+      def pack_for_local: () -> String
+
+      def pack_for_c_dir: () -> String
+
+      def ==: (untyped other) -> bool
+    end
+  end
+end

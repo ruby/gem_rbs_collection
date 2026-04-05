@@ -1,0 +1,29 @@
+module Zip
+  class OutputStream
+    include IOExtras::AbstractOutputStream
+
+    def self.open: (String file_name, ?encrypter: Encrypter?, ?suppress_extra_fields: bool) ?{ (OutputStream) -> void } -> OutputStream?
+
+    def self.write_buffer: (?IO io, ?encrypter: Encrypter?, ?suppress_extra_fields: bool) { (OutputStream) -> void } -> IO
+
+    def initialize: (String file_name, ?stream: bool, ?encrypter: Encrypter?, ?suppress_extra_fields: bool) -> void
+
+    def close: () -> void
+
+    def close_buffer: () -> IO
+
+    def put_next_entry: (
+      String | Entry entry,
+      ?String? comment,
+      ?ExtraField? extra,
+      ?Integer compression_method,
+      ?Integer? compression_level,
+      ?Integer? size,
+      ?Time? time
+    ) -> void
+
+    def copy_raw_entry: (Entry entry) -> void
+
+    def <<: (String data) -> self
+  end
+end
