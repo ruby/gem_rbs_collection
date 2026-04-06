@@ -270,6 +270,159 @@ Zip::File.open('exampleout.zip') do |zip_file|
   puts io.class
 end
 
+####### Using Zip.setup and Zip config attrs: #######
+
+Zip.setup do |config|
+  config.unicode_names = true
+  config.on_exists_proc = false
+  config.continue_on_exists_proc = false
+  config.sort_entries = false
+  config.default_compression = Zlib::DEFAULT_COMPRESSION
+  config.write_zip64_support = false
+  config.warn_invalid_date = true
+  config.case_insensitive_match = false
+  config.force_entry_names_encoding = nil
+  config.validate_entry_sizes = true
+end
+
+puts Zip.unicode_names
+puts Zip.default_compression
+
+Zip.reset!
+
+####### Using block callbacks on File#add, File#rename, File#extract: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  # add with overwrite callback: block returns boolish
+  zip_file.add('the first little entry', 'example.rb') { |_entry_name, _zip_entry| true }
+
+  # rename with overwrite callback
+  zip_file.rename('the first little entry', 'renamed_entry.txt') { |_entry_name, _zip_entry| true }
+
+  # extract with overwrite callback
+  entry = zip_file.get_entry('renamed_entry.txt')
+  entry&.extract('extracted_with_callback.txt') { |_entry, _path| true }
+end
+
+####### Using File#commit_required?: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  puts zip_file.commit_required?
+  zip_file.add('new_for_commit.rb', 'example.rb')
+  puts zip_file.commit_required?
+end
+
+####### Using remaining Entry predicates: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  zip_file.each do |entry|
+    puts entry.name_safe?
+    puts entry.encrypted?
+    puts entry.zip64?
+    puts entry.aes?
+    puts entry.absolute_time?
+  end
+end
+
+####### Using Filesystem API: #######
+
+require 'zip/filesystem'
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  # FileSystem::File: predicates and metadata
+  mapper = Zip::FileSystem::ZipFileNameMapper.new(zip_file)
+  file = Zip::FileSystem::File.new(mapper)
+  file.exists?('the second little entry')
+  file.file?('the second little entry')
+  file.directory?('the second little entry')
+  file.size('the second little entry')
+  file.readable?('the second little entry')
+  file.writable?('the second little entry')
+  file.zero?('the second little entry')
+  file.basename('the second little entry')
+  file.dirname('the second little entry')
+  file.expand_path('the second little entry')
+  file.join('dir', 'file.txt')
+  parts = file.split('dir/file.txt')
+  puts parts[0]
+  puts parts[1]
+  puts file.mtime('the second little entry')
+  puts file.pipe?('the second little entry')
+  puts file.chardev?('the second little entry')
+  puts file.socket?('the second little entry')
+  puts file.blockdev?('the second little entry')
+  lines = file.readlines('the second little entry')
+  puts lines.first
+
+  # FileSystem::File#open with block: returns TContent
+  result = file.open('the second little entry') { |io| io.read }
+  puts result
+
+  # FileSystem::File#open without block: returns IO
+  io = file.open('the second little entry')
+  puts io.read
+
+  # FileSystem::File#read
+  content = file.read('the second little entry')
+  puts content
+
+  # FileSystem::Dir: navigation and iteration
+  dir = Zip::FileSystem::Dir.new(mapper)
+  puts dir.pwd
+  entries = dir.entries('/')
+  puts entries.first
+
+  # Dir#open with block: no return
+  dir.open('/') { |_iter| 'ignored' }
+
+  # Dir#open without block: returns DirectoryIterator
+  iter = dir.open('/')
+  iter.each { |name| puts name }
+
+  # Dir#glob
+  matches = dir.glob('/*')
+  puts matches.first
+
+  # Dir#foreach
+  dir.foreach('/') { |name| puts name }
+
+  # Dir#mkdir and Dir#delete
+  dir.mkdir('fs_test_dir')
+  dir.delete('fs_test_dir')
+end
+
+####### Using Zip::Error and subclasses: #######
+
+begin
+  Zip::File.open('nonexistent.zip') { |_| }
+rescue Zip::Error => e
+  puts e.message
+end
+
+begin
+  raise Zip::EntryNameError.new('bad/name')
+rescue Zip::EntryNameError => e
+  puts e.message
+end
+
+begin
+  raise Zip::EntryExistsError.new('add', 'duplicate.txt')
+rescue Zip::EntryExistsError => e
+  puts e.message
+end
+
+begin
+  raise Zip::DestinationExistsError.new('/some/dest')
+rescue Zip::DestinationExistsError => e
+  puts e.message
+end
+
+begin
+  raise Zip::SplitArchiveError
+rescue Zip::SplitArchiveError => e
+  puts e.message
+end
+
 ####### Using ZipFile to split a zip file: #######
 
 # Creating large zip file for splitting
