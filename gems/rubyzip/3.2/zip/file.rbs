@@ -70,7 +70,8 @@ module Zip
       ?suppress_extra_fields: bool
     ) -> void
 
-    def get_input_stream: (String | Entry entry) ?{ (IO) -> void } -> IO
+    def get_input_stream: [TContent] (String | Entry entry) { (IO) -> TContent } -> TContent
+                        | (String | Entry entry) -> IO
 
     def get_output_stream: [TContent] (
       String | Entry entry,

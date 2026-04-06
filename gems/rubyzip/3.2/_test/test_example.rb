@@ -98,7 +98,7 @@ Zip::File.open('exampleout.zip') do |zip_file|
   puts found&.name
 
   entry = zip_file.get_entry('the second little entry')
-  puts entry.name
+  puts entry&.name
 end
 
 ####### Using File#read: #######
