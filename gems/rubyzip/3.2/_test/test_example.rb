@@ -1,5 +1,3 @@
-# Taken from https://github.com/rubyzip/rubyzip/blob/v3.2.0/samples/example.rb
-
 require 'zip'
 
 ####### Using ZipInputStream alone: #######
@@ -98,7 +96,7 @@ Zip::File.open('exampleout.zip') do |zip_file|
   puts found&.name
 
   entry = zip_file.get_entry('the second little entry')
-  puts entry&.name
+  puts entry.name
 end
 
 ####### Using File#read: #######
@@ -175,21 +173,21 @@ Zip::File.open('exampleout.zip') do |zip_file|
   entry = zip_file.get_entry('the first little entry')
 
   # with block: returns TContent
-  result = entry&.get_input_stream { |stream| stream.read }
+  result = entry.get_input_stream { |stream| stream.read }
   puts result
 
   # without block: returns IO
-  stream = entry&.get_input_stream
-  puts stream&.read
+  stream = entry.get_input_stream
+  puts stream.read
 end
 
 ####### Using Entry#extract: #######
 
 Zip::File.open('exampleout.zip') do |zip_file|
   entry = zip_file.get_entry('the first little entry')
-  returned = entry&.extract('extracted_entry.txt')
+  returned = entry.extract('extracted_entry.txt')
   # returns self (Entry)
-  puts returned&.name
+  puts returned.name
 end
 
 ####### Using InputStream#rewind and #sysread: #######
@@ -301,7 +299,7 @@ Zip::File.open('exampleout.zip') do |zip_file|
 
   # extract with overwrite callback
   entry = zip_file.get_entry('renamed_entry.txt')
-  entry&.extract('extracted_with_callback.txt') { |_entry, _path| true }
+  entry.extract('extracted_with_callback.txt') { |_entry, _path| true }
 end
 
 ####### Using File#commit_required?: #######
@@ -391,6 +389,112 @@ Zip::File.open('exampleout.zip') do |zip_file|
   dir.delete('fs_test_dir')
 end
 
+####### Using Entry#==, Entry#<=>, Entry#to_s: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  entries = zip_file.entries
+  a = entries[0]
+  b = entries[1]
+  puts a == b
+  puts a <=> b
+  puts a.to_s
+end
+
+####### Using ZipFileNameMapper directly: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  mapper = Zip::FileSystem::ZipFileNameMapper.new(zip_file)
+
+  puts mapper.pwd
+  puts mapper.find_entry('the second little entry')&.name
+  puts mapper.get_entry('the second little entry').name
+  puts mapper.read('the second little entry')
+  puts mapper.expand_path('the second little entry')
+
+  mapper.each { |name| puts name }
+  mapper.glob('*').each { |name| puts name }
+
+  # get_input_stream with block: returns TContent
+  result = mapper.get_input_stream('the second little entry') { |io| io.read }
+  puts result
+
+  # get_input_stream without block: returns IO
+  io = mapper.get_input_stream('the second little entry')
+  puts io.read
+
+  # get_output_stream with block: returns TContent
+  out_result = mapper.get_output_stream('mapper_out.txt') { |io| io.write('hi'); 'wrote' }
+  puts out_result
+
+  # get_output_stream without block: returns IO
+  out_io = mapper.get_output_stream('mapper_out2.txt')
+  out_io.write('hello')
+
+  mapper.mkdir('mapper_dir')
+  mapper.rename('mapper_out.txt', 'mapper_renamed.txt')
+  mapper.remove('mapper_renamed.txt')
+end
+
+####### Using DirectoryIterator beyond each: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  mapper = Zip::FileSystem::ZipFileNameMapper.new(zip_file)
+  dir = Zip::FileSystem::Dir.new(mapper)
+  iter = dir.open('/')
+
+  puts iter.tell
+  puts iter.read
+  iter.seek(0)
+  iter.rewind
+  iter.close
+end
+
+####### Using FileSystem::FileStat: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  mapper = Zip::FileSystem::ZipFileNameMapper.new(zip_file)
+  fs_file = Zip::FileSystem::File.new(mapper)
+  stat = fs_file.stat('the second little entry')
+
+  puts stat.kind_of?(Zip::FileSystem::FileStat)
+  puts stat.size
+  puts stat.size?
+  puts stat.ftype
+  puts stat.mode
+  puts stat.nlink
+  puts stat.blocks.inspect
+  puts stat.blksize.inspect
+  puts stat.gid
+  puts stat.uid
+  puts stat.ino
+  puts stat.dev
+  puts stat.rdev
+  puts stat.rdev_major
+  puts stat.rdev_minor
+  puts stat.mtime
+  puts stat.atime.inspect
+  puts stat.ctime.inspect
+  puts stat.file?
+  puts stat.directory?
+  puts stat.pipe?
+  puts stat.chardev?
+  puts stat.symlink?
+  puts stat.socket?
+  puts stat.blockdev?
+  puts stat.readable?
+  puts stat.readable_real?
+  puts stat.writable?
+  puts stat.writable_real?
+  puts stat.executable?
+  puts stat.executable_real?
+  puts stat.sticky?
+  puts stat.owned?
+  puts stat.grpowned?
+  puts stat.setuid?
+  puts stat.setgid?
+  puts stat.zero?
+end
+
 ####### Using Zip::Error and subclasses: #######
 
 begin
@@ -421,6 +525,31 @@ begin
   raise Zip::SplitArchiveError
 rescue Zip::SplitArchiveError => e
   puts e.message
+end
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  entry = zip_file.get_entry('the second little entry')
+
+  begin
+    raise Zip::EntrySizeError.new(entry)
+  rescue Zip::EntrySizeError => e
+    puts e.message
+    puts e.entry.name
+  end
+
+  begin
+    raise Zip::StreamingError.new(entry)
+  rescue Zip::StreamingError => e
+    puts e.message
+    puts e.entry.name
+  end
+end
+
+begin
+  raise Zip::DecompressionError.new(Zlib::Error.new('bad data'))
+rescue Zip::DecompressionError => e
+  puts e.message
+  puts e.zlib_error.message
 end
 
 ####### Using ZipFile to split a zip file: #######
