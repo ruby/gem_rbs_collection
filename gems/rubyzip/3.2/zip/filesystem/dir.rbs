@@ -7,12 +7,13 @@ module Zip
 
       def new: (String directory_name) -> DirectoryIterator
 
-      def open: (String directory_name) ?{ (DirectoryIterator) -> void } -> DirectoryIterator?
+      def open: (String directory_name) { (DirectoryIterator) -> void } -> nil
+              | (String directory_name) -> DirectoryIterator
 
       def pwd: () -> String
       alias getwd pwd
 
-      def chdir: (String directory_name) ?{ () -> void } -> void
+      def chdir: (String directory_name) -> void
 
       def entries: (String directory_name) -> Array[String]
 
