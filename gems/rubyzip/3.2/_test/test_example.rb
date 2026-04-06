@@ -169,6 +169,107 @@ io = Zip::OutputStream.write_buffer do |zos|
 end
 puts io.class
 
+####### Using Entry#get_input_stream directly (block and no-block): #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  entry = zip_file.get_entry('the first little entry')
+
+  # with block: returns TContent
+  result = entry&.get_input_stream { |stream| stream.read }
+  puts result
+
+  # without block: returns IO
+  stream = entry&.get_input_stream
+  puts stream&.read
+end
+
+####### Using Entry#extract: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  entry = zip_file.get_entry('the first little entry')
+  returned = entry&.extract('extracted_entry.txt')
+  # returns self (Entry)
+  puts returned&.name
+end
+
+####### Using InputStream#rewind and #sysread: #######
+
+zis = Zip::InputStream.open('example.zip')
+zis.get_next_entry
+data = zis.sysread(10)
+puts data
+zis.rewind
+zis.close
+
+####### Using OutputStream#<< and OutputStream.open without a block: #######
+
+zos = Zip::OutputStream.open('stream_out.zip')
+zos.put_next_entry('streamed.txt')
+ret = zos << 'Hello via <<'
+# << returns self
+puts ret.class
+zos.close
+
+####### Using OutputStream#close_buffer: #######
+
+zos2 = Zip::OutputStream.open('buffer_out.zip', suppress_extra_fields: true)
+zos2.put_next_entry('buf.txt')
+zos2.write('buffered content')
+io = zos2.close_buffer
+puts io.class
+
+####### Using File.foreach: #######
+
+Zip::File.foreach('exampleout.zip') do |entry|
+  puts entry.name
+end
+
+####### Using File.count_entries: #######
+
+count = Zip::File.count_entries('exampleout.zip')
+puts count
+
+####### Using File#size, File#comment, File#comment=: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  puts zip_file.size
+  zip_file.comment = 'test comment'
+  puts zip_file.comment
+end
+
+####### Using File#each directly: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  zip_file.each do |entry|
+    puts entry.name
+  end
+end
+
+####### Using File#mkdir: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  zip_file.mkdir('new_directory/')
+end
+
+####### Using File#add_stored and File#replace: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  zip_file.add_stored('stored_entry.rb', 'example.rb')
+  zip_file.replace('stored_entry.rb', 'example.rb')
+end
+
+####### Using File#commit and File#write_buffer: #######
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  zip_file.add('commit_entry.rb', 'example.rb')
+  zip_file.commit
+end
+
+Zip::File.open('exampleout.zip') do |zip_file|
+  io = zip_file.write_buffer
+  puts io.class
+end
+
 ####### Using ZipFile to split a zip file: #######
 
 # Creating large zip file for splitting
