@@ -25,7 +25,8 @@ module Zip
       def size?: (String filename) -> Integer?
       def zero?: (String filename) -> bool
 
-      def open: (String filename, ?String mode, ?Integer permissions) ?{ (IO) -> void } -> IO?
+      def open: [TContent] (String filename, ?String mode, ?Integer permissions) { (IO) -> TContent } -> TContent
+              | (String filename, ?String mode, ?Integer permissions) -> IO
 
       def read: (String filename) -> String
 

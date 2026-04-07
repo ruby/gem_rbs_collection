@@ -78,7 +78,8 @@ module Zip
 
     def extract: (?String entry_path, ?destination_directory: String) ?{ (Entry, String) -> boolish } -> self
 
-    def get_input_stream: () ?{ (IO) -> void } -> IO
+    def get_input_stream: [TContent] () { (IO) -> TContent } -> TContent
+                        | () -> IO
 
     def write_to_zip_output_stream: (OutputStream zip_output_stream) -> void
 

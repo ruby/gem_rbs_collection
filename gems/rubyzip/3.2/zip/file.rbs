@@ -17,7 +17,7 @@ module Zip
     def glob: (String pattern, ?Integer flags) ?{ (Entry) -> void } -> Array[Entry]
     def size: () -> Integer
 
-    def self.open: (
+    def self.open: [TContent] (
       String file_name,
       ?create: bool,
       ?restore_ownership: bool,
@@ -25,17 +25,35 @@ module Zip
       ?restore_times: bool,
       ?compression_level: Integer,
       ?suppress_extra_fields: bool
-    ) ?{ (File) -> void } -> File?
-
-    def self.open_buffer: (
-      ?IO io,
+    ) { (File) -> TContent } -> TContent
+                 | (
+      String file_name,
       ?create: bool,
       ?restore_ownership: bool,
       ?restore_permissions: bool,
       ?restore_times: bool,
       ?compression_level: Integer,
       ?suppress_extra_fields: bool
-    ) ?{ (File) -> void } -> File?
+    ) -> File
+
+    def self.open_buffer: [TContent] (
+      ?IO | String io,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) { (File) -> TContent } -> TContent
+                        | (
+      ?IO | String io,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) -> File
 
     def self.foreach: (String zip_file_name) { (Entry) -> void } -> void
 
@@ -52,9 +70,10 @@ module Zip
       ?suppress_extra_fields: bool
     ) -> void
 
-    def get_input_stream: (String | Entry entry) ?{ (IO) -> void } -> IO
+    def get_input_stream: [TContent] (String | Entry entry) { (IO) -> TContent } -> TContent
+                        | (String | Entry entry) -> IO
 
-    def get_output_stream: (
+    def get_output_stream: [TContent] (
       String | Entry entry,
       ?permissions: Integer?,
       ?comment: String?,
@@ -65,7 +84,19 @@ module Zip
       ?compression_level: Integer?,
       ?size: Integer?,
       ?time: Time?
-    ) ?{ (IO) -> void } -> IO
+    ) { (IO) -> TContent } -> TContent
+                         | (
+      String | Entry entry,
+      ?permissions: Integer?,
+      ?comment: String?,
+      ?extra: ExtraField?,
+      ?compressed_size: Integer?,
+      ?crc: Integer?,
+      ?compression_method: Integer?,
+      ?compression_level: Integer?,
+      ?size: Integer?,
+      ?time: Time?
+    ) -> IO
 
     def read: (String | Entry entry) -> String
 

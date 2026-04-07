@@ -11,9 +11,11 @@ module Zip
 
       def get_entry: (String filename) -> Entry
 
-      def get_input_stream: (String filename) ?{ (IO) -> void } -> IO?
+      def get_input_stream: [TContent] (String filename) { (IO) -> TContent } -> TContent
+                          | (String filename) -> IO
 
-      def get_output_stream: (String filename, ?Integer? permissions) ?{ (IO) -> void } -> IO?
+      def get_output_stream: [TContent] (String filename, ?Integer? permissions) { (IO) -> TContent } -> TContent
+                           | (String filename, ?Integer? permissions) -> IO
 
       def glob: (String pattern, *untyped flags) ?{ (String) -> void } -> Array[String]
 
