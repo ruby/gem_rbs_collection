@@ -3,11 +3,11 @@ require 'zip'
 ####### Using ZipInputStream alone: #######
 
 is_val = Zip::InputStream.open('example.zip') do |zis|
-  entry = zis.get_next_entry
-  print "First line of '#{entry&.name} (#{entry&.size} bytes):  "
+  next_entry = zis.get_next_entry
+  print "First line of '#{next_entry&.name} (#{next_entry&.size} bytes):  "
   puts "'#{zis.gets&.chomp}'"
-  entry = zis.get_next_entry
-  print "First line of '#{entry&.name} (#{entry&.size} bytes):  "
+  next_entry = zis.get_next_entry
+  print "First line of '#{next_entry&.name} (#{next_entry&.size} bytes):  "
   puts "'#{zis.gets&.chomp}'"
 
   ' input-stream '
@@ -70,8 +70,8 @@ end
 ####### Using ZipInputStream.open without a block: #######
 
 zis = Zip::InputStream.open('example.zip')
-entry = zis.get_next_entry
-puts "First entry: #{entry&.name}"
+next_entry = zis.get_next_entry
+puts "First entry: #{next_entry&.name}"
 zis.close
 
 ####### Accessing Entry attributes: #######
