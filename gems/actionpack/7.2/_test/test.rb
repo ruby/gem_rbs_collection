@@ -7,3 +7,7 @@ class BarController < ActionController::Base
 end
 
 ActionController::Base.new.render_to_string(template: 'foo', locals: { bar: 'baz' })
+
+class FooService
+  include ActionDispatch::Routing::RouteSet.new.url_helpers
+end

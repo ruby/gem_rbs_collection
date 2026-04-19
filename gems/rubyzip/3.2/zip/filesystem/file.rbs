@@ -1,0 +1,63 @@
+module Zip
+  module FileSystem
+    class File
+      attr_writer dir: FileSystem::Dir
+
+      def initialize: (ZipFileNameMapper mapped_zip) -> void
+
+      def find_entry: (String filename) -> Entry?
+
+      def exists?: (String filename) -> bool
+      alias exist? exists?
+
+      def readable?: (String filename) -> bool
+      def writable?: (String filename) -> bool
+      def executable?: (String filename) -> bool
+
+      def directory?: (String filename) -> bool
+      def file?: (String filename) -> bool
+      def symlink?: (String filename) -> bool
+      def setuid?: (String filename) -> bool
+      def setgid?: (String filename) -> bool
+      def sticky?: (String filename) -> bool
+
+      def size: (String filename) -> Integer
+      def size?: (String filename) -> Integer?
+      def zero?: (String filename) -> bool
+
+      def open: [TContent] (String filename, ?String mode, ?Integer permissions) { (IO) -> TContent } -> TContent
+              | (String filename, ?String mode, ?Integer permissions) -> IO
+
+      def read: (String filename) -> String
+
+      def readlines: (String filename) -> Array[String]
+
+      def delete: (*String args) -> void
+      alias unlink delete
+
+      def rename: (String file_to_rename, String new_name) -> void
+
+      def chmod: (Integer mode, *String filenames) -> void
+      def chown: (Integer? owner, Integer? group, *String filenames) -> void
+
+      def mtime: (String filename) -> Time
+      def atime: (String filename) -> Time?
+      def ctime: (String filename) -> Time?
+
+      def utime: (Time modified_time, *String filenames) -> Integer
+
+      def dirname: (String filename) -> String
+      def basename: (String filename) -> String
+      def split: (String filename) -> [String, String]
+      def join: (*String fragments) -> String
+      def expand_path: (String path) -> String
+
+      def stat: (String filename) -> FileStat
+
+      def pipe?: (String filename) -> false
+      def chardev?: (String filename) -> false
+      def socket?: (String filename) -> false
+      def blockdev?: (String filename) -> false
+    end
+  end
+end

@@ -1,0 +1,52 @@
+class ActiveRecord::Base
+  extend Ancestry::HasAncestry
+end
+
+class Directory < ActiveRecord::Base
+  include Ancestry::InstanceMethods[Directory, ActiveRecord_Relation, Integer]
+  extend Ancestry::ClassMethods[Directory, ActiveRecord_Relation, Integer]
+  extend Ancestry::MaterializedPath[Directory, ActiveRecord_Relation, Integer]
+  include Ancestry::MaterializedPath::InstanceMethods[Directory, Integer]
+  extend ActiveRecord::Base::ClassMethods[Directory, ActiveRecord_Relation, Integer]
+
+  def rank: () -> Integer
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::ActiveRecord::Relation::Methods[Directory, ::Integer]
+    include Ancestry::ClassMethods[Directory, ActiveRecord_Relation, Integer]
+    include Ancestry::MaterializedPath[Directory, ActiveRecord_Relation, Integer]
+  end
+end
+
+class Group < ActiveRecord::Base
+  include Ancestry::InstanceMethods[Group, ActiveRecord_Relation, Integer]
+  extend Ancestry::ClassMethods[Group, ActiveRecord_Relation, Integer]
+  extend Ancestry::MaterializedPath2[Group, ActiveRecord_Relation, Integer]
+  include Ancestry::MaterializedPathPg
+  include Ancestry::MaterializedPath::InstanceMethods[Group, Integer]
+  include Ancestry::MaterializedPath2::InstanceMethods[Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include Ancestry::ClassMethods[Group, ActiveRecord_Relation, Integer]
+    include Ancestry::MaterializedPath2[Directory, ActiveRecord_Relation, Integer]
+  end
+end
+
+class Category < ActiveRecord::Base
+  include Ancestry::InstanceMethods[Category, ActiveRecord_Relation, Integer]
+  extend Ancestry::ClassMethods[Category, ActiveRecord_Relation, Integer]
+  extend Ancestry::MaterializedPath[Category, ActiveRecord_Relation, Integer]
+  include Ancestry::MaterializedPath::InstanceMethods[Category, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include Ancestry::ClassMethods[Category, ActiveRecord_Relation, Integer]
+    include Ancestry::MaterializedPath[Category, ActiveRecord_Relation, Integer]
+  end
+end
+
+class MySerializer
+  @parent: untyped
+  @children: Array[untyped]
+
+  def initialize: (untyped parent, children: Array[untyped]) -> void
+end

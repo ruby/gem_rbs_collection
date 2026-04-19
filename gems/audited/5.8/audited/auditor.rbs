@@ -1,0 +1,131 @@
+module Audited
+  module Auditor
+    interface _Callable
+      def call: (self) -> bool
+    end
+
+    CALLBACKS: [:audit_create, :audit_update, :audit_destroy]
+
+    module ClassMethods
+      type audited_options = {
+        ?associated_with: String | Symbol,
+        ?on: :create | :update | :touch | :destroy | Array[:create | :update | :touch | :destroy],
+        ?only: String | Symbol | Array[String | Symbol],
+        ?except: String | Symbol | Array[String | Symbol],
+        ?max_audits: Integer,
+        ?comment_required: bool,
+        ?redacted: String | Symbol | Array[String | Symbol],
+        ?redaction_value: String,
+        ?update_with_comment_only: bool,
+        ?if: bool | String | Symbol | _Callable,
+        ?unless: bool | String | Symbol | _Callable
+      }
+
+      def audited: (?audited_options options) -> void
+
+      private
+
+      def audited?: () -> bool
+
+      def set_autit: (audited_options options) -> void
+
+      def has_associated_audits: () -> void
+
+      def update_audited_options: (audited_options new_options) -> void
+
+      def set_auited_options: (audited_options options) -> void
+    end
+
+    module AuditedInstanceMethods[AuditableClass, AuditClass, AuditClassRelation]
+      REDACTED: "[REDACTED]"
+
+      def save_without_auditing: () -> bool
+
+      def without_auditing: [R] () { () -> R } -> R
+
+      def save_with_auditing: () -> bool
+
+      def with_auditing: [R] () { () -> R } -> R
+
+      def revisions: (?Integer from_version) -> Array[AuditableClass]
+
+      def revision: (Integer | :previous version) -> AuditableClass?
+
+      def revision_at: (ActiveSupport::TimeWithZone | Date | DateTime | Time | String date_or_time) -> AuditableClass?
+
+      def audited_attributes: () -> Hash[String, untyped]
+
+      def own_and_associated_audits: () -> AuditClassRelation
+
+      def combine_audits: (AuditClassRelation audits_to_combine) -> void
+
+      private
+
+      def audited_changes: (?for_touch: bool, ?exclude_readonly_attrs: bool) -> Hash[String, untyped]
+
+      def normalize_enum_changes: (Hash[String, untyped] changes) -> Hash[String, untyped]
+
+      def redact_values: (Hash[String, untyped] filtered_changes) -> Hash[String, untyped]
+
+      def filter_encrypted_attrs: (Hash[String, untyped] filtered_changes) -> Hash[String, untyped]
+
+      def filter_attr_values: (?audited_changes: Hash[String, untyped], ?attrs: Array[String], ?placeholder: String) -> Hash[String, untyped]
+
+      def rails_below?: (String rails_version) -> bool
+
+      def audits_to: (?(Integer | :previous)? version) -> AuditClassRelation
+
+      def audit_create: () -> void
+
+      def audit_update: () -> void
+
+      def audit_touch: () -> void
+
+      def audit_destroy: () -> void
+
+      def write_audit: (?Hash[untyped, untyped] attrs) -> void
+
+      def presence_of_audit_comment: () -> void
+
+      def comment_required_state?: () -> bool
+
+      def combine_audits_if_needed: () -> void
+
+      def evaluate_max_audits: () -> Integer?
+
+      def require_comment: () -> void
+
+      def auditing_enabled: () -> bool
+
+      def run_conditional_check: (bool | String | Symbol | _Callable condition, ?matching: bool) -> bool
+
+      def reconstruct_attributes: (AuditClassRelation | Array[AuditClass] audits) -> Hash[String, untyped]
+    end
+
+    module AuditedClassMethods
+      REDACTED: '[REDACTED]'
+
+      def audited_columns: () -> Array[String]
+
+      def non_audited_columns: () -> Array[String]
+
+      def non_audited_columns=: (Array[String | Symbol] columns) -> void
+
+      def without_auditing: [R] () { () -> R } -> R
+
+      def with_auditing: [R] () { () -> R } -> R
+
+      def disable_auditing: () -> void
+
+      def enable_auditing: () -> void
+
+      def audit_as: [R] (untyped user) { () -> R } -> R
+
+      def auditing_enabled: () -> bool
+
+      def auditing_enabled=: (bool enabled) -> void
+
+      def default_ignored_attributes: () -> Array[String]
+    end
+  end
+end

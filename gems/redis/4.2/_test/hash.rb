@@ -1,0 +1,86 @@
+redis = Redis.new
+
+redis.hdel("hash_key", "foo")
+redis.hdel("hash_key", "foo", "bar")
+
+redis.hexists("hash_key", "foo")
+
+redis.hget("hash_key", "key1")
+
+redis.hgetall("hash_key")
+
+redis.hincrby("hash_key", "field", 42)
+redis.hincrby("hash_key", "field", 42.2)
+
+redis.hincrbyfloat("hash_key", "field", 42.2)
+redis.hincrbyfloat("hash_key", "field", 42)
+
+redis.hkeys("hash_key")
+redis.hlen("hash_key")
+
+redis.hmget("hash_key", "key1")
+redis.hmget("hash_key", ["key1"])
+redis.hmget("hash_key", "key1", "key2")
+redis.hmget("hash_key", ["key1", "key2"])
+redis.hmget("hash_key", "key1", "key2", "key3")
+redis.hmget("hash_key", ["key1", "key2", "key3"])
+redis.hmget("hash_key", "key1", "key2", "key3", "key4")
+redis.hmget("hash_key", ["key1", "key2", "key3", "key4"])
+redis.hmget("hash_key", "key1", "key2", "key3", "key4", "key5")
+redis.hmget("hash_key", ["key1", "key2", "key3", "key4", "key5"])
+redis.hmget("hash_key", "key1", "key2", "key3", "key4", "key5", "key6")
+redis.hmget("hash_key", ["key1", "key2", "key3", "key4", "key5", "key6"])
+redis.hmget("hash_key", "key1", "key2", "key3", "key4", "key5", "key6", "key7")
+redis.hmget("hash_key", ["key1", "key2", "key3", "key4", "key5", "key6", "key7"])
+redis.hmget("hash_key", "key1", "key2", "key3", "key4", "key5", "key6", "key7", "key8")
+redis.hmget("hash_key", ["key1", "key2", "key3", "key4", "key5", "key6", "key7", "key8"])
+redis.hmget(:foo, "key1", 42, :bar, 42.2)
+redis.hmget(42, "key1", 42, :bar, 42.2)
+redis.hmget(42.2, "key1", 42, :bar, 42.2)
+
+redis.hmset("hash_key", "key1", "value1")
+redis.hmset("hash_key", ["key1", "value1"])
+redis.hmset("hash_key", "key1", "value1", "key2", "value2")
+redis.hmset("hash_key", ["key1", "value1", "key2", "value2"])
+redis.hmset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3")
+redis.hmset("hash_key", ["key1", "value1", "key2", "value2", "key3", "value3"])
+redis.hmset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4")
+redis.hmset("hash_key", ["key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4"])
+redis.hmset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5")
+redis.hmset("hash_key", ["key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5"])
+redis.hmset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5", "key6", "value6")
+redis.hmset("hash_key", ["key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5", "key6", "value6"])
+redis.hmset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5", "key6", "value6", "key7", "value7")
+redis.hmset("hash_key", ["key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5", "key6", "value6", "key7", "value7"])
+redis.hmset("hash_key", "key1", 42)
+redis.hmset(:hash_key, :key1, 42)
+redis.hmset(42, 42, 42)
+redis.hmset("hash_key", {key1: "value1", "key2" =>"value2"})
+
+redis.hrandfield("hash")
+redis.hrandfield("hash", 42)
+redis.hrandfield("hash", 42, with_values: true)
+redis.hrandfield("hash", 42, with_values: false)
+
+redis.hset("hash_key", "key1", "value1")
+redis.hset("hash_key", "key1", "value1", "key2", "value2")
+redis.hset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3")
+redis.hset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4")
+redis.hset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5")
+redis.hset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5", "key6", "value6")
+redis.hset("hash_key", "key1", "value1", "key2", "value2", "key3", "value3", "key4", "value4", "key5", "value5", "key6", "value6", "key7", "value7")
+redis.hset("hash_key", "key1", 42)
+redis.hset(:hash_key, :key1, 42)
+redis.hset(42, 42, 42)
+redis.hset("hash_key", {key1: "value1", "key2" =>"value2"})
+
+redis.hsetnx("hash_key", "field1", 42)
+
+redis.hvals("hash_key")
+
+redis.mapped_hmget("hash_key", "key1")
+redis.mapped_hmget("hash_key", ["key1"])
+redis.mapped_hmget("hash_key", "key1", "key2")
+redis.mapped_hmget("hash_key", ["key1", "key2"])
+
+redis.mapped_hmset("hash_key", {"foo" => "bar", bar: 42})

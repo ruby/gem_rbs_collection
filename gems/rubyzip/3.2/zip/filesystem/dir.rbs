@@ -1,0 +1,33 @@
+module Zip
+  module FileSystem
+    class Dir
+      attr_writer file: FileSystem::File
+
+      def initialize: (ZipFileNameMapper mapped_zip) -> void
+
+      def new: (String directory_name) -> DirectoryIterator
+
+      def open: (String directory_name) { (DirectoryIterator) -> void } -> nil
+              | (String directory_name) -> DirectoryIterator
+
+      def pwd: () -> String
+      alias getwd pwd
+
+      def chdir: (String directory_name) -> void
+
+      def entries: (String directory_name) -> Array[String]
+
+      def glob: (String pattern, *untyped flags) ?{ (String) -> void } -> Array[String]
+
+      def foreach: (String directory_name) { (String) -> void } -> void
+
+      def delete: (String entry_name) -> void
+      alias rmdir delete
+      alias unlink delete
+
+      def mkdir: (String entry_name, ?Integer permissions) -> void
+
+      def chroot: (*untyped args) -> void
+    end
+  end
+end

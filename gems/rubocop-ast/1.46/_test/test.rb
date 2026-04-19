@@ -34,35 +34,37 @@ class MyRule < Parser::AST::Processor
     node.else_branch
     node.node_parts
     node.branches
-    if node.location.is_a?(Parser::Source::Map::Condition)
-      node.location.keyword
-      node.location.begin
-      node.location.else
-      node.location.end
+    node_location = node.location
+    node_loc = node.loc
+    if node_location.is_a?(Parser::Source::Map::Condition)
+      node_location.keyword
+      node_location.begin
+      node_location.else
+      node_location.end
     end
-    if node.loc.is_a?(Parser::Source::Map::Condition)
-      node.loc.keyword
-      node.loc.begin
-      node.loc.else
-      node.loc.end
+    if node_loc.is_a?(Parser::Source::Map::Condition)
+      node_loc.keyword
+      node_loc.begin
+      node_loc.else
+      node_loc.end
     end
-    if node.location.is_a?(Parser::Source::Map::Keyword)
-      node.location.keyword
-      node.location.begin
-      node.location.end
+    if node_location.is_a?(Parser::Source::Map::Keyword)
+      node_location.keyword
+      node_location.begin
+      node_location.end
     end
-    if node.loc.is_a?(Parser::Source::Map::Keyword)
-      node.loc.keyword
-      node.loc.begin
-      node.loc.end
+    if node_loc.is_a?(Parser::Source::Map::Keyword)
+      node_loc.keyword
+      node_loc.begin
+      node_loc.end
     end
-    if node.location.is_a?(Parser::Source::Map::Ternary)
-      node.location.question
-      node.location.colon
+    if node_location.is_a?(Parser::Source::Map::Ternary)
+      node_location.question
+      node_location.colon
     end
-    if node.loc.is_a?(Parser::Source::Map::Ternary)
-      node.loc.question
-      node.loc.colon
+    if node_loc.is_a?(Parser::Source::Map::Ternary)
+      node_loc.question
+      node_loc.colon
     end
   end
 
@@ -590,13 +592,15 @@ end
 dstr_node = RuboCop::AST::ProcessedSource.new('"dstr#{123}dstr"', RUBY_VERSION.to_f).ast
 if dstr_node.is_a?(RuboCop::AST::DstrNode)
   dstr_node.value
-  if dstr_node.location.is_a?(Parser::Source::Map::Collection)
-    dstr_node.location.begin
-    dstr_node.location.end
+  dstr_node_location = dstr_node.location
+  if dstr_node_location.is_a?(Parser::Source::Map::Collection)
+    dstr_node_location.begin
+    dstr_node_location.end
   end
-  if dstr_node.loc.is_a?(Parser::Source::Map::Collection)
-    dstr_node.loc.begin
-    dstr_node.loc.end
+  dstr_node_loc = dstr_node.loc
+  if dstr_node_loc.is_a?(Parser::Source::Map::Collection)
+    dstr_node_loc.begin
+    dstr_node_loc.end
   end
 end
 dstr_node = RuboCop::AST::ProcessedSource.new('<<EOM
@@ -604,13 +608,15 @@ dstr#{123}dstr
 EOM', RUBY_VERSION.to_f).ast
 if dstr_node.is_a?(RuboCop::AST::DstrNode)
   dstr_node.value
-  if dstr_node.location.is_a?(Parser::Source::Map::Heredoc)
-    dstr_node.location.heredoc_body
-    dstr_node.location.heredoc_end
+  dstr_node_location = dstr_node.location
+  if dstr_node_location.is_a?(Parser::Source::Map::Heredoc)
+    dstr_node_location.heredoc_body
+    dstr_node_location.heredoc_end
   end
-  if dstr_node.loc.is_a?(Parser::Source::Map::Heredoc)
-    dstr_node.loc.heredoc_body
-    dstr_node.loc.heredoc_end
+  dstr_node_loc = dstr_node.loc
+  if dstr_node_loc.is_a?(Parser::Source::Map::Heredoc)
+    dstr_node_loc.heredoc_body
+    dstr_node_loc.heredoc_end
   end
 end
 
@@ -805,26 +811,30 @@ if str_node.is_a?(RuboCop::AST::StrNode)
   str_node.heredoc?
   str_node.percent_literal?
   str_node.percent_literal?(:Q)
-  if str_node.location.is_a?(Parser::Source::Map::Collection)
-    str_node.location.begin
-    str_node.location.end
+  str_node_location = str_node.location
+  if str_node_location.is_a?(Parser::Source::Map::Collection)
+    str_node_location.begin
+    str_node_location.end
   end
-  if str_node.loc.is_a?(Parser::Source::Map::Collection)
-    str_node.loc.begin
-    str_node.loc.end
+  str_node_loc = str_node.loc
+  if str_node_loc.is_a?(Parser::Source::Map::Collection)
+    str_node_loc.begin
+    str_node_loc.end
   end
 end
 str_node = RuboCop::AST::ProcessedSource.new('<<EOM
 heredoc
 EOM', RUBY_VERSION.to_f).ast
 if str_node.is_a?(RuboCop::AST::StrNode)
-  if str_node.location.is_a?(Parser::Source::Map::Heredoc)
-    str_node.location.heredoc_body
-    str_node.location.heredoc_end
+  str_node_location = str_node.location
+  if str_node_location.is_a?(Parser::Source::Map::Heredoc)
+    str_node_location.heredoc_body
+    str_node_location.heredoc_end
   end
-  if str_node.loc.is_a?(Parser::Source::Map::Heredoc)
-    str_node.loc.heredoc_body
-    str_node.loc.heredoc_end
+  str_node_loc = str_node.loc
+  if str_node_loc.is_a?(Parser::Source::Map::Heredoc)
+    str_node_loc.heredoc_body
+    str_node_loc.heredoc_end
   end
 end
 

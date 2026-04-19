@@ -1,0 +1,131 @@
+module Zip
+  class File
+    include Enumerable[Entry]
+    extend FileSplit
+
+    IO_METHODS: Array[Symbol]
+
+    attr_reader name: String
+    attr_accessor restore_ownership: bool
+    attr_accessor restore_permissions: bool
+    attr_accessor restore_times: bool
+
+    def comment: () -> String
+    def comment=: (String) -> String
+    def each: () { (Entry) -> void } -> void
+    def entries: () -> Array[Entry]
+    def glob: (String pattern, ?Integer flags) ?{ (Entry) -> void } -> Array[Entry]
+    def size: () -> Integer
+
+    def self.open: [TContent] (
+      String file_name,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) { (File) -> TContent } -> TContent
+                 | (
+      String file_name,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) -> File
+
+    def self.open_buffer: [TContent] (
+      ?IO | String io,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) { (File) -> TContent } -> TContent
+                        | (
+      ?IO | String io,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) -> File
+
+    def self.foreach: (String zip_file_name) { (Entry) -> void } -> void
+
+    def self.count_entries: (String | IO path_or_io) -> Integer
+
+    def initialize: (
+      String | IO path_or_io,
+      ?create: bool,
+      ?buffer: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool
+    ) -> void
+
+    def get_input_stream: [TContent] (String | Entry entry) { (IO) -> TContent } -> TContent
+                        | (String | Entry entry) -> IO
+
+    def get_output_stream: [TContent] (
+      String | Entry entry,
+      ?permissions: Integer?,
+      ?comment: String?,
+      ?extra: ExtraField?,
+      ?compressed_size: Integer?,
+      ?crc: Integer?,
+      ?compression_method: Integer?,
+      ?compression_level: Integer?,
+      ?size: Integer?,
+      ?time: Time?
+    ) { (IO) -> TContent } -> TContent
+                         | (
+      String | Entry entry,
+      ?permissions: Integer?,
+      ?comment: String?,
+      ?extra: ExtraField?,
+      ?compressed_size: Integer?,
+      ?crc: Integer?,
+      ?compression_method: Integer?,
+      ?compression_level: Integer?,
+      ?size: Integer?,
+      ?time: Time?
+    ) -> IO
+
+    def read: (String | Entry entry) -> String
+
+    def add: (String | Entry entry, String src_path) ?{ (String, Entry) -> boolish } -> Entry
+
+    def add_stored: (String | Entry entry, String src_path) ?{ (String, Entry) -> boolish } -> Entry
+
+    def remove: (String | Entry entry) -> Entry
+
+    def rename: (String | Entry entry, String new_name) ?{ (String, Entry) -> boolish } -> void
+
+    def replace: (String | Entry entry, String src_path) -> void
+
+    def extract: (String | Entry entry, ?String? entry_path, ?destination_directory: String) ?{ (Entry, String) -> boolish } -> void
+
+    def mkdir: (String entry_name, ?Integer permission) -> void
+
+    def find_entry: (String entry_name) -> Entry?
+
+    def get_entry: (String | Entry entry) -> Entry
+
+    def commit: () -> void
+
+    def close: () -> void
+
+    def write_buffer: (?IO io) -> IO
+
+    def commit_required?: () -> bool
+
+    def to_s: () -> String
+  end
+end

@@ -1,0 +1,19 @@
+module Zip
+  module NullEncryption
+    def header_bytesize: () -> Integer
+
+    def gp_flags: () -> Integer
+  end
+
+  class NullEncrypter < Encrypter
+    include NullEncryption
+
+    def header: (Time mtime) -> String
+
+    def encrypt: (String data) -> String
+
+    def data_descriptor: (Integer crc, Integer compressed_size, Integer size) -> String
+
+    def reset!: () -> void
+  end
+end

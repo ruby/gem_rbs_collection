@@ -85,6 +85,11 @@ response.headers
 response.body
 response.success?
 
+uri = conn.build_url('/path')
+uri = conn.build_url('/path', { key: 'value' })
+uri = conn.build_url
+uri.path
+
 Faraday::FlatParamsEncoder.sort_params = true
 Faraday::FlatParamsEncoder.sort_params
 Faraday::FlatParamsEncoder.encode(a: :x)

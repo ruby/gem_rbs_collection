@@ -23,3 +23,7 @@ error.detail
 error.full_message
 error.match?(:name)
 error.strict_match?(:name, :too_short, count: 5)
+
+Person.human_attribute_name("name")
+Person.human_attribute_name(:name)
+Person.human_attribute_name("name", default: "Name")

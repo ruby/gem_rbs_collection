@@ -1,12 +1,67 @@
 module Octokit
+  class Repository
+    attr_accessor owner: String
+    attr_accessor name: String
+    attr_accessor id: Integer
+
+    def initialize: (Integer | Regexp | Repository | Hash[untyped, untyped] repo) -> void
+  end
+
+  type repository = Integer | String | Hash[untyped, untyped] | Repository
+
   class Client
     module Apps
       def create_app_installation_access_token: (Integer installation, **untyped) -> untyped
       def find_organization_installation: (String organization, **untyped) -> untyped
     end
 
+    module Commits
+      def commit: (repository repo, String sha) -> untyped
+      def create_commit: (repository repo, String message, String tree_sha, ?String parent_sha, ?Hash[untyped, untyped] options) -> untyped
+    end
+
+    module Issues
+      def add_assignees: (repository repo, Integer pr_number, Array[String] assignees) -> untyped
+    end
+
+    module Labels
+      def add_labels_to_an_issue: (repository repo, Integer pr_number, Array[String] labels) -> untyped
+    end
+
+    module Objects
+      def create_blob: (repository repo, String file_body) -> String
+      def create_tree: (repository repo, Array[untyped] tree_metas, base_tree: String) -> untyped
+    end
+
     module Organizations
       def organization_member?: (String | Integer org, String user, **untyped options) -> bool
+    end
+
+    module PullRequests
+      def create_pull_request: (repository repo, String base, String head, String title, String body, ?Hash[untyped, untyped] options) -> untyped
+    end
+
+    module Refs
+      def create_ref: (repository repo, String ref, String sha) -> untyped
+      alias create_reference create_ref
+
+      def ref: (repository repo, String ref) -> untyped
+      alias reference ref
+
+      def update_ref: (repository repo, String ref, String sha) -> untyped
+      alias update_reference update_ref
+    end
+
+    module Repositories
+      def branch: (repository repo, String branch, ?Hash[untyped, untyped] options) -> untyped
+      alias get_branch branch
+
+      def repository: (repository repo, ?Hash[untyped, untyped] options) -> untyped
+      alias repo repository
+    end
+
+    module Reviews
+      def request_pull_request_review: (repository repo, Integer pr_number, ?Hash[untyped, untyped] reviewers, ?Hash[untyped, untyped] options) -> untyped
     end
 
     module Users
@@ -14,13 +69,27 @@ module Octokit
     end
 
     include Apps
+    include Commits
+    include Issues
+    include Labels
+    include Objects
     include Organizations
+    include PullRequests
+    include Refs
+    include Repositories
+    include Reviews
     include Users
 
     def initialize: (?access_token: untyped, ?api_endpoint: untyped, ?auto_paginate: untyped, ?bearer_token: untyped, ?client_id: untyped, ?client_secret: untyped, ?connection_options: untyped, ?default_media_type: untyped, ?login: untyped, ?management_console_endpoint: untyped, ?management_console_password: untyped, ?middleware: untyped, ?netrc: untyped, ?netrc_file: untyped, ?per_page: untyped, ?password: untyped, ?proxy: untyped, ?ssl_verify_mode: untyped, ?user_agent: untyped, ?web_endpoint: untyped) -> void
   end
 
   class Error < StandardError
+  end
+
+  class ClientError < Error
+  end
+
+  class NotFound < ClientError
   end
 
   def self.user: (Integer) -> untyped

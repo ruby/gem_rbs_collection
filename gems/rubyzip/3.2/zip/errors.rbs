@@ -1,0 +1,58 @@
+module Zip
+  class Error < StandardError
+  end
+
+  class CompressionMethodError < Error
+    attr_reader compression_method: Integer
+
+    def initialize: (Integer method) -> void
+
+    def message: () -> String
+  end
+
+  class DecompressionError < Error
+    attr_reader zlib_error: Zlib::Error
+
+    def initialize: (Zlib::Error zlib_error) -> void
+
+    def message: () -> String
+  end
+
+  class DestinationExistsError < Error
+    def initialize: (String destination) -> void
+
+    def message: () -> String
+  end
+
+  class EntryExistsError < Error
+    def initialize: (String source, String name) -> void
+
+    def message: () -> String
+  end
+
+  class EntryNameError < Error
+    def initialize: (?String? name) -> void
+
+    def message: () -> String
+  end
+
+  class EntrySizeError < Error
+    attr_reader entry: Entry
+
+    def initialize: (Entry entry) -> void
+
+    def message: () -> String
+  end
+
+  class SplitArchiveError < Error
+    def message: () -> String
+  end
+
+  class StreamingError < Error
+    attr_reader entry: Entry
+
+    def initialize: (Entry entry) -> void
+
+    def message: () -> String
+  end
+end

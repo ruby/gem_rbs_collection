@@ -1,0 +1,25 @@
+module Pundit
+  class NotAuthorizedError < StandardError
+  end
+
+  class NotDefinedError < StandardError
+  end
+
+  module Authorization
+    def authorize: [T] (T record, ?Symbol? query, ?policy_class: untyped?) -> T
+
+    def policy: (untyped record) -> untyped
+
+    def policy_scope: [T] (T scope, ?policy_scope_class: untyped?) -> T?
+
+    def policy_scope!: [T] (T scope, ?policy_scope_class: untyped?) -> T
+
+    def verify_authorized: () -> void
+
+    def verify_policy_scoped: () -> void
+
+    def skip_authorization: () -> void
+
+    def skip_policy_scope: () -> void
+  end
+end

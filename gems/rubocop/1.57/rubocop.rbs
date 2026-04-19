@@ -1,13 +1,23 @@
 module RuboCop
+  class CommentConfig
+    attr_reader processed_source: ProcessedSource
+
+    def initialize: (ProcessedSource processed_source) -> void
+  end
+
   class ConfigLoader
     def self.debug?: () -> boolish
     def self.merge_with_default: (Config, String) -> Config
   end
 
   class Config
-    def initialize: (Hash[untyped, untyped], String) -> void
+    def initialize: (?Hash[untyped, untyped] hash, ?String loaded_path) -> void
     def for_cop: (String cop) -> Hash[String, untyped]
     def for_enabled_cop: (String cop) -> Hash[String, untyped]
+  end
+
+  class ConfigStore
+    def options_config=: (String options_config) -> void
   end
 
   module Cop
@@ -25,6 +35,9 @@ module RuboCop
 
       attr_reader config: Config
 
+      def on_new_investigation: () -> void
+      def on_investigation_end: () -> void
+      def on_other_file: () -> void
       def add_offense: (untyped node, ?message: String, ?severity: Symbol) -> void
                      | (untyped node, ?message: String, ?severity: Symbol) { (Corrector) -> void } -> void
       def cop_config: () -> Hash[String, untyped]
@@ -62,6 +75,11 @@ module RuboCop
     end
 
     module ConfigurableEnforcedStyle
+      def opposite_style_detected: () -> void
+      def correct_style_detected: () -> void
+      def unexpected_style_detected: (Symbol unexpected) -> void
+      def ambiguous_style_detected: (*Symbol possibilities) -> void
+      def style_detected: (Symbol detected) -> void
       def style: () -> Symbol
     end
 
@@ -70,6 +88,16 @@ module RuboCop
       def contains_comments?: (RuboCop::AST::Node node) -> bool
       def comments_in_range: (RuboCop::AST::Node node) -> Array[Parser::Source::Comment]
       def comments_contain_disables?: (RuboCop::AST::Node node, String cop_name) -> bool
+    end
+
+    class Offense
+      attr_reader severity: Severity
+      attr_reader location: Parser::Source::Range
+      attr_reader message: String
+      attr_reader cop_name: String
+
+      def line: () -> Integer
+      def column: () -> Integer
     end
 
     module RangeHelp
@@ -84,10 +112,22 @@ module RuboCop
                                  ?buffer: Parser::Source::Buffer) -> Parser::Source::Range
     end
 
+    class Registry
+    end
+
     module IgnoredNode
       def ignore_node: (RuboCop::AST::Node node) -> void
       def part_of_ignored_node?: (RuboCop::AST::Node node) -> bool
       def ignored_node?: (RuboCop::AST::Node node) -> bool
+    end
+
+    class Severity
+      type t = :info | :refactor | :convention | :warning | :error | :fatal
+
+      attr_reader name: t
+
+      def code: () -> String
+      def level: () -> Integer
     end
 
     module TargetRubyVersion
@@ -117,7 +157,32 @@ module RuboCop
     end
   end
 
+  module Ext
+    module Comment
+      def source: () -> String
+      def source_range: () -> Parser::Source::Range
+    end
+
+    module ProcessedSource
+      attr_accessor registry: Cop::Registry
+      attr_accessor config: Config
+
+      def comment_config: () -> CommentConfig
+      def disabled_line_ranges: () -> Hash[untyped, untyped]
+    end
+  end
+
   class ProcessedSource = AST::ProcessedSource
+
+  class Runner
+    type extractorResult = Array[{ offset: Integer, processed_source: ProcessedSource}]?
+
+    interface _Extractor
+      def call: (ProcessedSource) -> extractorResult
+    end
+
+    def self.ruby_extractors: () -> Array[_Extractor]
+  end
 
   module AutoCorrector
     def support_autocorrect?: () -> true
@@ -125,5 +190,19 @@ module RuboCop
 
   module PathUtil
     def smart_path: (String path) -> String
+  end
+end
+
+# Patch to RuboCop::AST::*
+
+module RuboCop
+  module AST
+    class Comment
+      include Ext::Comment
+    end
+
+    class ProcessedSource
+      include Ext::ProcessedSource
+    end
   end
 end

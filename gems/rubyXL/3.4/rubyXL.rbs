@@ -1,0 +1,47 @@
+module RubyXL
+  class SheetData
+    def rows: () -> Array[Row?]
+    def []: (Integer ind) -> Row?
+    def size: () -> Integer
+  end
+
+  class Row
+    def cells: () -> Array[Cell?]
+    def []: (Integer ind) -> Cell?
+    def size: () -> Integer
+  end
+
+  class Cell
+    def value: () -> (::String | ::Integer | ::Float | ::DateTime | nil)
+    def change_fill: (::String rgb) -> void
+    def change_font_bold: (bool bold) -> void
+    def change_text_wrap: (bool wrap) -> void
+    def change_vertical_alignment: (::String alignment) -> void
+  end
+
+  class Worksheet
+    def sheet_name: () -> ::String
+    def sheet_name=: (::String name) -> ::String
+    def sheet_data: () -> SheetData
+    def []: (Integer row) -> Row?
+    def add_cell: (Integer row_index, Integer column_index, ?untyped data, ?::String? formula, ?bool overwrite) -> Cell
+    def change_row_height: (?Integer row, ?::Numeric height) -> void
+    def change_row_font_size: (?Integer row, ?::Numeric font_size) -> void
+    def change_column_width: (Integer column_index, ?::Numeric width_in_chars) -> void
+  end
+
+  class Workbook
+    def initialize: () -> void
+    def worksheets: () -> Array[Worksheet]
+    def []: (Integer index) -> Worksheet?
+          | (::String name) -> Worksheet?
+    def add_worksheet: (?::String? name) -> Worksheet
+    def stream: () -> ::StringIO
+    def write: (::String dst_file_path) -> ::String
+  end
+
+  class Parser
+    def self.parse: (::String src_file_path) -> Workbook
+    def self.parse_buffer: (::IO | ::String buffer) -> Workbook
+  end
+end

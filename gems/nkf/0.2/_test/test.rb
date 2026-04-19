@@ -5,3 +5,7 @@ require "nkf"
 
 NKF.guess("str")
 NKF.nkf("-w", "str")
+
+require "kconv"
+
+Kconv.guess("str")
