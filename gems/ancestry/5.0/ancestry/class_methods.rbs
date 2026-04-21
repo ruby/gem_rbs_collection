@@ -1,0 +1,37 @@
+module Ancestry
+  module ClassMethods[AncestryBaseClass, Relation, PrimaryKey]
+    def to_node: (AncestryBaseClass | PrimaryKey object) -> AncestryBaseClass
+               | (untyped object) -> AncestryBaseClass
+
+    def scope_depth: (depth_options depth_options, Integer depth) -> Relation
+
+    def orphan_strategy=: (:destroy | :rootify | :restrict | :adopt orphan_strategy) -> void
+
+    def arrange: (?Hash[untyped, untyped] options) -> Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]
+
+    def arrange_nodes: (Relation | Array[AncestryBaseClass] nodes) -> Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]
+
+    def flatten_arranged_nodes: (Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]] arranged, ?Array[AncestryBaseClass] nodes) -> Array[AncestryBaseClass]
+
+    def arrange_serializable: [R] (?Hash[untyped, untyped] options, ?Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]? nodes) ?{ (AncestryBaseClass parent, Array[R]) -> R } -> Array[R]
+                            | (?Hash[untyped, untyped] options, ?Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]? nodes) -> Array[Hash[String, untyped]]
+
+    def tree_view: (String | Symbol column, ?Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]? data) -> void
+
+    def sort_by_ancestry: (Relation | Array[AncestryBaseClass] | Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]) ?{ (AncestryBaseClass a, AncestryBaseClass b) -> Integer? } -> Array[AncestryBaseClass]
+
+    def check_ancestry_integrity!: (?{ ?report: :list | :echo } options) -> void
+
+    def restore_ancestry_integrity!: () -> void
+
+    def build_ancestry_from_parent_ids!: (?String | Symbol column, ?PrimaryKey? parent_id, ?Array[PrimaryKey] ancestor_ids) -> void
+
+    def rebuild_depth_cache!: () -> void
+
+    def unscoped_where: [R] () { (Relation scope) -> R } -> R
+
+    ANCESTRY_UNCAST_TYPES: [:string, :uuid, :text]
+
+    def primary_key_is_an_integer?: () -> bool
+  end
+end
