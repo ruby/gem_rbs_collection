@@ -44,6 +44,42 @@ class Category < ActiveRecord::Base
   end
 end
 
+class Tag < ActiveRecord::Base
+  include Ancestry::InstanceMethods[Tag, ActiveRecord_Relation, Integer]
+  extend Ancestry::ClassMethods[Tag, ActiveRecord_Relation, Integer]
+  extend Ancestry::MaterializedPath[Tag, ActiveRecord_Relation, Integer]
+  include Ancestry::MaterializedPath::InstanceMethods[Tag, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include Ancestry::ClassMethods[Tag, ActiveRecord_Relation, Integer]
+    include Ancestry::MaterializedPath[Tag, ActiveRecord_Relation, Integer]
+  end
+end
+
+class Item < ActiveRecord::Base
+  include Ancestry::InstanceMethods[Item, ActiveRecord_Relation, Integer]
+  extend Ancestry::ClassMethods[Item, ActiveRecord_Relation, Integer]
+  extend Ancestry::MaterializedPath[Item, ActiveRecord_Relation, Integer]
+  include Ancestry::MaterializedPath::InstanceMethods[Item, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include Ancestry::ClassMethods[Item, ActiveRecord_Relation, Integer]
+    include Ancestry::MaterializedPath[Item, ActiveRecord_Relation, Integer]
+  end
+end
+
+class Node < ActiveRecord::Base
+  include Ancestry::InstanceMethods[Node, ActiveRecord_Relation, Integer]
+  extend Ancestry::ClassMethods[Node, ActiveRecord_Relation, Integer]
+  extend Ancestry::MaterializedPath[Node, ActiveRecord_Relation, Integer]
+  include Ancestry::MaterializedPath::InstanceMethods[Node, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include Ancestry::ClassMethods[Node, ActiveRecord_Relation, Integer]
+    include Ancestry::MaterializedPath[Node, ActiveRecord_Relation, Integer]
+  end
+end
+
 class MySerializer
   @parent: untyped
   @children: Array[untyped]

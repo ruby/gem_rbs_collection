@@ -23,6 +23,18 @@ class Category < ActiveRecord::Base
   has_ancestry orphan_strategy: :adopt, cache_depth: true, depth_cache_column: :ancestry_depth_cache, update_strategy: :ruby, ancestry_format: :materialized_path
 end
 
+class Tag < ActiveRecord::Base
+  has_ancestry orphan_strategy: :none
+end
+
+class Item < ActiveRecord::Base
+  has_ancestry cache_depth: 'item_depth'
+end
+
+class Node < ActiveRecord::Base
+  has_ancestry cache_depth: :virtual
+end
+
 class MySerializer
   def initialize(parent, children:)
     @parent = parent
