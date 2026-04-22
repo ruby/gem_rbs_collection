@@ -54,6 +54,9 @@ Directory.arrange_nodes(Directory.all, orphan_strategy: :rootify)
 Directory.arrange_nodes(Directory.all, orphan_strategy: :destroy)
 Directory.arrange_nodes(Directory.roots.to_a, orphan_strategy: :rootify)
 
+node = Directory.find(1)
+Directory.find(2).in_subtree_of?(node)
+
 Directory.find(1).ancestors(from_depth: -6, to_depth: -4)
 Directory.find(1).descendants(from_depth: 2, to_depth: 4)
 Directory.find(1).path(from_depth: 3, to_depth: 4)

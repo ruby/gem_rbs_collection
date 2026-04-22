@@ -6,6 +6,14 @@ module Ancestry
 
     def apply_orphan_strategy: () -> void
 
+    def apply_orphan_strategy_rootify: () -> void
+
+    def apply_orphan_strategy_destroy: () -> void
+
+    def apply_orphan_strategy_adopt: () -> void
+
+    def apply_orphan_strategy_restrict: () -> void
+
     def touch_ancestors_callback: () -> void
 
     def increase_parent_counter_cache: () -> boolish
@@ -119,6 +127,8 @@ module Ancestry
     def subtree: (?depth_options depth_options) -> Relation
 
     def subtree_ids: (?depth_options depth_options) -> Array[PrimaryKey]
+
+    def in_subtree_of?: (AncestryBaseClass node) -> bool
 
     def without_ancestry_callbacks: [R] () { () -> R } -> R
 
