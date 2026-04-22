@@ -18,7 +18,7 @@ module Ancestry
 
     def descendant_conditions: (AncestryBaseClass | PrimaryKey object) -> Arel::Nodes::Matches
 
-    def descendant_before_save_conditions: (AncestryBaseClass | PrimaryKey object) -> Arel::Nodes::Matches
+    def descendant_before_last_save_conditions: (AncestryBaseClass | PrimaryKey object) -> Arel::Nodes::Matches
 
     def subtree_of: (AncestryBaseClass | PrimaryKey object) -> Relation
 
@@ -30,13 +30,27 @@ module Ancestry
 
     def ancestry_root: () -> nil
 
+    def child_ancestry_sql: () -> String
+
+    def ancestry_depth_sql: () -> String
+
+    def generate_ancestry: (Array[PrimaryKey]? ancestor_ids) -> String?
+
+    def parse_ancestry_column: (String? obj) -> Array[PrimaryKey]
+
+    def ancestry_depth_change: (String? old_value, String? new_value) -> Integer
+
+    def concat: (*String args) -> String
+
+    def self.construct_depth_sql: (String table_name, String ancestry_column, String ancestry_delimiter) -> String
+
     private
 
-    def ancestry_validation_options: () -> { format: { with: Regexp }, allow_nil: bool }
+    def ancestry_validation_options: ('[0-9]+' | '[-A-Fa-f0-9]{36}' ancestry_primary_key_format) -> { format: { with: Regexp }, allow_nil: bool }
 
     def ancestry_nil_allowed?: () -> true
 
-    def ancestry_format_regexp: () -> Regexp
+    def ancestry_format_regexp: ('[0-9]+' | '[-A-Fa-f0-9]{36}' primary_key_format) -> Regexp
 
     module InstanceMethods[AncestryBaseClass, PrimaryKey]
       def ancestors?: () -> bool
@@ -59,11 +73,7 @@ module Ancestry
 
       def child_ancestry: () -> String
 
-      def child_ancestry_before_save: () -> String
-
-      def parse_ancestry_column: (String? obj) -> Array[PrimaryKey]
-
-      def generate_ancestry: (Array[PrimaryKey]? ancestor_ids) -> String?
+      def child_ancestry_before_last_save: () -> String
     end
   end
 end
