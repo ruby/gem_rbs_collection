@@ -33,6 +33,14 @@ end
 Category.build_ancestry_from_parent_ids!
 Category.check_ancestry_integrity!
 Category.rebuild_depth_cache!
+Category.rebuild_depth_cache_sql!
+
+Group.rebuild_counter_cache!
+
+Directory.arrange_nodes(Directory.all)
+Directory.arrange_nodes(Directory.all, orphan_strategy: :rootify)
+Directory.arrange_nodes(Directory.all, orphan_strategy: :destroy)
+Directory.arrange_nodes(Directory.roots.to_a, orphan_strategy: :rootify)
 
 Directory.find(1).ancestors(from_depth: -6, to_depth: -4)
 Directory.find(1).descendants(from_depth: 2, to_depth: 4)

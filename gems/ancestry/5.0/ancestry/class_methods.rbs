@@ -5,11 +5,9 @@ module Ancestry
 
     def scope_depth: (depth_options depth_options, Integer depth) -> Relation
 
-    def orphan_strategy=: (:destroy | :rootify | :restrict | :adopt orphan_strategy) -> void
-
     def arrange: (?Hash[untyped, untyped] options) -> Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]
 
-    def arrange_nodes: (Relation | Array[AncestryBaseClass] nodes) -> Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]
+    def arrange_nodes: (Relation | Array[AncestryBaseClass] nodes, ?orphan_strategy: :rootify | :destroy) -> Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]]
 
     def flatten_arranged_nodes: (Hash[AncestryBaseClass, Hash[AncestryBaseClass, untyped]] arranged, ?Array[AncestryBaseClass] nodes) -> Array[AncestryBaseClass]
 
@@ -27,6 +25,10 @@ module Ancestry
     def build_ancestry_from_parent_ids!: (?String | Symbol column, ?PrimaryKey? parent_id, ?Array[PrimaryKey] ancestor_ids) -> void
 
     def rebuild_depth_cache!: () -> void
+
+    def rebuild_depth_cache_sql!: () -> void
+
+    def rebuild_counter_cache!: () -> void
 
     def unscoped_where: [R] () { (Relation scope) -> R } -> R
 
