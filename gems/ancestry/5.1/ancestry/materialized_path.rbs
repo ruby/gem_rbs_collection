@@ -42,15 +42,29 @@ module Ancestry
 
     def concat: (*String args) -> String
 
+    def self.generate: [T] (Array[T]? ancestor_ids, String delimiter, nil root) -> String?
+
+    def self.parse: (String? obj, nil root, String delimiter, true integer_pk) -> Array[Integer]
+                  | (String? obj, nil root, String delimiter, false integer_pk) -> Array[String]
+                  | (String? obj, nil root, String delimiter, bool integer_pk) -> Array[Integer | String]
+
+    def self.child_ancestry_value: [T] (String? ancestry_value, T id, String delimiter) -> String
+
+    def self.descendants_condition: (Arel::Attributes::Attribute attr, String child_ancestry, String delimiter) -> Arel::Nodes::Matches
+
+    def self.indirects_condition: (Arel::Attributes::Attribute attr, String child_ancestry, String delimiter) -> Arel::Nodes::Matches
+
+    def self.concat: (String adapter, *String args) -> String
+
+    def self.child_ancestry_sql: (String table_name, String | Symbol ancestry_column, String | Symbol primary_key, String delimiter, String adapter) -> String
+
     def self.construct_depth_sql: (String table_name, String | Symbol ancestry_column, String ancestry_delimiter) -> String
+
+    def self.validation_options: ('[0-9]+' | '[-A-Fa-f0-9]{36}' primary_key_format, String delimiter) -> { format: { with: Regexp }, allow_nil: true }
 
     private
 
     def ancestry_validation_options: ('[0-9]+' | '[-A-Fa-f0-9]{36}' ancestry_primary_key_format) -> { format: { with: Regexp }, allow_nil: bool }
-
-    def ancestry_nil_allowed?: () -> true
-
-    def ancestry_format_regexp: ('[0-9]+' | '[-A-Fa-f0-9]{36}' primary_key_format) -> Regexp
 
     module InstanceMethods[AncestryBaseClass, PrimaryKey]
       def ancestors?: () -> bool
