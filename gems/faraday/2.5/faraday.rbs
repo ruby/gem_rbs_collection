@@ -225,6 +225,12 @@ module Faraday
   end
 
   class Response
+    class Logger < Middleware
+      def initialize: (untyped app, ?untyped logger, ?::Hash[Symbol, untyped] options) ?{ (Logging::Formatter formatter) -> void } -> void
+      def call: (Env env) -> untyped
+      def on_complete: (Env env) -> void
+    end
+
     def status: () -> Integer
     def headers: () -> untyped
     def body: () -> String
@@ -262,6 +268,42 @@ module Faraday
     def initialize: (?untyped? app, ?::Hash[untyped, untyped] options) -> void
     def call: (Env env) -> untyped
     def close: () -> void
+  end
+
+  module Logging
+    class Formatter
+      extend Forwardable
+
+      DEFAULT_OPTIONS: ::Hash[Symbol, untyped]
+
+      @logger: untyped
+      @options: ::Hash[Symbol, untyped]
+      @filter: ::Array[[untyped, untyped]]
+
+      def initialize: (logger: untyped, options: ::Hash[Symbol, untyped]) -> void
+
+      def debug: (?untyped progname) ?{ () -> untyped } -> untyped
+      def info: (?untyped progname) ?{ () -> untyped } -> untyped
+      def warn: (?untyped progname) ?{ () -> untyped } -> untyped
+      def error: (?untyped progname) ?{ () -> untyped } -> untyped
+      def fatal: (?untyped progname) ?{ () -> untyped } -> untyped
+
+      def request: (Env env) -> void
+      def response: (Env env) -> void
+      def filter: (untyped filter_word, untyped filter_replacement) -> void
+
+      private
+
+      def dump_headers: (untyped headers) -> String
+      def dump_body: (untyped body) -> String
+      def pretty_inspect: (untyped body) -> String
+      def log_headers?: (String | Symbol type) -> boolish
+      def log_body?: (String | Symbol type) -> boolish
+      def apply_filters: (untyped output) -> String
+      def log_level: () -> Symbol
+      def log_headers: (String type, untyped headers) -> untyped
+      def log_body: (String type, untyped body) -> untyped
+    end
   end
 
   module MiddlewareRegistry
@@ -329,5 +371,8 @@ module Faraday
     attr_accessor response_body: untyped
 
     alias body request_body
+
+    def []: (untyped key) -> untyped
+    def []=: (untyped key, untyped value) -> untyped
   end
 end
