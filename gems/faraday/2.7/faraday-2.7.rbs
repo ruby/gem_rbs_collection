@@ -1,4 +1,22 @@
 module Faraday
   class TooManyRequestsError < ClientError
   end
+
+  class Response
+    class Logger
+      def on_error: (untyped exc) -> void
+    end
+  end
+
+  module Logging
+    class Formatter
+      def exception: (untyped exc) -> void
+
+      private
+
+      def dump_headers: (nil headers) -> nil
+                      | ...
+      def log_errors?: () -> boolish
+    end
+  end
 end
