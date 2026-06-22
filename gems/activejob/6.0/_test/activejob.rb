@@ -22,4 +22,12 @@ class SendMessageJob < ActiveJob::Base
 end
 
 SendMessageJob.perform_now
+SendMessageJob.logger
+SendMessageJob.logger = ActiveSupport::Logger.new(STDOUT)
+SendMessageJob.log_arguments = false
+SendMessageJob.log_arguments
+SendMessageJob.log_arguments?
 SendMessageJob.set(queue: :another_queue).perform_later(flag: false)
+job = SendMessageJob.new(flag: false)
+job.logger
+job.logger = ActiveSupport::Logger.new(STDOUT)
