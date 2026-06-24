@@ -42,9 +42,11 @@ module ActiveRecord
     extend ::ActiveRecord::Validations::ClassMethods
     extend ::ActiveSupport::Callbacks::ClassMethods
 
+    type belongs_to_default[T] = ^(T) [self: T] -> ::ActiveRecord::Base?
+
     def self.abstract_class=: (bool) -> void
     def self.scope: (Symbol, Proc) ?{ () -> untyped } -> void
-    def self.belongs_to: (Symbol, ?untyped, **untyped) -> void
+    def self.belongs_to: (Symbol, ?untyped, **untyped, ?default: belongs_to_default[instance]) -> void
     def self.has_many: (Symbol, ?untyped, **untyped) -> void
     def self.has_one: (Symbol, ?untyped, **untyped) -> void
     def self.has_and_belongs_to_many: (untyped name, ?untyped? scope, **untyped options) ?{ () -> untyped } -> untyped
