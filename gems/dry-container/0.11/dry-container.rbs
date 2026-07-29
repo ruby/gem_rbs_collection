@@ -1,0 +1,51 @@
+module Dry
+  class Container
+    class Namespace
+      attr_reader name: Symbol | String
+
+      attr_reader block: Proc
+
+      def initialize: (Symbol | String name) { () [self: Mixin] -> void } -> void
+    end
+
+    # Mixin to expose Inversion of Control (IoC) container behaviour
+    module Mixin
+      def register: (Symbol | String key, ?untyped contents, ?Hash[Symbol, bool] options) -> self
+                  | (Symbol | String key, ?Hash[Symbol, bool] options) { () -> untyped } -> self
+
+      def resolve: (Symbol | String key) -> untyped
+                 | (Symbol | String key) { (Symbol | String) -> untyped } -> untyped
+
+      def []: (Symbol | String key) -> untyped
+
+      def merge: (Mixin other, ?namespace: Symbol | String | nil) -> self
+
+      def key?: (Symbol | String key) -> bool
+
+      def keys: () -> Array[String]
+
+      def each_key: () { (String) -> void } -> self
+                  | () -> Enumerator[String, self]
+
+      def each: () { ([String, untyped]) -> void } -> void
+              | () -> Enumerator[[String, untyped], void]
+
+      def decorate: (Symbol | String key, ?with: untyped) -> self
+                  | (Symbol | String key, ?with: untyped) { (untyped) -> untyped } -> self
+
+      def namespace: (Symbol | String namespace) { () [self: Mixin] -> void } -> self
+
+      def import: (Namespace namespace) -> self
+
+      def freeze: () -> self
+
+      def dup: () -> self
+
+      def clone: () -> self
+    end
+
+    include Mixin
+
+    def initialize: (*untyped) -> void
+  end
+end
