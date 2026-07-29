@@ -74,4 +74,23 @@ module Concurrent
 
     def to_s: () -> String
   end
+
+  # An executor service which runs all operations on the current thread, blocking as necessary.
+  class ImmediateExecutor
+    include ExecutorService
+
+    def initialize: () -> void
+
+    def running?: () -> bool
+
+    def shuttingdown?: () -> bool
+
+    def shutdown?: () -> bool
+
+    def shutdown: () -> bool
+
+    def kill: () -> bool
+
+    def wait_for_termination: (?Numeric? timeout) -> bool
+  end
 end

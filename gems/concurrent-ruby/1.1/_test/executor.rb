@@ -34,3 +34,14 @@ pool.prune_pool
 pool.shutdown #=> true
 pool.wait_for_termination(1) #=> true
 pool.kill #=> true
+
+immediate = Concurrent::ImmediateExecutor.new
+immediate.post { p :immediate_executor }
+immediate.can_overflow? #=> false
+immediate.serialized? #=> true
+immediate.running? #=> true
+immediate.shuttingdown? #=> false
+immediate.shutdown? #=> false
+immediate.shutdown #=> true
+immediate.wait_for_termination(1) #=> true
+immediate.kill #=> true
