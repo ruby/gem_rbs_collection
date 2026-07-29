@@ -21,6 +21,57 @@ module Concurrent
   def self.global_fast_executor: () -> ExecutorService
   def self.global_immediate_executor: () -> ExecutorService
 
-  def self.new_io_executor: (?Hash[Symbol, untyped] opts) -> ExecutorService
-  def self.new_fast_executor: (?Hash[Symbol, untyped] opts) -> ExecutorService
+  def self.new_io_executor: (?::Hash[Symbol, untyped] opts) -> ExecutorService
+  def self.new_fast_executor: (?::Hash[Symbol, untyped] opts) -> ExecutorService
+
+  # A thread pool that reuses a fixed number of threads operating off an unbounded queue.
+  class FixedThreadPool
+    include ExecutorService
+
+    attr_reader fallback_policy: Symbol
+
+    attr_reader name: String?
+
+    attr_reader max_length: Integer
+
+    attr_reader min_length: Integer
+
+    attr_reader idletime: Integer
+
+    attr_reader max_queue: Integer
+
+    attr_reader synchronous: bool
+
+    def initialize: (Integer num_threads, ?::Hash[Symbol, untyped] opts) -> void
+
+    def largest_length: () -> Integer
+
+    def scheduled_task_count: () -> Integer
+
+    def completed_task_count: () -> Integer
+
+    def length: () -> Integer
+
+    def queue_length: () -> Integer
+
+    def remaining_capacity: () -> Integer
+
+    def prune_pool: () -> void
+
+    def running?: () -> bool
+
+    def shuttingdown?: () -> bool
+
+    def shutdown?: () -> bool
+
+    def shutdown: () -> bool
+
+    def kill: () -> bool
+
+    def wait_for_termination: (?Numeric? timeout) -> bool
+
+    def auto_terminate?: () -> bool
+
+    def to_s: () -> String
+  end
 end
