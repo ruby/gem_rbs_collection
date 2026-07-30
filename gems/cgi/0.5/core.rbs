@@ -887,6 +887,26 @@ class CGI
     #
     def rfc1123_date: (Time time) -> String
 
+    def escape: (String) -> String
+    def unescape: (String, ?encoding: Encoding) -> String
+
+    def escapeURIComponent: (String) -> String
+    def unescapeURIComponent: (String, ?encoding: Encoding) -> String
+    alias escape_uri_component escapeURIComponent
+    alias unescape_uri_component unescapeURIComponent
+
+    def escapeHTML: (String) -> String
+    def unescapeHTML: (String) -> String
+    alias escape_html escapeHTML
+    alias unescape_html unescapeHTML
+
+    def escapeElement: (String, *String) -> String
+                     | (String, Array[String]) -> String
+    def unescapeElement: (String, *String) -> String
+                       | (String, Array[String]) -> String
+    alias escape_element escapeElement
+    alias unescape_element unescapeElement
+
     # Abbreviated day-of-week names specified by RFC 822
     RFC822_DAYS: Array[String]
 
