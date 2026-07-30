@@ -46,6 +46,10 @@ class MyApp < Sinatra::Base
     json(status: 'ok')
   end
 
+  get '/test_erb' do
+    erb :index, locals: {foo: 42, bar: "baz"}
+  end
+
   get '/fail' do
     halt 500
   end
