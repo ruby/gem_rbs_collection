@@ -6,6 +6,10 @@ class CGI
 
   extend CGI::Util
 
+  include CGI::Escape
+
+  extend CGI::Escape
+
   # <!--
   #   rdoc-file=lib/cgi/core.rb
   #   - CGI.new(tag_maker) { block }
@@ -886,7 +890,12 @@ class CGI
     #       # Sat, 01 Jan 2000 00:00:00 GMT
     #
     def rfc1123_date: (Time time) -> String
+  end
 
+  # <!-- rdoc-file=lib/cgi/escape.rb -->
+  # Escape/unescape for CGI, HTML, URI.
+  #
+  module Escape
     def escape: (String) -> String
     def unescape: (String, ?encoding: Encoding) -> String
 
@@ -907,9 +916,17 @@ class CGI
     alias escape_element escapeElement
     alias unescape_element unescapeElement
 
-    # <!-- rdoc-file=lib/cgi/util.rb -->
+    # <!-- rdoc-file=lib/cgi/escape.rb -->
     # The set of special characters and their escaped values
     #
     TABLE_FOR_ESCAPE_HTML__: Hash[String, String]
+  end
+
+  # <!-- rdoc-file=lib/cgi/escape.rb -->
+  # Internal module that provides a C-accelerated implementation of some
+  # CGI::Escape methods. Left empty here since it is an implementation
+  # detail and its public interface is already covered by CGI::Escape.
+  #
+  module EscapeExt
   end
 end
