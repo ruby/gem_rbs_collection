@@ -193,16 +193,20 @@ module RuboCop
   end
 end
 
-# Patch to RuboCop::AST::*
+# Patch to RuboCop::AST::* and Parser::Source::Comment
 
 module RuboCop
   module AST
-    class Comment
-      include Ext::Comment
-    end
-
     class ProcessedSource
       include Ext::ProcessedSource
+    end
+  end
+end
+
+module Parser
+  class Source
+    class Comment
+      include RuboCop::Ext::Comment
     end
   end
 end
