@@ -255,7 +255,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
   def exists?: (*untyped) -> bool
   def order: (*untyped) -> self
   def group: (*Symbol | String) -> untyped
-  def in_order_of: (Symbol, Array[untyped]) -> self
+  def in_order_of: (Symbol, Array[untyped], ?filter: bool) -> self
   def reorder: (*untyped args) -> self
   def unscope: (*untyped args) -> self
   def distinct: () -> self
@@ -355,7 +355,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
           | () { (Model) -> boolish } -> bool
   def order: (*untyped) -> Relation
   def group: (*Symbol | String) -> untyped
-  def in_order_of: (Symbol, Array[untyped]) -> Relation
+  def in_order_of: (Symbol, Array[untyped], ?filter: bool) -> Relation
   def reorder: (*untyped args) -> Relation
   def unscope: (*untyped args) -> Relation
   def distinct: () -> Relation
