@@ -34,6 +34,11 @@ module Test
   end
 
   class Article < ApplicationRecord
+    belongs_to :user, default: -> { default_user }
+
+    def default_user
+      User.first
+    end
   end
 
   User.where.missing.to_sql
