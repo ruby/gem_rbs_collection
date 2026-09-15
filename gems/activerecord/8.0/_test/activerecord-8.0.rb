@@ -91,4 +91,18 @@ module Test
   User.order(id: :asc).reorder(id: :desc)
 
   User.all.table_name
+
+  user = User.create(name: 'James')
+  user.articles
+  User.create(name: 'James') { |user| user.articles }
+  users = User.create([{name: 'James'}, {name: 'John'}])
+  users.first.articles
+  User.create([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
+
+  user = User.create!(name: 'James')
+  user.articles
+  User.create!(name: 'James') { |user| user.articles }
+  users = User.create!([{name: 'James'}, {name: 'John'}])
+  users.first.articles
+  User.create!([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
 end
