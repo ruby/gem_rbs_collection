@@ -36,7 +36,16 @@ module Rails
 end
 
 module Rails
+  class Application
+    def config: () -> ::Rails::Application::Configuration
+  end
+
   def self.application: () -> Rails::Application
+
+  class Railtie
+    def configure: () { (Rails::Application) [self: Rails::Application] -> void } -> void
+    def self.config: () -> ::Rails::Application::Configuration
+  end
 
   class Railties
     extend Initializable::ClassMethods
