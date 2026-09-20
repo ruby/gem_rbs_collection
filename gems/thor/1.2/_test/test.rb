@@ -9,6 +9,7 @@ class CLI < Thor
   desc "usage", "description"
   option :message, type: :string, desc: "description", required: false, aliases: "-m", default: "Hello"
   def example(*args)
+    say "example"
     message = options[:message]
   end
 
