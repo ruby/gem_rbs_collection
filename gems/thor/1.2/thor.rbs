@@ -34,8 +34,27 @@ class Thor
     end
   end
 
+  module Invocation
+    module ClassMethods
+    end
+  end
+
+  module Shell
+    def ask: (String, *untyped) -> void
+    def say: (?String message, ?untyped color, ?boolish force_new_line) -> void
+    def say_error: (?String message, ?untyped color, ?boolish force_new_line) -> void
+
+    def yes?: (String, ?untyped color) -> bool
+    def no?: (String, ?untyped color) -> bool
+
+    def error: (String) -> void
+  end
+
   include Base
   extend Base::ClassMethods
+  include Invocation
+  extend Invocation::ClassMethods
+  include Shell
 
   def self.desc: (
       String usage,
