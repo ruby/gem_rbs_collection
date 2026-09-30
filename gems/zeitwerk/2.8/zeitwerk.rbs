@@ -1,0 +1,114 @@
+module Zeitwerk
+  VERSION: String
+
+  class Loader
+    # An object that maps a file or directory basename to a constant name.
+    interface _Inflector
+      def camelize: (String basename, String abspath) -> String
+    end
+
+    interface _CallableLogger
+      def call: (String message) -> void
+    end
+
+    interface _DebugLogger
+      def debug: (String message) -> void
+    end
+
+    type logger = ^(String message) -> void | _CallableLogger | _DebugLogger
+
+    type path = String | Pathname
+
+    def self.default_logger: () -> logger?
+    def self.default_logger=: (logger? logger) -> logger?
+
+    def self.for_gem: (?warn_on_extra_files: boolish) -> GemLoader
+    def self.for_gem_extension: (Module namespace) -> GemLoader
+    def self.eager_load_all: () -> void
+    def self.eager_load_namespace: (Module mod) -> void
+    def self.all_dirs: () -> Array[String]
+
+    def initialize: () -> void
+
+    # Returns `Zeitwerk::Inflector` so that the documented
+    # `loader.inflector.inflect(...)` idiom type checks. If a custom inflector
+    # has been assigned, the actual object may only implement `_Inflector`.
+    def inflector: () -> Inflector
+    def inflector=: (_Inflector inflector) -> void
+
+    attr_accessor logger: logger?
+
+    def tag: () -> String
+    def tag=: (_ToS tag) -> void
+
+    def nsfile: () -> String?
+    def nsfile=: (String? nsfile) -> void
+
+    def push_dir: (path path, ?namespace: Module) -> void
+
+    def dirs: (?namespaces: false, ?ignored: boolish) -> Array[String]
+            | (namespaces: true, ?ignored: boolish) -> Hash[String, Module]
+            | (?namespaces: boolish, ?ignored: boolish) -> (Array[String] | Hash[String, Module])
+
+    def enable_reloading: () -> void
+    def reloading_enabled?: () -> bool
+
+    def do_not_eager_load: (*(path | Array[path]) paths) -> void
+    def ignore: (*(path | Array[path]) glob_patterns) -> void
+    def collapse: (*(path | Array[path]) glob_patterns) -> void
+
+    def on_setup: () { () -> void } -> void
+    def on_load: (String cpath) { (untyped value, String abspath) -> void } -> void
+               | () { (String cpath, untyped value, String abspath) -> void } -> void
+    def on_unload: (String cpath) { (untyped value, String abspath) -> void } -> void
+                 | () { (String cpath, untyped value, String abspath) -> void } -> void
+
+    def log!: () -> void
+
+    def setup: () -> void
+    def reload: () -> void
+
+    def eager_load: (?force: boolish) -> void
+    def eager_load_dir: (path path) -> void
+    def eager_load_namespace: (Module mod) -> void
+    def load_file: (path path) -> void
+
+    def all_expected_cpaths: () -> Hash[String, String]
+    def cpath_expected_at: (path path) -> String?
+  end
+
+  # Returned by `Zeitwerk::Loader.for_gem`. Not meant to be instantiated directly.
+  class GemLoader < Loader
+  end
+
+  class Inflector
+    def camelize: (String basename, String abspath) -> String
+    def inflect: (Hash[String, String] inflections) -> void
+  end
+
+  class GemInflector < Inflector
+    def initialize: (String root_file) -> void
+  end
+
+  class NullInflector
+    def camelize: (String basename, String abspath) -> String
+  end
+
+  class Error < StandardError
+  end
+
+  class ReloadingDisabledError < Error
+    def initialize: () -> void
+  end
+
+  class NameError[T] < ::NameError[T]
+  end
+
+  class SetupRequired < Error
+    def initialize: () -> void
+  end
+
+  class ConflictingNamespaceDefinitionError < Error
+    def initialize: (String cpath, location: String?, conflicting_file: String) -> void
+  end
+end
