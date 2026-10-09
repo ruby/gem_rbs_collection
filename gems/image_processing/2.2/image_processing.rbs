@@ -1,0 +1,228 @@
+module ImageProcessing
+  VERSION: String
+
+  class Error < StandardError
+  end
+
+  UNSAFE_METHOD_OWNERS: Array[Module]
+
+  def self.unsafe_method?: (untyped receiver, Symbol | String name) -> bool
+
+  # An object which responds to `#path`, such as `File` or `Tempfile`.
+  interface _Path
+    def path: () -> String?
+  end
+
+  # The name of a format, such as `"png"` or `:webp`.
+  type format = String | Symbol
+
+  # Implements a chainable interface for building processing options.
+  #
+  # Unknown method names are forwarded to the processor as operations through
+  # `method_missing`, and calling them with a bang (`!`) also performs the
+  # processing. Only the operations shared by both processors are declared here.
+  module Chainable
+    # The source image: a path, an object responding to `#path` or `#to_path`,
+    # or an accumulator object (`Vips::Image` or `MiniMagick::Tool`).
+    def source: (untyped file) -> Builder
+
+    def convert: (format format) -> Builder
+
+    def loader: (**untyped options) -> Builder
+
+    def saver: (**untyped options) -> Builder
+
+    def instrumenter: () { (?) -> untyped } -> Builder
+
+    def apply: (Hash[Symbol | String, untyped] | Array[[ Symbol | String, untyped ]] operations) -> Builder
+
+    def operation: (Symbol | String name, *untyped args) ?{ (?) -> untyped } -> Builder
+
+    # Without `destination:` the result is saved to a `Tempfile`.
+    # With `save: false` the accumulator object is returned without saving.
+    def call: (?untyped file, destination: String, ?save: bool) -> untyped
+            | (?untyped file, save: false) -> untyped
+            | (?untyped file, ?save: true) -> Tempfile
+
+    def branch: (**untyped new_options) -> Builder
+
+    def resize_to_limit: (Integer? width, Integer? height, **untyped options) -> Builder
+    def resize_to_limit!: (Integer? width, Integer? height, **untyped options) -> Tempfile
+
+    def resize_to_fit: (Integer? width, Integer? height, **untyped options) -> Builder
+    def resize_to_fit!: (Integer? width, Integer? height, **untyped options) -> Tempfile
+
+    def resize_to_fill: (Integer width, Integer height, **untyped options) -> Builder
+    def resize_to_fill!: (Integer width, Integer height, **untyped options) -> Tempfile
+
+    def resize_and_pad: (Integer width, Integer height, **untyped options) -> Builder
+    def resize_and_pad!: (Integer width, Integer height, **untyped options) -> Tempfile
+
+    def resize_to_cover: (Integer width, Integer height, **untyped options) -> Builder
+    def resize_to_cover!: (Integer width, Integer height, **untyped options) -> Tempfile
+
+    def crop: (Integer left, Integer top, Integer width, Integer height) -> Builder
+            | (String geometry) -> Builder
+    def crop!: (Integer left, Integer top, Integer width, Integer height) -> Tempfile
+             | (String geometry) -> Tempfile
+
+    def rotate: (Numeric degrees, **untyped options) -> Builder
+    def rotate!: (Numeric degrees, **untyped options) -> Tempfile
+
+    def composite: (?untyped overlay, ?untyped mode, **untyped options) ?{ (untyped magick) -> void } -> Builder
+    def composite!: (?untyped overlay, ?untyped mode, **untyped options) ?{ (untyped magick) -> void } -> Tempfile
+
+    private
+
+    def invalid_operation?: (Symbol | String name) -> bool
+
+    DEFAULT_OPTIONS: Hash[Symbol, untyped]
+  end
+
+  class Builder
+    include Chainable
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (Hash[Symbol, untyped] options) -> void
+
+    def call!: (?save: bool) -> untyped
+
+    private
+
+    def instrument: [T] () { () -> T } -> T
+
+    def pipeline_options: () -> Hash[Symbol, untyped]
+  end
+
+  class Pipeline
+    DEFAULT_FORMAT: String
+
+    attr_reader loader: Hash[Symbol, untyped]
+    attr_reader saver: Hash[Symbol, untyped]
+    attr_reader format: format?
+    attr_reader operations: Array[untyped]
+    attr_reader processor: singleton(Processor)
+    attr_reader destination: String?
+
+    def initialize: (Hash[Symbol, untyped] options) -> void
+
+    def call: (?save: bool) -> untyped
+
+    def source_path: () -> String?
+
+    def destination_format: () -> String
+  end
+
+  # Abstract class inherited by individual processors.
+  class Processor
+    def self.call: (source: untyped, loader: Hash[Symbol, untyped], operations: Array[untyped], saver: Hash[Symbol, untyped], ?destination: String?, ?format: format?) -> untyped
+
+    def self.accumulator: (Symbol name, Class klass) -> void
+
+    def self.apply_operation: (untyped accumulator, Array[untyped] operation) -> untyped
+
+    def self.supports_resize_on_load?: () -> bool
+
+    def initialize: (?untyped accumulator) -> void
+
+    def apply_operation: (Symbol | String name, *untyped args) ?{ (?) -> untyped } -> untyped
+
+    def custom: () ?{ (untyped accumulator) -> untyped } -> untyped
+  end
+
+  # Processor backed by libvips. Requires the ruby-vips gem.
+  #
+  # The accumulator object is a `Vips::Image`.
+  module Vips
+    extend Chainable
+
+    def self.valid_image?: (_Path file) -> bool
+
+    class Processor < ImageProcessing::Processor
+      ACCUMULATOR_CLASS: Class
+
+      SHARPEN_MASK: untyped
+
+      def self.load_image: (untyped path_or_image, ?loader: String | Symbol | nil, ?autorot: bool, **untyped options) -> untyped
+
+      def self.save_image: (untyped image, String path, ?format? format, ?saver: String | Symbol | nil, ?quality: Integer?, **untyped options) -> untyped
+
+      def resize_to_limit: (Integer? width, Integer? height, **untyped options) -> untyped
+
+      def resize_to_fit: (Integer? width, Integer? height, **untyped options) -> untyped
+
+      def resize_to_fill: (Integer width, Integer height, **untyped options) -> untyped
+
+      def resize_and_pad: (Integer width, Integer height, ?gravity: String, ?extend: String?, ?background: untyped, ?alpha: bool?, **untyped options) -> untyped
+
+      def resize_to_cover: (Integer width, Integer height, **untyped options) -> untyped
+
+      def rotate: (Numeric degrees, **untyped options) -> untyped
+
+      def composite: (untyped overlay, ?untyped _mode, ?mode: String, ?gravity: String, ?offset: [ Integer, Integer ]?, **untyped options) -> untyped
+
+      def set: (*untyped args) -> untyped
+
+      def set_type: (*untyped args) -> untyped
+
+      def set_value: (*untyped args) -> untyped
+
+      def remove: (*untyped args) -> untyped
+
+      private
+
+      def image: () -> untyped
+    end
+  end
+
+  # Processor backed by ImageMagick/GraphicsMagick. Requires the mini_magick gem.
+  #
+  # The accumulator object is a `MiniMagick::Tool`.
+  module MiniMagick
+    extend Chainable
+
+    INHERIT_FDS_MINIMUM_VERSION: Gem::Version
+
+    def self.convert_shim: (?inherit_fds: Array[IO]?) ?{ (untyped convert) -> void } -> untyped
+
+    def self.valid_image?: (_Path file) -> bool
+
+    class Processor < ImageProcessing::Processor
+      ACCUMULATOR_CLASS: Class
+
+      SHARPEN_PARAMETERS: Hash[Symbol, Integer]
+
+      def self.load_image: (untyped path_or_magick, ?loader: String | Symbol | nil, ?page: Integer?, ?geometry: String?, ?auto_orient: bool, ?inherit_fds: Array[IO]?, **untyped options) -> untyped
+
+      def self.save_image: (untyped magick, String destination_path, ?format? format, ?allow_splitting: bool, **untyped options) -> void
+
+      def resize_to_limit: (Integer? width, Integer? height, **untyped options) -> untyped
+
+      def resize_to_fit: (Integer? width, Integer? height, **untyped options) -> untyped
+
+      def resize_to_fill: (Integer width, Integer height, ?gravity: String, **untyped options) -> untyped
+
+      def resize_and_pad: (Integer width, Integer height, ?background: String | Symbol | Array[Numeric], ?gravity: String, **untyped options) -> untyped
+
+      def resize_to_cover: (Integer width, Integer height, **untyped options) -> untyped
+
+      def crop: (Integer left, Integer top, Integer width, Integer height) -> untyped
+              | (String geometry) -> untyped
+
+      def rotate: (Numeric degrees, ?background: String | Symbol | Array[Numeric] | nil) -> untyped
+
+      def composite: (?untyped overlay, ?mask: untyped, ?mode: String?, ?gravity: String?, ?offset: [ Integer, Integer ]?, ?args: String?) ?{ (untyped magick) -> void } -> untyped
+
+      def define: (String | Hash[Symbol | String, untyped] options) -> untyped
+
+      def limits: (Hash[Symbol | String, untyped] options) -> untyped
+
+      def append: (*untyped args) -> untyped
+
+      private
+
+      def magick: () -> untyped
+    end
+  end
+end
