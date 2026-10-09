@@ -69,3 +69,92 @@ module ActiveRecord
     extend Devise::Models::_DeviseClassMethod
   end
 end
+
+module Devise
+  class MissingWarden < StandardError
+  end
+
+  class ParameterSanitizer
+    DEFAULT_PERMITTED_ATTRIBUTES: Hash[Symbol, Array[Symbol]]
+
+    def initialize: (untyped resource_class, Symbol | String resource_name, ActionController::Parameters params) -> void
+
+    def sanitize: (Symbol action) -> ActiveSupport::HashWithIndifferentAccess[String, untyped]
+
+    def permit: (Symbol action, ?keys: Array[Symbol | Hash[Symbol, untyped]]?, ?except: Array[Symbol]?) ?{ (ActionController::Parameters) -> untyped } -> void
+  end
+
+  module Controllers
+    module SignInOut
+      def signed_in?: (?(Symbol | String)? scope) -> bool
+
+      def sign_in: (untyped resource_or_scope, *untyped args, **untyped options) -> void
+
+      def bypass_sign_in: (untyped resource, ?scope: (Symbol | String)?) -> void
+
+      def sign_out: (?untyped resource_or_scope) -> bool
+
+      def sign_out_all_scopes: (?bool lock) -> bool
+    end
+
+    module StoreLocation
+      def stored_location_for: (untyped resource_or_scope) -> String?
+
+      def store_location_for: (untyped resource_or_scope, String? location) -> String?
+    end
+
+    module Helpers
+      include SignInOut
+      include StoreLocation
+
+      module ClassMethods
+        def devise_group: (Symbol | String group_name, contains: Array[Symbol]) -> void
+
+        def log_process_action: (untyped payload) -> untyped
+      end
+
+      def warden: () -> untyped
+
+      def devise_controller?: () -> bool
+
+      def devise_parameter_sanitizer: () -> Devise::ParameterSanitizer
+
+      def allow_params_authentication!: () -> void
+
+      def signed_in_root_path: (untyped resource_or_scope) -> String
+
+      def after_sign_in_path_for: (untyped resource_or_scope) -> String
+
+      def after_sign_out_path_for: (untyped resource_or_scope) -> String
+
+      def sign_in_and_redirect: (untyped resource_or_scope, *untyped args, **untyped options) -> void
+
+      def sign_out_and_redirect: (untyped resource_or_scope) -> void
+
+      def handle_unverified_request: () -> void
+
+      def request_format: () -> (Symbol | String)?
+
+      def is_navigational_format?: () -> bool
+
+      def is_flashing_format?: () -> bool
+    end
+  end
+end
+
+# NOTE: Devise includes its controller helpers into every controller through
+# `ActiveSupport.on_load(:action_controller)`, which runs for both
+# `ActionController::Base` and `ActionController::API`.
+# See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise/rails.rb#L24-L26
+# See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise.rb#L463-L467
+module ActionController
+  class Base
+    include Devise::Controllers::Helpers
+    extend Devise::Controllers::Helpers::ClassMethods
+  end
+
+  class API
+    include Devise::Controllers::Helpers
+    extend Devise::Controllers::Helpers::ClassMethods
+  end
+end
