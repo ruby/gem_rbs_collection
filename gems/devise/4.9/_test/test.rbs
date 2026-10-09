@@ -28,3 +28,16 @@ class User < ActiveRecord::Base
   include Devise::Models::Validatable
   include Devise::Models::Lockable
 end
+
+class ApplicationController < ActionController::Base
+  def configure_permitted_parameters: () -> void
+  def after_sign_in_path_for: (untyped resource) -> String
+  def after_sign_out_path_for: (untyped resource_or_scope) -> String
+  def create: () -> void
+  def destroy: () -> void
+  def format_info: () -> void
+end
+
+class ApiController < ActionController::API
+  def create: () -> void
+end
