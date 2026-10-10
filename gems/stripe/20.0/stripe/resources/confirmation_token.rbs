@@ -1,0 +1,874 @@
+module Stripe
+  class ConfirmationToken < APIResource
+    class MandateData < ::Stripe::StripeObject
+      class CustomerAcceptance < ::Stripe::StripeObject
+        class Online < ::Stripe::StripeObject
+          def ip_address: () -> String?
+
+          def user_agent: () -> String?
+        end
+
+        def online: () -> Online?
+
+        def type: () -> String
+      end
+
+      def customer_acceptance: () -> CustomerAcceptance
+    end
+
+    class PaymentMethodOptions < ::Stripe::StripeObject
+      class Card < ::Stripe::StripeObject
+        class Installments < ::Stripe::StripeObject
+          class Plan < ::Stripe::StripeObject
+            def count: () -> Integer?
+
+            def interval: () -> String?
+
+            def type: () -> String
+          end
+
+          def plan: () -> Plan?
+        end
+
+        def cvc_token: () -> String?
+
+        def installments: () -> Installments?
+      end
+
+      def card: () -> Card?
+    end
+
+    class PaymentMethodPreview < ::Stripe::StripeObject
+      class AcssDebit < ::Stripe::StripeObject
+        def bank_name: () -> String?
+
+        def fingerprint: () -> String?
+
+        def institution_number: () -> String?
+
+        def last4: () -> String?
+
+        def transit_number: () -> String?
+      end
+
+      class Affirm < ::Stripe::StripeObject
+      end
+
+      class AfterpayClearpay < ::Stripe::StripeObject
+      end
+
+      class Alipay < ::Stripe::StripeObject
+      end
+
+      class Alma < ::Stripe::StripeObject
+      end
+
+      class AmazonPay < ::Stripe::StripeObject
+      end
+
+      class AuBecsDebit < ::Stripe::StripeObject
+        def bsb_number: () -> String?
+
+        def fingerprint: () -> String?
+
+        def last4: () -> String?
+      end
+
+      class BacsDebit < ::Stripe::StripeObject
+        def fingerprint: () -> String?
+
+        def last4: () -> String?
+
+        def sort_code: () -> String?
+      end
+
+      class Bancontact < ::Stripe::StripeObject
+      end
+
+      class Billie < ::Stripe::StripeObject
+      end
+
+      class BillingDetails < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String?
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        def address: () -> Address?
+
+        def email: () -> String?
+
+        def name: () -> String?
+
+        def phone: () -> String?
+
+        def tax_id: () -> String?
+      end
+
+      class Bizum < ::Stripe::StripeObject
+        def buyer_id: () -> String?
+      end
+
+      class Blik < ::Stripe::StripeObject
+        def buyer_id: () -> String?
+      end
+
+      class Boleto < ::Stripe::StripeObject
+        def tax_id: () -> String
+      end
+
+      class Card < ::Stripe::StripeObject
+        class Checks < ::Stripe::StripeObject
+          def address_line1_check: () -> String?
+
+          def address_postal_code_check: () -> String?
+
+          def cvc_check: () -> String?
+        end
+
+        class GeneratedFrom < ::Stripe::StripeObject
+          class PaymentMethodDetails < ::Stripe::StripeObject
+            class CardPresent < ::Stripe::StripeObject
+              class Offline < ::Stripe::StripeObject
+                def stored_at: () -> Integer?
+
+                def type: () -> String?
+              end
+
+              class Receipt < ::Stripe::StripeObject
+                def account_type: () -> String?
+
+                def application_cryptogram: () -> String?
+
+                def application_preferred_name: () -> String?
+
+                def authorization_code: () -> String?
+
+                def authorization_response_code: () -> String?
+
+                def cardholder_verification_method: () -> String?
+
+                def dedicated_file_name: () -> String?
+
+                def terminal_verification_results: () -> String?
+
+                def transaction_status_information: () -> String?
+              end
+
+              class Wallet < ::Stripe::StripeObject
+                def type: () -> String
+              end
+
+              def amount_authorized: () -> Integer?
+
+              def brand: () -> String?
+
+              def brand_product: () -> String?
+
+              def capture_before: () -> Integer?
+
+              def cardholder_name: () -> String?
+
+              def country: () -> String?
+
+              def description: () -> String?
+
+              def emv_auth_data: () -> String?
+
+              def exp_month: () -> Integer
+
+              def exp_year: () -> Integer
+
+              def fingerprint: () -> String?
+
+              def funding: () -> String?
+
+              def generated_card: () -> String?
+
+              def incremental_authorization_supported: () -> bool
+
+              def issuer: () -> String?
+
+              def last4: () -> String?
+
+              def location: () -> String?
+
+              def network: () -> String?
+
+              def network_transaction_id: () -> String?
+
+              def offline: () -> Offline?
+
+              def overcapture_supported: () -> bool
+
+              def preferred_locales: () -> ::Array[String]?
+
+              def read_method: () -> String?
+
+              def reader: () -> String?
+
+              def receipt: () -> Receipt?
+
+              def wallet: () -> Wallet?
+            end
+
+            def card_present: () -> CardPresent?
+
+            def type: () -> String
+          end
+
+          def charge: () -> String?
+
+          def payment_method_details: () -> PaymentMethodDetails?
+
+          def setup_attempt: () -> (String | ::Stripe::SetupAttempt)?
+        end
+
+        class Networks < ::Stripe::StripeObject
+          def available: () -> ::Array[String]
+
+          def preferred: () -> String?
+        end
+
+        class ThreeDSecureUsage < ::Stripe::StripeObject
+          def supported: () -> bool
+        end
+
+        class Wallet < ::Stripe::StripeObject
+          class AmexExpressCheckout < ::Stripe::StripeObject
+          end
+
+          class ApplePay < ::Stripe::StripeObject
+          end
+
+          class GooglePay < ::Stripe::StripeObject
+          end
+
+          class Link < ::Stripe::StripeObject
+          end
+
+          class Masterpass < ::Stripe::StripeObject
+            class BillingAddress < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            class ShippingAddress < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            def billing_address: () -> BillingAddress?
+
+            def email: () -> String?
+
+            def name: () -> String?
+
+            def shipping_address: () -> ShippingAddress?
+          end
+
+          class SamsungPay < ::Stripe::StripeObject
+          end
+
+          class VisaCheckout < ::Stripe::StripeObject
+            class BillingAddress < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            class ShippingAddress < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            def billing_address: () -> BillingAddress?
+
+            def email: () -> String?
+
+            def name: () -> String?
+
+            def shipping_address: () -> ShippingAddress?
+          end
+
+          def amex_express_checkout: () -> AmexExpressCheckout?
+
+          def apple_pay: () -> ApplePay?
+
+          def dynamic_last4: () -> String?
+
+          def google_pay: () -> GooglePay?
+
+          def link: () -> Link?
+
+          def masterpass: () -> Masterpass?
+
+          def samsung_pay: () -> SamsungPay?
+
+          def type: () -> String
+
+          def visa_checkout: () -> VisaCheckout?
+        end
+
+        def brand: () -> String
+
+        def checks: () -> Checks?
+
+        def country: () -> String?
+
+        def display_brand: () -> String?
+
+        def exp_month: () -> Integer
+
+        def exp_year: () -> Integer
+
+        def fingerprint: () -> String?
+
+        def funding: () -> String
+
+        def generated_from: () -> GeneratedFrom?
+
+        def last4: () -> String
+
+        def networks: () -> Networks?
+
+        def regulated_status: () -> String?
+
+        def three_d_secure_usage: () -> ThreeDSecureUsage?
+
+        def wallet: () -> Wallet?
+      end
+
+      class CardPresent < ::Stripe::StripeObject
+        class Networks < ::Stripe::StripeObject
+          def available: () -> ::Array[String]
+
+          def preferred: () -> String?
+        end
+
+        class Offline < ::Stripe::StripeObject
+          def stored_at: () -> Integer?
+
+          def type: () -> String?
+        end
+
+        class Wallet < ::Stripe::StripeObject
+          def type: () -> String
+        end
+
+        def brand: () -> String?
+
+        def brand_product: () -> String?
+
+        def cardholder_name: () -> String?
+
+        def country: () -> String?
+
+        def description: () -> String?
+
+        def exp_month: () -> Integer
+
+        def exp_year: () -> Integer
+
+        def fingerprint: () -> String?
+
+        def funding: () -> String?
+
+        def issuer: () -> String?
+
+        def last4: () -> String?
+
+        def networks: () -> Networks?
+
+        def offline: () -> Offline?
+
+        def preferred_locales: () -> ::Array[String]?
+
+        def read_method: () -> String?
+
+        def wallet: () -> Wallet?
+      end
+
+      class Cashapp < ::Stripe::StripeObject
+        def buyer_id: () -> String?
+
+        def cashtag: () -> String?
+      end
+
+      class Crypto < ::Stripe::StripeObject
+      end
+
+      class CustomerBalance < ::Stripe::StripeObject
+      end
+
+      class Eps < ::Stripe::StripeObject
+        def bank: () -> String?
+      end
+
+      class Fpx < ::Stripe::StripeObject
+        def bank: () -> String
+      end
+
+      class Giropay < ::Stripe::StripeObject
+      end
+
+      class Grabpay < ::Stripe::StripeObject
+      end
+
+      class Ideal < ::Stripe::StripeObject
+        def bank: () -> String?
+
+        def bic: () -> String?
+      end
+
+      class InteracPresent < ::Stripe::StripeObject
+        class Networks < ::Stripe::StripeObject
+          def available: () -> ::Array[String]
+
+          def preferred: () -> String?
+        end
+
+        def brand: () -> String?
+
+        def cardholder_name: () -> String?
+
+        def country: () -> String?
+
+        def description: () -> String?
+
+        def exp_month: () -> Integer
+
+        def exp_year: () -> Integer
+
+        def fingerprint: () -> String?
+
+        def funding: () -> String?
+
+        def issuer: () -> String?
+
+        def last4: () -> String?
+
+        def networks: () -> Networks?
+
+        def preferred_locales: () -> ::Array[String]?
+
+        def read_method: () -> String?
+      end
+
+      class KakaoPay < ::Stripe::StripeObject
+      end
+
+      class Klarna < ::Stripe::StripeObject
+        class Dob < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        def dob: () -> Dob?
+      end
+
+      class Konbini < ::Stripe::StripeObject
+      end
+
+      class KrCard < ::Stripe::StripeObject
+        def brand: () -> String?
+
+        def last4: () -> String?
+      end
+
+      class Link < ::Stripe::StripeObject
+        def email: () -> String?
+      end
+
+      class MbWay < ::Stripe::StripeObject
+      end
+
+      class Mobilepay < ::Stripe::StripeObject
+      end
+
+      class Multibanco < ::Stripe::StripeObject
+      end
+
+      class NaverPay < ::Stripe::StripeObject
+        def buyer_id: () -> String?
+
+        def funding: () -> String
+      end
+
+      class NzBankAccount < ::Stripe::StripeObject
+        def account_holder_name: () -> String?
+
+        def bank_code: () -> String
+
+        def bank_name: () -> String
+
+        def branch_code: () -> String
+
+        def last4: () -> String
+
+        def suffix: () -> String?
+      end
+
+      class Oxxo < ::Stripe::StripeObject
+      end
+
+      class P24 < ::Stripe::StripeObject
+        def bank: () -> String?
+      end
+
+      class PayByBank < ::Stripe::StripeObject
+      end
+
+      class Payco < ::Stripe::StripeObject
+      end
+
+      class Paynow < ::Stripe::StripeObject
+      end
+
+      class Paypal < ::Stripe::StripeObject
+        def country: () -> String?
+
+        def payer_email: () -> String?
+
+        def payer_id: () -> String?
+      end
+
+      class Paypay < ::Stripe::StripeObject
+      end
+
+      class Payto < ::Stripe::StripeObject
+        def bsb_number: () -> String?
+
+        def last4: () -> String?
+
+        def pay_id: () -> String?
+      end
+
+      class Pix < ::Stripe::StripeObject
+        def fingerprint: () -> String?
+      end
+
+      class Promptpay < ::Stripe::StripeObject
+      end
+
+      class RevolutPay < ::Stripe::StripeObject
+      end
+
+      class SamsungPay < ::Stripe::StripeObject
+      end
+
+      class Satispay < ::Stripe::StripeObject
+      end
+
+      class Scalapay < ::Stripe::StripeObject
+      end
+
+      class SepaDebit < ::Stripe::StripeObject
+        class GeneratedFrom < ::Stripe::StripeObject
+          def charge: () -> (String | ::Stripe::Charge)?
+
+          def setup_attempt: () -> (String | ::Stripe::SetupAttempt)?
+        end
+
+        def bank_code: () -> String?
+
+        def branch_code: () -> String?
+
+        def country: () -> String?
+
+        def fingerprint: () -> String?
+
+        def generated_from: () -> GeneratedFrom?
+
+        def last4: () -> String?
+      end
+
+      class Sequra < ::Stripe::StripeObject
+      end
+
+      class Sofort < ::Stripe::StripeObject
+        def country: () -> String?
+      end
+
+      class Sunbit < ::Stripe::StripeObject
+      end
+
+      class Swish < ::Stripe::StripeObject
+      end
+
+      class Twint < ::Stripe::StripeObject
+      end
+
+      class Upi < ::Stripe::StripeObject
+        def vpa: () -> String?
+      end
+
+      class UsBankAccount < ::Stripe::StripeObject
+        class Networks < ::Stripe::StripeObject
+          def preferred: () -> String?
+
+          def supported: () -> ::Array[String]
+        end
+
+        class StatusDetails < ::Stripe::StripeObject
+          class Blocked < ::Stripe::StripeObject
+            def network_code: () -> String?
+
+            def reason: () -> String?
+          end
+
+          def blocked: () -> Blocked?
+        end
+
+        def account_holder_type: () -> String?
+
+        def account_type: () -> String?
+
+        def bank_name: () -> String?
+
+        def financial_connections_account: () -> String?
+
+        def fingerprint: () -> String?
+
+        def last4: () -> String?
+
+        def networks: () -> Networks?
+
+        def routing_number: () -> String?
+
+        def status_details: () -> StatusDetails?
+      end
+
+      class WechatPay < ::Stripe::StripeObject
+      end
+
+      class Zip < ::Stripe::StripeObject
+      end
+
+      def acss_debit: () -> AcssDebit?
+
+      def affirm: () -> Affirm?
+
+      def afterpay_clearpay: () -> AfterpayClearpay?
+
+      def alipay: () -> Alipay?
+
+      def allow_redisplay: () -> String?
+
+      def alma: () -> Alma?
+
+      def amazon_pay: () -> AmazonPay?
+
+      def au_becs_debit: () -> AuBecsDebit?
+
+      def bacs_debit: () -> BacsDebit?
+
+      def bancontact: () -> Bancontact?
+
+      def billie: () -> Billie?
+
+      def billing_details: () -> BillingDetails
+
+      def bizum: () -> Bizum?
+
+      def blik: () -> Blik?
+
+      def boleto: () -> Boleto?
+
+      def card: () -> Card?
+
+      def card_present: () -> CardPresent?
+
+      def cashapp: () -> Cashapp?
+
+      def crypto: () -> Crypto?
+
+      def customer: () -> (String | ::Stripe::Customer)?
+
+      def customer_account: () -> String?
+
+      def customer_balance: () -> CustomerBalance?
+
+      def eps: () -> Eps?
+
+      def fpx: () -> Fpx?
+
+      def giropay: () -> Giropay?
+
+      def grabpay: () -> Grabpay?
+
+      def ideal: () -> Ideal?
+
+      def interac_present: () -> InteracPresent?
+
+      def kakao_pay: () -> KakaoPay?
+
+      def klarna: () -> Klarna?
+
+      def konbini: () -> Konbini?
+
+      def kr_card: () -> KrCard?
+
+      def link: () -> Link?
+
+      def mb_way: () -> MbWay?
+
+      def mobilepay: () -> Mobilepay?
+
+      def multibanco: () -> Multibanco?
+
+      def naver_pay: () -> NaverPay?
+
+      def nz_bank_account: () -> NzBankAccount?
+
+      def oxxo: () -> Oxxo?
+
+      def p24: () -> P24?
+
+      def pay_by_bank: () -> PayByBank?
+
+      def payco: () -> Payco?
+
+      def paynow: () -> Paynow?
+
+      def paypal: () -> Paypal?
+
+      def paypay: () -> Paypay?
+
+      def payto: () -> Payto?
+
+      def pix: () -> Pix?
+
+      def promptpay: () -> Promptpay?
+
+      def revolut_pay: () -> RevolutPay?
+
+      def samsung_pay: () -> SamsungPay?
+
+      def satispay: () -> Satispay?
+
+      def scalapay: () -> Scalapay?
+
+      def sepa_debit: () -> SepaDebit?
+
+      def sequra: () -> Sequra?
+
+      def sofort: () -> Sofort?
+
+      def sunbit: () -> Sunbit?
+
+      def swish: () -> Swish?
+
+      def twint: () -> Twint?
+
+      def type: () -> String
+
+      def upi: () -> Upi?
+
+      def us_bank_account: () -> UsBankAccount?
+
+      def wechat_pay: () -> WechatPay?
+
+      def zip: () -> Zip?
+    end
+
+    class Shipping < ::Stripe::StripeObject
+      class Address < ::Stripe::StripeObject
+        def city: () -> String?
+
+        def country: () -> String?
+
+        def line1: () -> String?
+
+        def line2: () -> String?
+
+        def postal_code: () -> String?
+
+        def state: () -> String?
+      end
+
+      def address: () -> Address
+
+      def name: () -> String
+
+      def phone: () -> String?
+    end
+
+    def created: () -> Integer
+
+    def expires_at: () -> Integer?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def mandate_data: () -> MandateData?
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def object: () -> String
+
+    def payment_intent: () -> String?
+
+    def payment_method_options: () -> PaymentMethodOptions?
+
+    def payment_method_preview: () -> PaymentMethodPreview?
+
+    def return_url: () -> String?
+
+    def setup_future_usage: () -> String?
+
+    def setup_intent: () -> String?
+
+    def shipping: () -> Shipping?
+
+    def use_stripe_sdk: () -> bool
+  end
+end

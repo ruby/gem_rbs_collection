@@ -1,0 +1,47 @@
+module Stripe
+  module ProductCatalog
+    class TrialOffer < APIResource
+      class Duration < ::Stripe::StripeObject
+        class Relative < ::Stripe::StripeObject
+          def iterations: () -> Integer
+        end
+
+        def relative: () -> Relative?
+
+        def type: () -> String
+      end
+
+      class EndBehavior < ::Stripe::StripeObject
+        class Transition < ::Stripe::StripeObject
+          def price: () -> (String | ::Stripe::Price)
+        end
+
+        def transition: () -> Transition?
+
+        def type: () -> String
+      end
+
+      def active: () -> bool
+
+      def duration: () -> Duration
+
+      def end_behavior: () -> EndBehavior
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def nickname: () -> String?
+
+      def object: () -> String
+
+      def price: () -> (String | ::Stripe::Price)
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ProductCatalog::TrialOffer
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::ProductCatalog::TrialOffer]
+
+      def self.update: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ProductCatalog::TrialOffer
+    end
+  end
+end

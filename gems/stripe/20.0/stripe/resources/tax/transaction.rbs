@@ -1,0 +1,111 @@
+module Stripe
+  module Tax
+    class Transaction < APIResource
+      class CustomerDetails < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        class TaxId < ::Stripe::StripeObject
+          def type: () -> String
+
+          def value: () -> String
+        end
+
+        def address: () -> Address?
+
+        def address_source: () -> String?
+
+        def ip_address: () -> String?
+
+        def tax_ids: () -> ::Array[TaxId]
+
+        def taxability_override: () -> String
+      end
+
+      class Reversal < ::Stripe::StripeObject
+        def original_transaction: () -> String?
+      end
+
+      class ShipFromDetails < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        def address: () -> Address
+      end
+
+      class ShippingCost < ::Stripe::StripeObject
+        def amount: () -> Integer
+
+        def amount_tax: () -> Integer
+
+        def shipping_rate: () -> String?
+
+        def tax_behavior: () -> String
+
+        def tax_code: () -> String
+      end
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def customer: () -> String?
+
+      def customer_details: () -> CustomerDetails
+
+      def id: () -> String
+
+      def line_items: () -> ::Stripe::ListObject[::Stripe::Tax::TransactionLineItem]?
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def object: () -> String
+
+      def posted_at: () -> Integer
+
+      def reference: () -> String
+
+      def reversal: () -> Reversal?
+
+      def ship_from_details: () -> ShipFromDetails?
+
+      def shipping_cost: () -> ShippingCost?
+
+      def tax_date: () -> Integer
+
+      def type: () -> String
+
+      def self.create_from_calculation: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Tax::Transaction
+
+      def self.create_reversal: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Tax::Transaction
+
+      def list_line_items: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Tax::TransactionLineItem]
+
+      def self.list_line_items: (String transaction, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Tax::TransactionLineItem]
+    end
+  end
+end

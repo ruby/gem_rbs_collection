@@ -1,0 +1,19 @@
+module Stripe
+  module Events
+    class V1PayoutPaidEvent < Stripe::V2::Core::Event
+      def self.lookup_type: () -> "v1.payout.paid"
+
+      def fetch_related_object: () -> untyped
+
+      attr_reader related_object: untyped
+    end
+
+    class V1PayoutPaidEventNotification < Stripe::V2::Core::EventNotification
+      def self.lookup_type: () -> "v1.payout.paid"
+
+      attr_reader related_object: ::Stripe::V2::Core::RelatedObject
+
+      def fetch_related_object: () -> untyped
+    end
+  end
+end

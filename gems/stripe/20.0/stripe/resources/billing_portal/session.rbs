@@ -1,0 +1,106 @@
+module Stripe
+  module BillingPortal
+    class Session < APIResource
+      class Flow < ::Stripe::StripeObject
+        class AfterCompletion < ::Stripe::StripeObject
+          class HostedConfirmation < ::Stripe::StripeObject
+            def custom_message: () -> String?
+          end
+
+          class Redirect < ::Stripe::StripeObject
+            def return_url: () -> String
+          end
+
+          def hosted_confirmation: () -> HostedConfirmation?
+
+          def redirect: () -> Redirect?
+
+          def type: () -> String
+        end
+
+        class CustomerUpdate < ::Stripe::StripeObject
+        end
+
+        class SubscriptionCancel < ::Stripe::StripeObject
+          class Retention < ::Stripe::StripeObject
+            class CouponOffer < ::Stripe::StripeObject
+              def coupon: () -> String
+            end
+
+            def coupon_offer: () -> CouponOffer?
+
+            def type: () -> String
+          end
+
+          def retention: () -> Retention?
+
+          def subscription: () -> String
+        end
+
+        class SubscriptionUpdate < ::Stripe::StripeObject
+          def subscription: () -> String
+        end
+
+        class SubscriptionUpdateConfirm < ::Stripe::StripeObject
+          class Discount < ::Stripe::StripeObject
+            def coupon: () -> String?
+
+            def promotion_code: () -> String?
+          end
+
+          class Item < ::Stripe::StripeObject
+            def id: () -> String?
+
+            def price: () -> String?
+
+            def quantity: () -> Integer?
+          end
+
+          def discounts: () -> ::Array[Discount]?
+
+          def items: () -> ::Array[Item]
+
+          def subscription: () -> String
+        end
+
+        def after_completion: () -> AfterCompletion
+
+        def customer_update: () -> CustomerUpdate?
+
+        def subscription_cancel: () -> SubscriptionCancel?
+
+        def subscription_update: () -> SubscriptionUpdate?
+
+        def subscription_update_confirm: () -> SubscriptionUpdateConfirm?
+
+        def type: () -> String
+      end
+
+      def configuration: () -> (String | ::Stripe::BillingPortal::Configuration)
+
+      def created: () -> Integer
+
+      def customer: () -> String
+
+      def customer_account: () -> String?
+
+      def flow: () -> Flow?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def locale: () -> String?
+
+      def object: () -> String
+
+      def on_behalf_of: () -> String?
+
+      def return_url: () -> String?
+
+      def url: () -> String
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::BillingPortal::Session
+    end
+  end
+end

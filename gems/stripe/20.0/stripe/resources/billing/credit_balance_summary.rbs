@@ -1,0 +1,45 @@
+module Stripe
+  module Billing
+    class CreditBalanceSummary < SingletonAPIResource
+      class Balance < ::Stripe::StripeObject
+        class AvailableBalance < ::Stripe::StripeObject
+          class Monetary < ::Stripe::StripeObject
+            def currency: () -> String
+
+            def value: () -> Integer
+          end
+
+          def monetary: () -> Monetary?
+
+          def type: () -> String
+        end
+
+        class LedgerBalance < ::Stripe::StripeObject
+          class Monetary < ::Stripe::StripeObject
+            def currency: () -> String
+
+            def value: () -> Integer
+          end
+
+          def monetary: () -> Monetary?
+
+          def type: () -> String
+        end
+
+        def available_balance: () -> AvailableBalance
+
+        def ledger_balance: () -> LedgerBalance
+      end
+
+      def balances: () -> ::Array[Balance]
+
+      def customer: () -> (String | ::Stripe::Customer)
+
+      def customer_account: () -> String?
+
+      def livemode: () -> bool
+
+      def object: () -> String
+    end
+  end
+end

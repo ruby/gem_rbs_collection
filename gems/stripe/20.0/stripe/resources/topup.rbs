@@ -1,0 +1,59 @@
+module Stripe
+  class Topup < APIResource
+    class PaymentMethodOptions < ::Stripe::StripeObject
+      class UsBankAccount < ::Stripe::StripeObject
+        def network: () -> String
+      end
+
+      def us_bank_account: () -> UsBankAccount?
+    end
+
+    def amount: () -> Integer
+
+    def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)?
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def description: () -> String?
+
+    def expected_availability_date: () -> Integer?
+
+    def failure_code: () -> String?
+
+    def failure_message: () -> String?
+
+    def id: () -> String
+
+    def initiated_by: () -> String?
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def object: () -> String
+
+    def payment_method: () -> (String | ::Stripe::PaymentMethod)?
+
+    def payment_method_options: () -> PaymentMethodOptions?
+
+    def source: () -> ::Stripe::Source?
+
+    def statement_descriptor: () -> String?
+
+    def status: () -> String
+
+    def transfer_group: () -> String?
+
+    def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Topup
+
+    def self.cancel: (String topup, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Topup
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Topup
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Topup]
+
+    def self.update: (String topup, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Topup
+  end
+end

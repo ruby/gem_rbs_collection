@@ -1,0 +1,121 @@
+module Stripe
+  module Treasury
+    class ReceivedCredit < APIResource
+      class InitiatingPaymentMethodDetails < ::Stripe::StripeObject
+        class BillingDetails < ::Stripe::StripeObject
+          class Address < ::Stripe::StripeObject
+            def city: () -> String?
+
+            def country: () -> String?
+
+            def line1: () -> String?
+
+            def line2: () -> String?
+
+            def postal_code: () -> String?
+
+            def state: () -> String?
+          end
+
+          def address: () -> Address
+
+          def email: () -> String?
+
+          def name: () -> String?
+        end
+
+        class FinancialAccount < ::Stripe::StripeObject
+          def id: () -> String
+
+          def network: () -> String
+        end
+
+        class UsBankAccount < ::Stripe::StripeObject
+          def bank_name: () -> String?
+
+          def last4: () -> String?
+
+          def routing_number: () -> String?
+        end
+
+        def balance: () -> String?
+
+        def billing_details: () -> BillingDetails
+
+        def financial_account: () -> FinancialAccount?
+
+        def issuing_card: () -> String?
+
+        def type: () -> String
+
+        def us_bank_account: () -> UsBankAccount?
+      end
+
+      class LinkedFlows < ::Stripe::StripeObject
+        class SourceFlowDetails < ::Stripe::StripeObject
+          def credit_reversal: () -> ::Stripe::Treasury::CreditReversal?
+
+          def outbound_payment: () -> ::Stripe::Treasury::OutboundPayment?
+
+          def outbound_transfer: () -> ::Stripe::Treasury::OutboundTransfer?
+
+          def payout: () -> ::Stripe::Payout?
+
+          def type: () -> String
+        end
+
+        def credit_reversal: () -> String?
+
+        def issuing_authorization: () -> String?
+
+        def issuing_transaction: () -> String?
+
+        def source_flow: () -> String?
+
+        def source_flow_details: () -> SourceFlowDetails?
+
+        def source_flow_type: () -> String?
+      end
+
+      class ReversalDetails < ::Stripe::StripeObject
+        def deadline: () -> Integer?
+
+        def restricted_reason: () -> String?
+      end
+
+      def amount: () -> Integer
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def description: () -> String
+
+      def failure_code: () -> String?
+
+      def financial_account: () -> String?
+
+      def hosted_regulatory_receipt_url: () -> String?
+
+      def id: () -> String
+
+      def initiating_payment_method_details: () -> InitiatingPaymentMethodDetails
+
+      def linked_flows: () -> LinkedFlows
+
+      def livemode: () -> bool
+
+      def network: () -> String
+
+      def object: () -> String
+
+      def reversal_details: () -> ReversalDetails?
+
+      def status: () -> String
+
+      def transaction: () -> (String | ::Stripe::Treasury::Transaction)?
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Treasury::ReceivedCredit]
+    end
+  end
+end

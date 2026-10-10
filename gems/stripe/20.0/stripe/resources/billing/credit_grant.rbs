@@ -1,0 +1,79 @@
+module Stripe
+  module Billing
+    class CreditGrant < APIResource
+      class Amount < ::Stripe::StripeObject
+        class Monetary < ::Stripe::StripeObject
+          def currency: () -> String
+
+          def value: () -> Integer
+        end
+
+        def monetary: () -> Monetary?
+
+        def type: () -> String
+      end
+
+      class ApplicabilityConfig < ::Stripe::StripeObject
+        class Scope < ::Stripe::StripeObject
+          class Price < ::Stripe::StripeObject
+            def id: () -> String?
+          end
+
+          def price_type: () -> String?
+
+          def prices: () -> ::Array[Price]?
+        end
+
+        def scope: () -> Scope
+      end
+
+      def amount: () -> Amount
+
+      def applicability_config: () -> ApplicabilityConfig
+
+      def category: () -> String
+
+      def created: () -> Integer
+
+      def customer: () -> (String | ::Stripe::Customer)
+
+      def customer_account: () -> String?
+
+      def effective_at: () -> Integer?
+
+      def expires_at: () -> Integer?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def name: () -> String?
+
+      def object: () -> String
+
+      def priority: () -> Integer?
+
+      def test_clock: () -> (String | ::Stripe::TestHelpers::TestClock)?
+
+      def updated: () -> Integer
+
+      def voided_at: () -> Integer?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::CreditGrant
+
+      def expire: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::CreditGrant
+
+      def self.expire: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::CreditGrant
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Billing::CreditGrant]
+
+      def self.update: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::CreditGrant
+
+      def void_grant: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::CreditGrant
+
+      def self.void_grant: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::CreditGrant
+    end
+  end
+end

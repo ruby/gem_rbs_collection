@@ -1,0 +1,83 @@
+module Stripe
+  class Capability < APIResource
+    class FutureRequirements < ::Stripe::StripeObject
+      class Alternative < ::Stripe::StripeObject
+        def alternative_fields_due: () -> ::Array[String]
+
+        def original_fields_due: () -> ::Array[String]
+      end
+
+      class Error < ::Stripe::StripeObject
+        def code: () -> String
+
+        def reason: () -> String
+
+        def requirement: () -> String
+      end
+
+      def alternatives: () -> ::Array[Alternative]?
+
+      def current_deadline: () -> Integer?
+
+      def currently_due: () -> ::Array[String]
+
+      def disabled_reason: () -> String?
+
+      def errors: () -> ::Array[Error]
+
+      def eventually_due: () -> ::Array[String]
+
+      def past_due: () -> ::Array[String]
+
+      def pending_verification: () -> ::Array[String]
+    end
+
+    class Requirements < ::Stripe::StripeObject
+      class Alternative < ::Stripe::StripeObject
+        def alternative_fields_due: () -> ::Array[String]
+
+        def original_fields_due: () -> ::Array[String]
+      end
+
+      class Error < ::Stripe::StripeObject
+        def code: () -> String
+
+        def reason: () -> String
+
+        def requirement: () -> String
+      end
+
+      def alternatives: () -> ::Array[Alternative]?
+
+      def current_deadline: () -> Integer?
+
+      def currently_due: () -> ::Array[String]
+
+      def disabled_reason: () -> String?
+
+      def errors: () -> ::Array[Error]
+
+      def eventually_due: () -> ::Array[String]
+
+      def past_due: () -> ::Array[String]
+
+      def pending_verification: () -> ::Array[String]
+    end
+
+    def account: () -> (String | ::Stripe::Account)
+
+    def future_requirements: () -> FutureRequirements?
+
+    def id: () -> String
+
+    def object: () -> String
+
+    def requested: () -> bool
+
+    def requested_at: () -> Integer?
+
+    def requirements: () -> Requirements?
+
+    def status: () -> String
+  end
+end

@@ -1,0 +1,125 @@
+module Stripe
+  class Price < APIResource
+    class CurrencyOptions < ::Stripe::StripeObject
+      class CustomUnitAmount < ::Stripe::StripeObject
+        def maximum: () -> Integer?
+
+        def minimum: () -> Integer?
+
+        def preset: () -> Integer?
+      end
+
+      class Tier < ::Stripe::StripeObject
+        def flat_amount: () -> Integer?
+
+        def flat_amount_decimal: () -> BigDecimal?
+
+        def unit_amount: () -> Integer?
+
+        def unit_amount_decimal: () -> BigDecimal?
+
+        def up_to: () -> Integer?
+      end
+
+      def custom_unit_amount: () -> CustomUnitAmount?
+
+      def tax_behavior: () -> String?
+
+      def tiers: () -> ::Array[Tier]?
+
+      def unit_amount: () -> Integer?
+
+      def unit_amount_decimal: () -> BigDecimal?
+    end
+
+    class CustomUnitAmount < ::Stripe::StripeObject
+      def maximum: () -> Integer?
+
+      def minimum: () -> Integer?
+
+      def preset: () -> Integer?
+    end
+
+    class Recurring < ::Stripe::StripeObject
+      def interval: () -> String
+
+      def interval_count: () -> Integer
+
+      def meter: () -> String?
+
+      def usage_type: () -> String
+    end
+
+    class Tier < ::Stripe::StripeObject
+      def flat_amount: () -> Integer?
+
+      def flat_amount_decimal: () -> BigDecimal?
+
+      def unit_amount: () -> Integer?
+
+      def unit_amount_decimal: () -> BigDecimal?
+
+      def up_to: () -> Integer?
+    end
+
+    class TransformQuantity < ::Stripe::StripeObject
+      def divide_by: () -> Integer
+
+      def round: () -> String
+    end
+
+    def active: () -> bool
+
+    def billing_scheme: () -> String
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def currency_options: () -> ::Stripe::StripeObject?
+
+    def custom_unit_amount: () -> CustomUnitAmount?
+
+    def deleted: () -> bool?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def lookup_key: () -> String?
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def nickname: () -> String?
+
+    def object: () -> String
+
+    def product: () -> (String | ::Stripe::Product)
+
+    def recurring: () -> Recurring?
+
+    def tax_behavior: () -> String?
+
+    def tiers: () -> ::Array[Tier]?
+
+    def tiers_mode: () -> String?
+
+    def transform_quantity: () -> TransformQuantity?
+
+    def type: () -> String
+
+    def unit_amount: () -> Integer?
+
+    def unit_amount_decimal: () -> BigDecimal?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Price
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Price]
+
+    def self.search: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SearchResultObject[::Stripe::Price]
+
+    def self.search_auto_paging_each: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) { (::Stripe::Price) -> void } -> ::Stripe::SearchResultObject[::Stripe::Price]
+
+    def self.update: (String price, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Price
+  end
+end

@@ -1,0 +1,375 @@
+module Stripe
+  class PaymentLink < APIResource
+    class AfterCompletion < ::Stripe::StripeObject
+      class HostedConfirmation < ::Stripe::StripeObject
+        def custom_message: () -> String?
+      end
+
+      class Redirect < ::Stripe::StripeObject
+        def url: () -> String
+      end
+
+      def hosted_confirmation: () -> HostedConfirmation?
+
+      def redirect: () -> Redirect?
+
+      def type: () -> String
+    end
+
+    class AutomaticTax < ::Stripe::StripeObject
+      class Liability < ::Stripe::StripeObject
+        def account: () -> (String | ::Stripe::Account)?
+
+        def type: () -> String
+      end
+
+      def enabled: () -> bool
+
+      def liability: () -> Liability?
+    end
+
+    class ConsentCollection < ::Stripe::StripeObject
+      class PaymentMethodReuseAgreement < ::Stripe::StripeObject
+        def position: () -> String
+      end
+
+      def payment_method_reuse_agreement: () -> PaymentMethodReuseAgreement?
+
+      def promotions: () -> String?
+
+      def terms_of_service: () -> String?
+    end
+
+    class CustomField < ::Stripe::StripeObject
+      class Dropdown < ::Stripe::StripeObject
+        class Option < ::Stripe::StripeObject
+          def label: () -> String
+
+          def value: () -> String
+        end
+
+        def default_value: () -> String?
+
+        def options: () -> ::Array[Option]
+      end
+
+      class Label < ::Stripe::StripeObject
+        def custom: () -> String?
+
+        def type: () -> String
+      end
+
+      class Numeric < ::Stripe::StripeObject
+        def default_value: () -> String?
+
+        def maximum_length: () -> Integer?
+
+        def minimum_length: () -> Integer?
+      end
+
+      class Text < ::Stripe::StripeObject
+        def default_value: () -> String?
+
+        def maximum_length: () -> Integer?
+
+        def minimum_length: () -> Integer?
+      end
+
+      def dropdown: () -> Dropdown?
+
+      def key: () -> String
+
+      def label: () -> Label
+
+      def numeric: () -> Numeric?
+
+      def optional: () -> bool
+
+      def text: () -> Text?
+
+      def type: () -> String
+    end
+
+    class CustomText < ::Stripe::StripeObject
+      class AfterSubmit < ::Stripe::StripeObject
+        def message: () -> String
+      end
+
+      class ShippingAddress < ::Stripe::StripeObject
+        def message: () -> String
+      end
+
+      class Submit < ::Stripe::StripeObject
+        def message: () -> String
+      end
+
+      class TermsOfServiceAcceptance < ::Stripe::StripeObject
+        def message: () -> String
+      end
+
+      def after_submit: () -> AfterSubmit?
+
+      def shipping_address: () -> ShippingAddress?
+
+      def submit: () -> Submit?
+
+      def terms_of_service_acceptance: () -> TermsOfServiceAcceptance?
+    end
+
+    class InvoiceCreation < ::Stripe::StripeObject
+      class InvoiceData < ::Stripe::StripeObject
+        class CustomField < ::Stripe::StripeObject
+          def name: () -> String
+
+          def value: () -> String
+        end
+
+        class Issuer < ::Stripe::StripeObject
+          def account: () -> (String | ::Stripe::Account)?
+
+          def type: () -> String
+        end
+
+        class RenderingOptions < ::Stripe::StripeObject
+          def amount_tax_display: () -> String?
+
+          def template: () -> String?
+        end
+
+        def account_tax_ids: () -> ::Array[String | ::Stripe::TaxId]?
+
+        def custom_fields: () -> ::Array[CustomField]?
+
+        def description: () -> String?
+
+        def footer: () -> String?
+
+        def issuer: () -> Issuer?
+
+        def metadata: () -> ::Stripe::StripeObject?
+
+        def rendering_options: () -> RenderingOptions?
+      end
+
+      def enabled: () -> bool
+
+      def invoice_data: () -> InvoiceData?
+    end
+
+    class ManagedPayments < ::Stripe::StripeObject
+      def enabled: () -> bool
+    end
+
+    class NameCollection < ::Stripe::StripeObject
+      class Business < ::Stripe::StripeObject
+        def enabled: () -> bool
+
+        def optional: () -> bool
+      end
+
+      class Individual < ::Stripe::StripeObject
+        def enabled: () -> bool
+
+        def optional: () -> bool
+      end
+
+      def business: () -> Business?
+
+      def individual: () -> Individual?
+    end
+
+    class OptionalItem < ::Stripe::StripeObject
+      class AdjustableQuantity < ::Stripe::StripeObject
+        def enabled: () -> bool
+
+        def maximum: () -> Integer?
+
+        def minimum: () -> Integer?
+      end
+
+      def adjustable_quantity: () -> AdjustableQuantity?
+
+      def price: () -> String
+
+      def quantity: () -> Integer
+    end
+
+    class PaymentIntentData < ::Stripe::StripeObject
+      def capture_method: () -> String?
+
+      def description: () -> String?
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def setup_future_usage: () -> String?
+
+      def statement_descriptor: () -> String?
+
+      def statement_descriptor_suffix: () -> String?
+
+      def transfer_group: () -> String?
+    end
+
+    class PaymentMethodOptions < ::Stripe::StripeObject
+      class Card < ::Stripe::StripeObject
+        class Restrictions < ::Stripe::StripeObject
+          def brands_blocked: () -> ::Array[String]
+        end
+
+        def restrictions: () -> Restrictions?
+      end
+
+      def card: () -> Card?
+    end
+
+    class PhoneNumberCollection < ::Stripe::StripeObject
+      def enabled: () -> bool
+    end
+
+    class Restrictions < ::Stripe::StripeObject
+      class CompletedSessions < ::Stripe::StripeObject
+        def count: () -> Integer
+
+        def limit: () -> Integer
+      end
+
+      def completed_sessions: () -> CompletedSessions
+    end
+
+    class ShippingAddressCollection < ::Stripe::StripeObject
+      def allowed_countries: () -> ::Array[String]
+    end
+
+    class ShippingOption < ::Stripe::StripeObject
+      def shipping_amount: () -> Integer
+
+      def shipping_rate: () -> (String | ::Stripe::ShippingRate)
+    end
+
+    class SubscriptionData < ::Stripe::StripeObject
+      class InvoiceSettings < ::Stripe::StripeObject
+        class Issuer < ::Stripe::StripeObject
+          def account: () -> (String | ::Stripe::Account)?
+
+          def type: () -> String
+        end
+
+        def issuer: () -> Issuer
+      end
+
+      class TrialSettings < ::Stripe::StripeObject
+        class EndBehavior < ::Stripe::StripeObject
+          def missing_payment_method: () -> String
+        end
+
+        def end_behavior: () -> EndBehavior
+      end
+
+      def description: () -> String?
+
+      def invoice_settings: () -> InvoiceSettings
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def trial_period_days: () -> Integer?
+
+      def trial_settings: () -> TrialSettings?
+    end
+
+    class TaxIdCollection < ::Stripe::StripeObject
+      def enabled: () -> bool
+
+      def required: () -> String
+    end
+
+    class TransferData < ::Stripe::StripeObject
+      def amount: () -> Integer?
+
+      def destination: () -> (String | ::Stripe::Account)
+    end
+
+    def active: () -> bool
+
+    def after_completion: () -> AfterCompletion
+
+    def allow_promotion_codes: () -> bool
+
+    def application: () -> (String | ::Stripe::Application)?
+
+    def application_fee_amount: () -> Integer?
+
+    def application_fee_percent: () -> Float?
+
+    def automatic_tax: () -> AutomaticTax
+
+    def billing_address_collection: () -> String
+
+    def consent_collection: () -> ConsentCollection?
+
+    def currency: () -> String
+
+    def custom_fields: () -> ::Array[CustomField]
+
+    def custom_text: () -> CustomText
+
+    def customer_creation: () -> String
+
+    def id: () -> String
+
+    def inactive_message: () -> String?
+
+    def invoice_creation: () -> InvoiceCreation?
+
+    def line_items: () -> ::Stripe::ListObject[::Stripe::LineItem]?
+
+    def livemode: () -> bool
+
+    def managed_payments: () -> ManagedPayments?
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def name_collection: () -> NameCollection?
+
+    def object: () -> String
+
+    def on_behalf_of: () -> (String | ::Stripe::Account)?
+
+    def optional_items: () -> ::Array[OptionalItem]?
+
+    def payment_intent_data: () -> PaymentIntentData?
+
+    def payment_method_collection: () -> String
+
+    def payment_method_options: () -> PaymentMethodOptions?
+
+    def payment_method_types: () -> ::Array[String]?
+
+    def phone_number_collection: () -> PhoneNumberCollection
+
+    def restrictions: () -> Restrictions?
+
+    def shipping_address_collection: () -> ShippingAddressCollection?
+
+    def shipping_options: () -> ::Array[ShippingOption]
+
+    def submit_type: () -> String
+
+    def subscription_data: () -> SubscriptionData?
+
+    def tax_id_collection: () -> TaxIdCollection
+
+    def transfer_data: () -> TransferData?
+
+    def url: () -> String
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::PaymentLink
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::PaymentLink]
+
+    def list_line_items: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::LineItem]
+
+    def self.list_line_items: (String payment_link, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::LineItem]
+
+    def self.update: (String payment_link, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::PaymentLink
+  end
+end

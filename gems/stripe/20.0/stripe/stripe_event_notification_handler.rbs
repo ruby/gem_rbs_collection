@@ -1,0 +1,505 @@
+module Stripe
+  class UnhandledNotificationDetails
+    def is_known_event_type: () -> bool
+  end
+
+  class StripeEventNotificationHandlerBase
+    def initialize: (::Stripe::StripeClient client) { (::Stripe::V2::Core::EventNotification event_notification, ::Stripe::StripeClient client, ::Stripe::UnhandledNotificationDetails details) -> void } -> void
+
+    def registered_event_types: () -> ::Array[String]
+
+    def pre_handle: () { (::Stripe::V2::Core::EventNotification event_notification, ::Stripe::StripeClient client) -> ::boolish } -> void
+
+    def on_v1_account_application_authorized: () { (::Stripe::Events::V1AccountApplicationAuthorizedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_account_application_deauthorized: () { (::Stripe::Events::V1AccountApplicationDeauthorizedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_account_external_account_created: () { (::Stripe::Events::V1AccountExternalAccountCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_account_external_account_deleted: () { (::Stripe::Events::V1AccountExternalAccountDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_account_external_account_updated: () { (::Stripe::Events::V1AccountExternalAccountUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_account_updated: () { (::Stripe::Events::V1AccountUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_application_fee_created: () { (::Stripe::Events::V1ApplicationFeeCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_application_fee_refund_updated: () { (::Stripe::Events::V1ApplicationFeeRefundUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_application_fee_refunded: () { (::Stripe::Events::V1ApplicationFeeRefundedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_balance_available: () { (::Stripe::Events::V1BalanceAvailableEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_balance_settings_updated: () { (::Stripe::Events::V1BalanceSettingsUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_alert_triggered: () { (::Stripe::Events::V1BillingAlertTriggeredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_credit_balance_transaction_created: () { (::Stripe::Events::V1BillingCreditBalanceTransactionCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_credit_grant_created: () { (::Stripe::Events::V1BillingCreditGrantCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_credit_grant_updated: () { (::Stripe::Events::V1BillingCreditGrantUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_meter_created: () { (::Stripe::Events::V1BillingMeterCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_meter_deactivated: () { (::Stripe::Events::V1BillingMeterDeactivatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_meter_error_report_triggered: () { (::Stripe::Events::V1BillingMeterErrorReportTriggeredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_meter_no_meter_found: () { (::Stripe::Events::V1BillingMeterNoMeterFoundEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_meter_reactivated: () { (::Stripe::Events::V1BillingMeterReactivatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_meter_updated: () { (::Stripe::Events::V1BillingMeterUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_portal_configuration_created: () { (::Stripe::Events::V1BillingPortalConfigurationCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_portal_configuration_updated: () { (::Stripe::Events::V1BillingPortalConfigurationUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_billing_portal_session_created: () { (::Stripe::Events::V1BillingPortalSessionCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_capability_updated: () { (::Stripe::Events::V1CapabilityUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_cash_balance_funds_available: () { (::Stripe::Events::V1CashBalanceFundsAvailableEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_captured: () { (::Stripe::Events::V1ChargeCapturedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_dispute_closed: () { (::Stripe::Events::V1ChargeDisputeClosedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_dispute_created: () { (::Stripe::Events::V1ChargeDisputeCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_dispute_funds_reinstated: () { (::Stripe::Events::V1ChargeDisputeFundsReinstatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_dispute_funds_withdrawn: () { (::Stripe::Events::V1ChargeDisputeFundsWithdrawnEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_dispute_updated: () { (::Stripe::Events::V1ChargeDisputeUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_expired: () { (::Stripe::Events::V1ChargeExpiredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_failed: () { (::Stripe::Events::V1ChargeFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_pending: () { (::Stripe::Events::V1ChargePendingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_refund_updated: () { (::Stripe::Events::V1ChargeRefundUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_refunded: () { (::Stripe::Events::V1ChargeRefundedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_succeeded: () { (::Stripe::Events::V1ChargeSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_charge_updated: () { (::Stripe::Events::V1ChargeUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_checkout_session_async_payment_failed: () { (::Stripe::Events::V1CheckoutSessionAsyncPaymentFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_checkout_session_async_payment_succeeded: () { (::Stripe::Events::V1CheckoutSessionAsyncPaymentSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_checkout_session_completed: () { (::Stripe::Events::V1CheckoutSessionCompletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_checkout_session_expired: () { (::Stripe::Events::V1CheckoutSessionExpiredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_order_canceled: () { (::Stripe::Events::V1ClimateOrderCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_order_created: () { (::Stripe::Events::V1ClimateOrderCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_order_delayed: () { (::Stripe::Events::V1ClimateOrderDelayedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_order_delivered: () { (::Stripe::Events::V1ClimateOrderDeliveredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_order_product_substituted: () { (::Stripe::Events::V1ClimateOrderProductSubstitutedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_product_created: () { (::Stripe::Events::V1ClimateProductCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_climate_product_pricing_updated: () { (::Stripe::Events::V1ClimateProductPricingUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_coupon_created: () { (::Stripe::Events::V1CouponCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_coupon_deleted: () { (::Stripe::Events::V1CouponDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_coupon_updated: () { (::Stripe::Events::V1CouponUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_credit_note_created: () { (::Stripe::Events::V1CreditNoteCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_credit_note_updated: () { (::Stripe::Events::V1CreditNoteUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_credit_note_voided: () { (::Stripe::Events::V1CreditNoteVoidedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_created: () { (::Stripe::Events::V1CustomerCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_deleted: () { (::Stripe::Events::V1CustomerDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_discount_created: () { (::Stripe::Events::V1CustomerDiscountCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_discount_deleted: () { (::Stripe::Events::V1CustomerDiscountDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_discount_updated: () { (::Stripe::Events::V1CustomerDiscountUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_created: () { (::Stripe::Events::V1CustomerSubscriptionCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_deleted: () { (::Stripe::Events::V1CustomerSubscriptionDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_paused: () { (::Stripe::Events::V1CustomerSubscriptionPausedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_pending_update_applied: () { (::Stripe::Events::V1CustomerSubscriptionPendingUpdateAppliedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_pending_update_expired: () { (::Stripe::Events::V1CustomerSubscriptionPendingUpdateExpiredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_resumed: () { (::Stripe::Events::V1CustomerSubscriptionResumedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_trial_will_end: () { (::Stripe::Events::V1CustomerSubscriptionTrialWillEndEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_subscription_updated: () { (::Stripe::Events::V1CustomerSubscriptionUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_tax_id_created: () { (::Stripe::Events::V1CustomerTaxIdCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_tax_id_deleted: () { (::Stripe::Events::V1CustomerTaxIdDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_tax_id_updated: () { (::Stripe::Events::V1CustomerTaxIdUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_updated: () { (::Stripe::Events::V1CustomerUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_customer_cash_balance_transaction_created: () { (::Stripe::Events::V1CustomerCashBalanceTransactionCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_entitlements_active_entitlement_summary_updated: () { (::Stripe::Events::V1EntitlementsActiveEntitlementSummaryUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_file_created: () { (::Stripe::Events::V1FileCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_account_numbers_updated: () { (::Stripe::Events::V1FinancialConnectionsAccountAccountNumbersUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_created: () { (::Stripe::Events::V1FinancialConnectionsAccountCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_deactivated: () { (::Stripe::Events::V1FinancialConnectionsAccountDeactivatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_disconnected: () { (::Stripe::Events::V1FinancialConnectionsAccountDisconnectedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_expected_deactivation_date_updated: () { (::Stripe::Events::V1FinancialConnectionsAccountExpectedDeactivationDateUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_reactivated: () { (::Stripe::Events::V1FinancialConnectionsAccountReactivatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_refreshed_balance: () { (::Stripe::Events::V1FinancialConnectionsAccountRefreshedBalanceEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_refreshed_ownership: () { (::Stripe::Events::V1FinancialConnectionsAccountRefreshedOwnershipEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_refreshed_transactions: () { (::Stripe::Events::V1FinancialConnectionsAccountRefreshedTransactionsEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_supported_payment_method_types_updated: () { (::Stripe::Events::V1FinancialConnectionsAccountSupportedPaymentMethodTypesUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_upcoming_account_number_expiry: () { (::Stripe::Events::V1FinancialConnectionsAccountUpcomingAccountNumberExpiryEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_financial_connections_account_upcoming_deactivation: () { (::Stripe::Events::V1FinancialConnectionsAccountUpcomingDeactivationEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_identity_verification_session_canceled: () { (::Stripe::Events::V1IdentityVerificationSessionCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_identity_verification_session_created: () { (::Stripe::Events::V1IdentityVerificationSessionCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_identity_verification_session_processing: () { (::Stripe::Events::V1IdentityVerificationSessionProcessingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_identity_verification_session_redacted: () { (::Stripe::Events::V1IdentityVerificationSessionRedactedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_identity_verification_session_requires_input: () { (::Stripe::Events::V1IdentityVerificationSessionRequiresInputEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_identity_verification_session_verified: () { (::Stripe::Events::V1IdentityVerificationSessionVerifiedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_created: () { (::Stripe::Events::V1InvoiceCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_deleted: () { (::Stripe::Events::V1InvoiceDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_finalization_failed: () { (::Stripe::Events::V1InvoiceFinalizationFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_finalized: () { (::Stripe::Events::V1InvoiceFinalizedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_marked_uncollectible: () { (::Stripe::Events::V1InvoiceMarkedUncollectibleEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_overdue: () { (::Stripe::Events::V1InvoiceOverdueEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_overpaid: () { (::Stripe::Events::V1InvoiceOverpaidEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_paid: () { (::Stripe::Events::V1InvoicePaidEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_payment_action_required: () { (::Stripe::Events::V1InvoicePaymentActionRequiredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_payment_attempt_required: () { (::Stripe::Events::V1InvoicePaymentAttemptRequiredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_payment_failed: () { (::Stripe::Events::V1InvoicePaymentFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_payment_succeeded: () { (::Stripe::Events::V1InvoicePaymentSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_sent: () { (::Stripe::Events::V1InvoiceSentEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_upcoming: () { (::Stripe::Events::V1InvoiceUpcomingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_updated: () { (::Stripe::Events::V1InvoiceUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_voided: () { (::Stripe::Events::V1InvoiceVoidedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_will_be_due: () { (::Stripe::Events::V1InvoiceWillBeDueEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoice_payment_paid: () { (::Stripe::Events::V1InvoicePaymentPaidEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoiceitem_created: () { (::Stripe::Events::V1InvoiceitemCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_invoiceitem_deleted: () { (::Stripe::Events::V1InvoiceitemDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_authorization_created: () { (::Stripe::Events::V1IssuingAuthorizationCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_authorization_request: () { (::Stripe::Events::V1IssuingAuthorizationRequestEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_authorization_updated: () { (::Stripe::Events::V1IssuingAuthorizationUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_card_created: () { (::Stripe::Events::V1IssuingCardCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_card_updated: () { (::Stripe::Events::V1IssuingCardUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_cardholder_created: () { (::Stripe::Events::V1IssuingCardholderCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_cardholder_updated: () { (::Stripe::Events::V1IssuingCardholderUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_dispute_closed: () { (::Stripe::Events::V1IssuingDisputeClosedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_dispute_created: () { (::Stripe::Events::V1IssuingDisputeCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_dispute_funds_reinstated: () { (::Stripe::Events::V1IssuingDisputeFundsReinstatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_dispute_funds_rescinded: () { (::Stripe::Events::V1IssuingDisputeFundsRescindedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_dispute_submitted: () { (::Stripe::Events::V1IssuingDisputeSubmittedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_dispute_updated: () { (::Stripe::Events::V1IssuingDisputeUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_personalization_design_activated: () { (::Stripe::Events::V1IssuingPersonalizationDesignActivatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_personalization_design_deactivated: () { (::Stripe::Events::V1IssuingPersonalizationDesignDeactivatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_personalization_design_rejected: () { (::Stripe::Events::V1IssuingPersonalizationDesignRejectedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_personalization_design_updated: () { (::Stripe::Events::V1IssuingPersonalizationDesignUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_token_created: () { (::Stripe::Events::V1IssuingTokenCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_token_updated: () { (::Stripe::Events::V1IssuingTokenUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_transaction_created: () { (::Stripe::Events::V1IssuingTransactionCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_transaction_purchase_details_receipt_updated: () { (::Stripe::Events::V1IssuingTransactionPurchaseDetailsReceiptUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_issuing_transaction_updated: () { (::Stripe::Events::V1IssuingTransactionUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_mandate_updated: () { (::Stripe::Events::V1MandateUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_amount_capturable_updated: () { (::Stripe::Events::V1PaymentIntentAmountCapturableUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_canceled: () { (::Stripe::Events::V1PaymentIntentCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_created: () { (::Stripe::Events::V1PaymentIntentCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_partially_funded: () { (::Stripe::Events::V1PaymentIntentPartiallyFundedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_payment_failed: () { (::Stripe::Events::V1PaymentIntentPaymentFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_processing: () { (::Stripe::Events::V1PaymentIntentProcessingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_requires_action: () { (::Stripe::Events::V1PaymentIntentRequiresActionEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_intent_succeeded: () { (::Stripe::Events::V1PaymentIntentSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_link_created: () { (::Stripe::Events::V1PaymentLinkCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_link_updated: () { (::Stripe::Events::V1PaymentLinkUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_method_attached: () { (::Stripe::Events::V1PaymentMethodAttachedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_method_automatically_updated: () { (::Stripe::Events::V1PaymentMethodAutomaticallyUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_method_detached: () { (::Stripe::Events::V1PaymentMethodDetachedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payment_method_updated: () { (::Stripe::Events::V1PaymentMethodUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payout_canceled: () { (::Stripe::Events::V1PayoutCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payout_created: () { (::Stripe::Events::V1PayoutCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payout_failed: () { (::Stripe::Events::V1PayoutFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payout_paid: () { (::Stripe::Events::V1PayoutPaidEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payout_reconciliation_completed: () { (::Stripe::Events::V1PayoutReconciliationCompletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_payout_updated: () { (::Stripe::Events::V1PayoutUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_person_created: () { (::Stripe::Events::V1PersonCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_person_deleted: () { (::Stripe::Events::V1PersonDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_person_updated: () { (::Stripe::Events::V1PersonUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_plan_created: () { (::Stripe::Events::V1PlanCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_plan_deleted: () { (::Stripe::Events::V1PlanDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_plan_updated: () { (::Stripe::Events::V1PlanUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_price_created: () { (::Stripe::Events::V1PriceCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_price_deleted: () { (::Stripe::Events::V1PriceDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_price_updated: () { (::Stripe::Events::V1PriceUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_product_created: () { (::Stripe::Events::V1ProductCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_product_deleted: () { (::Stripe::Events::V1ProductDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_product_updated: () { (::Stripe::Events::V1ProductUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_promotion_code_created: () { (::Stripe::Events::V1PromotionCodeCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_promotion_code_updated: () { (::Stripe::Events::V1PromotionCodeUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_quote_accepted: () { (::Stripe::Events::V1QuoteAcceptedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_quote_canceled: () { (::Stripe::Events::V1QuoteCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_quote_created: () { (::Stripe::Events::V1QuoteCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_quote_finalized: () { (::Stripe::Events::V1QuoteFinalizedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_radar_early_fraud_warning_created: () { (::Stripe::Events::V1RadarEarlyFraudWarningCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_radar_early_fraud_warning_updated: () { (::Stripe::Events::V1RadarEarlyFraudWarningUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_refund_created: () { (::Stripe::Events::V1RefundCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_refund_failed: () { (::Stripe::Events::V1RefundFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_refund_updated: () { (::Stripe::Events::V1RefundUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_review_closed: () { (::Stripe::Events::V1ReviewClosedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_review_opened: () { (::Stripe::Events::V1ReviewOpenedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_setup_intent_canceled: () { (::Stripe::Events::V1SetupIntentCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_setup_intent_created: () { (::Stripe::Events::V1SetupIntentCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_setup_intent_requires_action: () { (::Stripe::Events::V1SetupIntentRequiresActionEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_setup_intent_setup_failed: () { (::Stripe::Events::V1SetupIntentSetupFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_setup_intent_succeeded: () { (::Stripe::Events::V1SetupIntentSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_sigma_scheduled_query_run_created: () { (::Stripe::Events::V1SigmaScheduledQueryRunCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_source_canceled: () { (::Stripe::Events::V1SourceCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_source_chargeable: () { (::Stripe::Events::V1SourceChargeableEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_source_failed: () { (::Stripe::Events::V1SourceFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_source_refund_attributes_required: () { (::Stripe::Events::V1SourceRefundAttributesRequiredEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_aborted: () { (::Stripe::Events::V1SubscriptionScheduleAbortedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_canceled: () { (::Stripe::Events::V1SubscriptionScheduleCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_completed: () { (::Stripe::Events::V1SubscriptionScheduleCompletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_created: () { (::Stripe::Events::V1SubscriptionScheduleCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_expiring: () { (::Stripe::Events::V1SubscriptionScheduleExpiringEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_released: () { (::Stripe::Events::V1SubscriptionScheduleReleasedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_subscription_schedule_updated: () { (::Stripe::Events::V1SubscriptionScheduleUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_tax_settings_updated: () { (::Stripe::Events::V1TaxSettingsUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_tax_rate_created: () { (::Stripe::Events::V1TaxRateCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_tax_rate_updated: () { (::Stripe::Events::V1TaxRateUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_terminal_reader_action_failed: () { (::Stripe::Events::V1TerminalReaderActionFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_terminal_reader_action_succeeded: () { (::Stripe::Events::V1TerminalReaderActionSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_terminal_reader_action_updated: () { (::Stripe::Events::V1TerminalReaderActionUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_test_helpers_test_clock_advancing: () { (::Stripe::Events::V1TestHelpersTestClockAdvancingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_test_helpers_test_clock_created: () { (::Stripe::Events::V1TestHelpersTestClockCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_test_helpers_test_clock_deleted: () { (::Stripe::Events::V1TestHelpersTestClockDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_test_helpers_test_clock_internal_failure: () { (::Stripe::Events::V1TestHelpersTestClockInternalFailureEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_test_helpers_test_clock_ready: () { (::Stripe::Events::V1TestHelpersTestClockReadyEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_topup_canceled: () { (::Stripe::Events::V1TopupCanceledEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_topup_created: () { (::Stripe::Events::V1TopupCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_topup_failed: () { (::Stripe::Events::V1TopupFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_topup_reversed: () { (::Stripe::Events::V1TopupReversedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_topup_succeeded: () { (::Stripe::Events::V1TopupSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_transfer_created: () { (::Stripe::Events::V1TransferCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_transfer_reversed: () { (::Stripe::Events::V1TransferReversedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v1_transfer_updated: () { (::Stripe::Events::V1TransferUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_commerce_product_catalog_imports_failed: () { (::Stripe::Events::V2CommerceProductCatalogImportsFailedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_commerce_product_catalog_imports_processing: () { (::Stripe::Events::V2CommerceProductCatalogImportsProcessingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_commerce_product_catalog_imports_succeeded: () { (::Stripe::Events::V2CommerceProductCatalogImportsSucceededEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_commerce_product_catalog_imports_succeeded_with_errors: () { (::Stripe::Events::V2CommerceProductCatalogImportsSucceededWithErrorsEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_closed: () { (::Stripe::Events::V2CoreAccountClosedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_created: () { (::Stripe::Events::V2CoreAccountCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_updated: () { (::Stripe::Events::V2CoreAccountUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_configuration_customer_capability_status_updated: () { (::Stripe::Events::V2CoreAccountIncludingConfigurationCustomerCapabilityStatusUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_configuration_customer_updated: () { (::Stripe::Events::V2CoreAccountIncludingConfigurationCustomerUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_configuration_merchant_capability_status_updated: () { (::Stripe::Events::V2CoreAccountIncludingConfigurationMerchantCapabilityStatusUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_configuration_merchant_updated: () { (::Stripe::Events::V2CoreAccountIncludingConfigurationMerchantUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_configuration_recipient_capability_status_updated: () { (::Stripe::Events::V2CoreAccountIncludingConfigurationRecipientCapabilityStatusUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_configuration_recipient_updated: () { (::Stripe::Events::V2CoreAccountIncludingConfigurationRecipientUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_defaults_updated: () { (::Stripe::Events::V2CoreAccountIncludingDefaultsUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_future_requirements_updated: () { (::Stripe::Events::V2CoreAccountIncludingFutureRequirementsUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_identity_updated: () { (::Stripe::Events::V2CoreAccountIncludingIdentityUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_including_requirements_updated: () { (::Stripe::Events::V2CoreAccountIncludingRequirementsUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_link_returned: () { (::Stripe::Events::V2CoreAccountLinkReturnedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_person_created: () { (::Stripe::Events::V2CoreAccountPersonCreatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_person_deleted: () { (::Stripe::Events::V2CoreAccountPersonDeletedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_account_person_updated: () { (::Stripe::Events::V2CoreAccountPersonUpdatedEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+
+    def on_v2_core_event_destination_ping: () { (::Stripe::Events::V2CoreEventDestinationPingEventNotification event_notification, ::Stripe::StripeClient client) -> void } -> void
+  end
+
+  class StripeEventNotificationHandler < StripeEventNotificationHandlerBase
+    def initialize: (::Stripe::StripeClient client, String webhook_secret) { (::Stripe::V2::Core::EventNotification event_notification, ::Stripe::StripeClient client, ::Stripe::UnhandledNotificationDetails details) -> void } -> void
+
+    def self.without_verification: (::Stripe::StripeClient client) { (::Stripe::V2::Core::EventNotification event_notification, ::Stripe::StripeClient client, ::Stripe::UnhandledNotificationDetails details) -> void } -> ::Stripe::StripeEventNotificationHandlerWithoutVerification
+
+    def handle: (String webhook_body, String sig_header) -> void
+  end
+
+  class StripeEventNotificationHandlerWithoutVerification < StripeEventNotificationHandlerBase
+    def handle: (String webhook_body) -> void
+  end
+end

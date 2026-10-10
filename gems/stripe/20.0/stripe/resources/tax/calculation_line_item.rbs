@@ -1,0 +1,63 @@
+module Stripe
+  module Tax
+    class CalculationLineItem < APIResource
+      class TaxBreakdown < ::Stripe::StripeObject
+        class Jurisdiction < ::Stripe::StripeObject
+          def country: () -> String
+
+          def display_name: () -> String
+
+          def level: () -> String
+
+          def state: () -> String?
+        end
+
+        class TaxRateDetails < ::Stripe::StripeObject
+          def display_name: () -> String
+
+          def percentage_decimal: () -> String
+
+          def tax_type: () -> String
+        end
+
+        def amount: () -> Integer
+
+        def jurisdiction: () -> Jurisdiction
+
+        def sourcing: () -> String
+
+        def tax_rate_details: () -> TaxRateDetails?
+
+        def taxability_reason: () -> String
+
+        def taxable_amount: () -> Integer
+      end
+
+      def amount: () -> Integer
+
+      def amount_tax: () -> Integer
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def object: () -> String
+
+      def performance_location: () -> String?
+
+      def product: () -> String?
+
+      def quantity: () -> Integer
+
+      def reference: () -> String
+
+      def tax_behavior: () -> String
+
+      def tax_breakdown: () -> ::Array[TaxBreakdown]?
+
+      def tax_code: () -> String
+    end
+  end
+end

@@ -1,0 +1,65 @@
+module Stripe
+  class ShippingRate < APIResource
+    class DeliveryEstimate < ::Stripe::StripeObject
+      class Maximum < ::Stripe::StripeObject
+        def unit: () -> String
+
+        def value: () -> Integer
+      end
+
+      class Minimum < ::Stripe::StripeObject
+        def unit: () -> String
+
+        def value: () -> Integer
+      end
+
+      def maximum: () -> Maximum?
+
+      def minimum: () -> Minimum?
+    end
+
+    class FixedAmount < ::Stripe::StripeObject
+      class CurrencyOptions < ::Stripe::StripeObject
+        def amount: () -> Integer
+
+        def tax_behavior: () -> String
+      end
+
+      def amount: () -> Integer
+
+      def currency: () -> String
+
+      def currency_options: () -> ::Stripe::StripeObject?
+    end
+
+    def active: () -> bool
+
+    def created: () -> Integer
+
+    def delivery_estimate: () -> DeliveryEstimate?
+
+    def display_name: () -> String?
+
+    def fixed_amount: () -> FixedAmount?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def object: () -> String
+
+    def tax_behavior: () -> String?
+
+    def tax_code: () -> (String | ::Stripe::TaxCode)?
+
+    def type: () -> String
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ShippingRate
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::ShippingRate]
+
+    def self.update: (String shipping_rate_token, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ShippingRate
+  end
+end

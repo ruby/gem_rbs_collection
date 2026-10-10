@@ -1,0 +1,105 @@
+module Stripe
+  class CustomerCashBalanceTransaction < APIResource
+    class AdjustedForOverdraft < ::Stripe::StripeObject
+      def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)
+
+      def linked_transaction: () -> (String | ::Stripe::CustomerCashBalanceTransaction)
+    end
+
+    class AppliedToPayment < ::Stripe::StripeObject
+      def payment_intent: () -> (String | ::Stripe::PaymentIntent)
+    end
+
+    class Funded < ::Stripe::StripeObject
+      class BankTransfer < ::Stripe::StripeObject
+        class EuBankTransfer < ::Stripe::StripeObject
+          def bic: () -> String?
+
+          def iban_last4: () -> String?
+
+          def sender_name: () -> String?
+        end
+
+        class GbBankTransfer < ::Stripe::StripeObject
+          def account_number_last4: () -> String?
+
+          def sender_name: () -> String?
+
+          def sort_code: () -> String?
+        end
+
+        class JpBankTransfer < ::Stripe::StripeObject
+          def sender_bank: () -> String?
+
+          def sender_branch: () -> String?
+
+          def sender_name: () -> String?
+        end
+
+        class UsBankTransfer < ::Stripe::StripeObject
+          def network: () -> String?
+
+          def sender_name: () -> String?
+        end
+
+        def eu_bank_transfer: () -> EuBankTransfer?
+
+        def gb_bank_transfer: () -> GbBankTransfer?
+
+        def jp_bank_transfer: () -> JpBankTransfer?
+
+        def reference: () -> String?
+
+        def type: () -> String
+
+        def us_bank_transfer: () -> UsBankTransfer?
+      end
+
+      def bank_transfer: () -> BankTransfer
+    end
+
+    class RefundedFromPayment < ::Stripe::StripeObject
+      def refund: () -> (String | ::Stripe::Refund)
+    end
+
+    class TransferredToBalance < ::Stripe::StripeObject
+      def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)
+    end
+
+    class UnappliedFromPayment < ::Stripe::StripeObject
+      def payment_intent: () -> (String | ::Stripe::PaymentIntent)
+    end
+
+    def adjusted_for_overdraft: () -> AdjustedForOverdraft?
+
+    def applied_to_payment: () -> AppliedToPayment?
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def customer: () -> (String | ::Stripe::Customer)
+
+    def customer_account: () -> String?
+
+    def ending_balance: () -> Integer
+
+    def funded: () -> Funded?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def net_amount: () -> Integer
+
+    def object: () -> String
+
+    def refunded_from_payment: () -> RefundedFromPayment?
+
+    def transferred_to_balance: () -> TransferredToBalance?
+
+    def type: () -> String
+
+    def unapplied_from_payment: () -> UnappliedFromPayment?
+  end
+end

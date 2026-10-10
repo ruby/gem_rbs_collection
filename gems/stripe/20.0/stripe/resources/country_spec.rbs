@@ -1,0 +1,39 @@
+module Stripe
+  class CountrySpec < APIResource
+    class VerificationFields < ::Stripe::StripeObject
+      class Company < ::Stripe::StripeObject
+        def additional: () -> ::Array[String]
+
+        def minimum: () -> ::Array[String]
+      end
+
+      class Individual < ::Stripe::StripeObject
+        def additional: () -> ::Array[String]
+
+        def minimum: () -> ::Array[String]
+      end
+
+      def company: () -> Company
+
+      def individual: () -> Individual
+    end
+
+    def default_currency: () -> String
+
+    def id: () -> String
+
+    def object: () -> String
+
+    def supported_bank_account_currencies: () -> ::Stripe::StripeObject
+
+    def supported_payment_currencies: () -> ::Array[String]
+
+    def supported_payment_methods: () -> ::Array[String]
+
+    def supported_transfer_countries: () -> ::Array[String]
+
+    def verification_fields: () -> VerificationFields
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::CountrySpec]
+  end
+end

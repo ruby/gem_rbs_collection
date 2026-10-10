@@ -1,0 +1,103 @@
+module Stripe
+  class CustomerSession < APIResource
+    class Components < ::Stripe::StripeObject
+      class ActiveEntitlements < ::Stripe::StripeObject
+        def enabled: () -> bool
+      end
+
+      class BuyButton < ::Stripe::StripeObject
+        def enabled: () -> bool
+      end
+
+      class CustomerPortal < ::Stripe::StripeObject
+        def enabled: () -> bool
+      end
+
+      class CustomerSheet < ::Stripe::StripeObject
+        class Features < ::Stripe::StripeObject
+          def payment_method_allow_redisplay_filters: () -> ::Array[String]?
+
+          def payment_method_remove: () -> String?
+        end
+
+        def enabled: () -> bool
+
+        def features: () -> Features?
+      end
+
+      class MobilePaymentElement < ::Stripe::StripeObject
+        class Features < ::Stripe::StripeObject
+          def payment_method_allow_redisplay_filters: () -> ::Array[String]?
+
+          def payment_method_redisplay: () -> String?
+
+          def payment_method_remove: () -> String?
+
+          def payment_method_save: () -> String?
+
+          def payment_method_save_allow_redisplay_override: () -> String?
+        end
+
+        def enabled: () -> bool
+
+        def features: () -> Features?
+      end
+
+      class PaymentElement < ::Stripe::StripeObject
+        class Features < ::Stripe::StripeObject
+          def payment_method_allow_redisplay_filters: () -> ::Array[String]
+
+          def payment_method_redisplay: () -> String
+
+          def payment_method_redisplay_limit: () -> Integer?
+
+          def payment_method_remove: () -> String
+
+          def payment_method_save: () -> String
+
+          def payment_method_save_usage: () -> String?
+        end
+
+        def enabled: () -> bool
+
+        def features: () -> Features?
+      end
+
+      class PricingTable < ::Stripe::StripeObject
+        def enabled: () -> bool
+      end
+
+      def active_entitlements: () -> ActiveEntitlements
+
+      def buy_button: () -> BuyButton
+
+      def customer_portal: () -> CustomerPortal
+
+      def customer_sheet: () -> CustomerSheet
+
+      def mobile_payment_element: () -> MobilePaymentElement
+
+      def payment_element: () -> PaymentElement
+
+      def pricing_table: () -> PricingTable
+    end
+
+    def client_secret: () -> String
+
+    def components: () -> Components?
+
+    def created: () -> Integer
+
+    def customer: () -> (String | ::Stripe::Customer)
+
+    def customer_account: () -> String?
+
+    def expires_at: () -> Integer
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::CustomerSession
+  end
+end

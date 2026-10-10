@@ -1,0 +1,73 @@
+module Stripe
+  class Plan < APIResource
+    class Tier < ::Stripe::StripeObject
+      def flat_amount: () -> Integer?
+
+      def flat_amount_decimal: () -> BigDecimal?
+
+      def unit_amount: () -> Integer?
+
+      def unit_amount_decimal: () -> BigDecimal?
+
+      def up_to: () -> Integer?
+    end
+
+    class TransformUsage < ::Stripe::StripeObject
+      def divide_by: () -> Integer
+
+      def round: () -> String
+    end
+
+    def active: () -> bool
+
+    def amount: () -> Integer?
+
+    def amount_decimal: () -> BigDecimal?
+
+    def billing_scheme: () -> String
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def deleted: () -> bool?
+
+    def id: () -> String
+
+    def interval: () -> String
+
+    def interval_count: () -> Integer
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def meter: () -> String?
+
+    def nickname: () -> String?
+
+    def object: () -> String
+
+    def product: () -> (String | ::Stripe::Product)?
+
+    def tiers: () -> ::Array[Tier]?
+
+    def tiers_mode: () -> String?
+
+    def transform_usage: () -> TransformUsage?
+
+    def trial_period_days: () -> Integer?
+
+    def usage_type: () -> String
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Plan
+
+    def self.delete: (String plan, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Plan
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Plan
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Plan]
+
+    def self.update: (String plan, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Plan
+  end
+end

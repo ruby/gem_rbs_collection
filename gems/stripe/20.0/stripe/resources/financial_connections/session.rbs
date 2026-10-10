@@ -1,0 +1,59 @@
+module Stripe
+  module FinancialConnections
+    class Session < APIResource
+      class AccountHolder < ::Stripe::StripeObject
+        def account: () -> (String | ::Stripe::Account)?
+
+        def customer: () -> (String | ::Stripe::Customer)?
+
+        def customer_account: () -> String?
+
+        def type: () -> String
+      end
+
+      class Filters < ::Stripe::StripeObject
+        def account_subcategories: () -> ::Array[String]?
+
+        def country: () -> String?
+
+        def require_payment_method_support: () -> String?
+      end
+
+      class Limits < ::Stripe::StripeObject
+        def accounts: () -> Integer
+      end
+
+      class ManualEntry < ::Stripe::StripeObject
+        def mode: () -> String?
+      end
+
+      def account_holder: () -> AccountHolder?
+
+      def accounts: () -> ::Stripe::ListObject[::Stripe::FinancialConnections::Account]
+
+      def bank_account_token: () -> ::Stripe::Token?
+
+      def client_secret: () -> String?
+
+      def filters: () -> Filters?
+
+      def id: () -> String
+
+      def limits: () -> Limits?
+
+      def livemode: () -> bool
+
+      def manual_entry: () -> ManualEntry?
+
+      def object: () -> String
+
+      def permissions: () -> ::Array[String]
+
+      def prefetch: () -> ::Array[String]?
+
+      def return_url: () -> String?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Session
+    end
+  end
+end

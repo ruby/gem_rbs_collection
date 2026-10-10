@@ -1,0 +1,77 @@
+module Stripe
+  module V2
+    module Core
+      class EventDestination < APIResource
+        class AmazonEventbridge < ::Stripe::StripeObject
+          def aws_account_id: () -> String
+
+          def aws_event_source_arn: () -> String
+
+          def aws_event_source_status: () -> String
+        end
+
+        class AzureEventGrid < ::Stripe::StripeObject
+          def azure_partner_topic_name: () -> String
+
+          def azure_partner_topic_status: () -> String
+
+          def azure_region: () -> String
+
+          def azure_resource_group_name: () -> String
+
+          def azure_subscription_id: () -> String
+        end
+
+        class StatusDetails < ::Stripe::StripeObject
+          class Disabled < ::Stripe::StripeObject
+            def reason: () -> String
+          end
+
+          def disabled: () -> Disabled?
+        end
+
+        class WebhookEndpoint < ::Stripe::StripeObject
+          def signing_secret: () -> String?
+
+          def url: () -> String?
+        end
+
+        def amazon_eventbridge: () -> AmazonEventbridge?
+
+        def azure_event_grid: () -> AzureEventGrid?
+
+        def created: () -> String
+
+        def description: () -> String
+
+        def enabled_events: () -> ::Array[String]
+
+        def event_payload: () -> String
+
+        def events_from: () -> ::Array[String]?
+
+        def id: () -> String
+
+        def livemode: () -> bool
+
+        def metadata: () -> ::Stripe::StripeObject?
+
+        def name: () -> String
+
+        def object: () -> String
+
+        def snapshot_api_version: () -> String?
+
+        def status: () -> String
+
+        def status_details: () -> StatusDetails?
+
+        def type: () -> String
+
+        def updated: () -> String
+
+        def webhook_endpoint: () -> WebhookEndpoint?
+      end
+    end
+  end
+end

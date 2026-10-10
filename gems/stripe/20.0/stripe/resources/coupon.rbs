@@ -1,0 +1,57 @@
+module Stripe
+  class Coupon < APIResource
+    class AppliesTo < ::Stripe::StripeObject
+      def products: () -> ::Array[String]
+    end
+
+    class CurrencyOptions < ::Stripe::StripeObject
+      def amount_off: () -> Integer
+    end
+
+    def amount_off: () -> Integer?
+
+    def applies_to: () -> AppliesTo?
+
+    def created: () -> Integer
+
+    def currency: () -> String?
+
+    def currency_options: () -> ::Stripe::StripeObject?
+
+    def deleted: () -> bool?
+
+    def duration: () -> String
+
+    def duration_in_months: () -> Integer?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def max_redemptions: () -> Integer?
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def name: () -> String?
+
+    def object: () -> String
+
+    def percent_off: () -> Float?
+
+    def redeem_by: () -> Integer?
+
+    def times_redeemed: () -> Integer
+
+    def valid: () -> bool
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Coupon
+
+    def self.delete: (String coupon, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Coupon
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Coupon
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Coupon]
+
+    def self.update: (String coupon, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Coupon
+  end
+end

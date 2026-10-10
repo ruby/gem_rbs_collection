@@ -1,0 +1,159 @@
+module Stripe
+  class Balance < SingletonAPIResource
+    class Available < ::Stripe::StripeObject
+      class SourceTypes < ::Stripe::StripeObject
+        def bank_account: () -> Integer?
+
+        def card: () -> Integer?
+
+        def fpx: () -> Integer?
+      end
+
+      def amount: () -> Integer
+
+      def currency: () -> String
+
+      def source_types: () -> SourceTypes?
+    end
+
+    class ConnectReserved < ::Stripe::StripeObject
+      class SourceTypes < ::Stripe::StripeObject
+        def bank_account: () -> Integer?
+
+        def card: () -> Integer?
+
+        def fpx: () -> Integer?
+      end
+
+      def amount: () -> Integer
+
+      def currency: () -> String
+
+      def source_types: () -> SourceTypes?
+    end
+
+    class InstantAvailable < ::Stripe::StripeObject
+      class NetAvailable < ::Stripe::StripeObject
+        class SourceTypes < ::Stripe::StripeObject
+          def bank_account: () -> Integer?
+
+          def card: () -> Integer?
+
+          def fpx: () -> Integer?
+        end
+
+        def amount: () -> Integer
+
+        def destination: () -> String
+
+        def source_types: () -> SourceTypes?
+      end
+
+      class SourceTypes < ::Stripe::StripeObject
+        def bank_account: () -> Integer?
+
+        def card: () -> Integer?
+
+        def fpx: () -> Integer?
+      end
+
+      def amount: () -> Integer
+
+      def currency: () -> String
+
+      def net_available: () -> ::Array[NetAvailable]?
+
+      def source_types: () -> SourceTypes?
+    end
+
+    class Issuing < ::Stripe::StripeObject
+      class Available < ::Stripe::StripeObject
+        class SourceTypes < ::Stripe::StripeObject
+          def bank_account: () -> Integer?
+
+          def card: () -> Integer?
+
+          def fpx: () -> Integer?
+        end
+
+        def amount: () -> Integer
+
+        def currency: () -> String
+
+        def source_types: () -> SourceTypes?
+      end
+
+      def available: () -> ::Array[Available]
+    end
+
+    class Pending < ::Stripe::StripeObject
+      class SourceTypes < ::Stripe::StripeObject
+        def bank_account: () -> Integer?
+
+        def card: () -> Integer?
+
+        def fpx: () -> Integer?
+      end
+
+      def amount: () -> Integer
+
+      def currency: () -> String
+
+      def source_types: () -> SourceTypes?
+    end
+
+    class RefundAndDisputePrefunding < ::Stripe::StripeObject
+      class Available < ::Stripe::StripeObject
+        class SourceTypes < ::Stripe::StripeObject
+          def bank_account: () -> Integer?
+
+          def card: () -> Integer?
+
+          def fpx: () -> Integer?
+        end
+
+        def amount: () -> Integer
+
+        def currency: () -> String
+
+        def source_types: () -> SourceTypes?
+      end
+
+      class Pending < ::Stripe::StripeObject
+        class SourceTypes < ::Stripe::StripeObject
+          def bank_account: () -> Integer?
+
+          def card: () -> Integer?
+
+          def fpx: () -> Integer?
+        end
+
+        def amount: () -> Integer
+
+        def currency: () -> String
+
+        def source_types: () -> SourceTypes?
+      end
+
+      def available: () -> ::Array[Available]
+
+      def pending: () -> ::Array[Pending]
+    end
+
+    def available: () -> ::Array[Available]
+
+    def connect_reserved: () -> ::Array[ConnectReserved]?
+
+    def instant_available: () -> ::Array[InstantAvailable]?
+
+    def issuing: () -> Issuing?
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def pending: () -> ::Array[Pending]
+
+    def refund_and_dispute_prefunding: () -> RefundAndDisputePrefunding?
+  end
+end

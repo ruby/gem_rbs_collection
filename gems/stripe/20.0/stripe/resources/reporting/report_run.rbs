@@ -1,0 +1,47 @@
+module Stripe
+  module Reporting
+    class ReportRun < APIResource
+      class Parameters < ::Stripe::StripeObject
+        def columns: () -> ::Array[String]?
+
+        def connected_account: () -> String?
+
+        def currency: () -> String?
+
+        def interval_end: () -> Integer?
+
+        def interval_start: () -> Integer?
+
+        def payout: () -> String?
+
+        def reporting_category: () -> String?
+
+        def timezone: () -> String?
+      end
+
+      def created: () -> Integer
+
+      def error: () -> String?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def parameters: () -> Parameters
+
+      def report_type: () -> String
+
+      def result: () -> ::Stripe::File?
+
+      def status: () -> String
+
+      def succeeded_at: () -> Integer?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Reporting::ReportRun
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Reporting::ReportRun]
+    end
+  end
+end

@@ -1,0 +1,117 @@
+module Stripe
+  module Treasury
+    class InboundTransfer < APIResource
+      class FailureDetails < ::Stripe::StripeObject
+        def code: () -> String
+      end
+
+      class LinkedFlows < ::Stripe::StripeObject
+        def received_debit: () -> String?
+      end
+
+      class OriginPaymentMethodDetails < ::Stripe::StripeObject
+        class BillingDetails < ::Stripe::StripeObject
+          class Address < ::Stripe::StripeObject
+            def city: () -> String?
+
+            def country: () -> String?
+
+            def line1: () -> String?
+
+            def line2: () -> String?
+
+            def postal_code: () -> String?
+
+            def state: () -> String?
+          end
+
+          def address: () -> Address
+
+          def email: () -> String?
+
+          def name: () -> String?
+        end
+
+        class UsBankAccount < ::Stripe::StripeObject
+          def account_holder_type: () -> String?
+
+          def account_type: () -> String?
+
+          def bank_name: () -> String?
+
+          def fingerprint: () -> String?
+
+          def last4: () -> String?
+
+          def mandate: () -> (String | ::Stripe::Mandate)?
+
+          def network: () -> String
+
+          def routing_number: () -> String?
+        end
+
+        def billing_details: () -> BillingDetails
+
+        def type: () -> String
+
+        def us_bank_account: () -> UsBankAccount?
+      end
+
+      class StatusTransitions < ::Stripe::StripeObject
+        def canceled_at: () -> Integer?
+
+        def failed_at: () -> Integer?
+
+        def succeeded_at: () -> Integer?
+      end
+
+      def amount: () -> Integer
+
+      def cancelable: () -> bool
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def description: () -> String?
+
+      def failure_details: () -> FailureDetails?
+
+      def financial_account: () -> String
+
+      def hosted_regulatory_receipt_url: () -> String?
+
+      def id: () -> String
+
+      def linked_flows: () -> LinkedFlows
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def object: () -> String
+
+      def origin_payment_method: () -> String?
+
+      def origin_payment_method_details: () -> OriginPaymentMethodDetails?
+
+      def returned: () -> bool?
+
+      def statement_descriptor: () -> String
+
+      def status: () -> String
+
+      def status_transitions: () -> StatusTransitions
+
+      def transaction: () -> (String | ::Stripe::Treasury::Transaction)?
+
+      def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::InboundTransfer
+
+      def self.cancel: (String inbound_transfer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::InboundTransfer
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::InboundTransfer
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Treasury::InboundTransfer]
+    end
+  end
+end

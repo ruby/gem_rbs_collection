@@ -1,0 +1,230 @@
+module Stripe
+  class Mandate < APIResource
+    class CustomerAcceptance < ::Stripe::StripeObject
+      class Offline < ::Stripe::StripeObject
+      end
+
+      class Online < ::Stripe::StripeObject
+        def ip_address: () -> String?
+
+        def user_agent: () -> String?
+      end
+
+      def accepted_at: () -> Integer?
+
+      def offline: () -> Offline?
+
+      def online: () -> Online?
+
+      def type: () -> String
+    end
+
+    class MultiUse < ::Stripe::StripeObject
+      def amount: () -> Integer?
+
+      def currency: () -> String?
+    end
+
+    class PaymentMethodDetails < ::Stripe::StripeObject
+      class AcssDebit < ::Stripe::StripeObject
+        def default_for: () -> ::Array[String]?
+
+        def interval_description: () -> String?
+
+        def payment_schedule: () -> String
+
+        def transaction_type: () -> String
+      end
+
+      class AmazonPay < ::Stripe::StripeObject
+      end
+
+      class AuBecsDebit < ::Stripe::StripeObject
+        def url: () -> String
+      end
+
+      class BacsDebit < ::Stripe::StripeObject
+        def display_name: () -> String?
+
+        def network_status: () -> String
+
+        def reference: () -> String
+
+        def revocation_reason: () -> String?
+
+        def service_user_number: () -> String?
+
+        def url: () -> String
+      end
+
+      class Blik < ::Stripe::StripeObject
+        def expires_at: () -> Integer?
+
+        def type: () -> String
+      end
+
+      class Card < ::Stripe::StripeObject
+        class India < ::Stripe::StripeObject
+          def inactive_reason: () -> String?
+        end
+
+        def india: () -> India?
+      end
+
+      class Cashapp < ::Stripe::StripeObject
+      end
+
+      class KakaoPay < ::Stripe::StripeObject
+      end
+
+      class Klarna < ::Stripe::StripeObject
+      end
+
+      class KrCard < ::Stripe::StripeObject
+      end
+
+      class Link < ::Stripe::StripeObject
+      end
+
+      class NaverPay < ::Stripe::StripeObject
+      end
+
+      class NzBankAccount < ::Stripe::StripeObject
+      end
+
+      class Paypal < ::Stripe::StripeObject
+        def billing_agreement_id: () -> String?
+
+        def payer_id: () -> String?
+      end
+
+      class Payto < ::Stripe::StripeObject
+        def amount: () -> Integer?
+
+        def amount_type: () -> String
+
+        def end_date: () -> String?
+
+        def payment_schedule: () -> String
+
+        def payments_per_period: () -> Integer?
+
+        def purpose: () -> String?
+
+        def start_date: () -> String?
+      end
+
+      class Pix < ::Stripe::StripeObject
+        def amount_includes_iof: () -> String?
+
+        def amount_type: () -> String?
+
+        def end_date: () -> String?
+
+        def payment_schedule: () -> String?
+
+        def reference: () -> String?
+
+        def start_date: () -> String?
+      end
+
+      class RevolutPay < ::Stripe::StripeObject
+      end
+
+      class SepaDebit < ::Stripe::StripeObject
+        def reference: () -> String
+
+        def url: () -> String
+      end
+
+      class Twint < ::Stripe::StripeObject
+      end
+
+      class Upi < ::Stripe::StripeObject
+        def amount: () -> Integer?
+
+        def amount_type: () -> String?
+
+        def description: () -> String?
+
+        def end_date: () -> Integer?
+      end
+
+      class UsBankAccount < ::Stripe::StripeObject
+        def collection_method: () -> String?
+      end
+
+      def acss_debit: () -> AcssDebit?
+
+      def amazon_pay: () -> AmazonPay?
+
+      def au_becs_debit: () -> AuBecsDebit?
+
+      def bacs_debit: () -> BacsDebit?
+
+      def blik: () -> Blik?
+
+      def card: () -> Card?
+
+      def cashapp: () -> Cashapp?
+
+      def kakao_pay: () -> KakaoPay?
+
+      def klarna: () -> Klarna?
+
+      def kr_card: () -> KrCard?
+
+      def link: () -> Link?
+
+      def naver_pay: () -> NaverPay?
+
+      def nz_bank_account: () -> NzBankAccount?
+
+      def paypal: () -> Paypal?
+
+      def payto: () -> Payto?
+
+      def pix: () -> Pix?
+
+      def revolut_pay: () -> RevolutPay?
+
+      def sepa_debit: () -> SepaDebit?
+
+      def twint: () -> Twint?
+
+      def type: () -> String
+
+      def upi: () -> Upi?
+
+      def us_bank_account: () -> UsBankAccount?
+    end
+
+    class SingleUse < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def currency: () -> String
+    end
+
+    def customer_acceptance: () -> CustomerAcceptance
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def multi_use: () -> MultiUse?
+
+    def object: () -> String
+
+    def on_behalf_of: () -> String?
+
+    def payment_method: () -> (String | ::Stripe::PaymentMethod)
+
+    def payment_method_details: () -> PaymentMethodDetails
+
+    def single_use: () -> SingleUse?
+
+    def status: () -> String
+
+    def type: () -> String
+  end
+end

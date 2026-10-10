@@ -1,0 +1,145 @@
+module Stripe
+  module Treasury
+    class OutboundTransfer < APIResource
+      class DestinationPaymentMethodDetails < ::Stripe::StripeObject
+        class BillingDetails < ::Stripe::StripeObject
+          class Address < ::Stripe::StripeObject
+            def city: () -> String?
+
+            def country: () -> String?
+
+            def line1: () -> String?
+
+            def line2: () -> String?
+
+            def postal_code: () -> String?
+
+            def state: () -> String?
+          end
+
+          def address: () -> Address
+
+          def email: () -> String?
+
+          def name: () -> String?
+        end
+
+        class FinancialAccount < ::Stripe::StripeObject
+          def id: () -> String
+
+          def network: () -> String
+        end
+
+        class UsBankAccount < ::Stripe::StripeObject
+          def account_holder_type: () -> String?
+
+          def account_type: () -> String?
+
+          def bank_name: () -> String?
+
+          def fingerprint: () -> String?
+
+          def last4: () -> String?
+
+          def mandate: () -> (String | ::Stripe::Mandate)?
+
+          def network: () -> String
+
+          def routing_number: () -> String?
+        end
+
+        def billing_details: () -> BillingDetails
+
+        def financial_account: () -> FinancialAccount?
+
+        def type: () -> String
+
+        def us_bank_account: () -> UsBankAccount?
+      end
+
+      class ReturnedDetails < ::Stripe::StripeObject
+        def code: () -> String
+
+        def transaction: () -> (String | ::Stripe::Treasury::Transaction)
+      end
+
+      class StatusTransitions < ::Stripe::StripeObject
+        def canceled_at: () -> Integer?
+
+        def failed_at: () -> Integer?
+
+        def posted_at: () -> Integer?
+
+        def returned_at: () -> Integer?
+      end
+
+      class TrackingDetails < ::Stripe::StripeObject
+        class Ach < ::Stripe::StripeObject
+          def trace_id: () -> String
+        end
+
+        class UsDomesticWire < ::Stripe::StripeObject
+          def chips: () -> String?
+
+          def imad: () -> String?
+
+          def omad: () -> String?
+        end
+
+        def ach: () -> Ach?
+
+        def type: () -> String
+
+        def us_domestic_wire: () -> UsDomesticWire?
+      end
+
+      def amount: () -> Integer
+
+      def cancelable: () -> bool
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def description: () -> String?
+
+      def destination_payment_method: () -> String?
+
+      def destination_payment_method_details: () -> DestinationPaymentMethodDetails
+
+      def expected_arrival_date: () -> Integer
+
+      def financial_account: () -> String
+
+      def hosted_regulatory_receipt_url: () -> String?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def object: () -> String
+
+      def returned_details: () -> ReturnedDetails?
+
+      def statement_descriptor: () -> String
+
+      def status: () -> String
+
+      def status_transitions: () -> StatusTransitions
+
+      def tracking_details: () -> TrackingDetails?
+
+      def transaction: () -> (String | ::Stripe::Treasury::Transaction)
+
+      def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::OutboundTransfer
+
+      def self.cancel: (String outbound_transfer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::OutboundTransfer
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::OutboundTransfer
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Treasury::OutboundTransfer]
+    end
+  end
+end

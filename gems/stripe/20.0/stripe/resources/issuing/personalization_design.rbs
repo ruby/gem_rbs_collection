@@ -1,0 +1,59 @@
+module Stripe
+  module Issuing
+    class PersonalizationDesign < APIResource
+      class CarrierText < ::Stripe::StripeObject
+        def footer_body: () -> String?
+
+        def footer_title: () -> String?
+
+        def header_body: () -> String?
+
+        def header_title: () -> String?
+      end
+
+      class Preferences < ::Stripe::StripeObject
+        def is_default: () -> bool
+
+        def is_platform_default: () -> bool?
+      end
+
+      class RejectionReasons < ::Stripe::StripeObject
+        def card_logo: () -> ::Array[String]?
+
+        def carrier_text: () -> ::Array[String]?
+      end
+
+      def card_logo: () -> (String | ::Stripe::File)?
+
+      def carrier_text: () -> CarrierText?
+
+      def created: () -> Integer
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def lookup_key: () -> String?
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def name: () -> String?
+
+      def object: () -> String
+
+      def physical_bundle: () -> (String | ::Stripe::Issuing::PhysicalBundle)
+
+      def preferences: () -> Preferences
+
+      def rejection_reasons: () -> RejectionReasons
+
+      def status: () -> String
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::PersonalizationDesign
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::PersonalizationDesign]
+
+      def self.update: (String personalization_design, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::PersonalizationDesign
+    end
+  end
+end

@@ -1,0 +1,55 @@
+module Stripe
+  class TaxId < APIResource
+    class Owner < ::Stripe::StripeObject
+      def account: () -> (String | ::Stripe::Account)?
+
+      def application: () -> (String | ::Stripe::Application)?
+
+      def customer: () -> (String | ::Stripe::Customer)?
+
+      def customer_account: () -> String?
+
+      def type: () -> String
+    end
+
+    class Verification < ::Stripe::StripeObject
+      def status: () -> String
+
+      def verified_address: () -> String?
+
+      def verified_name: () -> String?
+    end
+
+    def country: () -> String?
+
+    def created: () -> Integer
+
+    def customer: () -> (String | ::Stripe::Customer)?
+
+    def customer_account: () -> String?
+
+    def deleted: () -> bool?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def owner: () -> Owner?
+
+    def type: () -> String
+
+    def value: () -> String
+
+    def verification: () -> Verification?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TaxId
+
+    def self.delete: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TaxId
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TaxId
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::TaxId]
+  end
+end

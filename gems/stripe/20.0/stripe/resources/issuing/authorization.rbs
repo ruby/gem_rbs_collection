@@ -1,0 +1,269 @@
+module Stripe
+  module Issuing
+    class Authorization < APIResource
+      class AmountDetails < ::Stripe::StripeObject
+        def atm_fee: () -> Integer?
+
+        def cashback_amount: () -> Integer?
+      end
+
+      class Fleet < ::Stripe::StripeObject
+        class CardholderPromptData < ::Stripe::StripeObject
+          def alphanumeric_id: () -> String?
+
+          def driver_id: () -> String?
+
+          def odometer: () -> Integer?
+
+          def unspecified_id: () -> String?
+
+          def user_id: () -> String?
+
+          def vehicle_number: () -> String?
+        end
+
+        class ReportedBreakdown < ::Stripe::StripeObject
+          class Fuel < ::Stripe::StripeObject
+            def gross_amount_decimal: () -> BigDecimal?
+          end
+
+          class NonFuel < ::Stripe::StripeObject
+            def gross_amount_decimal: () -> BigDecimal?
+          end
+
+          class Tax < ::Stripe::StripeObject
+            def local_amount_decimal: () -> BigDecimal?
+
+            def national_amount_decimal: () -> BigDecimal?
+          end
+
+          def fuel: () -> Fuel?
+
+          def non_fuel: () -> NonFuel?
+
+          def tax: () -> Tax?
+        end
+
+        def cardholder_prompt_data: () -> CardholderPromptData?
+
+        def purchase_type: () -> String?
+
+        def reported_breakdown: () -> ReportedBreakdown?
+
+        def service_type: () -> String?
+      end
+
+      class FraudChallenge < ::Stripe::StripeObject
+        def channel: () -> String
+
+        def status: () -> String
+
+        def undeliverable_reason: () -> String?
+      end
+
+      class Fuel < ::Stripe::StripeObject
+        def industry_product_code: () -> String?
+
+        def quantity_decimal: () -> BigDecimal?
+
+        def type: () -> String?
+
+        def unit: () -> String?
+
+        def unit_cost_decimal: () -> BigDecimal?
+      end
+
+      class MerchantData < ::Stripe::StripeObject
+        def category: () -> String
+
+        def category_code: () -> String
+
+        def city: () -> String?
+
+        def country: () -> String?
+
+        def name: () -> String?
+
+        def network_id: () -> String
+
+        def postal_code: () -> String?
+
+        def state: () -> String?
+
+        def tax_id: () -> String?
+
+        def terminal_id: () -> String?
+
+        def url: () -> String?
+      end
+
+      class NetworkData < ::Stripe::StripeObject
+        def acquiring_institution_id: () -> String?
+
+        def system_trace_audit_number: () -> String?
+
+        def transaction_id: () -> String?
+      end
+
+      class PendingRequest < ::Stripe::StripeObject
+        class AmountDetails < ::Stripe::StripeObject
+          def atm_fee: () -> Integer?
+
+          def cashback_amount: () -> Integer?
+        end
+
+        def amount: () -> Integer
+
+        def amount_details: () -> AmountDetails?
+
+        def currency: () -> String
+
+        def is_amount_controllable: () -> bool
+
+        def merchant_amount: () -> Integer
+
+        def merchant_currency: () -> String
+
+        def network_risk_score: () -> Integer?
+      end
+
+      class RequestHistory < ::Stripe::StripeObject
+        class AmountDetails < ::Stripe::StripeObject
+          def atm_fee: () -> Integer?
+
+          def cashback_amount: () -> Integer?
+        end
+
+        def amount: () -> Integer
+
+        def amount_details: () -> AmountDetails?
+
+        def approved: () -> bool
+
+        def authorization_code: () -> String?
+
+        def created: () -> Integer
+
+        def currency: () -> String
+
+        def merchant_amount: () -> Integer
+
+        def merchant_currency: () -> String
+
+        def network_risk_score: () -> Integer?
+
+        def reason: () -> String
+
+        def reason_message: () -> String?
+
+        def requested_at: () -> Integer?
+      end
+
+      class Treasury < ::Stripe::StripeObject
+        def received_credits: () -> ::Array[String]
+
+        def received_debits: () -> ::Array[String]
+
+        def transaction: () -> String?
+      end
+
+      class VerificationData < ::Stripe::StripeObject
+        class AuthenticationExemption < ::Stripe::StripeObject
+          def claimed_by: () -> String
+
+          def type: () -> String
+        end
+
+        class ThreeDSecure < ::Stripe::StripeObject
+          def result: () -> String
+        end
+
+        def address_line1_check: () -> String
+
+        def address_postal_code_check: () -> String
+
+        def authentication_exemption: () -> AuthenticationExemption?
+
+        def cvc_check: () -> String
+
+        def expiry_check: () -> String
+
+        def postal_code: () -> String?
+
+        def three_d_secure: () -> ThreeDSecure?
+      end
+
+      def amount: () -> Integer
+
+      def amount_details: () -> AmountDetails?
+
+      def approved: () -> bool
+
+      def authorization_method: () -> String
+
+      def balance_transactions: () -> ::Array[::Stripe::BalanceTransaction]
+
+      def card: () -> ::Stripe::Issuing::Card
+
+      def card_presence: () -> String?
+
+      def cardholder: () -> (String | ::Stripe::Issuing::Cardholder)?
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def fleet: () -> Fleet?
+
+      def fraud_challenges: () -> ::Array[FraudChallenge]?
+
+      def fuel: () -> Fuel?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def merchant_amount: () -> Integer
+
+      def merchant_currency: () -> String
+
+      def merchant_data: () -> MerchantData
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def network_data: () -> NetworkData?
+
+      def object: () -> String
+
+      def pending_request: () -> PendingRequest?
+
+      def request_history: () -> ::Array[RequestHistory]
+
+      def status: () -> String
+
+      def token: () -> (String | ::Stripe::Issuing::Token)?
+
+      def transactions: () -> ::Array[::Stripe::Issuing::Transaction]
+
+      def treasury: () -> Treasury?
+
+      def verification_data: () -> VerificationData
+
+      def verified_by_fraud_challenge: () -> bool?
+
+      def wallet: () -> String?
+
+      def approve: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Authorization
+
+      def self.approve: (String authorization, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Authorization
+
+      def decline: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Authorization
+
+      def self.decline: (String authorization, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Authorization
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::Authorization]
+
+      def self.update: (String authorization, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Authorization
+    end
+  end
+end

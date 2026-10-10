@@ -1,0 +1,163 @@
+module Stripe
+  module Issuing
+    class Dispute < APIResource
+      class Evidence < ::Stripe::StripeObject
+        class Canceled < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def canceled_at: () -> Integer?
+
+          def cancellation_policy_provided: () -> bool?
+
+          def cancellation_reason: () -> String?
+
+          def expected_at: () -> Integer?
+
+          def explanation: () -> String?
+
+          def product_description: () -> String?
+
+          def product_type: () -> String?
+
+          def return_status: () -> String?
+
+          def returned_at: () -> Integer?
+        end
+
+        class Duplicate < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def card_statement: () -> (String | ::Stripe::File)?
+
+          def cash_receipt: () -> (String | ::Stripe::File)?
+
+          def check_image: () -> (String | ::Stripe::File)?
+
+          def explanation: () -> String?
+
+          def original_transaction: () -> String?
+        end
+
+        class Fraudulent < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def explanation: () -> String?
+        end
+
+        class MerchandiseNotAsDescribed < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def explanation: () -> String?
+
+          def received_at: () -> Integer?
+
+          def return_description: () -> String?
+
+          def return_status: () -> String?
+
+          def returned_at: () -> Integer?
+        end
+
+        class NoValidAuthorization < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def explanation: () -> String?
+        end
+
+        class NotReceived < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def expected_at: () -> Integer?
+
+          def explanation: () -> String?
+
+          def product_description: () -> String?
+
+          def product_type: () -> String?
+        end
+
+        class Other < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def explanation: () -> String?
+
+          def product_description: () -> String?
+
+          def product_type: () -> String?
+        end
+
+        class ServiceNotAsDescribed < ::Stripe::StripeObject
+          def additional_documentation: () -> (String | ::Stripe::File)?
+
+          def canceled_at: () -> Integer?
+
+          def cancellation_reason: () -> String?
+
+          def explanation: () -> String?
+
+          def received_at: () -> Integer?
+        end
+
+        def canceled: () -> Canceled?
+
+        def duplicate: () -> Duplicate?
+
+        def fraudulent: () -> Fraudulent?
+
+        def merchandise_not_as_described: () -> MerchandiseNotAsDescribed?
+
+        def no_valid_authorization: () -> NoValidAuthorization?
+
+        def not_received: () -> NotReceived?
+
+        def other: () -> Other?
+
+        def reason: () -> String
+
+        def service_not_as_described: () -> ServiceNotAsDescribed?
+      end
+
+      class Treasury < ::Stripe::StripeObject
+        def debit_reversal: () -> String?
+
+        def received_debit: () -> String
+      end
+
+      def amount: () -> Integer
+
+      def balance_transactions: () -> ::Array[::Stripe::BalanceTransaction]?
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def evidence: () -> Evidence
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def loss_reason: () -> String?
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def object: () -> String
+
+      def status: () -> String
+
+      def transaction: () -> (String | ::Stripe::Issuing::Transaction)
+
+      def treasury: () -> Treasury?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Dispute
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::Dispute]
+
+      def submit: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Dispute
+
+      def self.submit: (String dispute, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Dispute
+
+      def self.update: (String dispute, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Dispute
+    end
+  end
+end

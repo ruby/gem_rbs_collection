@@ -1,0 +1,61 @@
+module Stripe
+  module Treasury
+    class TransactionEntry < APIResource
+      class BalanceImpact < ::Stripe::StripeObject
+        def cash: () -> Integer
+
+        def inbound_pending: () -> Integer
+
+        def outbound_pending: () -> Integer
+      end
+
+      class FlowDetails < ::Stripe::StripeObject
+        def credit_reversal: () -> ::Stripe::Treasury::CreditReversal?
+
+        def debit_reversal: () -> ::Stripe::Treasury::DebitReversal?
+
+        def inbound_transfer: () -> ::Stripe::Treasury::InboundTransfer?
+
+        def issuing_authorization: () -> ::Stripe::Issuing::Authorization?
+
+        def outbound_payment: () -> ::Stripe::Treasury::OutboundPayment?
+
+        def outbound_transfer: () -> ::Stripe::Treasury::OutboundTransfer?
+
+        def received_credit: () -> ::Stripe::Treasury::ReceivedCredit?
+
+        def received_debit: () -> ::Stripe::Treasury::ReceivedDebit?
+
+        def type: () -> String
+      end
+
+      def balance_impact: () -> BalanceImpact
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def effective_at: () -> Integer
+
+      def financial_account: () -> String
+
+      def flow: () -> String?
+
+      def flow_details: () -> FlowDetails?
+
+      def flow_type: () -> String
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def transaction: () -> (String | ::Stripe::Treasury::Transaction)
+
+      def type: () -> String
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Treasury::TransactionEntry]
+    end
+  end
+end

@@ -1,0 +1,56 @@
+module Stripe
+  module Tax
+    class Settings < SingletonAPIResource
+      class Defaults < ::Stripe::StripeObject
+        def provider: () -> String
+
+        def tax_behavior: () -> String?
+
+        def tax_code: () -> String?
+      end
+
+      class HeadOffice < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String?
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        def address: () -> Address
+      end
+
+      class StatusDetails < ::Stripe::StripeObject
+        class Active < ::Stripe::StripeObject
+        end
+
+        class Pending < ::Stripe::StripeObject
+          def missing_fields: () -> ::Array[String]?
+        end
+
+        def active: () -> Active?
+
+        def pending: () -> Pending?
+      end
+
+      def defaults: () -> Defaults
+
+      def head_office: () -> HeadOffice?
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def status: () -> String
+
+      def status_details: () -> StatusDetails
+    end
+  end
+end

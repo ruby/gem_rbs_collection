@@ -1,0 +1,43 @@
+module Stripe
+  class ApplicationFee < APIResource
+    class FeeSource < ::Stripe::StripeObject
+      def charge: () -> String?
+
+      def payout: () -> String?
+
+      def type: () -> String
+    end
+
+    def account: () -> (String | ::Stripe::Account)
+
+    def amount: () -> Integer
+
+    def amount_refunded: () -> Integer
+
+    def application: () -> (String | ::Stripe::Application)
+
+    def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)?
+
+    def charge: () -> (String | ::Stripe::Charge)
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def fee_source: () -> FeeSource?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def originating_transaction: () -> (String | ::Stripe::Charge)?
+
+    def refunded: () -> bool
+
+    def refunds: () -> ::Stripe::ListObject[::Stripe::ApplicationFeeRefund]
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::ApplicationFee]
+  end
+end

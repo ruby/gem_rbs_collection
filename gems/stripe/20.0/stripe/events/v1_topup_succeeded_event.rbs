@@ -1,0 +1,19 @@
+module Stripe
+  module Events
+    class V1TopupSucceededEvent < Stripe::V2::Core::Event
+      def self.lookup_type: () -> "v1.topup.succeeded"
+
+      def fetch_related_object: () -> untyped
+
+      attr_reader related_object: untyped
+    end
+
+    class V1TopupSucceededEventNotification < Stripe::V2::Core::EventNotification
+      def self.lookup_type: () -> "v1.topup.succeeded"
+
+      attr_reader related_object: ::Stripe::V2::Core::RelatedObject
+
+      def fetch_related_object: () -> untyped
+    end
+  end
+end

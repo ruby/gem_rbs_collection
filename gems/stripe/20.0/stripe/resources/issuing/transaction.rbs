@@ -1,0 +1,209 @@
+module Stripe
+  module Issuing
+    class Transaction < APIResource
+      class AmountDetails < ::Stripe::StripeObject
+        def atm_fee: () -> Integer?
+
+        def cashback_amount: () -> Integer?
+      end
+
+      class MerchantData < ::Stripe::StripeObject
+        def category: () -> String
+
+        def category_code: () -> String
+
+        def city: () -> String?
+
+        def country: () -> String?
+
+        def name: () -> String?
+
+        def network_id: () -> String
+
+        def postal_code: () -> String?
+
+        def state: () -> String?
+
+        def tax_id: () -> String?
+
+        def terminal_id: () -> String?
+
+        def url: () -> String?
+      end
+
+      class NetworkData < ::Stripe::StripeObject
+        def authorization_code: () -> String?
+
+        def processing_date: () -> String?
+
+        def transaction_id: () -> String?
+      end
+
+      class PurchaseDetails < ::Stripe::StripeObject
+        class Fleet < ::Stripe::StripeObject
+          class CardholderPromptData < ::Stripe::StripeObject
+            def driver_id: () -> String?
+
+            def odometer: () -> Integer?
+
+            def unspecified_id: () -> String?
+
+            def user_id: () -> String?
+
+            def vehicle_number: () -> String?
+          end
+
+          class ReportedBreakdown < ::Stripe::StripeObject
+            class Fuel < ::Stripe::StripeObject
+              def gross_amount_decimal: () -> BigDecimal?
+            end
+
+            class NonFuel < ::Stripe::StripeObject
+              def gross_amount_decimal: () -> BigDecimal?
+            end
+
+            class Tax < ::Stripe::StripeObject
+              def local_amount_decimal: () -> BigDecimal?
+
+              def national_amount_decimal: () -> BigDecimal?
+            end
+
+            def fuel: () -> Fuel?
+
+            def non_fuel: () -> NonFuel?
+
+            def tax: () -> Tax?
+          end
+
+          def cardholder_prompt_data: () -> CardholderPromptData?
+
+          def purchase_type: () -> String?
+
+          def reported_breakdown: () -> ReportedBreakdown?
+
+          def service_type: () -> String?
+        end
+
+        class Flight < ::Stripe::StripeObject
+          class Segment < ::Stripe::StripeObject
+            def arrival_airport_code: () -> String?
+
+            def carrier: () -> String?
+
+            def departure_airport_code: () -> String?
+
+            def flight_number: () -> String?
+
+            def service_class: () -> String?
+
+            def stopover_allowed: () -> bool?
+          end
+
+          def departure_at: () -> Integer?
+
+          def passenger_name: () -> String?
+
+          def refundable: () -> bool?
+
+          def segments: () -> ::Array[Segment]?
+
+          def travel_agency: () -> String?
+        end
+
+        class Fuel < ::Stripe::StripeObject
+          def industry_product_code: () -> String?
+
+          def quantity_decimal: () -> BigDecimal?
+
+          def type: () -> String
+
+          def unit: () -> String
+
+          def unit_cost_decimal: () -> BigDecimal
+        end
+
+        class Lodging < ::Stripe::StripeObject
+          def check_in_at: () -> Integer?
+
+          def nights: () -> Integer?
+        end
+
+        class Receipt < ::Stripe::StripeObject
+          def description: () -> String?
+
+          def quantity: () -> Float?
+
+          def total: () -> Integer?
+
+          def unit_cost: () -> Integer?
+        end
+
+        def fleet: () -> Fleet?
+
+        def flight: () -> Flight?
+
+        def fuel: () -> Fuel?
+
+        def lodging: () -> Lodging?
+
+        def receipt: () -> ::Array[Receipt]?
+
+        def reference: () -> String?
+      end
+
+      class Treasury < ::Stripe::StripeObject
+        def received_credit: () -> String?
+
+        def received_debit: () -> String?
+      end
+
+      def amount: () -> Integer
+
+      def amount_details: () -> AmountDetails?
+
+      def authorization: () -> (String | ::Stripe::Issuing::Authorization)?
+
+      def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)?
+
+      def card: () -> (String | ::Stripe::Issuing::Card)
+
+      def cardholder: () -> (String | ::Stripe::Issuing::Cardholder)?
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def dispute: () -> (String | ::Stripe::Issuing::Dispute)?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def merchant_amount: () -> Integer
+
+      def merchant_currency: () -> String
+
+      def merchant_data: () -> MerchantData
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def network_data: () -> NetworkData?
+
+      def object: () -> String
+
+      def purchase_details: () -> PurchaseDetails?
+
+      def token: () -> (String | ::Stripe::Issuing::Token)?
+
+      def treasury: () -> Treasury?
+
+      def type: () -> String
+
+      def wallet: () -> String?
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::Transaction]
+
+      def self.update: (String transaction, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Transaction
+    end
+  end
+end

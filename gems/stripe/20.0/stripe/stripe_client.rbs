@@ -1,0 +1,13 @@
+module Stripe
+  class StripeClient
+    def parse_event_notification: (String payload, String sig_header, String secret, ?tolerance: Integer? tolerance) -> ::Stripe::V2::Core::EventNotification
+
+    def parse_event_notification_without_verification: (String payload) -> ::Stripe::V2::Core::EventNotification
+
+    def with_stripe_context: ((String | ::Stripe::StripeContext)? context) -> ::Stripe::StripeClient
+
+    def notification_handler: (String webhook_secret) { (::Stripe::V2::Core::EventNotification event_notification, ::Stripe::StripeClient client, ::Stripe::UnhandledNotificationDetails details) -> void } -> ::Stripe::StripeEventNotificationHandler
+
+    def notification_handler_without_verification: () { (::Stripe::V2::Core::EventNotification event_notification, ::Stripe::StripeClient client, ::Stripe::UnhandledNotificationDetails details) -> void } -> ::Stripe::StripeEventNotificationHandlerWithoutVerification
+  end
+end

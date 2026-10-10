@@ -1,0 +1,107 @@
+module Stripe
+  module Issuing
+    class Token < APIResource
+      class NetworkData < ::Stripe::StripeObject
+        class Device < ::Stripe::StripeObject
+          def device_fingerprint: () -> String?
+
+          def ip_address: () -> String?
+
+          def location: () -> String?
+
+          def name: () -> String?
+
+          def phone_number: () -> String?
+
+          def type: () -> String?
+        end
+
+        class Mastercard < ::Stripe::StripeObject
+          def card_reference_id: () -> String?
+
+          def token_reference_id: () -> String
+
+          def token_requestor_id: () -> String
+
+          def token_requestor_name: () -> String?
+        end
+
+        class Visa < ::Stripe::StripeObject
+          def card_reference_id: () -> String?
+
+          def token_reference_id: () -> String
+
+          def token_requestor_id: () -> String
+
+          def token_risk_score: () -> String?
+        end
+
+        class WalletProvider < ::Stripe::StripeObject
+          class CardholderAddress < ::Stripe::StripeObject
+            def line1: () -> String
+
+            def postal_code: () -> String
+          end
+
+          def account_id: () -> String?
+
+          def account_trust_score: () -> Integer?
+
+          def card_number_source: () -> String?
+
+          def cardholder_address: () -> CardholderAddress?
+
+          def cardholder_name: () -> String?
+
+          def device_trust_score: () -> Integer?
+
+          def hashed_account_email_address: () -> String?
+
+          def reason_codes: () -> ::Array[String]?
+
+          def suggested_decision: () -> String?
+
+          def suggested_decision_version: () -> String?
+        end
+
+        def device: () -> Device?
+
+        def mastercard: () -> Mastercard?
+
+        def type: () -> String
+
+        def visa: () -> Visa?
+
+        def wallet_provider: () -> WalletProvider?
+      end
+
+      def card: () -> (String | ::Stripe::Issuing::Card)
+
+      def created: () -> Integer
+
+      def device_fingerprint: () -> String?
+
+      def id: () -> String
+
+      def last4: () -> String?
+
+      def livemode: () -> bool
+
+      def network: () -> String
+
+      def network_data: () -> NetworkData?
+
+      def network_updated_at: () -> Integer
+
+      def object: () -> String
+
+      def status: () -> String
+
+      def wallet_provider: () -> String?
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::Token]
+
+      def self.update: (String token, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Token
+    end
+  end
+end

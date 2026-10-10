@@ -1,0 +1,261 @@
+module Stripe
+  class Dispute < APIResource
+    class Evidence < ::Stripe::StripeObject
+      class EnhancedEvidence < ::Stripe::StripeObject
+        class MastercardCompliance < ::Stripe::StripeObject
+          def fee_acknowledged: () -> bool
+        end
+
+        class VisaCompellingEvidence3 < ::Stripe::StripeObject
+          class DisputedTransaction < ::Stripe::StripeObject
+            class ShippingAddress < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            def customer_account_id: () -> String?
+
+            def customer_device_fingerprint: () -> String?
+
+            def customer_device_id: () -> String?
+
+            def customer_email_address: () -> String?
+
+            def customer_purchase_ip: () -> String?
+
+            def merchandise_or_services: () -> String?
+
+            def product_description: () -> String?
+
+            def shipping_address: () -> ShippingAddress?
+          end
+
+          class PriorUndisputedTransaction < ::Stripe::StripeObject
+            class ShippingAddress < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            def charge: () -> String
+
+            def customer_account_id: () -> String?
+
+            def customer_device_fingerprint: () -> String?
+
+            def customer_device_id: () -> String?
+
+            def customer_email_address: () -> String?
+
+            def customer_purchase_ip: () -> String?
+
+            def product_description: () -> String?
+
+            def shipping_address: () -> ShippingAddress?
+          end
+
+          def disputed_transaction: () -> DisputedTransaction?
+
+          def prior_undisputed_transactions: () -> ::Array[PriorUndisputedTransaction]
+        end
+
+        class VisaCompliance < ::Stripe::StripeObject
+          def fee_acknowledged: () -> bool
+        end
+
+        def mastercard_compliance: () -> MastercardCompliance?
+
+        def visa_compelling_evidence_3: () -> VisaCompellingEvidence3?
+
+        def visa_compliance: () -> VisaCompliance?
+      end
+
+      def access_activity_log: () -> String?
+
+      def billing_address: () -> String?
+
+      def cancellation_policy: () -> (String | ::Stripe::File)?
+
+      def cancellation_policy_disclosure: () -> String?
+
+      def cancellation_rebuttal: () -> String?
+
+      def customer_communication: () -> (String | ::Stripe::File)?
+
+      def customer_email_address: () -> String?
+
+      def customer_name: () -> String?
+
+      def customer_purchase_ip: () -> String?
+
+      def customer_signature: () -> (String | ::Stripe::File)?
+
+      def duplicate_charge_documentation: () -> (String | ::Stripe::File)?
+
+      def duplicate_charge_explanation: () -> String?
+
+      def duplicate_charge_id: () -> String?
+
+      def enhanced_evidence: () -> EnhancedEvidence
+
+      def product_description: () -> String?
+
+      def receipt: () -> (String | ::Stripe::File)?
+
+      def refund_policy: () -> (String | ::Stripe::File)?
+
+      def refund_policy_disclosure: () -> String?
+
+      def refund_refusal_explanation: () -> String?
+
+      def service_date: () -> String?
+
+      def service_documentation: () -> (String | ::Stripe::File)?
+
+      def shipping_address: () -> String?
+
+      def shipping_carrier: () -> String?
+
+      def shipping_date: () -> String?
+
+      def shipping_documentation: () -> (String | ::Stripe::File)?
+
+      def shipping_tracking_number: () -> String?
+
+      def uncategorized_file: () -> (String | ::Stripe::File)?
+
+      def uncategorized_text: () -> String?
+    end
+
+    class EvidenceDetails < ::Stripe::StripeObject
+      class EnhancedEligibility < ::Stripe::StripeObject
+        class MastercardCompliance < ::Stripe::StripeObject
+          def status: () -> String
+        end
+
+        class VisaCompellingEvidence3 < ::Stripe::StripeObject
+          def required_actions: () -> ::Array[String]
+
+          def status: () -> String
+        end
+
+        class VisaCompliance < ::Stripe::StripeObject
+          def status: () -> String
+        end
+
+        def mastercard_compliance: () -> MastercardCompliance?
+
+        def visa_compelling_evidence_3: () -> VisaCompellingEvidence3?
+
+        def visa_compliance: () -> VisaCompliance?
+      end
+
+      def due_by: () -> Integer?
+
+      def enhanced_eligibility: () -> EnhancedEligibility
+
+      def has_evidence: () -> bool
+
+      def past_due: () -> bool
+
+      def submission_count: () -> Integer
+    end
+
+    class PaymentMethodDetails < ::Stripe::StripeObject
+      class AmazonPay < ::Stripe::StripeObject
+        def dispute_type: () -> String?
+      end
+
+      class Card < ::Stripe::StripeObject
+        def brand: () -> String
+
+        def case_type: () -> String
+
+        def network: () -> String
+
+        def network_reason_code: () -> String?
+      end
+
+      class Klarna < ::Stripe::StripeObject
+        def chargeback_loss_reason_code: () -> String?
+
+        def reason_code: () -> String?
+      end
+
+      class Paypal < ::Stripe::StripeObject
+        def case_id: () -> String?
+
+        def reason_code: () -> String?
+      end
+
+      def amazon_pay: () -> AmazonPay?
+
+      def card: () -> Card?
+
+      def klarna: () -> Klarna?
+
+      def paypal: () -> Paypal?
+
+      def type: () -> String
+    end
+
+    def amount: () -> Integer
+
+    def balance_transactions: () -> ::Array[::Stripe::BalanceTransaction]
+
+    def charge: () -> (String | ::Stripe::Charge)
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def enhanced_eligibility_types: () -> ::Array[String]
+
+    def evidence: () -> Evidence
+
+    def evidence_details: () -> EvidenceDetails
+
+    def id: () -> String
+
+    def is_charge_refundable: () -> bool
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def object: () -> String
+
+    def payment_intent: () -> (String | ::Stripe::PaymentIntent)?
+
+    def payment_method_details: () -> PaymentMethodDetails?
+
+    def reason: () -> String
+
+    def status: () -> String
+
+    def close: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Dispute
+
+    def self.close: (String dispute, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Dispute
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Dispute]
+
+    def self.update: (String dispute, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Dispute
+  end
+end

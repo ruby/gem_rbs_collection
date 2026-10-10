@@ -1,0 +1,23 @@
+module Stripe
+  class QuoteService < StripeService
+    attr_reader computed_upfront_line_items: ::Stripe::QuoteComputedUpfrontLineItemsService
+
+    attr_reader line_items: ::Stripe::QuoteLineItemService
+
+    def accept: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def cancel: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def finalize_quote: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Quote]
+
+    def pdf: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) { () -> untyped } -> untyped
+
+    def retrieve: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def update: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+  end
+end

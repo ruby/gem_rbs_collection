@@ -1,0 +1,47 @@
+module Stripe
+  module Treasury
+    class DebitReversal < APIResource
+      class LinkedFlows < ::Stripe::StripeObject
+        def issuing_dispute: () -> String?
+      end
+
+      class StatusTransitions < ::Stripe::StripeObject
+        def completed_at: () -> Integer?
+      end
+
+      def amount: () -> Integer
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def financial_account: () -> String?
+
+      def hosted_regulatory_receipt_url: () -> String?
+
+      def id: () -> String
+
+      def linked_flows: () -> LinkedFlows?
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def network: () -> String
+
+      def object: () -> String
+
+      def received_debit: () -> String
+
+      def status: () -> String
+
+      def status_transitions: () -> StatusTransitions
+
+      def transaction: () -> (String | ::Stripe::Treasury::Transaction)?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::DebitReversal
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Treasury::DebitReversal]
+    end
+  end
+end

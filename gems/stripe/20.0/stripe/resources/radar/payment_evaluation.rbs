@@ -1,0 +1,255 @@
+module Stripe
+  module Radar
+    class PaymentEvaluation < APIResource
+      class ClientDeviceMetadataDetails < ::Stripe::StripeObject
+        def radar_session: () -> String
+      end
+
+      class CustomerDetails < ::Stripe::StripeObject
+        def customer: () -> String?
+
+        def customer_account: () -> String?
+
+        def email: () -> String?
+
+        def name: () -> String?
+
+        def phone: () -> String?
+      end
+
+      class Event < ::Stripe::StripeObject
+        class DisputeOpened < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def currency: () -> String
+
+          def reason: () -> String
+        end
+
+        class EarlyFraudWarningReceived < ::Stripe::StripeObject
+          def fraud_type: () -> String
+        end
+
+        class Refunded < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def currency: () -> String
+
+          def reason: () -> String
+        end
+
+        class UserInterventionRaised < ::Stripe::StripeObject
+          class Custom < ::Stripe::StripeObject
+            def type: () -> String
+          end
+
+          def custom: () -> Custom?
+
+          def key: () -> String
+
+          def type: () -> String
+        end
+
+        class UserInterventionResolved < ::Stripe::StripeObject
+          def key: () -> String
+
+          def outcome: () -> String?
+        end
+
+        def dispute_opened: () -> DisputeOpened?
+
+        def early_fraud_warning_received: () -> EarlyFraudWarningReceived?
+
+        def occurred_at: () -> Integer
+
+        def refunded: () -> Refunded?
+
+        def type: () -> String
+
+        def user_intervention_raised: () -> UserInterventionRaised?
+
+        def user_intervention_resolved: () -> UserInterventionResolved?
+      end
+
+      class Outcome < ::Stripe::StripeObject
+        class MerchantBlocked < ::Stripe::StripeObject
+          def reason: () -> String
+        end
+
+        class Rejected < ::Stripe::StripeObject
+          class Card < ::Stripe::StripeObject
+            def address_line1_check: () -> String
+
+            def address_postal_code_check: () -> String
+
+            def cvc_check: () -> String
+
+            def reason: () -> String
+          end
+
+          def card: () -> Card?
+        end
+
+        class Succeeded < ::Stripe::StripeObject
+          class Card < ::Stripe::StripeObject
+            def address_line1_check: () -> String
+
+            def address_postal_code_check: () -> String
+
+            def cvc_check: () -> String
+          end
+
+          def card: () -> Card?
+        end
+
+        def merchant_blocked: () -> MerchantBlocked?
+
+        def payment_intent_id: () -> String?
+
+        def rejected: () -> Rejected?
+
+        def succeeded: () -> Succeeded?
+
+        def type: () -> String
+      end
+
+      class PaymentDetails < ::Stripe::StripeObject
+        class MoneyMovementDetails < ::Stripe::StripeObject
+          class Card < ::Stripe::StripeObject
+            def customer_presence: () -> String?
+
+            def payment_type: () -> String?
+          end
+
+          def card: () -> Card?
+
+          def money_movement_type: () -> String
+        end
+
+        class PaymentMethodDetails < ::Stripe::StripeObject
+          class BillingDetails < ::Stripe::StripeObject
+            class Address < ::Stripe::StripeObject
+              def city: () -> String?
+
+              def country: () -> String?
+
+              def line1: () -> String?
+
+              def line2: () -> String?
+
+              def postal_code: () -> String?
+
+              def state: () -> String?
+            end
+
+            def address: () -> Address
+
+            def email: () -> String?
+
+            def name: () -> String?
+
+            def phone: () -> String?
+          end
+
+          def billing_details: () -> BillingDetails?
+
+          def payment_method: () -> (String | ::Stripe::PaymentMethod)
+        end
+
+        class ShippingDetails < ::Stripe::StripeObject
+          class Address < ::Stripe::StripeObject
+            def city: () -> String?
+
+            def country: () -> String?
+
+            def line1: () -> String?
+
+            def line2: () -> String?
+
+            def postal_code: () -> String?
+
+            def state: () -> String?
+          end
+
+          def address: () -> Address
+
+          def name: () -> String?
+
+          def phone: () -> String?
+        end
+
+        def amount: () -> Integer
+
+        def currency: () -> String
+
+        def description: () -> String?
+
+        def money_movement_details: () -> MoneyMovementDetails?
+
+        def payment_method_details: () -> PaymentMethodDetails?
+
+        def shipping_details: () -> ShippingDetails?
+
+        def statement_descriptor: () -> String?
+      end
+
+      class Signals < ::Stripe::StripeObject
+        class EarlyFraudWarning < ::Stripe::StripeObject
+          def evaluated_at: () -> Integer
+
+          def risk_level: () -> String
+
+          def score: () -> Float?
+        end
+
+        class FraudulentDispute < ::Stripe::StripeObject
+          def evaluated_at: () -> Integer
+
+          def risk_level: () -> String
+
+          def score: () -> Float?
+        end
+
+        class FraudulentPayment < ::Stripe::StripeObject
+          def evaluated_at: () -> Integer
+
+          def risk_level: () -> String
+
+          def score: () -> Float?
+        end
+
+        def early_fraud_warning: () -> EarlyFraudWarning?
+
+        def fraudulent_dispute: () -> FraudulentDispute?
+
+        def fraudulent_payment: () -> FraudulentPayment
+      end
+
+      def client_device_metadata_details: () -> ClientDeviceMetadataDetails?
+
+      def created_at: () -> Integer
+
+      def customer_details: () -> CustomerDetails?
+
+      def events: () -> ::Array[Event]?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def object: () -> String
+
+      def outcome: () -> Outcome?
+
+      def payment_details: () -> PaymentDetails?
+
+      def recommended_action: () -> String
+
+      def signals: () -> Signals
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Radar::PaymentEvaluation
+    end
+  end
+end

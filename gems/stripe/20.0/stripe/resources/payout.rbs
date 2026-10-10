@@ -1,0 +1,77 @@
+module Stripe
+  class Payout < APIResource
+    class TraceId < ::Stripe::StripeObject
+      def status: () -> String
+
+      def value: () -> String?
+    end
+
+    def amount: () -> Integer
+
+    def application_fee: () -> (String | ::Stripe::ApplicationFee)?
+
+    def application_fee_amount: () -> Integer?
+
+    def arrival_date: () -> Integer
+
+    def automatic: () -> bool
+
+    def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)?
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def description: () -> String?
+
+    def destination: () -> (String | ::Stripe::BankAccount | ::Stripe::Card)?
+
+    def failure_balance_transaction: () -> (String | ::Stripe::BalanceTransaction)?
+
+    def failure_code: () -> String?
+
+    def failure_message: () -> String?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def method: () -> String
+
+    def object: () -> String
+
+    def original_payout: () -> (String | ::Stripe::Payout)?
+
+    def payout_method: () -> String?
+
+    def reconciliation_status: () -> String
+
+    def reversed_by: () -> (String | ::Stripe::Payout)?
+
+    def source_type: () -> String
+
+    def statement_descriptor: () -> String?
+
+    def status: () -> String
+
+    def trace_id: () -> TraceId?
+
+    def type: () -> String
+
+    def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Payout
+
+    def self.cancel: (String payout, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Payout
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Payout
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Payout]
+
+    def reverse: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Payout
+
+    def self.reverse: (String payout, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Payout
+
+    def self.update: (String payout, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Payout
+  end
+end

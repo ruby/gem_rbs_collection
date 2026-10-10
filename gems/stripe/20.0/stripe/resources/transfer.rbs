@@ -1,0 +1,43 @@
+module Stripe
+  class Transfer < APIResource
+    def amount: () -> Integer
+
+    def amount_reversed: () -> Integer
+
+    def balance_transaction: () -> (String | ::Stripe::BalanceTransaction)?
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def description: () -> String?
+
+    def destination: () -> (String | ::Stripe::Account)?
+
+    def destination_payment: () -> (String | ::Stripe::Charge)?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def object: () -> String
+
+    def reversals: () -> ::Stripe::ListObject[::Stripe::TransferReversal]
+
+    def reversed: () -> bool
+
+    def source_transaction: () -> (String | ::Stripe::Charge)?
+
+    def source_type: () -> String?
+
+    def transfer_group: () -> String?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Transfer
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Transfer]
+
+    def self.update: (String transfer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Transfer
+  end
+end

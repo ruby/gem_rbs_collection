@@ -1,0 +1,139 @@
+module Stripe
+  module BillingPortal
+    class Configuration < APIResource
+      class BusinessProfile < ::Stripe::StripeObject
+        def headline: () -> String?
+
+        def privacy_policy_url: () -> String?
+
+        def terms_of_service_url: () -> String?
+      end
+
+      class Features < ::Stripe::StripeObject
+        class CustomerUpdate < ::Stripe::StripeObject
+          def allowed_updates: () -> ::Array[String]
+
+          def enabled: () -> bool
+        end
+
+        class InvoiceHistory < ::Stripe::StripeObject
+          def enabled: () -> bool
+        end
+
+        class PaymentMethodUpdate < ::Stripe::StripeObject
+          def enabled: () -> bool
+
+          def payment_method_configuration: () -> String?
+        end
+
+        class SubscriptionCancel < ::Stripe::StripeObject
+          class CancellationReason < ::Stripe::StripeObject
+            def enabled: () -> bool
+
+            def feedback_options: () -> ::Array[String | ::Stripe::Billing::FeedbackOption]?
+
+            def options: () -> ::Array[String]
+          end
+
+          def cancellation_reason: () -> CancellationReason
+
+          def enabled: () -> bool
+
+          def mode: () -> String
+
+          def proration_behavior: () -> String
+        end
+
+        class SubscriptionUpdate < ::Stripe::StripeObject
+          class Product < ::Stripe::StripeObject
+            class AdjustableQuantity < ::Stripe::StripeObject
+              def enabled: () -> bool
+
+              def maximum: () -> Integer?
+
+              def minimum: () -> Integer
+            end
+
+            def adjustable_quantity: () -> AdjustableQuantity
+
+            def prices: () -> ::Array[String]
+
+            def product: () -> String
+          end
+
+          class ScheduleAtPeriodEnd < ::Stripe::StripeObject
+            class Condition < ::Stripe::StripeObject
+              def type: () -> String
+            end
+
+            def conditions: () -> ::Array[Condition]
+          end
+
+          def billing_cycle_anchor: () -> String?
+
+          def default_allowed_updates: () -> ::Array[String]
+
+          def enabled: () -> bool
+
+          def products: () -> ::Array[Product]?
+
+          def proration_behavior: () -> String
+
+          def schedule_at_period_end: () -> ScheduleAtPeriodEnd
+
+          def trial_update_behavior: () -> String
+        end
+
+        def customer_update: () -> CustomerUpdate
+
+        def invoice_history: () -> InvoiceHistory
+
+        def payment_method_update: () -> PaymentMethodUpdate
+
+        def subscription_cancel: () -> SubscriptionCancel
+
+        def subscription_update: () -> SubscriptionUpdate
+      end
+
+      class LoginPage < ::Stripe::StripeObject
+        def enabled: () -> bool
+
+        def url: () -> String?
+      end
+
+      def active: () -> bool
+
+      def application: () -> (String | ::Stripe::Application)?
+
+      def business_profile: () -> BusinessProfile
+
+      def created: () -> Integer
+
+      def default_return_url: () -> String?
+
+      def features: () -> Features
+
+      def id: () -> String
+
+      def is_default: () -> bool
+
+      def livemode: () -> bool
+
+      def login_page: () -> LoginPage
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def name: () -> String?
+
+      def object: () -> String
+
+      def updated: () -> Integer
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::BillingPortal::Configuration
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::BillingPortal::Configuration]
+
+      def self.update: (String configuration, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::BillingPortal::Configuration
+    end
+  end
+end

@@ -1,0 +1,59 @@
+module Stripe
+  class Review < APIResource
+    class IpAddressLocation < ::Stripe::StripeObject
+      def city: () -> String?
+
+      def country: () -> String?
+
+      def latitude: () -> Float?
+
+      def longitude: () -> Float?
+
+      def region: () -> String?
+    end
+
+    class Session < ::Stripe::StripeObject
+      def browser: () -> String?
+
+      def device: () -> String?
+
+      def platform: () -> String?
+
+      def version: () -> String?
+    end
+
+    def billing_zip: () -> String?
+
+    def charge: () -> (String | ::Stripe::Charge)?
+
+    def closed_reason: () -> String?
+
+    def created: () -> Integer
+
+    def id: () -> String
+
+    def ip_address: () -> String?
+
+    def ip_address_location: () -> IpAddressLocation?
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def open: () -> bool
+
+    def opened_reason: () -> String
+
+    def payment_intent: () -> (String | ::Stripe::PaymentIntent)?
+
+    def reason: () -> String
+
+    def session: () -> Session?
+
+    def approve: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Review
+
+    def self.approve: (String review, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Review
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Review]
+  end
+end

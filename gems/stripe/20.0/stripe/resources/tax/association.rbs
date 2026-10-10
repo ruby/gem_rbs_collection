@@ -1,0 +1,35 @@
+module Stripe
+  module Tax
+    class Association < APIResource
+      class TaxTransactionAttempt < ::Stripe::StripeObject
+        class Committed < ::Stripe::StripeObject
+          def transaction: () -> String
+        end
+
+        class Errored < ::Stripe::StripeObject
+          def reason: () -> String
+        end
+
+        def committed: () -> Committed?
+
+        def errored: () -> Errored?
+
+        def source: () -> String
+
+        def status: () -> String
+      end
+
+      def calculation: () -> String
+
+      def id: () -> String
+
+      def object: () -> String
+
+      def payment_intent: () -> String
+
+      def tax_transaction_attempts: () -> ::Array[TaxTransactionAttempt]?
+
+      def self.find: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Tax::Association
+    end
+  end
+end

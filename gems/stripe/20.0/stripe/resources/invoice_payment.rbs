@@ -1,0 +1,45 @@
+module Stripe
+  class InvoicePayment < APIResource
+    class Payment < ::Stripe::StripeObject
+      def charge: () -> (String | ::Stripe::Charge)?
+
+      def payment_intent: () -> (String | ::Stripe::PaymentIntent)?
+
+      def payment_record: () -> (String | ::Stripe::PaymentRecord)?
+
+      def type: () -> String
+    end
+
+    class StatusTransitions < ::Stripe::StripeObject
+      def canceled_at: () -> Integer?
+
+      def paid_at: () -> Integer?
+    end
+
+    def amount_paid: () -> Integer?
+
+    def amount_requested: () -> Integer
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def id: () -> String
+
+    def invoice: () -> (String | ::Stripe::Invoice)
+
+    def is_default: () -> bool
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def payment: () -> Payment
+
+    def status: () -> String
+
+    def status_transitions: () -> StatusTransitions
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::InvoicePayment]
+  end
+end

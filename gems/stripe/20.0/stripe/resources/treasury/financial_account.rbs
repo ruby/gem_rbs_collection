@@ -1,0 +1,101 @@
+module Stripe
+  module Treasury
+    class FinancialAccount < APIResource
+      class Balance < ::Stripe::StripeObject
+        def cash: () -> ::Stripe::StripeObject
+
+        def inbound_pending: () -> ::Stripe::StripeObject
+
+        def outbound_pending: () -> ::Stripe::StripeObject
+      end
+
+      class FinancialAddress < ::Stripe::StripeObject
+        class Aba < ::Stripe::StripeObject
+          def account_holder_name: () -> String
+
+          def account_number: () -> String?
+
+          def account_number_last4: () -> String
+
+          def bank_name: () -> String
+
+          def routing_number: () -> String
+        end
+
+        def aba: () -> Aba?
+
+        def supported_networks: () -> ::Array[String]?
+
+        def type: () -> String
+      end
+
+      class PlatformRestrictions < ::Stripe::StripeObject
+        def inbound_flows: () -> String?
+
+        def outbound_flows: () -> String?
+      end
+
+      class StatusDetails < ::Stripe::StripeObject
+        class Closed < ::Stripe::StripeObject
+          def reasons: () -> ::Array[String]
+        end
+
+        def closed: () -> Closed?
+      end
+
+      def active_features: () -> ::Array[String]?
+
+      def balance: () -> Balance
+
+      def country: () -> String
+
+      def created: () -> Integer
+
+      def features: () -> ::Stripe::Treasury::FinancialAccountFeatures?
+
+      def financial_addresses: () -> ::Array[FinancialAddress]
+
+      def id: () -> String
+
+      def is_default: () -> bool?
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def nickname: () -> String?
+
+      def object: () -> String
+
+      def pending_features: () -> ::Array[String]?
+
+      def platform_restrictions: () -> PlatformRestrictions?
+
+      def restricted_features: () -> ::Array[String]?
+
+      def status: () -> String
+
+      def status_details: () -> StatusDetails
+
+      def supported_currencies: () -> ::Array[String]
+
+      def close: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccount
+
+      def self.close: (String financial_account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccount
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccount
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Treasury::FinancialAccount]
+
+      def retrieve_features: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccountFeatures
+
+      def self.retrieve_features: (String financial_account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccountFeatures
+
+      def self.update: (String financial_account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccount
+
+      def update_features: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccountFeatures
+
+      def self.update_features: (String financial_account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Treasury::FinancialAccountFeatures
+    end
+  end
+end

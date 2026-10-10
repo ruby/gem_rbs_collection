@@ -1,0 +1,401 @@
+module Stripe
+  class SubscriptionSchedule < APIResource
+    class BillingMode < ::Stripe::StripeObject
+      class Flexible < ::Stripe::StripeObject
+        def proration_discounts: () -> String?
+      end
+
+      def flexible: () -> Flexible?
+
+      def type: () -> String
+
+      def updated_at: () -> Integer?
+    end
+
+    class CurrentPhase < ::Stripe::StripeObject
+      def end_date: () -> Integer
+
+      def start_date: () -> Integer
+    end
+
+    class DefaultSettings < ::Stripe::StripeObject
+      class AutomaticTax < ::Stripe::StripeObject
+        class Liability < ::Stripe::StripeObject
+          def account: () -> (String | ::Stripe::Account)?
+
+          def type: () -> String
+        end
+
+        def disabled_reason: () -> String?
+
+        def enabled: () -> bool
+
+        def liability: () -> Liability?
+      end
+
+      class BillingThresholds < ::Stripe::StripeObject
+        def amount_gte: () -> Integer?
+
+        def reset_billing_cycle_anchor: () -> bool?
+      end
+
+      class InvoiceSettings < ::Stripe::StripeObject
+        class CustomField < ::Stripe::StripeObject
+          def name: () -> String
+
+          def value: () -> String
+        end
+
+        class Issuer < ::Stripe::StripeObject
+          def account: () -> (String | ::Stripe::Account)?
+
+          def type: () -> String
+        end
+
+        def account_tax_ids: () -> ::Array[String | ::Stripe::TaxId]?
+
+        def custom_fields: () -> ::Array[CustomField]?
+
+        def days_until_due: () -> Integer?
+
+        def description: () -> String?
+
+        def footer: () -> String?
+
+        def issuer: () -> Issuer
+      end
+
+      class TransferData < ::Stripe::StripeObject
+        def amount_percent: () -> Float?
+
+        def destination: () -> (String | ::Stripe::Account)
+      end
+
+      def application_fee_percent: () -> Float?
+
+      def automatic_tax: () -> AutomaticTax?
+
+      def billing_cycle_anchor: () -> String
+
+      def billing_thresholds: () -> BillingThresholds?
+
+      def collection_method: () -> String?
+
+      def default_payment_method: () -> (String | ::Stripe::PaymentMethod)?
+
+      def description: () -> String?
+
+      def invoice_settings: () -> InvoiceSettings
+
+      def on_behalf_of: () -> (String | ::Stripe::Account)?
+
+      def transfer_data: () -> TransferData?
+    end
+
+    class PauseSchedule < ::Stripe::StripeObject
+      class Pause < ::Stripe::StripeObject
+        class Settings < ::Stripe::StripeObject
+          class BillFor < ::Stripe::StripeObject
+            class OutstandingUsageThrough < ::Stripe::StripeObject
+              def type: () -> String
+            end
+
+            class UnusedTimeFrom < ::Stripe::StripeObject
+              def type: () -> String
+            end
+
+            def outstanding_usage_through: () -> OutstandingUsageThrough
+
+            def unused_time_from: () -> UnusedTimeFrom
+          end
+
+          def bill_for: () -> BillFor
+
+          def invoicing_behavior: () -> String
+
+          def type: () -> String
+        end
+
+        class Status < ::Stripe::StripeObject
+          class Error < ::Stripe::StripeObject
+            def code: () -> String?
+
+            def message: () -> String
+          end
+
+          def error: () -> Error?
+
+          def type: () -> String
+        end
+
+        def pause_at: () -> Integer
+
+        def settings: () -> Settings?
+
+        def status: () -> Status
+      end
+
+      class Resume < ::Stripe::StripeObject
+        class Settings < ::Stripe::StripeObject
+          def billing_cycle_anchor: () -> String
+
+          def payment_behavior: () -> String
+
+          def proration_behavior: () -> String
+        end
+
+        class Status < ::Stripe::StripeObject
+          class Error < ::Stripe::StripeObject
+            def code: () -> String?
+
+            def message: () -> String
+          end
+
+          def error: () -> Error?
+
+          def type: () -> String
+        end
+
+        def resume_at: () -> Integer
+
+        def settings: () -> Settings
+
+        def status: () -> Status
+      end
+
+      def key: () -> String
+
+      def pause: () -> Pause
+
+      def resume: () -> Resume?
+    end
+
+    class Phase < ::Stripe::StripeObject
+      class AddInvoiceItem < ::Stripe::StripeObject
+        class Discount < ::Stripe::StripeObject
+          def coupon: () -> (String | ::Stripe::Coupon)?
+
+          def discount: () -> (String | ::Stripe::Discount)?
+
+          def promotion_code: () -> (String | ::Stripe::PromotionCode)?
+        end
+
+        class Period < ::Stripe::StripeObject
+          class End < ::Stripe::StripeObject
+            def timestamp: () -> Integer?
+
+            def type: () -> String
+          end
+
+          class Start < ::Stripe::StripeObject
+            def timestamp: () -> Integer?
+
+            def type: () -> String
+          end
+
+          def end: () -> End
+
+          def start: () -> Start
+        end
+
+        def discountable: () -> bool?
+
+        def discounts: () -> ::Array[Discount]
+
+        def metadata: () -> ::Stripe::StripeObject?
+
+        def period: () -> Period
+
+        def price: () -> (String | ::Stripe::Price)
+
+        def quantity: () -> Integer?
+
+        def tax_rates: () -> ::Array[::Stripe::TaxRate]?
+      end
+
+      class AutomaticTax < ::Stripe::StripeObject
+        class Liability < ::Stripe::StripeObject
+          def account: () -> (String | ::Stripe::Account)?
+
+          def type: () -> String
+        end
+
+        def disabled_reason: () -> String?
+
+        def enabled: () -> bool
+
+        def liability: () -> Liability?
+      end
+
+      class BillingThresholds < ::Stripe::StripeObject
+        def amount_gte: () -> Integer?
+
+        def reset_billing_cycle_anchor: () -> bool?
+      end
+
+      class Discount < ::Stripe::StripeObject
+        def coupon: () -> (String | ::Stripe::Coupon)?
+
+        def discount: () -> (String | ::Stripe::Discount)?
+
+        def promotion_code: () -> (String | ::Stripe::PromotionCode)?
+      end
+
+      class InvoiceSettings < ::Stripe::StripeObject
+        class CustomField < ::Stripe::StripeObject
+          def name: () -> String
+
+          def value: () -> String
+        end
+
+        class Issuer < ::Stripe::StripeObject
+          def account: () -> (String | ::Stripe::Account)?
+
+          def type: () -> String
+        end
+
+        def account_tax_ids: () -> ::Array[String | ::Stripe::TaxId]?
+
+        def custom_fields: () -> ::Array[CustomField]?
+
+        def days_until_due: () -> Integer?
+
+        def description: () -> String?
+
+        def footer: () -> String?
+
+        def issuer: () -> Issuer?
+      end
+
+      class Item < ::Stripe::StripeObject
+        class BillingThresholds < ::Stripe::StripeObject
+          def usage_gte: () -> Integer?
+        end
+
+        class Discount < ::Stripe::StripeObject
+          def coupon: () -> (String | ::Stripe::Coupon)?
+
+          def discount: () -> (String | ::Stripe::Discount)?
+
+          def promotion_code: () -> (String | ::Stripe::PromotionCode)?
+        end
+
+        def billing_thresholds: () -> BillingThresholds?
+
+        def discounts: () -> ::Array[Discount]
+
+        def metadata: () -> ::Stripe::StripeObject?
+
+        def price: () -> (String | ::Stripe::Price)
+
+        def quantity: () -> Integer?
+
+        def tax_rates: () -> ::Array[::Stripe::TaxRate]?
+      end
+
+      class TransferData < ::Stripe::StripeObject
+        def amount_percent: () -> Float?
+
+        def destination: () -> (String | ::Stripe::Account)
+      end
+
+      def add_invoice_items: () -> ::Array[AddInvoiceItem]
+
+      def application_fee_percent: () -> Float?
+
+      def automatic_tax: () -> AutomaticTax?
+
+      def billing_cycle_anchor: () -> String?
+
+      def billing_thresholds: () -> BillingThresholds?
+
+      def collection_method: () -> String?
+
+      def currency: () -> String
+
+      def default_payment_method: () -> (String | ::Stripe::PaymentMethod)?
+
+      def default_tax_rates: () -> ::Array[::Stripe::TaxRate]?
+
+      def description: () -> String?
+
+      def discounts: () -> ::Array[Discount]
+
+      def end_date: () -> Integer
+
+      def invoice_settings: () -> InvoiceSettings?
+
+      def items: () -> ::Array[Item]
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def on_behalf_of: () -> (String | ::Stripe::Account)?
+
+      def proration_behavior: () -> String
+
+      def start_date: () -> Integer
+
+      def transfer_data: () -> TransferData?
+
+      def trial: () -> bool?
+
+      def trial_end: () -> Integer?
+    end
+
+    def application: () -> (String | ::Stripe::Application)?
+
+    def billing_mode: () -> BillingMode
+
+    def canceled_at: () -> Integer?
+
+    def completed_at: () -> Integer?
+
+    def created: () -> Integer
+
+    def current_phase: () -> CurrentPhase?
+
+    def customer: () -> (String | ::Stripe::Customer)
+
+    def customer_account: () -> String?
+
+    def default_settings: () -> DefaultSettings
+
+    def end_behavior: () -> String
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def object: () -> String
+
+    def pause_schedules: () -> ::Array[PauseSchedule]?
+
+    def phases: () -> ::Array[Phase]
+
+    def released_at: () -> Integer?
+
+    def released_subscription: () -> String?
+
+    def status: () -> String
+
+    def subscription: () -> (String | ::Stripe::Subscription)?
+
+    def test_clock: () -> (String | ::Stripe::TestHelpers::TestClock)?
+
+    def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionSchedule
+
+    def self.cancel: (String schedule, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionSchedule
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionSchedule
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::SubscriptionSchedule]
+
+    def release: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionSchedule
+
+    def self.release: (String schedule, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionSchedule
+
+    def self.update: (String schedule, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionSchedule
+  end
+end

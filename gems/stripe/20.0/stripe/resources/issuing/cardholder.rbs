@@ -1,0 +1,139 @@
+module Stripe
+  module Issuing
+    class Cardholder < APIResource
+      class Billing < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String?
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        def address: () -> Address
+      end
+
+      class Company < ::Stripe::StripeObject
+        def tax_id_provided: () -> bool
+      end
+
+      class Individual < ::Stripe::StripeObject
+        class CardIssuing < ::Stripe::StripeObject
+          class UserTermsAcceptance < ::Stripe::StripeObject
+            def date: () -> Integer?
+
+            def ip: () -> String?
+
+            def user_agent: () -> String?
+          end
+
+          def user_terms_acceptance: () -> UserTermsAcceptance?
+        end
+
+        class Dob < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        class Verification < ::Stripe::StripeObject
+          class Document < ::Stripe::StripeObject
+            def back: () -> (String | ::Stripe::File)?
+
+            def front: () -> (String | ::Stripe::File)?
+          end
+
+          def document: () -> Document?
+        end
+
+        def card_issuing: () -> CardIssuing?
+
+        def dob: () -> Dob?
+
+        def first_name: () -> String?
+
+        def last_name: () -> String?
+
+        def verification: () -> Verification?
+      end
+
+      class Requirements < ::Stripe::StripeObject
+        def disabled_reason: () -> String?
+
+        def past_due: () -> ::Array[String]?
+      end
+
+      class SpendingControls < ::Stripe::StripeObject
+        class SpendingLimit < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def categories: () -> ::Array[String]?
+
+          def interval: () -> String
+        end
+
+        def allowed_card_presences: () -> ::Array[String]?
+
+        def allowed_categories: () -> ::Array[String]?
+
+        def allowed_merchant_countries: () -> ::Array[String]?
+
+        def blocked_card_presences: () -> ::Array[String]?
+
+        def blocked_categories: () -> ::Array[String]?
+
+        def blocked_merchant_countries: () -> ::Array[String]?
+
+        def spending_limits: () -> ::Array[SpendingLimit]?
+
+        def spending_limits_currency: () -> String?
+      end
+
+      def billing: () -> Billing
+
+      def company: () -> Company?
+
+      def created: () -> Integer
+
+      def email: () -> String?
+
+      def id: () -> String
+
+      def individual: () -> Individual?
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def name: () -> String
+
+      def object: () -> String
+
+      def phone_number: () -> String?
+
+      def preferred_locales: () -> ::Array[String]?
+
+      def requirements: () -> Requirements
+
+      def spending_controls: () -> SpendingControls?
+
+      def status: () -> String
+
+      def type: () -> String
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Cardholder
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::Cardholder]
+
+      def self.update: (String cardholder, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Cardholder
+    end
+  end
+end
