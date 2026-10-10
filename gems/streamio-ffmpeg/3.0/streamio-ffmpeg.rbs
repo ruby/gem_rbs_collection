@@ -1,0 +1,124 @@
+module FFMPEG
+  VERSION: String
+
+  type encoding_options = EncodingOptions | Hash[Symbol, untyped]
+
+  type transcoder_options = {
+    ?validate: bool,
+    ?preserve_aspect_ratio: :width | :height | "width" | "height",
+    ?input: String,
+    ?input_options: Hash[Symbol | String, untyped]
+  }
+
+  def self.logger=: (Logger log) -> Logger
+  def self.logger: () -> Logger
+
+  def self.ffmpeg_binary=: (String bin) -> String
+  def self.ffmpeg_binary: () -> String
+
+  def self.ffprobe_binary=: (String bin) -> String
+  def self.ffprobe_binary: () -> String
+
+  def self.max_http_redirect_attempts=: (Integer? v) -> Integer?
+  def self.max_http_redirect_attempts: () -> Integer
+
+  def self.which: (String cmd) -> String
+
+  class Error < StandardError
+  end
+
+  class HTTPTooManyRequests < StandardError
+  end
+
+  class Movie
+    UNSUPPORTED_CODEC_PATTERN: Regexp
+
+    attr_reader path: String
+    attr_reader duration: Float | Integer
+    attr_reader time: Float?
+    attr_reader bitrate: Integer?
+    attr_reader rotation: Integer?
+    attr_reader creation_time: Time?
+
+    attr_reader video_stream: String?
+    attr_reader video_codec: String?
+    attr_reader video_bitrate: Integer?
+    attr_reader colorspace: String?
+    attr_reader sar: String?
+    attr_reader dar: String?
+    attr_reader frame_rate: Rational?
+
+    attr_reader audio_streams: Array[{
+      index: Integer,
+      channels: Integer,
+      codec_name: String?,
+      sample_rate: Integer,
+      bitrate: Integer,
+      channel_layout: String?,
+      tags: untyped,
+      overview: String
+    }]?
+    attr_reader audio_stream: String?
+    attr_reader audio_codec: String?
+    attr_reader audio_bitrate: Integer?
+    attr_reader audio_sample_rate: Integer?
+    attr_reader audio_channels: Integer?
+    attr_reader audio_tags: untyped
+
+    attr_reader container: String?
+    attr_reader metadata: Hash[Symbol, untyped]
+    attr_reader format_tags: Hash[Symbol, untyped]?
+
+    def initialize: (String path) -> void
+
+    def unsupported_streams: (String std_error) -> Array[Integer]
+
+    def valid?: () -> bool
+    def remote?: () -> Integer?
+    def local?: () -> bool
+
+    def width: () -> Integer?
+    def height: () -> Integer?
+    def resolution: () -> String?
+
+    def calculated_aspect_ratio: () -> Float?
+    def calculated_pixel_aspect_ratio: () -> (Float | Integer)
+
+    def size: () -> Integer?
+
+    def audio_channel_layout: () -> String
+
+    def transcode: (String output_file, ?encoding_options | Array[String] options, ?transcoder_options transcoder_options) ?{ (Float progress) -> void } -> Movie?
+
+    def screenshot: (String output_file, ?encoding_options options, ?transcoder_options transcoder_options) ?{ (Float progress) -> void } -> Movie?
+  end
+
+  class Transcoder
+    self.@timeout: Numeric | false | nil
+
+    def self.timeout: () -> (Numeric | false | nil)
+    def self.timeout=: (Numeric | false | nil) -> (Numeric | false | nil)
+
+    attr_reader command: Array[untyped]
+    attr_reader input: String?
+
+    def initialize: (Movie | String input, String output_file, ?encoding_options | Array[String] options, ?transcoder_options transcoder_options) -> void
+
+    def run: () ?{ (Float progress) -> void } -> Movie?
+
+    def encoding_succeeded?: () -> bool
+
+    def encoded: () -> Movie
+
+    def timeout: () -> (Numeric | false | nil)
+  end
+
+  class EncodingOptions < Hash[Symbol, untyped]
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    def to_a: () -> Array[String]
+
+    def width: () -> Integer?
+    def height: () -> Integer?
+  end
+end
