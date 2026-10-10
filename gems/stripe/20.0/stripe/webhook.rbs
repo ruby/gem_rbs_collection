@@ -1,0 +1,19 @@
+module Stripe
+  module Webhook
+    DEFAULT_TOLERANCE: untyped
+
+    def self.construct_event: (String payload, String sig_header, String secret, ?tolerance: Integer? tolerance) -> ::Stripe::Event
+
+    def self.construct_event_without_verification: (String payload) -> ::Stripe::Event
+
+    module Signature
+      EXPECTED_SCHEME: untyped
+
+      def self.compute_signature: (Time timestamp, String payload, String secret) -> String
+
+      def self.generate_header: (Time timestamp, String signature, ?scheme: String scheme) -> String
+
+      def self.verify_header: (String payload, String header, String secret, ?tolerance: Integer? tolerance) -> bool
+    end
+  end
+end

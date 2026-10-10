@@ -1,0 +1,225 @@
+module Stripe
+  module ThreeDSecure
+    class Authentication < APIResource
+      class AcquirerDetails < ::Stripe::StripeObject
+        def acquirer_bin: () -> String?
+
+        def acquirer_country: () -> String?
+
+        def acquirer_merchant_id: () -> String?
+
+        def mcc: () -> String?
+
+        def merchant_name: () -> String?
+
+        def requestor_id: () -> String?
+      end
+
+      class Channel < ::Stripe::StripeObject
+        class Browser < ::Stripe::StripeObject
+          def accept_header: () -> String
+
+          def color_depth: () -> Integer?
+
+          def ip_address: () -> String
+
+          def java_enabled: () -> bool?
+
+          def javascript_enabled: () -> bool
+
+          def language: () -> String
+
+          def screen_height: () -> Integer?
+
+          def screen_width: () -> Integer?
+
+          def timezone_offset: () -> Integer?
+
+          def user_agent: () -> String
+        end
+
+        class ThreeRI < ::Stripe::StripeObject
+          def previous_authentication: () -> String
+
+          def type: () -> String
+        end
+
+        def browser: () -> Browser?
+
+        def three_r_i: () -> ThreeRI?
+
+        def type: () -> String
+      end
+
+      class FlowPreference < ::Stripe::StripeObject
+        class Challenge < ::Stripe::StripeObject
+          def type: () -> String
+        end
+
+        class DataShare < ::Stripe::StripeObject
+          def type: () -> String
+        end
+
+        class Frictionless < ::Stripe::StripeObject
+          def type: () -> String
+        end
+
+        def challenge: () -> Challenge?
+
+        def data_share: () -> DataShare?
+
+        def frictionless: () -> Frictionless?
+
+        def type: () -> String
+      end
+
+      class FutureUsage < ::Stripe::StripeObject
+        class Installment < ::Stripe::StripeObject
+          class Expiry < ::Stripe::StripeObject
+            def date: () -> String?
+
+            def type: () -> String
+          end
+
+          def amount: () -> Integer?
+
+          def expiry: () -> Expiry
+
+          def interval: () -> String
+
+          def interval_count: () -> Integer
+
+          def number: () -> Integer
+        end
+
+        class Recurring < ::Stripe::StripeObject
+          class Expiry < ::Stripe::StripeObject
+            def date: () -> String?
+
+            def type: () -> String
+          end
+
+          def amount: () -> Integer?
+
+          def expiry: () -> Expiry
+
+          def interval: () -> String
+
+          def interval_count: () -> Integer
+        end
+
+        def installment: () -> Installment?
+
+        def recurring: () -> Recurring?
+
+        def type: () -> String
+      end
+
+      class OutcomeDetails < ::Stripe::StripeObject
+        class NetworkDetails < ::Stripe::StripeObject
+          class CartesBancaires < ::Stripe::StripeObject
+            def avalgo: () -> String
+
+            def cb_exemption: () -> String?
+
+            def cb_score: () -> String?
+          end
+
+          def cartes_bancaires: () -> CartesBancaires?
+        end
+
+        def acs_transaction_id: () -> String?
+
+        def ares: () -> String?
+
+        def ares_trans_status: () -> String?
+
+        def cryptogram: () -> String?
+
+        def ds_transaction_id: () -> String?
+
+        def eci: () -> String?
+
+        def network_details: () -> NetworkDetails?
+
+        def protocol_version: () -> String
+
+        def requestor_challenge_indicator: () -> String?
+
+        def rreq: () -> String?
+
+        def rreq_trans_status: () -> String?
+
+        def three_ds_server_transaction_id: () -> String
+      end
+
+      class ShippingAddress < ::Stripe::StripeObject
+        def city: () -> String?
+
+        def country: () -> String?
+
+        def line1: () -> String?
+
+        def line2: () -> String?
+
+        def postal_code: () -> String?
+
+        def state: () -> String?
+      end
+
+      def acquirer_details: () -> AcquirerDetails?
+
+      def amount: () -> Integer?
+
+      def challenge_url: () -> String?
+
+      def channel: () -> Channel
+
+      def created: () -> Integer
+
+      def currency: () -> String?
+
+      def directory_server: () -> String
+
+      def fingerprinting_url: () -> String?
+
+      def flow_preference: () -> FlowPreference?
+
+      def future_usage: () -> FutureUsage?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def message_category: () -> String
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def object: () -> String
+
+      def outcome: () -> String?
+
+      def outcome_details: () -> OutcomeDetails?
+
+      def payment_method: () -> (String | ::Stripe::PaymentMethod)
+
+      def reason: () -> String?
+
+      def shipping_address: () -> ShippingAddress?
+
+      def status: () -> String
+
+      def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ThreeDSecure::Authentication
+
+      def self.cancel: (String authentication, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ThreeDSecure::Authentication
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ThreeDSecure::Authentication
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::ThreeDSecure::Authentication]
+
+      def submit: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ThreeDSecure::Authentication
+
+      def self.submit: (String authentication, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ThreeDSecure::Authentication
+    end
+  end
+end

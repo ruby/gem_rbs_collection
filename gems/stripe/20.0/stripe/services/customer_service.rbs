@@ -1,0 +1,31 @@
+module Stripe
+  class CustomerService < StripeService
+    attr_reader balance_transactions: ::Stripe::CustomerBalanceTransactionService
+
+    attr_reader cash_balance: ::Stripe::CustomerCashBalanceService
+
+    attr_reader cash_balance_transactions: ::Stripe::CustomerCashBalanceTransactionService
+
+    attr_reader funding_instructions: ::Stripe::CustomerFundingInstructionsService
+
+    attr_reader payment_methods: ::Stripe::CustomerPaymentMethodService
+
+    attr_reader payment_sources: ::Stripe::CustomerPaymentSourceService
+
+    attr_reader tax_ids: ::Stripe::CustomerTaxIdService
+
+    def create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def delete: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def delete_discount: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Discount
+
+    def list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Customer]
+
+    def retrieve: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def search: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SearchResultObject[::Stripe::Customer]
+
+    def update: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+  end
+end

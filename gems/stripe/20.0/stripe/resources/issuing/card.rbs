@@ -1,0 +1,195 @@
+module Stripe
+  module Issuing
+    class Card < APIResource
+      class LatestFraudWarning < ::Stripe::StripeObject
+        def started_at: () -> Integer?
+
+        def type: () -> String?
+      end
+
+      class LifecycleControls < ::Stripe::StripeObject
+        class CancelAfter < ::Stripe::StripeObject
+          def payment_count: () -> Integer
+        end
+
+        def cancel_after: () -> CancelAfter
+      end
+
+      class Shipping < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String?
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        class AddressValidation < ::Stripe::StripeObject
+          class NormalizedAddress < ::Stripe::StripeObject
+            def city: () -> String?
+
+            def country: () -> String?
+
+            def line1: () -> String?
+
+            def line2: () -> String?
+
+            def postal_code: () -> String?
+
+            def state: () -> String?
+          end
+
+          def mode: () -> String
+
+          def normalized_address: () -> NormalizedAddress?
+
+          def result: () -> String?
+        end
+
+        class Customs < ::Stripe::StripeObject
+          def eori_number: () -> String?
+        end
+
+        def address: () -> Address
+
+        def address_validation: () -> AddressValidation?
+
+        def business_name: () -> String?
+
+        def carrier: () -> String?
+
+        def customs: () -> Customs?
+
+        def eta: () -> Integer?
+
+        def name: () -> String
+
+        def phone_number: () -> String?
+
+        def require_signature: () -> bool?
+
+        def service: () -> String
+
+        def status: () -> String?
+
+        def tracking_number: () -> String?
+
+        def tracking_url: () -> String?
+
+        def type: () -> String
+      end
+
+      class SpendingControls < ::Stripe::StripeObject
+        class SpendingLimit < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def categories: () -> ::Array[String]?
+
+          def interval: () -> String
+        end
+
+        def allowed_card_presences: () -> ::Array[String]?
+
+        def allowed_categories: () -> ::Array[String]?
+
+        def allowed_merchant_countries: () -> ::Array[String]?
+
+        def blocked_card_presences: () -> ::Array[String]?
+
+        def blocked_categories: () -> ::Array[String]?
+
+        def blocked_merchant_countries: () -> ::Array[String]?
+
+        def spending_limits: () -> ::Array[SpendingLimit]?
+
+        def spending_limits_currency: () -> String?
+      end
+
+      class Wallets < ::Stripe::StripeObject
+        class ApplePay < ::Stripe::StripeObject
+          def eligible: () -> bool
+
+          def ineligible_reason: () -> String?
+        end
+
+        class GooglePay < ::Stripe::StripeObject
+          def eligible: () -> bool
+
+          def ineligible_reason: () -> String?
+        end
+
+        def apple_pay: () -> ApplePay
+
+        def google_pay: () -> GooglePay
+
+        def primary_account_identifier: () -> String?
+      end
+
+      def brand: () -> String
+
+      def cancellation_reason: () -> String?
+
+      def cardholder: () -> ::Stripe::Issuing::Cardholder
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def cvc: () -> String?
+
+      def exp_month: () -> Integer
+
+      def exp_year: () -> Integer
+
+      def financial_account: () -> String?
+
+      def id: () -> String
+
+      def last4: () -> String
+
+      def latest_fraud_warning: () -> LatestFraudWarning?
+
+      def lifecycle_controls: () -> LifecycleControls?
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def number: () -> String?
+
+      def object: () -> String
+
+      def personalization_design: () -> (String | ::Stripe::Issuing::PersonalizationDesign)?
+
+      def replaced_by: () -> (String | ::Stripe::Issuing::Card)?
+
+      def replacement_for: () -> (String | ::Stripe::Issuing::Card)?
+
+      def replacement_reason: () -> String?
+
+      def second_line: () -> String?
+
+      def shipping: () -> Shipping?
+
+      def spending_controls: () -> SpendingControls
+
+      def status: () -> String
+
+      def type: () -> String
+
+      def wallets: () -> Wallets?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Card
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Issuing::Card]
+
+      def self.update: (String card, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Issuing::Card
+    end
+  end
+end

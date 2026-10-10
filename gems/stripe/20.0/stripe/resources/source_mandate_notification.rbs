@@ -1,0 +1,43 @@
+module Stripe
+  class SourceMandateNotification < APIResource
+    class AcssDebit < ::Stripe::StripeObject
+      def statement_descriptor: () -> String?
+    end
+
+    class BacsDebit < ::Stripe::StripeObject
+      def last4: () -> String?
+    end
+
+    class SepaDebit < ::Stripe::StripeObject
+      def creditor_identifier: () -> String?
+
+      def last4: () -> String?
+
+      def mandate_reference: () -> String?
+    end
+
+    def acss_debit: () -> AcssDebit?
+
+    def amount: () -> Integer?
+
+    def bacs_debit: () -> BacsDebit?
+
+    def created: () -> Integer
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def reason: () -> String
+
+    def sepa_debit: () -> SepaDebit?
+
+    def source: () -> ::Stripe::Source
+
+    def status: () -> String
+
+    def type: () -> String
+  end
+end

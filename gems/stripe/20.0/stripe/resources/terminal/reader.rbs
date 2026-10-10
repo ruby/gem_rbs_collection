@@ -1,0 +1,349 @@
+module Stripe
+  module Terminal
+    class Reader < APIResource
+      class Action < ::Stripe::StripeObject
+        class ApiError < ::Stripe::StripeObject
+          def advice_code: () -> String?
+
+          def charge: () -> String?
+
+          def code: () -> String?
+
+          def decline_code: () -> String?
+
+          def doc_url: () -> String?
+
+          def message: () -> String?
+
+          def network_advice_code: () -> String?
+
+          def network_decline_code: () -> String?
+
+          def param: () -> String?
+
+          def payment_intent: () -> ::Stripe::PaymentIntent?
+
+          def payment_method: () -> ::Stripe::PaymentMethod?
+
+          def payment_method_type: () -> String?
+
+          def request_log_url: () -> String?
+
+          def setup_intent: () -> ::Stripe::SetupIntent?
+
+          def source: () -> (::Stripe::Account | ::Stripe::BankAccount | ::Stripe::Card | ::Stripe::Source)?
+
+          def type: () -> String
+        end
+
+        class CollectInputs < ::Stripe::StripeObject
+          class Input < ::Stripe::StripeObject
+            class CustomText < ::Stripe::StripeObject
+              def description: () -> String?
+
+              def skip_button: () -> String?
+
+              def submit_button: () -> String?
+
+              def title: () -> String?
+            end
+
+            class Email < ::Stripe::StripeObject
+              def value: () -> String?
+            end
+
+            class Numeric < ::Stripe::StripeObject
+              def value: () -> String?
+            end
+
+            class Phone < ::Stripe::StripeObject
+              def value: () -> String?
+            end
+
+            class Selection < ::Stripe::StripeObject
+              class Choice < ::Stripe::StripeObject
+                def id: () -> String?
+
+                def style: () -> String?
+
+                def text: () -> String
+              end
+
+              def choices: () -> ::Array[Choice]
+
+              def id: () -> String?
+
+              def text: () -> String?
+            end
+
+            class Signature < ::Stripe::StripeObject
+              def value: () -> String?
+            end
+
+            class Text < ::Stripe::StripeObject
+              def value: () -> String?
+            end
+
+            class Toggle < ::Stripe::StripeObject
+              def default_value: () -> String?
+
+              def description: () -> String?
+
+              def title: () -> String?
+
+              def value: () -> String?
+            end
+
+            def custom_text: () -> CustomText?
+
+            def email: () -> Email?
+
+            def numeric: () -> Numeric?
+
+            def phone: () -> Phone?
+
+            def required: () -> bool?
+
+            def selection: () -> Selection?
+
+            def signature: () -> Signature?
+
+            def skipped: () -> bool?
+
+            def text: () -> Text?
+
+            def toggles: () -> ::Array[Toggle]?
+
+            def type: () -> String
+          end
+
+          def inputs: () -> ::Array[Input]
+
+          def metadata: () -> ::Stripe::StripeObject?
+        end
+
+        class CollectPaymentMethod < ::Stripe::StripeObject
+          class CollectConfig < ::Stripe::StripeObject
+            class Tipping < ::Stripe::StripeObject
+              def amount_eligible: () -> Integer?
+            end
+
+            def enable_customer_cancellation: () -> bool?
+
+            def skip_tipping: () -> bool?
+
+            def tipping: () -> Tipping?
+          end
+
+          def collect_config: () -> CollectConfig?
+
+          def payment_intent: () -> (String | ::Stripe::PaymentIntent)
+
+          def payment_method: () -> ::Stripe::PaymentMethod?
+        end
+
+        class ConfirmPaymentIntent < ::Stripe::StripeObject
+          class ConfirmConfig < ::Stripe::StripeObject
+            def return_url: () -> String?
+          end
+
+          def confirm_config: () -> ConfirmConfig?
+
+          def payment_intent: () -> (String | ::Stripe::PaymentIntent)
+        end
+
+        class PrintContent < ::Stripe::StripeObject
+          class Image < ::Stripe::StripeObject
+            def created_at: () -> Integer
+
+            def filename: () -> String
+
+            def size: () -> Integer
+
+            def type: () -> String
+          end
+
+          def image: () -> Image?
+
+          def type: () -> String
+        end
+
+        class ProcessPaymentIntent < ::Stripe::StripeObject
+          class ProcessConfig < ::Stripe::StripeObject
+            class Tipping < ::Stripe::StripeObject
+              def amount_eligible: () -> Integer?
+            end
+
+            def enable_customer_cancellation: () -> bool?
+
+            def return_url: () -> String?
+
+            def skip_tipping: () -> bool?
+
+            def tipping: () -> Tipping?
+          end
+
+          def payment_intent: () -> (String | ::Stripe::PaymentIntent)
+
+          def process_config: () -> ProcessConfig?
+        end
+
+        class ProcessSetupIntent < ::Stripe::StripeObject
+          class ProcessConfig < ::Stripe::StripeObject
+            def enable_customer_cancellation: () -> bool?
+          end
+
+          def generated_card: () -> String?
+
+          def process_config: () -> ProcessConfig?
+
+          def setup_intent: () -> (String | ::Stripe::SetupIntent)
+        end
+
+        class RefundPayment < ::Stripe::StripeObject
+          class RefundPaymentConfig < ::Stripe::StripeObject
+            def enable_customer_cancellation: () -> bool?
+          end
+
+          def amount: () -> Integer?
+
+          def charge: () -> (String | ::Stripe::Charge)?
+
+          def metadata: () -> ::Stripe::StripeObject?
+
+          def payment_intent: () -> (String | ::Stripe::PaymentIntent)?
+
+          def reason: () -> String?
+
+          def refund: () -> (String | ::Stripe::Refund)?
+
+          def refund_application_fee: () -> bool?
+
+          def refund_payment_config: () -> RefundPaymentConfig?
+
+          def reverse_transfer: () -> bool?
+        end
+
+        class SetReaderDisplay < ::Stripe::StripeObject
+          class Cart < ::Stripe::StripeObject
+            class LineItem < ::Stripe::StripeObject
+              def amount: () -> Integer
+
+              def description: () -> String
+
+              def quantity: () -> Integer
+            end
+
+            def currency: () -> String
+
+            def line_items: () -> ::Array[LineItem]
+
+            def tax: () -> Integer?
+
+            def total: () -> Integer
+          end
+
+          def cart: () -> Cart?
+
+          def type: () -> String
+        end
+
+        def api_error: () -> ApiError?
+
+        def collect_inputs: () -> CollectInputs?
+
+        def collect_payment_method: () -> CollectPaymentMethod?
+
+        def confirm_payment_intent: () -> ConfirmPaymentIntent?
+
+        def failure_code: () -> String?
+
+        def failure_message: () -> String?
+
+        def print_content: () -> PrintContent?
+
+        def process_payment_intent: () -> ProcessPaymentIntent?
+
+        def process_setup_intent: () -> ProcessSetupIntent?
+
+        def refund_payment: () -> RefundPayment?
+
+        def set_reader_display: () -> SetReaderDisplay?
+
+        def status: () -> String
+
+        def type: () -> String
+      end
+
+      def action: () -> Action?
+
+      def deleted: () -> bool?
+
+      def device_sw_version: () -> String?
+
+      def device_type: () -> String
+
+      def id: () -> String
+
+      def ip_address: () -> String?
+
+      def label: () -> String
+
+      def last_seen_at: () -> Integer?
+
+      def livemode: () -> bool
+
+      def location: () -> (String | ::Stripe::Terminal::Location)?
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def object: () -> String
+
+      def serial_number: () -> String
+
+      def status: () -> String?
+
+      def cancel_action: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.cancel_action: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def collect_inputs: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.collect_inputs: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def collect_payment_method: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.collect_payment_method: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def confirm_payment_intent: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.confirm_payment_intent: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.delete: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Terminal::Reader]
+
+      def process_payment_intent: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.process_payment_intent: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def process_setup_intent: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.process_setup_intent: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def refund_payment: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.refund_payment: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def set_reader_display: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.set_reader_display: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+
+      def self.update: (String reader, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::Reader
+    end
+  end
+end

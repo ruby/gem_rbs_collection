@@ -1,0 +1,51 @@
+module Stripe
+  module Billing
+    class Alert < APIResource
+      class UsageThreshold < ::Stripe::StripeObject
+        class Filter < ::Stripe::StripeObject
+          def customer: () -> (String | ::Stripe::Customer)?
+
+          def type: () -> String
+        end
+
+        def filters: () -> ::Array[Filter]?
+
+        def gte: () -> Integer
+
+        def meter: () -> (String | ::Stripe::Billing::Meter)
+
+        def recurrence: () -> String
+      end
+
+      def alert_type: () -> String
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def status: () -> String?
+
+      def title: () -> String
+
+      def usage_threshold: () -> UsageThreshold?
+
+      def activate: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def self.activate: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def archive: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def self.archive: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def deactivate: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def self.deactivate: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Alert
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Billing::Alert]
+    end
+  end
+end

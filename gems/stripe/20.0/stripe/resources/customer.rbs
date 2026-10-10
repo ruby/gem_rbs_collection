@@ -1,0 +1,181 @@
+module Stripe
+  class Customer < APIResource
+    class Address < ::Stripe::StripeObject
+      def city: () -> String?
+
+      def country: () -> String?
+
+      def line1: () -> String?
+
+      def line2: () -> String?
+
+      def postal_code: () -> String?
+
+      def state: () -> String?
+    end
+
+    class InvoiceSettings < ::Stripe::StripeObject
+      class CustomField < ::Stripe::StripeObject
+        def name: () -> String
+
+        def value: () -> String
+      end
+
+      class RenderingOptions < ::Stripe::StripeObject
+        def amount_tax_display: () -> String?
+
+        def template: () -> String?
+      end
+
+      def custom_fields: () -> ::Array[CustomField]?
+
+      def default_payment_method: () -> (String | ::Stripe::PaymentMethod)?
+
+      def footer: () -> String?
+
+      def rendering_options: () -> RenderingOptions?
+    end
+
+    class Shipping < ::Stripe::StripeObject
+      class Address < ::Stripe::StripeObject
+        def city: () -> String?
+
+        def country: () -> String?
+
+        def line1: () -> String?
+
+        def line2: () -> String?
+
+        def postal_code: () -> String?
+
+        def state: () -> String?
+      end
+
+      def address: () -> Address?
+
+      def carrier: () -> String?
+
+      def name: () -> String?
+
+      def phone: () -> String?
+
+      def tracking_number: () -> String?
+    end
+
+    class Tax < ::Stripe::StripeObject
+      class Location < ::Stripe::StripeObject
+        def country: () -> String
+
+        def source: () -> String
+
+        def state: () -> String?
+      end
+
+      def automatic_tax: () -> String
+
+      def ip_address: () -> String?
+
+      def location: () -> Location?
+
+      def provider: () -> String
+    end
+
+    def address: () -> Address?
+
+    def balance: () -> Integer?
+
+    def business_name: () -> String?
+
+    def cash_balance: () -> ::Stripe::CashBalance?
+
+    def created: () -> Integer
+
+    def currency: () -> String?
+
+    def customer_account: () -> String?
+
+    def default_source: () -> (String | ::Stripe::Account | ::Stripe::BankAccount | ::Stripe::Card | ::Stripe::Source)?
+
+    def deleted: () -> bool?
+
+    def delinquent: () -> bool?
+
+    def description: () -> String?
+
+    def discount: () -> ::Stripe::Discount?
+
+    def email: () -> String?
+
+    def id: () -> String
+
+    def individual_name: () -> String?
+
+    def invoice_credit_balance: () -> ::Stripe::StripeObject?
+
+    def invoice_prefix: () -> String?
+
+    def invoice_settings: () -> InvoiceSettings?
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def name: () -> String?
+
+    def next_invoice_sequence: () -> Integer?
+
+    def object: () -> String
+
+    def phone: () -> String?
+
+    def preferred_locales: () -> ::Array[String]?
+
+    def shipping: () -> Shipping?
+
+    def sources: () -> ::Stripe::ListObject[::Stripe::BankAccount | ::Stripe::Card | ::Stripe::Source]?
+
+    def subscriptions: () -> ::Stripe::ListObject[::Stripe::Subscription]?
+
+    def tax: () -> Tax?
+
+    def tax_exempt: () -> String?
+
+    def tax_ids: () -> ::Stripe::ListObject[::Stripe::TaxId]?
+
+    def test_clock: () -> (String | ::Stripe::TestHelpers::TestClock)?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def create_funding_instructions: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FundingInstructions
+
+    def self.create_funding_instructions: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FundingInstructions
+
+    def self.delete: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def delete_discount: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Discount
+
+    def self.delete_discount: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Discount
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Customer]
+
+    def list_payment_methods: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::PaymentMethod]
+
+    def self.list_payment_methods: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::PaymentMethod]
+
+    def self.retrieve_cash_balance: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> untyped
+
+    def retrieve_payment_method: (String payment_method, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::PaymentMethod
+
+    def self.retrieve_payment_method: (String customer, String payment_method, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::PaymentMethod
+
+    def self.search: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SearchResultObject[::Stripe::Customer]
+
+    def self.search_auto_paging_each: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) { (::Stripe::Customer) -> void } -> ::Stripe::SearchResultObject[::Stripe::Customer]
+
+    def self.update: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Customer
+
+    def self.update_cash_balance: (String customer, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> untyped
+  end
+end

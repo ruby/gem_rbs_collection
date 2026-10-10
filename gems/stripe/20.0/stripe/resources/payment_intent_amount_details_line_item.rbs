@@ -1,0 +1,63 @@
+module Stripe
+  class PaymentIntentAmountDetailsLineItem < APIResource
+    class PaymentMethodOptions < ::Stripe::StripeObject
+      class Card < ::Stripe::StripeObject
+        def commodity_code: () -> String?
+      end
+
+      class CardPresent < ::Stripe::StripeObject
+        def commodity_code: () -> String?
+      end
+
+      class Klarna < ::Stripe::StripeObject
+        def image_url: () -> String?
+
+        def product_url: () -> String?
+
+        def reference: () -> String?
+
+        def subscription_reference: () -> String?
+      end
+
+      class Paypal < ::Stripe::StripeObject
+        def category: () -> String?
+
+        def description: () -> String?
+
+        def sold_by: () -> String?
+      end
+
+      def card: () -> Card?
+
+      def card_present: () -> CardPresent?
+
+      def klarna: () -> Klarna?
+
+      def paypal: () -> Paypal?
+    end
+
+    class Tax < ::Stripe::StripeObject
+      def total_tax_amount: () -> Integer
+    end
+
+    def discount_amount: () -> Integer?
+
+    def id: () -> String
+
+    def object: () -> String
+
+    def payment_method_options: () -> PaymentMethodOptions?
+
+    def product_code: () -> String?
+
+    def product_name: () -> String
+
+    def quantity: () -> Integer
+
+    def tax: () -> Tax?
+
+    def unit_cost: () -> Integer
+
+    def unit_of_measure: () -> String?
+  end
+end

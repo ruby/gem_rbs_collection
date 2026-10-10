@@ -1,0 +1,275 @@
+module Stripe
+  class Person < APIResource
+    class AdditionalTosAcceptances < ::Stripe::StripeObject
+      class Account < ::Stripe::StripeObject
+        def date: () -> Integer?
+
+        def ip: () -> String?
+
+        def user_agent: () -> String?
+      end
+
+      def account: () -> Account?
+    end
+
+    class Address < ::Stripe::StripeObject
+      def city: () -> String?
+
+      def country: () -> String?
+
+      def line1: () -> String?
+
+      def line2: () -> String?
+
+      def postal_code: () -> String?
+
+      def state: () -> String?
+    end
+
+    class AddressKana < ::Stripe::StripeObject
+      def city: () -> String?
+
+      def country: () -> String?
+
+      def line1: () -> String?
+
+      def line2: () -> String?
+
+      def postal_code: () -> String?
+
+      def state: () -> String?
+
+      def town: () -> String?
+    end
+
+    class AddressKanji < ::Stripe::StripeObject
+      def city: () -> String?
+
+      def country: () -> String?
+
+      def line1: () -> String?
+
+      def line2: () -> String?
+
+      def postal_code: () -> String?
+
+      def state: () -> String?
+
+      def town: () -> String?
+    end
+
+    class Dob < ::Stripe::StripeObject
+      def day: () -> Integer?
+
+      def month: () -> Integer?
+
+      def year: () -> Integer?
+    end
+
+    class FutureRequirements < ::Stripe::StripeObject
+      class Alternative < ::Stripe::StripeObject
+        def alternative_fields_due: () -> ::Array[String]
+
+        def original_fields_due: () -> ::Array[String]
+      end
+
+      class Error < ::Stripe::StripeObject
+        def code: () -> String
+
+        def reason: () -> String
+
+        def requirement: () -> String
+      end
+
+      def alternatives: () -> ::Array[Alternative]?
+
+      def currently_due: () -> ::Array[String]
+
+      def errors: () -> ::Array[Error]
+
+      def eventually_due: () -> ::Array[String]
+
+      def past_due: () -> ::Array[String]
+
+      def pending_verification: () -> ::Array[String]
+    end
+
+    class RegisteredAddress < ::Stripe::StripeObject
+      def city: () -> String?
+
+      def country: () -> String?
+
+      def line1: () -> String?
+
+      def line2: () -> String?
+
+      def postal_code: () -> String?
+
+      def state: () -> String?
+    end
+
+    class Relationship < ::Stripe::StripeObject
+      def authorizer: () -> bool?
+
+      def director: () -> bool?
+
+      def executive: () -> bool?
+
+      def legal_guardian: () -> bool?
+
+      def owner: () -> bool?
+
+      def percent_ownership: () -> Float?
+
+      def representative: () -> bool?
+
+      def title: () -> String?
+    end
+
+    class Requirements < ::Stripe::StripeObject
+      class Alternative < ::Stripe::StripeObject
+        def alternative_fields_due: () -> ::Array[String]
+
+        def original_fields_due: () -> ::Array[String]
+      end
+
+      class Error < ::Stripe::StripeObject
+        def code: () -> String
+
+        def reason: () -> String
+
+        def requirement: () -> String
+      end
+
+      def alternatives: () -> ::Array[Alternative]?
+
+      def currently_due: () -> ::Array[String]
+
+      def errors: () -> ::Array[Error]
+
+      def eventually_due: () -> ::Array[String]
+
+      def past_due: () -> ::Array[String]
+
+      def pending_verification: () -> ::Array[String]
+    end
+
+    class UsCfpbData < ::Stripe::StripeObject
+      class EthnicityDetails < ::Stripe::StripeObject
+        def ethnicity: () -> ::Array[String]?
+
+        def ethnicity_other: () -> String?
+      end
+
+      class RaceDetails < ::Stripe::StripeObject
+        def race: () -> ::Array[String]?
+
+        def race_other: () -> String?
+      end
+
+      def ethnicity_details: () -> EthnicityDetails?
+
+      def race_details: () -> RaceDetails?
+
+      def self_identified_gender: () -> String?
+    end
+
+    class Verification < ::Stripe::StripeObject
+      class AdditionalDocument < ::Stripe::StripeObject
+        def back: () -> (String | ::Stripe::File)?
+
+        def details: () -> String?
+
+        def details_code: () -> String?
+
+        def front: () -> (String | ::Stripe::File)?
+      end
+
+      class Document < ::Stripe::StripeObject
+        def back: () -> (String | ::Stripe::File)?
+
+        def details: () -> String?
+
+        def details_code: () -> String?
+
+        def front: () -> (String | ::Stripe::File)?
+      end
+
+      def additional_document: () -> AdditionalDocument?
+
+      def details: () -> String?
+
+      def details_code: () -> String?
+
+      def document: () -> Document?
+
+      def status: () -> String
+    end
+
+    def account: () -> String?
+
+    def additional_tos_acceptances: () -> AdditionalTosAcceptances?
+
+    def address: () -> Address?
+
+    def address_kana: () -> AddressKana?
+
+    def address_kanji: () -> AddressKanji?
+
+    def created: () -> Integer
+
+    def deleted: () -> bool?
+
+    def dob: () -> Dob?
+
+    def email: () -> String?
+
+    def first_name: () -> String?
+
+    def first_name_kana: () -> String?
+
+    def first_name_kanji: () -> String?
+
+    def full_name_aliases: () -> ::Array[String]?
+
+    def future_requirements: () -> FutureRequirements?
+
+    def gender: () -> String?
+
+    def id: () -> String
+
+    def id_number_provided: () -> bool?
+
+    def id_number_secondary_provided: () -> bool?
+
+    def last_name: () -> String?
+
+    def last_name_kana: () -> String?
+
+    def last_name_kanji: () -> String?
+
+    def maiden_name: () -> String?
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def nationality: () -> String?
+
+    def object: () -> String
+
+    def phone: () -> String?
+
+    def political_exposure: () -> String?
+
+    def registered_address: () -> RegisteredAddress?
+
+    def relationship: () -> Relationship?
+
+    def requirements: () -> Requirements?
+
+    def ssn_last_4_provided: () -> bool?
+
+    def us_cfpb_data: () -> UsCfpbData?
+
+    def verification: () -> Verification?
+  end
+end

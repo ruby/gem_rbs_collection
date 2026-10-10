@@ -1,0 +1,19 @@
+module Stripe
+  module Events
+    class V1PayoutReconciliationCompletedEvent < Stripe::V2::Core::Event
+      def self.lookup_type: () -> "v1.payout.reconciliation_completed"
+
+      def fetch_related_object: () -> untyped
+
+      attr_reader related_object: untyped
+    end
+
+    class V1PayoutReconciliationCompletedEventNotification < Stripe::V2::Core::EventNotification
+      def self.lookup_type: () -> "v1.payout.reconciliation_completed"
+
+      attr_reader related_object: ::Stripe::V2::Core::RelatedObject
+
+      def fetch_related_object: () -> untyped
+    end
+  end
+end

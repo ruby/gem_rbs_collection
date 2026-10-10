@@ -1,0 +1,55 @@
+module Stripe
+  class LineItem < APIResource
+    class AdjustableQuantity < ::Stripe::StripeObject
+      def enabled: () -> bool
+
+      def maximum: () -> Integer?
+
+      def minimum: () -> Integer?
+    end
+
+    class Discount < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def discount: () -> ::Stripe::Discount
+    end
+
+    class Tax < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def rate: () -> ::Stripe::TaxRate
+
+      def taxability_reason: () -> String?
+
+      def taxable_amount: () -> Integer?
+    end
+
+    def adjustable_quantity: () -> AdjustableQuantity?
+
+    def amount_discount: () -> Integer
+
+    def amount_subtotal: () -> Integer
+
+    def amount_tax: () -> Integer
+
+    def amount_total: () -> Integer
+
+    def currency: () -> String
+
+    def description: () -> String?
+
+    def discounts: () -> ::Array[Discount]?
+
+    def id: () -> String
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def object: () -> String
+
+    def price: () -> ::Stripe::Price?
+
+    def quantity: () -> Integer?
+
+    def taxes: () -> ::Array[Tax]?
+  end
+end

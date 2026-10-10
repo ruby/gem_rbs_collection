@@ -1,0 +1,55 @@
+module Stripe
+  class SubscriptionItem < APIResource
+    class BillingThresholds < ::Stripe::StripeObject
+      def usage_gte: () -> Integer?
+    end
+
+    class CurrentTrial < ::Stripe::StripeObject
+      def end_date: () -> Integer
+
+      def start_date: () -> Integer
+
+      def trial_offer: () -> String
+    end
+
+    def billed_until: () -> Integer?
+
+    def billing_thresholds: () -> BillingThresholds?
+
+    def created: () -> Integer
+
+    def current_period_end: () -> Integer
+
+    def current_period_start: () -> Integer
+
+    def current_trial: () -> CurrentTrial?
+
+    def deleted: () -> bool?
+
+    def discounts: () -> ::Array[String | ::Stripe::Discount]
+
+    def id: () -> String
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def object: () -> String
+
+    def price: () -> ::Stripe::Price
+
+    def quantity: () -> Integer?
+
+    def subscription: () -> String
+
+    def tax_rates: () -> ::Array[::Stripe::TaxRate]?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionItem
+
+    def self.delete: (String item, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionItem
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionItem
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::SubscriptionItem]
+
+    def self.update: (String item, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SubscriptionItem
+  end
+end

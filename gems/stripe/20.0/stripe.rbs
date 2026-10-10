@@ -1,0 +1,264 @@
+# Hand-written signatures for the non-generated part of stripe-ruby.
+# Everything under stripe/ is produced by _generator/generate.rb.
+
+module Stripe
+  type request_opts = String | Hash[Symbol, untyped]
+
+  attr_reader self.config: untyped
+  def self.api_key: () -> String?
+  def self.api_key=: (String?) -> String?
+  def self.api_version: () -> String?
+  def self.api_version=: (String?) -> String?
+  def self.stripe_account: () -> String?
+  def self.stripe_account=: (String?) -> String?
+  def self.api_base: () -> String
+  def self.api_base=: (String) -> String
+  def self.uploads_base: () -> String
+  def self.uploads_base=: (String) -> String
+  def self.connect_base: () -> String
+  def self.connect_base=: (String) -> String
+  def self.meter_events_base: () -> String
+  def self.meter_events_base=: (String) -> String
+  def self.open_timeout: () -> Integer
+  def self.open_timeout=: (Integer) -> Integer
+  def self.read_timeout: () -> Integer
+  def self.read_timeout=: (Integer) -> Integer
+  def self.write_timeout: () -> Integer
+  def self.write_timeout=: (Integer) -> Integer
+  def self.proxy: () -> String?
+  def self.proxy=: (String?) -> String?
+  def self.verify_ssl_certs: () -> bool
+  def self.verify_ssl_certs=: (bool) -> bool
+  def self.ca_bundle_path: () -> String
+  def self.ca_bundle_path=: (String) -> String
+  def self.log_level: () -> String?
+  def self.log_level=: (String?) -> String?
+  def self.logger: () -> untyped
+  def self.logger=: (untyped) -> untyped
+  def self.max_network_retries: () -> Integer
+  def self.max_network_retries=: (Integer) -> Integer
+  def self.enable_telemetry?: () -> bool
+  def self.enable_telemetry=: (bool) -> bool
+  def self.client_id: () -> String?
+  def self.client_id=: (String?) -> String?
+  def self.app_info: () -> Hash[Symbol, String?]?
+  def self.app_info=: (Hash[Symbol, String?]?) -> Hash[Symbol, String?]?
+  def self.set_app_info: (String name, ?partner_id: String?, ?url: String?, ?version: String?) -> void
+
+  class StripeObject
+    include Enumerable[[Symbol, untyped]]
+
+    def self.construct_from: (Hash[Symbol, untyped] values, ?request_opts opts, ?untyped last_response, ?Symbol api_mode, ?untyped requestor) -> instance
+
+    attr_reader last_response: untyped
+
+    def initialize: (?String? id, ?request_opts opts, ?Symbol api_mode, ?untyped requestor) -> void
+    def deleted?: () -> bool
+    def update_attributes: (Hash[Symbol, untyped] values, ?request_opts opts, ?dirty: bool) -> void
+    def []: (String | Symbol key) -> untyped
+    def []=: (String | Symbol key, untyped value) -> untyped
+    def keys: () -> Array[Symbol]
+    def values: () -> Array[untyped]
+    def to_json: (*untyped) -> String
+    def as_json: (*untyped) -> Hash[String, untyped]
+    def to_hash: () -> Hash[Symbol, untyped]
+    def each: () { ([Symbol, untyped]) -> void } -> self
+            | () -> Enumerator[[Symbol, untyped], self]
+    def dirty!: () -> void
+    def serialize_params: (?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+  end
+
+  class APIResource < StripeObject
+    attr_accessor save_with_parent: bool
+
+    def self.object_name: () -> String
+    def self.class_name: () -> String
+    def self.resource_url: () -> String
+    def self.retrieve: (String | Hash[Symbol, untyped] id, ?request_opts opts) -> instance
+
+    def resource_url: () -> String
+    def refresh: () -> self
+  end
+
+  class SingletonAPIResource < APIResource
+    def self.retrieve: (?Hash[Symbol, untyped] params, ?request_opts opts) -> instance
+  end
+
+  class ListObject[T = untyped] < StripeObject
+    attr_accessor filters: Hash[Symbol, untyped]
+
+    def self.empty_list: (?request_opts opts) -> ListObject[untyped]
+
+    def data: () -> Array[T]
+    def has_more: () -> bool
+    def url: () -> String
+    def each: () { (T) -> void } -> self
+            | () -> Enumerator[T, self]
+    def reverse_each: () { (T) -> void } -> self
+                    | () -> Enumerator[T, self]
+    def auto_paging_each: () { (T) -> void } -> self
+                        | () -> Enumerator[T, self]
+    def empty?: () -> bool
+    def retrieve: (String id, ?request_opts opts) -> T
+    def next_page: (?Hash[Symbol, untyped] params, ?request_opts opts) -> ListObject[T]
+    def previous_page: (?Hash[Symbol, untyped] params, ?request_opts opts) -> ListObject[T]
+  end
+
+  class SearchResultObject[T = untyped] < StripeObject
+    attr_accessor filters: Hash[Symbol, untyped]
+
+    def self.empty_search_result: (?request_opts opts) -> SearchResultObject[untyped]
+
+    def data: () -> Array[T]
+    def has_more: () -> bool
+    def next_page: () -> String?
+    def each: () { (T) -> void } -> self
+            | () -> Enumerator[T, self]
+    def auto_paging_each: () { (T) -> void } -> self
+                        | () -> Enumerator[T, self]
+    def empty?: () -> bool
+    def next_search_result_page: (?Hash[Symbol, untyped] params, ?request_opts opts) -> SearchResultObject[T]
+  end
+
+  module V2
+    module Core
+      class EventNotification
+        # Returns the Stripe::Events::*Event matching the notification's type.
+        def fetch_event: () -> untyped
+      end
+
+      class RelatedObject
+        attr_reader id: String?
+        attr_reader type: String?
+        attr_reader url: String
+
+        def initialize: (Hash[Symbol, untyped] related_object) -> void
+      end
+
+      class RelatedSingletonObject
+        attr_reader type: String?
+        attr_reader url: String
+
+        def initialize: (Hash[Symbol, untyped] related_object) -> void
+      end
+    end
+
+    class ListObject[T = untyped] < StripeObject
+      def self.empty_list: (?request_opts opts) -> ListObject[untyped]
+
+      def data: () -> Array[T]
+      def next_page_url: () -> String?
+      def each: () { (T) -> void } -> self
+              | () -> Enumerator[T, self]
+      def reverse_each: () { (T) -> void } -> self
+                      | () -> Enumerator[T, self]
+      def auto_paging_each: () { (T) -> void } -> self
+                          | () -> Enumerator[T, self]
+      def empty?: () -> bool
+      def fetch_next_page: (?request_opts opts) -> ListObject[T]
+    end
+  end
+
+  class StripeService
+    def initialize: (untyped requestor) -> void
+  end
+
+  class StripeContext
+    include Comparable
+
+    attr_reader segments: Array[String]
+
+    def self.parse: (String? context_str) -> StripeContext
+
+    def initialize: (?Array[String]? segments) -> void
+    def push: (String segment) -> StripeContext
+    def pop: () -> StripeContext
+    def empty?: () -> bool
+  end
+
+  class StripeClient
+    attr_reader v1: V1Services
+    attr_reader v2: V2Services
+
+    def initialize: (String api_key, ?stripe_account: String?, ?stripe_context: (String | StripeContext)?, ?stripe_version: String?, ?api_base: String?, ?uploads_base: String?, ?connect_base: String?, ?meter_events_base: String?, ?client_id: String?) -> void
+    def raw_request: (Symbol method, String url, ?base_address: Symbol, ?params: Hash[Symbol, untyped], ?opts: request_opts, ?usage: Array[String]?) -> untyped
+    def deserialize: (String data, ?api_mode: Symbol) -> StripeObject
+  end
+
+  class StripeError < StandardError
+    attr_reader message: String?
+    attr_reader code: String?
+    attr_reader error: ErrorObject?
+    attr_reader http_body: String?
+    attr_reader http_headers: Hash[String, String]
+    attr_reader http_status: Integer?
+    attr_reader json_body: Hash[Symbol, untyped]?
+    attr_reader request_id: String?
+    attr_accessor response: untyped
+
+    def initialize: (?String? message, ?http_status: Integer?, ?http_body: String?, ?json_body: Hash[Symbol, untyped]?, ?http_headers: Hash[String, String]?, ?code: String?) -> void
+  end
+
+  class AuthenticationError < StripeError
+  end
+
+  class APIConnectionError < StripeError
+  end
+
+  class APIError < StripeError
+  end
+
+  class CardError < StripeError
+    attr_reader param: String?
+
+    def initialize: (String? message, String? param, ?code: String?, ?http_status: Integer?, ?http_body: String?, ?json_body: Hash[Symbol, untyped]?, ?http_headers: Hash[String, String]?) -> void
+  end
+
+  class IdempotencyError < StripeError
+  end
+
+  class InvalidRequestError < StripeError
+    attr_accessor param: String?
+
+    def initialize: (String? message, String? param, ?http_status: Integer?, ?http_body: String?, ?json_body: Hash[Symbol, untyped]?, ?http_headers: Hash[String, String]?, ?code: String?) -> void
+  end
+
+  class PermissionError < StripeError
+  end
+
+  class RateLimitError < StripeError
+  end
+
+  class SignatureVerificationError < StripeError
+    attr_accessor sig_header: String
+
+    def initialize: (String message, String sig_header, ?http_body: String?) -> void
+  end
+
+  class TemporarySessionExpiredError < StripeError
+  end
+
+  module OAuth
+    class OAuthError < StripeError
+      def initialize: (String? code, String? description, ?http_status: Integer?, ?http_body: String?, ?json_body: Hash[Symbol, untyped]?, ?http_headers: Hash[String, String]?) -> void
+    end
+
+    class InvalidClientError < OAuthError
+    end
+
+    class InvalidGrantError < OAuthError
+    end
+
+    class InvalidRequestError < OAuthError
+    end
+
+    class InvalidScopeError < OAuthError
+    end
+
+    class UnsupportedGrantTypeError < OAuthError
+    end
+
+    class UnsupportedResponseTypeError < OAuthError
+    end
+  end
+end

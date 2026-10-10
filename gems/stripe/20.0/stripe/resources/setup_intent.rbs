@@ -1,0 +1,418 @@
+module Stripe
+  class SetupIntent < APIResource
+    class AutomaticPaymentMethods < ::Stripe::StripeObject
+      def allow_redirects: () -> String?
+
+      def enabled: () -> bool?
+    end
+
+    class LastSetupError < ::Stripe::StripeObject
+      def advice_code: () -> String?
+
+      def charge: () -> String?
+
+      def code: () -> String?
+
+      def decline_code: () -> String?
+
+      def doc_url: () -> String?
+
+      def message: () -> String?
+
+      def network_advice_code: () -> String?
+
+      def network_decline_code: () -> String?
+
+      def param: () -> String?
+
+      def payment_intent: () -> ::Stripe::PaymentIntent?
+
+      def payment_method: () -> ::Stripe::PaymentMethod?
+
+      def payment_method_type: () -> String?
+
+      def request_log_url: () -> String?
+
+      def setup_intent: () -> ::Stripe::SetupIntent?
+
+      def source: () -> (::Stripe::Account | ::Stripe::BankAccount | ::Stripe::Card | ::Stripe::Source)?
+
+      def type: () -> String
+    end
+
+    class ManagedPayments < ::Stripe::StripeObject
+      def enabled: () -> bool
+    end
+
+    class NextAction < ::Stripe::StripeObject
+      class BlikAuthorize < ::Stripe::StripeObject
+      end
+
+      class CashappHandleRedirectOrDisplayQrCode < ::Stripe::StripeObject
+        class QrCode < ::Stripe::StripeObject
+          def expires_at: () -> Integer
+
+          def image_url_png: () -> String
+
+          def image_url_svg: () -> String
+        end
+
+        def hosted_instructions_url: () -> String
+
+        def mobile_auth_url: () -> String
+
+        def qr_code: () -> QrCode
+      end
+
+      class PixDisplayQrCode < ::Stripe::StripeObject
+        def data: () -> String
+
+        def expires_at: () -> Integer
+
+        def hosted_instructions_url: () -> String
+
+        def image_url_png: () -> String
+
+        def image_url_svg: () -> String
+      end
+
+      class RedirectToUrl < ::Stripe::StripeObject
+        def return_url: () -> String?
+
+        def url: () -> String?
+      end
+
+      class UpiHandleRedirectOrDisplayQrCode < ::Stripe::StripeObject
+        class QrCode < ::Stripe::StripeObject
+          def expires_at: () -> Integer
+
+          def image_url_png: () -> String
+
+          def image_url_svg: () -> String
+        end
+
+        def hosted_instructions_url: () -> String
+
+        def qr_code: () -> QrCode
+      end
+
+      class VerifyWithMicrodeposits < ::Stripe::StripeObject
+        def arrival_date: () -> Integer
+
+        def hosted_verification_url: () -> String
+
+        def microdeposit_type: () -> String?
+      end
+
+      def blik_authorize: () -> BlikAuthorize?
+
+      def cashapp_handle_redirect_or_display_qr_code: () -> CashappHandleRedirectOrDisplayQrCode?
+
+      def pix_display_qr_code: () -> PixDisplayQrCode?
+
+      def redirect_to_url: () -> RedirectToUrl?
+
+      def type: () -> String
+
+      def upi_handle_redirect_or_display_qr_code: () -> UpiHandleRedirectOrDisplayQrCode?
+
+      def use_stripe_sdk: () -> ::Stripe::StripeObject?
+
+      def verify_with_microdeposits: () -> VerifyWithMicrodeposits?
+    end
+
+    class PaymentMethodConfigurationDetails < ::Stripe::StripeObject
+      def id: () -> String
+
+      def parent: () -> String?
+    end
+
+    class PaymentMethodOptions < ::Stripe::StripeObject
+      class AcssDebit < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def custom_mandate_url: () -> String?
+
+          def default_for: () -> ::Array[String]?
+
+          def interval_description: () -> String?
+
+          def payment_schedule: () -> String?
+
+          def transaction_type: () -> String?
+        end
+
+        def currency: () -> String?
+
+        def mandate_options: () -> MandateOptions?
+
+        def verification_method: () -> String?
+      end
+
+      class AmazonPay < ::Stripe::StripeObject
+      end
+
+      class BacsDebit < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def reference_prefix: () -> String?
+        end
+
+        def mandate_options: () -> MandateOptions?
+      end
+
+      class Bizum < ::Stripe::StripeObject
+      end
+
+      class Blik < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def expires_at: () -> Integer?
+
+          def type: () -> String?
+        end
+
+        def mandate_options: () -> MandateOptions?
+      end
+
+      class Card < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def amount_type: () -> String
+
+          def currency: () -> String
+
+          def description: () -> String?
+
+          def end_date: () -> Integer?
+
+          def interval: () -> String
+
+          def interval_count: () -> Integer?
+
+          def reference: () -> String
+
+          def start_date: () -> Integer
+
+          def supported_types: () -> ::Array[String]?
+        end
+
+        def mandate_options: () -> MandateOptions?
+
+        def network: () -> String?
+
+        def request_three_d_secure: () -> String?
+      end
+
+      class CardPresent < ::Stripe::StripeObject
+      end
+
+      class Klarna < ::Stripe::StripeObject
+        def currency: () -> String?
+
+        def preferred_locale: () -> String?
+      end
+
+      class Link < ::Stripe::StripeObject
+      end
+
+      class Paypal < ::Stripe::StripeObject
+        def billing_agreement_id: () -> String?
+      end
+
+      class Payto < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def amount: () -> Integer?
+
+          def amount_type: () -> String?
+
+          def end_date: () -> String?
+
+          def payment_schedule: () -> String?
+
+          def payments_per_period: () -> Integer?
+
+          def purpose: () -> String?
+
+          def start_date: () -> String?
+        end
+
+        def mandate_options: () -> MandateOptions?
+      end
+
+      class Pix < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def amount: () -> Integer?
+
+          def amount_includes_iof: () -> String?
+
+          def amount_type: () -> String?
+
+          def currency: () -> String?
+
+          def end_date: () -> String?
+
+          def payment_schedule: () -> String?
+
+          def reference: () -> String?
+
+          def start_date: () -> String?
+        end
+
+        def mandate_options: () -> MandateOptions?
+      end
+
+      class SepaDebit < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def reference_prefix: () -> String?
+        end
+
+        def mandate_options: () -> MandateOptions?
+      end
+
+      class Upi < ::Stripe::StripeObject
+        class MandateOptions < ::Stripe::StripeObject
+          def amount: () -> Integer?
+
+          def amount_type: () -> String?
+
+          def description: () -> String?
+
+          def end_date: () -> Integer?
+        end
+
+        def mandate_options: () -> MandateOptions?
+      end
+
+      class UsBankAccount < ::Stripe::StripeObject
+        class FinancialConnections < ::Stripe::StripeObject
+          class Filters < ::Stripe::StripeObject
+            def account_subcategories: () -> ::Array[String]?
+          end
+
+          def filters: () -> Filters?
+
+          def permissions: () -> ::Array[String]?
+
+          def prefetch: () -> ::Array[String]?
+
+          def return_url: () -> String?
+        end
+
+        class MandateOptions < ::Stripe::StripeObject
+          def collection_method: () -> String?
+        end
+
+        def financial_connections: () -> FinancialConnections?
+
+        def mandate_options: () -> MandateOptions?
+
+        def verification_method: () -> String?
+      end
+
+      def acss_debit: () -> AcssDebit?
+
+      def amazon_pay: () -> AmazonPay?
+
+      def bacs_debit: () -> BacsDebit?
+
+      def bizum: () -> Bizum?
+
+      def blik: () -> Blik?
+
+      def card: () -> Card?
+
+      def card_present: () -> CardPresent?
+
+      def klarna: () -> Klarna?
+
+      def link: () -> Link?
+
+      def paypal: () -> Paypal?
+
+      def payto: () -> Payto?
+
+      def pix: () -> Pix?
+
+      def sepa_debit: () -> SepaDebit?
+
+      def upi: () -> Upi?
+
+      def us_bank_account: () -> UsBankAccount?
+    end
+
+    def allowed_payment_method_types: () -> ::Array[String]?
+
+    def application: () -> (String | ::Stripe::Application)?
+
+    def attach_to_self: () -> bool?
+
+    def automatic_payment_methods: () -> AutomaticPaymentMethods?
+
+    def cancellation_reason: () -> String?
+
+    def client_secret: () -> String?
+
+    def created: () -> Integer
+
+    def customer: () -> (String | ::Stripe::Customer)?
+
+    def customer_account: () -> String?
+
+    def description: () -> String?
+
+    def excluded_payment_method_types: () -> ::Array[String]?
+
+    def flow_directions: () -> ::Array[String]?
+
+    def id: () -> String
+
+    def last_setup_error: () -> LastSetupError?
+
+    def latest_attempt: () -> (String | ::Stripe::SetupAttempt)?
+
+    def livemode: () -> bool
+
+    def managed_payments: () -> ManagedPayments?
+
+    def mandate: () -> (String | ::Stripe::Mandate)?
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def next_action: () -> NextAction?
+
+    def object: () -> String
+
+    def on_behalf_of: () -> (String | ::Stripe::Account)?
+
+    def payment_method: () -> (String | ::Stripe::PaymentMethod)?
+
+    def payment_method_configuration_details: () -> PaymentMethodConfigurationDetails?
+
+    def payment_method_options: () -> PaymentMethodOptions?
+
+    def payment_method_types: () -> ::Array[String]
+
+    def single_use_mandate: () -> (String | ::Stripe::Mandate)?
+
+    def status: () -> String
+
+    def usage: () -> String
+
+    def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def self.cancel: (String intent, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def confirm: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def self.confirm: (String intent, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::SetupIntent]
+
+    def self.update: (String intent, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def verify_microdeposits: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+
+    def self.verify_microdeposits: (String intent, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SetupIntent
+  end
+end

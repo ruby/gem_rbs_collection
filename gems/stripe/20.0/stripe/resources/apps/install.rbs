@@ -1,0 +1,61 @@
+module Stripe
+  module Apps
+    class Install < APIResource
+      class ContentSecurityPolicyGranted < ::Stripe::StripeObject
+        def connect_src: () -> ::Array[String]
+
+        def image_src: () -> ::Array[String]
+      end
+
+      class ContentSecurityPolicyPending < ::Stripe::StripeObject
+        def connect_src: () -> ::Array[String]
+
+        def image_src: () -> ::Array[String]
+      end
+
+      def account: () -> String
+
+      def app: () -> String
+
+      def approval_required: () -> bool
+
+      def auth_code: () -> String?
+
+      def channel: () -> String
+
+      def content_security_policy_granted: () -> ContentSecurityPolicyGranted
+
+      def content_security_policy_pending: () -> ContentSecurityPolicyPending
+
+      def created: () -> Integer
+
+      def created_by: () -> String?
+
+      def endpoints_granted: () -> ::Array[String]
+
+      def endpoints_pending: () -> ::Array[String]
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def permissions_granted: () -> ::Array[String]
+
+      def permissions_pending: () -> ::Array[String]
+
+      def status: () -> String
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Apps::Install
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Apps::Install]
+
+      def uninstall: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Apps::Install
+
+      def self.uninstall: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Apps::Install
+
+      def self.update: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Apps::Install
+    end
+  end
+end

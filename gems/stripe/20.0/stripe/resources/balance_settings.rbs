@@ -1,0 +1,59 @@
+module Stripe
+  class BalanceSettings < SingletonAPIResource
+    class Payments < ::Stripe::StripeObject
+      class Payouts < ::Stripe::StripeObject
+        class AutomaticTransferRulesByCurrency < ::Stripe::StripeObject
+          def payout_method: () -> String
+
+          def transfer_up_to_amount: () -> Integer?
+
+          def type: () -> String
+        end
+
+        class Schedule < ::Stripe::StripeObject
+          def interval: () -> String?
+
+          def monthly_payout_days: () -> ::Array[Integer]?
+
+          def weekly_payout_days: () -> ::Array[String]?
+        end
+
+        def automatic_transfer_rules_by_currency: () -> ::Stripe::StripeObject?
+
+        def minimum_balance_by_currency: () -> ::Stripe::StripeObject?
+
+        def schedule: () -> Schedule?
+
+        def statement_descriptor: () -> String?
+
+        def status: () -> String
+      end
+
+      class SettlementTiming < ::Stripe::StripeObject
+        class StartOfDay < ::Stripe::StripeObject
+          def hour: () -> Integer
+
+          def minutes: () -> Integer
+
+          def timezone: () -> String
+        end
+
+        def delay_days: () -> Integer
+
+        def delay_days_override: () -> Integer?
+
+        def start_of_day: () -> StartOfDay?
+      end
+
+      def debit_negative_balances: () -> bool?
+
+      def payouts: () -> Payouts?
+
+      def settlement_timing: () -> SettlementTiming
+    end
+
+    def object: () -> String
+
+    def payments: () -> Payments
+  end
+end

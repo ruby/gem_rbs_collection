@@ -1,0 +1,79 @@
+module Stripe
+  class BankAccount < APIResource
+    class FutureRequirements < ::Stripe::StripeObject
+      class Error < ::Stripe::StripeObject
+        def code: () -> String
+
+        def reason: () -> String
+
+        def requirement: () -> String
+      end
+
+      def currently_due: () -> ::Array[String]?
+
+      def errors: () -> ::Array[Error]?
+
+      def past_due: () -> ::Array[String]?
+
+      def pending_verification: () -> ::Array[String]?
+    end
+
+    class Requirements < ::Stripe::StripeObject
+      class Error < ::Stripe::StripeObject
+        def code: () -> String
+
+        def reason: () -> String
+
+        def requirement: () -> String
+      end
+
+      def currently_due: () -> ::Array[String]?
+
+      def errors: () -> ::Array[Error]?
+
+      def past_due: () -> ::Array[String]?
+
+      def pending_verification: () -> ::Array[String]?
+    end
+
+    def account: () -> (String | ::Stripe::Account)?
+
+    def account_holder_name: () -> String?
+
+    def account_holder_type: () -> String?
+
+    def account_type: () -> String?
+
+    def available_payout_methods: () -> ::Array[String]?
+
+    def bank_name: () -> String?
+
+    def country: () -> String
+
+    def currency: () -> String
+
+    def customer: () -> (String | ::Stripe::Customer)?
+
+    def default_for_currency: () -> bool?
+
+    def deleted: () -> bool?
+
+    def fingerprint: () -> String?
+
+    def future_requirements: () -> FutureRequirements?
+
+    def id: () -> String
+
+    def last4: () -> String
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def object: () -> String
+
+    def requirements: () -> Requirements?
+
+    def routing_number: () -> String?
+
+    def status: () -> String
+  end
+end

@@ -1,0 +1,69 @@
+module Stripe
+  class CreditNoteLineItem < StripeObject
+    class DiscountAmount < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def discount: () -> (String | ::Stripe::Discount)
+    end
+
+    class PretaxCreditAmount < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def credit_balance_transaction: () -> (String | ::Stripe::Billing::CreditBalanceTransaction)?
+
+      def discount: () -> (String | ::Stripe::Discount)?
+
+      def type: () -> String
+    end
+
+    class Tax < ::Stripe::StripeObject
+      class TaxRateDetails < ::Stripe::StripeObject
+        def tax_rate: () -> String
+      end
+
+      def amount: () -> Integer
+
+      def tax_behavior: () -> String
+
+      def tax_rate_details: () -> TaxRateDetails?
+
+      def taxability_reason: () -> String
+
+      def taxable_amount: () -> Integer?
+
+      def type: () -> String
+    end
+
+    def amount: () -> Integer
+
+    def description: () -> String?
+
+    def discount_amount: () -> Integer
+
+    def discount_amounts: () -> ::Array[DiscountAmount]
+
+    def id: () -> String
+
+    def invoice_line_item: () -> String?
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def object: () -> String
+
+    def pretax_credit_amounts: () -> ::Array[PretaxCreditAmount]
+
+    def quantity: () -> Integer?
+
+    def tax_rates: () -> ::Array[::Stripe::TaxRate]
+
+    def taxes: () -> ::Array[Tax]?
+
+    def type: () -> String
+
+    def unit_amount: () -> Integer?
+
+    def unit_amount_decimal: () -> BigDecimal?
+  end
+end

@@ -1,0 +1,27 @@
+module Stripe
+  module Terminal
+    class OnboardingLink < APIResource
+      class LinkOptions < ::Stripe::StripeObject
+        class AppleTermsAndConditions < ::Stripe::StripeObject
+          def allow_relinking: () -> bool?
+
+          def merchant_display_name: () -> String
+        end
+
+        def apple_terms_and_conditions: () -> AppleTermsAndConditions?
+      end
+
+      def link_options: () -> LinkOptions
+
+      def link_type: () -> String
+
+      def object: () -> String
+
+      def on_behalf_of: () -> String?
+
+      def redirect_url: () -> String
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Terminal::OnboardingLink
+    end
+  end
+end

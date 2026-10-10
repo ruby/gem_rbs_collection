@@ -1,0 +1,77 @@
+module Stripe
+  class Product < APIResource
+    class MarketingFeature < ::Stripe::StripeObject
+      def name: () -> String?
+    end
+
+    class PackageDimensions < ::Stripe::StripeObject
+      def height: () -> Float
+
+      def length: () -> Float
+
+      def weight: () -> Float
+
+      def width: () -> Float
+    end
+
+    class TaxDetails < ::Stripe::StripeObject
+      def performance_location: () -> String?
+
+      def tax_code: () -> String?
+    end
+
+    def active: () -> bool
+
+    def created: () -> Integer
+
+    def default_price: () -> (String | ::Stripe::Price)?
+
+    def deleted: () -> bool?
+
+    def description: () -> String?
+
+    def id: () -> String
+
+    def images: () -> ::Array[String]
+
+    def livemode: () -> bool
+
+    def marketing_features: () -> ::Array[MarketingFeature]
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def name: () -> String
+
+    def object: () -> String
+
+    def package_dimensions: () -> PackageDimensions?
+
+    def shippable: () -> bool?
+
+    def statement_descriptor: () -> String?
+
+    def tax_code: () -> (String | ::Stripe::TaxCode)?
+
+    def tax_details: () -> TaxDetails?
+
+    def unit_label: () -> String?
+
+    def updated: () -> Integer
+
+    def url: () -> String?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Product
+
+    def self.delete: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Product
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Product
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Product]
+
+    def self.search: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::SearchResultObject[::Stripe::Product]
+
+    def self.search_auto_paging_each: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) { (::Stripe::Product) -> void } -> ::Stripe::SearchResultObject[::Stripe::Product]
+
+    def self.update: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Product
+  end
+end

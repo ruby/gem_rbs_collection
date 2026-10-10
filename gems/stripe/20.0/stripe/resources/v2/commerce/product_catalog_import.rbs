@@ -1,0 +1,99 @@
+module Stripe
+  module V2
+    module Commerce
+      class ProductCatalogImport < APIResource
+        class StatusDetails < ::Stripe::StripeObject
+          class AwaitingUpload < ::Stripe::StripeObject
+            class UploadUrl < ::Stripe::StripeObject
+              def expires_at: () -> String
+
+              def url: () -> String
+            end
+
+            def upload_url: () -> UploadUrl
+          end
+
+          class Failed < ::Stripe::StripeObject
+            def code: () -> String
+
+            def failure_message: () -> String
+
+            def type: () -> String
+          end
+
+          class Processing < ::Stripe::StripeObject
+            def error_count: () -> Integer
+
+            def success_count: () -> Integer
+          end
+
+          class Succeeded < ::Stripe::StripeObject
+            def success_count: () -> Integer
+          end
+
+          class SucceededWithErrors < ::Stripe::StripeObject
+            class ErrorFile < ::Stripe::StripeObject
+              class DownloadUrl < ::Stripe::StripeObject
+                def expires_at: () -> String
+
+                def url: () -> String
+              end
+
+              def content_type: () -> String
+
+              def download_url: () -> DownloadUrl
+
+              def size: () -> Integer
+            end
+
+            class Sample < ::Stripe::StripeObject
+              def error_message: () -> String
+
+              def field: () -> String
+
+              def id: () -> String
+
+              def row: () -> Integer
+            end
+
+            def error_count: () -> Integer
+
+            def error_file: () -> ErrorFile
+
+            def samples: () -> ::Array[Sample]
+
+            def success_count: () -> Integer
+          end
+
+          def awaiting_upload: () -> AwaitingUpload?
+
+          def failed: () -> Failed?
+
+          def processing: () -> Processing?
+
+          def succeeded: () -> Succeeded?
+
+          def succeeded_with_errors: () -> SucceededWithErrors?
+        end
+
+        def created: () -> String
+
+        def feed_type: () -> String
+
+        def id: () -> String
+
+        def livemode: () -> bool
+
+        def metadata: () -> ::Stripe::StripeObject
+
+        def mode: () -> String
+
+        def object: () -> String
+
+        def status: () -> String
+
+        def status_details: () -> StatusDetails?
+      end
+    end
+  end
+end

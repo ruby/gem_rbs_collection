@@ -1,0 +1,19 @@
+module Stripe
+  module Events
+    class V1CheckoutSessionCompletedEvent < Stripe::V2::Core::Event
+      def self.lookup_type: () -> "v1.checkout.session.completed"
+
+      def fetch_related_object: () -> untyped
+
+      attr_reader related_object: untyped
+    end
+
+    class V1CheckoutSessionCompletedEventNotification < Stripe::V2::Core::EventNotification
+      def self.lookup_type: () -> "v1.checkout.session.completed"
+
+      attr_reader related_object: ::Stripe::V2::Core::RelatedObject
+
+      def fetch_related_object: () -> untyped
+    end
+  end
+end

@@ -1,0 +1,39 @@
+module Stripe
+  class Event < APIResource
+    class Data < ::Stripe::StripeObject
+      def object: () -> untyped
+
+      def previous_attributes: () -> ::Stripe::StripeObject?
+    end
+
+    class Request < ::Stripe::StripeObject
+      def id: () -> String?
+
+      def idempotency_key: () -> String?
+    end
+
+    def account: () -> String?
+
+    def api_version: () -> String?
+
+    def context: () -> String?
+
+    def created: () -> Integer
+
+    def data: () -> Data
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def pending_webhooks: () -> Integer
+
+    def request: () -> Request?
+
+    def type: () -> String
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Event]
+  end
+end

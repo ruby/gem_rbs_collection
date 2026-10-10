@@ -1,0 +1,204 @@
+module Stripe
+  module Identity
+    class VerificationReport < APIResource
+      class Document < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String?
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        class Dob < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        class Error < ::Stripe::StripeObject
+          def code: () -> String?
+
+          def reason: () -> String?
+        end
+
+        class ExpirationDate < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        class IssuedDate < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        def address: () -> Address?
+
+        def dob: () -> Dob?
+
+        def error: () -> Error?
+
+        def expiration_date: () -> ExpirationDate?
+
+        def files: () -> ::Array[String]?
+
+        def first_name: () -> String?
+
+        def issued_date: () -> IssuedDate?
+
+        def issuing_country: () -> String?
+
+        def last_name: () -> String?
+
+        def number: () -> String?
+
+        def sex: () -> String?
+
+        def status: () -> String
+
+        def type: () -> String?
+
+        def unparsed_place_of_birth: () -> String?
+
+        def unparsed_sex: () -> String?
+      end
+
+      class Email < ::Stripe::StripeObject
+        class Error < ::Stripe::StripeObject
+          def code: () -> String?
+
+          def reason: () -> String?
+        end
+
+        def email: () -> String?
+
+        def error: () -> Error?
+
+        def status: () -> String
+      end
+
+      class IdNumber < ::Stripe::StripeObject
+        class Dob < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        class Error < ::Stripe::StripeObject
+          def code: () -> String?
+
+          def reason: () -> String?
+        end
+
+        def dob: () -> Dob?
+
+        def error: () -> Error?
+
+        def first_name: () -> String?
+
+        def id_number: () -> String?
+
+        def id_number_type: () -> String?
+
+        def last_name: () -> String?
+
+        def status: () -> String
+      end
+
+      class Options < ::Stripe::StripeObject
+        class Document < ::Stripe::StripeObject
+          def allowed_types: () -> ::Array[String]?
+
+          def require_id_number: () -> bool?
+
+          def require_live_capture: () -> bool?
+
+          def require_matching_selfie: () -> bool?
+        end
+
+        class IdNumber < ::Stripe::StripeObject
+        end
+
+        def document: () -> Document?
+
+        def id_number: () -> IdNumber?
+      end
+
+      class Phone < ::Stripe::StripeObject
+        class Error < ::Stripe::StripeObject
+          def code: () -> String?
+
+          def reason: () -> String?
+        end
+
+        def error: () -> Error?
+
+        def phone: () -> String?
+
+        def status: () -> String
+      end
+
+      class Selfie < ::Stripe::StripeObject
+        class Error < ::Stripe::StripeObject
+          def code: () -> String?
+
+          def reason: () -> String?
+        end
+
+        def document: () -> String?
+
+        def error: () -> Error?
+
+        def selfie: () -> String?
+
+        def status: () -> String
+      end
+
+      def client_reference_id: () -> String?
+
+      def created: () -> Integer
+
+      def document: () -> Document?
+
+      def email: () -> Email?
+
+      def id: () -> String
+
+      def id_number: () -> IdNumber?
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def options: () -> Options?
+
+      def phone: () -> Phone?
+
+      def selfie: () -> Selfie?
+
+      def type: () -> String
+
+      def verification_flow: () -> String?
+
+      def verification_session: () -> String?
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Identity::VerificationReport]
+    end
+  end
+end

@@ -1,0 +1,127 @@
+module Stripe
+  class InvoiceItem < APIResource
+    class InvoicingRule < ::Stripe::StripeObject
+      def type: () -> String
+    end
+
+    class Parent < ::Stripe::StripeObject
+      class SubscriptionDetails < ::Stripe::StripeObject
+        def subscription: () -> String
+
+        def subscription_item: () -> String?
+      end
+
+      def subscription_details: () -> SubscriptionDetails?
+
+      def type: () -> String
+    end
+
+    class Period < ::Stripe::StripeObject
+      def end: () -> Integer
+
+      def start: () -> Integer
+    end
+
+    class Pricing < ::Stripe::StripeObject
+      class PriceDetails < ::Stripe::StripeObject
+        def price: () -> (String | ::Stripe::Price)
+
+        def product: () -> String
+      end
+
+      def price_details: () -> PriceDetails?
+
+      def type: () -> String
+
+      def unit_amount_decimal: () -> BigDecimal?
+    end
+
+    class ProrationDetails < ::Stripe::StripeObject
+      class CreditedItems < ::Stripe::StripeObject
+        class InvoiceLineItemDetails < ::Stripe::StripeObject
+          def invoice: () -> String
+
+          def invoice_line_items: () -> ::Array[String]
+        end
+
+        def invoice_item: () -> String?
+
+        def invoice_line_item_details: () -> InvoiceLineItemDetails?
+
+        def type: () -> String
+      end
+
+      class DiscountAmount < ::Stripe::StripeObject
+        def amount: () -> Integer
+
+        def discount: () -> (String | ::Stripe::Discount)
+      end
+
+      def credited_items: () -> CreditedItems?
+
+      def discount_amounts: () -> ::Array[DiscountAmount]
+    end
+
+    def amount: () -> Integer
+
+    def currency: () -> String
+
+    def customer: () -> (String | ::Stripe::Customer)
+
+    def customer_account: () -> String?
+
+    def date: () -> Integer
+
+    def deleted: () -> bool?
+
+    def description: () -> String?
+
+    def discountable: () -> bool
+
+    def discounts: () -> ::Array[String | ::Stripe::Discount]?
+
+    def frozen_fields: () -> ::Array[String]?
+
+    def id: () -> String
+
+    def invoice: () -> (String | ::Stripe::Invoice)?
+
+    def invoicing_rules: () -> ::Array[InvoicingRule]?
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def net_amount: () -> Integer?
+
+    def object: () -> String
+
+    def parent: () -> Parent?
+
+    def period: () -> Period
+
+    def pricing: () -> Pricing?
+
+    def proration: () -> bool
+
+    def proration_details: () -> ProrationDetails?
+
+    def quantity: () -> Integer
+
+    def quantity_decimal: () -> BigDecimal
+
+    def tax_rates: () -> ::Array[::Stripe::TaxRate]?
+
+    def test_clock: () -> (String | ::Stripe::TestHelpers::TestClock)?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::InvoiceItem
+
+    def self.delete: (String invoiceitem, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::InvoiceItem
+
+    def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::InvoiceItem
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::InvoiceItem]
+
+    def self.update: (String invoiceitem, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::InvoiceItem
+  end
+end

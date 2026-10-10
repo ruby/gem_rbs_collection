@@ -1,0 +1,157 @@
+module Stripe
+  class CreditNote < APIResource
+    class DiscountAmount < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def discount: () -> (String | ::Stripe::Discount)
+    end
+
+    class PretaxCreditAmount < ::Stripe::StripeObject
+      def amount: () -> Integer
+
+      def credit_balance_transaction: () -> (String | ::Stripe::Billing::CreditBalanceTransaction)?
+
+      def discount: () -> (String | ::Stripe::Discount)?
+
+      def type: () -> String
+    end
+
+    class Refund < ::Stripe::StripeObject
+      class PaymentRecordRefund < ::Stripe::StripeObject
+        def payment_record: () -> String
+
+        def refund_group: () -> String
+      end
+
+      def amount_refunded: () -> Integer
+
+      def payment_record_refund: () -> PaymentRecordRefund?
+
+      def refund: () -> (String | ::Stripe::Refund)
+
+      def type: () -> String?
+    end
+
+    class ShippingCost < ::Stripe::StripeObject
+      class Tax < ::Stripe::StripeObject
+        def amount: () -> Integer
+
+        def rate: () -> ::Stripe::TaxRate
+
+        def taxability_reason: () -> String?
+
+        def taxable_amount: () -> Integer?
+      end
+
+      def amount_subtotal: () -> Integer
+
+      def amount_tax: () -> Integer
+
+      def amount_total: () -> Integer
+
+      def shipping_rate: () -> (String | ::Stripe::ShippingRate)?
+
+      def taxes: () -> ::Array[Tax]?
+    end
+
+    class TotalTax < ::Stripe::StripeObject
+      class TaxRateDetails < ::Stripe::StripeObject
+        def tax_rate: () -> String
+      end
+
+      def amount: () -> Integer
+
+      def tax_behavior: () -> String
+
+      def tax_rate_details: () -> TaxRateDetails?
+
+      def taxability_reason: () -> String
+
+      def taxable_amount: () -> Integer?
+
+      def type: () -> String
+    end
+
+    def amount: () -> Integer
+
+    def amount_shipping: () -> Integer
+
+    def created: () -> Integer
+
+    def currency: () -> String
+
+    def customer: () -> (String | ::Stripe::Customer)
+
+    def customer_account: () -> String?
+
+    def customer_balance_transaction: () -> (String | ::Stripe::CustomerBalanceTransaction)?
+
+    def discount_amount: () -> Integer
+
+    def discount_amounts: () -> ::Array[DiscountAmount]
+
+    def effective_at: () -> Integer?
+
+    def id: () -> String
+
+    def invoice: () -> (String | ::Stripe::Invoice)
+
+    def lines: () -> ::Stripe::ListObject[::Stripe::CreditNoteLineItem]
+
+    def livemode: () -> bool
+
+    def memo: () -> String?
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def number: () -> String
+
+    def object: () -> String
+
+    def out_of_band_amount: () -> Integer?
+
+    def pdf: () -> String
+
+    def post_payment_amount: () -> Integer
+
+    def pre_payment_amount: () -> Integer
+
+    def pretax_credit_amounts: () -> ::Array[PretaxCreditAmount]
+
+    def reason: () -> String?
+
+    def refunds: () -> ::Array[Refund]
+
+    def shipping_cost: () -> ShippingCost?
+
+    def status: () -> String
+
+    def subtotal: () -> Integer
+
+    def subtotal_excluding_tax: () -> Integer?
+
+    def total: () -> Integer
+
+    def total_excluding_tax: () -> Integer?
+
+    def total_taxes: () -> ::Array[TotalTax]?
+
+    def type: () -> String
+
+    def voided_at: () -> Integer?
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::CreditNote
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::CreditNote]
+
+    def self.list_preview_line_items: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::CreditNoteLineItem]
+
+    def self.preview: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::CreditNote
+
+    def self.update: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::CreditNote
+
+    def void_credit_note: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::CreditNote
+
+    def self.void_credit_note: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::CreditNote
+  end
+end

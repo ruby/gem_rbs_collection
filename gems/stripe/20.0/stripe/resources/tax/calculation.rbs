@@ -1,0 +1,169 @@
+module Stripe
+  module Tax
+    class Calculation < APIResource
+      class CustomerDetails < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        class TaxId < ::Stripe::StripeObject
+          def type: () -> String
+
+          def value: () -> String
+        end
+
+        def address: () -> Address?
+
+        def address_source: () -> String?
+
+        def ip_address: () -> String?
+
+        def tax_ids: () -> ::Array[TaxId]
+
+        def taxability_override: () -> String
+      end
+
+      class ShipFromDetails < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        def address: () -> Address
+      end
+
+      class ShippingCost < ::Stripe::StripeObject
+        class TaxBreakdown < ::Stripe::StripeObject
+          class Jurisdiction < ::Stripe::StripeObject
+            def country: () -> String
+
+            def display_name: () -> String
+
+            def level: () -> String
+
+            def state: () -> String?
+          end
+
+          class TaxRateDetails < ::Stripe::StripeObject
+            def display_name: () -> String
+
+            def percentage_decimal: () -> String
+
+            def tax_type: () -> String
+          end
+
+          def amount: () -> Integer
+
+          def jurisdiction: () -> Jurisdiction
+
+          def sourcing: () -> String
+
+          def tax_rate_details: () -> TaxRateDetails?
+
+          def taxability_reason: () -> String
+
+          def taxable_amount: () -> Integer
+        end
+
+        def amount: () -> Integer
+
+        def amount_tax: () -> Integer
+
+        def shipping_rate: () -> String?
+
+        def tax_behavior: () -> String
+
+        def tax_breakdown: () -> ::Array[TaxBreakdown]?
+
+        def tax_code: () -> String
+      end
+
+      class TaxBreakdown < ::Stripe::StripeObject
+        class TaxRateDetails < ::Stripe::StripeObject
+          class FlatAmount < ::Stripe::StripeObject
+            def amount: () -> Integer
+
+            def currency: () -> String
+          end
+
+          def country: () -> String?
+
+          def flat_amount: () -> FlatAmount?
+
+          def percentage_decimal: () -> String
+
+          def rate_type: () -> String?
+
+          def state: () -> String?
+
+          def tax_type: () -> String?
+        end
+
+        def amount: () -> Integer
+
+        def inclusive: () -> bool
+
+        def tax_rate_details: () -> TaxRateDetails
+
+        def taxability_reason: () -> String
+
+        def taxable_amount: () -> Integer
+      end
+
+      def amount_total: () -> Integer
+
+      def currency: () -> String
+
+      def customer: () -> String?
+
+      def customer_details: () -> CustomerDetails
+
+      def expires_at: () -> Integer?
+
+      def id: () -> String?
+
+      def line_items: () -> ::Stripe::ListObject[::Stripe::Tax::CalculationLineItem]?
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def ship_from_details: () -> ShipFromDetails?
+
+      def shipping_cost: () -> ShippingCost?
+
+      def tax_amount_exclusive: () -> Integer
+
+      def tax_amount_inclusive: () -> Integer
+
+      def tax_breakdown: () -> ::Array[TaxBreakdown]
+
+      def tax_date: () -> Integer
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Tax::Calculation
+
+      def list_line_items: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Tax::CalculationLineItem]
+
+      def self.list_line_items: (String calculation, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Tax::CalculationLineItem]
+    end
+  end
+end

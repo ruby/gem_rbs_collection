@@ -1,0 +1,65 @@
+module Stripe
+  module Forwarding
+    class Request < APIResource
+      class RequestContext < ::Stripe::StripeObject
+        def destination_duration: () -> Integer
+
+        def destination_ip_address: () -> String
+      end
+
+      class RequestDetails < ::Stripe::StripeObject
+        class Header < ::Stripe::StripeObject
+          def name: () -> String
+
+          def value: () -> String
+        end
+
+        def body: () -> String
+
+        def headers: () -> ::Array[Header]
+
+        def http_method: () -> String
+      end
+
+      class ResponseDetails < ::Stripe::StripeObject
+        class Header < ::Stripe::StripeObject
+          def name: () -> String
+
+          def value: () -> String
+        end
+
+        def body: () -> String
+
+        def headers: () -> ::Array[Header]
+
+        def status: () -> Integer
+      end
+
+      def created: () -> Integer
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def object: () -> String
+
+      def payment_method: () -> String
+
+      def replacements: () -> ::Array[String]
+
+      def request_context: () -> RequestContext?
+
+      def request_details: () -> RequestDetails?
+
+      def response_details: () -> ResponseDetails?
+
+      def url: () -> String?
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Forwarding::Request
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Forwarding::Request]
+    end
+  end
+end

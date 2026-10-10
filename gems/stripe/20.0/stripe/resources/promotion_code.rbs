@@ -1,0 +1,57 @@
+module Stripe
+  class PromotionCode < APIResource
+    class Promotion < ::Stripe::StripeObject
+      def coupon: () -> (String | ::Stripe::Coupon)?
+
+      def type: () -> String
+    end
+
+    class Restrictions < ::Stripe::StripeObject
+      class CurrencyOptions < ::Stripe::StripeObject
+        def minimum_amount: () -> Integer
+      end
+
+      def currency_options: () -> ::Stripe::StripeObject?
+
+      def first_time_transaction: () -> bool
+
+      def minimum_amount: () -> Integer?
+
+      def minimum_amount_currency: () -> String?
+    end
+
+    def active: () -> bool
+
+    def code: () -> String
+
+    def created: () -> Integer
+
+    def customer: () -> (String | ::Stripe::Customer)?
+
+    def customer_account: () -> String?
+
+    def expires_at: () -> Integer?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def max_redemptions: () -> Integer?
+
+    def metadata: () -> ::Stripe::StripeObject?
+
+    def object: () -> String
+
+    def promotion: () -> Promotion
+
+    def restrictions: () -> Restrictions
+
+    def times_redeemed: () -> Integer
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::PromotionCode
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::PromotionCode]
+
+    def self.update: (String promotion_code, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::PromotionCode
+  end
+end

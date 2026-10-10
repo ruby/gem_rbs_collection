@@ -1,0 +1,63 @@
+module Stripe
+  module Billing
+    class Meter < APIResource
+      class CustomerMapping < ::Stripe::StripeObject
+        def event_payload_key: () -> String
+
+        def type: () -> String
+      end
+
+      class DefaultAggregation < ::Stripe::StripeObject
+        def formula: () -> String
+      end
+
+      class StatusTransitions < ::Stripe::StripeObject
+        def deactivated_at: () -> Integer?
+      end
+
+      class ValueSettings < ::Stripe::StripeObject
+        def event_payload_key: () -> String
+      end
+
+      def created: () -> Integer
+
+      def customer_mapping: () -> CustomerMapping
+
+      def default_aggregation: () -> DefaultAggregation
+
+      def display_name: () -> String
+
+      def event_name: () -> String
+
+      def event_time_window: () -> String?
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def status: () -> String
+
+      def status_transitions: () -> StatusTransitions
+
+      def updated: () -> Integer
+
+      def value_settings: () -> ValueSettings
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Meter
+
+      def deactivate: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Meter
+
+      def self.deactivate: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Meter
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Billing::Meter]
+
+      def reactivate: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Meter
+
+      def self.reactivate: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Meter
+
+      def self.update: (String id, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Billing::Meter
+    end
+  end
+end

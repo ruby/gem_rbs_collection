@@ -1,0 +1,166 @@
+module Stripe
+  module Identity
+    class VerificationSession < APIResource
+      class LastError < ::Stripe::StripeObject
+        def code: () -> String?
+
+        def reason: () -> String?
+      end
+
+      class Options < ::Stripe::StripeObject
+        class Document < ::Stripe::StripeObject
+          def allowed_types: () -> ::Array[String]?
+
+          def require_id_number: () -> bool?
+
+          def require_live_capture: () -> bool?
+
+          def require_matching_selfie: () -> bool?
+        end
+
+        class Email < ::Stripe::StripeObject
+          def require_verification: () -> bool?
+        end
+
+        class IdNumber < ::Stripe::StripeObject
+        end
+
+        class Matching < ::Stripe::StripeObject
+          def dob: () -> String?
+
+          def name: () -> String?
+        end
+
+        class Phone < ::Stripe::StripeObject
+          def require_verification: () -> bool?
+        end
+
+        def document: () -> Document?
+
+        def email: () -> Email?
+
+        def id_number: () -> IdNumber?
+
+        def matching: () -> Matching?
+
+        def phone: () -> Phone?
+      end
+
+      class ProvidedDetails < ::Stripe::StripeObject
+        def email: () -> String?
+
+        def phone: () -> String?
+      end
+
+      class Redaction < ::Stripe::StripeObject
+        def status: () -> String
+      end
+
+      class RelatedPerson < ::Stripe::StripeObject
+        def account: () -> String
+
+        def person: () -> String
+      end
+
+      class VerifiedOutputs < ::Stripe::StripeObject
+        class Address < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String?
+
+          def line1: () -> String?
+
+          def line2: () -> String?
+
+          def postal_code: () -> String?
+
+          def state: () -> String?
+        end
+
+        class Dob < ::Stripe::StripeObject
+          def day: () -> Integer?
+
+          def month: () -> Integer?
+
+          def year: () -> Integer?
+        end
+
+        def address: () -> Address?
+
+        def dob: () -> Dob?
+
+        def email: () -> String?
+
+        def first_name: () -> String?
+
+        def id_number: () -> String?
+
+        def id_number_type: () -> String?
+
+        def last_name: () -> String?
+
+        def phone: () -> String?
+
+        def sex: () -> String?
+
+        def unparsed_place_of_birth: () -> String?
+
+        def unparsed_sex: () -> String?
+      end
+
+      def client_reference_id: () -> String?
+
+      def client_secret: () -> String?
+
+      def created: () -> Integer
+
+      def id: () -> String
+
+      def last_error: () -> LastError?
+
+      def last_verification_report: () -> (String | ::Stripe::Identity::VerificationReport)?
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def object: () -> String
+
+      def options: () -> Options?
+
+      def provided_details: () -> ProvidedDetails?
+
+      def redaction: () -> Redaction?
+
+      def related_customer: () -> String?
+
+      def related_customer_account: () -> String?
+
+      def related_person: () -> RelatedPerson?
+
+      def status: () -> String
+
+      def type: () -> String
+
+      def url: () -> String?
+
+      def verification_flow: () -> String?
+
+      def verified_outputs: () -> VerifiedOutputs?
+
+      def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Identity::VerificationSession
+
+      def self.cancel: (String session, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Identity::VerificationSession
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Identity::VerificationSession
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Identity::VerificationSession]
+
+      def redact: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Identity::VerificationSession
+
+      def self.redact: (String session, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Identity::VerificationSession
+
+      def self.update: (String session, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Identity::VerificationSession
+    end
+  end
+end

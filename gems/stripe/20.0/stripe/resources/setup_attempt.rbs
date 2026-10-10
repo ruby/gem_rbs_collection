@@ -1,0 +1,320 @@
+module Stripe
+  class SetupAttempt < APIResource
+    class PaymentMethodDetails < ::Stripe::StripeObject
+      class AcssDebit < ::Stripe::StripeObject
+      end
+
+      class AmazonPay < ::Stripe::StripeObject
+      end
+
+      class AuBecsDebit < ::Stripe::StripeObject
+      end
+
+      class BacsDebit < ::Stripe::StripeObject
+      end
+
+      class Bancontact < ::Stripe::StripeObject
+        def bank_code: () -> String?
+
+        def bank_name: () -> String?
+
+        def bic: () -> String?
+
+        def generated_sepa_debit: () -> (String | ::Stripe::PaymentMethod)?
+
+        def generated_sepa_debit_mandate: () -> (String | ::Stripe::Mandate)?
+
+        def iban_last4: () -> String?
+
+        def preferred_language: () -> String?
+
+        def verified_name: () -> String?
+      end
+
+      class Blik < ::Stripe::StripeObject
+        def buyer_id: () -> String?
+      end
+
+      class Boleto < ::Stripe::StripeObject
+      end
+
+      class Card < ::Stripe::StripeObject
+        class Checks < ::Stripe::StripeObject
+          def address_line1_check: () -> String?
+
+          def address_postal_code_check: () -> String?
+
+          def cvc_check: () -> String?
+        end
+
+        class ThreeDSecure < ::Stripe::StripeObject
+          def authentication_flow: () -> String?
+
+          def electronic_commerce_indicator: () -> String?
+
+          def result: () -> String?
+
+          def result_reason: () -> String?
+
+          def transaction_id: () -> String?
+
+          def version: () -> String?
+        end
+
+        class Wallet < ::Stripe::StripeObject
+          class ApplePay < ::Stripe::StripeObject
+          end
+
+          class GooglePay < ::Stripe::StripeObject
+          end
+
+          def apple_pay: () -> ApplePay?
+
+          def google_pay: () -> GooglePay?
+
+          def type: () -> String
+        end
+
+        def brand: () -> String?
+
+        def checks: () -> Checks?
+
+        def country: () -> String?
+
+        def exp_month: () -> Integer?
+
+        def exp_year: () -> Integer?
+
+        def fingerprint: () -> String?
+
+        def funding: () -> String?
+
+        def last4: () -> String?
+
+        def network: () -> String?
+
+        def three_d_secure: () -> ThreeDSecure?
+
+        def wallet: () -> Wallet?
+      end
+
+      class CardPresent < ::Stripe::StripeObject
+        class Offline < ::Stripe::StripeObject
+          def stored_at: () -> Integer?
+
+          def type: () -> String?
+        end
+
+        def generated_card: () -> (String | ::Stripe::PaymentMethod)?
+
+        def offline: () -> Offline?
+      end
+
+      class Cashapp < ::Stripe::StripeObject
+      end
+
+      class Ideal < ::Stripe::StripeObject
+        def bank: () -> String?
+
+        def bic: () -> String?
+
+        def generated_sepa_debit: () -> (String | ::Stripe::PaymentMethod)?
+
+        def generated_sepa_debit_mandate: () -> (String | ::Stripe::Mandate)?
+
+        def iban_last4: () -> String?
+
+        def verified_name: () -> String?
+      end
+
+      class KakaoPay < ::Stripe::StripeObject
+      end
+
+      class Klarna < ::Stripe::StripeObject
+      end
+
+      class KrCard < ::Stripe::StripeObject
+      end
+
+      class Link < ::Stripe::StripeObject
+      end
+
+      class NaverPay < ::Stripe::StripeObject
+        def buyer_id: () -> String?
+      end
+
+      class NzBankAccount < ::Stripe::StripeObject
+      end
+
+      class Paypal < ::Stripe::StripeObject
+      end
+
+      class Payto < ::Stripe::StripeObject
+      end
+
+      class Pix < ::Stripe::StripeObject
+        def fingerprint: () -> String?
+      end
+
+      class RevolutPay < ::Stripe::StripeObject
+      end
+
+      class Satispay < ::Stripe::StripeObject
+      end
+
+      class SepaDebit < ::Stripe::StripeObject
+      end
+
+      class Sofort < ::Stripe::StripeObject
+        def bank_code: () -> String?
+
+        def bank_name: () -> String?
+
+        def bic: () -> String?
+
+        def generated_sepa_debit: () -> (String | ::Stripe::PaymentMethod)?
+
+        def generated_sepa_debit_mandate: () -> (String | ::Stripe::Mandate)?
+
+        def iban_last4: () -> String?
+
+        def preferred_language: () -> String?
+
+        def verified_name: () -> String?
+      end
+
+      class Twint < ::Stripe::StripeObject
+      end
+
+      class Upi < ::Stripe::StripeObject
+      end
+
+      class UsBankAccount < ::Stripe::StripeObject
+      end
+
+      def acss_debit: () -> AcssDebit?
+
+      def amazon_pay: () -> AmazonPay?
+
+      def au_becs_debit: () -> AuBecsDebit?
+
+      def bacs_debit: () -> BacsDebit?
+
+      def bancontact: () -> Bancontact?
+
+      def blik: () -> Blik?
+
+      def boleto: () -> Boleto?
+
+      def card: () -> Card?
+
+      def card_present: () -> CardPresent?
+
+      def cashapp: () -> Cashapp?
+
+      def ideal: () -> Ideal?
+
+      def kakao_pay: () -> KakaoPay?
+
+      def klarna: () -> Klarna?
+
+      def kr_card: () -> KrCard?
+
+      def link: () -> Link?
+
+      def naver_pay: () -> NaverPay?
+
+      def nz_bank_account: () -> NzBankAccount?
+
+      def paypal: () -> Paypal?
+
+      def payto: () -> Payto?
+
+      def pix: () -> Pix?
+
+      def revolut_pay: () -> RevolutPay?
+
+      def satispay: () -> Satispay?
+
+      def sepa_debit: () -> SepaDebit?
+
+      def sofort: () -> Sofort?
+
+      def twint: () -> Twint?
+
+      def type: () -> String
+
+      def upi: () -> Upi?
+
+      def us_bank_account: () -> UsBankAccount?
+    end
+
+    class SetupError < ::Stripe::StripeObject
+      def advice_code: () -> String?
+
+      def charge: () -> String?
+
+      def code: () -> String?
+
+      def decline_code: () -> String?
+
+      def doc_url: () -> String?
+
+      def message: () -> String?
+
+      def network_advice_code: () -> String?
+
+      def network_decline_code: () -> String?
+
+      def param: () -> String?
+
+      def payment_intent: () -> ::Stripe::PaymentIntent?
+
+      def payment_method: () -> ::Stripe::PaymentMethod?
+
+      def payment_method_type: () -> String?
+
+      def request_log_url: () -> String?
+
+      def setup_intent: () -> ::Stripe::SetupIntent?
+
+      def source: () -> (::Stripe::Account | ::Stripe::BankAccount | ::Stripe::Card | ::Stripe::Source)?
+
+      def type: () -> String
+    end
+
+    def application: () -> (String | ::Stripe::Application)?
+
+    def attach_to_self: () -> bool?
+
+    def created: () -> Integer
+
+    def customer: () -> (String | ::Stripe::Customer)?
+
+    def customer_account: () -> String?
+
+    def flow_directions: () -> ::Array[String]?
+
+    def id: () -> String
+
+    def livemode: () -> bool
+
+    def object: () -> String
+
+    def on_behalf_of: () -> (String | ::Stripe::Account)?
+
+    def payment_method: () -> (String | ::Stripe::PaymentMethod)
+
+    def payment_method_details: () -> PaymentMethodDetails
+
+    def setup_error: () -> SetupError?
+
+    def setup_intent: () -> (String | ::Stripe::SetupIntent)
+
+    def status: () -> String
+
+    def usage: () -> String
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::SetupAttempt]
+  end
+end

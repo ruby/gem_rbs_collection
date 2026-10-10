@@ -1,0 +1,45 @@
+module Stripe
+  module TestHelpers
+    class TestClock < APIResource
+      class StatusDetails < ::Stripe::StripeObject
+        class Advancing < ::Stripe::StripeObject
+          def target_frozen_time: () -> Integer
+        end
+
+        def advancing: () -> Advancing?
+      end
+
+      def created: () -> Integer
+
+      def deleted: () -> bool?
+
+      def deletes_after: () -> Integer
+
+      def frozen_time: () -> Integer
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def name: () -> String?
+
+      def object: () -> String
+
+      def status: () -> String
+
+      def status_details: () -> StatusDetails
+
+      def advance: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TestHelpers::TestClock
+
+      def self.advance: (String test_clock, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TestHelpers::TestClock
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TestHelpers::TestClock
+
+      def self.delete: (String test_clock, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TestHelpers::TestClock
+
+      def delete: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::TestHelpers::TestClock
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::TestHelpers::TestClock]
+    end
+  end
+end

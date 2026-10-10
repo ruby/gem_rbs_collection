@@ -1,0 +1,313 @@
+module Stripe
+  class Quote < APIResource
+    class AutomaticTax < ::Stripe::StripeObject
+      class Liability < ::Stripe::StripeObject
+        def account: () -> (String | ::Stripe::Account)?
+
+        def type: () -> String
+      end
+
+      def enabled: () -> bool
+
+      def liability: () -> Liability?
+
+      def provider: () -> String?
+
+      def status: () -> String?
+    end
+
+    class Computed < ::Stripe::StripeObject
+      class Recurring < ::Stripe::StripeObject
+        class TotalDetails < ::Stripe::StripeObject
+          class Breakdown < ::Stripe::StripeObject
+            class Discount < ::Stripe::StripeObject
+              def amount: () -> Integer
+
+              def discount: () -> ::Stripe::Discount
+            end
+
+            class Tax < ::Stripe::StripeObject
+              def amount: () -> Integer
+
+              def rate: () -> ::Stripe::TaxRate
+
+              def taxability_reason: () -> String?
+
+              def taxable_amount: () -> Integer?
+            end
+
+            def discounts: () -> ::Array[Discount]
+
+            def taxes: () -> ::Array[Tax]
+          end
+
+          def amount_discount: () -> Integer
+
+          def amount_shipping: () -> Integer?
+
+          def amount_tax: () -> Integer
+
+          def breakdown: () -> Breakdown?
+        end
+
+        def amount_subtotal: () -> Integer
+
+        def amount_total: () -> Integer
+
+        def interval: () -> String
+
+        def interval_count: () -> Integer
+
+        def total_details: () -> TotalDetails
+      end
+
+      class Upfront < ::Stripe::StripeObject
+        class TotalDetails < ::Stripe::StripeObject
+          class Breakdown < ::Stripe::StripeObject
+            class Discount < ::Stripe::StripeObject
+              def amount: () -> Integer
+
+              def discount: () -> ::Stripe::Discount
+            end
+
+            class Tax < ::Stripe::StripeObject
+              def amount: () -> Integer
+
+              def rate: () -> ::Stripe::TaxRate
+
+              def taxability_reason: () -> String?
+
+              def taxable_amount: () -> Integer?
+            end
+
+            def discounts: () -> ::Array[Discount]
+
+            def taxes: () -> ::Array[Tax]
+          end
+
+          def amount_discount: () -> Integer
+
+          def amount_shipping: () -> Integer?
+
+          def amount_tax: () -> Integer
+
+          def breakdown: () -> Breakdown?
+        end
+
+        def amount_subtotal: () -> Integer
+
+        def amount_total: () -> Integer
+
+        def line_items: () -> ::Stripe::ListObject[::Stripe::LineItem]?
+
+        def total_details: () -> TotalDetails
+      end
+
+      def recurring: () -> Recurring?
+
+      def upfront: () -> Upfront
+    end
+
+    class FromQuote < ::Stripe::StripeObject
+      def is_revision: () -> bool
+
+      def quote: () -> (String | ::Stripe::Quote)
+    end
+
+    class InvoiceSettings < ::Stripe::StripeObject
+      class CustomField < ::Stripe::StripeObject
+        def name: () -> String
+
+        def value: () -> String
+      end
+
+      class Issuer < ::Stripe::StripeObject
+        def account: () -> (String | ::Stripe::Account)?
+
+        def type: () -> String
+      end
+
+      def custom_fields: () -> ::Array[CustomField]?
+
+      def days_until_due: () -> Integer?
+
+      def description: () -> String?
+
+      def footer: () -> String?
+
+      def issuer: () -> Issuer
+    end
+
+    class StatusTransitions < ::Stripe::StripeObject
+      def accepted_at: () -> Integer?
+
+      def canceled_at: () -> Integer?
+
+      def finalized_at: () -> Integer?
+    end
+
+    class SubscriptionData < ::Stripe::StripeObject
+      class BillingMode < ::Stripe::StripeObject
+        class Flexible < ::Stripe::StripeObject
+          def proration_discounts: () -> String?
+        end
+
+        def flexible: () -> Flexible?
+
+        def type: () -> String
+      end
+
+      def billing_mode: () -> BillingMode
+
+      def description: () -> String?
+
+      def effective_date: () -> Integer?
+
+      def metadata: () -> ::Stripe::StripeObject?
+
+      def trial_period_days: () -> Integer?
+    end
+
+    class TotalDetails < ::Stripe::StripeObject
+      class Breakdown < ::Stripe::StripeObject
+        class Discount < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def discount: () -> ::Stripe::Discount
+        end
+
+        class Tax < ::Stripe::StripeObject
+          def amount: () -> Integer
+
+          def rate: () -> ::Stripe::TaxRate
+
+          def taxability_reason: () -> String?
+
+          def taxable_amount: () -> Integer?
+        end
+
+        def discounts: () -> ::Array[Discount]
+
+        def taxes: () -> ::Array[Tax]
+      end
+
+      def amount_discount: () -> Integer
+
+      def amount_shipping: () -> Integer?
+
+      def amount_tax: () -> Integer
+
+      def breakdown: () -> Breakdown?
+    end
+
+    class TransferData < ::Stripe::StripeObject
+      def amount: () -> Integer?
+
+      def amount_percent: () -> Float?
+
+      def destination: () -> (String | ::Stripe::Account)
+    end
+
+    def amount_subtotal: () -> Integer
+
+    def amount_total: () -> Integer
+
+    def application: () -> (String | ::Stripe::Application)?
+
+    def application_fee_amount: () -> Integer?
+
+    def application_fee_percent: () -> Float?
+
+    def automatic_tax: () -> AutomaticTax
+
+    def collection_method: () -> String
+
+    def computed: () -> Computed
+
+    def created: () -> Integer
+
+    def currency: () -> String?
+
+    def customer: () -> (String | ::Stripe::Customer)?
+
+    def customer_account: () -> String?
+
+    def default_tax_rates: () -> ::Array[String | ::Stripe::TaxRate]?
+
+    def description: () -> String?
+
+    def discounts: () -> ::Array[String | ::Stripe::Discount]
+
+    def expires_at: () -> Integer
+
+    def footer: () -> String?
+
+    def from_quote: () -> FromQuote?
+
+    def header: () -> String?
+
+    def id: () -> String
+
+    def invoice: () -> (String | ::Stripe::Invoice)?
+
+    def invoice_settings: () -> InvoiceSettings
+
+    def line_items: () -> ::Stripe::ListObject[::Stripe::LineItem]?
+
+    def livemode: () -> bool
+
+    def metadata: () -> ::Stripe::StripeObject
+
+    def number: () -> String?
+
+    def object: () -> String
+
+    def on_behalf_of: () -> (String | ::Stripe::Account)?
+
+    def status: () -> String
+
+    def status_transitions: () -> StatusTransitions
+
+    def subscription: () -> (String | ::Stripe::Subscription)?
+
+    def subscription_data: () -> SubscriptionData
+
+    def subscription_schedule: () -> (String | ::Stripe::SubscriptionSchedule)?
+
+    def test_clock: () -> (String | ::Stripe::TestHelpers::TestClock)?
+
+    def total_details: () -> TotalDetails
+
+    def transfer_data: () -> TransferData?
+
+    def accept: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def self.accept: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def self.cancel: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def finalize_quote: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def self.finalize_quote: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+
+    def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Quote]
+
+    def list_computed_upfront_line_items: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::LineItem]
+
+    def self.list_computed_upfront_line_items: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::LineItem]
+
+    def list_line_items: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::LineItem]
+
+    def self.list_line_items: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::LineItem]
+
+    def pdf: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) { () -> untyped } -> untyped
+
+    def self.pdf: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) { () -> untyped } -> untyped
+
+    def self.update: (String quote, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Quote
+  end
+end

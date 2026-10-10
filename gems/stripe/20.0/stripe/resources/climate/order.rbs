@@ -1,0 +1,87 @@
+module Stripe
+  module Climate
+    class Order < APIResource
+      class Beneficiary < ::Stripe::StripeObject
+        def public_name: () -> String
+      end
+
+      class DeliveryDetail < ::Stripe::StripeObject
+        class Location < ::Stripe::StripeObject
+          def city: () -> String?
+
+          def country: () -> String
+
+          def latitude: () -> Float?
+
+          def longitude: () -> Float?
+
+          def region: () -> String?
+        end
+
+        def delivered_at: () -> Integer
+
+        def location: () -> Location?
+
+        def metric_tons: () -> String
+
+        def registry_url: () -> String?
+
+        def supplier: () -> ::Stripe::Climate::Supplier
+      end
+
+      def amount_fees: () -> Integer
+
+      def amount_subtotal: () -> Integer
+
+      def amount_total: () -> Integer
+
+      def beneficiary: () -> Beneficiary?
+
+      def canceled_at: () -> Integer?
+
+      def cancellation_reason: () -> String?
+
+      def certificate: () -> String?
+
+      def confirmed_at: () -> Integer?
+
+      def created: () -> Integer
+
+      def currency: () -> String
+
+      def delayed_at: () -> Integer?
+
+      def delivered_at: () -> Integer?
+
+      def delivery_details: () -> ::Array[DeliveryDetail]
+
+      def expected_delivery_year: () -> Integer
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def metadata: () -> ::Stripe::StripeObject
+
+      def metric_tons: () -> BigDecimal
+
+      def object: () -> String
+
+      def product: () -> (String | ::Stripe::Climate::Product)
+
+      def product_substituted_at: () -> Integer?
+
+      def status: () -> String
+
+      def cancel: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Climate::Order
+
+      def self.cancel: (String order, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Climate::Order
+
+      def self.create: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Climate::Order
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Climate::Order]
+
+      def self.update: (String order, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::Climate::Order
+    end
+  end
+end

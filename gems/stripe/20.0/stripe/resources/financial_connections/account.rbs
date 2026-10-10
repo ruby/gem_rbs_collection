@@ -1,0 +1,147 @@
+module Stripe
+  module FinancialConnections
+    class Account < APIResource
+      class AccountHolder < ::Stripe::StripeObject
+        def account: () -> (String | ::Stripe::Account)?
+
+        def customer: () -> (String | ::Stripe::Customer)?
+
+        def customer_account: () -> String?
+
+        def type: () -> String
+      end
+
+      class AccountNumber < ::Stripe::StripeObject
+        def expected_expiry_date: () -> Integer?
+
+        def identifier_type: () -> String
+
+        def status: () -> String
+
+        def supported_networks: () -> ::Array[String]
+      end
+
+      class Balance < ::Stripe::StripeObject
+        class Cash < ::Stripe::StripeObject
+          def available: () -> ::Stripe::StripeObject?
+        end
+
+        class Credit < ::Stripe::StripeObject
+          def used: () -> ::Stripe::StripeObject?
+        end
+
+        def as_of: () -> Integer
+
+        def cash: () -> Cash?
+
+        def credit: () -> Credit?
+
+        def current: () -> ::Stripe::StripeObject
+
+        def type: () -> String
+      end
+
+      class BalanceRefresh < ::Stripe::StripeObject
+        def last_attempted_at: () -> Integer
+
+        def next_refresh_available_at: () -> Integer?
+
+        def status: () -> String
+      end
+
+      class OwnershipRefresh < ::Stripe::StripeObject
+        def last_attempted_at: () -> Integer
+
+        def next_refresh_available_at: () -> Integer?
+
+        def status: () -> String
+      end
+
+      class StatusDetails < ::Stripe::StripeObject
+        class Active < ::Stripe::StripeObject
+          def action: () -> String
+
+          def cause: () -> String
+
+          def expected_deactivation_date: () -> Integer
+        end
+
+        def active: () -> Active?
+      end
+
+      class TransactionRefresh < ::Stripe::StripeObject
+        def id: () -> String
+
+        def last_attempted_at: () -> Integer
+
+        def next_refresh_available_at: () -> Integer?
+
+        def status: () -> String
+      end
+
+      def account_holder: () -> AccountHolder?
+
+      def account_numbers: () -> ::Array[AccountNumber]?
+
+      def balance: () -> Balance?
+
+      def balance_refresh: () -> BalanceRefresh?
+
+      def category: () -> String
+
+      def created: () -> Integer
+
+      def display_name: () -> String?
+
+      def id: () -> String
+
+      def institution_name: () -> String
+
+      def last4: () -> String?
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def ownership: () -> (String | ::Stripe::FinancialConnections::AccountOwnership)?
+
+      def ownership_refresh: () -> OwnershipRefresh?
+
+      def permissions: () -> ::Array[String]?
+
+      def status: () -> String
+
+      def status_details: () -> StatusDetails?
+
+      def subcategory: () -> String
+
+      def subscriptions: () -> ::Array[String]?
+
+      def supported_payment_method_types: () -> ::Array[String]
+
+      def transaction_refresh: () -> TransactionRefresh?
+
+      def disconnect: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def self.disconnect: (String account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::FinancialConnections::Account]
+
+      def list_owners: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::FinancialConnections::AccountOwner]
+
+      def self.list_owners: (String account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::FinancialConnections::AccountOwner]
+
+      def refresh_account: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def self.refresh_account: (String account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def subscribe: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def self.subscribe: (String account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def unsubscribe: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+
+      def self.unsubscribe: (String account, ?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::FinancialConnections::Account
+    end
+  end
+end

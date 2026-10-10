@@ -1,0 +1,79 @@
+module Stripe
+  module Billing
+    class CreditBalanceTransaction < APIResource
+      class Credit < ::Stripe::StripeObject
+        class Amount < ::Stripe::StripeObject
+          class Monetary < ::Stripe::StripeObject
+            def currency: () -> String
+
+            def value: () -> Integer
+          end
+
+          def monetary: () -> Monetary?
+
+          def type: () -> String
+        end
+
+        class CreditsApplicationInvoiceVoided < ::Stripe::StripeObject
+          def invoice: () -> (String | ::Stripe::Invoice)
+
+          def invoice_line_item: () -> String
+        end
+
+        def amount: () -> Amount
+
+        def credits_application_invoice_voided: () -> CreditsApplicationInvoiceVoided?
+
+        def type: () -> String
+      end
+
+      class Debit < ::Stripe::StripeObject
+        class Amount < ::Stripe::StripeObject
+          class Monetary < ::Stripe::StripeObject
+            def currency: () -> String
+
+            def value: () -> Integer
+          end
+
+          def monetary: () -> Monetary?
+
+          def type: () -> String
+        end
+
+        class CreditsApplied < ::Stripe::StripeObject
+          def invoice: () -> (String | ::Stripe::Invoice)
+
+          def invoice_line_item: () -> String
+        end
+
+        def amount: () -> Amount
+
+        def credits_applied: () -> CreditsApplied?
+
+        def type: () -> String
+      end
+
+      def created: () -> Integer
+
+      def credit: () -> Credit?
+
+      def credit_grant: () -> (String | ::Stripe::Billing::CreditGrant)
+
+      def debit: () -> Debit?
+
+      def effective_at: () -> Integer
+
+      def id: () -> String
+
+      def livemode: () -> bool
+
+      def object: () -> String
+
+      def test_clock: () -> (String | ::Stripe::TestHelpers::TestClock)?
+
+      def type: () -> String?
+
+      def self.list: (?::Hash[untyped, untyped] params, ?::Stripe::request_opts opts) -> ::Stripe::ListObject[::Stripe::Billing::CreditBalanceTransaction]
+    end
+  end
+end

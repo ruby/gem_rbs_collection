@@ -1,0 +1,19 @@
+module Stripe
+  module Events
+    class V1PersonDeletedEvent < Stripe::V2::Core::Event
+      def self.lookup_type: () -> "v1.person.deleted"
+
+      def fetch_related_object: () -> untyped
+
+      attr_reader related_object: untyped
+    end
+
+    class V1PersonDeletedEventNotification < Stripe::V2::Core::EventNotification
+      def self.lookup_type: () -> "v1.person.deleted"
+
+      attr_reader related_object: ::Stripe::V2::Core::RelatedObject
+
+      def fetch_related_object: () -> untyped
+    end
+  end
+end
