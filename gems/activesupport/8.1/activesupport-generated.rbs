@@ -3560,7 +3560,7 @@ class DateTime
   # Returns <tt>Time.zone.now.to_datetime</tt> when <tt>Time.zone</tt> or
   # <tt>config.time_zone</tt> are set, otherwise returns
   # <tt>Time.now.to_datetime</tt>.
-  def self.current: () -> untyped
+  def self.current: () -> ::DateTime
 
   # Returns the number of seconds since 00:00:00.
   #
@@ -3782,7 +3782,7 @@ class Date
   def self.tomorrow: () -> untyped
 
   # Returns Time.zone.today when <tt>Time.zone</tt> or <tt>config.time_zone</tt> are set, otherwise just returns Date.today.
-  def self.current: () -> untyped
+  def self.current: () -> ::Date
 
   # Converts Date to a Time (or DateTime if necessary) with the time portion set to the beginning of the day (0:00)
   # and then subtracts the specified number of seconds.
@@ -6621,7 +6621,7 @@ class Time
   def self.days_in_year: (?untyped year) -> untyped
 
   # Returns <tt>Time.zone.now</tt> when <tt>Time.zone</tt> or <tt>config.time_zone</tt> are set, otherwise just returns <tt>Time.now</tt>.
-  def self.current: () -> ActiveSupport::TimeWithZone
+  def self.current: () -> (ActiveSupport::TimeWithZone | ::Time)
 
   # Layers additional behavior on Time.at so that ActiveSupport::TimeWithZone and DateTime
   # instances can be used when called with a single argument
