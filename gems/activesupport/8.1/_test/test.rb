@@ -46,3 +46,30 @@ Array.wrap({a: 1, b: 2})
 (Time.now - 2.hours).to_fs
 (Date.today + 3.days).to_fs
 (Date.today - 1.week).to_fs
+
+# Test time zones
+Time.zone = 'Asia/Tokyo'
+Time.zone.now.to_fs(:db)
+Time.now.in_time_zone('Asia/Tokyo').to_fs
+Time.now.in_time_zone(false).to_fs
+"2026-01-01 00:00".in_time_zone.to_fs
+
+# Test inquiry
+[:cat, :dog].inquiry.any?(:cat, :ferret)
+'production'.inquiry.upcase
+
+# Test HashWithIndifferentAccess
+{ a: 1 }.with_indifferent_access.size.to_s
+{ a: 1 }.stringify_keys.keys.first.upcase
+{ 'a' => { 'b' => 1 } }.deep_symbolize_keys.keys.first.to_proc
+
+# Test inflections
+'active_support'.camelize.downcase
+'ActiveSupport'.underscore.upcase
+'person'.pluralize.upcase
+'people'.singularize(:en).upcase
+
+# Test blank?/present?
+1.present?.to_s
+nil.blank?.to_s
+'foo'.presence&.upcase
