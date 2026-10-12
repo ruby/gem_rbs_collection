@@ -1,6 +1,6 @@
 module ActionController
   interface _API_and_Base
-    def flash: () -> untyped
+    def flash: () -> ActionDispatch::Flash::FlashHash
   end
 
   class Base < Metal
@@ -324,6 +324,88 @@ module ActionController
     attr_accessor request: ActionDispatch::Request
 
     attr_reader response: ActionDispatch::Response
+
+    # nil for anonymous controllers, but typed non-nil for named ones
+    def self.controller_name: () -> String
+
+    def controller_name: () -> String
+
+    def performed?: () -> boolish
+
+    # Delegated to request and response
+    def session: () -> untyped
+
+    def headers: () -> untyped
+
+    def status: () -> Integer
+
+    def status=: (Integer | Symbol status) -> void
+
+    def location: () -> String?
+
+    def location=: (String location) -> void
+
+    def content_type: () -> String?
+
+    def content_type=: (String | Symbol | Mime::Type | nil content_type) -> void
+
+    def media_type: () -> String?
+  end
+
+  module StrongParameters
+    def params: () -> ActionController::Parameters
+
+    def params=: (Hash[untyped, untyped] | ActionController::Parameters value) -> void
+  end
+
+  module Cookies
+    def cookies: () -> ActionDispatch::Cookies::CookieJar
+  end
+
+  class Parameters
+    def permitted?: () -> bool
+
+    def permit: (*untyped filters) -> ActionController::Parameters
+
+    def to_h: () ?{ (untyped key, untyped value) -> [untyped, untyped] } -> ActiveSupport::HashWithIndifferentAccess[untyped, untyped]
+
+    def to_unsafe_h: () -> ActiveSupport::HashWithIndifferentAccess[untyped, untyped]
+
+    alias to_unsafe_hash to_unsafe_h
+
+    def to_hash: () -> Hash[untyped, untyped]
+
+    def to_query: (*untyped args) -> String
+
+    def slice: (*untyped keys) -> ActionController::Parameters
+
+    def except: (*untyped keys) -> ActionController::Parameters
+
+    def extract!: (*untyped keys) -> ActionController::Parameters
+
+    def transform_values: () { (untyped value) -> untyped } -> ActionController::Parameters
+                        | () -> Enumerator[untyped, ActionController::Parameters]
+
+    def transform_keys: () { (untyped key) -> untyped } -> ActionController::Parameters
+                      | () -> Enumerator[untyped, ActionController::Parameters]
+
+    def select: () { (untyped key, untyped value) -> boolish } -> ActionController::Parameters
+
+    def reject: () { (untyped key, untyped value) -> boolish } -> ActionController::Parameters
+
+    def compact: () -> ActionController::Parameters
+
+    def compact_blank: () -> ActionController::Parameters
+
+    def values_at: (*untyped keys) -> Array[untyped]
+
+    def merge: (untyped other_hash) -> ActionController::Parameters
+
+    def reverse_merge: (untyped other_hash) -> ActionController::Parameters
+
+    alias with_defaults reverse_merge
+
+    def deep_dup: () -> ActionController::Parameters
   end
 
   module Instrumentation

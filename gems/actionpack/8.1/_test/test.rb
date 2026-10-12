@@ -41,3 +41,38 @@ class BazController < ActionController::Base
     action_name.to_sym
   end
 end
+
+# Return values of common controller APIs
+class QuxController < ActionController::Base
+  def show
+    permitted = params.permit(:name, :age)
+    permitted.to_h.symbolize_keys
+    permitted.slice(:name).merge(age: 1).permitted?
+    params.except(:token).to_unsafe_h.keys
+    params.transform_values(&:to_s).to_query
+
+    request.url.start_with?("https")
+    request.host.length
+    request.port.succ
+    request.remote_ip.split(".")
+    request.headers["User-Agent"]
+    request.parameters.fetch(:id, nil)
+    request.xhr? && request.local?
+    request.request_id&.length
+    request.subdomains.first
+
+    cookies[:theme]&.upcase
+    cookies.signed[:user_id]
+    flash.now[:notice] = "Saved"
+    flash.keep.discard(:alert)
+
+    self.status = :created
+    self.content_type = :json
+    self.content_type = Mime[:html]
+    self.content_type = "text/plain"
+    self.content_type = nil
+    response.status.to_s
+    response.body.bytesize
+    controller_name.camelize
+  end
+end

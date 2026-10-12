@@ -1236,22 +1236,11 @@ module ActionController
   # You can refer to the modules included in ActionController::Base to see other
   # features you can bring into your metal controller.
   class Metal < ::AbstractController::Base
-    # Returns the last part of the controller's name, underscored, without the
-    # ending `Controller`. For instance, `PostsController` returns `posts`.
-    # Namespaces are left out, so `Admin::PostsController` returns `posts` as well.
-    #
-    # #### Returns
-    # *   `string`
-    def self.controller_name: () -> untyped
-
     def self.make_response!: (untyped request) -> untyped
 
     def self.action_encoding_template: (untyped action) -> false
 
     def self.inherited: (untyped subclass) -> untyped
-
-    # Delegates to the class's ::controller_name.
-    def controller_name: () -> untyped
 
     def initialize: () -> void
 
@@ -1265,9 +1254,6 @@ module ActionController
     def url_for: (untyped string) -> untyped
 
     def response_body=: (untyped body) -> untyped
-
-    # Tests if render or redirect has already happened.
-    def performed?: () -> untyped
 
     def dispatch: (untyped name, untyped request, untyped response) -> untyped
 
@@ -1704,12 +1690,6 @@ end
 module ActionController
   module Cookies
     extend ::ActiveSupport::Concern
-
-    private
-
-    # The cookies for the current request. See ActionDispatch::Cookies for more
-    # information.
-    def cookies: () -> untyped
   end
 end
 
@@ -4649,76 +4629,7 @@ module ActionController
 
     def hash: () -> untyped
 
-    # Returns a safe ActiveSupport::HashWithIndifferentAccess representation of the
-    # parameters with all unpermitted keys removed.
-    #
-    #     params = ActionController::Parameters.new({
-    #       name: "Senjougahara Hitagi",
-    #       oddity: "Heavy stone crab"
-    #     })
-    #     params.to_h
-    #     # => ActionController::UnfilteredParameters: unable to convert unpermitted parameters to hash
-    #
-    #     safe_params = params.permit(:name)
-    #     safe_params.to_h # => {"name"=>"Senjougahara Hitagi"}
-    def to_h: () ?{ (?) -> untyped } -> untyped
-
-    # Returns a safe `Hash` representation of the parameters with all unpermitted
-    # keys removed.
-    #
-    #     params = ActionController::Parameters.new({
-    #       name: "Senjougahara Hitagi",
-    #       oddity: "Heavy stone crab"
-    #     })
-    #     params.to_hash
-    #     # => ActionController::UnfilteredParameters: unable to convert unpermitted parameters to hash
-    #
-    #     safe_params = params.permit(:name)
-    #     safe_params.to_hash # => {"name"=>"Senjougahara Hitagi"}
-    def to_hash: () -> untyped
-
-    # Returns a string representation of the receiver suitable for use as a URL
-    # query string:
-    #
-    #     params = ActionController::Parameters.new({
-    #       name: "David",
-    #       nationality: "Danish"
-    #     })
-    #     params.to_query
-    #     # => ActionController::UnfilteredParameters: unable to convert unpermitted parameters to hash
-    #
-    #     safe_params = params.permit(:name, :nationality)
-    #     safe_params.to_query
-    #     # => "name=David&nationality=Danish"
-    #
-    # An optional namespace can be passed to enclose key names:
-    #
-    #     params = ActionController::Parameters.new({
-    #       name: "David",
-    #       nationality: "Danish"
-    #     })
-    #     safe_params = params.permit(:name, :nationality)
-    #     safe_params.to_query("user")
-    #     # => "user%5Bname%5D=David&user%5Bnationality%5D=Danish"
-    #
-    # The string pairs `"key=value"` that conform the query string are sorted
-    # lexicographically in ascending order.
-    def to_query: (*untyped args) -> untyped
-
     alias to_param to_query
-
-    # Returns an unsafe, unfiltered ActiveSupport::HashWithIndifferentAccess
-    # representation of the parameters.
-    #
-    #     params = ActionController::Parameters.new({
-    #       name: "Senjougahara Hitagi",
-    #       oddity: "Heavy stone crab"
-    #     })
-    #     params.to_unsafe_h
-    #     # => {"name"=>"Senjougahara Hitagi", "oddity" => "Heavy stone crab"}
-    def to_unsafe_h: () -> untyped
-
-    alias to_unsafe_hash to_unsafe_h
 
     # Convert all hashes in values into parameters, then yield each pair in the same
     # way as `Hash#each_pair`.
@@ -4738,14 +4649,6 @@ module ActionController
     # that converts values. Also, we are not going to build a new array object per
     # fetch.
     def converted_arrays: () -> untyped
-
-    # Returns `true` if the parameter is permitted, `false` otherwise.
-    #
-    #     params = ActionController::Parameters.new
-    #     params.permitted? # => false
-    #     params.permit!
-    #     params.permitted? # => true
-    def permitted?: () -> untyped
 
     # Sets the `permitted` attribute to `true`. This can be used to pass mass
     # assignment. Returns `self`.
@@ -4811,145 +4714,6 @@ module ActionController
     def require: (untyped key) -> untyped
 
     alias required require
-
-    # Returns a new `ActionController::Parameters` instance that includes only the
-    # given `filters` and sets the `permitted` attribute for the object to `true`.
-    # This is useful for limiting which attributes should be allowed for mass
-    # updating.
-    #
-    #     params = ActionController::Parameters.new(name: "Francesco", age: 22, role: "admin")
-    #     permitted = params.permit(:name, :age)
-    #     permitted.permitted?      # => true
-    #     permitted.has_key?(:name) # => true
-    #     permitted.has_key?(:age)  # => true
-    #     permitted.has_key?(:role) # => false
-    #
-    # Only permitted scalars pass the filter. For example, given
-    #
-    #     params.permit(:name)
-    #
-    # `:name` passes if it is a key of `params` whose associated value is of type
-    # `String`, `Symbol`, `NilClass`, `Numeric`, `TrueClass`, `FalseClass`, `Date`,
-    # `Time`, `DateTime`, `StringIO`, `IO`, ActionDispatch::Http::UploadedFile or
-    # `Rack::Test::UploadedFile`. Otherwise, the key `:name` is filtered out.
-    #
-    # You may declare that the parameter should be an array of permitted scalars by
-    # mapping it to an empty array:
-    #
-    #     params = ActionController::Parameters.new(tags: ["rails", "parameters"])
-    #     params.permit(tags: [])
-    #
-    # Sometimes it is not possible or convenient to declare the valid keys of a hash
-    # parameter or its internal structure. Just map to an empty hash:
-    #
-    #     params.permit(preferences: {})
-    #
-    # Be careful because this opens the door to arbitrary input. In this case,
-    # `permit` ensures values in the returned structure are permitted scalars and
-    # filters out anything else.
-    #
-    # You can also use `permit` on nested parameters:
-    #
-    #     params = ActionController::Parameters.new({
-    #       person: {
-    #         name: "Francesco",
-    #         age:  22,
-    #         pets: [{
-    #           name: "Purplish",
-    #           category: "dogs"
-    #         }]
-    #       }
-    #     })
-    #
-    #     permitted = params.permit(person: [ :name, { pets: :name } ])
-    #     permitted.permitted?                    # => true
-    #     permitted[:person][:name]               # => "Francesco"
-    #     permitted[:person][:age]                # => nil
-    #     permitted[:person][:pets][0][:name]     # => "Purplish"
-    #     permitted[:person][:pets][0][:category] # => nil
-    #
-    # This has the added benefit of rejecting user-modified inputs that send a
-    # string when a hash is expected.
-    #
-    # When followed by `require`, you can both filter and require parameters
-    # following the typical pattern of a Rails form. The `expect` method was
-    # made specifically for this use case and is the recommended way to require
-    # and permit parameters.
-    #
-    #      permitted = params.expect(person: [:name, :age])
-    #
-    # When using `permit` and `require` separately, pay careful attention to the
-    # order of the method calls.
-    #
-    #      params = ActionController::Parameters.new(person: { name: "Martin", age: 40, role: "admin" })
-    #      permitted = params.permit(person: [:name, :age]).require(:person) # correct
-    #
-    # When require is used first, it is possible for users of your application to
-    # trigger a NoMethodError when the user, for example, sends a string for :person.
-    #
-    #      params = ActionController::Parameters.new(person: "tampered")
-    #      permitted = params.require(:person).permit(:name, :age) # not recommended
-    #      # => NoMethodError: undefined method `permit' for an instance of String
-    #
-    # Note that if you use `permit` in a key that points to a hash, it won't allow
-    # all the hash. You also need to specify which attributes inside the hash should
-    # be permitted.
-    #
-    #     params = ActionController::Parameters.new({
-    #       person: {
-    #         contact: {
-    #           email: "none@test.com",
-    #           phone: "555-1234"
-    #         }
-    #       }
-    #     })
-    #
-    #     params.permit(person: :contact).require(:person)
-    #     # => ActionController::ParameterMissing: param is missing or the value is empty or invalid: person
-    #
-    #     params.permit(person: { contact: :phone }).require(:person)
-    #     # => #<ActionController::Parameters {"contact"=>#<ActionController::Parameters {"phone"=>"555-1234"} permitted: true>} permitted: true>
-    #
-    #     params.permit(person: { contact: [ :email, :phone ] }).require(:person)
-    #     # => #<ActionController::Parameters {"contact"=>#<ActionController::Parameters {"email"=>"none@test.com", "phone"=>"555-1234"} permitted: true>} permitted: true>
-    #
-    # If your parameters specify multiple parameters indexed by a number, you can
-    # permit each set of parameters under the numeric key to be the same using the
-    # same syntax as permitting a single item.
-    #
-    #     params = ActionController::Parameters.new({
-    #       person: {
-    #         '0': {
-    #           email: "none@test.com",
-    #           phone: "555-1234"
-    #         },
-    #         '1': {
-    #           email: "nothing@test.com",
-    #           phone: "555-6789"
-    #         },
-    #       }
-    #     })
-    #     params.permit(person: [:email]).to_h
-    #     # => {"person"=>{"0"=>{"email"=>"none@test.com"}, "1"=>{"email"=>"nothing@test.com"}}}
-    #
-    # If you want to specify what keys you want from each numeric key, you can
-    # instead specify each one individually
-    #
-    #     params = ActionController::Parameters.new({
-    #       person: {
-    #         '0': {
-    #           email: "none@test.com",
-    #           phone: "555-1234"
-    #         },
-    #         '1': {
-    #           email: "nothing@test.com",
-    #           phone: "555-6789"
-    #         },
-    #       }
-    #     })
-    #     params.permit(person: { '0': [:email], '1': [:phone]}).to_h
-    #     # => {"person"=>{"0"=>{"email"=>"none@test.com"}, "1"=>{"phone"=>"555-6789"}}}
-    def permit: (*untyped filters) -> untyped
 
     # `expect` is the preferred way to require and permit parameters.
     # It is safer than the previous recommendation to call `permit` and `require`
@@ -5084,50 +4848,15 @@ module ActionController
     #     params2.dig(:foo, 1) # => 11
     def dig: (*untyped keys) -> untyped
 
-    # Returns a new `ActionController::Parameters` instance that includes only the
-    # given `keys`. If the given `keys` don't exist, returns an empty hash.
-    #
-    #     params = ActionController::Parameters.new(a: 1, b: 2, c: 3)
-    #     params.slice(:a, :b) # => #<ActionController::Parameters {"a"=>1, "b"=>2} permitted: false>
-    #     params.slice(:d)     # => #<ActionController::Parameters {} permitted: false>
-    def slice: (*untyped keys) -> untyped
-
     # Returns the current `ActionController::Parameters` instance which contains
     # only the given `keys`.
     def slice!: (*untyped keys) -> self
 
-    # Returns a new `ActionController::Parameters` instance that filters out the
-    # given `keys`.
-    #
-    #     params = ActionController::Parameters.new(a: 1, b: 2, c: 3)
-    #     params.except(:a, :b) # => #<ActionController::Parameters {"c"=>3} permitted: false>
-    #     params.except(:d)     # => #<ActionController::Parameters {"a"=>1, "b"=>2, "c"=>3} permitted: false>
-    def except: (*untyped keys) -> untyped
-
     alias without except
-
-    # Removes and returns the key/value pairs matching the given keys.
-    #
-    #     params = ActionController::Parameters.new(a: 1, b: 2, c: 3)
-    #     params.extract!(:a, :b) # => #<ActionController::Parameters {"a"=>1, "b"=>2} permitted: false>
-    #     params                  # => #<ActionController::Parameters {"c"=>3} permitted: false>
-    def extract!: (*untyped keys) -> untyped
-
-    # Returns a new `ActionController::Parameters` instance with the results of
-    # running `block` once for every value. The keys are unchanged.
-    #
-    #     params = ActionController::Parameters.new(a: 1, b: 2, c: 3)
-    #     params.transform_values { |x| x * 2 }
-    #     # => #<ActionController::Parameters {"a"=>2, "b"=>4, "c"=>6} permitted: false>
-    def transform_values: () ?{ (untyped) -> untyped } -> untyped
 
     # Performs values transformation and returns the altered
     # `ActionController::Parameters` instance.
     def transform_values!: () ?{ (untyped) -> untyped } -> (untyped | self)
-
-    # Returns a new `ActionController::Parameters` instance with the results of
-    # running `block` once for every key. The values are unchanged.
-    def transform_keys: () ?{ (?) -> untyped } -> untyped
 
     # Performs keys transformation and returns the altered
     # `ActionController::Parameters` instance.
@@ -5143,49 +4872,25 @@ module ActionController
     # arrays. The values are unchanged.
     def deep_transform_keys!: () { (?) -> untyped } -> self
 
-    # Returns a new `ActionController::Parameters` instance with only items that the
-    # block evaluates to true.
-    def select: () { (?) -> untyped } -> untyped
-
     # Equivalent to Hash#keep_if, but returns `nil` if no changes were made.
     def select!: () { (?) -> untyped } -> self
 
     alias keep_if select!
-
-    # Returns a new `ActionController::Parameters` instance with items that the
-    # block evaluates to true removed.
-    def reject: () { (?) -> untyped } -> untyped
 
     # Removes items that the block evaluates to true and returns self.
     def reject!: () { (?) -> untyped } -> self
 
     alias delete_if reject!
 
-    # Returns a new `ActionController::Parameters` instance with `nil` values
-    # removed.
-    def compact: () -> untyped
-
     # Removes all `nil` values in place and returns `self`, or `nil` if no changes
     # were made.
     def compact!: () -> (self | nil)
-
-    # Returns a new `ActionController::Parameters` instance without the blank
-    # values. Uses Object#blank? for determining if a value is blank.
-    def compact_blank: () -> untyped
 
     # Removes all blank values in place and returns self. Uses Object#blank? for
     # determining if a value is blank.
     def compact_blank!: () -> untyped
 
     alias value? has_value?
-
-    # Returns values that were assigned to the given `keys`. Note that all the
-    # `Hash` objects will be converted to `ActionController::Parameters`.
-    def values_at: (*untyped keys) -> untyped
-
-    # Returns a new `ActionController::Parameters` instance with all keys from
-    # `other_hash` merged into current hash.
-    def merge: (untyped other_hash) -> untyped
 
     #
     # :call-seq: merge!(other_hash)
@@ -5195,12 +4900,6 @@ module ActionController
     def merge!: (untyped other_hash) ?{ (?) -> untyped } -> self
 
     def deep_merge?: (untyped other_hash) -> untyped
-
-    # Returns a new `ActionController::Parameters` instance with all keys from
-    # current hash merged into `other_hash`.
-    def reverse_merge: (untyped other_hash) -> untyped
-
-    alias with_defaults reverse_merge
 
     # Returns the current `ActionController::Parameters` instance with current hash
     # merged into `other_hash`.
@@ -5220,10 +4919,6 @@ module ActionController
     def init_with: (untyped coder) -> untyped
 
     def encode_with: (untyped coder) -> untyped
-
-    # Returns a duplicate `ActionController::Parameters` instance with the same
-    # permitted parameters.
-    def deep_dup: () -> untyped
 
     # Returns parameter value for the given `key` separated by `delimiter`.
     #
@@ -5411,14 +5106,6 @@ module ActionController
   # See ActionController::Parameters.require, and
   # ActionController::Parameters.permit for more information.
   module StrongParameters
-    # Returns a new ActionController::Parameters object that has been instantiated
-    # with the `request.parameters`.
-    def params: () -> untyped
-
-    # Assigns the given `value` to the `params` hash. If `value` is a Hash, this
-    # will create an ActionController::Parameters object that has been instantiated
-    # with the given `value` hash.
-    def params=: (untyped value) -> untyped
   end
 end
 
@@ -6940,18 +6627,9 @@ module ActionDispatch
         def parameter_parsers=: (untyped parsers) -> untyped
       end
 
-      # Returns both GET and POST parameters in a single hash.
-      def parameters: () -> untyped
-
       alias params parameters
 
       def path_parameters=: (untyped parameters) -> untyped
-
-      # Returns a hash with the parameters used to form the path of the request.
-      # Returned hash keys are symbols:
-      #
-      #     { action: "my_action", controller: "my_controller" }
-      def path_parameters: () -> untyped
 
       private
 
@@ -7154,13 +6832,6 @@ module ActionDispatch
 
     alias raw_request_method request_method
 
-    # Returns the HTTP method that the application should see. In the case where the
-    # method was overridden by a middleware (for instance, if a HEAD request was
-    # converted to a GET, or if a _method parameter was used to determine the method
-    # the application should use), this method returns the overridden value, not the
-    # original.
-    def request_method: () -> untyped
-
     # Returns the URI pattern of the matched route for the request, using the same
     # format as `bin/rails routes`:
     #
@@ -7188,20 +6859,8 @@ module ActionDispatch
     # Returns a symbol form of the #request_method.
     def request_method_symbol: () -> untyped
 
-    # Returns the original value of the environment's REQUEST_METHOD, even if it was
-    # overridden by middleware. See #request_method for more information.
-    #
-    # For debugging purposes, when called with arguments this method will fall back
-    # to Object#method
-    def method: (*untyped args) -> untyped
-
     # Returns a symbol form of the #method.
     def method_symbol: () -> untyped
-
-    # Provides access to the request's HTTP headers, for example:
-    #
-    #     request.headers["Content-Type"] # => "text/plain"
-    def headers: () -> untyped
 
     # Early Hints is an HTTP/2 status code that indicates hints to help a client
     # start making preparations for processing the final response.
@@ -7227,57 +6886,14 @@ module ActionDispatch
     #     request.original_fullpath # => '/foo?bar'
     def original_fullpath: () -> untyped
 
-    # Returns the `String` full path including params of the last URL requested.
-    #
-    #     # get "/articles"
-    #     request.fullpath # => "/articles"
-    #
-    #     # get "/articles?page=2"
-    #     request.fullpath # => "/articles?page=2"
-    def fullpath: () -> untyped
-
-    # Returns the original request URL as a `String`.
-    #
-    #     # get "/articles?page=2"
-    #     request.original_url # => "http://www.example.com/articles?page=2"
-    def original_url: () -> untyped
-
-    # The `String` MIME type of the request.
-    #
-    #     # get "/articles"
-    #     request.media_type # => "application/x-www-form-urlencoded"
-    def media_type: () -> untyped
-
-    # Returns the content length of the request as an integer.
-    def content_length: () -> untyped
-
-    # Returns true if the `X-Requested-With` header contains "XMLHttpRequest"
-    # (case-insensitive), which may need to be manually added depending on the
-    # choice of JavaScript libraries and frameworks.
-    def xml_http_request?: () -> untyped
-
     alias xhr? xml_http_request?
 
     # Returns the IP address of client as a `String`.
     def ip: () -> untyped
 
-    # Returns the IP address of client as a `String`, usually set by the RemoteIp
-    # middleware.
-    def remote_ip: () -> untyped
-
     def remote_ip=: (untyped remote_ip) -> untyped
 
     ACTION_DISPATCH_REQUEST_ID: "action_dispatch.request_id"
-
-    # Returns the unique request id, which is based on either the `X-Request-Id`
-    # header that can be generated by a firewall, load balancer, or web server, or
-    # by the RequestId middleware (which sets the `action_dispatch.request_id`
-    # environment variable).
-    #
-    # This unique ID is useful for tracing a request from end-to-end as part of
-    # logging or debugging. This relies on the Rack variable set by the
-    # ActionDispatch::RequestId middleware.
-    def request_id: () -> untyped
 
     def request_id=: (untyped id) -> untyped
 
@@ -7285,10 +6901,6 @@ module ActionDispatch
 
     # Returns the lowercase name of the HTTP server software.
     def server_software: () -> (untyped | nil)
-
-    # Read the request body. This is useful for web services that need to work with
-    # raw requests directly.
-    def raw_post: () -> untyped
 
     # The request body is an IO input stream. If the RAW_POST_DATA environment
     # variable is already set, wrap it in a StringIO.
@@ -7326,9 +6938,6 @@ module ActionDispatch
     # Returns the authorization header regardless of whether it was specified
     # directly or through one of the proxy alternatives.
     def authorization: () -> untyped
-
-    # True if the request came from localhost, 127.0.0.1, or ::1.
-    def local?: () -> untyped
 
     def request_parameters=: (untyped params) -> untyped
 
@@ -7394,9 +7003,6 @@ module ActionDispatch
 
     # The request that the response is responding to.
     attr_accessor request: untyped
-
-    # The HTTP status code.
-    attr_reader status: untyped
 
     # The headers for the response.
     #
@@ -7493,8 +7099,6 @@ module ActionDispatch
 
     def sending?: () -> untyped
 
-    def committed?: () -> untyped
-
     def sent?: () -> untyped
 
     # Sets the HTTP status code.
@@ -7514,12 +7118,6 @@ module ActionDispatch
     # information.
     def content_type=: (untyped content_type) -> (nil | untyped)
 
-    # Content type of response.
-    def content_type: () -> untyped
-
-    # Media type of response.
-    def media_type: () -> untyped
-
     def sending_file=: (untyped v) -> (untyped | nil)
 
     # Sets the HTTP character set. In case of `nil` parameter it sets the charset to
@@ -7536,24 +7134,7 @@ module ActionDispatch
     # The response code of the request.
     def response_code: () -> untyped
 
-    # Returns a string to ensure compatibility with `Net::HTTPResponse`.
-    def code: () -> untyped
-
-    # Returns the corresponding message for the current HTTP status code:
-    #
-    #     response.status = 200
-    #     response.message # => "OK"
-    #
-    #     response.status = 404
-    #     response.message # => "Not Found"
-    #
-    def message: () -> untyped
-
     alias status_message message
-
-    # Returns the content of the response as a string. This contains the contents of
-    # any calls to `render`.
-    def body: () -> untyped
 
     def write: (untyped string) -> untyped
 
@@ -7858,21 +7439,6 @@ module ActionDispatch
 
       def initialize: () -> void
 
-      # Returns the complete URL used for this request.
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com'
-      #     req.url # => "http://example.com"
-      def url: () -> untyped
-
-      # Returns 'https://' if this is an SSL request and 'http://' otherwise.
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com'
-      #     req.protocol # => "http://"
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com', 'HTTPS' => 'on'
-      #     req.protocol # => "https://"
-      def protocol: () -> untyped
-
       # Returns the host and port for this request, such as "example.com:8080".
       #
       #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com'
@@ -7885,60 +7451,6 @@ module ActionDispatch
       #     req.raw_host_with_port # => "example.com:8080"
       def raw_host_with_port: () -> untyped
 
-      # Returns the host for this request, such as "example.com".
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
-      #     req.host # => "example.com"
-      def host: () -> untyped
-
-      # Returns a host:port string for this request, such as "example.com" or
-      # "example.com:8080". Port is only included if it is not a default port (80 or
-      # 443)
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com'
-      #     req.host_with_port # => "example.com"
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:80'
-      #     req.host_with_port # => "example.com"
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
-      #     req.host_with_port # => "example.com:8080"
-      def host_with_port: () -> ::String
-
-      # Returns the port number of this request as an integer.
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com'
-      #     req.port # => 80
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
-      #     req.port # => 8080
-      def port: () -> untyped
-
-      # Returns the standard port number for this request's protocol.
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
-      #     req.standard_port # => 80
-      def standard_port: () -> (443 | 80)
-
-      # Returns whether this request is using the standard port.
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:80'
-      #     req.standard_port? # => true
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
-      #     req.standard_port? # => false
-      def standard_port?: () -> untyped
-
-      # Returns a number port suffix like 8080 if the port number of this request is
-      # not the default HTTP port 80 or HTTPS port 443.
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:80'
-      #     req.optional_port # => nil
-      #
-      #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
-      #     req.optional_port # => 8080
-      def optional_port: () -> (nil | untyped)
-
       # Returns a string port suffix, including colon, like ":8080" if the port number
       # of this request is not the default HTTP port 80 or HTTPS port 443.
       #
@@ -7948,31 +7460,6 @@ module ActionDispatch
       #     req = ActionDispatch::Request.new 'HTTP_HOST' => 'example.com:8080'
       #     req.port_string # => ":8080"
       def port_string: () -> ("" | ::String)
-
-      # Returns the requested port, such as 8080, based on SERVER_PORT.
-      #
-      #     req = ActionDispatch::Request.new 'SERVER_PORT' => '80'
-      #     req.server_port # => 80
-      #
-      #     req = ActionDispatch::Request.new 'SERVER_PORT' => '8080'
-      #     req.server_port # => 8080
-      def server_port: () -> untyped
-
-      # Returns the domain part of a host, such as "rubyonrails.org" in
-      # "www.rubyonrails.org". You can specify a different `tld_length`, such as 2 to
-      # catch rubyonrails.co.uk in "www.rubyonrails.co.uk".
-      def domain: (?untyped tld_length) -> untyped
-
-      # Returns all the subdomains as an array, so `["dev", "www"]` would be returned
-      # for "dev.www.rubyonrails.org". You can specify a different `tld_length`, such
-      # as 2 to catch `["www"]` instead of `["www", "rubyonrails"]` in
-      # "www.rubyonrails.co.uk".
-      def subdomains: (?untyped tld_length) -> untyped
-
-      # Returns all the subdomains as a string, so `"dev.www"` would be returned for
-      # "dev.www.rubyonrails.org". You can specify a different `tld_length`, such as 2
-      # to catch `"www"` instead of `"www.rubyonrails"` in "www.rubyonrails.co.uk".
-      def subdomain: (?untyped tld_length) -> untyped
     end
   end
 end
@@ -9074,58 +8561,6 @@ module ActionDispatch
 
     # Include in a cookie jar to allow chaining, e.g. `cookies.permanent.signed`.
     module ChainedCookieJars
-      # Returns a jar that'll automatically set the assigned cookies to have an
-      # expiration date 20 years from now. Example:
-      #
-      #     cookies.permanent[:prefers_open_id] = true
-      #     # => Set-Cookie: prefers_open_id=true; path=/; expires=Sun, 16-Dec-2029 03:24:16 GMT
-      #
-      # This jar is only meant for writing. You'll read permanent cookies through the
-      # regular accessor.
-      #
-      # This jar allows chaining with the signed jar as well, so you can set
-      # permanent, signed cookies. Examples:
-      #
-      #     cookies.permanent.signed[:remember_me] = current_user.id
-      #     # => Set-Cookie: remember_me=BAhU--848956038e692d7046deab32b7131856ab20e14e; path=/; expires=Sun, 16-Dec-2029 03:24:16 GMT
-      def permanent: () -> untyped
-
-      # Returns a jar that'll automatically generate a signed representation of cookie
-      # value and verify it when reading from the cookie again. This is useful for
-      # creating cookies with values that the user is not supposed to change. If a
-      # signed cookie was tampered with by the user (or a 3rd party), `nil` will be
-      # returned.
-      #
-      # This jar requires that you set a suitable secret for the verification on your
-      # app's `secret_key_base`.
-      #
-      # Example:
-      #
-      #     cookies.signed[:discount] = 45
-      #     # => Set-Cookie: discount=BAhpMg==--2c1c6906c90a3bc4fd54a51ffb41dffa4bf6b5f7; path=/
-      #
-      #     cookies.signed[:discount] # => 45
-      def signed: () -> untyped
-
-      # Returns a jar that'll automatically encrypt cookie values before sending them
-      # to the client and will decrypt them for read. If the cookie was tampered with
-      # by the user (or a 3rd party), `nil` will be returned.
-      #
-      # If `config.action_dispatch.encrypted_cookie_salt` and
-      # `config.action_dispatch.encrypted_signed_cookie_salt` are both set, legacy
-      # cookies encrypted with HMAC AES-256-CBC will be transparently upgraded.
-      #
-      # This jar requires that you set a suitable secret for the verification on your
-      # app's `secret_key_base`.
-      #
-      # Example:
-      #
-      #     cookies.encrypted[:discount] = 45
-      #     # => Set-Cookie: discount=DIQ7fw==--K3n//8vvnSbGq9dA--7Xh91HfLpwzbj1czhBiwOg==; path=/
-      #
-      #     cookies.encrypted[:discount] # => 45
-      def encrypted: () -> untyped
-
       # Returns the `signed` or `encrypted` jar, preferring `encrypted` if
       # `secret_key_base` is set. Used by ActionDispatch::Session::CookieStore to
       # avoid the need to introduce new cookie stores.
@@ -9159,9 +8594,6 @@ module ActionDispatch
 
       def each: () ?{ (?) -> untyped } -> untyped
 
-      # Returns the value of the cookie by `name`, or `nil` if no such cookie exists.
-      def []: (untyped name) -> untyped
-
       def key?: (untyped name) -> untyped
 
       alias has_key? key?
@@ -9178,13 +8610,6 @@ module ActionDispatch
       # Sets the cookie named `name`. The second argument may be the cookie's value or
       # a hash of options as documented above.
       def []=: (untyped name, untyped options) -> untyped
-
-      # Removes the cookie on the client machine by setting the value to an empty
-      # string and the expiration date in the past. Like `[]=`, you can pass in an
-      # options hash to delete cookies with extra data such as a `:path`.
-      #
-      # Returns the value of the cookie, or `nil` if the cookie does not exist.
-      def delete: (untyped name, ?::Hash[untyped, untyped] options) -> (nil | untyped)
 
       # Whether the given cookie is to be deleted by this CookieJar. Like `[]=`, you
       # can pass in an options hash to test if a deletion applies to a specific
@@ -9609,45 +9034,6 @@ module ActionDispatch
       alias merge! update
 
       def replace: (untyped h) -> self
-
-      # Sets a flash that will not be available to the next action, only to the
-      # current.
-      #
-      #     flash.now[:message] = "Hello current action"
-      #
-      # This method enables you to use the flash as a central messaging system in your
-      # app. When you need to pass an object to the next action, you use the standard
-      # flash assign (`[]=`). When you need to pass an object to the current action,
-      # you use `now`, and your object will vanish when the current action is done.
-      #
-      # Entries set via `now` are accessed the same way as standard entries:
-      # `flash['my-key']`.
-      #
-      # Also, brings two convenience accessors:
-      #
-      #     flash.now.alert = "Beware now!"
-      #     # Equivalent to flash.now[:alert] = "Beware now!"
-      #
-      #     flash.now.notice = "Good luck now!"
-      #     # Equivalent to flash.now[:notice] = "Good luck now!"
-      def now: () -> untyped
-
-      # Keeps either the entire current flash or a specific flash entry available for
-      # the next action:
-      #
-      #     flash.keep            # keeps the entire flash
-      #     flash.keep(:notice)   # keeps only the "notice" entry, the rest of the flash is discarded
-      def keep: (?untyped? k) -> untyped
-
-      # Marks the entire flash or a single flash entry to be discarded by the end of
-      # the current action:
-      #
-      #     flash.discard              # discard the entire flash at the end of the current action
-      #     flash.discard(:warning)    # discard only the "warning" entry at the end of the current action
-      #
-      # Use this method when you want to display the message in the current action but
-      # not in the next one. See also #delete.
-      def discard: (?untyped? k) -> untyped
 
       # Mark for removal entries that were kept, and delete unkept ones.
       #

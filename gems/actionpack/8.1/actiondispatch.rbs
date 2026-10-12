@@ -343,3 +343,116 @@ module ActionDispatch
     end
   end
 end
+
+module ActionDispatch
+  class Request
+    def request_method: () -> String
+
+    def method: () -> String
+              | (interned name) -> Method
+
+    def headers: () -> ActionDispatch::Http::Headers
+
+    def fullpath: () -> String
+
+    def original_url: () -> String
+
+    def media_type: () -> String?
+
+    def content_length: () -> Integer
+
+    def remote_ip: () -> String
+
+    def xml_http_request?: () -> bool
+
+    def request_id: () -> String?
+
+    def raw_post: () -> String?
+
+    def local?: () -> bool
+
+    def content_mime_type: () -> Mime::Type?
+
+    def filtered_parameters: () -> Hash[untyped, untyped]
+
+    def filtered_path: () -> String
+  end
+
+  module Http
+    module Parameters
+      def parameters: () -> ActiveSupport::HashWithIndifferentAccess[untyped, untyped]
+
+      def path_parameters: () -> Hash[Symbol, untyped]
+    end
+
+    module URL
+      def url: () -> String
+
+      def protocol: () -> String
+
+      def host: () -> String
+
+      def host_with_port: () -> String
+
+      def port: () -> Integer
+
+      def standard_port: () -> Integer
+
+      def standard_port?: () -> bool
+
+      def optional_port: () -> Integer?
+
+      def server_port: () -> Integer
+
+      def domain: (?Integer tld_length) -> String?
+
+      def subdomains: (?Integer tld_length) -> Array[String]
+
+      def subdomain: (?Integer tld_length) -> String
+    end
+  end
+
+  class Response
+    def status: () -> Integer
+
+    def code: () -> String
+
+    def message: () -> String?
+
+    def body: () -> String
+
+    def content_type: () -> String?
+
+    def media_type: () -> String?
+
+    def committed?: () -> bool
+  end
+
+  class Cookies
+    class CookieJar
+      def []: (String | Symbol name) -> String?
+
+      def delete: (String | Symbol name, ?Hash[Symbol, untyped] options) -> String?
+    end
+
+    module ChainedCookieJars
+      def permanent: () -> ActionDispatch::Cookies::PermanentCookieJar
+
+      def signed: () -> ActionDispatch::Cookies::SignedKeyRotatingCookieJar
+
+      def encrypted: () -> ActionDispatch::Cookies::EncryptedKeyRotatingCookieJar
+    end
+  end
+
+  class Flash
+    class FlashHash
+      def now: () -> ActionDispatch::Flash::FlashNow
+
+      def keep: () -> self
+              | (String | Symbol k) -> untyped
+
+      def discard: () -> self
+                 | (String | Symbol k) -> untyped
+    end
+  end
+end
