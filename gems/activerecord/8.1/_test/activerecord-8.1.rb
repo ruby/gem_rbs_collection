@@ -106,3 +106,32 @@ module Test
   users.first.articles
   User.create!([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
 end
+
+module Test
+  class Tag < ApplicationRecord
+    has_and_belongs_to_many :articles
+    after_save_commit :reindex
+    after_destroy_commit :reindex
+    before_commit :reindex
+    after_rollback :reindex
+
+    def reindex
+    end
+  end
+
+  class CreateTags < ActiveRecord::Migration[8.1]
+    def change
+      create_table :tags
+    end
+  end
+
+  ActiveRecord::Type.register(:tag_list, ActiveRecord::Type::String)
+  ActiveRecord::Base.lease_connection.create_table(:taggings)
+  Tag.where(name: "ruby").first_or_create
+  Tag.where(name: "ruby").first_or_initialize
+  Tag.where(name: "ruby").create_or_find_by(name: "ruby")
+  Tag.where(name: "ruby").load
+  tag = Tag.new
+  tag.save
+  tag.save!
+end

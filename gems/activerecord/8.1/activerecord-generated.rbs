@@ -364,11 +364,11 @@ module ActiveRecord
 
     private
 
-    def _new: (untyped attributes) { (?) -> untyped } -> untyped
+    def _new: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
-    def _create: (untyped attributes) { (?) -> untyped } -> untyped
+    def _create: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
-    def _create!: (untyped attributes) { (?) -> untyped } -> untyped
+    def _create!: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     def exec_queries: () ?{ (untyped) -> untyped } -> untyped
   end
@@ -1734,7 +1734,7 @@ module ActiveRecord
       #   has_many :comments, strict_loading: true
       #   has_many :comments, query_constraints: [:blog_id, :post_id]
       #   has_many :comments, index_errors: :nested_attributes_order
-      def has_many: (untyped name, ?untyped? scope, **untyped options) { (?) -> untyped } -> untyped
+      def has_many: (untyped name, ?untyped? scope, **untyped options) ?{ (?) -> untyped } -> untyped
 
       # Specifies a one-to-one association with another class. This method
       # should only be used if the other class contains the foreign key. If
@@ -2306,7 +2306,7 @@ module ActiveRecord
       #   has_and_belongs_to_many :categories, join_table: "prods_cats"
       #   has_and_belongs_to_many :categories, -> { readonly }
       #   has_and_belongs_to_many :categories, strict_loading: true
-      def has_and_belongs_to_many: (untyped name, ?untyped? scope, **untyped options) { (?) -> untyped } -> untyped
+      def has_and_belongs_to_many: (untyped name, ?untyped? scope, **untyped options) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -2495,9 +2495,9 @@ module ActiveRecord
 
       def initialize_attributes: (untyped record, ?untyped? except_from_scope_attributes) -> untyped
 
-      def create: (?untyped? attributes) { (?) -> untyped } -> untyped
+      def create: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
-      def create!: (?untyped? attributes) { (?) -> untyped } -> untyped
+      def create!: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
       def violates_strict_loading?: () -> (nil | untyped)
 
@@ -2673,9 +2673,9 @@ module ActiveRecord::Associations::Builder
 
     VALID_OPTIONS: ::Array[:anonymous_class | :primary_key | :foreign_key | :dependent | :validate | :inverse_of | :strict_loading | :query_constraints | :deprecated]
 
-    def self.build: (untyped model, untyped name, untyped scope, untyped options) { (?) -> untyped } -> untyped
+    def self.build: (untyped model, untyped name, untyped scope, untyped options) ?{ (?) -> untyped } -> untyped
 
-    def self.create_reflection: (untyped model, untyped name, untyped scope, untyped options) { (?) -> untyped } -> untyped
+    def self.create_reflection: (untyped model, untyped name, untyped scope, untyped options) ?{ (?) -> untyped } -> untyped
 
     def self.build_scope: (untyped scope) -> untyped
 
@@ -2871,7 +2871,7 @@ module ActiveRecord
 
       def find: (*untyped args) -> untyped
 
-      def build: (?untyped? attributes) { (?) -> untyped } -> untyped
+      def build: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
       # Add +records+ to this association. Since +<<+ flattens its argument list
       # and inserts each record, +push+ and +concat+ behave identically.
@@ -2943,7 +2943,7 @@ module ActiveRecord
 
       def load_target: () -> untyped
 
-      def add_to_target: (untyped record, ?skip_callbacks: bool, ?replace: bool) { (?) -> untyped } -> untyped
+      def add_to_target: (untyped record, ?skip_callbacks: bool, ?replace: bool) ?{ (?) -> untyped } -> untyped
 
       def target=: (untyped record) -> untyped
 
@@ -2971,10 +2971,10 @@ module ActiveRecord
       #   * Otherwise, attributes should have the value found in the database
       def merge_target_lists: (untyped persisted, untyped memory) -> untyped
 
-      def _create_record: (untyped attributes, ?bool raise) { (?) -> untyped } -> untyped
+      def _create_record: (untyped attributes, ?bool raise) ?{ (?) -> untyped } -> untyped
 
       # Do the relevant stuff to insert the given record into the association collection.
-      def insert_record: (untyped record, ?bool validate, ?bool raise) { (?) -> untyped } -> untyped
+      def insert_record: (untyped record, ?bool validate, ?bool raise) ?{ (?) -> untyped } -> untyped
 
       def delete_or_destroy: (untyped records, untyped method) -> (nil | untyped)
 
@@ -3973,7 +3973,7 @@ module ActiveRecord
 
       def transaction_if: (untyped value) { () -> untyped } -> untyped
 
-      def _create_record: (untyped attributes, ?bool raise_error) { (?) -> untyped } -> untyped
+      def _create_record: (untyped attributes, ?bool raise_error) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -4024,7 +4024,7 @@ module ActiveRecord
 
       def join_constraints: (untyped joins_to_add, untyped alias_tracker, untyped references) -> untyped
 
-      def instantiate: (untyped result_set, untyped strict_loading_value) { (?) -> untyped } -> untyped
+      def instantiate: (untyped result_set, untyped strict_loading_value) ?{ (?) -> untyped } -> untyped
 
       def apply_column_aliases: (untyped relation) -> untyped
 
@@ -4136,7 +4136,7 @@ module ActiveRecord
 
         def extract_record: (untyped row, untyped column_names_with_alias) -> untyped
 
-        def instantiate: (untyped row, untyped aliases, ?::Hash[untyped, untyped] column_types) { (?) -> untyped } -> untyped
+        def instantiate: (untyped row, untyped aliases, ?::Hash[untyped, untyped] column_types) ?{ (?) -> untyped } -> untyped
       end
     end
   end
@@ -4289,7 +4289,7 @@ module ActiveRecord
 
           def load_records_in_batch: (untyped loaders) -> untyped
 
-          def load_records_for_keys: (untyped keys) { (?) -> untyped } -> (::Array[untyped] | untyped)
+          def load_records_for_keys: (untyped keys) ?{ (?) -> untyped } -> (::Array[untyped] | untyped)
         end
 
         class LoaderRecords
@@ -4511,7 +4511,7 @@ module ActiveRecord
       # Implements the writer method, e.g. foo.bar= for Foo.belongs_to :bar
       def writer: (untyped record) -> untyped
 
-      def build: (?untyped? attributes) { (?) -> untyped } -> untyped
+      def build: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
       # Implements the reload reader method, e.g. foo.reload_bar for
       # Foo.has_one :bar
@@ -4527,7 +4527,7 @@ module ActiveRecord
 
       def set_new_record: (untyped record) -> untyped
 
-      def _create_record: (untyped attributes, ?bool raise_error) { (?) -> untyped } -> untyped
+      def _create_record: (untyped attributes, ?bool raise_error) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -9949,7 +9949,7 @@ module ActiveRecord
       #     SELECT * FROM orders INNER JOIN line_items ON order_id=orders.id
       #
       # See also TableDefinition#column for details on how to create columns.
-      def create_table: (untyped table_name, ?id: ::Symbol, ?primary_key: untyped?, ?force: untyped?, **untyped options) { (?) -> untyped } -> untyped
+      def create_table: (untyped table_name, ?id: ::Symbol, ?primary_key: untyped?, ?force: untyped?, **untyped options) ?{ (?) -> untyped } -> untyped
 
       # Returns a TableDefinition object containing information about the table that would be created
       # if the same arguments were passed to #create_table. See #create_table for information about
@@ -14784,7 +14784,7 @@ module ActiveRecord
     #   post = Post.allocate
     #   post.init_with(coder)
     #   post.title # => 'hello world'
-    def init_with: (untyped coder) { (?) -> untyped } -> untyped
+    def init_with: (untyped coder) ?{ (?) -> untyped } -> untyped
 
     #
     # Initialize an empty model object from +attributes+.
@@ -16934,7 +16934,7 @@ module ActiveRecord
 
       def serialize: (untyped value) -> untyped
 
-      def serializable?: (untyped value) { (?) -> untyped } -> untyped
+      def serializable?: (untyped value) ?{ (?) -> untyped } -> untyped
 
       def assert_valid_value: (untyped value) -> (nil | untyped)
 
@@ -19079,7 +19079,7 @@ module ActiveRecord
 
     def logger: () -> untyped
 
-    def debug: (?untyped? progname) { (?) -> untyped } -> (nil | untyped)
+    def debug: (?untyped? progname) ?{ (?) -> untyped } -> (nil | untyped)
 
     def log_query_source: () -> untyped
 
@@ -20038,7 +20038,7 @@ module ActiveRecord
 
     def connection_pool: () -> untyped
 
-    def method_missing: (untyped method, *untyped arguments) { (?) -> untyped } -> untyped
+    def method_missing: (untyped method, *untyped arguments) ?{ (?) -> untyped } -> untyped
 
     def copy: (untyped destination, untyped sources, ?::Hash[untyped, untyped] options) -> untyped
 
@@ -20102,7 +20102,7 @@ module ActiveRecord
     #
     # If none of the conditions are met, +up+ will be run with
     # the +target_version+.
-    def migrate: (?untyped? target_version) { (?) -> untyped } -> untyped
+    def migrate: (?untyped? target_version) ?{ (?) -> untyped } -> untyped
 
     def rollback: (?::Integer steps) -> untyped
 
@@ -20300,7 +20300,7 @@ module ActiveRecord
       # For example:
       #
       #   recorder.record(:method_name, [:arg1, :arg2])
-      def record: (*untyped command) { (?) -> untyped } -> untyped
+      def record: (*untyped command) ?{ (?) -> untyped } -> untyped
 
       # Returns the inverse of the given command. For example:
       #
@@ -20314,7 +20314,7 @@ module ActiveRecord
       #
       # This method will raise an +IrreversibleMigration+ exception if it cannot
       # invert the +command+.
-      def inverse_of: (untyped command, untyped args) { (?) -> untyped } -> untyped
+      def inverse_of: (untyped command, untyped args) ?{ (?) -> untyped } -> untyped
 
       alias add_belongs_to add_reference
 
@@ -20337,9 +20337,9 @@ module ActiveRecord
 
       def invert_transaction: (untyped args) { (?) -> untyped } -> ::Array[:transaction | untyped]
 
-      def invert_create_table: (untyped args) { (?) -> untyped } -> untyped
+      def invert_create_table: (untyped args) ?{ (?) -> untyped } -> untyped
 
-      def invert_drop_table: (untyped args) { (?) -> untyped } -> untyped
+      def invert_drop_table: (untyped args) ?{ (?) -> untyped } -> untyped
 
       def invert_rename_table: (untyped args) -> ::Array[:rename_table | untyped]
 
@@ -21497,7 +21497,7 @@ module ActiveRecord
       #   User.build([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }]) do |u|
       #     u.is_admin = false
       #   end
-      def build: (?untyped? attributes) { (?) -> untyped } -> untyped
+      def build: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
       # Given an attributes hash, +instantiate+ returns a new instance of
       # the appropriate class. Accepts only keys as strings.
@@ -21509,7 +21509,7 @@ module ActiveRecord
       #
       # See <tt>ActiveRecord::Inheritance#discriminate_class_for_record</tt> to see
       # how this "single-table" inheritance mapping is implemented.
-      def instantiate: (untyped attributes, ?::Hash[untyped, untyped] column_types) { (?) -> untyped } -> untyped
+      def instantiate: (untyped attributes, ?::Hash[untyped, untyped] column_types) ?{ (?) -> untyped } -> untyped
 
       # Updates an object (or multiple objects) and saves it to the database, if validations pass.
       # The resulting object is returned whether the object was saved successfully to the database or not.
@@ -21597,7 +21597,7 @@ module ActiveRecord
 
       # Given a class, an attributes hash, +instantiate_instance_of+ returns a
       # new instance of the class. Accepts only keys as strings.
-      def instantiate_instance_of: (untyped klass, untyped attributes, ?::Hash[untyped, untyped] column_types) { (?) -> untyped } -> untyped
+      def instantiate_instance_of: (untyped klass, untyped attributes, ?::Hash[untyped, untyped] column_types) ?{ (?) -> untyped } -> untyped
 
       # Called by +instantiate+ to decide which class to use for a new
       # record instance.
@@ -21653,7 +21653,7 @@ module ActiveRecord
     #
     # Attributes marked as readonly are silently ignored if the record is
     # being updated.
-    def save: (**untyped options) { (?) -> untyped } -> untyped
+    def save: (**untyped options) ?{ (?) -> untyped } -> untyped
 
     #
     # :call-seq:
@@ -21682,7 +21682,7 @@ module ActiveRecord
     # being updated.
     #
     # Unless an error is raised, returns true.
-    def save!: (**untyped options) { (?) -> untyped } -> untyped
+    def save!: (**untyped options) ?{ (?) -> untyped } -> untyped
 
     # Deletes the record in the database and freezes this instance to
     # reflect that no changes should be made (since they can't be
@@ -21945,7 +21945,7 @@ module ActiveRecord
 
     def _update_row: (untyped attribute_names, ?::String attempted_action) -> untyped
 
-    def create_or_update: (**untyped) { (?) -> untyped } -> (false | untyped)
+    def create_or_update: (**untyped) ?{ (?) -> untyped } -> (false | untyped)
 
     # Updates the associated record with values matching those of the instance attributes.
     # Returns the number of affected rows.
@@ -22199,11 +22199,11 @@ module ActiveRecord
     def with: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
 
     # Same as #find_by_sql but perform the query asynchronously and returns an ActiveRecord::Promise.
-    def async_find_by_sql: (untyped sql, ?untyped binds, ?preparable: untyped?, ?allow_retry: bool) { (?) -> untyped } -> untyped
+    def async_find_by_sql: (untyped sql, ?untyped binds, ?preparable: untyped?, ?allow_retry: bool) ?{ (?) -> untyped } -> untyped
 
     def _query_by_sql: (untyped connection, untyped sql, ?untyped binds, ?preparable: untyped?, ?async: bool, ?allow_retry: bool) -> untyped
 
-    def _load_from_sql: (untyped result_set) { (?) -> untyped } -> (::Array[untyped] | untyped)
+    def _load_from_sql: (untyped result_set) ?{ (?) -> untyped } -> (::Array[untyped] | untyped)
 
     # Returns the result of an SQL statement that should only include a COUNT(*) in the SELECT part.
     # The use of this method should be restricted to complicated SQL queries that can't be executed
@@ -22403,7 +22403,7 @@ module ActiveRecord
 
       # Returns a new, unsaved instance of the associated class. +attributes+ will
       # be passed to the class's constructor.
-      def build_association: (untyped attributes) { (?) -> untyped } -> untyped
+      def build_association: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
       # Returns the class name for the macro.
       #
@@ -22980,7 +22980,7 @@ module ActiveRecord
     #
     #   users.create(name: nil) # validation on name
     #   # => #<User id: nil, name: nil, ...>
-    def create: (?untyped? attributes) { (?) -> untyped } -> untyped
+    def create: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
     # Similar to #create, but calls
     # {create!}[rdoc-ref:Persistence::ClassMethods#create!]
@@ -22988,13 +22988,13 @@ module ActiveRecord
     #
     # Expects arguments in the same format as
     # {ActiveRecord::Base.create!}[rdoc-ref:Persistence::ClassMethods#create!].
-    def create!: (?untyped? attributes) { (?) -> untyped } -> untyped
+    def create!: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
-    def first_or_create: (?untyped? attributes) { (?) -> untyped } -> untyped
+    def first_or_create: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
-    def first_or_create!: (?untyped? attributes) { (?) -> untyped } -> untyped
+    def first_or_create!: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
-    def first_or_initialize: (?untyped? attributes) { (?) -> untyped } -> untyped
+    def first_or_initialize: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
 
     # Finds the first record with the given attributes, or creates a record
     # with the attributes if one is not found:
@@ -23037,12 +23037,12 @@ module ActiveRecord
     # and if there are no results an INSERT is attempted. So if the table
     # doesn't have a relevant unique constraint it could be the case that
     # you end up with two or more similar records.
-    def find_or_create_by: (untyped attributes) { (?) -> untyped } -> untyped
+    def find_or_create_by: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     # Like #find_or_create_by, but calls
     # {create!}[rdoc-ref:Persistence::ClassMethods#create!] so an exception
     # is raised if the created record is invalid.
-    def find_or_create_by!: (untyped attributes) { (?) -> untyped } -> untyped
+    def find_or_create_by!: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     # Attempts to create a record with the given attributes in a table that has a unique database constraint
     # on one or several of its columns. If a row already exists with one or several of these
@@ -23075,16 +23075,16 @@ module ActiveRecord
     # (unless the INSERT -> DELETE -> SELECT race condition is triggered), but if creation was attempted
     # and failed due to validation errors it won't be persisted, you get what #create returns in
     # such situation.
-    def create_or_find_by: (untyped attributes) { (?) -> untyped } -> untyped
+    def create_or_find_by: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     # Like #create_or_find_by, but calls
     # {create!}[rdoc-ref:Persistence::ClassMethods#create!] so an exception
     # is raised if the created record is invalid.
-    def create_or_find_by!: (untyped attributes) { (?) -> untyped } -> untyped
+    def create_or_find_by!: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     # Like #find_or_create_by, but calls {new}[rdoc-ref:Core.new]
     # instead of {create}[rdoc-ref:Persistence::ClassMethods#create].
-    def find_or_initialize_by: (untyped attributes) { (?) -> untyped } -> untyped
+    def find_or_initialize_by: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     # Runs EXPLAIN on the query or queries triggered by this relation and
     # returns the result as a string. The string is formatted imitating the
@@ -23412,7 +23412,7 @@ module ActiveRecord
     # return value is the relation itself, not the records.
     #
     #   Post.where(published: true).load # => #<ActiveRecord::Relation>
-    def load: () { (?) -> untyped } -> self
+    def load: () ?{ (?) -> untyped } -> self
 
     # Forces reloading of relation.
     def reload: () -> untyped
@@ -23482,11 +23482,11 @@ module ActiveRecord
 
     def current_scope_restoring_block: () ?{ (untyped) -> untyped } -> untyped
 
-    def _new: (untyped attributes) { (?) -> untyped } -> untyped
+    def _new: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
-    def _create: (untyped attributes) { (?) -> untyped } -> untyped
+    def _create: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
-    def _create!: (untyped attributes) { (?) -> untyped } -> untyped
+    def _create!: (untyped attributes) ?{ (?) -> untyped } -> untyped
 
     def _scoping: (untyped scope, untyped registry, ?bool all_queries) { () -> untyped } -> untyped
 
@@ -23494,11 +23494,11 @@ module ActiveRecord
 
     def _increment_attribute: (untyped attribute, ?::Integer value) -> untyped
 
-    def exec_queries: () { (?) -> untyped } -> untyped
+    def exec_queries: () ?{ (?) -> untyped } -> untyped
 
     def exec_main_query: (?async: bool) -> (untyped | ::Array[untyped])
 
-    def instantiate_records: (untyped rows) { (?) -> untyped } -> (::Array[untyped] | untyped)
+    def instantiate_records: (untyped rows) ?{ (?) -> untyped } -> (::Array[untyped] | untyped)
 
     def skip_query_cache_if_necessary: () { () -> untyped } -> untyped
 
@@ -24036,7 +24036,7 @@ module ActiveRecord
 
     def execute_grouped_calculation: (untyped operation, untyped column_name, untyped distinct) -> untyped
 
-    def type_for: (untyped field) { (?) -> untyped } -> untyped
+    def type_for: (untyped field) ?{ (?) -> untyped } -> untyped
 
     def lookup_cast_type_from_join_dependencies: (untyped name, ?untyped join_dependencies) -> (untyped | nil)
 
@@ -27041,9 +27041,9 @@ module ActiveRecord
 
       def <<: (untyped str) -> self
 
-      def add_bind: (untyped obj) { (?) -> untyped } -> self
+      def add_bind: (untyped obj) ?{ (?) -> untyped } -> self
 
-      def add_binds: (untyped binds, ?untyped? proc_for_binds) { (?) -> untyped } -> self
+      def add_binds: (untyped binds, ?untyped? proc_for_binds) ?{ (?) -> untyped } -> self
 
       def value: () -> ::Array[untyped]
     end
@@ -27068,7 +27068,7 @@ module ActiveRecord
 
     def initialize: (untyped query_builder, untyped bind_map, untyped model) -> void
 
-    def execute: (untyped params, untyped connection, ?async: bool) { (?) -> untyped } -> untyped
+    def execute: (untyped params, untyped connection, ?async: bool) ?{ (?) -> untyped } -> untyped
 
     def self.unsupported_value?: (untyped value) -> untyped
   end
@@ -28292,7 +28292,7 @@ module ActiveRecord
       # See the ActiveRecord::Transaction documentation for detailed behavior.
       def current_transaction: () -> untyped
 
-      def before_commit: (*untyped args) { (?) -> untyped } -> untyped
+      def before_commit: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # This callback is called after a record has been created, updated, or destroyed.
       #
@@ -28306,28 +28306,28 @@ module ActiveRecord
       #   after_commit :do_foo_bar, on: [:create, :update]
       #   after_commit :do_bar_baz, on: [:update, :destroy]
       #
-      def after_commit: (*untyped args) { (?) -> untyped } -> untyped
+      def after_commit: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # Shortcut for <tt>after_commit :hook, on: [ :create, :update ]</tt>.
-      def after_save_commit: (*untyped args) { (?) -> untyped } -> untyped
+      def after_save_commit: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # Shortcut for <tt>after_commit :hook, on: :create</tt>.
-      def after_create_commit: (*untyped args) { (?) -> untyped } -> untyped
+      def after_create_commit: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # Shortcut for <tt>after_commit :hook, on: :update</tt>.
-      def after_update_commit: (*untyped args) { (?) -> untyped } -> untyped
+      def after_update_commit: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # Shortcut for <tt>after_commit :hook, on: :destroy</tt>.
-      def after_destroy_commit: (*untyped args) { (?) -> untyped } -> untyped
+      def after_destroy_commit: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # This callback is called after a create, update, or destroy are rolled back.
       #
       # Please check the documentation of #after_commit for options.
-      def after_rollback: (*untyped args) { (?) -> untyped } -> untyped
+      def after_rollback: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # Similar to ActiveSupport::Callbacks::ClassMethods#set_callback, but with
       # support for options available on #after_commit and #after_rollback callbacks.
-      def set_callback: (untyped name, *untyped filter_list) { (?) -> untyped } -> untyped
+      def set_callback: (untyped name, *untyped filter_list) ?{ (?) -> untyped } -> untyped
 
       private
 
@@ -28460,7 +28460,7 @@ module ActiveRecord
     # raised unless you specify an +:override+ option. <tt>override: true</tt> will
     # cause your type to be used instead of the native type. <tt>override:
     # false</tt> will cause the native type to be used over yours if one exists.
-    def self.register: (untyped type_name, ?untyped? klass, **untyped options) { (?) -> untyped } -> untyped
+    def self.register: (untyped type_name, ?untyped? klass, **untyped options) ?{ (?) -> untyped } -> untyped
 
     def self.lookup: (*untyped args, ?adapter: untyped, **untyped kwargs) -> untyped
 
@@ -28599,7 +28599,7 @@ module ActiveRecord
 
       def lookup: (untyped lookup_key, *untyped args) -> untyped
 
-      def fetch: (untyped lookup_key, *untyped args) { (?) -> untyped } -> untyped
+      def fetch: (untyped lookup_key, *untyped args) ?{ (?) -> untyped } -> untyped
 
       def register_type: (untyped key, ?untyped? value) ?{ (?) -> untyped } -> untyped
 
@@ -28613,7 +28613,7 @@ module ActiveRecord
 
       private
 
-      def perform_fetch: (untyped type, *untyped args) { (?) -> untyped } -> untyped
+      def perform_fetch: (untyped type, *untyped args) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -29214,9 +29214,9 @@ module Arel
 
       def <<: (untyped str) -> self
 
-      def add_bind: (untyped bind) { (?) -> untyped } -> self
+      def add_bind: (untyped bind) ?{ (?) -> untyped } -> self
 
-      def add_binds: (untyped binds, ?untyped? proc_for_binds) { (?) -> untyped } -> self
+      def add_binds: (untyped binds, ?untyped? proc_for_binds) ?{ (?) -> untyped } -> self
 
       def value: () -> untyped
     end
@@ -29290,9 +29290,9 @@ module Arel
 
       def <<: (untyped str) -> self
 
-      def add_bind: (untyped bind) { (?) -> untyped } -> untyped
+      def add_bind: (untyped bind) ?{ (?) -> untyped } -> untyped
 
-      def add_binds: (untyped binds, ?untyped? proc_for_binds) { (?) -> untyped } -> untyped
+      def add_binds: (untyped binds, ?untyped? proc_for_binds) ?{ (?) -> untyped } -> untyped
 
       def value: () -> untyped
 
@@ -30228,7 +30228,7 @@ module Arel
       # Maybe we should just use `Table.engine`?  :'(
       def to_sql: (?untyped engine) -> untyped
 
-      def fetch_attribute: () { (?) -> untyped } -> nil
+      def fetch_attribute: () ?{ (?) -> untyped } -> nil
 
       def equality?: () -> false
     end
@@ -30379,7 +30379,7 @@ module Arel
 
       def encode_with: (untyped coder) -> untyped
 
-      def fetch_attribute: () { (?) -> untyped } -> nil
+      def fetch_attribute: () ?{ (?) -> untyped } -> nil
 
       def +: (untyped other) -> untyped
     end

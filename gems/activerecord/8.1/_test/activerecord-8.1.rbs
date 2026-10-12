@@ -22,4 +22,18 @@ module Test
       include ::ActiveRecord::Relation::Methods[Article, Integer]
     end
   end
+
+  class Tag < ApplicationRecord
+    extend ::ActiveRecord::Base::ClassMethods[Tag, ActiveRecord_Relation, Integer]
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::ActiveRecord::Relation::Methods[Tag, Integer]
+    end
+
+    def reindex: () -> void
+  end
+
+  class CreateTags < ActiveRecord::Migration::Current
+    def change: () -> void
+  end
 end
