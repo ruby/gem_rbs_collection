@@ -85,3 +85,12 @@ hwia.reject { |_key, value| value > 1 }.size
 hwia.transform_values { |value| value.to_s }.size
 hwia.transform_keys { |key| key.to_sym }.size
 hwia.transform_keys!(&:upcase).size
+
+# Test Hash#deep_merge
+{ a: { b: 1 } }.deep_merge({ a: { c: 2 } }).keys
+{ a: { b: 1 } }.deep_merge!({ a: { c: 2 } }).keys
+
+# Test Array#in_groups
+[1, 2, 3].in_groups(2).first&.size
+[1, 2, 3].in_groups(2, false).first&.sum
+[1, 2, 3].in_groups(2, 0).first&.sum

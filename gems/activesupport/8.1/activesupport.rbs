@@ -302,11 +302,11 @@ end
 
 class Hash[unchecked out K, unchecked out V]
   # Manual definition to make block optional
-  def deep_merge: (untyped other_hash) ?{ () -> untyped } -> untyped
+  def deep_merge: [A, B] (::Hash[A, B] other_hash) ?{ (untyped key, untyped this_val, untyped other_val) -> untyped } -> Hash[K | A, untyped]
                 | ...
 
   # Manual definition to make block optional
-  def deep_merge!: (untyped other_hash) ?{ () -> untyped } -> untyped
+  def deep_merge!: (::Hash[untyped, untyped] other_hash) ?{ (untyped key, untyped this_val, untyped other_val) -> untyped } -> self
                  | ...
 
   def stringify_keys: () -> Hash[String, V]
@@ -388,7 +388,9 @@ end
 
 class Array[unchecked out Elem]
   # Manual definition to make block optional
-  def in_groups: (untyped number, ?untyped? fill_with) ?{ (untyped) -> untyped } -> untyped
+  def in_groups: (Integer number, ?nil fill_with) ?{ (Array[Elem?]) -> void } -> Array[Array[Elem?]]
+               | (Integer number, false fill_with) ?{ (Array[Elem]) -> void } -> Array[Array[Elem]]
+               | [F] (Integer number, F fill_with) ?{ (Array[Elem | F]) -> void } -> Array[Array[Elem | F]]
 
   # Returns a string that represents the array in XML by invoking +to_xml+
   # on each element. Active Record collections delegate their representation
