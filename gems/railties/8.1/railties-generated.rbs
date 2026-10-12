@@ -1933,12 +1933,6 @@ module Rails
     class MiddlewareStackProxy
       def initialize: (?untyped operations, ?untyped delete_operations) -> void
 
-      def move_before: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
-
-      alias move move_before
-
-      def move_after: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
-
       def merge_into: (untyped other) -> untyped
 
       def +: (untyped other) -> MiddlewareStackProxy
@@ -2447,8 +2441,6 @@ module Rails
   class Engine
     class Configuration < ::Rails::Railtie::Configuration
       attr_reader root: untyped
-
-      attr_accessor middleware: untyped
 
       attr_accessor javascript_path: untyped
 
@@ -5830,13 +5822,6 @@ module Rails
       # The key of the hashes should be directories and the values should
       # be an array of extensions to match in each directory.
       def watchable_dirs: () -> untyped
-
-      # This allows you to modify the application's middlewares from Engines.
-      #
-      # All operations you run on the app_middleware will be replayed on the
-      # application once it is defined and the default_middlewares are
-      # created
-      def app_middleware: () -> untyped
 
       # This allows you to modify application's generators from Railties.
       #

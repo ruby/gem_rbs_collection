@@ -1,25 +1,39 @@
 module Rails
   module Configuration
     class MiddlewareStackProxy
-      def delete: (*untyped args) ?{ () -> untyped } -> untyped
+      def delete: (*untyped, **untyped) ?{ (?) -> untyped } -> void
 
-      def insert_before: (*untyped args) ?{ () -> untyped } -> untyped
+      def insert_before: (*untyped, **untyped) ?{ (?) -> untyped } -> void
 
       alias insert insert_before
 
-      def insert_after: (*untyped args) ?{ () -> untyped } -> untyped
+      def insert_after: (*untyped, **untyped) ?{ (?) -> untyped } -> void
 
-      def swap: (*untyped args) ?{ () -> untyped } -> untyped
+      def swap: (*untyped, **untyped) ?{ (?) -> untyped } -> void
 
-      def unshift: (*untyped args) ?{ () -> untyped } -> untyped
+      def unshift: (*untyped, **untyped) ?{ (?) -> untyped } -> void
 
-      def use: (*untyped args) ?{ () -> untyped } -> untyped
+      def use: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      def move_before: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      alias move move_before
+
+      def move_after: (*untyped, **untyped) ?{ (?) -> untyped } -> void
     end
   end
 end
 
 module Rails
   class Engine
+    class Configuration
+      # Holds the built ActionDispatch::MiddlewareStack once Engine#app is called,
+      # but typed as the proxy used while configuring the application
+      def middleware: () -> Rails::Configuration::MiddlewareStackProxy
+
+      def middleware=: (Rails::Configuration::MiddlewareStackProxy | ActionDispatch::MiddlewareStack) -> void
+    end
+
     # Defines the routes for this engine. If a block is given to
     # routes, it is appended to the engine.
     def routes: () ?{ () [self: ActionDispatch::Routing::Mapper] -> void } -> ActionDispatch::Routing::RouteSet
@@ -43,6 +57,10 @@ module Rails
   def self.application: () -> Rails::Application
 
   class Railtie
+    class Configuration
+      def app_middleware: () -> Rails::Configuration::MiddlewareStackProxy
+    end
+
     def configure: () { (Rails::Application) [self: Rails::Application] -> void } -> void
     def self.config: () -> ::Rails::Application::Configuration
   end

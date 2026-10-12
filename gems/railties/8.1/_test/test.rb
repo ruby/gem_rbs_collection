@@ -14,3 +14,7 @@ module SampleApp
   end
 end
 
+
+Rails.application.config.middleware.use(Rack::Head)
+Rails.application.config.middleware.insert_before(Rack::Head, Rack::ETag, "max-age=0")
+Rails.application.config.middleware.move_after(Rack::Head, Rack::ETag)
