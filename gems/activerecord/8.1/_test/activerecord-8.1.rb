@@ -165,3 +165,31 @@ module Test
     end
   end
 end
+
+module Test
+  user = User.new
+  user.persisted? && user.new_record? && user.destroyed? && user.previously_new_record?
+  user.delete.persisted?
+  user.reload.persisted?
+  user.increment!(:age).decrement!(:age).persisted?
+  user.toggle!(:active) && user.update_attribute(:name, "John") && user.update_column(:name, "John") && user.update_columns(name: "John")
+  user.attributes.each_key(&:upcase)
+  user.attribute_names.first&.upcase
+  user.has_attribute?(:name)
+  user.saved_changes? && user.has_changes_to_save? && user.saved_change_to_attribute?(:name)
+  user.saved_changes.each_key(&:upcase)
+  user.changes_to_save.each_key(&:upcase)
+  user.readonly? && user.frozen?
+  user.to_param&.upcase
+  user.cache_key.upcase
+  user.cache_version&.upcase
+  user.cache_key_with_version.upcase
+  user.signed_id(expires_in: 1.hour).upcase
+  User.table_name.upcase
+  User.column_names.first&.upcase
+  User.columns_hash["name"]&.name
+  User.ignored_columns.first&.upcase
+  User.abstract_class? && User.sti_name.upcase
+  User.readonly_attributes.first&.upcase
+  User.connection_pool.db_config
+end

@@ -930,3 +930,110 @@ module ActiveRecord
     end
   end
 end
+
+# Return types of commonly used methods
+module ActiveRecord
+  class Base
+    # Several modules included after Persistence override them
+    def reload: (?Hash[Symbol, untyped]? options) -> self
+
+    def increment!: (String | Symbol attribute, ?Integer by, ?touch: untyped) -> self
+  end
+
+  module Persistence
+    def persisted?: () -> bool
+
+    def new_record?: () -> bool
+
+    def destroyed?: () -> bool
+
+    def previously_new_record?: () -> bool
+
+    def delete: () -> self
+
+    def reload: (?Hash[Symbol, untyped]? options) -> self
+
+    def increment!: (String | Symbol attribute, ?Integer by, ?touch: untyped) -> self
+
+    def decrement!: (String | Symbol attribute, ?Integer by, ?touch: untyped) -> self
+
+    def toggle!: (String | Symbol attribute) -> bool
+
+    def update_attribute: (String | Symbol name, untyped value) -> bool
+
+    def update_column: (String | Symbol name, untyped value, ?touch: untyped) -> bool
+
+    def update_columns: (Hash[String | Symbol, untyped] attributes) -> bool
+  end
+
+  module AttributeMethods
+    def attributes: () -> Hash[String, untyped]
+
+    def attribute_names: () -> Array[String]
+
+    def has_attribute?: (String | Symbol attr_name) -> bool
+
+    module Dirty
+      def saved_changes?: () -> bool
+
+      def saved_changes: () -> ActiveSupport::HashWithIndifferentAccess[String, [untyped, untyped]]
+
+      def saved_change_to_attribute?: (String | Symbol attr_name, **untyped options) -> bool
+
+      def has_changes_to_save?: () -> bool
+
+      def changes_to_save: () -> ActiveSupport::HashWithIndifferentAccess[String, [untyped, untyped]]
+    end
+  end
+
+  module Core
+    def readonly?: () -> bool
+
+    def frozen?: () -> bool
+  end
+
+  module Integration
+    def to_param: () -> String?
+
+    def cache_key: () -> String
+
+    def cache_version: () -> String?
+
+    def cache_key_with_version: () -> String
+  end
+
+  module SignedId
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
+  end
+
+  module ModelSchema
+    module ClassMethods
+      # nil for abstract classes
+      def table_name: () -> String
+
+      def column_names: () -> Array[String]
+
+      def columns_hash: () -> Hash[String, ConnectionAdapters::Column]
+
+      def ignored_columns: () -> Array[String]
+    end
+  end
+
+  module Inheritance
+    module ClassMethods
+      def abstract_class?: () -> bool
+
+      def sti_name: () -> String
+    end
+  end
+
+  module ReadonlyAttributes
+    module ClassMethods
+      def readonly_attributes: () -> Array[String]
+    end
+  end
+
+  module ConnectionHandling
+    def connection_pool: () -> ConnectionAdapters::ConnectionPool
+  end
+end

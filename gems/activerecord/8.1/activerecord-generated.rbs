@@ -4881,40 +4881,7 @@ module ActiveRecord
     #   person.respond_to?(:nothing) # => false
     def respond_to?: (untyped name, ?bool include_private) -> (bool | untyped)
 
-    # Returns +true+ if the given attribute is in the attributes hash, otherwise +false+.
-    #
-    #   class Person < ActiveRecord::Base
-    #     alias_attribute :new_name, :name
-    #   end
-    #
-    #   person = Person.new
-    #   person.has_attribute?(:name)     # => true
-    #   person.has_attribute?(:new_name) # => true
-    #   person.has_attribute?('age')     # => true
-    #   person.has_attribute?(:nothing)  # => false
-    def has_attribute?: (untyped attr_name) -> untyped
-
     def _has_attribute?: (untyped attr_name) -> untyped
-
-    # Returns an array of names for the attributes available on this object.
-    #
-    #   class Person < ActiveRecord::Base
-    #   end
-    #
-    #   person = Person.new
-    #   person.attribute_names
-    #   # => ["id", "created_at", "updated_at", "name", "age"]
-    def attribute_names: () -> untyped
-
-    # Returns a hash of all the attributes with their names as keys and the values of the attributes as values.
-    #
-    #   class Person < ActiveRecord::Base
-    #   end
-    #
-    #   person = Person.create(name: 'Francesco', age: 22)
-    #   person.attributes
-    #   # => {"id"=>3, "created_at"=>Sun, 21 Oct 2012 04:53:04, "updated_at"=>Sun, 21 Oct 2012 04:53:04, "name"=>"Francesco", "age"=>22}
-    def attributes: () -> untyped
 
     # Returns an <tt>#inspect</tt>-like string for the value of the
     # attribute +attr_name+. String attributes are truncated up to 50
@@ -5202,24 +5169,6 @@ module ActiveRecord
       # <tt>reload</tt> the record and clears changed attributes.
       def reload: (*untyped) -> untyped
 
-      # Did this attribute change when we last saved?
-      #
-      # This method is useful in after callbacks to determine if an attribute
-      # was changed during the save that triggered the callbacks to run. It can
-      # be invoked as +saved_change_to_name?+ instead of
-      # <tt>saved_change_to_attribute?("name")</tt>.
-      #
-      # ==== Options
-      #
-      # [+from+]
-      #   When specified, this method will return false unless the original
-      #   value is equal to the given value.
-      #
-      # [+to+]
-      #   When specified, this method will return false unless the value will be
-      #   changed to the given value.
-      def saved_change_to_attribute?: (untyped attr_name, **untyped options) -> untyped
-
       # Returns the change to an attribute during the last save. If the
       # attribute was changed, the result will be an array containing the
       # original value and the saved value.
@@ -5237,12 +5186,6 @@ module ActiveRecord
       # invoked as +name_before_last_save+ instead of
       # <tt>attribute_before_last_save("name")</tt>.
       def attribute_before_last_save: (untyped attr_name) -> untyped
-
-      # Did the last call to +save+ have any changes to change?
-      def saved_changes?: () -> untyped
-
-      # Returns a hash containing all the changes that were just saved.
-      def saved_changes: () -> untyped
 
       # Will this attribute change the next time we save?
       #
@@ -5283,13 +5226,6 @@ module ActiveRecord
       # saved. It can be invoked as +name_in_database+ instead of
       # <tt>attribute_in_database("name")</tt>.
       def attribute_in_database: (untyped attr_name) -> untyped
-
-      # Will the next call to +save+ have any changes to persist?
-      def has_changes_to_save?: () -> untyped
-
-      # Returns a hash containing all the changes that will be persisted during
-      # the next save.
-      def changes_to_save: () -> untyped
 
       # Returns an array of the names of any attributes that will change when
       # the record is next saved.
@@ -15070,8 +15006,6 @@ module ActiveRecord
 
     def adapter_class: () -> untyped
 
-    def connection_pool: () -> untyped
-
     def retrieve_connection: () -> untyped
 
     # Returns +true+ if Active Record is connected.
@@ -15318,18 +15252,12 @@ module ActiveRecord
     # frozen.
     def freeze: () -> self
 
-    # Returns +true+ if the attributes hash has been frozen.
-    def frozen?: () -> untyped
-
     # Allows sort on objects
     def <=>: (untyped other_object) -> untyped
 
     def present?: () -> true
 
     def blank?: () -> false
-
-    # Returns +true+ if the record is read only.
-    def readonly?: () -> untyped
 
     attr_reader strict_loading_mode: untyped
 
@@ -19111,12 +19039,6 @@ module ActiveRecord
       # derive the table name.
       attr_accessor abstract_class: untyped
 
-      # Returns whether this class is an abstract class or not.
-      def abstract_class?: () -> untyped
-
-      # Returns the value to be stored in the inheritance column for STI.
-      def sti_name: () -> untyped
-
       # Returns the class for the provided +type_name+.
       #
       # It is used to find the class correspondent to the value stored in the inheritance column.
@@ -19305,53 +19227,6 @@ module ActiveRecord
     def collection_cache_versioning?: () -> bool
 
     extend ::ActiveSupport::Concern
-
-    # Returns a +String+, which Action Pack uses for constructing a URL to this
-    # object. The default implementation returns this record's id as a +String+,
-    # or +nil+ if this record's unsaved.
-    #
-    # For example, suppose that you have a User model, and that you have a
-    # <tt>resources :users</tt> route. Normally, +user_path+ will
-    # construct a path with the user object's 'id' in it:
-    #
-    #   user = User.find_by(name: 'Phusion')
-    #   user_path(user)  # => "/users/1"
-    #
-    # You can override +to_param+ in your model to make +user_path+ construct
-    # a path using the user's name instead of the user's id:
-    #
-    #   class User < ActiveRecord::Base
-    #     def to_param  # overridden
-    #       name
-    #     end
-    #   end
-    #
-    #   user = User.find_by(name: 'Phusion')
-    #   user_path(user)  # => "/users/Phusion"
-    def to_param: () -> (nil | untyped)
-
-    # Returns a stable cache key that can be used to identify this record.
-    #
-    #   Product.new.cache_key     # => "products/new"
-    #   Product.find(5).cache_key # => "products/5"
-    #
-    # If ActiveRecord::Base.cache_versioning is turned off, as it was in \Rails 5.1 and earlier,
-    # the cache key will also include a version.
-    #
-    #   Product.cache_versioning = false
-    #   Product.find(5).cache_key  # => "products/5-20071224150000" (updated_at available)
-    def cache_key: () -> (::String | untyped)
-
-    # Returns a cache version that can be used together with the cache key to form
-    # a recyclable caching scheme. By default, the #updated_at column is used for the
-    # cache_version, but this method can be overwritten to return something else.
-    #
-    # Note, this method will return nil if ActiveRecord::Base.cache_versioning is set to
-    # +false+.
-    def cache_version: () -> (nil | untyped)
-
-    # Returns a cache key along with the version.
-    def cache_key_with_version: () -> (::String | untyped)
 
     module ClassMethods
       def cache_timestamp_format: () -> untyped
@@ -21442,67 +21317,6 @@ module ActiveRecord
 
       def inheritance_column?: () -> bool
 
-      # Guesses the table name (in forced lower-case) based on the name of the class in the
-      # inheritance hierarchy descending directly from ActiveRecord::Base. So if the hierarchy
-      # looks like: Reply < Message < ActiveRecord::Base, then Message is used
-      # to guess the table name even when called on Reply. The rules used to do the guess
-      # are handled by the Inflector class in Active Support, which knows almost all common
-      # English inflections. You can add new inflections in config/initializers/inflections.rb.
-      #
-      # Nested classes are given table names prefixed by the singular form of
-      # the parent's table name. Enclosing modules are not considered.
-      #
-      # ==== Examples
-      #
-      #   class Invoice < ActiveRecord::Base
-      #   end
-      #
-      #   file                  class               table_name
-      #   invoice.rb            Invoice             invoices
-      #
-      #   class Invoice < ActiveRecord::Base
-      #     class Lineitem < ActiveRecord::Base
-      #     end
-      #   end
-      #
-      #   file                  class               table_name
-      #   invoice.rb            Invoice::Lineitem   invoice_lineitems
-      #
-      #   module Invoice
-      #     class Lineitem < ActiveRecord::Base
-      #     end
-      #   end
-      #
-      #   file                  class               table_name
-      #   invoice/lineitem.rb   Invoice::Lineitem   lineitems
-      #
-      # Additionally, the class-level +table_name_prefix+ is prepended and the
-      # +table_name_suffix+ is appended. So if you have "myapp_" as a prefix,
-      # the table name guess for an Invoice class becomes "myapp_invoices".
-      # Invoice::Lineitem becomes "myapp_invoice_lineitems".
-      #
-      # Active Model Naming's +model_name+ is the base name used to guess the
-      # table name. In case a custom Active Model Name is defined, it will be
-      # used for the table name as well:
-      #
-      #   class PostRecord < ActiveRecord::Base
-      #     class << self
-      #       def model_name
-      #         ActiveModel::Name.new(self, nil, "Post")
-      #       end
-      #     end
-      #   end
-      #
-      #   PostRecord.table_name
-      #   # => "posts"
-      #
-      # You can also set your own table name explicitly:
-      #
-      #   class Mouse < ActiveRecord::Base
-      #     self.table_name = "mice"
-      #   end
-      def table_name: () -> untyped
-
       # Sets the table name explicitly. Example:
       #
       #   class Project < ActiveRecord::Base
@@ -21528,10 +21342,6 @@ module ActiveRecord
       def protected_environments=: (untyped environments) -> untyped
 
       def real_inheritance_column=: (untyped value) -> untyped
-
-      # The list of columns names the model should ignore. Ignored columns won't have attribute
-      # accessors defined, and won't be referenced in SQL queries.
-      def ignored_columns: () -> untyped
 
       # The list of columns names the model should allow. Only columns are used to define
       # attribute accessors, and are referenced in SQL queries.
@@ -21605,8 +21415,6 @@ module ActiveRecord
 
       def attributes_builder: () -> untyped
 
-      def columns_hash: () -> untyped
-
       def columns: () -> untyped
 
       def _returning_columns_for_insert: (untyped connection) -> untyped
@@ -21631,9 +21439,6 @@ module ActiveRecord
       # Returns a hash where the keys are column names and the values are
       # default values when instantiating the Active Record object for this table.
       def column_defaults: () -> untyped
-
-      # Returns an array of column names as strings.
-      def column_names: () -> untyped
 
       def symbol_column_to_string: (untyped name_symbol) -> untyped
 
@@ -22348,22 +22153,6 @@ module ActiveRecord
       def build_default_constraint: () -> (nil | untyped)
     end
 
-    # Returns true if this object hasn't been saved yet -- that is, a record
-    # for the object doesn't exist in the database yet; otherwise, returns false.
-    def new_record?: () -> untyped
-
-    # Returns true if this object was just created -- that is, prior to the last
-    # update or delete, the object didn't exist in the database and new_record? would have
-    # returned true.
-    def previously_new_record?: () -> untyped
-
-    # Returns true if this object has been destroyed, otherwise returns false.
-    def destroyed?: () -> untyped
-
-    # Returns true if the record is persisted, i.e. it's not a new record and it was
-    # not destroyed, otherwise returns false.
-    def persisted?: () -> untyped
-
     #
     # :call-seq:
     #   save(**options)
@@ -22420,20 +22209,6 @@ module ActiveRecord
     # Unless an error is raised, returns true.
     def save!: (**untyped options) ?{ (?) -> untyped } -> untyped
 
-    # Deletes the record in the database and freezes this instance to
-    # reflect that no changes should be made (since they can't be
-    # persisted). Returns the frozen instance.
-    #
-    # The row is simply removed with an SQL +DELETE+ statement on the
-    # record's primary key, and no callbacks are executed.
-    #
-    # Note that this will also delete records marked as {#readonly?}[rdoc-ref:Core#readonly?].
-    #
-    # To enforce the object's +before_destroy+ and +after_destroy+
-    # callbacks or any <tt>:dependent</tt> association
-    # options, use #destroy.
-    def delete: () -> untyped
-
     # Deletes the record in the database and freezes this instance to reflect
     # that no changes should be made (since they can't be persisted).
     #
@@ -22487,20 +22262,6 @@ module ActiveRecord
     # This method raises an ActiveRecord::ActiveRecordError if the
     # attribute is marked as readonly.
     #
-    # Also see #update_column.
-    def update_attribute: (untyped name, untyped value) -> untyped
-
-    # Updates a single attribute and saves the record.
-    # This is especially useful for boolean flags on existing records. Also note that
-    #
-    # * Validation is skipped.
-    # * \Callbacks are invoked.
-    # * updated_at/updated_on column is updated if that column is available.
-    # * Updates all the attributes that are dirty in this object.
-    #
-    # This method raises an ActiveRecord::ActiveRecordError if the
-    # attribute is marked as readonly.
-    #
     # If any of the <tt>before_*</tt> callbacks throws +:abort+ the action is cancelled
     # and #update_attribute! raises ActiveRecord::RecordNotSaved. See
     # ActiveRecord::Callbacks for further details.
@@ -22515,40 +22276,15 @@ module ActiveRecord
     # of +save+, so an exception is raised if the record is invalid and saving will fail.
     def update!: (untyped attributes) -> untyped
 
-    # Equivalent to <code>update_columns(name => value)</code>.
-    def update_column: (untyped name, untyped value, ?touch: untyped?) -> untyped
-
-    def update_columns: (untyped attributes) -> untyped
-
     # Initializes +attribute+ to zero if +nil+ and adds the value passed as +by+ (default is 1).
     # The increment is performed directly on the underlying attribute, no setter is invoked.
     # Only makes sense for number-based attributes. Returns +self+.
     def increment: (untyped attribute, ?::Integer by) -> self
 
-    # Wrapper around #increment that writes the update to the database.
-    # Only +attribute+ is updated; the record itself is not saved.
-    # This means that any other modified attributes will still be dirty.
-    # Validations and callbacks are skipped. Supports the +touch+ option from
-    # +update_counters+, see that for more.
-    #
-    # This method raises an ActiveRecord::ActiveRecordError when called on new
-    # objects, or when at least one of the attributes is marked as readonly.
-    #
-    # Returns +self+.
-    def increment!: (untyped attribute, ?::Integer by, ?touch: untyped?) -> self
-
     # Initializes +attribute+ to zero if +nil+ and subtracts the value passed as +by+ (default is 1).
     # The decrement is performed directly on the underlying attribute, no setter is invoked.
     # Only makes sense for number-based attributes. Returns +self+.
     def decrement: (untyped attribute, ?::Integer by) -> untyped
-
-    # Wrapper around #decrement that writes the update to the database.
-    # Only +attribute+ is updated; the record itself is not saved.
-    # This means that any other modified attributes will still be dirty.
-    # Validations and callbacks are skipped. Supports the +touch+ option from
-    # +update_counters+, see that for more.
-    # Returns +self+.
-    def decrement!: (untyped attribute, ?::Integer by, ?touch: untyped?) -> untyped
 
     # Assigns to +attribute+ the boolean opposite of <tt>attribute?</tt>. So
     # if the predicate returns +true+ the attribute will become +false+. This
@@ -22563,62 +22299,6 @@ module ActiveRecord
     #   user.banned? # => true
     #
     def toggle: (untyped attribute) -> self
-
-    # Wrapper around #toggle that saves the record. This method differs from
-    # its non-bang version in the sense that it passes through the attribute setter.
-    # Saving is not subjected to validation checks. Returns +true+ if the
-    # record could be saved.
-    def toggle!: (untyped attribute) -> untyped
-
-    # Reloads the record from the database.
-    #
-    # This method finds the record by its primary key (which could be assigned
-    # manually) and modifies the receiver in-place:
-    #
-    #   account = Account.new
-    #   # => #<Account id: nil, email: nil>
-    #   account.id = 1
-    #   account.reload
-    #   # Account Load (1.2ms)  SELECT "accounts".* FROM "accounts" WHERE "accounts"."id" = $1 LIMIT 1  [["id", 1]]
-    #   # => #<Account id: 1, email: 'account@example.com'>
-    #
-    # Attributes are reloaded from the database, and caches busted, in
-    # particular the associations cache and the QueryCache.
-    #
-    # If the record no longer exists in the database ActiveRecord::RecordNotFound
-    # is raised. Otherwise, in addition to the in-place modification the method
-    # returns +self+ for convenience.
-    #
-    # The optional <tt>:lock</tt> flag option allows you to lock the reloaded record:
-    #
-    #   reload(lock: true) # reload with pessimistic locking
-    #
-    # Reloading is commonly used in test suites to test something is actually
-    # written to the database, or when some action modifies the corresponding
-    # row in the database but not the object in memory:
-    #
-    #   assert account.deposit!(25)
-    #   assert_equal 25, account.credit        # check it is updated in memory
-    #   assert_equal 25, account.reload.credit # check it is also persisted
-    #
-    # Another common use case is optimistic locking handling:
-    #
-    #   def with_optimistic_retry
-    #     begin
-    #       yield
-    #     rescue ActiveRecord::StaleObjectError
-    #       begin
-    #         # Reload lock_version in particular.
-    #         reload
-    #       rescue ActiveRecord::RecordNotFound
-    #         # If the record is gone there is nothing to do.
-    #       else
-    #         retry
-    #       end
-    #     end
-    #   end
-    #
-    def reload: (?untyped? options) -> self
 
     # Saves the record with the updated_at/on attributes set to the current time
     # or the time specified.
@@ -23040,9 +22720,6 @@ module ActiveRecord
       def attr_readonly: (*untyped attributes) -> untyped
 
       include ::ActiveRecord::ReadonlyAttributes::HasReadonlyAttributes
-
-      # Returns an array of all the attributes that have been specified as readonly.
-      def readonly_attributes: () -> untyped
 
       def readonly_attribute?: (untyped name) -> untyped
     end
@@ -27894,31 +27571,6 @@ module ActiveRecord
       # :nodoc:
       def combine_signed_id_purposes: (untyped purpose) -> untyped
     end
-
-    # Returns a signed id that's generated using a preconfigured +ActiveSupport::MessageVerifier+ instance.
-    #
-    # This signed id is tamper proof, so it's safe to send in an email or otherwise share with the outside world.
-    # However, as with any message signed with a +ActiveSupport::MessageVerifier+,
-    # {the signed id is not encrypted}[link:classes/ActiveSupport/MessageVerifier.html#class-ActiveSupport::MessageVerifier-label-Signing+is+not+encryption].
-    # It's just encoded and protected against tampering.
-    #
-    # This means that the ID can be decoded by anyone; however, if tampered with (so to point to a different ID),
-    # the cryptographic signature will no longer match, and the signed id will be considered invalid and return nil
-    # when passed to +find_signed+ (or raise with +find_signed!+).
-    #
-    # It can furthermore be set to expire (the default is not to expire), and scoped down with a specific purpose.
-    # If the expiration date has been exceeded before +find_signed+ is called, the id won't find the designated
-    # record. If a purpose is set, this too must match.
-    #
-    # If you accidentally let a signed id out in the wild that you wish to retract sooner than its expiration date
-    # (or maybe you forgot to set an expiration date while meaning to!), you can use the purpose to essentially
-    # version the signed_id, like so:
-    #
-    #   user.signed_id purpose: :v2
-    #
-    # And you then change your +find_signed+ calls to require this new purpose. Any old signed ids that were not
-    # created with the purpose will no longer find the record.
-    def signed_id: (?expires_in: untyped?, ?expires_at: untyped?, ?purpose: untyped?) -> untyped
   end
 end
 
