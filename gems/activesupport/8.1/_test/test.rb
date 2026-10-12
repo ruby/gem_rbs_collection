@@ -105,3 +105,12 @@ class TimeHelpersTest
     freeze_time { 42 }.succ
   end
 end
+
+# Test ActiveSupport::Rescuable
+class RescuableTest
+  include ActiveSupport::Rescuable
+
+  def test
+    rescue_with_handler(StandardError.new)&.message
+  end
+end

@@ -710,22 +710,22 @@ module ActiveSupport
       #     end
       #
       # Returns the exception if it was handled and +nil+ if it was not.
-      def rescue_with_handler: (untyped exception, ?visited_exceptions: untyped visited_exceptions, ?object: untyped object) -> untyped
+      def rescue_with_handler: (untyped exception, ?visited_exceptions: untyped visited_exceptions, ?object: untyped object) -> Exception?
 
-      def handler_for_rescue: (untyped exception, ?object: untyped object) -> untyped
+      def handler_for_rescue: (untyped exception, ?object: untyped object) -> (Proc | Method)?
 
       private
 
-      def find_rescue_handler: (untyped exception) -> untyped
+      def find_rescue_handler: (untyped exception) -> (Symbol | Proc)?
 
       def constantize_rescue_handler_class: (untyped class_or_name) -> untyped
     end
 
     # Delegates to the class method, but uses the instance as the subject for
     # rescue_from handlers (method calls, instance_exec blocks).
-    def rescue_with_handler: (untyped exception) -> untyped
+    def rescue_with_handler: (untyped exception) -> Exception?
 
-    def handler_for_rescue: (untyped exception) -> untyped
+    def handler_for_rescue: (untyped exception) -> (Proc | Method)?
   end
 end
 
