@@ -86,6 +86,40 @@ class Test
     end
   end
 
+class HelperView < ActionView::Base
+  def view_template_helpers
+    link_to("Home", "/").html_safe?
+    button_to("Delete", "/", method: :delete).html_safe?
+    content_tag(:div, "content").html_safe?
+    tag.div("content", class: "box").html_safe?
+    tag.br.html_safe?
+    tag("br").html_safe?
+    image_tag("logo.png").html_safe?
+    javascript_include_tag("application").html_safe?
+    safe_join(["a", "b"], ", ").html_safe?
+    raw("<b>bold</b>").html_safe?
+    sanitize("<b>bold</b>")&.html_safe?
+    truncate("long text", length: 4)&.html_safe?
+    simple_format("text").html_safe?
+    number_to_currency(1234)&.length
+    time_ago_in_words(Time.now).length
+    dom_id(Object.new).length
+    url_for("/").length
+    escape_javascript("alert()").length
+    content_for(:title)&.html_safe?
+    label_tag(:name).html_safe?
+    text_field_tag(:name).html_safe?
+    options_for_select([1, 2]).html_safe?
+    form_with(url: "/").html_safe?
+    form_with(url: "/") do |f|
+      f.label(:name).html_safe?
+      f.text_field(:name).html_safe?
+      f.checkbox(:admin).html_safe?
+      f.submit.html_safe?
+    end
+  end
+end
+
   class ViewTest < ActionView::TestCase
     def test_render
       render partial: "users/user"

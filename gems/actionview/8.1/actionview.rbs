@@ -105,7 +105,7 @@ module ActionView
       #   <% content_for :script, javascript_include_tag(:defaults) %>
       #
       # WARNING: <tt>content_for</tt> is ignored in caches. So you shouldn't use it for elements that will be fragment cached.
-      def content_for: (untyped name, ?untyped? content, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> void
+      def content_for: (untyped name, ?untyped? content, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer?
     end
   end
 end
@@ -170,7 +170,7 @@ module ActionView
       #   #      <strong>Ask me!</strong>
       #   #    </button>
       #
-      def button: (?untyped? value, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> untyped
+      def button: (?untyped? value, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Returns a label tag tailored for labelling an input field for a specified attribute (identified by +method+) on an object
       # assigned to the template (identified by +object+). The text of label will default to the attribute name unless a translation
@@ -220,7 +220,7 @@ module ActionView
       #     raw('Accept <a href="/terms">Terms</a>.')
       #   end
       #   # => <label for="post_terms">Accept <a href="/terms">Terms</a>.</label>
-      def label: (untyped method, ?untyped? text, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> untyped
+      def label: (untyped method, ?untyped? text, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Wraps ActionView::Helpers::FormOptionsHelper#select for form builders:
       #
@@ -230,7 +230,7 @@ module ActionView
       #   <% end %>
       #
       # Please refer to the documentation of the base helper for details.
-      def select: (untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> untyped
+      def select: (untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Wraps ActionView::Helpers::FormOptionsHelper#collection_check_boxes for form builders:
       #
@@ -411,7 +411,7 @@ module ActionView
       # In case if you don't want the helper to generate this hidden field you can specify
       # <tt>include_hidden: false</tt> option.
       #
-      def select: (untyped object, untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> untyped
+      def select: (untyped object, untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Returns radio button tags for the collection of existing return values
       # of +method+ for +object+'s class. The value returned from calling
@@ -594,7 +594,7 @@ module ActionView
       #
       #   label_tag 'name', nil, class: 'small_label'
       #   # => <label for="name" class="small_label">Name</label>
-      def label_tag: (?untyped? name, ?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> untyped
+      def label_tag: (?untyped? name, ?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Creates a button element that defines a <tt>submit</tt> button,
       # <tt>reset</tt> button or a generic button which can be used in
@@ -647,7 +647,7 @@ module ActionView
       #   button_tag "Checkout", data: { disable_with: "Please wait..." }
       #   # => <button data-disable-with="Please wait..." name="button" type="submit">Checkout</button>
       #
-      def button_tag: (?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> untyped
+      def button_tag: (?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
     end
   end
 end
@@ -1518,7 +1518,7 @@ module ActionView
       #     raw('Accept <a href="/terms">Terms</a>.')
       #   end
       #   # => <label for="post_terms">Accept <a href="/terms">Terms</a>.</label>
-      def label: (untyped object_name, untyped method, ?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> untyped
+      def label: (untyped object_name, untyped method, ?untyped? content_or_options, ?untyped? options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
     end
   end
 end
@@ -1576,7 +1576,7 @@ module ActionView
       #     Hello world!
       #   <% end -%>
       #    # => <div class="strong">Hello world!</div>
-      def content_tag: (untyped name, ?untyped? content_or_options_with_block, ?untyped? options, ?bool escape) ?{ () -> untyped } -> untyped
+      def content_tag: (untyped name, ?untyped? content_or_options_with_block, ?untyped? options, ?bool escape) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
     end
   end
 end
@@ -1719,7 +1719,7 @@ module ActionView
       #
       #   link_to "External link", "http://www.rubyonrails.org/", target: "_blank", rel: "nofollow"
       #   # => <a href="http://www.rubyonrails.org/" target="_blank" rel="nofollow">External link</a>
-      def link_to: (?untyped? name, ?untyped? options, ?untyped? html_options) ?{ () -> untyped } -> untyped
+      def link_to: (?untyped? name, ?untyped? options, ?untyped? html_options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Generates a form containing a single button that submits to the URL created
       # by the set of +options+. This is the safest method to ensure links that
@@ -1813,7 +1813,7 @@ module ActionView
       #   #       <input name="authenticity_token" type="hidden" value="10f2163b45388899ad4d5ae948988266befcb6c3d1b2451cf657a0c293d605a6"/>
       #   #     </form>"
       #   #
-      def button_to: (?untyped? name, ?untyped? options, ?untyped? html_options) ?{ () -> untyped } -> untyped
+      def button_to: (?untyped? name, ?untyped? options, ?untyped? html_options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
 
       # Creates a link tag of the given +name+ using a URL created by the set of
       # +options+ unless the current request URI is the same as the links, in
@@ -1937,7 +1937,7 @@ module ActionView
       #   # => <a href="mailto:me@domain.com">
       #          <strong>Email me:</strong> <span>me@domain.com</span>
       #        </a>
-      def mail_to: (untyped email_address, ?untyped? name, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> untyped
+      def mail_to: (untyped email_address, ?untyped? name, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
     end
   end
 end
@@ -2037,5 +2037,543 @@ module ActionView
     def locale: () -> untyped
 
     def locale=: (untyped value) -> untyped
+  end
+end
+
+# Return types of commonly used helpers. Most return an html_safe String.
+
+module ActionView
+  module Helpers
+    module AssetTagHelper
+      def image_tag: (untyped source, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def javascript_include_tag: (*untyped sources) -> ActiveSupport::SafeBuffer
+
+      def stylesheet_link_tag: (*untyped sources) -> ActiveSupport::SafeBuffer
+
+      def favicon_link_tag: (?::String source, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def picture_tag: (*untyped sources) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module AssetUrlHelper
+      def asset_path: (untyped source, ?::Hash[untyped, untyped] options) -> String
+
+      def asset_url: (untyped source, ?::Hash[untyped, untyped] options) -> String
+
+      def image_path: (untyped source, ?::Hash[untyped, untyped] options) -> String
+
+      def image_url: (untyped source, ?::Hash[untyped, untyped] options) -> String
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module CaptureHelper
+      def content_for?: (untyped name) -> bool
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module CspHelper
+      def csp_meta_tag: (**untyped options) -> ActiveSupport::SafeBuffer?
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module CsrfHelper
+      def csrf_meta_tags: () -> ActiveSupport::SafeBuffer?
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module DateHelper
+      def distance_of_time_in_words: (untyped from_time, ?::Integer to_time, ?::Hash[untyped, untyped] options) -> String
+
+      def time_ago_in_words: (untyped from_time, ?::Hash[untyped, untyped] options) -> String
+
+      def time_tag: (untyped date_or_time, *untyped args) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer
+
+      def date_select: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module DebugHelper
+      def debug: (untyped object) -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module FormOptionsHelper
+      def options_for_select: (untyped container, ?untyped? selected) -> ActiveSupport::SafeBuffer
+
+      def options_from_collection_for_select: (untyped collection, untyped value_method, untyped text_method, ?untyped? selected) -> ActiveSupport::SafeBuffer
+
+      def collection_select: (untyped object, untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module FormTagHelper
+      def form_tag: (?::Hash[untyped, untyped] url_for_options, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer
+
+      def submit_tag: (?::String value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def text_field_tag: (untyped name, ?untyped? value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def hidden_field_tag: (untyped name, ?untyped? value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def password_field_tag: (?::String name, ?untyped? value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def email_field_tag: (untyped name, ?untyped? value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def file_field_tag: (untyped name, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def textarea_tag: (untyped name, ?untyped? content, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def checkbox_tag: (untyped name, *untyped args) -> ActiveSupport::SafeBuffer
+
+      def radio_button_tag: (untyped name, untyped value, *untyped args) -> ActiveSupport::SafeBuffer
+
+      def select_tag: (untyped name, ?untyped? option_tags, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def field_id: (untyped object_name, untyped method_name, *untyped suffixes, ?index: untyped?, ?namespace: untyped?) -> String
+
+      def field_name: (untyped object_name, untyped method_name, *untyped method_names, ?multiple: bool, ?index: untyped?) -> String
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module JavaScriptHelper
+      def escape_javascript: (untyped javascript) -> String
+
+      def javascript_tag: (?untyped? content_or_options_with_block, ?::Hash[untyped, untyped] html_options) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module NumberHelper
+      def number_to_currency: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+
+      def number_to_percentage: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+
+      def number_with_delimiter: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+
+      def number_with_precision: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+
+      def number_to_human_size: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+
+      def number_to_human: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+
+      def number_to_phone: (untyped number, ?::Hash[untyped, untyped] options) -> String?
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module OutputSafetyHelper
+      def raw: (untyped stringish) -> ActiveSupport::SafeBuffer
+
+      def safe_join: (untyped array, ?untyped sep) -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module SanitizeHelper
+      def sanitize: (untyped html, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer?
+
+      def strip_tags: (untyped html) -> ActiveSupport::SafeBuffer?
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module TagHelper
+      def tag: () -> ActionView::Helpers::TagHelper::TagBuilder
+             | (untyped name, ?untyped options, ?bool open, ?bool escape) -> ActiveSupport::SafeBuffer
+
+      def token_list: (*untyped args) -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module TagHelper
+      class TagBuilder
+        def attributes: (untyped attributes) -> ActiveSupport::SafeBuffer
+
+        # Defined with define_element and its variants
+        def area: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def base: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def br: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def col: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def embed: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def hr: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def img: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def input: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def keygen: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def link: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def meta: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def source: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def track: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def wbr: (?escape: bool, **untyped options) -> ActiveSupport::SafeBuffer
+
+        def animate: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def animate_motion: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def animate_transform: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def circle: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def ellipse: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def line: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def path: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def polygon: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def polyline: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def rect: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def set: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def stop: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def use: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def view: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def a: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def abbr: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def address: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def article: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def aside: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def audio: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def b: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def bdi: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def bdo: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def blockquote: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def body: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def button: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def canvas: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def caption: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def cite: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def code: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def colgroup: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def data: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def datalist: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def dd: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def del: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def details: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def dfn: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def dialog: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def div: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def dl: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def dt: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def em: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def fieldset: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def figcaption: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def figure: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def footer: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def form: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def h1: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def h2: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def h3: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def h4: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def h5: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def h6: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def head: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def header: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def hgroup: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def html: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def i: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def iframe: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def ins: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def kbd: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def label: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def legend: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def li: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def main: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def map: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def mark: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def menu: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def meter: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def nav: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def noscript: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def object: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def ol: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def optgroup: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def option: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def output: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def p: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def picture: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def portal: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def pre: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def progress: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def q: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def rp: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def rt: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def ruby: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def s: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def samp: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def script: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def search: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def section: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def select: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def slot: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def small: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def span: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def strong: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def style: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def sub: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def summary: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def sup: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def table: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def tbody: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def td: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def template: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def textarea: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def tfoot: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def th: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def thead: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def time: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def title: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def tr: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def u: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def ul: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def var: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+
+        def video: (?untyped content, ?escape: bool, **untyped options) ?{ (ActionView::Helpers::TagHelper::TagBuilder) -> untyped } -> ActiveSupport::SafeBuffer
+      end
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module TextHelper
+      def truncate: (untyped text, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer?
+
+      def simple_format: (untyped text, ?::Hash[untyped, untyped] html_options, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def excerpt: (untyped text, untyped phrase, ?::Hash[untyped, untyped] options) -> String?
+
+      def highlight: (untyped text, untyped phrases, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> String
+
+      def cycle: (untyped first_value, *untyped values) -> String
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module UrlHelper
+      def url_for: (?untyped? options) -> String
+
+      def current_page?: (?untyped? options, ?check_parameters: bool, ?method: ::Symbol, **untyped options_as_kwargs) -> bool
+
+      def phone_to: (untyped phone_number, ?untyped? name, ?::Hash[untyped, untyped] html_options) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer
+
+      def sms_to: (untyped phone_number, ?untyped? name, ?::Hash[untyped, untyped] html_options) ?{ (?) -> untyped } -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+module ActionView
+  module RecordIdentifier
+    def dom_id: (untyped record_or_class, ?untyped? prefix) -> String
+
+    def dom_class: (untyped record_or_class, ?untyped? prefix) -> String
+  end
+end
+
+module ActionView
+  module RoutingUrlFor
+    def url_for: (?untyped? options) -> String
+  end
+end
+
+module ActionView
+  module Helpers
+    class FormBuilder
+      def submit: (?untyped? value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def hidden_field: (untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def checkbox: (untyped method, ?::Hash[untyped, untyped] options, ?::String checked_value, ?::String unchecked_value) -> ActiveSupport::SafeBuffer
+
+      def radio_button: (untyped method, untyped tag_value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def file_field: (untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def collection_select: (untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) -> ActiveSupport::SafeBuffer
+
+      def date_select: (untyped method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) -> ActiveSupport::SafeBuffer
+
+      def field_id: (untyped method, *untyped suffixes, ?namespace: untyped, ?index: untyped) -> String
+
+      def field_name: (untyped method, *untyped methods, ?multiple: bool, ?index: untyped) -> String
+    end
+  end
+end
+
+module ActionView
+  module Helpers
+    module FormHelper
+      def text_field: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def password_field: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def textarea: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def hidden_field: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def checkbox: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options, ?::String checked_value, ?::String unchecked_value) -> ActiveSupport::SafeBuffer
+
+      def radio_button: (untyped object_name, untyped method, untyped tag_value, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+
+      def file_field: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) -> ActiveSupport::SafeBuffer
+    end
   end
 end
