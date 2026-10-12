@@ -6,7 +6,7 @@ module ActionController
   class Base < Metal
     include _API_and_Base
 
-    # https://github.com/rails/rails/blob/v6.0.3.2/actionpack/lib/action_controller/base.rb#L205-L255
+    # https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_controller/base.rb#L231-L268
     include AbstractController::Rendering
     include AbstractController::Translation
     include AbstractController::AssetPaths
@@ -42,8 +42,12 @@ module ActionController
     extend RequestForgeryProtection::ClassMethods
     include ContentSecurityPolicy
     extend ContentSecurityPolicy::ClassMethods
-    include ForceSSL
-    extend ForceSSL::ClassMethods
+    include PermissionsPolicy
+    extend PermissionsPolicy::ClassMethods
+    include RateLimiting
+    extend RateLimiting::ClassMethods
+    include AllowBrowser
+    extend AllowBrowser::ClassMethods
     include Streaming
     include DataStreaming
     include HttpAuthentication::Basic::ControllerMethods
@@ -52,6 +56,8 @@ module ActionController
     include HttpAuthentication::Token::ControllerMethods
     include DefaultHeaders
     extend DefaultHeaders::ClassMethods
+    include Logging
+    extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
     include Rescue
@@ -66,7 +72,7 @@ module ActionController
   class API < Metal
     include _API_and_Base
 
-    # https://github.com/rails/rails/blob/v6.0.3.2/actionpack/lib/action_controller/api.rb#L112-L145
+    # https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_controller/api.rb#L116-L147
     include AbstractController::Rendering
     include UrlFor
     include Redirecting
@@ -76,11 +82,17 @@ module ActionController
     extend ConditionalGet::ClassMethods
     include BasicImplicitRender
     include StrongParameters
-    include ForceSSL
-    extend ForceSSL::ClassMethods
+    include RateLimiting
+    extend RateLimiting::ClassMethods
+    include Caching
+    include AbstractController::Caching
+    extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::Fragments::ClassMethods
     include DataStreaming
     include DefaultHeaders
     extend DefaultHeaders::ClassMethods
+    include Logging
+    extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
     include Rescue
