@@ -32,3 +32,12 @@ params.merge!(age: 1)
 
 Mime.fetch(:html)
 ActionDispatch::Callbacks.before(:prepare)
+
+# Attributes defined with attr_internal
+class BazController < ActionController::Base
+  def show
+    request.path
+    response.successful?
+    action_name.to_sym
+  end
+end

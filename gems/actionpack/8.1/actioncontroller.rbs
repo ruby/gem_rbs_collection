@@ -300,3 +300,33 @@ module ActionController
     def render_to_string: (*untyped args) ?{ () -> untyped } -> ::String
   end
 end
+
+# Attributes defined with attr_internal and delegated methods, which rbs
+# prototype doesn't see
+module AbstractController
+  class Base
+    attr_accessor response_body: untyped
+
+    attr_accessor action_name: String
+
+    attr_accessor formats: untyped
+  end
+
+  module Logger
+    def logger: () -> untyped
+
+    def logger=: (untyped logger) -> untyped
+  end
+end
+
+module ActionController
+  class Metal
+    attr_accessor request: ActionDispatch::Request
+
+    attr_reader response: ActionDispatch::Response
+  end
+
+  module Instrumentation
+    attr_accessor view_runtime: untyped
+  end
+end
