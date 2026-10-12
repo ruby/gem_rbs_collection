@@ -71,122 +71,7 @@ module Rails
 
   attr_accessor self.app_class: untyped
 
-  attr_accessor self.cache: untyped
-
   attr_accessor self.logger: untyped
-
-  # The Configuration instance used to configure the \Rails environment
-  def self.configuration: () -> untyped
-
-  def self.backtrace_cleaner: () -> untyped
-
-  # Returns a Pathname object of the current \Rails project,
-  # otherwise it returns +nil+ if there is no project:
-  #
-  #   Rails.root
-  #     # => #<Pathname:/Users/someuser/some/path/project>
-  def self.root: () -> untyped
-
-  # Returns the current \Rails environment.
-  #
-  #   Rails.env # => "development"
-  #   Rails.env.development? # => true
-  #   Rails.env.production? # => false
-  #   Rails.env.local? # => true              true for "development" and "test", false for anything else
-  def self.env: () -> untyped
-
-  # Sets the \Rails environment.
-  #
-  #   Rails.env = "staging" # => "staging"
-  def self.env=: (untyped environment) -> untyped
-
-  # Returns the ActiveSupport::ErrorReporter of the current \Rails project,
-  # otherwise it returns +nil+ if there is no project.
-  #
-  #   Rails.error.handle(IOError) do
-  #     # ...
-  #   end
-  #   Rails.error.report(error)
-  def self.error: () -> untyped
-
-  # Returns the ActiveSupport::EventReporter of the current \Rails project,
-  # otherwise it returns +nil+ if there is no project.
-  #
-  #   Rails.event.notify("my_event", { message: "Hello, world!" })
-  def self.event: () -> untyped
-
-  # Returns all \Rails groups for loading based on:
-  #
-  # * The \Rails environment;
-  # * The environment variable RAILS_GROUPS;
-  # * The optional envs given as argument and the hash with group dependencies;
-  #
-  #  Rails.groups assets: [:development, :test]
-  #  # => [:default, "development", :assets] for Rails.env == "development"
-  #  # => [:default, "production"]           for Rails.env == "production"
-  def self.groups: (*untyped groups) -> untyped
-
-  # Returns a Pathname object of the public folder of the current
-  # \Rails project, otherwise it returns +nil+ if there is no project:
-  #
-  #   Rails.public_path
-  #     # => #<Pathname:/Users/someuser/some/path/project/public>
-  def self.public_path: () -> untyped
-
-  # Provides access to the application autoloaders.
-  #
-  # The autoloader that manages `autoload_paths` is reachable as
-  #
-  #   Rails.autoloaders.main
-  #
-  # This autoloader manages the constants that are reloaded when reloading is
-  # enabled.
-  #
-  # The autoloader that manages `autoload_once_paths` is reachable as
-  #
-  #   Rails.autoloaders.once
-  #
-  # This autoloader manages constants that are autoloaded, but not reloaded.
-  #
-  # You can use these objects to customize their behavior, defining custom
-  # root namespaces, collapsing directories, configuring callbacks, etc.
-  #
-  #   # config/environments/development.rb
-  #   Rails.autoloaders.main.on_load("MyGateway") do
-  #     MyGateway.endpoint = "https://my-gateway.localhost"
-  #   end
-  #
-  #   # config/environments/production.rb
-  #   Rails.autoloaders.main.on_load("MyGateway") do
-  #     MyGateway.endpoint = "https://my-gateway.example.com"
-  #   end
-  #
-  # The +each+ iterator allows you to iterate over both loaders:
-  #
-  #   Rails.autoloaders.each do |loader|
-  #     loader.log!
-  #   end
-  #
-  # which may be handy if you want to run the same code for both of them.
-  #
-  # Indeed, there is a shortcut for that common use case:
-  #
-  #   Rails.autoloaders.log!
-  #
-  # which is handy to watch the activity of the autoloaders.
-  #
-  # Finally, +zeitwerk_enabled?+ allows you to check if autoloading is powered
-  # by Zeitwerk. This predicate returns a hard-coded true since Rails 7, but
-  # it is still in place for engines that support Rails 6.
-  #
-  # The autoloaders are available really early, you can access them in the
-  # application class body, environment configuration, initializers, etc.
-  #
-  # Please check the {Autoloading and Reloading
-  # Constants}[https://guides.rubyonrails.org/autoloading_and_reloading_constants.html]
-  # guide and the documentation of {Zeitwerk}[https://github.com/fxn/zeitwerk]
-  # itself for more details and usage patterns.
-  def self.autoloaders: () -> untyped
 end
 
 class RDoc::Generator::API < ::RDoc::Generator::SDoc
@@ -346,9 +231,6 @@ module Rails
 
     def initialize: (?::Hash[untyped, untyped] initial_variable_values) { (?) -> untyped } -> void
 
-    # Returns true if the application is initialized.
-    def initialized?: () -> untyped
-
     # Returns the dasherized application name.
     #
     #   MyApp::Application.new.name => "my-app"
@@ -360,71 +242,6 @@ module Rails
     def reload_routes!: () -> untyped
 
     def reload_routes_unless_loaded: () -> untyped
-
-    # Returns a key generator (ActiveSupport::CachingKeyGenerator) for a
-    # specified +secret_key_base+. The return value is memoized, so additional
-    # calls with the same +secret_key_base+ will return the same key generator
-    # instance.
-    def key_generator: (?untyped secret_key_base) -> untyped
-
-    # Returns a message verifier factory (ActiveSupport::MessageVerifiers). This
-    # factory can be used as a central point to configure and create message
-    # verifiers (ActiveSupport::MessageVerifier) for your application.
-    #
-    # By default, message verifiers created by this factory will generate
-    # messages using the default ActiveSupport::MessageVerifier options. You can
-    # override these options with a combination of
-    # ActiveSupport::MessageVerifiers#clear_rotations and
-    # ActiveSupport::MessageVerifiers#rotate. However, this must be done prior
-    # to building any message verifier instances. For example, in a
-    # +before_initialize+ block:
-    #
-    #   # Use `url_safe: true` when generating messages
-    #   config.before_initialize do |app|
-    #     app.message_verifiers.clear_rotations
-    #     app.message_verifiers.rotate(url_safe: true)
-    #   end
-    #
-    # Message verifiers created by this factory will always use a secret derived
-    # from #secret_key_base when generating messages. +clear_rotations+ will not
-    # affect this behavior. However, older +secret_key_base+ values can be
-    # rotated for verifying messages:
-    #
-    #   # Fall back to old `secret_key_base` when verifying messages
-    #   config.before_initialize do |app|
-    #     app.message_verifiers.rotate(secret_key_base: "old secret_key_base")
-    #   end
-    #
-    def message_verifiers: () -> untyped
-
-    # Returns a message verifier object.
-    #
-    # This verifier can be used to generate and verify signed messages in the application.
-    #
-    # It is recommended not to use the same verifier for different things, so you can get different
-    # verifiers passing the +verifier_name+ argument.
-    #
-    # For instance, +ActiveStorage::Blob.signed_id_verifier+ is implemented using this feature, which assures that
-    # the IDs strings haven't been tampered with and are safe to use in a finder.
-    #
-    # See the ActiveSupport::MessageVerifier documentation for more information.
-    #
-    # ==== Parameters
-    #
-    # * +verifier_name+ - the name of the message verifier.
-    #
-    # ==== Examples
-    #
-    #     message = Rails.application.message_verifier('my_purpose').generate('data to sign against tampering')
-    #     Rails.application.message_verifier('my_purpose').verify(message)
-    #     # => 'data to sign against tampering'
-    def message_verifier: (untyped verifier_name) -> untyped
-
-    # A managed collection of deprecators (ActiveSupport::Deprecation::Deprecators).
-    # The collection's configuration methods affect all deprecators in the
-    # collection. Additionally, the collection's +silence+ method silences all
-    # deprecators in the collection for the duration of a given block.
-    def deprecators: () -> untyped
 
     # Convenience for loading config/foo.yml for the current \Rails env.
     # Example:
@@ -532,43 +349,6 @@ module Rails
 
     attr_writer credentials: untyped
 
-    # The secret_key_base is used as the input secret to the application's key generator, which in turn
-    # is used to create all ActiveSupport::MessageVerifier and ActiveSupport::MessageEncryptor instances,
-    # including the ones that sign and encrypt cookies.
-    #
-    # We look for it first in <tt>ENV["SECRET_KEY_BASE"]</tt>, then in
-    # +credentials.secret_key_base+. For most applications, the correct place
-    # to store it is in the encrypted credentials file.
-    #
-    # In development and test, if the secret_key_base is still empty, it is
-    # randomly generated and stored in a temporary file in
-    # <tt>tmp/local_secret.txt</tt>.
-    #
-    # Generating a random secret_key_base and storing it in
-    # <tt>tmp/local_secret.txt</tt> can also be triggered by setting
-    # <tt>ENV["SECRET_KEY_BASE_DUMMY"]</tt>. This is useful when precompiling
-    # assets for production as part of a build step that otherwise does not
-    # need access to the production secrets.
-    #
-    # Dockerfile example: <tt>RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile</tt>.
-    def secret_key_base: () -> untyped
-
-    # Returns an ActiveSupport::EncryptedConfiguration instance for the
-    # credentials file specified by +config.credentials.content_path+.
-    #
-    # By default, +config.credentials.content_path+ will point to either
-    # <tt>config/credentials/#{environment}.yml.enc</tt> for the current
-    # environment (for example, +config/credentials/production.yml.enc+ for the
-    # +production+ environment), or +config/credentials.yml.enc+ if that file
-    # does not exist.
-    #
-    # The encryption key is taken from either <tt>ENV["RAILS_MASTER_KEY"]</tt>,
-    # or from the file specified by +config.credentials.key_path+. By default,
-    # +config.credentials.key_path+ will point to either
-    # <tt>config/credentials/#{environment}.key</tt> for the current
-    # environment, or +config/master.key+ if that file does not exist.
-    def credentials: () -> untyped
-
     # Returns an ActiveSupport::EncryptedConfiguration instance for an encrypted
     # file. By default, the encryption key is taken from either
     # <tt>ENV["RAILS_MASTER_KEY"]</tt>, or from the +config/master.key+ file.
@@ -599,9 +379,6 @@ module Rails
     def migration_railties: () -> untyped
 
     def load_generators: (?untyped app) -> untyped
-
-    # Eager loads the application code.
-    def eager_load!: () -> untyped
 
     alias build_middleware_stack app
 
@@ -6100,8 +5877,6 @@ module Rails
 end
 
 module Rails
-  # Returns the currently loaded version of \Rails as a string.
-  def self.version: () -> untyped
 end
 
 class Rails::WelcomeController < ::Rails::ApplicationController
