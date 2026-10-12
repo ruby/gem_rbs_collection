@@ -724,7 +724,7 @@ module ActiveModel
 
     def keys: () -> untyped
 
-    def fetch_value: (untyped name) { (?) -> untyped } -> untyped
+    def fetch_value: (untyped name) ?{ (?) -> untyped } -> untyped
 
     def write_from_database: (untyped name, untyped value) -> untyped
 
@@ -778,7 +778,7 @@ module ActiveModel
 
     def keys: () -> untyped
 
-    def fetch_value: (untyped name) { (?) -> untyped } -> untyped
+    def fetch_value: (untyped name) ?{ (?) -> untyped } -> untyped
 
     def attributes: () -> untyped
 
@@ -808,7 +808,7 @@ module ActiveModel
 
     def initialize_dup: (untyped _) -> untyped
 
-    def each_key: () { (?) -> untyped } -> untyped
+    def each_key: () ?{ (?) -> untyped } -> untyped
 
     def ==: (untyped other) -> untyped
 
@@ -874,13 +874,13 @@ module ActiveModel
     # Use #from_database or #from_user
     def initialize: (untyped name, untyped value_before_type_cast, untyped type, ?untyped? original_attribute, ?untyped? value) -> void
 
-    def value: () { (?) -> untyped } -> untyped
+    def value: () ?{ (?) -> untyped } -> untyped
 
     def original_value: () -> untyped
 
     def value_for_database: () -> untyped
 
-    def serializable?: () { (?) -> untyped } -> untyped
+    def serializable?: () ?{ (?) -> untyped } -> untyped
 
     def changed?: () -> untyped
 
@@ -2903,7 +2903,7 @@ module ActiveModel
 
       def serialize_cast_value: (untyped value) -> untyped
 
-      def serializable?: (untyped value) { (?) -> untyped } -> true
+      def serializable?: (untyped value) ?{ (?) -> untyped } -> true
 
       private
 
@@ -3582,7 +3582,7 @@ module ActiveModel
       # by the database.  For example a boolean type can return +true+ if the
       # value parameter is a Ruby boolean, but may return +false+ if the value
       # parameter is some other object.
-      def serializable?: (untyped value) { (?) -> untyped } -> true
+      def serializable?: (untyped value) ?{ (?) -> untyped } -> true
 
       # Returns the unique type name as a Symbol. Subclasses should override
       # this method.
@@ -3650,7 +3650,7 @@ module ActiveModel
 
       def force_equality?: (untyped _value) -> false
 
-      def map: (untyped value) { (?) -> untyped } -> untyped
+      def map: (untyped value) ?{ (?) -> untyped } -> untyped
 
       def ==: (untyped other) -> untyped
 
@@ -3880,7 +3880,7 @@ module ActiveModel
         #   person.name = '  bob  '
         #   person.valid? # => true
         #   person.name   # => "bob"
-        def before_validation: (*untyped args) { (?) -> untyped } -> untyped
+        def before_validation: (*untyped args) ?{ (?) -> untyped } -> untyped
 
         # Defines a callback that will get called right after validation.
         #
@@ -3907,7 +3907,7 @@ module ActiveModel
         #   person.name = 'bob'
         #   person.valid? # => true
         #   person.status # => true
-        def after_validation: (*untyped args) { (?) -> untyped } -> untyped
+        def after_validation: (*untyped args) ?{ (?) -> untyped } -> untyped
 
         private
 
@@ -4562,7 +4562,7 @@ module ActiveModel
       #       options[:my_custom_key] # => "my custom value"
       #     end
       #   end
-      def validates_with: (*untyped args) { (?) -> untyped } -> untyped
+      def validates_with: (*untyped args) ?{ (?) -> untyped } -> untyped
     end
 
     # Passes the record off to the class or classes specified and allows them
@@ -4601,7 +4601,7 @@ module ActiveModel
     # If you pass any additional configuration options, they will be passed
     # to the class and available as +options+, please refer to the
     # class version of this method for more information.
-    def validates_with: (*untyped args) { (?) -> untyped } -> untyped
+    def validates_with: (*untyped args) ?{ (?) -> untyped } -> untyped
   end
 end
 

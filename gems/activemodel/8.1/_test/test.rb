@@ -27,3 +27,24 @@ error.strict_match?(:name, :too_short, count: 5)
 Person.human_attribute_name("name")
 Person.human_attribute_name(:name)
 Person.human_attribute_name("name", default: "Name")
+
+class NameValidator < ActiveModel::Validator
+  def validate(record)
+  end
+end
+
+class Signup
+  include ActiveModel::Model
+  include ActiveModel::Validations::Callbacks
+
+  before_validation :strip_email
+  after_validation :log_errors
+  validates_with NameValidator
+
+  def strip_email
+  end
+
+  def log_errors
+    validates_with NameValidator
+  end
+end
