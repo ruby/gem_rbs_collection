@@ -1941,3 +1941,101 @@ module ActionView
     end
   end
 end
+
+# Attributes defined with attr_internal and delegated methods, which rbs
+# prototype doesn't see
+module ActionView
+  class Base
+    attr_accessor config: ActiveSupport::InheritableOptions
+
+    attr_accessor assigns: untyped
+
+    # Delegated to lookup_context
+    def formats: () -> Array[Symbol]
+
+    def formats=: (untyped values) -> untyped
+
+    def locale: () -> untyped
+
+    def locale=: (untyped value) -> untyped
+
+    def view_paths: () -> ActionView::PathSet
+
+    def view_paths=: (untyped paths) -> untyped
+  end
+
+  module Helpers
+    module ControllerHelper
+      # A controller, or a mailer in mailer views
+      attr_accessor controller: untyped
+
+      # nil in mailer views, but typed non-nil for controller views
+      attr_accessor request: ActionDispatch::Request
+
+      # Delegated to controller
+      def request_forgery_protection_token: () -> untyped
+
+      def params: () -> ActionController::Parameters
+
+      def session: () -> untyped
+
+      def cookies: () -> ActionDispatch::Cookies::CookieJar
+
+      def response: () -> ActionDispatch::Response
+
+      def headers: () -> untyped
+
+      def flash: () -> ActionDispatch::Flash::FlashHash
+
+      def action_name: () -> String
+
+      def controller_name: () -> String
+
+      def controller_path: () -> String
+    end
+
+    module FormHelper
+      attr_accessor default_form_builder: untyped
+    end
+  end
+
+  module Layouts
+    attr_writer action_has_layout: bool
+  end
+
+  module Rendering
+    attr_reader rendered_format: untyped
+  end
+
+  class LookupContext
+    # Defined by register_detail
+    module Accessors
+      def formats: () -> Array[Symbol]
+
+      def variants: () -> Array[untyped]
+
+      def variants=: (untyped value) -> untyped
+
+      def handlers: () -> Array[Symbol]
+
+      def handlers=: (untyped value) -> untyped
+    end
+  end
+
+  module ViewPaths
+    # Delegated to lookup_context
+    def template_exists?: (untyped name, ?untyped prefixes, ?bool partial, ?untyped keys, **untyped options) -> bool
+
+    def any_templates?: (untyped name, ?untyped prefixes, ?bool partial) -> bool
+
+    def view_paths: () -> ActionView::PathSet
+
+    def formats: () -> Array[Symbol]
+
+    def formats=: (untyped values) -> untyped
+
+    def locale: () -> untyped
+
+    def locale=: (untyped value) -> untyped
+  end
+end

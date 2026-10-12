@@ -72,6 +72,20 @@ class Test
     end
   end
 
+  class CustomView < ActionView::Base
+    def view_template_controller
+      request.path
+      params.permit(:name)
+      controller_name.to_sym
+      action_name.to_sym
+      flash.now
+      cookies[:name]
+      formats.first
+      view_paths.paths
+      config.key?(:asset_host)
+    end
+  end
+
   class ViewTest < ActionView::TestCase
     def test_render
       render partial: "users/user"
