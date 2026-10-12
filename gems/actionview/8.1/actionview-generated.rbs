@@ -210,7 +210,7 @@ module ActionView
 
     def initialize: (untyped lookup_context, untyped assigns, untyped controller) -> void
 
-    def _run: (untyped method, untyped template, untyped locals, untyped buffer, ?add_to_stack: bool, ?has_strict_locals: bool) { (?) -> untyped } -> untyped
+    def _run: (untyped method, untyped template, untyped locals, untyped buffer, ?add_to_stack: bool, ?has_strict_locals: bool) ?{ (?) -> untyped } -> untyped
 
     def compiled_method_container: () -> untyped
 
@@ -312,7 +312,7 @@ end
 module ActionView
   module CacheExpiry
     class ViewReloader
-      def initialize: (watcher: untyped) { (?) -> untyped } -> void
+      def initialize: (watcher: untyped) ?{ (?) -> untyped } -> void
 
       def updated?: () -> untyped
 
@@ -1025,7 +1025,7 @@ module ActionView
       #
       #   picture_tag(user.profile_picture)
       #   # => <picture><img src="/rails/active_storage/blobs/.../profile_picture.webp" /></picture>
-      def picture_tag: (*untyped sources) { (?) -> untyped } -> untyped
+      def picture_tag: (*untyped sources) ?{ (?) -> untyped } -> untyped
 
       # Returns an HTML video tag for the +sources+. If +sources+ is a string,
       # a single video tag will be returned. If +sources+ is an array, a video
@@ -1602,7 +1602,7 @@ module ActionView
         # Delegate to XML Builder, first wrapping the element in an XHTML
         # namespaced div element if the method and arguments indicate
         # that an xhtml_block? is desired.
-        def method_missing: (untyped method, *untyped arguments) { (?) -> untyped } -> untyped
+        def method_missing: (untyped method, *untyped arguments) ?{ (?) -> untyped } -> untyped
 
         # True if the method name matches one of the five elements defined
         # in the Atom spec as potentially containing XHTML content and
@@ -2682,7 +2682,7 @@ module ActionView
       #     <span>Right now</span>
       #   <% end %>
       #   # => <time datetime="2010-11-04T17:55:45+01:00"><span>Right now</span></time>
-      def time_tag: (untyped date_or_time, *untyped args) { (?) -> untyped } -> untyped
+      def time_tag: (untyped date_or_time, *untyped args) ?{ (?) -> untyped } -> untyped
 
       private
 
@@ -4321,7 +4321,7 @@ module ActionView
 
       # Returns select and option tags for the given object and method, using
       # #weekday_options_for_select to generate the list of option tags.
-      def weekday_select: (untyped object, untyped method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) { (?) -> untyped } -> untyped
+      def weekday_select: (untyped object, untyped method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (?) -> untyped } -> untyped
 
       # Accepts a container (hash, array, enumerable, your type) and returns a string of option tags. Given a container
       # where the elements respond to first and last (such as a two-element array), the "lasts" serve as option values and
@@ -5919,7 +5919,7 @@ module ActionView
 
         def respond_to_missing?: (*untyped args) -> true
 
-        def method_missing: (untyped called, *untyped args, ?escape: bool, **untyped options) { (?) -> untyped } -> untyped
+        def method_missing: (untyped called, *untyped args, ?escape: bool, **untyped options) ?{ (?) -> untyped } -> untyped
       end
 
       # Returns an HTML tag.
@@ -6225,7 +6225,7 @@ module ActionView
           alias check_box checkbox
         end
 
-        def render: () { (?) -> untyped } -> untyped
+        def render: () ?{ (?) -> untyped } -> untyped
 
         private
 
@@ -6250,7 +6250,7 @@ module ActionView
 
           def initialize: (untyped template_object, untyped object_name, untyped method_name, untyped object, untyped sanitized_attribute_name, untyped text, untyped value, untyped input_html_options) -> void
 
-          def label: (?::Hash[untyped, untyped] label_html_options) { (?) -> untyped } -> untyped
+          def label: (?::Hash[untyped, untyped] label_html_options) ?{ (?) -> untyped } -> untyped
         end
 
         def initialize: (untyped object_name, untyped method_name, untyped template_object, untyped collection, untyped value_method, untyped text_method, untyped options, untyped html_options) -> void
@@ -6293,7 +6293,7 @@ module ActionView
           def radio_button: (?::Hash[untyped, untyped] extra_html_options) -> untyped
         end
 
-        def render: () { (?) -> untyped } -> untyped
+        def render: () ?{ (?) -> untyped } -> untyped
 
         private
 
@@ -7361,7 +7361,7 @@ module ActionView
       #   # => <a href="sms:5155555785;">
       #          <strong>Text me:</strong>
       #        </a>
-      def sms_to: (untyped phone_number, ?untyped? name, ?::Hash[untyped, untyped] html_options) { (?) -> untyped } -> untyped
+      def sms_to: (untyped phone_number, ?untyped? name, ?::Hash[untyped, untyped] html_options) ?{ (?) -> untyped } -> untyped
 
       # Creates a TEL anchor link tag to the specified +phone_number+. When the
       # link is clicked, the default app to make phone calls is opened and
@@ -7398,7 +7398,7 @@ module ActionView
       #   # => <a href="tel:1234567890">
       #          <strong>Phone me:</strong>
       #        </a>
-      def phone_to: (untyped phone_number, ?untyped? name, ?::Hash[untyped, untyped] html_options) { (?) -> untyped } -> untyped
+      def phone_to: (untyped phone_number, ?untyped? name, ?::Hash[untyped, untyped] html_options) ?{ (?) -> untyped } -> untyped
 
       private
 
@@ -8354,7 +8354,7 @@ module ActionView
 
       def initialize: (untyped collection) -> void
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       def size: () -> untyped
 
@@ -8731,7 +8731,7 @@ module ActionView
     # so in such cases, we just wrap them in an array.
     def render_body: (untyped context, untyped options) -> untyped
 
-    def render_partial: (untyped context, untyped options) { (?) -> untyped } -> untyped
+    def render_partial: (untyped context, untyped options) ?{ (?) -> untyped } -> untyped
 
     def cache_hits: () -> untyped
 
@@ -8739,7 +8739,7 @@ module ActionView
 
     def render_template_to_object: (untyped context, untyped options) -> untyped
 
-    def render_partial_to_object: (untyped context, untyped options) { (?) -> untyped } -> untyped
+    def render_partial_to_object: (untyped context, untyped options) ?{ (?) -> untyped } -> untyped
 
     def collection_from_options: (untyped options) -> (untyped | nil)
 
@@ -9056,7 +9056,7 @@ module ActionView
     # This method is instrumented as "!render_template.action_view". Notice that
     # we use a bang in this instrumentation because you don't want to
     # consume this in production. This is only slow if it's being listened to.
-    def render: (untyped view, untyped locals, ?untyped? buffer, ?implicit_locals: untyped, ?add_to_stack: bool) { (?) -> untyped } -> untyped
+    def render: (untyped view, untyped locals, ?untyped? buffer, ?implicit_locals: untyped, ?add_to_stack: bool) ?{ (?) -> untyped } -> untyped
 
     def type: () -> untyped
 
@@ -9868,7 +9868,7 @@ module ActionView
         #     rendered.html.assert_css "h1", text: "Hello, world"
         #   end
         #
-        def register_parser: (untyped format, ?untyped? callable) { (?) -> untyped } -> untyped
+        def register_parser: (untyped format, ?untyped? callable) ?{ (?) -> untyped } -> untyped
 
         def tests: (untyped helper_class) -> untyped
 
@@ -9891,7 +9891,7 @@ module ActionView
 
       def config: () -> (untyped | nil)
 
-      def render: (?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] local_assigns) { (?) -> untyped } -> untyped
+      def render: (?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] local_assigns) ?{ (?) -> untyped } -> untyped
 
       def rendered_views: () -> untyped
 

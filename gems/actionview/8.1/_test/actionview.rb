@@ -30,6 +30,7 @@ class Test
         f.collection_check_boxes :country, [ "USA", "Canada", "Mexico" ], :to_s, :to_s
         f.collection_check_boxes :country, [ "USA", "Canada", "Mexico" ], :to_s, :to_s do |b|
           b.label { b.check_box }
+          b.label
         end
 
         f.submit
@@ -60,6 +61,20 @@ class Test
       button_tag "Click Me" do
         "Custom Button Content"
       end
+
+      form_with url: "/search"
+
+      picture_tag "picture.webp"
+      time_tag Date.new(2025, 1, 1)
+      weekday_select :user, :weekday
+      phone_to "1234567890"
+      sms_to "1234567890"
+    end
+  end
+
+  class ViewTest < ActionView::TestCase
+    def test_render
+      render partial: "users/user"
     end
   end
 end
