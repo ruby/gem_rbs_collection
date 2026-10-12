@@ -73,3 +73,15 @@ Time.now.in_time_zone(false).to_fs
 1.present?.to_s
 nil.blank?.to_s
 'foo'.presence&.upcase
+
+# Test HashWithIndifferentAccess methods returning typed values
+hwia = { 'a' => 1, 'b' => 2 }.with_indifferent_access
+hwia.fetch_values('a').first.to_s
+hwia.fetch_values('z') { |_key| 0 }.sum
+hwia.merge({ 'c' => 3 }).size
+hwia.merge({ 'c' => 3 }) { |_key, old, new| old }.size
+hwia.select { |_key, value| value > 1 }.size
+hwia.reject { |_key, value| value > 1 }.size
+hwia.transform_values { |value| value.to_s }.size
+hwia.transform_keys { |key| key.to_sym }.size
+hwia.transform_keys!(&:upcase).size

@@ -51,31 +51,40 @@ module ActiveSupport
 
   class HashWithIndifferentAccess[T, U] < Hash[T, U]
     # Manual definition to make block optional
-    def fetch_values: (*untyped indices) ?{ () -> untyped } -> untyped
+    def fetch_values: (*untyped indices) -> Array[U]
+                    | [X] (*untyped indices) { (untyped key) -> X } -> Array[U | X]
                     | ...
 
     # Manual definition to make block optional
-    def merge: (untyped hash) ?{ () -> untyped } -> untyped
+    def merge: [A, B] (*::Hash[A, B] hashes) -> HashWithIndifferentAccess[T | A, U | B]
+             | [A, B] (*::Hash[A, B] hashes) { (untyped key, untyped old_value, untyped new_value) -> untyped } -> HashWithIndifferentAccess[T | A, untyped]
              | ...
 
     # Manual definition to make block optional
-    def select: (*untyped args) ?{ () -> untyped } -> untyped
+    def select: () { (T key, U value) -> boolish } -> HashWithIndifferentAccess[T, U]
+              | () -> Enumerator[[T, U], HashWithIndifferentAccess[T, U]]
               | ...
 
     # Manual definition to make block optional
-    def reject: (*untyped args) ?{ () -> untyped } -> untyped
+    def reject: () { (T key, U value) -> boolish } -> HashWithIndifferentAccess[T, U]
+              | () -> Enumerator[[T, U], HashWithIndifferentAccess[T, U]]
               | ...
 
     # Manual definition to make block optional
-    def transform_values: (*untyped args) ?{ () -> untyped } -> untyped
+    def transform_values: [X] () { (U value) -> X } -> HashWithIndifferentAccess[T, X]
+                        | () -> Enumerator[U, HashWithIndifferentAccess[T, untyped]]
                         | ...
 
     # Manual definition to make block optional
-    def transform_keys: (*untyped args) ?{ () -> untyped } -> untyped
+    def transform_keys: () { (T key) -> untyped } -> HashWithIndifferentAccess[untyped, U]
+                      | (::Hash[untyped, untyped] mapping) ?{ (T key) -> untyped } -> HashWithIndifferentAccess[untyped, U]
+                      | () -> Enumerator[T, HashWithIndifferentAccess[untyped, U]]
                       | ...
 
     # Manual definition to make block optional
-    def transform_keys!: () ?{ (untyped) -> untyped } -> untyped
+    def transform_keys!: () { (T key) -> untyped } -> self
+                       | (::Hash[untyped, untyped] mapping) ?{ (T key) -> untyped } -> self
+                       | () -> Enumerator[T, self]
                        | ...
   end
 
