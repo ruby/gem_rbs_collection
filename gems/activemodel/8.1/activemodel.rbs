@@ -511,3 +511,75 @@ module ActiveModel
     def human_attribute_name: (String | Symbol attribute, ?::Hash[Symbol, untyped] options) -> String
   end
 end
+
+# Attributes defined with class_attribute and methods defined with
+# delegate, which rbs prototype doesn't see
+module ActiveModel
+  module AttributeMethods
+    def attribute_aliases: () -> Hash[String, String]
+
+    module ClassMethods
+      def attribute_aliases: () -> Hash[String, String]
+
+      def attribute_aliases=: (Hash[String, String]) -> Hash[String, String]
+    end
+  end
+
+  module Conversion
+    module ClassMethods
+      def param_delimiter: () -> String
+
+      def param_delimiter=: (String) -> String
+    end
+  end
+
+  class Error
+    def self.i18n_customize_full_message: () -> bool
+
+    def self.i18n_customize_full_message=: (bool) -> bool
+
+    def i18n_customize_full_message: () -> bool
+
+    def i18n_customize_full_message=: (bool) -> bool
+  end
+
+  class Errors
+    # Delegated to the array of errors
+    def clear: () -> void
+
+    def empty?: () -> bool
+
+    def size: () -> Integer
+
+    def uniq!: () -> Array[Error]?
+  end
+
+  class Name
+    # Delegated to the name string
+    def to_str: () -> String
+
+    def =~: (untyped other) -> Integer?
+
+    def match?: (Regexp | String pattern, ?Integer pos) -> bool
+  end
+
+  module Serializers
+    module JSON
+      def include_root_in_json: () -> bool
+    end
+  end
+
+  module Translation
+    attr_accessor self.raise_on_missing_translations: bool
+  end
+
+  module Validations
+    def _validators: () -> Hash[Symbol?, Array[Validator]]
+
+    module ClassMethods
+      def _validators: () -> Hash[Symbol?, Array[Validator]]
+
+      def _validators=: (Hash[Symbol?, Array[Validator]]) -> Hash[Symbol?, Array[Validator]]
+    end
+  end
+end

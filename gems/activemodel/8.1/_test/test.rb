@@ -48,3 +48,16 @@ class Signup
     validates_with NameValidator
   end
 end
+
+signup = Signup.new
+signup.errors.size + 1
+signup.errors.empty?
+signup.errors.uniq!
+signup.errors.clear
+ActiveModel::Name.new(Signup).to_str.upcase
+ActiveModel::Name.new(Signup).match?(/Sign/)
+Signup._validators.each_key(&:to_s)
+Signup.param_delimiter.length
+ActiveModel::Translation.raise_on_missing_translations = true
+ActiveModel::Error.i18n_customize_full_message = true
+Person.attribute_aliases.each_key(&:upcase)
