@@ -313,7 +313,7 @@ module AbstractController
       # `delete_matched`, for Regexp keys).
       def expire_fragment: (untyped key, ?untyped? options) -> (nil | untyped)
 
-      def instrument_fragment_cache: (untyped name, untyped key) { (?) -> untyped } -> untyped
+      def instrument_fragment_cache: (untyped name, untyped key) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -525,7 +525,7 @@ module AbstractController
     # sticks the result in `self.response_body`.
     #
     # Supported options depend on the underlying `render_to_body` implementation.
-    def render: (*untyped args) { (?) -> untyped } -> untyped
+    def render: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     # Performs the actual template rendering.
     def render_to_body: (?::Hash[untyped, untyped] options) -> nil
@@ -563,7 +563,7 @@ module AbstractController
     def _set_rendered_content_type: (untyped format) -> nil
 
     # Normalize args and options.
-    def _normalize_render: (*untyped args) { (?) -> untyped } -> untyped
+    def _normalize_render: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     def _protected_ivars: () -> untyped
   end
@@ -1166,7 +1166,7 @@ module ActionController
       def valid?: (untyped action) -> untyped
     end
 
-    def build: (untyped action, ?untyped? app) { (?) -> untyped } -> untyped
+    def build: (untyped action, ?untyped? app) ?{ (?) -> untyped } -> untyped
 
     private
 
@@ -3058,7 +3058,7 @@ module ActionController
 
       def initialize: (untyped mimes, ?untyped? variant) -> void
 
-      def any: (*untyped args) { (?) -> untyped } -> untyped
+      def any: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       alias all any
 
@@ -4661,7 +4661,7 @@ module ActionController
     #
     #     safe_params = params.permit(:name)
     #     safe_params.to_h # => {"name"=>"Senjougahara Hitagi"}
-    def to_h: () { (?) -> untyped } -> untyped
+    def to_h: () ?{ (?) -> untyped } -> untyped
 
     # Returns a safe `Hash` representation of the parameters with all unpermitted
     # keys removed.
@@ -5192,7 +5192,7 @@ module ActionController
     #
     # Returns the current `ActionController::Parameters` instance with `other_hash`
     # merged into current hash.
-    def merge!: (untyped other_hash) { (?) -> untyped } -> self
+    def merge!: (untyped other_hash) ?{ (?) -> untyped } -> self
 
     def deep_merge?: (untyped other_hash) -> untyped
 
@@ -6506,7 +6506,7 @@ module ActionDispatch
 
       DEFAULT: untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       # Returns a new Http::Headers instance containing the contents of
       # `headers_or_env` and the original instance.
@@ -6679,7 +6679,7 @@ module Mime
 
     def initialize: () -> void
 
-    def each: () { (?) -> untyped } -> untyped
+    def each: () ?{ (?) -> untyped } -> untyped
 
     def <<: (untyped type) -> untyped
 
@@ -6700,7 +6700,7 @@ module Mime
 
   def self.valid_symbols?: (untyped symbols) -> untyped
 
-  def self.fetch: (untyped type) { (?) -> untyped } -> untyped
+  def self.fetch: (untyped type) ?{ (?) -> untyped } -> untyped
 
   # Encapsulates the notion of a MIME type. Can be used at render time, for
   # example, with:
@@ -8657,7 +8657,7 @@ module ActionDispatch
 
       def last: () -> untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       def clear: () -> untyped
 
@@ -8890,9 +8890,9 @@ module ActionDispatch
   class Callbacks
     include ::ActiveSupport::Callbacks
 
-    def self.before: (*untyped args) { (?) -> untyped } -> untyped
+    def self.before: (*untyped args) ?{ (?) -> untyped } -> untyped
 
-    def self.after: (*untyped args) { (?) -> untyped } -> untyped
+    def self.after: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     def initialize: (untyped app) -> void
 
@@ -9157,7 +9157,7 @@ module ActionDispatch
 
       def commit!: () -> untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       # Returns the value of the cookie by `name`, or `nil` if no such cookie exists.
       def []: (untyped name) -> untyped
@@ -9287,7 +9287,7 @@ module ActionDispatch
   # This middleware is responsible for logging exceptions and showing a debugging
   # page in case the request is local.
   class DebugExceptions
-    def self.register_interceptor: (?untyped? object) { (?) -> untyped } -> untyped
+    def self.register_interceptor: (?untyped? object) ?{ (?) -> untyped } -> untyped
 
     def initialize: (untyped app, ?untyped? routes_app, ?::Symbol response_format, ?untyped interceptors) -> void
 
@@ -9604,7 +9604,7 @@ module ActionDispatch
 
       def clear: () -> untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       alias merge! update
 
@@ -10326,7 +10326,7 @@ module ActionDispatch
 
     def initialize: (*untyped args) ?{ (untyped) -> untyped } -> void
 
-    def each: () { (?) -> untyped } -> untyped
+    def each: () ?{ (?) -> untyped } -> untyped
 
     def size: () -> untyped
 
@@ -10334,17 +10334,17 @@ module ActionDispatch
 
     def []: (untyped i) -> untyped
 
-    def unshift: (untyped klass, *untyped args) { (?) -> untyped } -> untyped
+    def unshift: (untyped klass, *untyped args) ?{ (?) -> untyped } -> untyped
 
     def initialize_copy: (untyped other) -> untyped
 
-    def insert: (untyped index, untyped klass, *untyped args) { (?) -> untyped } -> untyped
+    def insert: (untyped index, untyped klass, *untyped args) ?{ (?) -> untyped } -> untyped
 
     alias insert_before insert
 
-    def insert_after: (untyped index, *untyped args) { (?) -> untyped } -> untyped
+    def insert_after: (untyped index, *untyped args) ?{ (?) -> untyped } -> untyped
 
-    def swap: (untyped target, *untyped args) { (?) -> untyped } -> untyped
+    def swap: (untyped target, *untyped args) ?{ (?) -> untyped } -> untyped
 
     # Deletes a middleware from the middleware stack.
     #
@@ -10364,9 +10364,9 @@ module ActionDispatch
 
     def move_after: (untyped target, untyped source) -> untyped
 
-    def use: (untyped klass, *untyped args) { (?) -> untyped } -> untyped
+    def use: (untyped klass, *untyped args) ?{ (?) -> untyped } -> untyped
 
-    def build: (?untyped? app) { (?) -> untyped } -> untyped
+    def build: (?untyped? app) ?{ (?) -> untyped } -> untyped
 
     private
 
@@ -10571,7 +10571,7 @@ module ActionDispatch
 
       def empty?: () -> untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       def id_was: () -> untyped
 
@@ -11326,7 +11326,7 @@ module ActionDispatch
         #
         # This will generate the `exciting_path` and `exciting_url` helpers which can be
         # used to navigate to this mounted app.
-        def mount: (?untyped? app, ?untyped? deprecated_options, ?as: untyped, ?via: untyped?, ?at: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) { (?) -> untyped } -> self
+        def mount: (?untyped? app, ?untyped? deprecated_options, ?as: untyped, ?via: untyped?, ?at: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> self
 
         def default_url_options=: (untyped options) -> untyped
 
@@ -11355,7 +11355,7 @@ module ActionDispatch
         # [match](rdoc-ref:Base#match)
         #
         #     options 'carrots', to: 'food#carrots'
-        def options: (*untyped path_or_actions, ?as: untyped, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) { (?) -> untyped } -> self
+        def options: (*untyped path_or_actions, ?as: untyped, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> self
 
         # Define a route that recognizes HTTP CONNECT (and GET) requests. More
         # specifically this recognizes HTTP/1 protocol upgrade requests and HTTP/2
@@ -11363,7 +11363,7 @@ module ActionDispatch
         # see [match](rdoc-ref:Base#match)
         #
         #     connect 'live', to: 'live#index'
-        def connect: (*untyped path_or_actions, ?as: untyped, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) { (?) -> untyped } -> self
+        def connect: (*untyped path_or_actions, ?as: untyped, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> self
       end
 
       # You may wish to organize groups of controllers under a namespace. Most
@@ -11793,7 +11793,7 @@ module ActionDispatch
         #
         #     match 'path', to: 'controller#action', via: :post
         #     match 'otherpath', on: :member, via: :get
-        def match: (*untyped path_or_actions, ?as: untyped, ?via: untyped?, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: untyped?, ?format: untyped?, ?path: untyped?, ?internal: untyped?, **untyped mapping) { (?) -> untyped } -> untyped
+        def match: (*untyped path_or_actions, ?as: untyped, ?via: untyped?, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: untyped?, ?format: untyped?, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> untyped
 
         # You can specify what Rails should route "/" to with the root method:
         #
@@ -11814,7 +11814,7 @@ module ActionDispatch
 
         def parent_resource: () -> untyped
 
-        def apply_common_behavior_for: (untyped method, untyped resources, ?shallow: untyped?, **untyped options) { (?) -> untyped } -> bool
+        def apply_common_behavior_for: (untyped method, untyped resources, ?shallow: untyped?, **untyped options) ?{ (?) -> untyped } -> bool
 
         def apply_action_options: (untyped method, untyped options) -> untyped
 
@@ -11948,7 +11948,7 @@ module ActionDispatch
         #
         # Any routing helpers can be used inside a concern. If using a callable, they're
         # accessible from the Mapper that's passed to `call`.
-        def concern: (untyped name, ?untyped? callable) { (?) -> untyped } -> untyped
+        def concern: (untyped name, ?untyped? callable) ?{ (?) -> untyped } -> untyped
 
         # Use the named concerns
         #
@@ -12383,7 +12383,7 @@ module ActionDispatch
 
         alias clear clear!
 
-        def each: () { (?) -> untyped } -> self
+        def each: () ?{ (?) -> untyped } -> self
 
         def names: () -> untyped
 
@@ -12988,7 +12988,7 @@ module ActionDispatch
     #     driven_by :selenium, using: :firefox
     #
     #     driven_by :selenium, using: :headless_firefox
-    def self.driven_by: (untyped driver, ?using: ::Symbol, ?screen_size: ::Array[untyped], ?options: ::Hash[untyped, untyped]) { (?) -> untyped } -> untyped
+    def self.driven_by: (untyped driver, ?using: ::Symbol, ?screen_size: ::Array[untyped], ?options: ::Hash[untyped, untyped]) ?{ (?) -> untyped } -> untyped
 
     # Configuration for the System Test application server.
     #
@@ -13038,7 +13038,7 @@ module ActionDispatch
     class Driver
       attr_reader name: untyped
 
-      def initialize: (untyped driver_type, **untyped options) { (?) -> untyped } -> void
+      def initialize: (untyped driver_type, **untyped options) ?{ (?) -> untyped } -> void
 
       def use: () -> untyped
 
@@ -13625,7 +13625,7 @@ module ActionDispatch
 
       attr_accessor root_session: untyped
 
-      def initialize: (*untyped args) { (?) -> untyped } -> void
+      def initialize: (*untyped args) ?{ (?) -> untyped } -> void
 
       def before_setup: () -> untyped
 
