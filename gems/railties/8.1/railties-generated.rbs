@@ -1,0 +1,6129 @@
+# The generated code is based on Ruby on Rails source code
+# You can find the license of Ruby on Rails from following.
+
+#Copyright (c) David Heinemeier Hansson
+#
+#Permission is hereby granted, free of charge, to any person obtaining
+#a copy of this software and associated documentation files (the
+#"Software"), to deal in the Software without restriction, including
+#without limitation the rights to use, copy, modify, merge, publish,
+#distribute, sublicense, and/or sell copies of the Software, and to
+#permit persons to whom the Software is furnished to do so, subject to
+#the following conditions:
+#
+#The above copyright notice and this permission notice shall be
+#included in all copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module Minitest
+  class BacktraceFilterWithFallback
+    def initialize: (untyped preferred, untyped fallback) -> void
+
+    def filter: (untyped backtrace) -> untyped
+  end
+
+  class SuppressedSummaryReporter < ::Minitest::SummaryReporter
+    # Disable extra failure output after a run if output is inline.
+    def aggregated_results: (*untyped) -> (untyped | nil)
+  end
+
+  class ProfileReporter < ::Minitest::Reporter
+    attr_accessor results: untyped
+
+    def initialize: (?untyped io, ?::Hash[untyped, untyped] options) -> void
+
+    def record: (untyped result) -> untyped
+
+    def passed?: () -> true
+
+    def report: () -> (nil | untyped)
+
+    def summary: () -> untyped
+
+    private
+
+    def print_summary: () -> untyped
+
+    def source_location: (untyped result) -> ("" | ::String)
+  end
+
+  def self.plugin_rails_options: (untyped opts, untyped options) -> untyped
+
+  # Owes great inspiration to test runner trailblazers like RSpec,
+  # minitest-reporters, maxitest, and others.
+  def self.plugin_rails_init: (untyped options) -> (nil | untyped)
+end
+
+# :include: ../README.rdoc
+module Rails
+  extend ::ActiveSupport::Autoload
+
+  extend ::ActiveSupport::Benchmarkable
+
+  attr_writer self.application: untyped
+
+  attr_accessor self.app_class: untyped
+
+  attr_accessor self.cache: untyped
+
+  attr_accessor self.logger: untyped
+
+  # The Configuration instance used to configure the \Rails environment
+  def self.configuration: () -> untyped
+
+  def self.backtrace_cleaner: () -> untyped
+
+  # Returns a Pathname object of the current \Rails project,
+  # otherwise it returns +nil+ if there is no project:
+  #
+  #   Rails.root
+  #     # => #<Pathname:/Users/someuser/some/path/project>
+  def self.root: () -> untyped
+
+  # Returns the current \Rails environment.
+  #
+  #   Rails.env # => "development"
+  #   Rails.env.development? # => true
+  #   Rails.env.production? # => false
+  #   Rails.env.local? # => true              true for "development" and "test", false for anything else
+  def self.env: () -> untyped
+
+  # Sets the \Rails environment.
+  #
+  #   Rails.env = "staging" # => "staging"
+  def self.env=: (untyped environment) -> untyped
+
+  # Returns the ActiveSupport::ErrorReporter of the current \Rails project,
+  # otherwise it returns +nil+ if there is no project.
+  #
+  #   Rails.error.handle(IOError) do
+  #     # ...
+  #   end
+  #   Rails.error.report(error)
+  def self.error: () -> untyped
+
+  # Returns the ActiveSupport::EventReporter of the current \Rails project,
+  # otherwise it returns +nil+ if there is no project.
+  #
+  #   Rails.event.notify("my_event", { message: "Hello, world!" })
+  def self.event: () -> untyped
+
+  # Returns all \Rails groups for loading based on:
+  #
+  # * The \Rails environment;
+  # * The environment variable RAILS_GROUPS;
+  # * The optional envs given as argument and the hash with group dependencies;
+  #
+  #  Rails.groups assets: [:development, :test]
+  #  # => [:default, "development", :assets] for Rails.env == "development"
+  #  # => [:default, "production"]           for Rails.env == "production"
+  def self.groups: (*untyped groups) -> untyped
+
+  # Returns a Pathname object of the public folder of the current
+  # \Rails project, otherwise it returns +nil+ if there is no project:
+  #
+  #   Rails.public_path
+  #     # => #<Pathname:/Users/someuser/some/path/project/public>
+  def self.public_path: () -> untyped
+
+  # Provides access to the application autoloaders.
+  #
+  # The autoloader that manages `autoload_paths` is reachable as
+  #
+  #   Rails.autoloaders.main
+  #
+  # This autoloader manages the constants that are reloaded when reloading is
+  # enabled.
+  #
+  # The autoloader that manages `autoload_once_paths` is reachable as
+  #
+  #   Rails.autoloaders.once
+  #
+  # This autoloader manages constants that are autoloaded, but not reloaded.
+  #
+  # You can use these objects to customize their behavior, defining custom
+  # root namespaces, collapsing directories, configuring callbacks, etc.
+  #
+  #   # config/environments/development.rb
+  #   Rails.autoloaders.main.on_load("MyGateway") do
+  #     MyGateway.endpoint = "https://my-gateway.localhost"
+  #   end
+  #
+  #   # config/environments/production.rb
+  #   Rails.autoloaders.main.on_load("MyGateway") do
+  #     MyGateway.endpoint = "https://my-gateway.example.com"
+  #   end
+  #
+  # The +each+ iterator allows you to iterate over both loaders:
+  #
+  #   Rails.autoloaders.each do |loader|
+  #     loader.log!
+  #   end
+  #
+  # which may be handy if you want to run the same code for both of them.
+  #
+  # Indeed, there is a shortcut for that common use case:
+  #
+  #   Rails.autoloaders.log!
+  #
+  # which is handy to watch the activity of the autoloaders.
+  #
+  # Finally, +zeitwerk_enabled?+ allows you to check if autoloading is powered
+  # by Zeitwerk. This predicate returns a hard-coded true since Rails 7, but
+  # it is still in place for engines that support Rails 6.
+  #
+  # The autoloaders are available really early, you can access them in the
+  # application class body, environment configuration, initializers, etc.
+  #
+  # Please check the {Autoloading and Reloading
+  # Constants}[https://guides.rubyonrails.org/autoloading_and_reloading_constants.html]
+  # guide and the documentation of {Zeitwerk}[https://github.com/fxn/zeitwerk]
+  # itself for more details and usage patterns.
+  def self.autoloaders: () -> untyped
+end
+
+class RDoc::Generator::API < ::RDoc::Generator::SDoc
+  def generate_class_tree_level: (untyped classes, ?::Hash[untyped, untyped] visited) -> untyped
+
+  private
+
+  def build_core_ext_subtree: (untyped classes, untyped visited) -> untyped
+
+  def core_extension?: (untyped klass) -> untyped
+
+  def active_storage?: (untyped klass) -> untyped
+end
+
+module Rails
+  module API
+    class Task < ::RDoc::Task
+      RDOC_FILES: { "activesupport" => { include: ::Array["README.rdoc" | "lib/active_support.rb" | "lib/active_support/**/*.rb"] }, "activerecord" => { include: ::Array["README.rdoc" | "lib/active_record.rb" | "lib/active_record/**/*.rb" | "lib/arel.rb"] }, "activemodel" => { include: ::Array["README.rdoc" | "lib/active_model.rb" | "lib/active_model/**/*.rb"] }, "actionpack" => { include: ::Array["README.rdoc" | "lib/abstract_controller/**/*.rb" | "lib/action_controller.rb" | "lib/action_controller/**/*.rb" | "lib/action_dispatch.rb" | "lib/action_dispatch/**/*.rb"] }, "actionview" => { include: ::Array["README.rdoc" | "lib/action_view.rb" | "lib/action_view/**/*.rb"], exclude: "lib/action_view/vendor/*" }, "actionmailer" => { include: ::Array["README.rdoc" | "lib/action_mailer.rb" | "lib/action_mailer/**/*.rb"] }, "activejob" => { include: ::Array["README.md" | "lib/active_job.rb" | "lib/active_job/**/*.rb"] }, "actioncable" => { include: ::Array["README.md" | "lib/action_cable.rb" | "lib/action_cable/**/*.rb"] }, "activestorage" => { include: ::Array["README.md" | "app/**/active_storage/**/*.rb" | "lib/active_storage.rb" | "lib/active_storage/**/*.rb"] }, "actionmailbox" => { include: ::Array["README.md" | "app/**/action_mailbox/**/*.rb" | "lib/action_mailbox.rb" | "lib/action_mailbox/**/*.rb"] }, "actiontext" => { include: ::Array["README.md" | "app/**/action_text/**/*.rb" | "lib/action_text.rb" | "lib/action_text/**/*.rb"] }, "railties" => { include: ::Array["README.rdoc" | "lib/**/*.rb"], exclude: ::Array["lib/rails/generators/**/templates/**/*.rb" | "lib/rails/test_unit/*" | "lib/rails/api/generator.rb"] } }
+
+      def initialize: (untyped name) -> void
+
+      # Hack, ignore the desc calls performed by the original initializer.
+      def desc: (untyped description) -> nil
+
+      def configure_sdoc: () -> untyped
+
+      def configure_rdoc_files: () -> untyped
+
+      # These variables are used by the sdoc template
+      def setup_horo_variables: () -> untyped
+
+      def api_main: () -> untyped
+    end
+
+    class RepoTask < ::Rails::API::Task
+      def configure_sdoc: () -> untyped
+
+      def component_root_dir: (untyped component) -> untyped
+
+      def api_dir: () -> "doc/rdoc"
+    end
+
+    class EdgeTask < ::Rails::API::RepoTask
+      def rails_version: () -> ::String
+
+      def badge_version: () -> "edge"
+
+      def canonical_url: () -> "https://edgeapi.rubyonrails.org"
+    end
+
+    class StableTask < ::Rails::API::RepoTask
+      def rails_version: () -> untyped
+
+      def badge_version: () -> ::String
+
+      def canonical_url: () -> ::String
+    end
+  end
+end
+
+module Rails
+  module AppLoader
+    extend ::Rails::AppLoader
+
+    RUBY: untyped
+
+    EXECUTABLES: ::Array["bin/rails" | "script/rails"]
+
+    BUNDLER_WARNING: "Beginning in Rails 4, Rails ships with a `rails` binstub at ./bin/rails that\nshould be used instead of the Bundler-generated `rails` binstub.\n\nIf you are seeing this message, your binstub at ./bin/rails was generated by\nBundler instead of Rails.\n\nYou might need to regenerate your `rails` binstub locally and add it to source\ncontrol:\n\n rails app:update:bin           # Bear in mind this generates other binstubs\n                                # too that you may or may not want (like yarn)\n\nIf you already have Rails binstubs in source control, you might be\ninadvertently overwriting them during deployment by using bundle install\nwith the --binstubs option.\n\nIf your application was created prior to Rails 4, here's how to upgrade:\n\n  bundle config --delete bin    # Turn off Bundler's stub generator\n  rails app:update:bin          # Use the new Rails executables\n  git add bin                   # Add bin/ to source control\n\nYou may need to remove bin/ from your .gitignore as well.\n\nWhen you install a gem whose executable you want to use in your app,\ngenerate it and add it to source control:\n\n  bundle binstubs some-gem-name\n  git add bin/new-executable\n\n"
+
+    def exec_app: () -> (nil | untyped)
+
+    def find_executable: () -> untyped
+  end
+end
+
+class Rails::ApplicationController < ::ActionController::Base
+  private
+
+  def require_local!: () -> (untyped | nil)
+
+  def local_request?: () -> untyped
+
+  def disable_content_security_policy_nonce!: () -> untyped
+end
+
+module Rails
+  # An Engine with the responsibility of coordinating the whole boot process.
+  #
+  # == Initialization
+  #
+  # Rails::Application is responsible for executing all railties and engines
+  # initializers. It also executes some bootstrap initializers (check
+  # Rails::Application::Bootstrap) and finishing initializers, after all the others
+  # are executed (check Rails::Application::Finisher).
+  #
+  # == \Configuration
+  #
+  # Besides providing the same configuration as Rails::Engine and Rails::Railtie,
+  # the application object has several specific configurations, for example
+  # +enable_reloading+, +consider_all_requests_local+, +filter_parameters+,
+  # +logger+, and so forth.
+  #
+  # Check Rails::Application::Configuration to see them all.
+  #
+  # == Routes
+  #
+  # The application object is also responsible for holding the routes and reloading routes
+  # whenever the files change in development.
+  #
+  # == Middlewares
+  #
+  # The Application is also responsible for building the middleware stack.
+  #
+  # == Booting process
+  #
+  # The application is also responsible for setting up and executing the booting
+  # process. From the moment you require <tt>config/application.rb</tt> in your app,
+  # the booting process goes like this:
+  #
+  # 1.  <tt>require "config/boot.rb"</tt> to set up load paths.
+  # 2.  +require+ railties and engines.
+  # 3.  Define +Rails.application+ as <tt>class MyApp::Application < Rails::Application</tt>.
+  # 4.  Run +config.before_configuration+ callbacks.
+  # 5.  Load <tt>config/environments/ENV.rb</tt>.
+  # 6.  Run +config.before_initialize+ callbacks.
+  # 7.  Run <tt>Railtie#initializer</tt> defined by railties, engines, and application.
+  #     One by one, each engine sets up its load paths and routes, and runs its <tt>config/initializers/*</tt> files.
+  # 8.  Custom <tt>Railtie#initializers</tt> added by railties, engines, and applications are executed.
+  # 9.  Build the middleware stack and run +to_prepare+ callbacks.
+  # 10. Run +config.before_eager_load+ and +eager_load!+ if +eager_load+ is +true+.
+  # 11. Run +config.after_initialize+ callbacks.
+  class Application < ::Rails::Engine
+    def self.inherited: (untyped base) -> untyped
+
+    def self.instance: () -> untyped
+
+    def self.create: (?::Hash[untyped, untyped] initial_variable_values) { (?) -> untyped } -> untyped
+
+    def self.find_root: (untyped from) -> untyped
+
+    attr_accessor assets: untyped
+
+    attr_accessor sandbox: untyped
+
+    alias sandbox? sandbox
+
+    attr_reader reloaders: untyped
+
+    attr_reader reloader: untyped
+
+    attr_reader executor: untyped
+
+    attr_reader autoloaders: untyped
+
+    INITIAL_VARIABLES: ::Array[:config | :railties | :routes_reloader | :reloaders | :routes | :helpers | :app_env_config]
+
+    def initialize: (?::Hash[untyped, untyped] initial_variable_values) { (?) -> untyped } -> void
+
+    # Returns true if the application is initialized.
+    def initialized?: () -> untyped
+
+    # Returns the dasherized application name.
+    #
+    #   MyApp::Application.new.name => "my-app"
+    def name: () -> untyped
+
+    def run_load_hooks!: () -> self
+
+    # Reload application routes regardless if they changed or not.
+    def reload_routes!: () -> untyped
+
+    def reload_routes_unless_loaded: () -> untyped
+
+    # Returns a key generator (ActiveSupport::CachingKeyGenerator) for a
+    # specified +secret_key_base+. The return value is memoized, so additional
+    # calls with the same +secret_key_base+ will return the same key generator
+    # instance.
+    def key_generator: (?untyped secret_key_base) -> untyped
+
+    # Returns a message verifier factory (ActiveSupport::MessageVerifiers). This
+    # factory can be used as a central point to configure and create message
+    # verifiers (ActiveSupport::MessageVerifier) for your application.
+    #
+    # By default, message verifiers created by this factory will generate
+    # messages using the default ActiveSupport::MessageVerifier options. You can
+    # override these options with a combination of
+    # ActiveSupport::MessageVerifiers#clear_rotations and
+    # ActiveSupport::MessageVerifiers#rotate. However, this must be done prior
+    # to building any message verifier instances. For example, in a
+    # +before_initialize+ block:
+    #
+    #   # Use `url_safe: true` when generating messages
+    #   config.before_initialize do |app|
+    #     app.message_verifiers.clear_rotations
+    #     app.message_verifiers.rotate(url_safe: true)
+    #   end
+    #
+    # Message verifiers created by this factory will always use a secret derived
+    # from #secret_key_base when generating messages. +clear_rotations+ will not
+    # affect this behavior. However, older +secret_key_base+ values can be
+    # rotated for verifying messages:
+    #
+    #   # Fall back to old `secret_key_base` when verifying messages
+    #   config.before_initialize do |app|
+    #     app.message_verifiers.rotate(secret_key_base: "old secret_key_base")
+    #   end
+    #
+    def message_verifiers: () -> untyped
+
+    # Returns a message verifier object.
+    #
+    # This verifier can be used to generate and verify signed messages in the application.
+    #
+    # It is recommended not to use the same verifier for different things, so you can get different
+    # verifiers passing the +verifier_name+ argument.
+    #
+    # For instance, +ActiveStorage::Blob.signed_id_verifier+ is implemented using this feature, which assures that
+    # the IDs strings haven't been tampered with and are safe to use in a finder.
+    #
+    # See the ActiveSupport::MessageVerifier documentation for more information.
+    #
+    # ==== Parameters
+    #
+    # * +verifier_name+ - the name of the message verifier.
+    #
+    # ==== Examples
+    #
+    #     message = Rails.application.message_verifier('my_purpose').generate('data to sign against tampering')
+    #     Rails.application.message_verifier('my_purpose').verify(message)
+    #     # => 'data to sign against tampering'
+    def message_verifier: (untyped verifier_name) -> untyped
+
+    # A managed collection of deprecators (ActiveSupport::Deprecation::Deprecators).
+    # The collection's configuration methods affect all deprecators in the
+    # collection. Additionally, the collection's +silence+ method silences all
+    # deprecators in the collection for the duration of a given block.
+    def deprecators: () -> untyped
+
+    # Convenience for loading config/foo.yml for the current \Rails env.
+    # Example:
+    #
+    #     # config/exception_notification.yml:
+    #     production:
+    #       url: http://127.0.0.1:8080
+    #       namespace: my_app_production
+    #
+    #     development:
+    #       url: http://localhost:3001
+    #       namespace: my_app_development
+    #
+    # <code></code>
+    #
+    #     # config/environments/production.rb
+    #     Rails.application.configure do
+    #       config.middleware.use ExceptionNotifier, config_for(:exception_notification)
+    #     end
+    #
+    # You can also store configurations in a shared section which will be merged
+    # with the environment configuration
+    #
+    #     # config/example.yml
+    #     shared:
+    #       foo:
+    #         bar:
+    #           baz: 1
+    #
+    #     development:
+    #       foo:
+    #         bar:
+    #           qux: 2
+    #
+    # <code></code>
+    #
+    #     # development environment
+    #     Rails.application.config_for(:example)[:foo][:bar]
+    #     # => { baz: 1, qux: 2 }
+    def config_for: (untyped name, ?env: untyped) -> untyped
+
+    # Stores some of the \Rails initial environment parameters which
+    # will be used by middlewares and engines to configure themselves.
+    def env_config: () -> untyped
+
+    # If you try to define a set of Rake tasks on the instance, these will get
+    # passed up to the Rake tasks defined on the application's class.
+    def rake_tasks: () { (?) -> untyped } -> untyped
+
+    # Sends the initializers to the +initializer+ method defined in the
+    # Rails::Initializable module. Each Rails::Application class has its own
+    # set of initializers, as defined by the Initializable module.
+    def initializer: (untyped name, ?::Hash[untyped, untyped] opts) { (?) -> untyped } -> untyped
+
+    # Sends any runner called in the instance of a new application up
+    # to the +runner+ method defined in Rails::Railtie.
+    def runner: () { (?) -> untyped } -> untyped
+
+    # Sends any console called in the instance of a new application up
+    # to the +console+ method defined in Rails::Railtie.
+    def console: () { (?) -> untyped } -> untyped
+
+    # Sends any generators called in the instance of a new application up
+    # to the +generators+ method defined in Rails::Railtie.
+    def generators: () { (?) -> untyped } -> untyped
+
+    # Sends any server called in the instance of a new application up
+    # to the +server+ method defined in Rails::Railtie.
+    def server: () { (?) -> untyped } -> untyped
+
+    # Sends the +isolate_namespace+ method up to the class method.
+    def isolate_namespace: (untyped mod) -> untyped
+
+    # This method is called just after an application inherits from Rails::Application,
+    # allowing the developer to load classes in lib and use them during application
+    # configuration.
+    #
+    #   class MyApplication < Rails::Application
+    #     require "my_backend" # in lib/my_backend
+    #     config.i18n.backend = MyBackend
+    #   end
+    #
+    # Notice this method takes into consideration the default root path. So if you
+    # are changing config.root inside your application definition or having a custom
+    # Rails application, you will need to add lib to $LOAD_PATH on your own in case
+    # you need to load files in lib/ during the application configuration as well.
+    def self.add_lib_to_load_path!: (untyped root) -> untyped
+
+    def require_environment!: () -> untyped
+
+    def routes_reloader: () -> untyped
+
+    # Returns an array of file paths appended with a hash of
+    # directories-extensions suitable for ActiveSupport::FileUpdateChecker
+    # API.
+    def watchable_args: () -> ::Array[untyped]
+
+    # Initialize the application passing the given group. By default, the
+    # group is :default
+    def initialize!: (?::Symbol group) -> self
+
+    def initializers: () -> untyped
+
+    attr_writer config: untyped
+
+    attr_writer credentials: untyped
+
+    # The secret_key_base is used as the input secret to the application's key generator, which in turn
+    # is used to create all ActiveSupport::MessageVerifier and ActiveSupport::MessageEncryptor instances,
+    # including the ones that sign and encrypt cookies.
+    #
+    # We look for it first in <tt>ENV["SECRET_KEY_BASE"]</tt>, then in
+    # +credentials.secret_key_base+. For most applications, the correct place
+    # to store it is in the encrypted credentials file.
+    #
+    # In development and test, if the secret_key_base is still empty, it is
+    # randomly generated and stored in a temporary file in
+    # <tt>tmp/local_secret.txt</tt>.
+    #
+    # Generating a random secret_key_base and storing it in
+    # <tt>tmp/local_secret.txt</tt> can also be triggered by setting
+    # <tt>ENV["SECRET_KEY_BASE_DUMMY"]</tt>. This is useful when precompiling
+    # assets for production as part of a build step that otherwise does not
+    # need access to the production secrets.
+    #
+    # Dockerfile example: <tt>RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile</tt>.
+    def secret_key_base: () -> untyped
+
+    # Returns an ActiveSupport::EncryptedConfiguration instance for the
+    # credentials file specified by +config.credentials.content_path+.
+    #
+    # By default, +config.credentials.content_path+ will point to either
+    # <tt>config/credentials/#{environment}.yml.enc</tt> for the current
+    # environment (for example, +config/credentials/production.yml.enc+ for the
+    # +production+ environment), or +config/credentials.yml.enc+ if that file
+    # does not exist.
+    #
+    # The encryption key is taken from either <tt>ENV["RAILS_MASTER_KEY"]</tt>,
+    # or from the file specified by +config.credentials.key_path+. By default,
+    # +config.credentials.key_path+ will point to either
+    # <tt>config/credentials/#{environment}.key</tt> for the current
+    # environment, or +config/master.key+ if that file does not exist.
+    def credentials: () -> untyped
+
+    # Returns an ActiveSupport::EncryptedConfiguration instance for an encrypted
+    # file. By default, the encryption key is taken from either
+    # <tt>ENV["RAILS_MASTER_KEY"]</tt>, or from the +config/master.key+ file.
+    #
+    #   my_config = Rails.application.encrypted("config/my_config.enc")
+    #
+    #   my_config.read
+    #   # => "foo:\n  bar: 123\n"
+    #
+    #   my_config.foo.bar
+    #   # => 123
+    #
+    # Encrypted files can be edited with the <tt>bin/rails encrypted:edit</tt>
+    # command. (See the output of <tt>bin/rails encrypted:edit --help</tt> for
+    # more information.)
+    def encrypted: (untyped path, ?env_key: ::String env_key, ?key_path: ::String key_path) -> ActiveSupport::EncryptedConfiguration
+
+    def to_app: () -> self
+
+    def helpers_paths: () -> untyped
+
+    # Return an array of railties respecting the order they're loaded
+    # and the order specified by the +railties_order+ config.
+    #
+    # While running initializers we need engines in reverse order here when
+    # copying migrations from railties ; we need them in the order given by
+    # +railties_order+.
+    def migration_railties: () -> untyped
+
+    def load_generators: (?untyped app) -> untyped
+
+    # Eager loads the application code.
+    def eager_load!: () -> untyped
+
+    alias build_middleware_stack app
+
+    def run_tasks_blocks: (untyped app) -> untyped
+
+    def run_generators_blocks: (untyped app) -> untyped
+
+    def run_runner_blocks: (untyped app) -> untyped
+
+    def run_console_blocks: (untyped app) -> untyped
+
+    def run_server_blocks: (untyped app) -> untyped
+
+    # Returns the ordered railties for this application considering railties_order.
+    def ordered_railties: () -> untyped
+
+    def railties_initializers: (untyped current) -> untyped
+
+    def default_middleware_stack: () -> untyped
+
+    def ensure_generator_templates_added: () -> untyped
+
+    private
+
+    def build_request: (untyped env) -> untyped
+
+    def build_middleware: () -> untyped
+
+    def coerce_same_site_protection: (untyped protection) -> untyped
+
+    def filter_parameters: () -> untyped
+  end
+end
+
+module Rails
+  class Application
+    module Bootstrap
+      include ::Rails::Initializable
+    end
+  end
+end
+
+module Rails
+  class Application
+    class Configuration < ::Rails::Engine::Configuration
+      attr_accessor allow_concurrency: untyped
+
+      attr_accessor asset_host: untyped
+
+      attr_accessor assume_ssl: untyped
+
+      attr_accessor autoflush_log: untyped
+
+      attr_accessor cache_classes: untyped
+
+      attr_accessor cache_store: untyped
+
+      attr_accessor consider_all_requests_local: untyped
+
+      attr_accessor console: untyped
+
+      attr_accessor eager_load: untyped
+
+      attr_accessor exceptions_app: untyped
+
+      attr_accessor file_watcher: untyped
+
+      attr_accessor filter_parameters: untyped
+
+      attr_accessor precompile_filter_parameters: untyped
+
+      attr_accessor force_ssl: untyped
+
+      attr_accessor helpers_paths: untyped
+
+      attr_accessor hosts: untyped
+
+      attr_accessor host_authorization: untyped
+
+      attr_accessor logger: untyped
+
+      attr_accessor log_formatter: untyped
+
+      attr_accessor log_tags: untyped
+
+      attr_accessor silence_healthcheck_path: untyped
+
+      attr_accessor railties_order: untyped
+
+      attr_accessor relative_url_root: untyped
+
+      attr_accessor ssl_options: untyped
+
+      attr_accessor public_file_server: untyped
+
+      attr_accessor session_options: untyped
+
+      attr_accessor time_zone: untyped
+
+      attr_accessor reload_classes_only_on_change: untyped
+
+      attr_accessor beginning_of_week: untyped
+
+      attr_accessor filter_redirect: untyped
+
+      attr_accessor x: untyped
+
+      attr_accessor content_security_policy_report_only: untyped
+
+      attr_accessor content_security_policy_nonce_generator: untyped
+
+      attr_accessor content_security_policy_nonce_directives: untyped
+
+      attr_accessor content_security_policy_nonce_auto: untyped
+
+      attr_accessor require_master_key: untyped
+
+      attr_accessor credentials: untyped
+
+      attr_accessor disable_sandbox: untyped
+
+      attr_accessor sandbox_by_default: untyped
+
+      attr_accessor add_autoload_paths_to_load_path: untyped
+
+      attr_accessor rake_eager_load: untyped
+
+      attr_accessor server_timing: untyped
+
+      attr_accessor log_file_size: untyped
+
+      attr_accessor dom_testing_default_html_version: untyped
+
+      attr_accessor yjit: untyped
+
+      attr_reader encoding: untyped
+
+      attr_reader api_only: untyped
+
+      attr_reader loaded_config_version: untyped
+
+      attr_reader log_level: untyped
+
+      def initialize: (*untyped) -> void
+
+      # Loads default configuration values for a target version. This includes
+      # defaults for versions prior to the target version. See the
+      # {configuration guide}[https://guides.rubyonrails.org/configuring.html#versioned-default-values]
+      # for the default values associated with a particular version.
+      def load_defaults: (untyped target_version) -> untyped
+
+      def reloading_enabled?: () -> untyped
+
+      def enable_reloading: () -> untyped
+
+      def enable_reloading=: (untyped value) -> untyped
+
+      def encoding=: (untyped value) -> untyped
+
+      def api_only=: (untyped value) -> untyped
+
+      def log_level=: (untyped level) -> untyped
+
+      attr_reader broadcast_log_level: untyped
+
+      def debug_exception_response_format: () -> untyped
+
+      attr_writer debug_exception_response_format: untyped
+
+      def paths: () -> untyped
+
+      # Load the <tt>config/database.yml</tt> to create the Rake tasks for
+      # multiple databases without loading the environment and filling in the
+      # environment specific configuration values.
+      #
+      # Do not use this method, use #database_configuration instead.
+      def load_database_yaml: () -> untyped
+
+      # Loads and returns the entire raw configuration of database from
+      # values stored in <tt>config/database.yml</tt>.
+      def database_configuration: () -> untyped
+
+      def autoload_lib: (ignore: untyped) -> untyped
+
+      def autoload_lib_once: (ignore: untyped) -> untyped
+
+      def colorize_logging: () -> untyped
+
+      def colorize_logging=: (untyped val) -> untyped
+
+      def secret_key_base: () -> untyped
+
+      def secret_key_base=: (untyped new_secret_key_base) -> untyped
+
+      # Specifies what class to use to store the session. Possible values
+      # are +:cache_store+, +:cookie_store+, +:mem_cache_store+, a custom
+      # store, or +:disabled+. +:disabled+ tells \Rails not to deal with
+      # sessions.
+      #
+      # Additional options will be set as +session_options+:
+      #
+      #   config.session_store :cookie_store, key: "_your_app_session"
+      #   config.session_options # => {key: "_your_app_session"}
+      #
+      # If a custom store is specified as a symbol, it will be resolved to
+      # the +ActionDispatch::Session+ namespace:
+      #
+      #   # use ActionDispatch::Session::MyCustomStore as the session store
+      #   config.session_store :my_custom_store
+      def session_store: (?untyped? new_session_store, **untyped options) -> untyped
+
+      def session_store?: () -> untyped
+
+      def annotations: () -> untyped
+
+      # Configures the ActionDispatch::ContentSecurityPolicy.
+      def content_security_policy: () ?{ (?) -> untyped } -> untyped
+
+      # Configures the ActionDispatch::PermissionsPolicy.
+      def permissions_policy: () ?{ (?) -> untyped } -> untyped
+
+      def default_log_file: () -> untyped
+
+      def inspect: () -> ::String
+
+      class Custom
+        def initialize: () -> void
+
+        def method_missing: (untyped method, *untyped args) -> untyped
+
+        def respond_to_missing?: (untyped symbol, untyped _) -> true
+      end
+
+      private
+
+      def credentials_defaults: () -> { content_path: untyped, key_path: untyped }
+
+      def generate_local_secret: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Application
+    class DefaultMiddlewareStack
+      attr_reader config: untyped
+
+      attr_reader paths: untyped
+
+      attr_reader app: untyped
+
+      def initialize: (untyped app, untyped config, untyped paths) -> void
+
+      def build_stack: () -> untyped
+
+      private
+
+      def load_rack_cache: () -> (nil | untyped)
+
+      def show_exceptions_app: () -> untyped
+    end
+  end
+end
+
+class DummyConfig
+  def initialize: (untyped config) -> void
+
+  def to_s: () -> "DummyConfig"
+
+  def method_missing: (untyped selector, *untyped, **untyped) ?{ (?) -> untyped } -> (untyped | self)
+end
+
+module Rails
+  class Application
+    module Finisher
+      include ::Rails::Initializable
+
+      class MonitorHook
+        def initialize: (?untyped monitor) -> void
+
+        def run: () -> untyped
+
+        def complete: (untyped _state) -> untyped
+      end
+
+      module InterlockHook
+        def self.run: () -> untyped
+
+        def self.complete: (untyped _state) -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  class Application
+    class RoutesReloader
+      include ::ActiveSupport::Callbacks
+
+      attr_reader route_sets: untyped
+
+      attr_reader paths: untyped
+
+      attr_reader external_routes: untyped
+
+      attr_accessor eager_load: untyped
+
+      attr_writer run_once_after_load_paths: untyped
+
+      def initialize: (?file_watcher: untyped) -> void
+
+      # Returns +true+ if the routes are loaded.
+      def loaded: () -> untyped
+
+      def reload!: () -> untyped
+
+      def execute: () -> untyped
+
+      def execute_unless_loaded: () -> (bool | untyped)
+
+      private
+
+      def updater: () -> untyped
+
+      def clear!: () -> untyped
+
+      def load_paths: () -> untyped
+
+      def run_after_load_paths_callback: () -> (untyped | nil)
+
+      def finalize!: () -> untyped
+
+      def revert: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Autoloaders
+    include ::Enumerable[untyped]
+
+    attr_reader main: untyped
+
+    attr_reader once: untyped
+
+    def initialize: () -> void
+
+    def each: () { (untyped) -> untyped } -> untyped
+
+    def logger=: (untyped logger) -> untyped
+
+    def log!: () -> untyped
+
+    def zeitwerk_enabled?: () -> true
+  end
+end
+
+module Rails
+  class Autoloaders
+    module Inflector
+      def self.camelize: (untyped basename, untyped _abspath) -> untyped
+
+      def self.inflect: (untyped overrides) -> untyped
+    end
+  end
+end
+
+module Rails
+  class BacktraceCleaner < ::ActiveSupport::BacktraceCleaner
+    APP_DIRS_PATTERN: ::Regexp
+
+    RENDER_TEMPLATE_PATTERN: ::Regexp
+
+    def initialize: () -> void
+
+    def clean: (untyped backtrace, ?::Symbol kind) -> untyped
+
+    alias filter clean
+
+    def clean_frame: (untyped frame, ?::Symbol kind) -> untyped
+  end
+end
+
+module Rails
+  class CodeStatisticsCalculator
+    attr_reader lines: untyped
+
+    attr_reader code_lines: untyped
+
+    attr_reader classes: untyped
+
+    attr_reader methods: untyped
+
+    PATTERNS: { rb: { line_comment: ::Regexp, begin_block_comment: ::Regexp, end_block_comment: ::Regexp, class: ::Regexp, method: ::Regexp }, erb: { line_comment: ::Regexp }, css: { line_comment: ::Regexp }, scss: { line_comment: ::Regexp }, js: { line_comment: ::Regexp, begin_block_comment: ::Regexp, end_block_comment: ::Regexp, method: ::Regexp }, coffee: { line_comment: ::Regexp, begin_block_comment: ::Regexp, end_block_comment: ::Regexp, class: ::Regexp, method: ::Regexp } }
+
+    def initialize: (?::Integer lines, ?::Integer code_lines, ?::Integer classes, ?::Integer methods) -> void
+
+    def add: (untyped code_statistics_calculator) -> untyped
+
+    def add_by_file_path: (untyped file_path) -> untyped
+
+    def add_by_io: (untyped io, untyped file_type) -> untyped
+
+    private
+
+    def file_type: (untyped file_path) -> (:minitest | untyped)
+  end
+end
+
+module Rails
+  class CodeStatistics
+    DIRECTORIES: ::Array[::Array["Controllers" | "app/controllers"] | ::Array["Helpers" | "app/helpers"] | ::Array["Jobs" | "app/jobs"] | ::Array["Models" | "app/models"] | ::Array["Mailers" | "app/mailers"] | ::Array["Mailboxes" | "app/mailboxes"] | ::Array["Channels" | "app/channels"] | ::Array["Views" | "app/views"] | ::Array["JavaScripts" | "app/assets/javascripts"] | ::Array["Stylesheets" | "app/assets/stylesheets"] | ::Array["JavaScript" | "app/javascript"] | ::Array["Libraries" | "lib/"] | ::Array["APIs" | "app/apis"] | ::Array["Controller tests" | "test/controllers"] | ::Array["Helper tests" | "test/helpers"] | ::Array["Job tests" | "test/jobs"] | ::Array["Model tests" | "test/models"] | ::Array["Mailer tests" | "test/mailers"] | ::Array["Mailbox tests" | "test/mailboxes"] | ::Array["Channel tests" | "test/channels"] | ::Array["Integration tests" | "test/integration"] | ::Array["System tests" | "test/system"]]
+
+    TEST_TYPES: ::Array["Controller tests" | "Helper tests" | "Model tests" | "Mailer tests" | "Mailbox tests" | "Channel tests" | "Job tests" | "Integration tests" | "System tests"]
+
+    HEADERS: { lines: " Lines", code_lines: "   LOC", classes: "Classes", methods: "Methods" }
+
+    PATTERN: ::Regexp
+
+    # Add directories to the output of the <tt>bin/rails stats</tt> command.
+    #
+    #   Rails::CodeStatistics.register_directory("My Directory", "path/to/dir")
+    #
+    # For directories that contain test code, set the <tt>test_directory</tt> argument to true.
+    #
+    #   Rails::CodeStatistics.register_directory("Model specs", "spec/models", test_directory: true)
+    def self.register_directory: (untyped label, untyped path, ?test_directory: bool) -> untyped
+
+    def initialize: (*untyped pairs) -> void
+
+    def to_s: () -> untyped
+
+    private
+
+    def calculate_statistics: () -> untyped
+
+    def calculate_directory_statistics: (untyped directory, ?untyped pattern) -> untyped
+
+    def calculate_total: () -> untyped
+
+    def calculate_code: () -> untyped
+
+    def calculate_tests: () -> untyped
+
+    def width_for: (untyped label) -> untyped
+
+    def print_header: () -> untyped
+
+    def print_splitter: () -> untyped
+
+    def print_line: (untyped name, untyped statistics) -> untyped
+
+    def print_code_test_stats: () -> untyped
+  end
+end
+
+module Rails
+  module Command
+    extend ::ActiveSupport::Autoload
+
+    class CorrectableNameError < ::StandardError
+      attr_reader name: untyped
+
+      def initialize: (untyped message, untyped name, untyped alternatives) -> void
+
+      include ::DidYouMean::Correctable
+
+      def corrections: () -> untyped
+    end
+
+    class UnrecognizedCommandError < ::Rails::Command::CorrectableNameError
+      def initialize: (untyped name) -> void
+    end
+
+    include ::Rails::Command::Behavior
+
+    HELP_MAPPINGS: untyped
+
+    VERSION_MAPPINGS: untyped
+
+    def self.hidden_commands: () -> untyped
+
+    def self.environment: () -> untyped
+
+    # Receives a namespace, arguments, and the behavior to invoke the command.
+    def self.invoke: (untyped full_namespace, ?untyped args, **untyped config) -> untyped
+
+    # Rails finds namespaces similar to Thor, it only adds one rule:
+    #
+    # Command names must end with "_command.rb". This is required because Rails
+    # looks in load paths and loads the command just before it's going to be used.
+    #
+    #   find_by_namespace :webrat, :integration
+    #
+    # Will search for the following commands:
+    #
+    #   "webrat", "webrat:integration", "rails:webrat", "rails:webrat:integration"
+    #
+    def self.find_by_namespace: (untyped namespace, ?untyped? command_name) -> untyped
+
+    # Returns the root of the \Rails engine or app running the command.
+    def self.root: () -> untyped
+
+    def self.application_root: () -> (untyped | nil)
+
+    def self.printing_commands: () -> untyped
+
+    def self.rails_new_with_no_path?: (untyped args) -> untyped
+
+    def self.split_namespace: (untyped namespace) -> untyped
+
+    def self.with_argv: (untyped argv) { () -> untyped } -> untyped
+
+    def self.invoke_rake: (untyped task, untyped args, untyped config) -> untyped
+
+    def self.command_type: () -> untyped
+
+    def self.lookup_paths: () -> untyped
+
+    def self.file_lookup_paths: () -> untyped
+  end
+end
+
+module Rails
+  module Command
+    module Actions
+      # Change to the application's path if there is no <tt>config.ru</tt> file in current directory.
+      # This allows us to run <tt>rails server</tt> from other directories, but still get
+      # the main <tt>config.ru</tt> and properly set the <tt>tmp</tt> directory.
+      def set_application_directory!: () -> (untyped | nil)
+
+      def require_application!: () -> untyped
+
+      def boot_application!: () -> untyped
+
+      def load_environment_config!: () -> untyped
+
+      def load_tasks: () -> untyped
+
+      def load_generators: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class Base < ::Thor
+      class Error < ::Thor::Error
+      end
+
+      include ::Rails::Command::Actions
+
+      def self.exit_on_failure?: () -> false
+
+      # Returns true when the app is a \Rails engine.
+      def self.engine?: () -> untyped
+
+      # Tries to get the description from a USAGE file one folder above the command
+      # root.
+      def self.desc: (?untyped? usage, ?untyped? description, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Convenience method to get the namespace from the class name. It's the
+      # same as Thor default except that the Command at the end of the class
+      # is removed.
+      def self.namespace: (?untyped? name) -> untyped
+
+      # Convenience method to hide this command from the available ones when
+      # running rails command.
+      def self.hide_command!: () -> untyped
+
+      def self.inherited: (untyped base) -> untyped
+
+      def self.perform: (untyped command, untyped args, untyped config) -> untyped
+
+      def self.printing_commands: () -> untyped
+
+      def self.executable: (?untyped command_name) -> ::String
+
+      def self.banner: (?untyped? command, *untyped) -> untyped
+
+      # Override Thor's class-level help to also show the USAGE.
+      def self.help: (untyped shell, *untyped) -> untyped
+
+      # Sets the base_name taking into account the current class namespace.
+      #
+      #   Rails::Command::TestCommand.base_name # => 'rails'
+      def self.base_name: () -> untyped
+
+      # Return command name without namespaces.
+      #
+      #   Rails::Command::TestCommand.command_name # => 'test'
+      def self.command_name: () -> untyped
+
+      def self.class_usage: () -> (untyped | nil)
+
+      # Path to lookup a USAGE description in a file.
+      def self.usage_path: () -> untyped
+
+      # Default file root to place extra files a command might need, placed
+      # one folder above the command file.
+      #
+      # For a Rails::Command::TestCommand placed in <tt>rails/command/test_command.rb</tt>
+      # would return <tt>rails/test</tt>.
+      def self.default_command_root: () -> untyped
+
+      # Allow the command method to be called perform.
+      def self.create_command: (untyped meth) -> untyped
+
+      def self.namespaced_name: (untyped name) -> untyped
+
+      def self.resolve_path: (untyped path) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    module Behavior
+      extend ::ActiveSupport::Concern
+    end
+  end
+end
+
+module Rails
+  module Command
+    module EnvironmentArgument
+      extend ::ActiveSupport::Concern
+
+      def initialize: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      private
+
+      def require_application!: () -> untyped
+
+      def environment: () -> untyped
+
+      def environment=: (untyped environment) -> untyped
+
+      def environment_specified?: () -> untyped
+
+      def available_environments: () -> untyped
+
+      def expand_environment_name: (untyped name) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    module Helpers
+      module Editor
+        private
+
+        def editor: () -> untyped
+
+        def display_hint_if_system_editor_not_specified: () -> (true | nil)
+
+        def system_editor: (untyped file_path) -> untyped
+
+        def using_system_editor: () { () -> untyped } -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  module Command
+    class AboutCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    module App
+      class UpdateCommand < ::Rails::Command::Base
+        include ::Thor::Actions
+
+        def perform: () -> untyped
+
+        def configs: () -> untyped
+
+        def bin: () -> untyped
+
+        def public_directory: () -> untyped
+
+        def active_storage: () -> untyped
+
+        private
+
+        def display_upgrade_guide_info: () -> untyped
+
+        def app_generator: () -> untyped
+
+        def generator_options: () -> untyped
+
+        def asset_pipeline: () -> ("propshaft" | nil)
+
+        def skip_gem?: (untyped gem_name) -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class AppGenerator
+      # We want to exit on failure to be kind to other libraries
+      # This is only when accessing via CLI
+      def self.exit_on_failure?: () -> true
+    end
+  end
+
+  module Command
+    class ApplicationCommand < ::Rails::Command::Base
+      def help: () -> untyped
+
+      def perform: (*untyped args) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class BootCommand < ::Rails::Command::Base
+      include ::Rails::Command::EnvironmentArgument
+
+      def perform: (*untyped) -> untyped
+    end
+  end
+end
+
+module Rails
+  class Console
+    def self.start: (*untyped args) -> untyped
+
+    attr_reader options: untyped
+
+    attr_reader app: untyped
+
+    attr_reader console: untyped
+
+    def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> void
+
+    def sandbox?: () -> (untyped | false)
+
+    def environment: () -> untyped
+
+    alias environment? environment
+
+    def set_environment!: () -> untyped
+
+    def start: () -> untyped
+  end
+
+  module Command
+    class ConsoleCommand < ::Rails::Command::Base
+      include ::Rails::Command::EnvironmentArgument
+
+      def initialize: (?untyped args, ?::Hash[untyped, untyped] local_options, ?::Hash[untyped, untyped] config) -> void
+
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Console
+    class RailsHelperBase
+    end
+
+    class ControllerHelper < ::Rails::Console::RailsHelperBase
+      # This method assumes an +ApplicationController+ exists, and that it extends ActionController::Base.
+      def execute: () -> untyped
+    end
+
+    class ControllerInstance < ::Rails::Console::RailsHelperBase
+      # This method assumes an +ApplicationController+ exists, and that it extends ActionController::Base.
+      def execute: () -> untyped
+    end
+
+    class NewSession < ::Rails::Console::RailsHelperBase
+      def execute: (*untyped) -> untyped
+    end
+
+    class AppInstance < ::Rails::Console::NewSession
+      def execute: (?bool create) -> untyped
+    end
+
+    class ReloadHelper < ::Rails::Console::RailsHelperBase
+      def execute: () -> untyped
+    end
+
+    class IRBConsole
+      def initialize: (untyped app) -> void
+
+      def name: () -> "IRB"
+
+      def start: () -> untyped
+
+      def colorized_env: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class CredentialsCommand < ::Rails::Command::Base
+      include ::Rails::Command::Helpers::Editor
+
+      include ::Rails::Command::EnvironmentArgument
+
+      include ::Rails::Command::CredentialsCommand::Diffing
+
+      def edit: () -> untyped
+
+      def show: () -> untyped
+
+      def diff: (?untyped? content_path) -> untyped
+
+      def fetch: (untyped path) -> untyped
+
+      private
+
+      def config: () -> untyped
+
+      def content_path: () -> untyped
+
+      def key_path: () -> untyped
+
+      def credentials: () -> untyped
+
+      def ensure_encryption_key_has_been_added: () -> (nil | untyped)
+
+      def ensure_credentials_have_been_added: () -> untyped
+
+      def change_credentials_in_system_editor: () -> untyped
+
+      def warn_if_credentials_are_invalid: () -> untyped
+
+      def missing_credentials!: () -> untyped
+
+      def relative_path: (untyped path) -> untyped
+
+      def extract_environment_from_path: (untyped path) -> untyped
+
+      def extract_custom_environment: (untyped path) -> untyped
+    end
+  end
+end
+
+module Rails::Command::CredentialsCommand::Diffing
+  GITATTRIBUTES_ENTRY: "config/credentials/*.yml.enc diff=rails_credentials\nconfig/credentials.yml.enc diff=rails_credentials\n"
+
+  def enroll_project_in_credentials_diffing: () -> untyped
+
+  def disenroll_project_from_credentials_diffing: () -> untyped
+
+  def ensure_diffing_driver_is_configured: () -> (untyped | nil)
+
+  private
+
+  def enrolled_in_credentials_diffing?: () -> untyped
+
+  def diffing_driver_configured?: () -> untyped
+
+  def configure_diffing_driver: () -> untyped
+
+  def gitattributes: () -> untyped
+end
+
+module Rails
+  module Command
+    module Db
+      module System
+        class ChangeCommand < ::Rails::Command::Base
+          def initialize: (untyped positional_args, untyped option_args, *untyped) -> void
+
+          def perform: (*untyped) -> untyped
+        end
+      end
+    end
+  end
+end
+
+module Rails
+  class DBConsole
+    def self.start: (*untyped args) -> untyped
+
+    def initialize: (?::Hash[untyped, untyped] options) -> void
+
+    def start: () -> untyped
+
+    def db_config: () -> untyped
+
+    def database: () -> untyped
+
+    def environment: () -> untyped
+
+    private
+
+    def adapter_class: () -> untyped
+
+    def configurations: () -> untyped
+  end
+
+  module Command
+    class DbconsoleCommand < ::Rails::Command::Base
+      include ::Rails::Command::EnvironmentArgument
+
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class DestroyCommand < ::Rails::Command::Base
+      def perform: (*untyped) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class DevCommand < ::Rails::Command::Base
+      def cache: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class DevcontainerCommand < ::Rails::Command::Base
+      def perform: (*untyped) -> untyped
+
+      private
+
+      def devcontainer_options: () -> untyped
+
+      def database: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class EncryptedCommand < ::Rails::Command::Base
+      include ::Rails::Command::Helpers::Editor
+
+      def edit: (*untyped) -> untyped
+
+      def show: (*untyped) -> untyped
+
+      private
+
+      def content_path: () -> untyped
+
+      def key_path: () -> untyped
+
+      def encrypted_configuration: () -> untyped
+
+      def ensure_encryption_key_has_been_added: () -> (nil | untyped)
+
+      def ensure_encrypted_configuration_has_been_added: () -> untyped
+
+      def change_encrypted_configuration_in_system_editor: () -> untyped
+
+      def warn_if_encrypted_configuration_is_invalid: () -> untyped
+
+      def encryption_key_file_generator: () -> Rails::Generators::EncryptionKeyFileGenerator
+
+      def encrypted_file_generator: () -> Rails::Generators::EncryptedFileGenerator
+
+      def missing_encrypted_configuration_message: () -> ::String
+    end
+  end
+end
+
+module Rails
+  module Command
+    class GemHelpCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class GenerateCommand < ::Rails::Command::Base
+      def perform: (*untyped) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class HelpCommand < ::Rails::Command::Base
+      def help: (*untyped) -> untyped
+
+      def help_extended: (*untyped) -> untyped
+
+      private
+
+      COMMANDS_IN_USAGE: ::Array["generate" | "console" | "server" | "test" | "test:system" | "dbconsole" | "new"]
+
+      def printing_commands_not_in_usage: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class InitializersCommand < ::Rails::Command::Base
+      include ::Rails::Command::EnvironmentArgument
+
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class MiddlewareCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class NewCommand < ::Rails::Command::Base
+      def perform: (*untyped) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class NotesCommand < ::Rails::Command::Base
+      def perform: (*untyped) -> untyped
+
+      private
+
+      def display_annotations: () -> untyped
+
+      def directories: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class PluginCommand < ::Rails::Command::Base
+      def help: () -> untyped
+
+      def self.banner: (*untyped) -> ::String
+
+      def perform: (?untyped? type, *untyped plugin_args) -> untyped
+
+      private
+
+      def run_plugin_generator: (untyped plugin_args) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class RakeCommand < ::Rails::Command::Base
+      extend ::Rails::Command::Actions
+
+      def self.printing_commands: () -> untyped
+
+      def self.perform: (untyped task, untyped args, untyped config) -> untyped
+
+      def self.non_app_file_pattern: () -> ::Regexp
+
+      def self.with_rake: (*untyped args) { (?) -> untyped } -> untyped
+
+      def self.rake_tasks: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class RestartCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class RoutesCommand < ::Rails::Command::Base
+      def perform: (*untyped) -> untyped
+
+      private
+
+      def inspector: () -> ActionDispatch::Routing::RoutesInspector
+
+      def formatter: () -> untyped
+
+      def routes_filter: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class RunnerCommand < ::Rails::Command::Base
+      include ::Rails::Command::EnvironmentArgument
+
+      def perform: (?untyped? code_or_file, *untyped command_argv) -> untyped
+
+      private
+
+      def conditional_executor: (untyped enabled, **untyped args) { () -> untyped } -> untyped
+
+      def looks_like_a_file_path?: (untyped code_or_file) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class SecretCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Server
+    class Options
+      def parse!: (untyped args) -> untyped
+    end
+
+    def initialize: (?untyped? options) -> void
+
+    def opt_parser: () -> Options
+
+    def set_environment: () -> untyped
+
+    def start: (?untyped? after_stop_callback) -> untyped
+
+    def serveable?: () -> untyped
+
+    def middleware: () -> untyped
+
+    def default_options: () -> untyped
+
+    def served_url: () -> (::String | nil)
+
+    private
+
+    def setup_dev_caching: () -> (untyped | nil)
+
+    def create_tmp_directories: () -> untyped
+
+    def log_to_stdout: () -> untyped
+
+    def use_puma?: () -> untyped
+  end
+
+  module Command
+    class ServerCommand < ::Rails::Command::Base
+      include ::Rails::Command::EnvironmentArgument
+
+      RACK_HANDLER_GEMS: ::Array["cgi" | "webrick" | "scgi" | "thin" | "puma" | "unicorn" | "falcon"]
+
+      # Hard-coding a bunch of handlers here as we don't have a public way of
+      # querying them from the Rackup::Handler registry.
+      RACK_HANDLERS: untyped
+
+      RECOMMENDED_SERVER: "puma"
+
+      DEFAULT_PORT: 3000
+
+      DEFAULT_PIDFILE: "tmp/pids/server.pid"
+
+      def initialize: (untyped args, untyped local_options, *untyped) -> void
+
+      def perform: () -> untyped
+
+      private
+
+      def user_supplied_options: () -> untyped
+
+      def port: () -> untyped
+
+      def host: () -> untyped
+
+      def environment: () -> untyped
+
+      def restart_command: () -> ::String
+
+      def early_hints: () -> untyped
+
+      def log_to_stdout?: () -> untyped
+
+      def pid: () -> untyped
+
+      def prepare_restart: () -> (untyped | nil)
+
+      def rack_server_suggestion: (untyped server) -> ::String
+
+      def print_boot_information: (untyped server, untyped url) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class StatsCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class TestCommand < ::Rails::Command::Base
+      def self.executable: (*untyped args) -> untyped
+
+      def perform: (*untyped args) -> untyped
+
+      def all: (*untyped args) -> untyped
+
+      def functionals: (*untyped args) -> untyped
+
+      def units: (*untyped args) -> untyped
+
+      def system: (*untyped args) -> untyped
+
+      def generators: (*untyped args) -> untyped
+
+      private
+
+      EXACT_TEST_ARGUMENT_PATTERN: ::Regexp
+
+      def run_prepare_task: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class UnusedRoutesCommand < ::Rails::Command::Base
+      class RouteInfo
+        def initialize: (untyped route) -> void
+
+        def unused?: () -> untyped
+
+        private
+
+        def view_path: (untyped root) -> untyped
+
+        def controller_class_missing?: () -> untyped
+
+        def template_missing?: () -> untyped
+
+        def action_missing?: () -> untyped
+      end
+
+      def perform: (*untyped) -> untyped
+
+      private
+
+      def inspector: () -> untyped
+
+      def routes: () -> untyped
+
+      def formatter: () -> untyped
+
+      def routes_filter: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Command
+    class VersionCommand < ::Rails::Command::Base
+      def perform: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Configuration
+    # MiddlewareStackProxy is a proxy for the \Rails middleware stack that allows
+    # you to configure middlewares in your application. It works basically as a
+    # command recorder, saving each command to be applied after initialization
+    # over the default middleware stack, so you can add, swap, or remove any
+    # middleware in \Rails.
+    #
+    # You can add your own middlewares by using the +config.middleware.use+ method:
+    #
+    #     config.middleware.use Magical::Unicorns
+    #
+    # This will put the +Magical::Unicorns+ middleware on the end of the stack.
+    # You can use +insert_before+ if you wish to add a middleware before another:
+    #
+    #     config.middleware.insert_before Rack::Head, Magical::Unicorns
+    #
+    # There's also +insert_after+ which will insert a middleware after another:
+    #
+    #     config.middleware.insert_after Rack::Head, Magical::Unicorns
+    #
+    # Middlewares can also be completely swapped out and replaced with others:
+    #
+    #     config.middleware.swap ActionDispatch::Flash, Magical::Unicorns
+    #
+    # Middlewares can be moved from one place to another:
+    #
+    #     config.middleware.move_before ActionDispatch::Flash, Magical::Unicorns
+    #
+    # This will move the +Magical::Unicorns+ middleware before the
+    # +ActionDispatch::Flash+. You can also move it after:
+    #
+    #     config.middleware.move_after ActionDispatch::Flash, Magical::Unicorns
+    #
+    # And finally they can also be removed from the stack completely:
+    #
+    #     config.middleware.delete ActionDispatch::Flash
+    #
+    class MiddlewareStackProxy
+      def initialize: (?untyped operations, ?untyped delete_operations) -> void
+
+      def move_before: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+      alias move move_before
+
+      def move_after: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+      def merge_into: (untyped other) -> untyped
+
+      def +: (untyped other) -> MiddlewareStackProxy
+
+      attr_reader operations: untyped
+
+      attr_reader delete_operations: untyped
+    end
+
+    class Generators
+      attr_accessor aliases: untyped
+
+      attr_accessor options: untyped
+
+      attr_accessor templates: untyped
+
+      attr_accessor fallbacks: untyped
+
+      attr_accessor colorize_logging: untyped
+
+      attr_accessor api_only: untyped
+
+      attr_reader hidden_namespaces: untyped
+
+      attr_reader after_generate_callbacks: untyped
+
+      def initialize: () -> void
+
+      def initialize_copy: (untyped source) -> untyped
+
+      def hide_namespace: (untyped namespace) -> untyped
+
+      def after_generate: () { (?) -> untyped } -> untyped
+
+      def apply_rubocop_autocorrect_after_generate!: () -> untyped
+
+      def method_missing: (untyped method, *untyped args) -> untyped
+    end
+  end
+end
+
+module Rails
+  def self.deprecator: () -> untyped
+end
+
+module Rails
+  module DevCaching
+    FILE: "tmp/caching-dev.txt"
+
+    def self.enable_by_file: () -> untyped
+
+    def self.enable_by_argument: (untyped caching) -> untyped
+
+    def self.create_cache_file: () -> untyped
+
+    def self.delete_cache_file: () -> untyped
+  end
+end
+
+module Rails
+  # +Rails::Engine+ allows you to wrap a specific \Rails application or subset of
+  # functionality and share it with other applications or within a larger packaged application.
+  # Every Rails::Application is just an engine, which allows for simple
+  # feature and application sharing.
+  #
+  # Any +Rails::Engine+ is also a Rails::Railtie, so the same
+  # methods (like {rake_tasks}[rdoc-ref:Rails::Railtie::rake_tasks] and
+  # {generators}[rdoc-ref:Rails::Railtie::generators]) and configuration
+  # options that are available in railties can also be used in engines.
+  #
+  # == Creating an Engine
+  #
+  # If you want a gem to behave as an engine, you have to specify an +Engine+
+  # for it somewhere inside your plugin's +lib+ folder (similar to how we
+  # specify a +Railtie+):
+  #
+  #   # lib/my_engine.rb
+  #   module MyEngine
+  #     class Engine < Rails::Engine
+  #     end
+  #   end
+  #
+  # Then ensure that this file is loaded at the top of your <tt>config/application.rb</tt>
+  # (or in your +Gemfile+), and it will automatically load models, controllers, and helpers
+  # inside +app+, load routes at <tt>config/routes.rb</tt>, load locales at
+  # <tt>config/locales/**/*</tt>, and load tasks at <tt>lib/tasks/**/*</tt>.
+  #
+  # == Configuration
+  #
+  # Like railties, engines can access a config object which contains configuration shared by
+  # all railties and the application.
+  # Additionally, each engine can access <tt>autoload_paths</tt>, <tt>eager_load_paths</tt> and
+  # <tt>autoload_once_paths</tt> settings which are scoped to that engine.
+  #
+  #   class MyEngine < Rails::Engine
+  #     # Add a load path for this specific Engine
+  #     config.autoload_paths << File.expand_path("lib/some/path", __dir__)
+  #
+  #     initializer "my_engine.add_middleware" do |app|
+  #       app.middleware.use MyEngine::Middleware
+  #     end
+  #   end
+  #
+  # == Generators
+  #
+  # You can set up generators for engines with <tt>config.generators</tt> method:
+  #
+  #   class MyEngine < Rails::Engine
+  #     config.generators do |g|
+  #       g.orm             :active_record
+  #       g.template_engine :erb
+  #       g.test_framework  :test_unit
+  #     end
+  #   end
+  #
+  # You can also set generators for an application by using <tt>config.app_generators</tt>:
+  #
+  #   class MyEngine < Rails::Engine
+  #     # note that you can also pass block to app_generators in the same way you
+  #     # can pass it to generators method
+  #     config.app_generators.orm :datamapper
+  #   end
+  #
+  # == Paths
+  #
+  # Applications and engines have flexible path configuration, meaning that you
+  # are not required to place your controllers at <tt>app/controllers</tt>, but
+  # in any place which you find convenient.
+  #
+  # For example, let's suppose you want to place your controllers in <tt>lib/controllers</tt>.
+  # You can set that as an option:
+  #
+  #   class MyEngine < Rails::Engine
+  #     paths["app/controllers"] = "lib/controllers"
+  #   end
+  #
+  # You can also have your controllers loaded from both <tt>app/controllers</tt> and
+  # <tt>lib/controllers</tt>:
+  #
+  #   class MyEngine < Rails::Engine
+  #     paths["app/controllers"] << "lib/controllers"
+  #   end
+  #
+  # The available paths in an engine are:
+  #
+  #   class MyEngine < Rails::Engine
+  #     paths["app"]                 # => ["app"]
+  #     paths["app/controllers"]     # => ["app/controllers"]
+  #     paths["app/helpers"]         # => ["app/helpers"]
+  #     paths["app/models"]          # => ["app/models"]
+  #     paths["app/views"]           # => ["app/views"]
+  #     paths["lib"]                 # => ["lib"]
+  #     paths["lib/tasks"]           # => ["lib/tasks"]
+  #     paths["config"]              # => ["config"]
+  #     paths["config/initializers"] # => ["config/initializers"]
+  #     paths["config/locales"]      # => ["config/locales"]
+  #     paths["config/routes.rb"]    # => ["config/routes.rb"]
+  #   end
+  #
+  # The <tt>Application</tt> class adds a couple more paths to this set. And as in your
+  # <tt>Application</tt>, all folders under +app+ are automatically added to the load path.
+  # If you have an <tt>app/services</tt> folder for example, it will be added by default.
+  #
+  # == Endpoint
+  #
+  # An engine can also be a Rack application. It can be useful if you have a Rack application that
+  # you would like to provide with some of the +Engine+'s features.
+  #
+  # To do that, use the ::endpoint method:
+  #
+  #   module MyEngine
+  #     class Engine < Rails::Engine
+  #       endpoint MyRackApplication
+  #     end
+  #   end
+  #
+  # Now you can mount your engine in application's routes:
+  #
+  #   Rails.application.routes.draw do
+  #     mount MyEngine::Engine => "/engine"
+  #   end
+  #
+  # == Middleware stack
+  #
+  # As an engine can now be a Rack endpoint, it can also have a middleware
+  # stack. The usage is exactly the same as in <tt>Application</tt>:
+  #
+  #   module MyEngine
+  #     class Engine < Rails::Engine
+  #       middleware.use SomeMiddleware
+  #     end
+  #   end
+  #
+  # == Routes
+  #
+  # If you don't specify an endpoint, routes will be used as the default
+  # endpoint. You can use them just like you use an application's routes:
+  #
+  #   # ENGINE/config/routes.rb
+  #   MyEngine::Engine.routes.draw do
+  #     get "/" => "posts#index"
+  #   end
+  #
+  # == Mount priority
+  #
+  # Note that now there can be more than one router in your application, and it's better to avoid
+  # passing requests through many routers. Consider this situation:
+  #
+  #   Rails.application.routes.draw do
+  #     mount MyEngine::Engine => "/blog"
+  #     get "/blog/omg" => "main#omg"
+  #   end
+  #
+  # +MyEngine+ is mounted at <tt>/blog</tt>, and <tt>/blog/omg</tt> points to application's
+  # controller. In such a situation, requests to <tt>/blog/omg</tt> will go through +MyEngine+,
+  # and if there is no such route in +Engine+'s routes, it will be dispatched to <tt>main#omg</tt>.
+  # It's much better to swap that:
+  #
+  #   Rails.application.routes.draw do
+  #     get "/blog/omg" => "main#omg"
+  #     mount MyEngine::Engine => "/blog"
+  #   end
+  #
+  # Now, +Engine+ will get only requests that were not handled by +Application+.
+  #
+  # == Engine name
+  #
+  # There are some places where an Engine's name is used:
+  #
+  # * routes: when you mount an Engine with <tt>mount(MyEngine::Engine => '/my_engine')</tt>,
+  #   it's used as default <tt>:as</tt> option
+  # * rake task for installing migrations <tt>my_engine:install:migrations</tt>
+  #
+  # Engine name is set by default based on class name. For +MyEngine::Engine+ it will be
+  # <tt>my_engine_engine</tt>. You can change it manually using the <tt>engine_name</tt> method:
+  #
+  #   module MyEngine
+  #     class Engine < Rails::Engine
+  #       engine_name "my_engine"
+  #     end
+  #   end
+  #
+  # == Isolated Engine
+  #
+  # Normally when you create controllers, helpers, and models inside an engine, they are treated
+  # as if they were created inside the application itself. This means that all helpers and
+  # named routes from the application will be available to your engine's controllers as well.
+  #
+  # However, sometimes you want to isolate your engine from the application, especially if your engine
+  # has its own router. To do that, you simply need to call ::isolate_namespace. This method requires
+  # you to pass a module where all your controllers, helpers, and models should be nested to:
+  #
+  #   module MyEngine
+  #     class Engine < Rails::Engine
+  #       isolate_namespace MyEngine
+  #     end
+  #   end
+  #
+  # With such an engine, everything that is inside the +MyEngine+ module will be isolated from
+  # the application.
+  #
+  # Consider this controller:
+  #
+  #   module MyEngine
+  #     class FooController < ActionController::Base
+  #     end
+  #   end
+  #
+  # If the +MyEngine+ engine is marked as isolated, +FooController+ only has
+  # access to helpers from +MyEngine+, and <tt>url_helpers</tt> from
+  # <tt>MyEngine::Engine.routes</tt>.
+  #
+  # The next thing that changes in isolated engines is the behavior of routes.
+  # Normally, when you namespace your controllers, you also need to namespace
+  # the related routes. With an isolated engine, the engine's namespace is
+  # automatically applied, so you don't need to specify it explicitly in your
+  # routes:
+  #
+  #   MyEngine::Engine.routes.draw do
+  #     resources :articles
+  #   end
+  #
+  # If +MyEngine+ is isolated, the routes above will point to
+  # +MyEngine::ArticlesController+. You also don't need to use longer
+  # URL helpers like +my_engine_articles_path+. Instead, you should simply use
+  # +articles_path+, like you would do with your main application.
+  #
+  # To make this behavior consistent with other parts of the framework,
+  # isolated engines also have an effect on ActiveModel::Naming. In a
+  # normal \Rails app, when you use a namespaced model such as
+  # +Namespace::Article+, ActiveModel::Naming will generate
+  # names with the prefix "namespace". In an isolated engine, the prefix will
+  # be omitted in URL helpers and form fields, for convenience.
+  #
+  #   polymorphic_url(MyEngine::Article.new)
+  #   # => "articles_path" # not "my_engine_articles_path"
+  #
+  #   form_with(model: MyEngine::Article.new) do
+  #     text_field :title # => <input type="text" name="article[title]" id="article_title" />
+  #   end
+  #
+  # Additionally, an isolated engine will set its own name according to its
+  # namespace, so <tt>MyEngine::Engine.engine_name</tt> will return
+  # "my_engine". It will also set +MyEngine.table_name_prefix+ to "my_engine_",
+  # meaning for example that +MyEngine::Article+ will use the
+  # +my_engine_articles+ database table by default.
+  #
+  # == Using Engine's routes outside Engine
+  #
+  # Since you can now mount an engine inside application's routes, you do not have direct access to +Engine+'s
+  # <tt>url_helpers</tt> inside +Application+. When you mount an engine in an application's routes, a special helper is
+  # created to allow you to do that. Consider such a scenario:
+  #
+  #   # config/routes.rb
+  #   Rails.application.routes.draw do
+  #     mount MyEngine::Engine => "/my_engine", as: "my_engine"
+  #     get "/foo" => "foo#index"
+  #   end
+  #
+  # Now, you can use the <tt>my_engine</tt> helper inside your application:
+  #
+  #   class FooController < ApplicationController
+  #     def index
+  #       my_engine.root_url # => /my_engine/
+  #     end
+  #   end
+  #
+  # There is also a <tt>main_app</tt> helper that gives you access to application's routes inside Engine:
+  #
+  #   module MyEngine
+  #     class BarController
+  #       def index
+  #         main_app.foo_path # => /foo
+  #       end
+  #     end
+  #   end
+  #
+  # Note that the <tt>:as</tt> option given to mount takes the <tt>engine_name</tt> as default, so most of the time
+  # you can simply omit it.
+  #
+  # Finally, if you want to generate a URL to an engine's route using
+  # <tt>polymorphic_url</tt>, you also need to pass the engine helper. Let's
+  # say that you want to create a form pointing to one of the engine's routes.
+  # All you need to do is pass the helper as the first element in array with
+  # attributes for URL:
+  #
+  #   form_with(model: [my_engine, @user])
+  #
+  # This code will use <tt>my_engine.user_path(@user)</tt> to generate the proper route.
+  #
+  # == Isolated engine's helpers
+  #
+  # Sometimes you may want to isolate an engine, but use helpers that are defined for it.
+  # If you want to share just a few specific helpers you can add them to application's
+  # helpers in ApplicationController:
+  #
+  #   class ApplicationController < ActionController::Base
+  #     helper MyEngine::SharedEngineHelper
+  #   end
+  #
+  # If you want to include all of the engine's helpers, you can use the #helpers method on an engine's
+  # instance:
+  #
+  #   class ApplicationController < ActionController::Base
+  #     helper MyEngine::Engine.helpers
+  #   end
+  #
+  # It will include all of the helpers from engine's directory. Take into account this does
+  # not include helpers defined in controllers with helper_method or other similar solutions,
+  # only helpers defined in the helpers directory will be included.
+  #
+  # == Migrations & seed data
+  #
+  # Engines can have their own migrations. The default path for migrations is exactly the same
+  # as in application: <tt>db/migrate</tt>
+  #
+  # To use engine's migrations in application you can use the rake task below, which copies them to
+  # application's dir:
+  #
+  #   $ rake ENGINE_NAME:install:migrations
+  #
+  # Note that some of the migrations may be skipped if a migration with the same name already exists
+  # in application. In such a situation you must decide whether to leave that migration or rename the
+  # migration in the application and rerun copying migrations.
+  #
+  # If your engine has migrations, you may also want to prepare data for the database in
+  # the <tt>db/seeds.rb</tt> file. You can load that data using the <tt>load_seed</tt> method, e.g.
+  #
+  #   MyEngine::Engine.load_seed
+  #
+  # == Loading priority
+  #
+  # In order to change engine's priority you can use +config.railties_order+ in the main application.
+  # It will affect the priority of loading views, helpers, assets, and all the other files
+  # related to engine or application.
+  #
+  #   # load Blog::Engine with highest priority, followed by application and other railties
+  #   config.railties_order = [Blog::Engine, :main_app, :all]
+  class Engine < ::Rails::Railtie
+    attr_accessor self.called_from: untyped
+
+    attr_accessor self.isolated: untyped
+
+    alias self.isolated? self.isolated
+
+    alias self.engine_name self.railtie_name
+
+    def self.inherited: (untyped base) -> untyped
+
+    def self.find_root: (untyped from) -> untyped
+
+    def self.endpoint: (?untyped? endpoint) -> untyped
+
+    def self.isolate_namespace: (untyped mod) -> untyped
+
+    # Finds engine with given path.
+    def self.find: (untyped path) -> (untyped | nil)
+
+    include ::ActiveSupport::Callbacks
+
+    def initialize: () -> void
+
+    # Load console and invoke the registered hooks.
+    # Check Rails::Railtie.console for more info.
+    def load_console: (?untyped app) -> self
+
+    # Load \Rails runner and invoke the registered hooks.
+    # Check Rails::Railtie.runner for more info.
+    def load_runner: (?untyped app) -> self
+
+    # Load Rake and railties tasks, and invoke the registered hooks.
+    # Check Rails::Railtie.rake_tasks for more info.
+    def load_tasks: (?untyped app) -> self
+
+    # Load \Rails generators and invoke the registered hooks.
+    # Check Rails::Railtie.generators for more info.
+    def load_generators: (?untyped app) -> self
+
+    # Invoke the server registered hooks.
+    # Check Rails::Railtie.server for more info.
+    def load_server: (?untyped app) -> self
+
+    def eager_load!: () -> nil
+
+    def railties: () -> untyped
+
+    # Returns a module with all the helpers defined for the engine.
+    def helpers: () -> untyped
+
+    # Returns all registered helpers paths.
+    def helpers_paths: () -> untyped
+
+    # Returns the underlying Rack application for this engine.
+    def app: () -> untyped
+
+    # Returns the endpoint for this engine. If none is registered,
+    # defaults to an ActionDispatch::Routing::RouteSet.
+    def endpoint: () -> untyped
+
+    # Define the Rack API for this engine.
+    def call: (untyped env) -> untyped
+
+    # Defines additional Rack env configuration that is added on each call.
+    def env_config: () -> untyped
+
+    # Define the configuration object for the engine.
+    def config: () -> untyped
+
+    # Load data from db/seeds.rb file. It can be used in to load engines'
+    # seeds, e.g.:
+    #
+    # Blog::Engine.load_seed
+    def load_seed: () -> untyped
+
+    def routes?: () -> untyped
+
+    def run_tasks_blocks: (*untyped) -> untyped
+
+    private
+
+    def load_config_initializer: (untyped initializer) -> untyped
+
+    def has_migrations?: () -> untyped
+
+    def self.find_root_with_flag: (untyped flag, untyped root_path, ?untyped? default) -> Pathname
+
+    def default_middleware_stack: () -> ActionDispatch::MiddlewareStack
+
+    def _all_autoload_once_paths: () -> untyped
+
+    def _all_autoload_paths: () -> untyped
+
+    def _all_load_paths: (untyped add_autoload_paths_to_load_path) -> untyped
+
+    def fixtures_in_root_and_not_in_vendor_or_dot_dir?: (untyped fixtures) -> untyped
+
+    def build_request: (untyped env) -> untyped
+
+    def build_middleware: () -> untyped
+  end
+end
+
+APP_PATH: untyped
+
+module Rails
+  class Engine
+    class Configuration < ::Rails::Railtie::Configuration
+      attr_reader root: untyped
+
+      attr_accessor middleware: untyped
+
+      attr_accessor javascript_path: untyped
+
+      attr_accessor route_set_class: untyped
+
+      attr_accessor default_scope: untyped
+
+      attr_writer eager_load_paths: untyped
+
+      attr_writer autoload_once_paths: untyped
+
+      attr_writer autoload_paths: untyped
+
+      # An array of custom autoload paths to be added to the ones defined
+      # automatically by Rails. These won't be eager loaded, unless you push
+      # them to +eager_load_paths+ too, which is recommended.
+      #
+      # This collection is empty by default, it accepts strings and +Pathname+
+      # objects.
+      #
+      # If you'd like to add +lib+ to it, please see +autoload_lib+.
+      attr_reader autoload_paths: untyped
+
+      # An array of custom autoload once paths. These won't be eager loaded
+      # unless you push them to +eager_load_paths+ too, which is recommended.
+      #
+      # This collection is empty by default, it accepts strings and +Pathname+
+      # objects.
+      #
+      # If you'd like to add +lib+ to it, please see +autoload_lib_once+.
+      attr_reader autoload_once_paths: untyped
+
+      # An array of custom eager load paths to be added to the ones defined
+      # automatically by Rails. Anything in this collection is considered to be
+      # an autoload path regardless of whether it was added to +autoload_paths+.
+      #
+      # This collection is empty by default, it accepts strings and +Pathname+
+      # objects.
+      #
+      # If you'd like to add +lib+ to it, please see +autoload_lib+.
+      attr_reader eager_load_paths: untyped
+
+      def initialize: (?untyped? root) -> void
+
+      # Holds generators configuration:
+      #
+      #   config.generators do |g|
+      #     g.orm             :data_mapper, migration: true
+      #     g.template_engine :haml
+      #     g.test_framework  :rspec
+      #   end
+      #
+      # If you want to disable color in console, do:
+      #
+      #   config.generators.colorize_logging = false
+      #
+      def generators: () ?{ (untyped) -> untyped } -> untyped
+
+      def paths: () -> untyped
+
+      def root=: (untyped value) -> untyped
+
+      # Private method that adds custom autoload paths to the ones defined by
+      # +paths+.
+      def all_autoload_paths: () -> untyped
+
+      # Private method that adds custom autoload once paths to the ones defined
+      # by +paths+.
+      def all_autoload_once_paths: () -> untyped
+
+      # Private method that adds custom eager load paths to the ones defined by
+      # +paths+.
+      def all_eager_load_paths: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Engine
+    class LazyRouteSet < ::ActionDispatch::Routing::RouteSet
+      class NamedRouteCollection < ::ActionDispatch::Routing::RouteSet::NamedRouteCollection
+        def route_defined?: (untyped name) -> untyped
+      end
+
+      module ProxyUrlHelpers
+        def url_for: (untyped options) -> untyped
+
+        def full_url_for: (untyped options) -> untyped
+
+        def route_for: (untyped name, *untyped args) -> untyped
+
+        def optimize_routes_generation?: () -> untyped
+      end
+
+      # Mounted helpers are only defined when `mount` runs during the route
+      # draw. _path/_url names are left to method_missing_module, which owns
+      # them and relies on reload_routes_unless_loaded returning true only to
+      # the caller that performed the load.
+      module MountedHelpers
+        extend ::ActiveSupport::Concern
+
+        include ::ActionDispatch::Routing::RouteSet::MountedHelpers
+
+        private
+
+        def method_missing: (untyped method_name, *untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+        def respond_to_missing?: (untyped method_name, ?bool include_private) -> untyped
+      end
+
+      def initialize: (?untyped config) -> void
+
+      def generate_extras: (untyped options, ?::Hash[untyped, untyped] recall) -> untyped
+
+      def generate_url_helpers: (untyped supports_path) -> untyped
+
+      def call: (untyped req) -> untyped
+
+      def polymorphic_mappings: () -> untyped
+
+      def draw: () { (?) -> untyped } -> untyped
+
+      def recognize_path: (untyped path, ?::Hash[untyped, untyped] environment) -> untyped
+
+      def recognize_path_with_request: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+      def routes: () -> untyped
+
+      def mounted_helpers: () -> untyped
+
+      def define_mounted_helper: (untyped name, ?untyped? script_namer) -> (nil | untyped)
+
+      private
+
+      def method_missing_module: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Engine < ::Rails::Railtie
+    class Railties
+      include ::Enumerable[untyped]
+
+      attr_reader _all: untyped
+
+      def initialize: () -> void
+
+      def each: (*untyped args) { (?) -> untyped } -> untyped
+
+      def -: (untyped others) -> untyped
+    end
+  end
+end
+
+module Rails
+  class Engine
+    class Updater
+      def self.generator: () -> untyped
+
+      def self.run: (untyped action) -> untyped
+    end
+  end
+end
+
+module Rails
+  # Returns the currently loaded version of \Rails as a +Gem::Version+.
+  def self.gem_version: () -> Gem::Version
+
+  module VERSION
+    MAJOR: 8
+
+    MINOR: 1
+
+    TINY: 4
+
+    PRE: nil
+
+    STRING: untyped
+  end
+end
+
+module Rails
+  module Generators
+    include ::Rails::Command::Behavior
+
+    DEFAULT_ALIASES: { rails: { actions: "-a", orm: "-o", javascripts: ::Array["-j" | "--js"], resource_controller: "-c", scaffold_controller: "-c", stylesheets: "-y", template_engine: "-e", test_framework: "-t" }, test_unit: { fixture_replacement: "-r" } }
+
+    DEFAULT_OPTIONS: { rails: { api: false, assets: true, force_plural: false, helper: true, integration_tool: nil, orm: false, resource_controller: :controller, resource_route: true, scaffold_controller: :scaffold_controller, system_tests: nil, test_framework: nil, template_engine: :erb } }
+
+    # We need to store the RAILS_DEV_PATH in a constant, otherwise the path
+    # can change when we FileUtils.cd.
+    RAILS_DEV_PATH: untyped
+
+    def self.configure!: (untyped config) -> untyped
+
+    def self.templates_path: () -> untyped
+
+    def self.aliases: () -> untyped
+
+    def self.options: () -> untyped
+
+    def self.after_generate_callbacks: () -> untyped
+
+    # Hold configured generators fallbacks. If a plugin developer wants a
+    # generator group to fall back to another group in case of missing generators,
+    # they can add a fallback.
+    #
+    # For example, shoulda is considered a +test_framework+ and is an extension
+    # of +test_unit+. However, most part of shoulda generators are similar to
+    # +test_unit+ ones.
+    #
+    # Shoulda then can tell generators to search for +test_unit+ generators when
+    # some of them are not available by adding a fallback:
+    #
+    #   Rails::Generators.fallbacks[:shoulda] = :test_unit
+    def self.fallbacks: () -> untyped
+
+    # Configure generators for API only applications. It basically hides
+    # everything that is usually browser related, such as assets and session
+    # migration generators, and completely disable helpers and assets
+    # so generators such as scaffold won't create them.
+    def self.api_only!: () -> untyped
+
+    # Returns an array of generator namespaces that are hidden.
+    # Generator namespaces may be hidden for a variety of reasons.
+    # Some are aliased such as "rails:migration" and can be
+    # invoked with the shorter "migration".
+    def self.hidden_namespaces: () -> untyped
+
+    def self.hide_namespaces: (*untyped namespaces) -> untyped
+
+    alias self.hide_namespace self.hide_namespaces
+
+    # Show help message with available generators.
+    def self.help: (?::String command) -> untyped
+
+    def self.public_namespaces: () -> untyped
+
+    def self.print_generators: () -> untyped
+
+    def self.sorted_groups: () -> untyped
+
+    # Rails finds namespaces similar to Thor, it only adds one rule:
+    #
+    # Generators names must end with "_generator.rb". This is required because Rails
+    # looks in load paths and loads the generator just before it's going to be used.
+    #
+    #   find_by_namespace :webrat, :rails, :integration
+    #
+    # Will search for the following generators:
+    #
+    #   "rails:webrat", "webrat:integration", "webrat"
+    #
+    # Notice that "rails:generators:webrat" could be loaded as well, what
+    # Rails looks for is the first and last parts of the namespace.
+    def self.find_by_namespace: (untyped name, ?untyped? base, ?untyped? context) -> untyped
+
+    # Receives a namespace, arguments, and the behavior to invoke the generator.
+    # It's used as the default entry point for generate, destroy, and update
+    # commands.
+    def self.invoke: (untyped namespace, ?untyped args, ?::Hash[untyped, untyped] config) -> untyped
+
+    def self.add_generated_file: (untyped file) -> untyped
+
+    def self.print_list: (untyped base, untyped namespaces) -> untyped
+
+    # Try fallbacks for the given base.
+    def self.invoke_fallbacks_for: (untyped name, untyped base) -> (nil | untyped)
+
+    def self.command_type: () -> untyped
+
+    def self.lookup_paths: () -> untyped
+
+    def self.file_lookup_paths: () -> untyped
+
+    def self.run_after_generate_callback: () -> (untyped | nil)
+  end
+end
+
+module Rails
+  module Generators
+    module Actions
+      def initialize: (*untyped) -> void
+
+      # Adds a +gem+ declaration to the +Gemfile+ for the specified gem.
+      #
+      #   gem "rspec", group: :test
+      #   gem "technoweenie-restful-authentication", lib: "restful-authentication", source: "http://gems.github.com/"
+      #   gem "rails", "3.0", git: "https://github.com/rails/rails"
+      #   gem "RedCloth", ">= 4.1.0", "< 4.2.0"
+      #   gem "rspec", comment: "Put this comment above the gem declaration"
+      #
+      # Note that this method only adds the gem to the +Gemfile+; it does not
+      # install the gem.
+      #
+      # ==== Options
+      #
+      # [+:version+]
+      #   The version constraints for the gem, specified as a string or an
+      #   array of strings:
+      #
+      #     gem "my_gem", version: "~> 1.1"
+      #     gem "my_gem", version: [">= 1.1", "< 2.0"]
+      #
+      #   Alternatively, can be specified as one or more arguments following the
+      #   gem name:
+      #
+      #     gem "my_gem", ">= 1.1", "< 2.0"
+      #
+      # [+:comment+]
+      #   Outputs a comment above the +gem+ declaration in the +Gemfile+.
+      #
+      #     gem "my_gem", comment: "First line.\nSecond line."
+      #
+      #   Outputs:
+      #
+      #     # First line.
+      #     # Second line.
+      #     gem "my_gem"
+      #
+      # [+:group+]
+      #   The gem group in the +Gemfile+ that the gem belongs to.
+      #
+      # [+:git+]
+      #   The URL of the git repository for the gem.
+      #
+      # Any additional options passed to this method will be appended to the
+      # +gem+ declaration in the +Gemfile+. For example:
+      #
+      #   gem "my_gem", comment: "Edge my_gem", git: "https://example.com/my_gem.git", branch: "master"
+      #
+      # Outputs:
+      #
+      #   # Edge my_gem
+      #   gem "my_gem", git: "https://example.com/my_gem.git", branch: "master"
+      #
+      def gem: (*untyped args) -> untyped
+
+      # Wraps gem entries inside a group.
+      #
+      #   gem_group :development, :test do
+      #     gem "rspec-rails"
+      #   end
+      def gem_group: (*untyped names) { (?) -> untyped } -> untyped
+
+      def github: (untyped repo, ?::Hash[untyped, untyped] options) { (?) -> untyped } -> untyped
+
+      # Add the given source to +Gemfile+
+      #
+      # If block is given, gem entries in block are wrapped into the source group.
+      #
+      #   add_source "http://gems.github.com/"
+      #
+      #   add_source "http://gems.github.com/" do
+      #     gem "rspec-rails"
+      #   end
+      def add_source: (untyped source, ?::Hash[untyped, untyped] options) { (?) -> untyped } -> untyped
+
+      # Adds configuration code to a \Rails runtime environment.
+      #
+      # By default, adds code inside the +Application+ class in
+      # +config/application.rb+ so that it applies to all environments.
+      #
+      #   environment %(config.asset_host = "cdn.provider.com")
+      #
+      # Results in:
+      #
+      #   # config/application.rb
+      #   class Application < Rails::Application
+      #     config.asset_host = "cdn.provider.com"
+      #     # ...
+      #   end
+      #
+      # If the +:env+ option is specified, the code will be added to the
+      # corresponding file in +config/environments+ instead.
+      #
+      #   environment %(config.asset_host = "localhost:3000"), env: "development"
+      #
+      # Results in:
+      #
+      #   # config/environments/development.rb
+      #   Rails.application.configure do
+      #     config.asset_host = "localhost:3000"
+      #     # ...
+      #   end
+      #
+      # +:env+ can also be an array. In which case, the code is added to each
+      # corresponding file in +config/environments+.
+      #
+      # The code can also be specified as the return value of the block:
+      #
+      #   environment do
+      #     %(config.asset_host = "cdn.provider.com")
+      #   end
+      #
+      #   environment(nil, env: "development") do
+      #     %(config.asset_host = "localhost:3000")
+      #   end
+      #
+      def environment: (?untyped? data, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> untyped
+
+      alias application environment
+
+      # Runs one or more git commands.
+      #
+      #   git :init
+      #   # => runs `git init`
+      #
+      #   git add: "this.file that.rb"
+      #   # => runs `git add this.file that.rb`
+      #
+      #   git commit: "-m 'First commit'"
+      #   # => runs `git commit -m 'First commit'`
+      #
+      #   git add: "good.rb", rm: "bad.cxx"
+      #   # => runs `git add good.rb; git rm bad.cxx`
+      #
+      def git: (?::Hash[untyped, untyped] commands) -> untyped
+
+      # Creates a file in +vendor/+. The contents can be specified as an
+      # argument or as the return value of the block.
+      #
+      #   vendor "foreign.rb", <<~RUBY
+      #     # Foreign code is fun
+      #   RUBY
+      #
+      #   vendor "foreign.rb" do
+      #     "# Foreign code is fun"
+      #   end
+      #
+      def vendor: (untyped filename, ?untyped? data) ?{ () -> untyped } -> untyped
+
+      # Creates a file in +lib/+. The contents can be specified as an argument
+      # or as the return value of the block.
+      #
+      #   lib "foreign.rb", <<~RUBY
+      #     # Foreign code is fun
+      #   RUBY
+      #
+      #   lib "foreign.rb" do
+      #     "# Foreign code is fun"
+      #   end
+      #
+      def lib: (untyped filename, ?untyped? data) ?{ () -> untyped } -> untyped
+
+      # Creates a Rake tasks file in +lib/tasks/+. The code can be specified as
+      # an argument or as the return value of the block.
+      #
+      #   rakefile "bootstrap.rake", <<~RUBY
+      #     task :bootstrap do
+      #       puts "Boots! Boots! Boots!"
+      #     end
+      #   RUBY
+      #
+      #   rakefile "bootstrap.rake" do
+      #     project = ask("What is the UNIX name of your project?")
+      #
+      #     <<~RUBY
+      #       namespace :#{project} do
+      #         task :bootstrap do
+      #           puts "Boots! Boots! Boots!"
+      #         end
+      #       end
+      #     RUBY
+      #   end
+      #
+      def rakefile: (untyped filename, ?untyped? data) ?{ () -> untyped } -> untyped
+
+      # Creates an initializer file in +config/initializers/+. The code can be
+      # specified as an argument or as the return value of the block.
+      #
+      #   initializer "api.rb", <<~RUBY
+      #     API_KEY = "123456"
+      #   RUBY
+      #
+      #   initializer "api.rb" do
+      #     %(API_KEY = "123456")
+      #   end
+      #
+      def initializer: (untyped filename, ?untyped? data) ?{ () -> untyped } -> untyped
+
+      # Runs another generator.
+      #
+      #   generate "scaffold", "Post title:string body:text"
+      #   generate "scaffold", "Post", "title:string", "body:text"
+      #
+      # The first argument is the generator name, and the remaining arguments
+      # are joined together and passed to the generator.
+      def generate: (untyped what, *untyped args) -> untyped
+
+      # Runs the specified Rake task.
+      #
+      #   rake "db:migrate"
+      #   rake "db:migrate", env: "production"
+      #   rake "db:migrate", abort_on_failure: true
+      #   rake "stats", capture: true
+      #   rake "gems:install", sudo: true
+      #
+      # ==== Options
+      #
+      # [+:env+]
+      #   The \Rails environment in which to run the task. Defaults to
+      #   <tt>ENV["RAILS_ENV"] || "development"</tt>.
+      #
+      # [+:abort_on_failure+]
+      #   Whether to halt the generator if the task exits with a non-success
+      #   exit status.
+      #
+      # [+:capture+]
+      #   Whether to capture and return the output of the task.
+      #
+      # [+:sudo+]
+      #   Whether to run the task using +sudo+.
+      def rake: (untyped command, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Runs the specified \Rails command.
+      #
+      #   rails_command "db:migrate"
+      #   rails_command "db:migrate", env: "production"
+      #   rails_command "db:migrate", abort_on_failure: true
+      #   rails_command "stats", capture: true
+      #   rails_command "gems:install", sudo: true
+      #
+      # ==== Options
+      #
+      # [+:env+]
+      #   The \Rails environment in which to run the command. Defaults to
+      #   <tt>ENV["RAILS_ENV"] || "development"</tt>.
+      #
+      # [+:abort_on_failure+]
+      #   Whether to halt the generator if the command exits with a non-success
+      #   exit status.
+      #
+      # [+:capture+]
+      #   Whether to capture and return the output of the command.
+      #
+      # [+:sudo+]
+      #   Whether to run the command using +sudo+.
+      def rails_command: (untyped command, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Make an entry in \Rails routing file <tt>config/routes.rb</tt>
+      #
+      #   route "root 'welcome#index'"
+      #   route "root 'admin#index'", namespace: :admin
+      def route: (untyped routing_code, ?namespace: untyped?) -> untyped
+
+      # Reads the given file at the source root and prints it in the console.
+      #
+      #   readme "README"
+      def readme: (untyped path) -> untyped
+
+      private
+
+      # Define log for backwards compatibility. If just one argument is sent,
+      # invoke +say+, otherwise invoke +say_status+.
+      def log: (*untyped args) -> untyped
+
+      # Runs the supplied command using either +rake+ or +rails+
+      # based on the executor parameter provided.
+      def execute_command: (untyped executor, untyped command, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Always returns value in double quotes.
+      def quote: (untyped value) -> (untyped | ::String)
+
+      # Returns optimized string with indentation
+      def optimize_indentation: (untyped value, ?::Integer amount) -> ::String
+
+      alias rebase_indentation optimize_indentation
+
+      # Returns a string corresponding to the current indentation level
+      # (i.e. 2 * <code>@indentation</code> spaces). See also
+      # #with_indentation, which can be used to manage the indentation level.
+      def indentation: () -> untyped
+
+      # Increases the current indentation indentation level for the duration
+      # of the given block, and decreases it after the block ends. Call
+      # #indentation to get an indentation string.
+      def with_indentation: () { (?) -> untyped } -> untyped
+
+      # Append string to a file with a newline if necessary
+      def append_file_with_newline: (untyped path, untyped str, ?::Hash[untyped, untyped] options) -> untyped
+
+      def match_file: (untyped path, untyped pattern) -> (untyped | nil)
+
+      def route_namespace_pattern: (untyped namespace) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module Actions
+      class CreateMigration < ::Thor::Actions::CreateFile
+        def migration_dir: () -> untyped
+
+        def migration_file_name: () -> untyped
+
+        def identical?: () -> untyped
+
+        def invoke!: () -> untyped
+
+        def revoke!: () -> (nil | untyped)
+
+        def relative_existing_migration: () -> untyped
+
+        def existing_migration: () -> untyped
+
+        alias exists? existing_migration
+
+        private
+
+        def on_conflict_behavior: () { () -> untyped } -> untyped
+
+        def say_status: (untyped status, untyped color, ?untyped message) -> (untyped | nil)
+      end
+    end
+  end
+end
+
+module Rails
+  module Generators
+    # ActiveModel is a class to be implemented by each ORM to allow \Rails to
+    # generate customized controller code.
+    #
+    # The API has the same methods as ActiveRecord, but each method returns a
+    # string that matches the ORM API.
+    #
+    # For example:
+    #
+    #   ActiveRecord::Generators::ActiveModel.find(Foo, "params[:id]")
+    #   # => "Foo.find(params[:id])"
+    #
+    #   DataMapper::Generators::ActiveModel.find(Foo, "params[:id]")
+    #   # => "Foo.get(params[:id])"
+    #
+    # On initialization, the ActiveModel accepts the instance name that will
+    # receive the calls:
+    #
+    #   builder = ActiveRecord::Generators::ActiveModel.new "@foo"
+    #   builder.save # => "@foo.save"
+    #
+    # The only exception in ActiveModel for ActiveRecord is the use of self.build
+    # instead of self.new.
+    #
+    class ActiveModel
+      attr_reader name: untyped
+
+      def initialize: (untyped name) -> void
+
+      # Used for:
+      #
+      # * GET +index+
+      def self.all: (untyped klass) -> ::String
+
+      # Used for:
+      #
+      # * GET +show+
+      # * GET +edit+
+      # * PATCH / PUT +update+
+      # * DELETE +destroy+
+      def self.find: (untyped klass, ?untyped? params) -> ::String
+
+      # Used for:
+      #
+      # * GET +new+
+      # * POST +create+
+      def self.build: (untyped klass, ?untyped? params) -> ::String
+
+      # Used for:
+      #
+      # * POST +create+
+      def save: () -> ::String
+
+      # Used for:
+      #
+      # * PATCH / PUT +update+
+      def update: (?untyped? params) -> ::String
+
+      # Used for:
+      #
+      # * POST +create+
+      # * PATCH / PUT +update+
+      def errors: () -> ::String
+
+      # Used for:
+      #
+      # * DELETE +destroy+
+      def destroy: () -> ::String
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class AppBase < ::Rails::Generators::Base
+      include ::Rails::Generators::AppName
+
+      include ::Rails::Generators::BundleHelper
+
+      NODE_LTS_VERSION: "20.11.1"
+
+      BUN_VERSION: "1.0.1"
+
+      JAVASCRIPT_OPTIONS: ::Array["importmap" | "bun" | "webpack" | "esbuild" | "rollup"]
+
+      CSS_OPTIONS: ::Array["tailwind" | "bootstrap" | "bulma" | "postcss" | "sass"]
+
+      attr_accessor rails_template: untyped
+
+      def self.strict_args_position: () -> false
+
+      def self.add_shared_options_for: (untyped name) -> untyped
+
+      def self.edge_branch: () -> ("main" | untyped)
+
+      def initialize: (untyped positional_argv, untyped option_argv, *untyped) -> void
+
+      private
+
+      def gemfile_entries: () -> untyped
+
+      def builder: () -> untyped
+
+      def build: (untyped meth, *untyped args) -> (untyped | nil)
+
+      def deduce_implied_options: (untyped options, untyped option_reasons, untyped meta_options) -> untyped
+
+      OPTION_IMPLICATIONS: { skip_active_job: ::Array[:skip_action_mailer | :skip_active_storage], skip_active_record: ::Array[:skip_active_storage | :skip_solid], skip_active_storage: ::Array[:skip_action_mailbox | :skip_action_text], skip_javascript: ::Array[:skip_hotwire] }
+
+      # ==== Options
+      #
+      # [+:meta_options+]
+      #   A list of generator options which only serve to trigger other options.
+      #   These options should have no other effects, and will be treated
+      #   transparently when revoking other options.
+      #
+      #   For example: --minimal implies both --skip-active-job and
+      #   --skip-active-storage. Also, --skip-active-job by itself implies
+      #   --skip-active-storage. If --skip-active-job is explicitly
+      #   specified, --no-skip-active-storage should raise an error. But, if
+      #   only --minimal is specified, --no-skip-active-storage should "undo"
+      #   the implied --skip-active-job. This can be accomplished by passing
+      #   <tt>meta_options: [:minimal]</tt>.
+      #
+      #   In contrast, --api is not a meta option because it does other things
+      #   besides implying options such as --skip-asset-pipeline. (And so --api
+      #   with --no-skip-asset-pipeline should raise an error.)
+      def imply_options: (?untyped option_implications, ?meta_options: untyped) -> untyped
+
+      def report_implied_options: () -> (nil | untyped)
+
+      def create_root: () -> untyped
+
+      def apply_rails_template: () -> untyped
+
+      def set_default_accessors!: () -> untyped
+
+      def database_gemfile_entry: () -> (nil | untyped)
+
+      def web_server_gemfile_entry: () -> untyped
+
+      def asset_pipeline_gemfile_entry: () -> (untyped | nil)
+
+      def required_railties: () -> untyped
+
+      def include_all_railties?: () -> untyped
+
+      def rails_require_statement: () -> ("require \"rails/all\"" | untyped)
+
+      def comment_if: (untyped value) -> untyped
+
+      def keeps?: () -> untyped
+
+      def sqlite3?: () -> untyped
+
+      def skip_active_record?: () -> untyped
+
+      def skip_active_storage?: () -> untyped
+
+      def skip_storage?: () -> untyped
+
+      def skip_action_cable?: () -> untyped
+
+      def skip_action_mailer?: () -> untyped
+
+      def skip_action_mailbox?: () -> untyped
+
+      def skip_action_text?: () -> untyped
+
+      def skip_asset_pipeline?: () -> untyped
+
+      def skip_thruster?: () -> untyped
+
+      def skip_rubocop?: () -> untyped
+
+      def skip_brakeman?: () -> untyped
+
+      def skip_bundler_audit?: () -> untyped
+
+      def skip_ci?: () -> untyped
+
+      def skip_devcontainer?: () -> untyped
+
+      def devcontainer?: () -> untyped
+
+      def skip_kamal?: () -> untyped
+
+      def skip_solid?: () -> untyped
+
+      class GemfileEntry
+        def initialize: (untyped name, untyped version, untyped comment, ?::Hash[untyped, untyped] options, ?bool commented_out) -> void
+
+        def self.github: (untyped name, untyped github, ?untyped? branch, ?untyped? comment) -> untyped
+
+        def self.version: (untyped name, untyped version, ?untyped? comment) -> untyped
+
+        def self.floats: (untyped name, ?untyped? comment) -> untyped
+
+        def self.path: (untyped name, untyped path, ?untyped? comment) -> untyped
+
+        def to_s: () -> untyped
+      end
+
+      def rails_prerelease?: () -> untyped
+
+      def rails_gemfile_entry: () -> untyped
+
+      def rails_version_specifier: (?untyped gem_version) -> (::String | ::Array[::String])
+
+      def jbuilder_gemfile_entry: () -> GemfileEntry
+
+      def javascript_gemfile_entry: () -> (nil | untyped)
+
+      def hotwire_gemfile_entry: () -> (nil | ::Array[untyped])
+
+      def using_importmap?: () -> untyped
+
+      def using_js_runtime?: () -> untyped
+
+      def using_node?: () -> untyped
+
+      def using_bun?: () -> untyped
+
+      def capture_command: (untyped command, ?untyped? pattern) -> untyped
+
+      def node_version: () -> (untyped | nil)
+
+      def dockerfile_yarn_version: () -> untyped
+
+      def yarn_through_corepack?: () -> untyped
+
+      def dockerfile_bun_version: () -> untyped
+
+      def dockerfile_binfile_fixups: () -> untyped
+
+      def dockerfile_base_packages: () -> untyped
+
+      def dockerfile_build_packages: () -> untyped
+
+      def ci_packages: () -> untyped
+
+      def css_gemfile_entry: () -> (nil | untyped)
+
+      def cable_gemfile_entry: () -> (untyped | nil)
+
+      def rails_command: (untyped command, ?::Hash[untyped, untyped] command_options) -> untyped
+
+      def bundle_install?: () -> untyped
+
+      def depends_on_system_test?: () -> untyped
+
+      def depend_on_bootsnap?: () -> untyped
+
+      def target_rails_prerelease: (?::String self_command) -> (nil | untyped)
+
+      def run_bundle: () -> (untyped | nil)
+
+      def run_javascript: () -> (nil | untyped)
+
+      def run_hotwire: () -> (nil | untyped)
+
+      def run_css: () -> (nil | untyped)
+
+      def run_kamal: () -> (nil | untyped)
+
+      def run_solid: () -> (nil | untyped)
+
+      def add_bundler_platforms: () -> (untyped | nil)
+
+      def jruby?: () -> untyped
+
+      def version_manager_ruby_version: () -> (untyped | ::String)
+
+      def empty_directory_with_keep_file: (untyped destination, ?::Hash[untyped, untyped] config) -> untyped
+
+      def keep_file: (untyped destination) -> (untyped | nil)
+
+      def user_default_branch: () -> untyped
+
+      def git_init_command: () -> ("git init" | untyped)
+
+      def edge_branch: () -> untyped
+
+      def dockerfile_chown_directories: () -> untyped
+
+      def database: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module AppName
+      RESERVED_NAMES: ::Array["application" | "destroy" | "plugin" | "runner" | "test"]
+
+      private
+
+      def app_name: () -> untyped
+
+      def original_app_name: () -> untyped
+
+      def app_const_base: () -> untyped
+
+      alias camelized app_const_base
+
+      def app_const: () -> untyped
+
+      def valid_const?: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class Error < ::Thor::Error
+    end
+
+    class Base < ::Thor::Group
+      include ::Thor::Actions
+
+      include ::Rails::Generators::Actions
+
+      def self.exit_on_failure?: () -> false
+
+      # Returns the source root for this generator using default_source_root as default.
+      def self.source_root: (?untyped? path) -> untyped
+
+      # Tries to get the description from a USAGE file one folder above the source
+      # root otherwise uses a default description.
+      def self.desc: (?untyped? description) -> untyped
+
+      # Convenience method to get the namespace from the class name. It's the
+      # same as Thor default except that the Generator at the end of the class
+      # is removed.
+      def self.namespace: (?untyped? name) -> untyped
+
+      # Convenience method to hide this generator from the available ones when
+      # running rails generator command.
+      def self.hide!: () -> untyped
+
+      # Invoke a generator based on the value supplied by the user to the
+      # given option named "name". A class option is created when this method
+      # is invoked and you can set a hash to customize it.
+      #
+      # ==== Examples
+      #
+      #   module Rails::Generators
+      #     class ControllerGenerator < Base
+      #       hook_for :test_framework, aliases: "-t"
+      #     end
+      #   end
+      #
+      # The example above will create a test framework option and will invoke
+      # a generator based on the user supplied value.
+      #
+      # For example, if the user invoke the controller generator as:
+      #
+      #   $ bin/rails generate controller Account --test-framework=test_unit
+      #
+      # The controller generator will then try to invoke the following generators:
+      #
+      #   "rails:test_unit", "test_unit:controller", "test_unit"
+      #
+      # Notice that "rails:generators:test_unit" could be loaded as well, what
+      # \Rails looks for is the first and last parts of the namespace. This is what
+      # allows any test framework to hook into \Rails as long as it provides any
+      # of the hooks above.
+      #
+      # ==== Options
+      #
+      # The first and last part used to find the generator to be invoked are
+      # guessed based on class invokes hook_for, as noticed in the example above.
+      # This can be customized with two options: +:in+ and +:as+.
+      #
+      # Let's suppose you are creating a generator that needs to invoke the
+      # controller generator from test unit. Your first attempt is:
+      #
+      #   class AwesomeGenerator < Rails::Generators::Base
+      #     hook_for :test_framework
+      #   end
+      #
+      # The lookup in this case for test_unit as input is:
+      #
+      #   "test_unit:awesome", "test_unit"
+      #
+      # Which is not the desired lookup. You can change it by providing the
+      # +:as+ option:
+      #
+      #   class AwesomeGenerator < Rails::Generators::Base
+      #     hook_for :test_framework, as: :controller
+      #   end
+      #
+      # And now it will look up at:
+      #
+      #   "test_unit:controller", "test_unit"
+      #
+      # Similarly, if you want it to also look up in the rails namespace, you
+      # just need to provide the +:in+ value:
+      #
+      #   class AwesomeGenerator < Rails::Generators::Base
+      #     hook_for :test_framework, in: :rails, as: :controller
+      #   end
+      #
+      # And the lookup is exactly the same as previously:
+      #
+      #   "rails:test_unit", "test_unit:controller", "test_unit"
+      #
+      # ==== Switches
+      #
+      # All hooks come with switches for user interface. If you do not want
+      # to use any test framework, you can do:
+      #
+      #   $ bin/rails generate controller Account --skip-test-framework
+      #
+      # Or similarly:
+      #
+      #   $ bin/rails generate controller Account --no-test-framework
+      #
+      # ==== Boolean hooks
+      #
+      # In some cases, you may want to provide a boolean hook. For example, webrat
+      # developers might want to have webrat available on controller generator.
+      # This can be achieved as:
+      #
+      #   Rails::Generators::ControllerGenerator.hook_for :webrat, type: :boolean
+      #
+      # Then, if you want webrat to be invoked, just supply:
+      #
+      #   $ bin/rails generate controller Account --webrat
+      #
+      # The hooks lookup is similar as above:
+      #
+      #   "rails:generators:webrat", "webrat:generators:controller", "webrat"
+      #
+      # ==== Custom invocations
+      #
+      # You can also supply a block to hook_for to customize how the hook is
+      # going to be invoked. The block receives two arguments, an instance
+      # of the current class and the class to be invoked.
+      #
+      # For example, in the resource generator, the controller should be invoked
+      # with a pluralized class name. But by default it is invoked with the same
+      # name as the resource generator, which is singular. To change this, we
+      # can give a block to customize how the controller can be invoked.
+      #
+      #   hook_for :resource_controller do |instance, controller|
+      #     instance.invoke controller, [ instance.name.pluralize ]
+      #   end
+      #
+      def self.hook_for: (*untyped names) { (?) -> untyped } -> untyped
+
+      # Remove a previously added hook.
+      #
+      #   remove_hook_for :orm
+      def self.remove_hook_for: (*untyped names) -> untyped
+
+      # Make class option aware of Rails::Generators.options and Rails::Generators.aliases.
+      def self.class_option: (untyped name, ?::Hash[untyped, untyped] options) -> untyped
+
+      # Returns the default source root for a given generator. This is used internally
+      # by Rails to set its generators source root. If you want to customize your source
+      # root, you should use source_root.
+      def self.default_source_root: () -> (nil | untyped)
+
+      # Returns the base root for a common set of generators. This is used to dynamically
+      # guess the default source root.
+      def self.base_root: () -> untyped
+
+      # Cache source root and add lib/generators/base/generator/templates to
+      # source paths.
+      def self.inherited: (untyped base) -> untyped
+
+      private
+
+      # Check whether the given class names are already taken by user
+      # application or Ruby on Rails.
+      def class_collisions: (*untyped class_names) -> (nil | untyped)
+
+      # Takes in an array of nested modules and extracts the last module
+      def extract_last_module: (untyped nesting) -> untyped
+
+      # Wrap block with namespace of current application
+      # if namespace exists and is not skipped
+      def module_namespacing: () { (?) -> untyped } -> untyped
+
+      def indent: (untyped content, ?::Integer multiplier) -> untyped
+
+      def wrap_with_namespace: (untyped content) -> ::String
+
+      def namespace: () -> untyped
+
+      def namespaced?: () -> untyped
+
+      def namespace_dirs: () -> untyped
+
+      def namespaced_path: () -> untyped
+
+      # Use \Rails default banner.
+      def self.banner: () -> untyped
+
+      # Sets the base_name taking into account the current class namespace.
+      def self.base_name: () -> untyped
+
+      # Removes the namespaces and get the generator name. For example,
+      # Rails::Generators::ModelGenerator will return "model" as generator name.
+      def self.generator_name: () -> untyped
+
+      # Returns the default value for the option name given doing a lookup in
+      # Rails::Generators.options.
+      def self.default_value_for_option: (untyped name, untyped options) -> untyped
+
+      # Returns default aliases for the option name given doing a lookup in
+      # Rails::Generators.aliases.
+      def self.default_aliases_for_option: (untyped name, untyped options) -> untyped
+
+      # Returns default for the option name given doing a lookup in config.
+      def self.default_for_option: (untyped config, untyped name, untyped options, untyped default) -> untyped
+
+      # Keep hooks configuration that are used on prepare_for_invocation.
+      def self.hooks: () -> untyped
+
+      # Prepare class invocation to search on Rails namespace if a previous
+      # added hook is being used.
+      def self.prepare_for_invocation: (untyped name, untyped value) -> untyped
+
+      # Small macro to add ruby as an option to the generator with proper
+      # default value plus an instance helper method called shebang.
+      def self.add_shebang_option!: () -> untyped
+
+      def self.usage_path: () -> untyped
+
+      def self.default_generator_root: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module BundleHelper
+      def bundle_command: (untyped command, ?::Hash[untyped, untyped] env, ?::Hash[untyped, untyped] params) -> untyped
+
+      private
+
+      def exec_bundle_command: (untyped bundle_command, untyped command, untyped env, untyped params) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class Database
+      DATABASES: ::Array["mysql" | "trilogy" | "postgresql" | "sqlite3" | "mariadb-mysql" | "mariadb-trilogy"]
+
+      module MySQL
+        def name: () -> "mysql"
+
+        def port: () -> 3306
+
+        def service: () -> { "image" => "mysql/mysql-server:8.0", "restart" => "unless-stopped", "environment" => { "MYSQL_ALLOW_EMPTY_PASSWORD" => "true", "MYSQL_ROOT_HOST" => "%" }, "volumes" => ::Array["mysql-data:/var/lib/mysql"], "networks" => ::Array["default"] }
+
+        def socket: () -> (untyped | nil)
+
+        def host: () -> "127.0.0.1"
+      end
+
+      module MariaDB
+        def name: () -> "mariadb"
+
+        def port: () -> 3306
+
+        def service: () -> { "image" => "mariadb:10.5", "restart" => "unless-stopped", "networks" => ::Array["default"], "volumes" => ::Array["mariadb-data:/var/lib/mysql"], "environment" => { "MARIADB_ALLOW_EMPTY_ROOT_PASSWORD" => "true" } }
+      end
+
+      def self.build: (untyped database_name) -> untyped
+
+      def self.all: () -> untyped
+
+      def name: () -> untyped
+
+      def template: () -> untyped
+
+      def service: () -> untyped
+
+      def port: () -> untyped
+
+      def feature_name: () -> untyped
+
+      def gem: () -> untyped
+
+      def base_package: () -> untyped
+
+      def build_package: () -> untyped
+
+      def socket: () -> nil
+
+      def host: () -> nil
+
+      def feature: () -> (nil | ::Hash[untyped, ::Hash[untyped, untyped]])
+
+      def volume: () -> (nil | ::String)
+
+      class MySQL2 < ::Rails::Generators::Database
+        include ::Rails::Generators::Database::MySQL
+
+        def template: () -> "config/databases/mysql.yml"
+
+        def gem: () -> ::Array["mysql2" | ::Array["~> 0.5"]]
+
+        def base_package: () -> "default-mysql-client"
+
+        def build_package: () -> "default-libmysqlclient-dev"
+
+        def feature_name: () -> "ghcr.io/rails/devcontainer/features/mysql-client"
+      end
+
+      class PostgreSQL < ::Rails::Generators::Database
+        def name: () -> "postgres"
+
+        def template: () -> "config/databases/postgresql.yml"
+
+        def service: () -> { "image" => "postgres:16.1", "restart" => "unless-stopped", "networks" => ::Array["default"], "volumes" => ::Array["postgres-data:/var/lib/postgresql/data"], "environment" => { "POSTGRES_USER" => "postgres", "POSTGRES_PASSWORD" => "postgres" } }
+
+        def port: () -> 5432
+
+        def gem: () -> ::Array["pg" | ::Array["~> 1.1"]]
+
+        def base_package: () -> "postgresql-client"
+
+        def build_package: () -> "libpq-dev"
+
+        def feature_name: () -> "ghcr.io/rails/devcontainer/features/postgres-client"
+      end
+
+      class Trilogy < ::Rails::Generators::Database
+        include ::Rails::Generators::Database::MySQL
+
+        def template: () -> "config/databases/trilogy.yml"
+
+        def gem: () -> ::Array["trilogy" | ::Array["~> 2.7"]]
+
+        def base_package: () -> "default-mysql-client"
+
+        def build_package: () -> nil
+
+        def feature_name: () -> nil
+      end
+
+      class SQLite3 < ::Rails::Generators::Database
+        def name: () -> "sqlite3"
+
+        def template: () -> "config/databases/sqlite3.yml"
+
+        def service: () -> nil
+
+        def port: () -> nil
+
+        def gem: () -> ::Array["sqlite3" | ::Array[">= 2.1"]]
+
+        def base_package: () -> "sqlite3"
+
+        def build_package: () -> nil
+
+        def feature_name: () -> "ghcr.io/rails/devcontainer/features/sqlite3"
+      end
+
+      class MariaDBMySQL2 < ::Rails::Generators::Database::MySQL2
+        include ::Rails::Generators::Database::MariaDB
+      end
+
+      class MariaDBTrilogy < ::Rails::Generators::Database::Trilogy
+        include ::Rails::Generators::Database::MariaDB
+      end
+
+      class Null < ::Rails::Generators::Database
+        def name: () -> nil
+
+        def template: () -> nil
+
+        def service: () -> nil
+
+        def port: () -> nil
+
+        def volume: () -> nil
+
+        def base_package: () -> nil
+
+        def build_package: () -> nil
+
+        def feature_name: () -> nil
+      end
+    end
+  end
+end
+
+module Erb
+  module Generators
+    class Base < ::Rails::Generators::NamedBase
+      private
+
+      def formats: () -> ::Array[untyped]
+
+      def format: () -> :html
+
+      def handler: () -> :erb
+
+      def filename_with_extensions: (untyped name, ?untyped file_format) -> untyped
+    end
+  end
+end
+
+module Erb
+  module Generators
+    class AuthenticationGenerator < ::Rails::Generators::Base
+      def create_files: () -> untyped
+    end
+  end
+end
+
+module Erb
+  module Generators
+    class ControllerGenerator < ::Erb::Generators::Base
+      def copy_view_files: () -> untyped
+    end
+  end
+end
+
+module Erb
+  module Generators
+    class MailerGenerator < ::Erb::Generators::Base
+      def copy_view_files: () -> untyped
+
+      private
+
+      def formats: () -> ::Array[:text | :html]
+
+      def file_name: () -> untyped
+    end
+  end
+end
+
+module Erb
+  module Generators
+    class ScaffoldGenerator < ::Erb::Generators::Base
+      include ::Rails::Generators::ResourceHelpers
+
+      def create_root_folder: () -> untyped
+
+      def copy_view_files: () -> untyped
+
+      private
+
+      def available_views: () -> ::Array["index" | "edit" | "show" | "new" | "_form"]
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class GeneratedAttribute
+      INDEX_OPTIONS: ::Array["index" | "uniq"]
+
+      UNIQ_INDEX_OPTIONS: ::Array["uniq"]
+
+      DEFAULT_TYPES: ::Array["attachment" | "attachments" | "belongs_to" | "boolean" | "date" | "datetime" | "decimal" | "digest" | "float" | "integer" | "references" | "rich_text" | "string" | "text" | "time" | "timestamp" | "token"]
+
+      attr_accessor name: untyped
+
+      attr_accessor type: untyped
+
+      attr_reader attr_options: untyped
+
+      attr_writer index_name: untyped
+
+      def self.parse: (untyped column_definition) -> untyped
+
+      def self.dangerous_name?: (untyped name) -> untyped
+
+      def self.valid_type?: (untyped type) -> untyped
+
+      def self.valid_index_type?: (untyped index_type) -> untyped
+
+      def self.reference?: (untyped type) -> untyped
+
+      # parse possible attribute options like :limit for string/text/binary/integer, :precision/:scale for decimals or :polymorphic for references/belongs_to
+      # when declaring options curly brackets should be used
+      def self.parse_type_and_options: (untyped type) -> untyped
+
+      def initialize: (untyped name, ?untyped? type, ?bool index_type, ?::Hash[untyped, untyped] attr_options) -> void
+
+      def field_type: () -> untyped
+
+      def default: () -> untyped
+
+      def plural_name: () -> untyped
+
+      def singular_name: () -> untyped
+
+      def human_name: () -> untyped
+
+      def index_name: () -> untyped
+
+      def column_name: () -> untyped
+
+      def foreign_key?: () -> untyped
+
+      def reference?: () -> untyped
+
+      def polymorphic?: () -> untyped
+
+      def required?: () -> untyped
+
+      def has_index?: () -> untyped
+
+      def has_uniq_index?: () -> untyped
+
+      def password_digest?: () -> untyped
+
+      def token?: () -> untyped
+
+      def rich_text?: () -> untyped
+
+      def attachment?: () -> untyped
+
+      def attachments?: () -> untyped
+
+      def virtual?: () -> untyped
+
+      def inject_options: () -> untyped
+
+      def inject_index_options: () -> (", unique: true" | "")
+
+      def options_for_migration: () -> untyped
+
+      def to_s: () -> ::String
+
+      private
+
+      def print_attribute_options: () -> ::String
+    end
+  end
+end
+
+module Rails
+  module Generators
+    # Holds common methods for migrations. It assumes that migrations have the
+    # [0-9]*_name format and can be used by other frameworks (like Sequel)
+    # just by implementing the +next_migration_number+ method.
+    module Migration
+      extend ::ActiveSupport::Concern
+
+      attr_reader migration_number: untyped
+
+      attr_reader migration_file_name: untyped
+
+      attr_reader migration_class_name: untyped
+
+      module ClassMethods
+        def migration_lookup_at: (untyped dirname) -> untyped
+
+        def migration_exists?: (untyped dirname, untyped file_name) -> untyped
+
+        def current_migration_number: (untyped dirname) -> untyped
+
+        def next_migration_number: (untyped dirname) -> untyped
+      end
+
+      def create_migration: (untyped destination, untyped data, ?::Hash[untyped, untyped] config) ?{ (?) -> untyped } -> untyped
+
+      def set_migration_assigns!: (untyped destination) -> untyped
+
+      # Creates a migration template at the given destination. The difference
+      # to the default template method is that the migration number is prepended
+      # to the destination file name.
+      #
+      # The migration number, migration file name, migration class name are
+      # available as instance variables in the template to be rendered.
+      #
+      #   migration_template "migration.rb", "db/migrate/add_foo_to_bar.rb"
+      def migration_template: (untyped source, untyped destination, ?::Hash[untyped, untyped] config) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module ModelHelpers
+      PLURAL_MODEL_NAME_WARN_MESSAGE: "[WARNING] The model name '%s' was recognized as a plural, using the singular '%s' instead. Override with --force-plural or setup custom inflection rules for this noun before running the generator."
+
+      IRREGULAR_MODEL_NAME_WARN_MESSAGE: "[WARNING] Rails cannot recover singular form from its plural form '%s'.\nPlease setup custom inflection rules for this noun before running the generator in config/initializers/inflections.rb.\n"
+
+      INFLECTION_IMPOSSIBLE_ERROR_MESSAGE: "Rails cannot recover the underscored form from its camelcase form '%s'.\nPlease use an underscored name instead, either '%s' or '%s'.\nOr setup custom inflection rules for this noun before running the generator in config/initializers/inflections.rb.\n"
+
+      def self.included: (untyped base) -> untyped
+
+      def initialize: (untyped args, *untyped _options) -> void
+
+      private
+
+      def plural_model_name?: (untyped name) -> untyped
+
+      def irregular_model_name?: (untyped name) -> untyped
+
+      def inflection_impossible?: (untyped name) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class NamedBase < ::Rails::Generators::Base
+      def initialize: (untyped args, *untyped options) -> void
+
+      private
+
+      attr_reader file_name: untyped
+
+      # FIXME: We are avoiding to use alias because a bug on thor that make
+      # this method public and add it to the task list.
+      def singular_name: () -> untyped
+
+      def inside_template: () { () -> untyped } -> untyped
+
+      def inside_template?: () -> untyped
+
+      def file_path: () -> untyped
+
+      def class_path: () -> untyped
+
+      def regular_class_path: () -> untyped
+
+      def namespaced_class_path: () -> untyped
+
+      def class_name: () -> untyped
+
+      def human_name: () -> untyped
+
+      def plural_name: () -> untyped
+
+      def i18n_scope: () -> untyped
+
+      def table_name: () -> untyped
+
+      def uncountable?: () -> untyped
+
+      def index_helper: (?type: untyped?) -> untyped
+
+      def show_helper: (?::String arg, ?type: ::Symbol) -> ::String
+
+      def edit_helper: (*untyped, **untyped) ?{ (?) -> untyped } -> ::String
+
+      def new_helper: (?type: ::Symbol) -> ::String
+
+      def singular_table_name: () -> untyped
+
+      def plural_table_name: () -> untyped
+
+      def plural_file_name: () -> untyped
+
+      def fixture_file_name: () -> untyped
+
+      def route_url: () -> untyped
+
+      def url_helper_prefix: () -> untyped
+
+      # Tries to retrieve the application name or simply return application.
+      def application_name: () -> (untyped | "application")
+
+      def redirect_resource_name: () -> untyped
+
+      def model_resource_name: (?untyped base_name, ?prefix: ::String) -> untyped
+
+      def singular_route_name: () -> (::String | untyped)
+
+      def plural_route_name: () -> (::String | untyped)
+
+      def assign_names!: (untyped name) -> untyped
+
+      # Convert attributes array into GeneratedAttribute objects.
+      def parse_attributes!: () -> untyped
+
+      def attributes_names: () -> untyped
+
+      def pluralize_table_names?: () -> untyped
+
+      def mountable_engine?: () -> untyped
+
+      # Add a class collisions name to be checked on class initialization. You
+      # can supply a hash with a +:prefix+ or +:suffix+ to be tested.
+      #
+      # ==== Examples
+      #
+      #   check_class_collision suffix: "Decorator"
+      #
+      # If the generator is invoked with class name Admin, it will check for
+      # the presence of "AdminDecorator".
+      #
+      def self.check_class_collision: (?::Hash[untyped, untyped] options) -> untyped
+    end
+  end
+end
+
+module Rails
+  module ActionMethods
+    attr_reader options: untyped
+
+    def initialize: (untyped generator) -> void
+
+    private
+
+    def method_missing: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+  end
+
+  # The application builder allows you to override elements of the application
+  # generator without being forced to reverse the operations of the default
+  # generator.
+  #
+  # This allows you to override entire operations, like the creation of the
+  # Gemfile, README, or JavaScript files, without needing to know exactly
+  # what those operations do so you can create another template action.
+  #
+  #  class CustomAppBuilder < Rails::AppBuilder
+  #    def test
+  #      @generator.gem "rspec-rails", group: [:development, :test]
+  #      run "bundle install"
+  #      generate "rspec:install"
+  #    end
+  #  end
+  class AppBuilder
+    def rakefile: () -> untyped
+
+    def readme: () -> untyped
+
+    def ruby_version: () -> untyped
+
+    def node_version: () -> untyped
+
+    def gemfile: () -> untyped
+
+    def configru: () -> untyped
+
+    def gitignore: () -> untyped
+
+    def gitattributes: () -> untyped
+
+    def dockerfiles: () -> untyped
+
+    def cifiles: () -> untyped
+
+    def rubocop: () -> untyped
+
+    def version_control: () -> (untyped | nil)
+
+    def app: () -> untyped
+
+    def bin: () -> untyped
+
+    def bin_when_updating: () -> untyped
+
+    def config: () -> untyped
+
+    def config_when_updating: () -> untyped
+
+    def master_key: () -> (nil | untyped)
+
+    def credentials: () -> (nil | untyped)
+
+    def credentials_diff_enroll: () -> (nil | untyped)
+
+    def database_yml: () -> untyped
+
+    def db: () -> untyped
+
+    def lib: () -> untyped
+
+    def log: () -> untyped
+
+    def public_directory: () -> (nil | untyped)
+
+    def script: () -> untyped
+
+    def storage: () -> untyped
+
+    def test: () -> untyped
+
+    def system_test: () -> (untyped | nil)
+
+    def tmp: () -> untyped
+
+    def vendor: () -> untyped
+
+    def config_target_version: () -> untyped
+
+    def devcontainer: () -> untyped
+  end
+
+  module Generators
+    class AppGenerator < ::Rails::Generators::AppBase
+      OPTION_IMPLICATIONS: untyped
+
+      META_OPTIONS: ::Array[:minimal]
+
+      def self.apply_rails_template: (untyped template, untyped destination) -> untyped
+
+      def initialize: (*untyped args) -> void
+
+      def create_root_files: () -> untyped
+
+      def create_app_files: () -> untyped
+
+      def create_bin_files: () -> untyped
+
+      def update_bin_files: () -> untyped
+
+      def update_active_storage: () -> (untyped | nil)
+
+      def create_dockerfiles: () -> (nil | untyped)
+
+      def create_rubocop_file: () -> (nil | untyped)
+
+      def create_cifiles: () -> (nil | untyped)
+
+      def create_config_files: () -> untyped
+
+      def update_config_files: () -> untyped
+
+      def create_master_key: () -> untyped
+
+      def create_credentials: () -> untyped
+
+      def create_boot_file: () -> untyped
+
+      def create_active_record_files: () -> (nil | untyped)
+
+      def create_db_files: () -> (nil | untyped)
+
+      def create_lib_files: () -> untyped
+
+      def create_log_files: () -> untyped
+
+      def create_public_files: () -> untyped
+
+      def create_script_folder: () -> (nil | untyped)
+
+      def create_tmp_files: () -> untyped
+
+      def create_vendor_files: () -> untyped
+
+      def create_test_files: () -> (untyped | nil)
+
+      def create_system_test_files: () -> untyped
+
+      def create_storage_files: () -> (untyped | nil)
+
+      def create_devcontainer_files: () -> (nil | untyped)
+
+      def delete_app_assets_if_api_option: () -> (untyped | nil)
+
+      def delete_app_helpers_if_api_option: () -> (untyped | nil)
+
+      def delete_app_views_if_api_option: () -> (untyped | nil)
+
+      def delete_public_files_if_api_option: () -> (untyped | nil)
+
+      def delete_assets_initializer_skipping_asset_pipeline: () -> (untyped | nil)
+
+      def delete_application_record_skipping_active_record: () -> (untyped | nil)
+
+      def delete_active_job_folder_if_skipping_active_job: () -> (untyped | nil)
+
+      def delete_action_mailer_files_skipping_action_mailer: () -> (untyped | nil)
+
+      def delete_action_cable_files_skipping_action_cable: () -> (untyped | nil)
+
+      def delete_non_api_initializers_if_api_option: () -> (untyped | nil)
+
+      def delete_api_initializers: () -> (untyped | nil)
+
+      def delete_new_framework_defaults: () -> (untyped | nil)
+
+      def finish_template: () -> untyped
+
+      def run_after_bundle_callbacks: () -> untyped
+
+      def self.banner: () -> ::String
+
+      private
+
+      # Define file as an alias to create_file for backwards compatibility.
+      def file: (*untyped args) { (?) -> untyped } -> untyped
+
+      # Registers a callback to be executed after bundle binstubs
+      # have run.
+      #
+      #   after_bundle do
+      #     git add: '.'
+      #   end
+      def after_bundle: () { (?) -> untyped } -> untyped
+
+      def get_builder_class: () -> untyped
+    end
+
+    # This class handles preparation of the arguments before the AppGenerator is
+    # called. The class provides version or help information if they were
+    # requested, and also constructs the railsrc file (used for extra configuration
+    # options).
+    #
+    # This class should be called before the AppGenerator is required and started
+    # since it configures and mutates ARGV correctly.
+    class ARGVScrubber
+      def initialize: (?untyped argv) -> void
+
+      def prepare!: () -> untyped
+
+      def self.default_rc_file: () -> untyped
+
+      private
+
+      def handle_version_request!: (untyped argument) -> (untyped | nil)
+
+      def handle_invalid_command!: (untyped argument, untyped argv) { () -> untyped } -> untyped
+
+      def handle_rails_rc!: (untyped argv) -> untyped
+
+      def railsrc: (untyped argv) { (untyped, untyped) -> untyped } -> untyped
+
+      def read_rc_file: (untyped railsrc) -> untyped
+
+      def insert_railsrc_into_argv!: (untyped argv, untyped railsrc) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ApplicationRecordGenerator < ::Rails::Generators::Base
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class AuthenticationGenerator < ::Rails::Generators::Base
+      include ::Rails::Generators::BundleHelper
+
+      def create_authentication_files: () -> untyped
+
+      def configure_application_controller: () -> untyped
+
+      def configure_authentication_routes: () -> untyped
+
+      def enable_bcrypt: () -> untyped
+
+      def add_migrations: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class BenchmarkGenerator < ::Rails::Generators::NamedBase
+      IPS_GEM_NAME: "benchmark-ips"
+
+      IPS_GEM_USED_REGEXP: ::Regexp
+
+      def generate_layout: () -> untyped
+
+      private
+
+      def add_ips_to_gemfile: () -> untyped
+
+      def ips_installed?: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ControllerGenerator < ::Rails::Generators::NamedBase
+      def create_controller_files: () -> untyped
+
+      def add_routes: () -> (nil | untyped)
+
+      private
+
+      def parent_class_name: () -> untyped
+
+      def file_name: () -> untyped
+
+      def remove_possible_suffix: (untyped name) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class CredentialsGenerator < ::Rails::Generators::Base
+      def add_credentials_file: () -> untyped
+
+      private
+
+      def encrypted_file: () -> untyped
+
+      def secret_key_base: () -> untyped
+
+      def render_template_to_encrypted_file: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module Db
+      module System
+        class ChangeGenerator < ::Rails::Generators::Base
+          include ::Rails::Generators::AppName
+
+          BASE_PACKAGES: ::Array["curl" | "libjemalloc2" | "libvips"]
+
+          BUILD_PACKAGES: ::Array["build-essential" | "git"]
+
+          def self.default_generator_root: () -> untyped
+
+          def initialize: (*untyped) -> void
+
+          def edit_database_config: () -> untyped
+
+          def edit_gemfile: () -> untyped
+
+          def edit_dockerfile: () -> (nil | untyped)
+
+          def edit_devcontainer_files: () -> (nil | untyped)
+
+          private
+
+          def all_database_gems: () -> untyped
+
+          def all_docker_bases: () -> untyped
+
+          def docker_base_packages: (untyped database_package) -> untyped
+
+          def all_docker_builds: () -> untyped
+
+          def docker_build_packages: (untyped database_package) -> untyped
+
+          def all_database_gems_regex: () -> ::Regexp
+
+          def all_docker_bases_regex: () -> ::Regexp
+
+          def all_docker_builds_regex: () -> ::Regexp
+
+          def gem_entry_regex_for: (untyped gem_name) -> ::Regexp
+
+          def gem_entry_for: (*untyped gem_name_and_version) -> ::String
+
+          def edit_devcontainer_json: () -> (nil | untyped)
+
+          def edit_compose_yaml: () -> (nil | untyped)
+
+          def update_devcontainer_db_host: () -> untyped
+
+          def update_devcontainer_db_feature: () -> untyped
+
+          def devcontainer_json: () -> (nil | untyped)
+
+          def devcontainer_json_path: () -> untyped
+
+          def database: () -> untyped
+
+          def devcontainer?: () -> untyped
+        end
+      end
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class DevcontainerGenerator < ::Rails::Generators::Base
+      def create_devcontainer: () -> untyped
+
+      def update_application_system_test_case: () -> (nil | untyped)
+
+      def update_database_yml: () -> (nil | untyped)
+
+      private
+
+      def devcontainer?: () -> true
+
+      def app_name: () -> untyped
+
+      def app_folder: () -> untyped
+
+      def dependencies: () -> untyped
+
+      def container_env: () -> untyped
+
+      def volumes: () -> untyped
+
+      def features: () -> untyped
+
+      def mounts: () -> untyped
+
+      def forward_ports: () -> untyped
+
+      def database: () -> untyped
+
+      def devcontainer_db_service_yaml: (**untyped options) -> (nil | untyped)
+
+      def local_rails_mount: () -> { type: "bind", source: untyped, target: untyped }
+
+      def system_test_configuration: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class EncryptedFileGenerator < ::Rails::Generators::Base
+      def add_encrypted_file_silently: (untyped file_path, untyped key_path, ?untyped template) -> (untyped | nil)
+
+      private
+
+      def encrypted_file_template: () -> "# aws:\n#   access_key_id: 123\n#   secret_access_key: 345\n\n"
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class EncryptionKeyFileGenerator < ::Rails::Generators::Base
+      def add_key_file: (untyped key_path) -> untyped
+
+      def add_key_file_silently: (untyped key_path, ?untyped? key) -> untyped
+
+      def ensure_key_files_are_ignored: (untyped key_path, ?ignore: untyped) -> (untyped | nil)
+
+      def ensure_key_files_are_ignored_silently: (untyped key_path, ?ignore: untyped) -> (untyped | nil)
+
+      private
+
+      def key_ignore: (untyped key_path) -> ::String
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class GeneratorGenerator < ::Rails::Generators::NamedBase
+      def create_generator_files: () -> untyped
+
+      private
+
+      def generator_dir: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class HelperGenerator < ::Rails::Generators::NamedBase
+      def create_helper_files: () -> untyped
+
+      private
+
+      def file_name: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class IntegrationTestGenerator < ::Rails::Generators::NamedBase
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class MasterKeyGenerator < ::Rails::Generators::Base
+      MASTER_KEY_PATH: untyped
+
+      def add_master_key_file: () -> (untyped | nil)
+
+      def add_master_key_file_silently: (?untyped? key) -> (untyped | nil)
+
+      private
+
+      def key_file_generator: () -> EncryptionKeyFileGenerator
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class MigrationGenerator < ::Rails::Generators::NamedBase
+      def self.exit_on_failure?: () -> true
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ModelGenerator < ::Rails::Generators::NamedBase
+      include ::Rails::Generators::ModelHelpers
+    end
+  end
+end
+
+module Rails
+  # The plugin builder allows you to override elements of the plugin
+  # generator without being forced to reverse the operations of the default
+  # generator.
+  #
+  # This allows you to override entire operations, like the creation of the
+  # Gemfile, \README, or JavaScript files, without needing to know exactly
+  # what those operations do so you can create another template action.
+  class PluginBuilder
+    def rakefile: () -> untyped
+
+    def app: () -> untyped
+
+    def readme: () -> untyped
+
+    def gemfile: () -> untyped
+
+    def license: () -> (untyped | nil)
+
+    def gemspec: () -> untyped
+
+    def gitignore: () -> untyped
+
+    def cifiles: () -> untyped
+
+    def rubocop: () -> untyped
+
+    def version_control: () -> (untyped | nil)
+
+    def lib: () -> untyped
+
+    def config: () -> (untyped | nil)
+
+    def test: () -> untyped
+
+    DUMMY_IGNORE_OPTIONS: ::Array[:dev | :edge | :master | :template]
+
+    def generate_test_dummy: (?bool force) -> untyped
+
+    def test_dummy_config: () -> untyped
+
+    def test_dummy_assets: () -> untyped
+
+    def test_dummy_clean: () -> untyped
+
+    def stylesheets: () -> untyped
+
+    def bin: () -> untyped
+
+    def gemfile_entry: () -> (nil | untyped)
+  end
+
+  module Generators
+    class PluginGenerator
+      alias plugin_path app_path
+
+      def initialize: (*untyped args) -> void
+
+      def target_rails_prerelease: () -> untyped
+
+      def create_root_files: () -> untyped
+
+      def create_app_files: () -> untyped
+
+      def create_rubocop_file: () -> (nil | untyped)
+
+      def create_cifiles: () -> (nil | untyped)
+
+      def create_config_files: () -> untyped
+
+      def create_lib_files: () -> untyped
+
+      def create_assets_manifest_file: () -> (untyped | nil)
+
+      def create_public_stylesheets_files: () -> (untyped | nil)
+
+      def create_bin_files: () -> untyped
+
+      def create_test_files: () -> (untyped | nil)
+
+      def create_test_dummy_files: () -> (nil | untyped)
+
+      def update_gemfile: () -> (untyped | nil)
+
+      def finish_template: () -> untyped
+
+      def name: () -> untyped
+
+      def underscored_name: () -> untyped
+
+      def namespaced_name: () -> untyped
+
+      private
+
+      def gemfile_entries: () -> untyped
+
+      def rails_gemfile_entry: () -> (untyped | nil)
+
+      def simplify_gemfile_entries: (*untyped gemfile_entries) -> untyped
+
+      def create_dummy_app: (?untyped? path) -> untyped
+
+      def engine?: () -> untyped
+
+      def full?: () -> untyped
+
+      def mountable?: () -> untyped
+
+      def skip_git?: () -> untyped
+
+      def with_dummy_app?: () -> untyped
+
+      def api?: () -> untyped
+
+      def self.banner: () -> ::String
+
+      def original_name: () -> untyped
+
+      def modules: () -> untyped
+
+      def wrap_in_modules: (untyped unwrapped_code) -> untyped
+
+      def camelized_modules: () -> untyped
+
+      def humanized: () -> untyped
+
+      def camelized: () -> untyped
+
+      def author: () -> untyped
+
+      def email: () -> untyped
+
+      def rails_version_specifier: (?untyped gem_version) -> ::Array[::String]
+
+      def valid_const?: () -> untyped
+
+      def get_builder_class: () -> untyped
+
+      def dummy_path: (?untyped? path) -> untyped
+
+      def mute: () { (?) -> untyped } -> untyped
+
+      def rails_app_path: () -> (untyped | nil)
+
+      def inside_application?: () -> untyped
+
+      def relative_path: () -> (nil | untyped)
+
+      def test_command: () -> ("bin/rails db:test:prepare test" | "bin/rails test" | "bin/test")
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ResourceRouteGenerator < ::Rails::Generators::NamedBase
+      # Properly nests namespaces passed into a generator
+      #
+      #   $ bin/rails generate resource admin/users/products
+      #
+      # should give you
+      #
+      #   namespace :admin do
+      #     namespace :users do
+      #       resources :products
+      #     end
+      #   end
+      def add_resource_route: () -> (nil | untyped)
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ResourceGenerator < ::Rails::Generators::ModelGenerator
+      include ::Rails::Generators::ResourceHelpers
+
+      def self.desc: (?untyped? description) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ScaffoldControllerGenerator < ::Rails::Generators::NamedBase
+      include ::Rails::Generators::ResourceHelpers
+
+      def create_controller_files: () -> untyped
+
+      private
+
+      def permitted_params: () -> untyped
+
+      def attachments?: (untyped name) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ScaffoldGenerator < ::Rails::Generators::ResourceGenerator
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class ScriptGenerator < ::Rails::Generators::NamedBase
+      def generate_script: () -> untyped
+
+      private
+
+      def depth: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class SystemTestGenerator < ::Rails::Generators::NamedBase
+    end
+  end
+end
+
+module Rails
+  module Generators
+    class TaskGenerator < ::Rails::Generators::NamedBase
+      def create_task_files: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    # Deal with controller names on scaffold and add some helpers to deal with
+    # ActiveModel.
+    module ResourceHelpers
+      def self.included: (untyped base) -> untyped
+
+      # Set controller variables on initialization.
+      def initialize: (*untyped args) -> void
+
+      private
+
+      attr_reader controller_name: untyped
+
+      attr_reader controller_file_name: untyped
+
+      def controller_class_path: () -> untyped
+
+      def assign_controller_names!: (untyped name) -> untyped
+
+      def controller_file_path: () -> untyped
+
+      def controller_class_name: () -> untyped
+
+      def controller_i18n_scope: () -> untyped
+
+      # Loads the ORM::Generators::ActiveModel class. This class is responsible
+      # to tell scaffold entities how to generate a specific method for the
+      # ORM. Check Rails::Generators::ActiveModel for more information.
+      def orm_class: () -> untyped
+
+      # Initialize ORM::Generators::ActiveModel to access instance methods.
+      def orm_instance: (?untyped name) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    # This class provides a TestCase for testing generators. To set up, you need
+    # just to configure the destination and set which generator is being tested:
+    #
+    #   class AppGeneratorTest < Rails::Generators::TestCase
+    #     tests AppGenerator
+    #     destination File.expand_path("../tmp", __dir__)
+    #   end
+    #
+    # If you want to ensure your destination root is clean before running each test,
+    # you can set a setup callback:
+    #
+    #   class AppGeneratorTest < Rails::Generators::TestCase
+    #     tests AppGenerator
+    #     destination File.expand_path("../tmp", __dir__)
+    #     setup :prepare_destination
+    #   end
+    class TestCase < ::ActiveSupport::TestCase
+      include ::Rails::Generators::Testing::Behavior
+
+      include ::Rails::Generators::Testing::SetupAndTeardown
+
+      include ::Rails::Generators::Testing::Assertions
+
+      include ::FileUtils
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class Base < ::Rails::Generators::NamedBase
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class AuthenticationGenerator < ::Rails::Generators::Base
+      def create_user_test_files: () -> untyped
+
+      def create_controller_test_files: () -> untyped
+
+      def create_mailer_preview_files: () -> (untyped | nil)
+
+      def create_test_helper_files: () -> untyped
+
+      def configure_test_helper: () -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class ControllerGenerator < ::TestUnit::Generators::Base
+      def create_test_files: () -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class GeneratorGenerator < ::TestUnit::Generators::Base
+      def create_generator_files: () -> untyped
+
+      private
+
+      def generator_path: () -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class HelperGenerator < ::TestUnit::Generators::Base
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class IntegrationGenerator < ::TestUnit::Generators::Base
+      def create_test_files: () -> untyped
+
+      private
+
+      def file_name: () -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class JobGenerator < ::TestUnit::Generators::Base
+      def create_test_file: () -> untyped
+
+      private
+
+      def file_name: () -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class MailerGenerator < ::TestUnit::Generators::Base
+      def check_class_collision: () -> untyped
+
+      def create_test_files: () -> untyped
+
+      def create_preview_files: () -> untyped
+
+      private
+
+      def file_name: () -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class ModelGenerator < ::TestUnit::Generators::Base
+      RESERVED_YAML_KEYWORDS: ::Array["y" | "yes" | "n" | "no" | "true" | "false" | "on" | "off" | "null"]
+
+      def create_test_file: () -> untyped
+
+      def create_fixture_file: () -> (untyped | nil)
+
+      private
+
+      def yaml_key_value: (untyped key, untyped value) -> ::String
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class ScaffoldGenerator < ::TestUnit::Generators::Base
+      include ::Rails::Generators::ResourceHelpers
+
+      def create_test_files: () -> untyped
+
+      def fixture_name: () -> untyped
+
+      private
+
+      def attributes_string: () -> ("{}" | ::String)
+
+      def attributes_hash: () -> (::Hash[untyped, untyped] | untyped)
+
+      def boolean?: (untyped name) -> untyped
+
+      def virtual?: (untyped name) -> untyped
+
+      def datetime?: (untyped name) -> untyped
+
+      def time?: (untyped name) -> untyped
+    end
+  end
+end
+
+module TestUnit
+  module Generators
+    class SystemGenerator < ::TestUnit::Generators::Base
+      def create_test_files: () -> untyped
+
+      private
+
+      def file_name: () -> untyped
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module Testing
+      module Assertions
+        # Asserts a given file exists. You need to supply an absolute path or a path relative
+        # to the configured destination:
+        #
+        #   assert_file "config/environment.rb"
+        #
+        # You can also give extra arguments. If the argument is a regexp, it will check if the
+        # regular expression matches the given file content. If it's a string, it compares the
+        # file with the given string:
+        #
+        #   assert_file "config/environment.rb", /initialize/
+        #
+        # Finally, when a block is given, it yields the file content:
+        #
+        #   assert_file "app/controllers/products_controller.rb" do |controller|
+        #     assert_instance_method :index, controller do |index|
+        #       assert_match(/Product\.all/, index)
+        #     end
+        #   end
+        def assert_file: (untyped relative, *untyped contents) ?{ (untyped) -> untyped } -> untyped
+
+        alias assert_directory assert_file
+
+        # Asserts a given file does not exist. You need to supply an absolute path or a
+        # path relative to the configured destination:
+        #
+        #   assert_no_file "config/random.rb"
+        def assert_no_file: (untyped relative) -> untyped
+
+        alias assert_no_directory assert_no_file
+
+        # Asserts a given migration exists. You need to supply an absolute path or a
+        # path relative to the configured destination:
+        #
+        #   assert_migration "db/migrate/create_products.rb"
+        #
+        # This method manipulates the given path and tries to find any migration which
+        # matches the migration name. For example, the call above is converted to:
+        #
+        #   assert_file "db/migrate/003_create_products.rb"
+        #
+        # Consequently, assert_migration accepts the same arguments has assert_file.
+        def assert_migration: (untyped relative, *untyped contents) { (?) -> untyped } -> untyped
+
+        # Asserts a given migration does not exist. You need to supply an absolute path or a
+        # path relative to the configured destination:
+        #
+        #   assert_no_migration "db/migrate/create_products.rb"
+        def assert_no_migration: (untyped relative) -> untyped
+
+        # Asserts the given class method exists in the given content. This method does not detect
+        # class methods inside (class << self), only class methods which starts with "self.".
+        # When a block is given, it yields the content of the method.
+        #
+        #   assert_migration "db/migrate/create_products.rb" do |migration|
+        #     assert_class_method :up, migration do |up|
+        #       assert_match(/create_table/, up)
+        #     end
+        #   end
+        def assert_class_method: (untyped method, untyped content) { (?) -> untyped } -> untyped
+
+        # Asserts the given method exists in the given content. When a block is given,
+        # it yields the content of the method.
+        #
+        #   assert_file "app/controllers/products_controller.rb" do |controller|
+        #     assert_instance_method :index, controller do |index|
+        #       assert_match(/Product\.all/, index)
+        #     end
+        #   end
+        def assert_instance_method: (untyped method, untyped content) ?{ (untyped) -> untyped } -> untyped
+
+        alias assert_method assert_instance_method
+
+        # Asserts the given attribute type gets translated to a field type
+        # properly:
+        #
+        #   assert_field_type :date, :date_select
+        def assert_field_type: (untyped attribute_type, untyped field_type) -> untyped
+
+        # Asserts the given attribute type gets a proper default value:
+        #
+        #   assert_field_default_value :string, "MyString"
+        def assert_field_default_value: (untyped attribute_type, untyped value) -> untyped
+
+        # Asserts a given initializer exists. You need to supply a path relative
+        # to the `config/initializers/` directory.
+        #
+        #   assert_initializer "mail_interceptors.rb"
+        #
+        # You can also give extra arguments. If the argument is a regexp, it will check if the
+        # regular expression matches the given file content. If it's a string, it compares the
+        # file with the given string:
+        #
+        #   assert_initializer "mail_interceptors.rb", /SandboxEmailInterceptor/
+        #
+        # Finally, when a block is given, it yields the file content:
+        #
+        #   assert_initializer "mail_interceptors.rb" do |initializer|
+        #     assert_match(/SandboxEmailInterceptor/, initializer)
+        #   end
+        def assert_initializer: (untyped name, *untyped contents) { (?) -> untyped } -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module Testing
+      module Behavior
+        extend ::ActiveSupport::Concern
+
+        include ::ActiveSupport::Testing::Stream
+
+        module ClassMethods
+          # Sets which generator should be tested:
+          #
+          #   tests AppGenerator
+          def tests: (untyped klass) -> untyped
+
+          # Sets default arguments on generator invocation. This can be overwritten when
+          # invoking it.
+          #
+          #   arguments %w(app_name --skip-active-record)
+          def arguments: (untyped array) -> untyped
+
+          # Sets the destination of generator files:
+          #
+          #   destination File.expand_path("../tmp", __dir__)
+          def destination: (untyped path) -> untyped
+        end
+
+        # Runs the generator configured for this class. The first argument is an array like
+        # command line arguments:
+        #
+        #   class AppGeneratorTest < Rails::Generators::TestCase
+        #     tests AppGenerator
+        #     destination File.expand_path("../tmp", __dir__)
+        #     setup :prepare_destination
+        #
+        #     test "database.yml is not created when skipping Active Record" do
+        #       run_generator %w(myapp --skip-active-record)
+        #       assert_no_file "config/database.yml"
+        #     end
+        #   end
+        #
+        # You can provide a configuration hash as second argument. This method returns the output
+        # printed by the generator.
+        def run_generator: (?untyped args, ?::Hash[untyped, untyped] config) -> untyped
+
+        # Instantiate the generator.
+        def generator: (?untyped args, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] config) -> untyped
+
+        # Create a Rails::Generators::GeneratedAttribute by supplying the
+        # attribute type and, optionally, the attribute name:
+        #
+        #   create_generated_attribute(:string, "name")
+        def create_generated_attribute: (untyped attribute_type, ?::String name, ?untyped? index) -> untyped
+
+        private
+
+        def destination_root_is_set?: () -> (untyped | nil)
+
+        def ensure_current_path: () -> untyped
+
+        # Clears all files and directories in destination.
+        def prepare_destination: () -> untyped
+
+        def migration_file_name: (untyped relative) -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  module Generators
+    module Testing
+      module SetupAndTeardown
+        def setup: () -> untyped
+
+        def teardown: () -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  # Built-in Health Check Endpoint
+  #
+  # \Rails also comes with a built-in health check endpoint that is reachable at
+  # the +/up+ path. This endpoint will return a 200 status code if the app has
+  # booted with no exceptions, and a 500 status code otherwise.
+  #
+  # In production, many applications are required to report their status upstream,
+  # whether it's to an uptime monitor that will page an engineer when things go
+  # wrong, or a load balancer or Kubernetes controller used to determine a pod's
+  # health. This health check is designed to be a one-size fits all that will work
+  # in many situations.
+  #
+  # While any newly generated \Rails applications will have the health check at
+  # +/up+, you can configure the path to be anything you'd like in your
+  # <tt>"config/routes.rb"</tt>:
+  #
+  #   Rails.application.routes.draw do
+  #     get "healthz" => "rails/health#show", as: :rails_health_check
+  #   end
+  #
+  # The health check will now be accessible via the +/healthz+ path.
+  #
+  # NOTE: This endpoint does not reflect the status of all of your application's
+  # dependencies, such as the database or Redis cluster. Replace
+  # <tt>"rails/health#show"</tt> with your own controller action if you have
+  # application specific needs.
+  #
+  # Think carefully about what you want to check as it can lead to situations
+  # where your application is being restarted due to a third-party service going
+  # bad. Ideally, you should design your application to handle those outages
+  # gracefully.
+  class HealthController < ::ActionController::Base
+    def show: () -> untyped
+
+    private
+
+    def render_up: () -> untyped
+
+    def render_down: () -> untyped
+
+    def html_status: (color: untyped) -> untyped
+  end
+end
+
+class Rails::InfoController < ::Rails::ApplicationController
+  def index: () -> untyped
+
+  def properties: () -> untyped
+
+  def routes: () -> untyped
+
+  def notes: () -> untyped
+
+  private
+
+  def matching_routes: (query: untyped, exact_match: untyped) -> (::Array[untyped] | untyped)
+end
+
+module Rails
+  # This module helps build the runtime properties that are displayed in
+  # Rails::InfoController responses. These include the active \Rails version,
+  # Ruby version, Rack version, and so on.
+  module Info
+    def self.names: () -> untyped
+
+    def self.value_for: (untyped property_name) -> (untyped | nil)
+
+    def self.property: (untyped name, ?untyped? value) { () -> untyped } -> untyped
+
+    def self.to_s: () -> untyped
+
+    alias self.inspect self.to_s
+
+    def self.to_html: () -> untyped
+  end
+end
+
+module Rails
+  module Initializable
+    def self.included: (untyped base) -> untyped
+
+    class Initializer
+      attr_reader name: untyped
+
+      attr_reader block: untyped
+
+      attr_reader before: untyped
+
+      attr_reader after: untyped
+
+      def initialize: (untyped name, untyped context, before: untyped, after: untyped, ?group: untyped?) { (?) -> untyped } -> void
+
+      def belongs_to?: (untyped group) -> untyped
+
+      def run: (*untyped args) -> untyped
+
+      def bind: (untyped context) -> (self | untyped)
+
+      def context_class: () -> untyped
+    end
+
+    class Collection
+      include ::Enumerable[untyped]
+
+      include ::TSort[untyped]
+
+      def initialize: (?untyped? initializers) -> void
+
+      def to_a: () -> untyped
+
+      def last: () -> untyped
+
+      def each: () { (?) -> untyped } -> untyped
+
+      alias tsort_each_node each
+
+      def tsort_each_child: (untyped initializer) { (?) -> untyped } -> untyped
+
+      def +: (untyped other) -> untyped
+
+      def <<: (untyped initializer) -> self
+
+      def push: (*untyped initializers) -> self
+
+      alias append push
+
+      def concat: (*untyped initializer_collections) -> self
+
+      def has?: (untyped name) -> untyped
+    end
+
+    def run_initializers: (?::Symbol group, *untyped args) -> (nil | untyped)
+
+    def initializers: () -> untyped
+
+    module ClassMethods
+      def initializers: () -> untyped
+
+      def initializers_chain: () -> untyped
+
+      def initializers_for: (untyped binding) -> untyped
+
+      def initializer: (untyped name, ?::Hash[untyped, untyped] opts) ?{ (?) -> untyped } -> untyped
+    end
+  end
+end
+
+class Rails::MailersController < ::Rails::ApplicationController
+  def index: () -> untyped
+
+  def download: () -> untyped
+
+  def preview: () -> untyped
+
+  private
+
+  def show_previews?: () -> untyped
+
+  def find_preview: () -> untyped
+
+  def find_preferred_part: (*untyped formats) -> untyped
+
+  def find_part: (untyped format) -> untyped
+
+  def attachments_for: (untyped email) -> untyped
+
+  def attachment_url: (untyped attachment) -> ::String
+
+  def part_query: (untyped mime_type) -> untyped
+
+  def locale_query: (untyped locale) -> untyped
+
+  def set_locale: () { (?) -> untyped } -> untyped
+end
+
+module Rails
+  module Paths
+    # This object is an extended hash that behaves as root of the Rails::Paths system.
+    # It allows you to collect information about how you want to structure your application
+    # paths through a Hash-like \API. It requires you to give a physical path on initialization.
+    #
+    #   root = Root.new "/rails"
+    #   root.add "app/controllers", eager_load: true
+    #
+    # The above command creates a new root object and adds "app/controllers" as a path.
+    # This means we can get a Rails::Paths::Path object back like below:
+    #
+    #   path = root["app/controllers"]
+    #   path.eager_load?               # => true
+    #   path.is_a?(Rails::Paths::Path) # => true
+    #
+    # The Path[rdoc-ref:Rails::Paths::Path] object is simply an enumerable and
+    # allows you to easily add extra paths:
+    #
+    #   path.is_a?(Enumerable) # => true
+    #   path.to_ary    # => ["app/controllers"]
+    #
+    #   path << "lib/controllers"
+    #   path.to_ary    # => ["app/controllers", "lib/controllers"]
+    #
+    # Notice that when you add a path using #add, the
+    # Path[rdoc-ref:Rails::Paths::Path] object created already contains the path
+    # with the same path value given to #add. In some situations, you may not
+    # want this behavior, so you can give <tt>:with</tt> as option.
+    #
+    #   root.add "config/routes", with: "config/routes.rb"
+    #   root["config/routes"].to_ary # => ["config/routes.rb"]
+    #
+    # The #add method accepts the following options as arguments:
+    # +eager_load+, +autoload+, +autoload_once+, and +glob+.
+    #
+    # Finally, the Path[rdoc-ref:Rails::Paths::Path] object also provides a few
+    # helpers:
+    #
+    #   root = Root.new "/rails"
+    #   root.add "app/controllers"
+    #
+    #   root["app/controllers"].expanded # => ["/rails/app/controllers"]
+    #   root["app/controllers"].existent # => ["/rails/app/controllers"]
+    #
+    # Check the Rails::Paths::Path documentation for more information.
+    class Root
+      attr_accessor path: untyped
+
+      def initialize: (untyped path) -> void
+
+      def []=: (untyped path, untyped value) -> untyped
+
+      def add: (untyped path, ?::Hash[untyped, untyped] options) -> untyped
+
+      def []: (untyped path) -> untyped
+
+      def values: () -> untyped
+
+      def keys: () -> untyped
+
+      def values_at: (*untyped list) -> untyped
+
+      def all_paths: () -> untyped
+
+      def autoload_once: () -> untyped
+
+      def eager_load: () -> untyped
+
+      def autoload_paths: () -> untyped
+
+      def load_paths: () -> untyped
+
+      private
+
+      def filter_by: () { (untyped) -> untyped } -> untyped
+    end
+
+    class Path
+      include ::Enumerable[untyped]
+
+      attr_accessor glob: untyped
+
+      def initialize: (untyped root, untyped current, untyped paths, ?::Hash[untyped, untyped] options) -> void
+
+      def absolute_current: () -> untyped
+
+      def children: () -> untyped
+
+      def first: () -> untyped
+
+      def last: () -> untyped
+
+      def each: () { (?) -> untyped } -> untyped
+
+      def <<: (untyped path) -> untyped
+
+      alias push <<
+
+      def concat: (untyped paths) -> untyped
+
+      def unshift: (*untyped paths) -> untyped
+
+      def to_ary: () -> untyped
+
+      def paths: () -> untyped
+
+      def extensions: () -> (untyped | nil)
+
+      # Expands all paths against the root and return all unique values.
+      def expanded: () -> untyped
+
+      # Returns all expanded paths but only if they exist in the filesystem.
+      def existent: () -> untyped
+
+      def existent_directories: () -> untyped
+
+      alias to_a expanded
+
+      private
+
+      def files_in: (untyped path) -> untyped
+    end
+  end
+end
+
+class Rails::PwaController < ::Rails::ApplicationController
+  def service_worker: () -> untyped
+
+  def manifest: () -> untyped
+end
+
+module Rails
+  module Rack
+  end
+end
+
+module Rails
+  module Rack
+    # Sets log tags, logs the request, calls the app, and flushes the logs.
+    #
+    # Log tags (+taggers+) can be an Array containing: methods that the +request+
+    # object responds to, objects that respond to +to_s+ or Proc objects that accept
+    # an instance of the +request+ object.
+    class Logger < ::ActiveSupport::LogSubscriber
+      def initialize: (untyped app, ?untyped? taggers) -> void
+
+      def call: (untyped env) -> untyped
+
+      private
+
+      def call_app: (untyped request, untyped env) -> untyped
+
+      # Started GET "/session/new" for 127.0.0.1 at 2012-09-26 14:51:42 -0700
+      def started_request_message: (untyped request) -> untyped
+
+      def compute_tags: (untyped request) -> untyped
+
+      def logger: () -> untyped
+
+      def finish_request_instrumentation: (untyped handle, untyped logger_tag_pop_count) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Rack
+    # Allows you to silence requests made to a specific path.
+    # This is useful for preventing recurring requests like health checks from clogging the logging.
+    # This middleware is used to do just that against the path /up in production by default.
+    #
+    # Examples:
+    #
+    #   config.middleware.insert_before \
+    #     Rails::Rack::Logger, Rails::Rack::SilenceRequest, path: "/up"
+    #
+    #   config.middleware.insert_before \
+    #     Rails::Rack::Logger, Rails::Rack::SilenceRequest, path: /test$/
+    #
+    # This middleware can also be configured using `config.silence_healthcheck_path = "/up"` in Rails.
+    class SilenceRequest
+      def initialize: (untyped app, path: untyped) -> void
+
+      def call: (untyped env) -> untyped
+    end
+  end
+end
+
+module Rails
+  module Rackup
+    Server: untyped
+  end
+end
+
+module Rails
+  # +Rails::Railtie+ is the core of the \Rails framework and provides
+  # several hooks to extend \Rails and/or modify the initialization process.
+  #
+  # Every major component of \Rails (Action Mailer, Action Controller, Active
+  # Record, etc.) implements a railtie. Each of them is responsible for their
+  # own initialization. This makes \Rails itself absent of any component hooks,
+  # allowing other components to be used in place of any of the \Rails defaults.
+  #
+  # Developing a \Rails extension does _not_ require implementing a railtie, but
+  # if you need to interact with the \Rails framework during or after boot, then
+  # a railtie is needed.
+  #
+  # For example, an extension doing any of the following would need a railtie:
+  #
+  # * creating initializers
+  # * configuring a \Rails framework for the application, like setting a generator
+  # * adding <tt>config.*</tt> keys to the environment
+  # * setting up a subscriber with ActiveSupport::Notifications
+  # * adding Rake tasks
+  #
+  # == Creating a Railtie
+  #
+  # To extend \Rails using a railtie, create a subclass of +Rails::Railtie+.
+  # This class must be loaded during the \Rails boot process, and is conventionally
+  # called +MyNamespace::Railtie+.
+  #
+  # The following example demonstrates an extension which can be used with or
+  # without \Rails.
+  #
+  #   # lib/my_gem/railtie.rb
+  #   module MyGem
+  #     class Railtie < Rails::Railtie
+  #     end
+  #   end
+  #
+  #   # lib/my_gem.rb
+  #   require "my_gem/railtie" if defined?(Rails::Railtie)
+  #
+  # == Initializers
+  #
+  # To add an initialization step to the \Rails boot process from your railtie, just
+  # define the initialization code with the +initializer+ macro:
+  #
+  #   class MyGem::Railtie < Rails::Railtie
+  #     initializer "my_gem.configure_rails_initialization" do
+  #       # some initialization behavior
+  #     end
+  #   end
+  #
+  # If specified, the block can also receive the application object, in case you
+  # need to access some application-specific configuration, like middleware:
+  #
+  #   class MyGem::Railtie < Rails::Railtie
+  #     initializer "my_gem.configure_rails_initialization" do |app|
+  #       app.middleware.use MyGem::Middleware
+  #     end
+  #   end
+  #
+  # Finally, you can also pass <tt>:before</tt> and <tt>:after</tt> as options to
+  # +initializer+, in case you want to couple it with a specific step in the
+  # initialization process.
+  #
+  # == Configuration
+  #
+  # Railties can access a config object which contains configuration shared by all
+  # railties and the application:
+  #
+  #   class MyGem::Railtie < Rails::Railtie
+  #     # Customize the ORM
+  #     config.app_generators.orm :my_gem_orm
+  #
+  #     # Add a to_prepare block which is executed once in production
+  #     # and before each request in development.
+  #     config.to_prepare do
+  #       MyGem.setup!
+  #     end
+  #   end
+  #
+  # == Loading Rake Tasks and Generators
+  #
+  # If your railtie has Rake tasks, you can tell \Rails to load them through the method
+  # +rake_tasks+:
+  #
+  #   class MyGem::Railtie < Rails::Railtie
+  #     rake_tasks do
+  #       load "path/to/my_gem.tasks"
+  #     end
+  #   end
+  #
+  # By default, \Rails loads generators from your load path. However, if you want to place
+  # your generators at a different location, you can specify in your railtie a block which
+  # will load them during normal generators lookup:
+  #
+  #   class MyGem::Railtie < Rails::Railtie
+  #     generators do
+  #       require "path/to/my_gem_generator"
+  #     end
+  #   end
+  #
+  # Since filenames on the load path are shared across gems, be sure that files you load
+  # through a railtie have unique names.
+  #
+  # == Run another program when the \Rails server starts
+  #
+  # In development, it's very usual to have to run another process next to the \Rails Server. In example
+  # you might want to start the Webpack or React server. Or maybe you need to run your job scheduler process
+  # like Sidekiq. This is usually done by opening a new shell and running the program from here.
+  #
+  # \Rails allow you to specify a +server+ block which will get called when a \Rails server starts.
+  # This way, your users don't need to remember to have to open a new shell and run another program, making
+  # this less confusing for everyone.
+  # It can be used like this:
+  #
+  #   class MyGem::Railtie < Rails::Railtie
+  #     server do
+  #       WebpackServer.start
+  #     end
+  #   end
+  #
+  # == Application and Engine
+  #
+  # An engine is nothing more than a railtie with some initializers already set. And since
+  # Rails::Application is an engine, the same configuration described here can be
+  # used in both.
+  #
+  # Be sure to look at the documentation of those specific classes for more information.
+  class Railtie
+    extend ::ActiveSupport::DescendantsTracker
+
+    include ::Rails::Initializable
+
+    ABSTRACT_RAILTIES: ::Array["Rails::Railtie" | "Rails::Engine" | "Rails::Application"]
+
+    def self.subclasses: () -> untyped
+
+    def self.rake_tasks: () { (?) -> untyped } -> untyped
+
+    def self.console: () { (?) -> untyped } -> untyped
+
+    def self.runner: () { (?) -> untyped } -> untyped
+
+    def self.generators: () { (?) -> untyped } -> untyped
+
+    def self.server: () { (?) -> untyped } -> untyped
+
+    def self.abstract_railtie?: () -> untyped
+
+    def self.railtie_name: (?untyped? name) -> untyped
+
+    # Since Rails::Railtie cannot be instantiated, any methods that call
+    # +instance+ are intended to be called only on subclasses of a Railtie.
+    def self.instance: () -> untyped
+
+    # Allows you to configure the railtie. This is the same method seen in
+    # Railtie::Configurable, but this module is no longer required for all
+    # subclasses of Railtie so we provide the class method here.
+    def self.configure: () { (?) -> untyped } -> untyped
+
+    def self.<=>: (untyped other) -> untyped
+
+    def self.inherited: (untyped subclass) -> untyped
+
+    attr_reader self.load_index: untyped
+
+    def self.increment_load_index: () -> untyped
+
+    def self.generate_railtie_name: (untyped string) -> untyped
+
+    def self.respond_to_missing?: (untyped name, untyped _) -> untyped
+
+    # If the class method does not have a method, then send the method call
+    # to the Railtie instance.
+    def self.method_missing: (untyped name, *untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+    # receives an instance variable identifier, set the variable value if is
+    # blank and append given block to value, which will be used later in
+    # `#each_registered_block(type, &block)`
+    def self.register_block_for: (untyped type) ?{ (?) -> untyped } -> untyped
+
+    def initialize: () -> void
+
+    def inspect: () -> ::String
+
+    # This is used to create the <tt>config</tt> object on Railties, an instance of
+    # Railtie::Configuration, that is used by Railties and Application to store
+    # related configuration.
+    def config: () -> untyped
+
+    def railtie_namespace: () -> untyped
+
+    def run_console_blocks: (untyped app) -> untyped
+
+    def run_generators_blocks: (untyped app) -> untyped
+
+    def run_runner_blocks: (untyped app) -> untyped
+
+    def run_tasks_blocks: (untyped app) -> untyped
+
+    extend ::Rake::DSL
+
+    def run_server_blocks: (untyped app) -> untyped
+
+    private
+
+    # run `&block` in every registered block in `#register_block_for`
+    def each_registered_block: (untyped type) { (?) -> untyped } -> untyped
+  end
+end
+
+module Rails
+  class Railtie
+    module Configurable
+      extend ::ActiveSupport::Concern
+
+      module ClassMethods
+        def inherited: (untyped base) -> untyped
+
+        def instance: () -> untyped
+
+        def respond_to?: (*untyped args) -> untyped
+
+        def configure: () { (?) -> untyped } -> untyped
+
+        private
+
+        def method_missing: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+      end
+    end
+  end
+end
+
+module Rails
+  class Railtie
+    class Configuration
+      def initialize: () -> void
+
+      # Expose the eager_load_namespaces at "module" level for convenience.
+      def self.eager_load_namespaces: () -> untyped
+
+      # All namespaces that are eager loaded
+      def eager_load_namespaces: () -> untyped
+
+      # Add files that should be watched for change.
+      def watchable_files: () -> untyped
+
+      # Add directories that should be watched for change.
+      # The key of the hashes should be directories and the values should
+      # be an array of extensions to match in each directory.
+      def watchable_dirs: () -> untyped
+
+      # This allows you to modify the application's middlewares from Engines.
+      #
+      # All operations you run on the app_middleware will be replayed on the
+      # application once it is defined and the default_middlewares are
+      # created
+      def app_middleware: () -> untyped
+
+      # This allows you to modify application's generators from Railties.
+      #
+      # Values set on app_generators will become defaults for application, unless
+      # application overwrites them.
+      def app_generators: () ?{ (untyped) -> untyped } -> untyped
+
+      # First configurable block to run. Called before any initializers are run.
+      def before_configuration: () { (?) -> untyped } -> untyped
+
+      # Third configurable block to run. Does not run if +config.eager_load+
+      # set to false.
+      def before_eager_load: () { (?) -> untyped } -> untyped
+
+      # Second configurable block to run. Called before frameworks initialize.
+      def before_initialize: () { (?) -> untyped } -> untyped
+
+      # Last configurable block to run. Called after frameworks initialize.
+      def after_initialize: () { (?) -> untyped } -> untyped
+
+      # Called after application routes have been loaded.
+      def after_routes_loaded: () { (?) -> untyped } -> untyped
+
+      # Array of callbacks defined by #to_prepare.
+      def to_prepare_blocks: () -> untyped
+
+      # Defines generic callbacks to run before #after_initialize. Useful for
+      # Rails::Railtie subclasses.
+      def to_prepare: () ?{ (?) -> untyped } -> (untyped | nil)
+
+      def respond_to?: (untyped name, ?bool include_private) -> untyped
+
+      private
+
+      def actual_method?: (untyped key) -> untyped
+
+      def method_missing: (untyped name, *untyped args) { (?) -> untyped } -> untyped
+    end
+  end
+end
+
+module Rails
+  # Implements the logic behind +Rails::Command::NotesCommand+. See <tt>rails notes --help</tt> for usage information.
+  #
+  # Annotation objects are triplets <tt>:line</tt>, <tt>:tag</tt>, <tt>:text</tt> that
+  # represent the line where the annotation lives, its tag, and its text. Note
+  # the filename is not stored.
+  #
+  # Annotations are looked for in comments and modulus whitespace they have to
+  # start with the tag optionally followed by a colon. Everything up to the end
+  # of the line (or closing ERB comment tag) is considered to be their text.
+  class SourceAnnotationExtractor
+    # Wraps a regular expression that will be tested against each of the source
+    # file's comments.
+    class ParserExtractor
+      def annotations: (untyped file) -> (::Array[untyped] | untyped)
+
+      class Parser < ::Ripper
+        attr_reader comments: untyped
+
+        attr_reader pattern: untyped
+
+        def initialize: (untyped source, pattern: untyped) -> void
+
+        def on_comment: (untyped value) -> (untyped | nil)
+      end
+    end
+
+    # Wraps a regular expression that will iterate through a file's lines and
+    # test each one for the given pattern.
+    class PatternExtractor
+      def annotations: (untyped file) -> untyped
+    end
+
+    class Annotation
+      def self.directories: () -> untyped
+
+      # Registers additional directories to be included
+      #   Rails::SourceAnnotationExtractor::Annotation.register_directories("spec", "another")
+      def self.register_directories: (*untyped dirs) -> untyped
+
+      def self.tags: () -> untyped
+
+      # Registers additional tags
+      #   Rails::SourceAnnotationExtractor::Annotation.register_tags("TESTME", "DEPRECATEME")
+      def self.register_tags: (*untyped additional_tags) -> untyped
+
+      def self.extensions: () -> untyped
+
+      # Registers new Annotations File Extensions
+      #   Rails::SourceAnnotationExtractor::Annotation.register_extensions("css", "scss", "sass", "less", "js") { |tag| /\/\/\s*(#{tag}):?\s*(.*)$/ }
+      def self.register_extensions: (*untyped exts) { (?) -> untyped } -> untyped
+
+      # Returns a representation of the annotation that looks like this:
+      #
+      #   [126] [TODO] This algorithm is simple and clearly correct, make it faster.
+      #
+      # If +options+ has a flag <tt>:tag</tt> the tag is shown as in the example above.
+      # Otherwise the string contains just line and text.
+      def to_s: (?::Hash[untyped, untyped] options) -> untyped
+    end
+
+    # Prints all annotations with tag +tag+ under the root directories +app+,
+    # +config+, +db+, +lib+, and +test+ (recursively).
+    #
+    # If +tag+ is <tt>nil</tt>, annotations with either default or registered tags are printed.
+    #
+    # Specific directories can be explicitly set using the <tt>:dirs</tt> key in +options+.
+    #
+    #   Rails::SourceAnnotationExtractor.enumerate 'TODO|FIXME', dirs: %w(app lib), tag: true
+    #
+    # If +options+ has a <tt>:tag</tt> flag, it will be passed to each annotation's +to_s+.
+    #
+    # See SourceAnnotationExtractor#find_in for a list of file extensions that will be taken into account.
+    #
+    # This class method is the single entry point for the <tt>rails notes</tt> command.
+    def self.enumerate: (?untyped? tag, ?::Hash[untyped, untyped] options) -> untyped
+
+    attr_reader tag: untyped
+
+    def initialize: (untyped tag) -> void
+
+    # Returns a hash that maps filenames under +dirs+ (recursively) to arrays
+    # with their annotations.
+    def find: (untyped dirs) -> untyped
+
+    # Returns a hash that maps filenames under +dir+ (recursively) to arrays
+    # with their annotations. Files with extensions registered in
+    # <tt>Rails::SourceAnnotationExtractor::Annotation.extensions</tt> are
+    # taken into account. Only files with annotations are included.
+    def find_in: (untyped dir) -> untyped
+
+    # Prints the mapping from filenames to annotations in +results+ ordered by filename.
+    # The +options+ hash is passed to each annotation's +to_s+.
+    def display: (untyped results, ?::Hash[untyped, untyped] options) -> untyped
+  end
+end
+
+module Rails
+  module LineFiltering
+    def self.extended: (untyped obj) -> untyped
+
+    module MT5
+      def run: (untyped reporter, ?::Hash[untyped, untyped] options) -> untyped
+    end
+
+    module MT6
+      def run_suite: (untyped reporter, ?::Hash[untyped, untyped] options) -> untyped
+    end
+  end
+end
+
+module Rails
+  class TestUnitRailtie < ::Rails::Railtie
+  end
+end
+
+module Rails
+  class TestUnitReporter < ::Minitest::StatisticsReporter
+    def prerecord: (untyped test_class, untyped test_name) -> untyped
+
+    def record: (untyped result) -> untyped
+
+    def report: () -> (nil | untyped)
+
+    def aggregated_results: () -> untyped
+
+    def filtered_results: () -> untyped
+
+    def relative_path_for: (untyped file) -> untyped
+
+    private
+
+    def output_inline?: () -> untyped
+
+    def fail_fast?: () -> untyped
+
+    def format_line: (untyped result) -> untyped
+
+    def format_rerun_snippet: (untyped result) -> ::String
+
+    def app_root: () -> untyped
+
+    def colored_output?: () -> untyped
+
+    COLOR_BY_RESULT_CODE: { "." => untyped, "E" => untyped, "F" => untyped, "S" => untyped }
+
+    def color_output: (untyped string, by: untyped) -> (::String | untyped)
+  end
+end
+
+module Rails
+  module TestUnit
+    class InvalidTestError < ::ArgumentError
+      def initialize: (untyped path, untyped suggestion) -> void
+
+      def backtrace: (*untyped args) -> ::Array[untyped]
+    end
+
+    class Runner
+      TEST_FOLDERS: ::Array[:models | :helpers | :channels | :controllers | :mailers | :integration | :jobs | :mailboxes]
+
+      PATH_ARGUMENT_PATTERN: ::Regexp
+
+      def self.attach_before_load_options: (untyped opts) -> untyped
+
+      def self.parse_options: (untyped argv) -> untyped
+
+      def self.run_from_rake: (untyped test_command, ?untyped argv) -> untyped
+
+      def self.run: (?untyped args) -> untyped
+
+      def self.load_tests: (untyped argv) -> untyped
+
+      def self.compose_filter: (untyped runnable, untyped filter) -> untyped
+
+      def self.extract_filters: (untyped argv) -> untyped
+
+      def self.default_test_glob: () -> untyped
+
+      def self.default_test_exclude_glob: () -> untyped
+
+      def self.regexp_filter?: (untyped arg) -> untyped
+
+      def self.path_argument?: (untyped arg) -> untyped
+
+      def self.list_tests: (untyped patterns) -> untyped
+
+      def self.normalize_declarative_test_filter: (untyped filter) -> untyped
+    end
+
+    class CompositeFilter
+      attr_reader named_filter: untyped
+
+      def initialize: (untyped runnable, untyped filter, untyped patterns) -> void
+
+      # minitest uses === to find matching filters.
+      def ===: (untyped method) -> untyped
+
+      private
+
+      def derive_named_filter: (untyped filter) -> untyped
+
+      def derive_line_filters: (untyped patterns) -> untyped
+    end
+
+    class Filter
+      def initialize: (untyped runnable, untyped file, untyped line_or_range) -> void
+
+      def ===: (untyped method) -> (nil | untyped)
+
+      private
+
+      def definition_for: (untyped method) -> untyped
+    end
+  end
+end
+
+module Rails
+  module TestUnit
+    # Parse a test file to extract the line ranges of all tests in both
+    # method-style (def test_foo) and declarative-style (test "foo" do)
+    module TestParser
+      # Helper to translate a method object into the path and line range where
+      # the method was defined.
+      def self.definition_for: (untyped method) -> (nil | ::Array[untyped | ::Range[untyped]])
+
+      def self.ranges: (untyped filepath) -> untyped
+    end
+  end
+end
+
+module Rails
+  module TestUnit
+  end
+end
+
+module Rails
+  # Returns the currently loaded version of \Rails as a string.
+  def self.version: () -> untyped
+end
+
+class Rails::WelcomeController < ::Rails::ApplicationController
+  def index: () -> nil
+end
+
+# The actual (private) implementation of the Rake task zeitwerk:check.
+class Rails::ZeitwerkChecker
+  def self.check: () -> untyped
+end
