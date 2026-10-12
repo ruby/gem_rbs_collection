@@ -40,3 +40,9 @@ Array.wrap(nil)
 Array.wrap([1, 2, 3])
 Array.wrap("hello")
 Array.wrap({a: 1, b: 2})
+
+# Test ActiveSupport::Duration arithmetic on Time/Date
+(Time.now + 1.day).to_fs
+(Time.now - 2.hours).to_fs
+(Date.today + 3.days).to_fs
+(Date.today - 1.week).to_fs
