@@ -38,3 +38,7 @@ Rails.application.secret_key_base.bytesize
 Rails.application.key_generator.generate_key("salt")
 Rails.application.message_verifier(:remember_me).generate("data")
 Rails.application.deprecators[:railties]
+
+# Methods whose block is optional
+Rails.application.rake_tasks
+SampleApp::Application.console

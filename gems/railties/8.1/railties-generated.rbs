@@ -209,7 +209,7 @@ module Rails
 
     def self.instance: () -> untyped
 
-    def self.create: (?::Hash[untyped, untyped] initial_variable_values) { (?) -> untyped } -> untyped
+    def self.create: (?::Hash[untyped, untyped] initial_variable_values) ?{ (?) -> untyped } -> untyped
 
     def self.find_root: (untyped from) -> untyped
 
@@ -229,7 +229,7 @@ module Rails
 
     INITIAL_VARIABLES: ::Array[:config | :railties | :routes_reloader | :reloaders | :routes | :helpers | :app_env_config]
 
-    def initialize: (?::Hash[untyped, untyped] initial_variable_values) { (?) -> untyped } -> void
+    def initialize: (?::Hash[untyped, untyped] initial_variable_values) ?{ (?) -> untyped } -> void
 
     # Returns the dasherized application name.
     #
@@ -289,7 +289,7 @@ module Rails
 
     # If you try to define a set of Rake tasks on the instance, these will get
     # passed up to the Rake tasks defined on the application's class.
-    def rake_tasks: () { (?) -> untyped } -> untyped
+    def rake_tasks: () ?{ (?) -> untyped } -> untyped
 
     # Sends the initializers to the +initializer+ method defined in the
     # Rails::Initializable module. Each Rails::Application class has its own
@@ -298,19 +298,19 @@ module Rails
 
     # Sends any runner called in the instance of a new application up
     # to the +runner+ method defined in Rails::Railtie.
-    def runner: () { (?) -> untyped } -> untyped
+    def runner: () ?{ (?) -> untyped } -> untyped
 
     # Sends any console called in the instance of a new application up
     # to the +console+ method defined in Rails::Railtie.
-    def console: () { (?) -> untyped } -> untyped
+    def console: () ?{ (?) -> untyped } -> untyped
 
     # Sends any generators called in the instance of a new application up
     # to the +generators+ method defined in Rails::Railtie.
-    def generators: () { (?) -> untyped } -> untyped
+    def generators: () ?{ (?) -> untyped } -> untyped
 
     # Sends any server called in the instance of a new application up
     # to the +server+ method defined in Rails::Railtie.
-    def server: () { (?) -> untyped } -> untyped
+    def server: () ?{ (?) -> untyped } -> untyped
 
     # Sends the +isolate_namespace+ method up to the class method.
     def isolate_namespace: (untyped mod) -> untyped
@@ -2366,7 +2366,7 @@ module Rails
 
       def initialize: () -> void
 
-      def each: (*untyped args) { (?) -> untyped } -> untyped
+      def each: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       def -: (untyped others) -> untyped
     end
@@ -2575,7 +2575,7 @@ module Rails
       #   add_source "http://gems.github.com/" do
       #     gem "rspec-rails"
       #   end
-      def add_source: (untyped source, ?::Hash[untyped, untyped] options) { (?) -> untyped } -> untyped
+      def add_source: (untyped source, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> untyped
 
       # Adds configuration code to a \Rails runtime environment.
       #
@@ -3288,7 +3288,7 @@ module Rails
       #     instance.invoke controller, [ instance.name.pluralize ]
       #   end
       #
-      def self.hook_for: (*untyped names) { (?) -> untyped } -> untyped
+      def self.hook_for: (*untyped names) ?{ (?) -> untyped } -> untyped
 
       # Remove a previously added hook.
       #
@@ -4027,7 +4027,7 @@ module Rails
       private
 
       # Define file as an alias to create_file for backwards compatibility.
-      def file: (*untyped args) { (?) -> untyped } -> untyped
+      def file: (*untyped args) ?{ (?) -> untyped } -> untyped
 
       # Registers a callback to be executed after bundle binstubs
       # have run.
@@ -4835,7 +4835,7 @@ module Rails
         #   assert_file "db/migrate/003_create_products.rb"
         #
         # Consequently, assert_migration accepts the same arguments has assert_file.
-        def assert_migration: (untyped relative, *untyped contents) { (?) -> untyped } -> untyped
+        def assert_migration: (untyped relative, *untyped contents) ?{ (?) -> untyped } -> untyped
 
         # Asserts a given migration does not exist. You need to supply an absolute path or a
         # path relative to the configured destination:
@@ -4852,7 +4852,7 @@ module Rails
         #       assert_match(/create_table/, up)
         #     end
         #   end
-        def assert_class_method: (untyped method, untyped content) { (?) -> untyped } -> untyped
+        def assert_class_method: (untyped method, untyped content) ?{ (?) -> untyped } -> untyped
 
         # Asserts the given method exists in the given content. When a block is given,
         # it yields the content of the method.
@@ -4893,7 +4893,7 @@ module Rails
         #   assert_initializer "mail_interceptors.rb" do |initializer|
         #     assert_match(/SandboxEmailInterceptor/, initializer)
         #   end
-        def assert_initializer: (untyped name, *untyped contents) { (?) -> untyped } -> untyped
+        def assert_initializer: (untyped name, *untyped contents) ?{ (?) -> untyped } -> untyped
       end
     end
   end
@@ -5047,7 +5047,7 @@ module Rails
 
     def self.value_for: (untyped property_name) -> (untyped | nil)
 
-    def self.property: (untyped name, ?untyped? value) { () -> untyped } -> untyped
+    def self.property: (untyped name, ?untyped? value) ?{ () -> untyped } -> untyped
 
     def self.to_s: () -> untyped
 
@@ -5092,7 +5092,7 @@ module Rails
 
       def last: () -> untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       alias tsort_each_node each
 
@@ -5248,7 +5248,7 @@ module Rails
 
       def last: () -> untyped
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       def <<: (untyped path) -> untyped
 
@@ -5485,15 +5485,15 @@ module Rails
 
     def self.subclasses: () -> untyped
 
-    def self.rake_tasks: () { (?) -> untyped } -> untyped
+    def self.rake_tasks: () ?{ (?) -> untyped } -> untyped
 
-    def self.console: () { (?) -> untyped } -> untyped
+    def self.console: () ?{ (?) -> untyped } -> untyped
 
-    def self.runner: () { (?) -> untyped } -> untyped
+    def self.runner: () ?{ (?) -> untyped } -> untyped
 
-    def self.generators: () { (?) -> untyped } -> untyped
+    def self.generators: () ?{ (?) -> untyped } -> untyped
 
-    def self.server: () { (?) -> untyped } -> untyped
+    def self.server: () ?{ (?) -> untyped } -> untyped
 
     def self.abstract_railtie?: () -> untyped
 
@@ -5635,7 +5635,7 @@ module Rails
 
       def actual_method?: (untyped key) -> untyped
 
-      def method_missing: (untyped name, *untyped args) { (?) -> untyped } -> untyped
+      def method_missing: (untyped name, *untyped args) ?{ (?) -> untyped } -> untyped
     end
   end
 end
