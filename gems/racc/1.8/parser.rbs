@@ -1,0 +1,99 @@
+# Type signatures for the Racc runtime (lib/racc/parser.rb, racc 1.8.x)
+module Racc
+  VERSION: String
+  Version: String
+  Copyright: String
+
+  Racc_No_Extensions: bool
+
+  class ParseError < StandardError
+  end
+
+  class Parser
+    # Token symbols as serialized in racc_token_table
+    type token_symbol = Symbol | String | false
+
+    # The 14-element Racc_arg tuple (same order as ParserFileGenerator emits)
+    type racc_arg = [
+      Array[Integer?],             # action_table
+      Array[Integer?],             # action_check
+      Array[Integer?],             # action_default
+      Array[Integer?],             # action_pointer
+      Array[Integer?],             # goto_table
+      Array[Integer?],             # goto_check
+      Array[Integer?],             # goto_default
+      Array[Integer?],             # goto_pointer
+      Integer,                     # nt_base
+      Array[Integer | Symbol],     # reduce_table
+      Hash[untyped, Integer],      # token_table
+      Integer,                     # shift_n
+      Integer,                     # reduce_n
+      bool                         # use_result_var
+    ]
+
+    interface _DebugOut
+      def print: (*untyped) -> untyped
+      def puts: (*untyped) -> untyped
+    end
+
+    Racc_Runtime_Version: String
+    Racc_Runtime_Core_Version_R: String
+    Racc_Runtime_Core_Version_C: String
+    Racc_Main_Parsing_Routine: Symbol
+    Racc_YY_Parse_Method: Symbol
+    Racc_Runtime_Core_Version: String
+    Racc_Runtime_Type: String
+
+    @yydebug: bool
+    @racc_debug_out: _DebugOut
+    @racc_state: Array[Integer]
+    @racc_tstack: Array[Integer]
+    @racc_vstack: Array[untyped]
+    @racc_t: Integer?
+    @racc_val: untyped
+    @racc_read_next: bool
+    @racc_user_yyerror: bool
+    @racc_error_status: Integer
+
+    def self.racc_runtime_type: () -> String
+
+    # Subclasses define their own constructors; keep it permissive so that
+    # unannotated overrides do not inherit `() -> void` from Object.
+    def initialize: (?) -> void
+
+    # Methods users commonly override: keep types permissive.
+    def next_token: () -> Array[untyped]?
+    def on_error: (Integer t, untyped val, Array[untyped] vstack) -> untyped
+
+    def do_parse: () -> untyped
+    def yyparse: (untyped recv, interned mid) -> untyped
+    def yyerror: () -> bot
+    def yyaccept: () -> bot
+    def yyerrok: () -> void
+    def token_to_str: (Integer t) -> String?
+
+    def racc_read_token: (Integer t, untyped tok, untyped val) -> void
+    def racc_shift: (Integer tok, Array[Integer] tstack, Array[untyped] vstack) -> void
+    def racc_reduce: (Array[Integer] toks, Integer sim, Array[Integer] tstack, Array[untyped] vstack) -> void
+    def racc_accept: () -> void
+    def racc_e_pop: (Array[Integer] state, Array[Integer] tstack, Array[untyped] vstack) -> void
+    def racc_next_state: (Integer curstate, Array[Integer] state) -> void
+    def racc_print_stacks: (Array[Integer] t, Array[untyped] v) -> void
+    def racc_print_states: (Array[Integer] s) -> void
+    def racc_token2str: (Integer tok) -> String
+
+    def _racc_setup: () -> racc_arg
+    def _racc_init_sysvars: () -> void
+    def _racc_do_parse_rb: (racc_arg arg, bool in_debug) -> untyped
+    def _racc_yyparse_rb: (untyped recv, interned mid, racc_arg arg, bool c_debug) -> untyped
+    def _racc_evalact: (Integer act, racc_arg arg) -> Integer?
+    def _racc_do_reduce: (racc_arg arg, Integer act) -> Integer?
+
+    private
+
+    def _racc_do_parse_c: (racc_arg arg, bool in_debug) -> untyped
+    def _racc_yyparse_c: (untyped recv, interned mid, racc_arg arg, bool c_debug) -> untyped
+  end
+end
+
+class ::ParseError = Racc::ParseError
