@@ -118,3 +118,7 @@ end
 # Test methods whose block is optional
 ActiveSupport::Notifications.instrument("test.active_support", { key: 1 })
 { a: 1 }.with_indifferent_access.update({ b: 2 })
+
+# Test ActiveSupport::EnvironmentInquirer
+env = ActiveSupport::EnvironmentInquirer.new("production")
+env.production? && !env.local?

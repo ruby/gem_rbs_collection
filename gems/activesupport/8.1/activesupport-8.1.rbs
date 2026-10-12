@@ -397,3 +397,18 @@ class Time
   def -: (ActiveSupport::Duration other) -> self
        | ...
 end
+
+module ActiveSupport
+  # The predicates for the default environments are defined with class_eval,
+  # which the generator doesn't see
+  class EnvironmentInquirer < StringInquirer
+    def development?: () -> bool
+
+    def test?: () -> bool
+
+    def production?: () -> bool
+
+    # Returns true if we're in the development or test environment.
+    def local?: () -> bool
+  end
+end
