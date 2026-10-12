@@ -369,12 +369,6 @@ module ActiveModel
 
       def alias_attribute_method_definition: (untyped code_generator, untyped pattern, untyped new_name, untyped old_name) -> untyped
 
-      # Is +new_name+ an alias?
-      def attribute_alias?: (untyped new_name) -> untyped
-
-      # Returns the original name for the alias +name+
-      def attribute_alias: (untyped name) -> untyped
-
       # Declares the attributes that should be prefixed and suffixed by
       # +ActiveModel::AttributeMethods+.
       #
@@ -1072,18 +1066,6 @@ module ActiveModel
       #   person.active # => true
       def attribute: (untyped name, *untyped, **untyped) ?{ (?) -> untyped } -> untyped
 
-      # Returns an array of attribute names as strings.
-      #
-      #   class Person
-      #     include ActiveModel::Attributes
-      #
-      #     attribute :name, :string
-      #     attribute :age, :integer
-      #   end
-      #
-      #   Person.attribute_names # => ["name", "age"]
-      def attribute_names: () -> untyped
-
       private
 
       def define_method_attribute=: (untyped canonical_name, owner: untyped, ?as: untyped) -> untyped
@@ -1092,36 +1074,6 @@ module ActiveModel
     def initialize: (*untyped) -> void
 
     def initialize_dup: (untyped other) -> untyped
-
-    # Returns a hash of all the attributes with their names as keys and the
-    # values of the attributes as values.
-    #
-    #   class Person
-    #     include ActiveModel::Attributes
-    #
-    #     attribute :name, :string
-    #     attribute :age, :integer
-    #   end
-    #
-    #   person = Person.new
-    #   person.name = "Francesco"
-    #   person.age = 22
-    #
-    #   person.attributes # => { "name" => "Francesco", "age" => 22}
-    def attributes: () -> untyped
-
-    # Returns an array of attribute names as strings.
-    #
-    #   class Person
-    #     include ActiveModel::Attributes
-    #
-    #     attribute :name, :string
-    #     attribute :age, :integer
-    #   end
-    #
-    #   person = Person.new
-    #   person.attribute_names # => ["name", "age"]
-    def attribute_names: () -> untyped
 
     def freeze: () -> untyped
 
@@ -1445,53 +1397,6 @@ module ActiveModel
     # your object with \Active \Model compliant methods.
     def to_model: () -> self
 
-    # Returns an Array of all key attributes if any of the attributes is set, whether or not
-    # the object is persisted. Returns +nil+ if there are no key attributes.
-    #
-    #   class Person
-    #     include ActiveModel::Conversion
-    #     attr_accessor :id
-    #
-    #     def initialize(id)
-    #       @id = id
-    #     end
-    #   end
-    #
-    #   person = Person.new(1)
-    #   person.to_key # => [1]
-    def to_key: () -> untyped
-
-    # Returns a +string+ representing the object's key suitable for use in URLs,
-    # or +nil+ if <tt>persisted?</tt> is +false+.
-    #
-    #   class Person
-    #     include ActiveModel::Conversion
-    #     attr_accessor :id
-    #
-    #     def initialize(id)
-    #       @id = id
-    #     end
-    #
-    #     def persisted?
-    #       true
-    #     end
-    #   end
-    #
-    #   person = Person.new(1)
-    #   person.to_param # => "1"
-    def to_param: () -> (untyped | nil)
-
-    # Returns a +string+ identifying the path associated with the object.
-    # ActionPack uses this to find a suitable partial to represent the object.
-    #
-    #   class Person
-    #     include ActiveModel::Conversion
-    #   end
-    #
-    #   person = Person.new
-    #   person.to_partial_path # => "people/person"
-    def to_partial_path: () -> untyped
-
     module ClassMethods
       # Provide a class level cache for #to_partial_path. This is an
       # internal method and should not be accessed directly.
@@ -1633,67 +1538,11 @@ module ActiveModel
 
     def as_json: (?::Hash[untyped, untyped] options) -> untyped
 
-    # Clears dirty data and moves +changes+ to +previous_changes+ and
-    # +mutations_from_database+ to +mutations_before_last_save+ respectively.
-    def changes_applied: () -> untyped
-
-    # Returns +true+ if any of the attributes has unsaved changes, +false+ otherwise.
-    #
-    #   person.changed? # => false
-    #   person.name = 'bob'
-    #   person.changed? # => true
-    def changed?: () -> untyped
-
-    # Returns an array with the name of the attributes with unsaved changes.
-    #
-    #   person.changed # => []
-    #   person.name = 'bob'
-    #   person.changed # => ["name"]
-    def changed: () -> untyped
-
-    # Dispatch target for {*_changed?}[rdoc-ref:#*_changed?] attribute methods.
-    def attribute_changed?: (untyped attr_name, **untyped options) -> untyped
-
     # Dispatch target for {*_was}[rdoc-ref:#*_was] attribute methods.
     def attribute_was: (untyped attr_name) -> untyped
 
-    # Dispatch target for {*_previously_changed?}[rdoc-ref:#*_previously_changed?] attribute methods.
-    def attribute_previously_changed?: (untyped attr_name, **untyped options) -> untyped
-
     # Dispatch target for {*_previously_was}[rdoc-ref:#*_previously_was] attribute methods.
     def attribute_previously_was: (untyped attr_name) -> untyped
-
-    # Restore all previous data of the provided attributes.
-    def restore_attributes: (?untyped attr_names) -> untyped
-
-    # Clears all dirty data: current changes and previous changes.
-    def clear_changes_information: () -> untyped
-
-    def clear_attribute_changes: (untyped attr_names) -> untyped
-
-    # Returns a hash of the attributes with unsaved changes indicating their original
-    # values like <tt>attr => original value</tt>.
-    #
-    #   person.name # => "bob"
-    #   person.name = 'robert'
-    #   person.changed_attributes # => {"name" => "bob"}
-    def changed_attributes: () -> untyped
-
-    # Returns a hash of changed attributes indicating their original
-    # and new values like <tt>attr => [original value, new value]</tt>.
-    #
-    #   person.changes # => {}
-    #   person.name = 'bob'
-    #   person.changes # => { "name" => ["bill", "bob"] }
-    def changes: () -> untyped
-
-    # Returns a hash of attributes that were changed before the model was saved.
-    #
-    #   person.name # => "bob"
-    #   person.name = 'robert'
-    #   person.save
-    #   person.previous_changes # => {"name" => ["bob", "robert"]}
-    def previous_changes: () -> untyped
 
     def attribute_changed_in_place?: (untyped attr_name) -> untyped
 
@@ -1800,12 +1649,6 @@ module ActiveModel
   class Errors
     include ::Enumerable[untyped]
 
-    # The actual array of +Error+ objects
-    # This method is aliased to <tt>objects</tt>.
-    attr_reader errors: untyped
-
-    alias objects errors
-
     # Pass in the instance of the object that is using the errors object.
     #
     #   class Person
@@ -1854,168 +1697,7 @@ module ActiveModel
     #
     def merge!: (untyped other) -> untyped
 
-    # Search for errors matching +attribute+, +type+, or +options+.
-    #
-    # Only supplied params will be matched.
-    #
-    #   person.errors.where(:name) # => all name errors.
-    #   person.errors.where(:name, :too_short) # => all name errors being too short
-    #   person.errors.where(:name, :too_short, minimum: 2) # => all name errors being too short and minimum is 2
-    def where: (untyped attribute, ?untyped? type, **untyped options) -> untyped
-
-    # Returns +true+ if the error messages include an error for the given key
-    # +attribute+, +false+ otherwise.
-    #
-    #   person.errors.messages        # => {:name=>["cannot be nil"]}
-    #   person.errors.include?(:name) # => true
-    #   person.errors.include?(:age)  # => false
-    def include?: (untyped attribute) -> untyped
-
-    alias has_key? include?
-
-    alias key? include?
-
-    # When passed a symbol or a name of a method, returns an array of errors
-    # for the method.
-    #
-    #   person.errors[:name]  # => ["cannot be nil"]
-    #   person.errors['name'] # => ["cannot be nil"]
-    def []: (untyped attribute) -> untyped
-
-    # Returns all error attribute names
-    #
-    #   person.errors.messages        # => {:name=>["cannot be nil", "must be specified"]}
-    #   person.errors.attribute_names # => [:name]
-    def attribute_names: () -> untyped
-
-    # Returns a Hash that can be used as the JSON representation for this
-    # object. You can pass the <tt>:full_messages</tt> option. This determines
-    # if the JSON object should contain full messages or not (false by default).
-    #
-    #   person.errors.as_json                      # => {:name=>["cannot be nil"]}
-    #   person.errors.as_json(full_messages: true) # => {:name=>["name cannot be nil"]}
-    def as_json: (?untyped? options) -> untyped
-
-    # Returns a Hash of attributes with their error messages. If +full_messages+
-    # is +true+, it will contain full messages (see +full_message+).
-    #
-    #   person.errors.to_hash       # => {:name=>["cannot be nil"]}
-    #   person.errors.to_hash(true) # => {:name=>["name cannot be nil"]}
-    def to_hash: (?bool full_messages) -> untyped
-
     EMPTY_ARRAY: ::Array[untyped]
-
-    # Returns a Hash of attributes with an array of their error messages.
-    def messages: () -> untyped
-
-    # Returns a Hash of attributes with an array of their error details.
-    def details: () -> untyped
-
-    # Returns a Hash of attributes with an array of their Error objects.
-    #
-    #   person.errors.group_by_attribute
-    #   # => {:name=>[<#ActiveModel::Error>, <#ActiveModel::Error>]}
-    def group_by_attribute: () -> untyped
-
-    # Returns +true+ if an error matches provided +attribute+ and +type+,
-    # or +false+ otherwise. +type+ is treated the same as for +add+.
-    #
-    #   person.errors.add :name, :blank
-    #   person.errors.added? :name, :blank           # => true
-    #   person.errors.added? :name, "can't be blank" # => true
-    #
-    # If the error requires options, then it returns +true+ with
-    # the correct options, or +false+ with incorrect or missing options.
-    #
-    #   person.errors.add :name, :too_long, count: 25
-    #   person.errors.added? :name, :too_long, count: 25                     # => true
-    #   person.errors.added? :name, "is too long (maximum is 25 characters)" # => true
-    #   person.errors.added? :name, :too_long, count: 24                     # => false
-    #   person.errors.added? :name, :too_long                                # => false
-    #   person.errors.added? :name, "is too long"                            # => false
-    def added?: (untyped attribute, ?::Symbol type, ?::Hash[untyped, untyped] options) -> untyped
-
-    # Returns +true+ if an error on the attribute with the given type is
-    # present, or +false+ otherwise. +type+ is treated the same as for +add+.
-    #
-    #   person.errors.add :age
-    #   person.errors.add :name, :too_long, count: 25
-    #   person.errors.of_kind? :age                                            # => true
-    #   person.errors.of_kind? :name                                           # => false
-    #   person.errors.of_kind? :name, :too_long                                # => true
-    #   person.errors.of_kind? :name, "is too long (maximum is 25 characters)" # => true
-    #   person.errors.of_kind? :name, :not_too_long                            # => false
-    #   person.errors.of_kind? :name, "is too long"                            # => false
-    def of_kind?: (untyped attribute, ?::Symbol type) -> untyped
-
-    # Returns all the full error messages in an array.
-    #
-    #   class Person
-    #     validates_presence_of :name, :address, :email
-    #     validates_length_of :name, in: 5..30
-    #   end
-    #
-    #   person = Person.create(address: '123 First St.')
-    #   person.errors.full_messages
-    #   # => ["Name is too short (minimum is 5 characters)", "Name can't be blank", "Email can't be blank"]
-    def full_messages: () -> untyped
-
-    alias to_a full_messages
-
-    # Returns all the full error messages for a given attribute in an array.
-    #
-    #   class Person
-    #     validates_presence_of :name, :email
-    #     validates_length_of :name, in: 5..30
-    #   end
-    #
-    #   person = Person.create()
-    #   person.errors.full_messages_for(:name)
-    #   # => ["Name is too short (minimum is 5 characters)", "Name can't be blank"]
-    def full_messages_for: (untyped attribute) -> untyped
-
-    # Returns all the error messages for a given attribute in an array.
-    #
-    #   class Person
-    #     validates_presence_of :name, :email
-    #     validates_length_of :name, in: 5..30
-    #   end
-    #
-    #   person = Person.create()
-    #   person.errors.messages_for(:name)
-    #   # => ["is too short (minimum is 5 characters)", "can't be blank"]
-    def messages_for: (untyped attribute) -> untyped
-
-    # Returns a full message for a given attribute.
-    #
-    #   person.errors.full_message(:name, 'is invalid') # => "Name is invalid"
-    def full_message: (untyped attribute, untyped message) -> untyped
-
-    # Translates an error message in its default scope
-    # (<tt>activemodel.errors.messages</tt>).
-    #
-    # Error messages are first looked up in <tt>activemodel.errors.models.MODEL.attributes.ATTRIBUTE.MESSAGE</tt>,
-    # if it's not there, it's looked up in <tt>activemodel.errors.models.MODEL.MESSAGE</tt> and if
-    # that is not there also, it returns the translation of the default message
-    # (e.g. <tt>activemodel.errors.messages.MESSAGE</tt>). The translated model
-    # name, translated attribute name, and the value are available for
-    # interpolation.
-    #
-    # When using inheritance in your models, it will check all the inherited
-    # models too, but only if the model itself hasn't been found. Say you have
-    # <tt>class Admin < User; end</tt> and you wanted the translation for
-    # the <tt>:blank</tt> error message for the <tt>title</tt> attribute,
-    # it looks for these translations:
-    #
-    # * <tt>activemodel.errors.models.admin.attributes.title.blank</tt>
-    # * <tt>activemodel.errors.models.admin.blank</tt>
-    # * <tt>activemodel.errors.models.user.attributes.title.blank</tt>
-    # * <tt>activemodel.errors.models.user.blank</tt>
-    # * any default you provided through the +options+ hash (in the <tt>activemodel.errors</tt> scope)
-    # * <tt>activemodel.errors.messages.blank</tt>
-    # * <tt>errors.attributes.title.blank</tt>
-    # * <tt>errors.messages.blank</tt>
-    def generate_message: (untyped attribute, ?::Symbol type, ?::Hash[untyped, untyped] options) -> untyped
 
     def inspect: () -> ::String
     def each: () { (untyped) -> void } -> untyped
@@ -2255,24 +1937,6 @@ module ActiveModel
   class Name
     include ::Comparable
 
-    attr_accessor singular: untyped
-
-    attr_accessor plural: untyped
-
-    attr_accessor element: untyped
-
-    attr_accessor collection: untyped
-
-    attr_accessor singular_route_key: untyped
-
-    attr_accessor route_key: untyped
-
-    attr_accessor param_key: untyped
-
-    attr_accessor i18n_key: untyped
-
-    attr_accessor name: untyped
-
     alias cache_key collection
 
     # Returns a new ActiveModel::Name instance. By default, the +namespace+
@@ -2288,20 +1952,6 @@ module ActiveModel
     #   ActiveModel::Name.new(Foo::Bar).to_s
     #   # => "Foo::Bar"
     def initialize: (untyped klass, ?untyped? namespace, ?untyped? name, ?::Symbol locale) -> void
-
-    # Transform the model name into a more human format, using I18n. By default,
-    # it will underscore then humanize the class name.
-    #
-    #   class BlogPost
-    #     extend ActiveModel::Naming
-    #   end
-    #
-    #   BlogPost.model_name.human # => "Blog post"
-    #
-    # Specify +options+ with additional translating options.
-    def human: (?::Hash[untyped, untyped] options) -> untyped
-
-    def uncountable?: () -> untyped
 
     private
 
@@ -2336,70 +1986,11 @@ module ActiveModel
   module Naming
     def self.extended: (untyped base) -> untyped
 
-    # Returns an ActiveModel::Name object for module. It can be
-    # used to retrieve all kinds of naming-related information
-    # (See ActiveModel::Name for more information).
-    #
-    #   class Person
-    #     extend ActiveModel::Naming
-    #   end
-    #
-    #   Person.model_name.name     # => "Person"
-    #   Person.model_name.class    # => ActiveModel::Name
-    #   Person.model_name.singular # => "person"
-    #   Person.model_name.plural   # => "people"
-    def model_name: () -> untyped
-
-    # Returns the plural class name of a record or class.
-    #
-    #   ActiveModel::Naming.plural(post)             # => "posts"
-    #   ActiveModel::Naming.plural(Highrise::Person) # => "highrise_people"
-    def self.plural: (untyped record_or_class) -> untyped
-
-    # Returns the singular class name of a record or class.
-    #
-    #   ActiveModel::Naming.singular(post)             # => "post"
-    #   ActiveModel::Naming.singular(Highrise::Person) # => "highrise_person"
-    def self.singular: (untyped record_or_class) -> untyped
-
     # Identifies whether the class name of a record or class is uncountable.
     #
     #   ActiveModel::Naming.uncountable?(Sheep) # => true
     #   ActiveModel::Naming.uncountable?(Post)  # => false
     def self.uncountable?: (untyped record_or_class) -> untyped
-
-    # Returns string to use while generating route names. It differs for
-    # namespaced models regarding whether it's inside isolated engine.
-    #
-    #   # For isolated engine:
-    #   ActiveModel::Naming.singular_route_key(Blog::Post) # => "post"
-    #
-    #   # For shared engine:
-    #   ActiveModel::Naming.singular_route_key(Blog::Post) # => "blog_post"
-    def self.singular_route_key: (untyped record_or_class) -> untyped
-
-    # Returns string to use while generating route names. It differs for
-    # namespaced models regarding whether it's inside isolated engine.
-    #
-    #   # For isolated engine:
-    #   ActiveModel::Naming.route_key(Blog::Post) # => "posts"
-    #
-    #   # For shared engine:
-    #   ActiveModel::Naming.route_key(Blog::Post) # => "blog_posts"
-    #
-    # The route key also considers if the noun is uncountable and, in
-    # such cases, automatically appends _index.
-    def self.route_key: (untyped record_or_class) -> untyped
-
-    # Returns string to use for params names. It differs for
-    # namespaced models regarding whether it's inside isolated engine.
-    #
-    #   # For isolated engine:
-    #   ActiveModel::Naming.param_key(Blog::Post) # => "post"
-    #
-    #   # For shared engine:
-    #   ActiveModel::Naming.param_key(Blog::Post) # => "blog_post"
-    def self.param_key: (untyped record_or_class) -> untyped
 
     def self.model_name_from_record_or_class: (untyped record_or_class) -> untyped
 
@@ -2615,63 +2206,6 @@ module ActiveModel
   #   person.serializable_hash(include: :address)
   #   person.serializable_hash(include: { address: { only: 'city' }})
   module Serialization
-    # Returns a serialized hash of your object.
-    #
-    #   class Person
-    #     include ActiveModel::Serialization
-    #
-    #     attr_accessor :name, :age
-    #
-    #     def attributes
-    #       {'name' => nil, 'age' => nil}
-    #     end
-    #
-    #     def capitalized_name
-    #       name.capitalize
-    #     end
-    #   end
-    #
-    #   person = Person.new
-    #   person.name = 'bob'
-    #   person.age  = 22
-    #   person.serializable_hash                # => {"name"=>"bob", "age"=>22}
-    #   person.serializable_hash(only: :name)   # => {"name"=>"bob"}
-    #   person.serializable_hash(except: :name) # => {"age"=>22}
-    #   person.serializable_hash(methods: :capitalized_name)
-    #   # => {"name"=>"bob", "age"=>22, "capitalized_name"=>"Bob"}
-    #
-    # Example with <tt>:include</tt> option
-    #
-    #   class User
-    #     include ActiveModel::Serializers::JSON
-    #     attr_accessor :name, :notes # Emulate has_many :notes
-    #     def attributes
-    #       {'name' => nil}
-    #     end
-    #   end
-    #
-    #   class Note
-    #     include ActiveModel::Serializers::JSON
-    #     attr_accessor :title, :text
-    #     def attributes
-    #       {'title' => nil, 'text' => nil}
-    #     end
-    #   end
-    #
-    #   note = Note.new
-    #   note.title = 'Battle of Austerlitz'
-    #   note.text = 'Some text here'
-    #
-    #   user = User.new
-    #   user.name = 'Napoleon'
-    #   user.notes = [note]
-    #
-    #   user.serializable_hash
-    #   # => {"name" => "Napoleon"}
-    #   user.serializable_hash(include: { notes: { only: 'title' }})
-    #   # => {"name" => "Napoleon", "notes" => [{"title"=>"Battle of Austerlitz"}]}
-    def serializable_hash: (?untyped? options) -> untyped
-
     # Hook method defining how an attribute value should be retrieved for
     # serialization. By default this is assumed to be an instance named after
     # the attribute. Override this method in subclasses should you need to
@@ -2713,86 +2247,6 @@ module ActiveModel
       extend ::ActiveSupport::Concern
 
       include ::ActiveModel::Serialization
-
-      # Returns a hash representing the model. Some configuration can be
-      # passed through +options+.
-      #
-      # The option <tt>include_root_in_json</tt> controls the top-level behavior
-      # of +as_json+. If +true+, +as_json+ will emit a single root node named
-      # after the object's type. The default value for <tt>include_root_in_json</tt>
-      # option is +false+.
-      #
-      #   user = User.find(1)
-      #   user.as_json
-      #   # => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #     "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true}
-      #
-      #   ActiveRecord::Base.include_root_in_json = true
-      #
-      #   user.as_json
-      #   # => { "user" => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #                  "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true } }
-      #
-      # This behavior can also be achieved by setting the <tt>:root</tt> option
-      # to +true+ as in:
-      #
-      #   user = User.find(1)
-      #   user.as_json(root: true)
-      #   # => { "user" => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #                  "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true } }
-      #
-      # If you prefer, <tt>:root</tt> may also be set to a custom string key instead as in:
-      #
-      #   user = User.find(1)
-      #   user.as_json(root: "author")
-      #   # => { "author" => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #                  "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true } }
-      #
-      # Without any +options+, the returned Hash will include all the model's
-      # attributes.
-      #
-      #   user = User.find(1)
-      #   user.as_json
-      #   # => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #      "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true}
-      #
-      # The <tt>:only</tt> and <tt>:except</tt> options can be used to limit
-      # the attributes included, and work similar to the +attributes+ method.
-      #
-      #   user.as_json(only: [:id, :name])
-      #   # => { "id" => 1, "name" => "Konata Izumi" }
-      #
-      #   user.as_json(except: [:id, :created_at, :age])
-      #   # => { "name" => "Konata Izumi", "awesome" => true }
-      #
-      # To include the result of some method calls on the model use <tt>:methods</tt>:
-      #
-      #   user.as_json(methods: :permalink)
-      #   # => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #      "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true,
-      #   #      "permalink" => "1-konata-izumi" }
-      #
-      # To include associations use <tt>:include</tt>:
-      #
-      #   user.as_json(include: :posts)
-      #   # => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #      "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true,
-      #   #      "posts" => [ { "id" => 1, "author_id" => 1, "title" => "Welcome to the weblog" },
-      #   #                   { "id" => 2, "author_id" => 1, "title" => "So I was thinking" } ] }
-      #
-      # Second level and higher order associations work as well:
-      #
-      #   user.as_json(include: { posts: {
-      #                              include: { comments: {
-      #                                             only: :body } },
-      #                              only: :title } })
-      #   # => { "id" => 1, "name" => "Konata Izumi", "age" => 16,
-      #   #      "created_at" => "2006-08-01T17:27:13.000Z", "awesome" => true,
-      #   #      "posts" => [ { "comments" => [ { "body" => "1st post!" }, { "body" => "Second!" } ],
-      #   #                     "title" => "Welcome to the weblog" },
-      #   #                   { "comments" => [ { "body" => "Don't think too hard" } ],
-      #   #                     "title" => "So I was thinking" } ] }
-      def as_json: (?untyped? options) -> untyped
 
       # Sets the model +attributes+ from a JSON string. Returns +self+.
       #
@@ -2871,8 +2325,6 @@ end
 module ActiveModel
   module Type
     attr_accessor self.registry: untyped
-
-    def self.lookup: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
 
     def self.default_value: () -> untyped
   end
@@ -4697,8 +4149,6 @@ module ActiveModel
   #     end
   #   end
   class Validator
-    attr_reader options: untyped
-
     # Returns the kind of the validator.
     #
     #   PresenceValidator.kind   # => :presence
@@ -4707,12 +4157,6 @@ module ActiveModel
 
     # Accepts options that will be made available through the +options+ reader.
     def initialize: (?::Hash[untyped, untyped] options) -> void
-
-    # Returns the kind for this validator.
-    #
-    #   PresenceValidator.new(attributes: [:username]).kind # => :presence
-    #   AcceptanceValidator.new(attributes: [:terms]).kind  # => :acceptance
-    def kind: () -> untyped
 
     # Override this method in subclasses with validation logic, adding errors
     # to the records +errors+ array where necessary.
