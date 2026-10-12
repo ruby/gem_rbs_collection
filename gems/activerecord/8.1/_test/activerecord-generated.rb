@@ -56,3 +56,11 @@ User.all.sum(0.0) { |user| user.age.to_f }.next_float
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
+
+predicate_builder = ActiveRecord::PredicateBuilder.new(ActiveRecord::TableMetadata.new(User, User.arel_table))
+predicate_builder.build_bind_attribute("name", "bob").value_for_database
+
+User.sanitize_sql_for_conditions(Arel::SelectManager.new)
+User.sanitize_sql(["name = ?", "bob"])
+User.sanitize_sql_for_order(:id)
+User.sanitize_sql_for_order({ id: :desc })
