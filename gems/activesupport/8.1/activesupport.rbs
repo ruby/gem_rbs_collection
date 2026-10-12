@@ -90,16 +90,19 @@ module ActiveSupport
 
   module Testing
     module TimeHelpers
-      # Manual definition to make block optional
-      def travel: (untyped duration) ?{ () -> untyped } -> untyped
+      # Returns the block's value when a block is given
+      def travel: [T] (untyped duration, ?with_usec: bool) { () -> T } -> T
+                | (untyped duration, ?with_usec: bool) -> void
                 | ...
 
-      # Manual definition to make block optional
-      def travel_to: (untyped date_or_time) ?{ () -> untyped } -> untyped
+      # Returns the block's value when a block is given
+      def travel_to: [T] (untyped date_or_time, ?with_usec: bool) { () -> T } -> T
+                   | (untyped date_or_time, ?with_usec: bool) -> void
                    | ...
 
-      # Manual definition to make block optional
-      def freeze_time: () ?{ () -> untyped } -> untyped
+      # Returns the block's value when a block is given
+      def freeze_time: [T] (?untyped date_or_time, ?with_usec: bool) { () -> T } -> T
+                     | (?untyped date_or_time, ?with_usec: bool) -> void
                      | ...
     end
   end

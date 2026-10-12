@@ -94,3 +94,14 @@ hwia.transform_keys!(&:upcase).size
 [1, 2, 3].in_groups(2).first&.size
 [1, 2, 3].in_groups(2, false).first&.sum
 [1, 2, 3].in_groups(2, 0).first&.sum
+
+# Test ActiveSupport::Testing::TimeHelpers returning the block's value
+class TimeHelpersTest
+  include ActiveSupport::Testing::TimeHelpers
+
+  def test
+    travel(1.day) { Time.now }.to_fs
+    travel_to(Time.now) { 'traveled' }.upcase
+    freeze_time { 42 }.succ
+  end
+end
