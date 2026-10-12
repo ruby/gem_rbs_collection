@@ -541,6 +541,8 @@ module ActiveRecord
       def touch_all: (*untyped, ?time: untyped) -> untyped
       def destroy_by: (*untyped) -> untyped
       def delete_by: (*untyped) -> untyped
+      def destroy: (untyped id) -> untyped
+      def delete: (untyped id_or_array) -> untyped
       def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
@@ -881,4 +883,50 @@ module ActiveRecord
   attr_accessor self.reading_role: untyped
 
   attr_accessor self.index_nested_attribute_errors: untyped
+end
+
+# Methods rbs prototype doesn't see, which aren't generated from the source
+module ActiveRecord
+  class Base
+    # ActiveModel::API extends them in its included block
+    extend ::ActiveModel::Naming
+    extend ::ActiveModel::Translation
+
+    # class_attribute in concerns that have no ClassMethods module
+    def self.partial_updates: () -> untyped
+    def self.partial_updates=: (untyped value) -> untyped
+    def self.partial_updates?: () -> bool
+    def partial_updates: () -> untyped
+    def partial_updates?: () -> bool
+
+    def self.partial_inserts: () -> untyped
+    def self.partial_inserts=: (untyped value) -> untyped
+    def self.partial_inserts?: () -> bool
+    def partial_inserts: () -> untyped
+    def partial_inserts?: () -> bool
+
+    def self.encrypted_attributes: () -> untyped
+    def self.encrypted_attributes=: (untyped value) -> untyped
+    def self.encrypted_attributes?: () -> bool
+    def encrypted_attributes: () -> untyped
+    def encrypted_attributes=: (untyped value) -> untyped
+    def encrypted_attributes?: () -> bool
+  end
+
+  module Encryption
+    class Context
+      # attr_accessor(*PROPERTIES)
+      attr_accessor key_provider: untyped
+
+      attr_accessor key_generator: untyped
+
+      attr_accessor cipher: untyped
+
+      attr_accessor message_serializer: untyped
+
+      attr_accessor encryptor: untyped
+
+      attr_accessor frozen_encryption: untyped
+    end
+  end
 end

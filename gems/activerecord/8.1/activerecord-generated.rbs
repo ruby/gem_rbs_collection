@@ -26,6 +26,110 @@
 
 # :include: ../README.rdoc
 module ActiveRecord
+  def self.disable_prepared_statements: () -> untyped
+
+  def self.disable_prepared_statements=: (untyped value) -> untyped
+
+  def self.lazily_load_schema_cache: () -> untyped
+
+  def self.lazily_load_schema_cache=: (untyped value) -> untyped
+
+  def self.schema_cache_ignored_tables: () -> untyped
+
+  def self.schema_cache_ignored_tables=: (untyped value) -> untyped
+
+  def self.database_cli: () -> untyped
+
+  def self.database_cli=: (untyped value) -> untyped
+
+  def self.db_warnings_action: () -> untyped
+
+  def self.db_warnings_ignore: () -> untyped
+
+  def self.db_warnings_ignore=: (untyped value) -> untyped
+
+  def self.async_query_executor: () -> untyped
+
+  def self.async_query_executor=: (untyped value) -> untyped
+
+  def self.permanent_connection_checkout: () -> untyped
+
+  def self.queues: () -> untyped
+
+  def self.queues=: (untyped value) -> untyped
+
+  def self.raise_on_assign_to_attr_readonly: () -> untyped
+
+  def self.raise_on_assign_to_attr_readonly=: (untyped value) -> untyped
+
+  def self.belongs_to_required_validates_foreign_key: () -> untyped
+
+  def self.belongs_to_required_validates_foreign_key=: (untyped value) -> untyped
+
+  def self.before_committed_on_all_records: () -> untyped
+
+  def self.before_committed_on_all_records=: (untyped value) -> untyped
+
+  def self.run_after_transaction_callbacks_in_order_defined: () -> untyped
+
+  def self.run_after_transaction_callbacks_in_order_defined=: (untyped value) -> untyped
+
+  def self.raise_on_missing_required_finder_order_columns: () -> untyped
+
+  def self.raise_on_missing_required_finder_order_columns=: (untyped value) -> untyped
+
+  def self.application_record_class: () -> untyped
+
+  def self.application_record_class=: (untyped value) -> untyped
+
+  def self.action_on_strict_loading_violation: () -> untyped
+
+  def self.action_on_strict_loading_violation=: (untyped value) -> untyped
+
+  def self.validate_migration_timestamps: () -> untyped
+
+  def self.validate_migration_timestamps=: (untyped value) -> untyped
+
+  def self.migration_strategy: () -> untyped
+
+  def self.migration_strategy=: (untyped value) -> untyped
+
+  def self.schema_versions_formatter: () -> untyped
+
+  def self.schema_versions_formatter=: (untyped value) -> untyped
+
+  def self.verify_foreign_keys_for_fixtures: () -> untyped
+
+  def self.verify_foreign_keys_for_fixtures=: (untyped value) -> untyped
+
+  def self.query_transformers: () -> untyped
+
+  def self.query_transformers=: (untyped value) -> untyped
+
+  def self.use_yaml_unsafe_load: () -> untyped
+
+  def self.use_yaml_unsafe_load=: (untyped value) -> untyped
+
+  def self.raise_int_wider_than_64bit: () -> untyped
+
+  def self.raise_int_wider_than_64bit=: (untyped value) -> untyped
+
+  def self.yaml_column_permitted_classes: () -> untyped
+
+  def self.yaml_column_permitted_classes=: (untyped value) -> untyped
+
+  def self.generate_secure_token_on: () -> untyped
+
+  def self.generate_secure_token_on=: (untyped value) -> untyped
+
+  def self.protocol_adapters: () -> untyped
+
+  def self.protocol_adapters=: (untyped value) -> untyped
+
+  def self.message_verifiers: () -> untyped
+
+  def self.message_verifiers=: (untyped value) -> untyped
+
   extend ::ActiveSupport::Autoload
 
   module Coders
@@ -2414,6 +2518,8 @@ module ActiveRecord
     # <tt>owner</tt>, the collection of its posts as <tt>target</tt>, and
     # the <tt>reflection</tt> object represents a <tt>:has_many</tt> macro.
     class Association
+      def options: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       attr_accessor owner: untyped
 
       attr_reader reflection: untyped
@@ -4111,6 +4217,11 @@ module ActiveRecord
       # operations (for example a has_and_belongs_to_many JoinAssociation would result in
       # two; one for the join table and one for the target table).
       class JoinPart
+        def table_name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        def column_names: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        def primary_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        def attribute_types: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
         include ::Enumerable[untyped]
 
         # The Active Record class which this join part is associated 'about'; for a JoinBase
@@ -4536,6 +4647,8 @@ module ActiveRecord
   module Associations
     # = Active Record Through Association
     module ThroughAssociation
+      def source_reflection: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       private
 
       def transaction: () { (?) -> untyped } -> untyped
@@ -5074,6 +5187,14 @@ module ActiveRecord
     # +saved_change_to_name?+ or by passing an argument to the generic method
     # <tt>saved_change_to_attribute?("name")</tt>.
     module Dirty
+      def partial_updates: () -> untyped
+
+      def partial_updates?: () -> bool
+
+      def partial_inserts: () -> untyped
+
+      def partial_inserts?: () -> bool
+
       extend ::ActiveSupport::Concern
 
       include ::ActiveModel::Dirty
@@ -5368,6 +5489,12 @@ module ActiveRecord
       end
 
       module ClassMethods
+        def default_column_serializer: () -> untyped
+
+        def default_column_serializer=: (untyped value) -> untyped
+
+        def default_column_serializer?: () -> bool
+
         # If you have an attribute that needs to be saved to the database as a
         # serialized object, and retrieved by deserializing into the same object,
         # then specify the name of that attribute using this method and serialization
@@ -5552,6 +5679,18 @@ end
 module ActiveRecord
   module AttributeMethods
     module TimeZoneConversion
+      def time_zone_aware_attributes: () -> untyped
+
+      def time_zone_aware_attributes?: () -> bool
+
+      def skip_time_zone_conversion_for_attributes: () -> untyped
+
+      def skip_time_zone_conversion_for_attributes?: () -> bool
+
+      def time_zone_aware_types: () -> untyped
+
+      def time_zone_aware_types?: () -> bool
+
       class TimeZoneConverter
         def self.new: (untyped subtype) -> untyped
 
@@ -5571,6 +5710,24 @@ module ActiveRecord
       extend ::ActiveSupport::Concern
 
       module ClassMethods
+        def time_zone_aware_attributes: () -> untyped
+
+        def time_zone_aware_attributes=: (untyped value) -> untyped
+
+        def time_zone_aware_attributes?: () -> bool
+
+        def skip_time_zone_conversion_for_attributes: () -> untyped
+
+        def skip_time_zone_conversion_for_attributes=: (untyped value) -> untyped
+
+        def skip_time_zone_conversion_for_attributes?: () -> bool
+
+        def time_zone_aware_types: () -> untyped
+
+        def time_zone_aware_types=: (untyped value) -> untyped
+
+        def time_zone_aware_types?: () -> bool
+
         private
 
         def hook_attribute_type: (untyped name, untyped cast_type) -> untyped
@@ -7263,6 +7420,16 @@ end
 module ActiveRecord
   module ConnectionAdapters
     class AbstractMysqlAdapter < ::ActiveRecord::ConnectionAdapters::AbstractAdapter
+      def self.emulate_booleans: () -> untyped
+      def self.emulate_booleans=: (untyped value) -> untyped
+      def self.emulate_booleans?: () -> bool
+      def emulate_booleans: () -> untyped
+      def emulate_booleans?: () -> bool
+      def emulate_booleans=: (untyped value) -> untyped
+      def self.cli_arg_map: () -> untyped
+      def self.cli_arg_map=: (untyped value) -> untyped
+      def self.cli_arg_map?: () -> bool
+
       include ::ActiveRecord::ConnectionAdapters::MySQL::DatabaseStatements
 
       include ::ActiveRecord::ConnectionAdapters::MySQL::Quoting
@@ -7848,6 +8015,9 @@ module ActiveRecord
     # * private methods that require being called in a +synchronize+ blocks
     #   are now explicitly documented
     class ConnectionPool
+      def schema_reflection: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def server_version: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       class WeakThreadKeyMap
         # FIXME: On 3.3 we could use ObjectSpace::WeakKeyMap
         # but it currently causes GC crashes: https://github.com/byroot/rails/pull/3
@@ -8442,6 +8612,26 @@ end
 module ActiveRecord
   module ConnectionAdapters
     module DatabaseStatements
+      def within_new_transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def open_transactions: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def current_transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def begin_transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def commit_transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def rollback_transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def materialize_transactions: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def disable_lazy_transactions!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def enable_lazy_transactions!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def dirty_current_transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: () -> void
 
       # Converts an arel AST to SQL
@@ -9064,6 +9254,24 @@ end
 module ActiveRecord
   module ConnectionAdapters
     class SchemaCreation
+      private
+      def quote_column_name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def quote_table_name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def quote_default_expression: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def type_to_sql: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def options_include_default?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_indexes_in_create?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def use_foreign_keys?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def quoted_columns_for_index: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_partial_index?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_check_constraints?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_index_include?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_exclusion_constraints?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_unique_constraints?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def supports_nulls_not_distinct?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def lookup_cast_type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      public
+
       def initialize: (untyped conn) -> void
 
       def accept: (untyped o) -> untyped
@@ -9228,11 +9436,43 @@ module ActiveRecord
     end
 
     module ColumnMethods
+      def bigint: (*untyped names, **untyped options) -> untyped
+
+      def binary: (*untyped names, **untyped options) -> untyped
+
+      def boolean: (*untyped names, **untyped options) -> untyped
+
+      def date: (*untyped names, **untyped options) -> untyped
+
+      def datetime: (*untyped names, **untyped options) -> untyped
+
+      def decimal: (*untyped names, **untyped options) -> untyped
+
+      def float: (*untyped names, **untyped options) -> untyped
+
+      def integer: (*untyped names, **untyped options) -> untyped
+
+      def json: (*untyped names, **untyped options) -> untyped
+
+      def string: (*untyped names, **untyped options) -> untyped
+
+      def text: (*untyped names, **untyped options) -> untyped
+
+      def time: (*untyped names, **untyped options) -> untyped
+
+      def timestamp: (*untyped names, **untyped options) -> untyped
+
+      def virtual: (*untyped names, **untyped options) -> untyped
+
       extend ::ActiveSupport::Concern
 
       # Appends a primary key definition to the table definition.
       # Can be called multiple times, but this is probably not a good idea.
       def primary_key: (untyped name, ?::Symbol type, **untyped options) -> untyped
+
+      alias blob binary
+
+      alias numeric decimal
     end
 
     # = Active Record Connection Adapters \Table \Definition
@@ -11039,6 +11279,9 @@ module ActiveRecord
     end
 
     class Transaction
+      def invalidate!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def invalidated?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       class Callback
         def initialize: (untyped event, untyped callback) -> void
 
@@ -11121,6 +11364,11 @@ module ActiveRecord
 
     # = Active Record Restart Parent \Transaction
     class RestartParentTransaction < ::ActiveRecord::ConnectionAdapters::Transaction
+      def materialize!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def materialized?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def restart: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def isolation: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: (untyped connection, untyped parent_transaction, **untyped options) -> void
 
       def rollback: () -> untyped
@@ -11208,6 +11456,12 @@ module ActiveRecord
       attr_accessor name(): untyped
 
       attr_accessor alias(): untyped
+
+      def precision: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def scale: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def limit: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def sql_type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
 
       include ::ActiveRecord::ConnectionAdapters::Deduplicable
 
@@ -11302,6 +11556,8 @@ module ActiveRecord
         attr_accessor name(): untyped
 
         attr_accessor alias(): untyped
+
+        def extra: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
 
         def unsigned?: () -> untyped
 
@@ -11429,6 +11685,11 @@ module ActiveRecord
     module MySQL
       class SchemaCreation < ::ActiveRecord::ConnectionAdapters::SchemaCreation
         private
+        def add_sql_comment!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        def mariadb?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        public
+
+        private
 
         def visit_DropForeignKey: (untyped name) -> ::String
 
@@ -11460,6 +11721,24 @@ module ActiveRecord
   module ConnectionAdapters
     module MySQL
       module ColumnMethods
+        def blob: (*untyped names, **untyped options) -> untyped
+
+        def tinyblob: (*untyped names, **untyped options) -> untyped
+
+        def mediumblob: (*untyped names, **untyped options) -> untyped
+
+        def longblob: (*untyped names, **untyped options) -> untyped
+
+        def tinytext: (*untyped names, **untyped options) -> untyped
+
+        def mediumtext: (*untyped names, **untyped options) -> untyped
+
+        def longtext: (*untyped names, **untyped options) -> untyped
+
+        def unsigned_integer: (*untyped names, **untyped options) -> untyped
+
+        def unsigned_bigint: (*untyped names, **untyped options) -> untyped
+
         extend ::ActiveSupport::Concern
       end
 
@@ -11845,6 +12124,25 @@ module ActiveRecord
     # In addition, default connection parameters of libpq can be set per environment variables.
     # See https://www.postgresql.org/docs/current/static/libpq-envars.html .
     class PostgreSQLAdapter < ::ActiveRecord::ConnectionAdapters::AbstractAdapter
+      def self.create_unlogged_tables: () -> untyped
+      def self.create_unlogged_tables=: (untyped value) -> untyped
+      def self.create_unlogged_tables?: () -> bool
+      def create_unlogged_tables: () -> untyped
+      def create_unlogged_tables?: () -> bool
+      def create_unlogged_tables=: (untyped value) -> untyped
+      def self.datetime_type: () -> untyped
+      def self.datetime_type=: (untyped value) -> untyped
+      def self.datetime_type?: () -> bool
+      def datetime_type: () -> untyped
+      def datetime_type?: () -> bool
+      def datetime_type=: (untyped value) -> untyped
+      def self.decode_dates: () -> untyped
+      def self.decode_dates=: (untyped value) -> untyped
+      def self.decode_dates?: () -> bool
+      def decode_dates: () -> untyped
+      def decode_dates?: () -> bool
+      def decode_dates=: (untyped value) -> untyped
+
       ADAPTER_NAME: "PostgreSQL"
 
       def self.new_client: (untyped conn_params) -> untyped
@@ -12177,6 +12475,9 @@ module ActiveRecord
 
         attr_accessor alias(): untyped
 
+        def oid: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        def fmod: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
         def initialize: (*untyped, ?serial: untyped?, ?identity: untyped?, ?generated: untyped?, **untyped) -> void
 
         def identity?: () -> untyped
@@ -12328,6 +12629,12 @@ module ActiveRecord
     module PostgreSQL
       module OID
         class Array[unchecked out Elem] < ActiveModel::Type::Value
+          def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+          def user_input_in_time_zone: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+          def limit: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+          def precision: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+          def scale: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
           include ::ActiveModel::Type::Helpers::Mutable
 
           Data: untyped
@@ -12680,6 +12987,8 @@ module ActiveRecord
     module PostgreSQL
       module OID
         class Range[out Elem] < ActiveModel::Type::Value
+          def user_input_in_time_zone: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
           attr_reader subtype: untyped
 
           attr_reader type: untyped
@@ -13014,6 +13323,9 @@ module ActiveRecord
   module ConnectionAdapters
     module PostgreSQL
       class SchemaCreation < ::ActiveRecord::ConnectionAdapters::SchemaCreation
+        def quoted_include_columns_for_index: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+        def database_version: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
         private
 
         def visit_AlterTable: (untyped o) -> untyped
@@ -13053,6 +13365,70 @@ module ActiveRecord
   module ConnectionAdapters
     module PostgreSQL
       module ColumnMethods
+        def bigserial: (*untyped names, **untyped options) -> untyped
+
+        def bit: (*untyped names, **untyped options) -> untyped
+
+        def bit_varying: (*untyped names, **untyped options) -> untyped
+
+        def cidr: (*untyped names, **untyped options) -> untyped
+
+        def citext: (*untyped names, **untyped options) -> untyped
+
+        def daterange: (*untyped names, **untyped options) -> untyped
+
+        def hstore: (*untyped names, **untyped options) -> untyped
+
+        def inet: (*untyped names, **untyped options) -> untyped
+
+        def interval: (*untyped names, **untyped options) -> untyped
+
+        def int4range: (*untyped names, **untyped options) -> untyped
+
+        def int8range: (*untyped names, **untyped options) -> untyped
+
+        def jsonb: (*untyped names, **untyped options) -> untyped
+
+        def ltree: (*untyped names, **untyped options) -> untyped
+
+        def macaddr: (*untyped names, **untyped options) -> untyped
+
+        def money: (*untyped names, **untyped options) -> untyped
+
+        def numrange: (*untyped names, **untyped options) -> untyped
+
+        def oid: (*untyped names, **untyped options) -> untyped
+
+        def point: (*untyped names, **untyped options) -> untyped
+
+        def line: (*untyped names, **untyped options) -> untyped
+
+        def lseg: (*untyped names, **untyped options) -> untyped
+
+        def box: (*untyped names, **untyped options) -> untyped
+
+        def path: (*untyped names, **untyped options) -> untyped
+
+        def polygon: (*untyped names, **untyped options) -> untyped
+
+        def circle: (*untyped names, **untyped options) -> untyped
+
+        def serial: (*untyped names, **untyped options) -> untyped
+
+        def tsrange: (*untyped names, **untyped options) -> untyped
+
+        def tstzrange: (*untyped names, **untyped options) -> untyped
+
+        def tsvector: (*untyped names, **untyped options) -> untyped
+
+        def uuid: (*untyped names, **untyped options) -> untyped
+
+        def xml: (*untyped names, **untyped options) -> untyped
+
+        def timestamptz: (*untyped names, **untyped options) -> untyped
+
+        def enum: (*untyped names, **untyped options) -> untyped
+
         extend ::ActiveSupport::Concern
 
         # Defines the primary key field.
@@ -13881,6 +14257,13 @@ module ActiveRecord
     # {SQLite3::Database.new}[https://sparklemotion.github.io/sqlite3-ruby/SQLite3/Database.html#method-c-new]
     #
     class SQLite3Adapter < ::ActiveRecord::ConnectionAdapters::AbstractAdapter
+      def self.strict_strings_by_default: () -> untyped
+      def self.strict_strings_by_default=: (untyped value) -> untyped
+      def self.strict_strings_by_default?: () -> bool
+      def strict_strings_by_default: () -> untyped
+      def strict_strings_by_default?: () -> bool
+      def strict_strings_by_default=: (untyped value) -> untyped
+
       ADAPTER_NAME: "SQLite"
 
       def self.new_client: (untyped config) -> untyped
@@ -14717,11 +15100,113 @@ end
 module ActiveRecord
   # = Active Record \Core
   module Core
+    def logger: () -> untyped
+
+    def logger?: () -> bool
+
+    def destroy_association_async_batch_size: () -> untyped
+
+    def default_connection_handler: () -> untyped
+
+    def default_connection_handler?: () -> bool
+
+    def default_role: () -> untyped
+
+    def default_role?: () -> bool
+
+    def default_shard: () -> untyped
+
+    def default_shard?: () -> bool
+
+    def destroy_association_async_job: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     extend ::ActiveSupport::Concern
 
     include ::ActiveModel::Access
 
     module ClassMethods
+      def logger: () -> untyped
+
+      def logger=: (untyped value) -> untyped
+
+      def logger?: () -> bool
+
+      def _destroy_association_async_job: () -> untyped
+
+      def _destroy_association_async_job=: (untyped value) -> untyped
+
+      def _destroy_association_async_job?: () -> bool
+
+      def destroy_association_async_batch_size: () -> untyped
+
+      def destroy_association_async_batch_size=: (untyped value) -> untyped
+
+      def enumerate_columns_in_select_statements: () -> untyped
+
+      def enumerate_columns_in_select_statements=: (untyped value) -> untyped
+
+      def enumerate_columns_in_select_statements?: () -> bool
+
+      def belongs_to_required_by_default: () -> untyped
+
+      def belongs_to_required_by_default=: (untyped value) -> untyped
+
+      def belongs_to_required_by_default?: () -> bool
+
+      def strict_loading_by_default: () -> untyped
+
+      def strict_loading_by_default=: (untyped value) -> untyped
+
+      def strict_loading_by_default?: () -> bool
+
+      def strict_loading_mode: () -> untyped
+
+      def strict_loading_mode=: (untyped value) -> untyped
+
+      def strict_loading_mode?: () -> bool
+
+      def has_many_inversing: () -> untyped
+
+      def has_many_inversing=: (untyped value) -> untyped
+
+      def has_many_inversing?: () -> bool
+
+      def run_commit_callbacks_on_first_saved_instances_in_transaction: () -> untyped
+
+      def run_commit_callbacks_on_first_saved_instances_in_transaction=: (untyped value) -> untyped
+
+      def run_commit_callbacks_on_first_saved_instances_in_transaction?: () -> bool
+
+      def default_connection_handler: () -> untyped
+
+      def default_connection_handler=: (untyped value) -> untyped
+
+      def default_connection_handler?: () -> bool
+
+      def default_role: () -> untyped
+
+      def default_role=: (untyped value) -> untyped
+
+      def default_role?: () -> bool
+
+      def default_shard: () -> untyped
+
+      def default_shard=: (untyped value) -> untyped
+
+      def default_shard?: () -> bool
+
+      def shard_selector: () -> untyped
+
+      def shard_selector=: (untyped value) -> untyped
+
+      def shard_selector?: () -> bool
+
+      def attributes_for_inspect: () -> untyped
+
+      def attributes_for_inspect=: (untyped value) -> untyped
+
+      def attributes_for_inspect?: () -> bool
+
       def initialize_find_by_cache: () -> untyped
 
       def find: (*untyped ids) -> untyped
@@ -14940,9 +15425,25 @@ end
 module ActiveRecord
   # = Active Record Counter Cache
   module CounterCache
+    def counter_cached_association_names: () -> untyped
+
+    def counter_cached_association_names?: () -> bool
+
     extend ::ActiveSupport::Concern
 
     module ClassMethods
+      def _counter_cache_columns: () -> untyped
+
+      def _counter_cache_columns=: (untyped value) -> untyped
+
+      def _counter_cache_columns?: () -> bool
+
+      def counter_cached_association_names: () -> untyped
+
+      def counter_cached_association_names=: (untyped value) -> untyped
+
+      def counter_cached_association_names?: () -> bool
+
       # Resets one or more counter caches to their correct value using an SQL
       # count query. This is useful when adding new counter caches, or if the
       # counter has been corrupted or modified directly by SQL.
@@ -15099,6 +15600,10 @@ module ActiveRecord
   # conditions of the handler. See ::register_db_config_handler for more on
   # registering custom handlers.
   class DatabaseConfigurations
+    def self.db_config_handlers: () -> untyped
+    def self.db_config_handlers=: (untyped value) -> untyped
+    def any?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     class InvalidConfigurationError < ::StandardError
     end
 
@@ -15999,6 +16504,18 @@ module ActiveRecord
   module Encryption
     # Configuration API for ActiveRecord::Encryption
     module Configurable
+      def self.config: () -> untyped
+
+      def config: () -> untyped
+
+      def self.encrypted_attribute_declaration_listeners: () -> untyped
+
+      def self.encrypted_attribute_declaration_listeners=: (untyped value) -> untyped
+
+      def encrypted_attribute_declaration_listeners: () -> untyped
+
+      def encrypted_attribute_declaration_listeners=: (untyped value) -> untyped
+
       extend ::ActiveSupport::Concern
     end
   end
@@ -16018,7 +16535,7 @@ module ActiveRecord
 
       def initialize: () -> void
 
-      def key_provider: () -> untyped
+      alias frozen_encryption? frozen_encryption
 
       private
 
@@ -16040,6 +16557,22 @@ module ActiveRecord
     #
     # See Context.
     module Contexts
+      def self.default_context: () -> untyped
+
+      def self.default_context=: (untyped value) -> untyped
+
+      def default_context: () -> untyped
+
+      def default_context=: (untyped value) -> untyped
+
+      def self.custom_contexts: () -> untyped
+
+      def self.custom_contexts=: (untyped value) -> untyped
+
+      def custom_contexts: () -> untyped
+
+      def custom_contexts=: (untyped value) -> untyped
+
       extend ::ActiveSupport::Concern
     end
   end
@@ -16072,6 +16605,12 @@ module ActiveRecord
     # This is the concern mixed in Active Record models to make them encryptable. It adds the +encrypts+
     # attribute declaration, as well as the API to encrypt and decrypt records.
     module EncryptableRecord
+      def encrypted_attributes: () -> untyped
+
+      def encrypted_attributes?: () -> bool
+
+      def encrypted_attributes=: (untyped value) -> untyped
+
       extend ::ActiveSupport::Concern
 
       private
@@ -16105,6 +16644,15 @@ module ActiveRecord
     # model classes. Whenever you declare an attribute as encrypted, it configures an +EncryptedAttributeType+
     # for that attribute.
     class EncryptedAttributeType < ::ActiveModel::Type::Value
+      def key_provider: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def downcase?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def deterministic?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def previous_schemes: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def with_context: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def fixed?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def accessor: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       include ::ActiveModel::Type::Helpers::Mutable
 
       attr_reader scheme: untyped
@@ -16673,6 +17221,11 @@ module ActiveRecord
     #
     # See +Properties::DEFAULT_PROPERTIES+, Key, Message
     class Properties
+      def ==: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def []: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def each: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def key?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       ALLOWED_VALUE_CLASSES: ::Array[untyped]
 
       # For each entry it generates an accessor exposing the full name
@@ -16926,6 +17479,8 @@ module ActiveRecord
     def self.extended: (untyped base) -> untyped
 
     class EnumType < ::ActiveModel::Type::Value
+      def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: (untyped name, untyped mapping, untyped subtype, ?raise_on_invalid_values: bool) -> void
 
       def cast: (untyped value) -> untyped
@@ -17464,6 +18019,13 @@ module ActiveRecord
   #
   # returns the collected queries local to the current thread.
   class ExplainRegistry
+    def self.start: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def self.reset: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def self.collect: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def self.collect=: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def self.collect?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def self.queries: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     class Subscriber
       MUTEX: untyped
 
@@ -17554,6 +18116,11 @@ end
 
 module ActiveRecord
   class FixtureSet
+    def self.all_loaded_fixtures: () -> untyped
+    def self.all_loaded_fixtures=: (untyped value) -> untyped
+    def all_loaded_fixtures: () -> untyped
+    def all_loaded_fixtures=: (untyped value) -> untyped
+
     class File
       include ::Enumerable[untyped]
 
@@ -18326,7 +18893,13 @@ end
 
 module ActiveRecord
   class FutureResult
+    def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def to_a: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     class Complete
+      def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def to_a: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       attr_reader result: untyped
 
       def initialize: (untyped result) -> void
@@ -18437,9 +19010,29 @@ module ActiveRecord
   # for more background.
   #
   module Inheritance
+    def store_full_class_name: () -> untyped
+
+    def store_full_class_name?: () -> bool
+
+    def store_full_sti_class: () -> untyped
+
+    def store_full_sti_class?: () -> bool
+
     extend ::ActiveSupport::Concern
 
     module ClassMethods
+      def store_full_class_name: () -> untyped
+
+      def store_full_class_name=: (untyped value) -> untyped
+
+      def store_full_class_name?: () -> bool
+
+      def store_full_sti_class: () -> untyped
+
+      def store_full_sti_class=: (untyped value) -> untyped
+
+      def store_full_sti_class?: () -> bool
+
       # Determines if one of the attributes passed in is the inheritance column,
       # and if the inheritance column is attr accessible, it initializes an
       # instance of the given subclass instead of the base class.
@@ -18649,6 +19242,13 @@ module ActiveRecord
     def disallow_raw_sql!: (untyped value) -> (nil | untyped)
 
     class Builder
+      def skip_duplicates?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def update_duplicates?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def keys: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def keys_including_timestamps: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def record_timestamps?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def primary_keys: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       attr_reader model: untyped
 
       def initialize: (untyped insert_all) -> void
@@ -18692,6 +19292,18 @@ end
 
 module ActiveRecord
   module Integration
+    def cache_timestamp_format: () -> untyped
+
+    def cache_timestamp_format?: () -> bool
+
+    def cache_versioning: () -> untyped
+
+    def cache_versioning?: () -> bool
+
+    def collection_cache_versioning: () -> untyped
+
+    def collection_cache_versioning?: () -> bool
+
     extend ::ActiveSupport::Concern
 
     # Returns a +String+, which Action Pack uses for constructing a URL to this
@@ -18742,6 +19354,24 @@ module ActiveRecord
     def cache_key_with_version: () -> (::String | untyped)
 
     module ClassMethods
+      def cache_timestamp_format: () -> untyped
+
+      def cache_timestamp_format=: (untyped value) -> untyped
+
+      def cache_timestamp_format?: () -> bool
+
+      def cache_versioning: () -> untyped
+
+      def cache_versioning=: (untyped value) -> untyped
+
+      def cache_versioning?: () -> bool
+
+      def collection_cache_versioning: () -> untyped
+
+      def collection_cache_versioning=: (untyped value) -> untyped
+
+      def collection_cache_versioning?: () -> bool
+
       # Defines your model's +to_param+ method to generate "pretty" URLs
       # using +method_name+, which can be any attribute or method that
       # responds to +to_s+.
@@ -18909,6 +19539,10 @@ module ActiveRecord
     #   end
     #
     module Optimistic
+      def lock_optimistically: () -> untyped
+
+      def lock_optimistically?: () -> bool
+
       extend ::ActiveSupport::Concern
 
       def locking_enabled?: () -> untyped
@@ -18934,6 +19568,12 @@ module ActiveRecord
       def _query_constraints_hash: () -> untyped
 
       module ClassMethods
+        def lock_optimistically: () -> untyped
+
+        def lock_optimistically=: (untyped value) -> untyped
+
+        def lock_optimistically?: () -> bool
+
         DEFAULT_LOCKING_COLUMN: "lock_version"
 
         # Returns true if the +lock_optimistically+ flag is set to true
@@ -19061,6 +19701,13 @@ end
 
 module ActiveRecord
   class LogSubscriber < ::ActiveSupport::LogSubscriber
+    def self.backtrace_cleaner: () -> untyped
+    def self.backtrace_cleaner=: (untyped value) -> untyped
+    def self.backtrace_cleaner?: () -> bool
+    def backtrace_cleaner: () -> untyped
+    def backtrace_cleaner?: () -> bool
+    def backtrace_cleaner=: (untyped value) -> untyped
+
     IGNORE_PAYLOAD_NAMES: ::Array["SCHEMA" | "EXPLAIN"]
 
     def strict_loading_violation: (untyped event) -> untyped
@@ -19833,6 +20480,11 @@ module ActiveRecord
   # Remember that you can still open your own transactions, even if you
   # are in a Migration with <tt>self.disable_ddl_transaction!</tt>.
   class Migration
+    def self.verbose: () -> untyped
+    def self.verbose=: (untyped value) -> untyped
+    def verbose: () -> untyped
+    def verbose=: (untyped value) -> untyped
+
     # This must be defined before the inherited hook, below
     class Current < ::ActiveRecord::Migration
       def create_table: (untyped table_name, **untyped options) ?{ (untyped) -> untyped } -> untyped
@@ -20703,6 +21355,26 @@ end
 
 module ActiveRecord
   module ModelSchema
+    def primary_key_prefix_type: () -> untyped
+
+    def primary_key_prefix_type?: () -> bool
+
+    def table_name_prefix: () -> untyped
+
+    def table_name_prefix?: () -> bool
+
+    def table_name_suffix: () -> untyped
+
+    def table_name_suffix?: () -> bool
+
+    def pluralize_table_names: () -> untyped
+
+    def pluralize_table_names?: () -> bool
+
+    def type_for_attribute: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def column_for_attribute: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     extend ::ActiveSupport::Concern
 
     # Derives the join table name for +first_table+ and +second_table+. The
@@ -20716,6 +21388,60 @@ module ActiveRecord
     def self.derive_join_table_name: (untyped first_table, untyped second_table) -> untyped
 
     module ClassMethods
+      def primary_key_prefix_type: () -> untyped
+
+      def primary_key_prefix_type=: (untyped value) -> untyped
+
+      def primary_key_prefix_type?: () -> bool
+
+      def table_name_prefix: () -> untyped
+
+      def table_name_prefix=: (untyped value) -> untyped
+
+      def table_name_prefix?: () -> bool
+
+      def table_name_suffix: () -> untyped
+
+      def table_name_suffix=: (untyped value) -> untyped
+
+      def table_name_suffix?: () -> bool
+
+      def schema_migrations_table_name: () -> untyped
+
+      def schema_migrations_table_name=: (untyped value) -> untyped
+
+      def schema_migrations_table_name?: () -> bool
+
+      def internal_metadata_table_name: () -> untyped
+
+      def internal_metadata_table_name=: (untyped value) -> untyped
+
+      def internal_metadata_table_name?: () -> bool
+
+      def pluralize_table_names: () -> untyped
+
+      def pluralize_table_names=: (untyped value) -> untyped
+
+      def pluralize_table_names?: () -> bool
+
+      def implicit_order_column: () -> untyped
+
+      def implicit_order_column=: (untyped value) -> untyped
+
+      def implicit_order_column?: () -> bool
+
+      def immutable_strings_by_default: () -> untyped
+
+      def immutable_strings_by_default=: (untyped value) -> untyped
+
+      def immutable_strings_by_default?: () -> bool
+
+      def inheritance_column: () -> untyped
+
+      def inheritance_column=: (untyped value) -> untyped
+
+      def inheritance_column?: () -> bool
+
       # Guesses the table name (in forced lower-case) based on the name of the class in the
       # inheritance hierarchy descending directly from ActiveRecord::Base. So if the hierarchy
       # looks like: Reply < Message < ActiveRecord::Base, then Message is used
@@ -20974,6 +21700,10 @@ end
 
 module ActiveRecord
   module NestedAttributes
+    def nested_attributes_options: () -> untyped
+
+    def nested_attributes_options?: () -> bool
+
     class TooManyRecords < ::ActiveRecord::ActiveRecordError
     end
 
@@ -21264,6 +21994,12 @@ module ActiveRecord
     #     }
     #   }
     module ClassMethods
+      def nested_attributes_options: () -> untyped
+
+      def nested_attributes_options=: (untyped value) -> untyped
+
+      def nested_attributes_options?: () -> bool
+
       REJECT_ALL_BLANK_PROC: untyped
 
       # Defines an attributes writer for the specified association(s).
@@ -22041,6 +22777,10 @@ end
 
 module ActiveRecord
   module QueryLogs
+    def self.cached_comment: () -> untyped
+
+    def self.cached_comment=: (untyped value) -> untyped
+
     module LegacyFormatter
       # Formats the key value pairs into a string.
       def self.format: (untyped key, untyped value) -> ::String
@@ -22276,6 +23016,12 @@ module ActiveRecord
     extend ::ActiveSupport::Concern
 
     module ClassMethods
+      def _attr_readonly: () -> untyped
+
+      def _attr_readonly=: (untyped value) -> untyped
+
+      def _attr_readonly?: () -> bool
+
       # Attributes listed as readonly will be used to create a new record.
       # Assigning a new value to a readonly attribute on a persisted record raises an error.
       #
@@ -22312,6 +23058,22 @@ end
 module ActiveRecord
   # = Active Record Reflection
   module Reflection
+    def _reflections: () -> untyped
+
+    def _reflections?: () -> bool
+
+    def aggregate_reflections: () -> untyped
+
+    def aggregate_reflections?: () -> bool
+
+    def automatic_scope_inversing: () -> untyped
+
+    def automatic_scope_inversing?: () -> bool
+
+    def automatically_invert_plural_associations: () -> untyped
+
+    def automatically_invert_plural_associations?: () -> bool
+
     extend ::ActiveSupport::Concern
 
     def self.create: (untyped macro, untyped name, untyped scope, untyped options, untyped ar) -> untyped
@@ -22333,6 +23095,30 @@ module ActiveRecord
     # MacroReflection class has info for AggregateReflection and AssociationReflection
     # classes.
     module ClassMethods
+      def _reflections: () -> untyped
+
+      def _reflections=: (untyped value) -> untyped
+
+      def _reflections?: () -> bool
+
+      def aggregate_reflections: () -> untyped
+
+      def aggregate_reflections=: (untyped value) -> untyped
+
+      def aggregate_reflections?: () -> bool
+
+      def automatic_scope_inversing: () -> untyped
+
+      def automatic_scope_inversing=: (untyped value) -> untyped
+
+      def automatic_scope_inversing?: () -> bool
+
+      def automatically_invert_plural_associations: () -> untyped
+
+      def automatically_invert_plural_associations=: (untyped value) -> untyped
+
+      def automatically_invert_plural_associations?: () -> bool
+
       # Returns an array of AggregateReflection objects for all the aggregations in the class.
       def reflect_on_all_aggregations: () -> untyped
 
@@ -22728,6 +23514,14 @@ module ActiveRecord
     # Holds all the metadata about a :through association as it was specified
     # in the Active Record class.
     class ThroughReflection < ::ActiveRecord::Reflection::AbstractReflection
+      def foreign_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def foreign_type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def association_foreign_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def join_id_for: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def active_record_primary_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def join_foreign_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: (untyped delegate_reflection) -> void
 
       def through_reflection?: () -> true
@@ -22853,6 +23647,15 @@ module ActiveRecord
     end
 
     class PolymorphicReflection < ::ActiveRecord::Reflection::AbstractReflection
+      def klass: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def plural_name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def join_primary_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def join_foreign_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def scope_for: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: (untyped reflection, untyped previous_reflection) -> void
 
       def join_scopes: (untyped table, ?untyped? predicate_builder, ?untyped klass, ?untyped? record) -> untyped
@@ -22865,6 +23668,11 @@ module ActiveRecord
     end
 
     class RuntimeReflection < ::ActiveRecord::Reflection::AbstractReflection
+      def scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def constraints: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def join_foreign_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: (untyped reflection, untyped association) -> void
 
       def klass: () -> untyped
@@ -24054,11 +24862,81 @@ end
 
 module ActiveRecord
   module Delegation
+    def to_xml: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def encode_with: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def length: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def each: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def join: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def intersect?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def []: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def &: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def |: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def +: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def -: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def sample: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def reverse: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def rotate: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def compact: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def in_groups: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def in_groups_of: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def to_sentence: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def to_fs: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def to_formatted_s: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def as_json: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def shuffle: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def split: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def slice: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def index: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def rindex: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def primary_key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def with_connection: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def connection: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def transaction: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def sanitize_sql_like: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def unscoped: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     def self.delegated_classes: () -> ::Array[untyped]
 
     def self.uncacheable_methods: () -> untyped
 
     module DelegateCache
+      def self.delegate_base_methods: () -> untyped
+
+      def self.delegate_base_methods=: (untyped value) -> untyped
+
       def relation_delegate_class: (untyped klass) -> untyped
 
       def initialize_relation_delegate_cache: () -> untyped
@@ -25941,6 +26819,9 @@ end
 module ActiveRecord
   class Relation
     class WhereClause
+      def any?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def initialize: (untyped predicates) -> void
 
       def +: (untyped other) -> WhereClause
@@ -26315,6 +27196,27 @@ module ActiveRecord
   # This class is used to dump the database schema for some connection to some
   # output format (i.e., ActiveRecord::Schema).
   class SchemaDumper
+    def self.ignore_tables: () -> untyped
+    def self.ignore_tables=: (untyped value) -> untyped
+    def ignore_tables: () -> untyped
+    def ignore_tables=: (untyped value) -> untyped
+    def self.fk_ignore_pattern: () -> untyped
+    def self.fk_ignore_pattern=: (untyped value) -> untyped
+    def fk_ignore_pattern: () -> untyped
+    def fk_ignore_pattern=: (untyped value) -> untyped
+    def self.chk_ignore_pattern: () -> untyped
+    def self.chk_ignore_pattern=: (untyped value) -> untyped
+    def chk_ignore_pattern: () -> untyped
+    def chk_ignore_pattern=: (untyped value) -> untyped
+    def self.excl_ignore_pattern: () -> untyped
+    def self.excl_ignore_pattern=: (untyped value) -> untyped
+    def excl_ignore_pattern: () -> untyped
+    def excl_ignore_pattern=: (untyped value) -> untyped
+    def self.unique_ignore_pattern: () -> untyped
+    def self.unique_ignore_pattern=: (untyped value) -> untyped
+    def unique_ignore_pattern: () -> untyped
+    def unique_ignore_pattern=: (untyped value) -> untyped
+
     def self.dump: (?untyped pool, ?untyped stream, ?untyped config) -> untyped
 
     def self.generate_options: (untyped config) -> { table_name_prefix: untyped, table_name_suffix: untyped }
@@ -26523,6 +27425,13 @@ module ActiveRecord
     #
     # You will obtain whatever was defined in +some_new_scope+.
     class ScopeRegistry
+      def self.current_scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def self.set_current_scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def self.ignore_default_scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def self.set_ignore_default_scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def self.global_current_scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def self.set_global_current_scope: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       def self.instance: () -> untyped
 
       def initialize: () -> void
@@ -26561,9 +27470,21 @@ module ActiveRecord
     end
 
     module Default
+      def default_scopes: () -> untyped
+
+      def default_scope_override: () -> untyped
+
       extend ::ActiveSupport::Concern
 
       module ClassMethods
+        def default_scopes: () -> untyped
+
+        def default_scopes=: (untyped value) -> untyped
+
+        def default_scope_override: () -> untyped
+
+        def default_scope_override=: (untyped value) -> untyped
+
         # Returns a scope for the model without the previously set scopes.
         #
         #   class Post < ActiveRecord::Base
@@ -26899,6 +27820,10 @@ end
 module ActiveRecord
   # = Active Record Signed Id
   module SignedId
+    def signed_id_verifier_secret: () -> untyped
+
+    def signed_id_verifier_secret?: () -> bool
+
     extend ::ActiveSupport::Concern
 
     module RelationMethods
@@ -26908,6 +27833,16 @@ module ActiveRecord
     end
 
     module ClassMethods
+      def _signed_id_verifier: () -> untyped
+
+      def _signed_id_verifier=: (untyped value) -> untyped
+
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
+
+      def signed_id_verifier_secret?: () -> bool
+
       # Lets you find a record based on a signed id that's safe to put into the world without risk of tampering.
       # This is particularly useful for things like password reset or email verification, where you want
       # the bearer of the signed id to be able to interact with the underlying record, but usually only within
@@ -27389,6 +28324,14 @@ module ActiveRecord
     #
     #   DatabaseTasks.create_current('production')
     module DatabaseTasks
+      def self.structure_dump_flags: () -> untyped
+
+      def self.structure_dump_flags=: (untyped value) -> untyped
+
+      def self.structure_load_flags: () -> untyped
+
+      def self.structure_load_flags=: (untyped value) -> untyped
+
       extend ::ActiveRecord::Tasks::DatabaseTasks
 
       attr_writer db_dir: untyped
@@ -27649,6 +28592,58 @@ end
 
 module ActiveRecord
   module TestFixtures
+    def fixture_paths: () -> untyped
+
+    def fixture_paths?: () -> bool
+
+    def fixture_table_names: () -> untyped
+
+    def fixture_table_names?: () -> bool
+
+    def fixture_table_names=: (untyped value) -> untyped
+
+    def fixture_class_names: () -> untyped
+
+    def fixture_class_names?: () -> bool
+
+    def fixture_class_names=: (untyped value) -> untyped
+
+    def use_transactional_tests: () -> untyped
+
+    def use_transactional_tests?: () -> bool
+
+    def use_transactional_tests=: (untyped value) -> untyped
+
+    def use_instantiated_fixtures: () -> untyped
+
+    def use_instantiated_fixtures?: () -> bool
+
+    def use_instantiated_fixtures=: (untyped value) -> untyped
+
+    def pre_loaded_fixtures: () -> untyped
+
+    def pre_loaded_fixtures?: () -> bool
+
+    def pre_loaded_fixtures=: (untyped value) -> untyped
+
+    def lock_threads: () -> untyped
+
+    def lock_threads?: () -> bool
+
+    def lock_threads=: (untyped value) -> untyped
+
+    def fixture_sets: () -> untyped
+
+    def fixture_sets?: () -> bool
+
+    def fixture_sets=: (untyped value) -> untyped
+
+    def database_transactions_config: () -> untyped
+
+    def database_transactions_config?: () -> bool
+
+    def database_transactions_config=: (untyped value) -> untyped
+
     extend ::ActiveSupport::Concern
 
     def before_setup: () -> untyped
@@ -27656,6 +28651,60 @@ module ActiveRecord
     def after_teardown: () -> untyped
 
     module ClassMethods
+      def fixture_paths: () -> untyped
+
+      def fixture_paths=: (untyped value) -> untyped
+
+      def fixture_paths?: () -> bool
+
+      def fixture_table_names: () -> untyped
+
+      def fixture_table_names=: (untyped value) -> untyped
+
+      def fixture_table_names?: () -> bool
+
+      def fixture_class_names: () -> untyped
+
+      def fixture_class_names=: (untyped value) -> untyped
+
+      def fixture_class_names?: () -> bool
+
+      def use_transactional_tests: () -> untyped
+
+      def use_transactional_tests=: (untyped value) -> untyped
+
+      def use_transactional_tests?: () -> bool
+
+      def use_instantiated_fixtures: () -> untyped
+
+      def use_instantiated_fixtures=: (untyped value) -> untyped
+
+      def use_instantiated_fixtures?: () -> bool
+
+      def pre_loaded_fixtures: () -> untyped
+
+      def pre_loaded_fixtures=: (untyped value) -> untyped
+
+      def pre_loaded_fixtures?: () -> bool
+
+      def lock_threads: () -> untyped
+
+      def lock_threads=: (untyped value) -> untyped
+
+      def lock_threads?: () -> bool
+
+      def fixture_sets: () -> untyped
+
+      def fixture_sets=: (untyped value) -> untyped
+
+      def fixture_sets?: () -> bool
+
+      def database_transactions_config: () -> untyped
+
+      def database_transactions_config=: (untyped value) -> untyped
+
+      def database_transactions_config?: () -> bool
+
       # Do not use transactional tests for the given database. This overrides
       # the default setting as defined by `use_transactional_tests`, which
       # applies to all database connection pools not explicitly configured here.
@@ -27855,11 +28904,23 @@ module ActiveRecord
   #     self.skip_time_zone_conversion_for_attributes = [:written_on]
   #   end
   module Timestamp
+    def record_timestamps: () -> untyped
+
+    def record_timestamps?: () -> bool
+
+    def record_timestamps=: (untyped value) -> untyped
+
     extend ::ActiveSupport::Concern
 
     def initialize_dup: (untyped other) -> untyped
 
     module ClassMethods
+      def record_timestamps: () -> untyped
+
+      def record_timestamps=: (untyped value) -> untyped
+
+      def record_timestamps?: () -> bool
+
       def touch_attributes_with_time: (*untyped names, ?time: untyped?) -> untyped
 
       def timestamp_attributes_for_create_in_model: () -> untyped
@@ -27918,6 +28979,13 @@ module ActiveRecord
     end
 
     module ClassMethods
+      def token_definitions: () -> untyped
+
+      def token_definitions=: (untyped value) -> untyped
+
+      def generated_token_verifier: () -> untyped
+
+      def generated_token_verifier=: (untyped value) -> untyped
     end
   end
 end
@@ -28450,6 +29518,8 @@ end
 
 module ActiveRecord
   module Type
+    def self.add_modifier: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     attr_accessor self.registry: untyped
 
     # Add a new type to the registry, allowing it to be referenced as a

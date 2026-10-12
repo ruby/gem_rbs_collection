@@ -135,3 +135,33 @@ module Test
   tag.save
   tag.save!
 end
+
+module Test
+  User.model_name.human
+  User.human_attribute_name(:name)
+  User.inheritance_column
+  User.partial_updates?
+  User.strict_loading_by_default
+  User.destroy(1)
+  User.delete(1)
+  User.where(name: "James").length
+  User.all.table_name
+  User.new.type_for_attribute(:name)
+  User.new.column_for_attribute(:name)
+  ActiveRecord.db_warnings_ignore
+  ActiveRecord.application_record_class
+  ActiveRecord::Base.lease_connection.open_transactions
+  ActiveRecord::Encryption::Context.new.frozen_encryption?
+
+  class CreateUsers < ActiveRecord::Migration[8.1]
+    def change
+      create_table :users do |t|
+        # @type var t: ActiveRecord::ConnectionAdapters::TableDefinition
+        t.string :name, null: false
+        t.integer :age
+        t.references :team
+        t.timestamps
+      end
+    end
+  end
+end
