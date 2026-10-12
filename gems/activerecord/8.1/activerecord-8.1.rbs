@@ -2,8 +2,8 @@ module ActiveRecord
   class Base
     include Encryption::EncryptableRecord
     extend Encryption::EncryptableRecord::ClassMethods
-    include Normalization
-    extend Normalization::ClassMethods
+    include ActiveModel::Attributes::Normalization
+    extend ActiveModel::Attributes::Normalization::ClassMethods
     include SecurePassword
     extend SecurePassword::ClassMethods
     include TokenFor
@@ -30,8 +30,8 @@ module ActiveRecord
     def insert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
-    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?on_duplicate: untyped, ?update_only: untyped?, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert_all: (untyped attributes, ?on_duplicate: untyped, ?update_only: untyped?, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
     def load_async: () -> self
   end
 
@@ -102,15 +102,6 @@ module ActiveRecord
     end
   end
 
-  module Normalization
-    def normalize_attribute: (untyped name) -> void
-
-    module ClassMethods
-      def normalizes: (*untyped names, with: untyped, ?apply_to_nil: bool) -> void
-      def normalize_value_for: (untyped name, untyped value) -> untyped
-    end
-  end
-
   class AdapterError < ActiveRecordError
     def initialize: (?untyped? message, ?connection_pool: ConnectionAdapters::ConnectionPool?) -> void
 
@@ -145,9 +136,9 @@ module ActiveRecord
 
     def insert_all!: (untyped attributes, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-    def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert: (untyped attributes, ?on_duplicate: untyped, ?update_only: untyped?, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
-    def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def upsert_all: (untyped attributes, ?on_duplicate: untyped, ?update_only: untyped?, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
   end
 
   module Querying
@@ -198,7 +189,7 @@ module ActiveRecord
   class InsertAll
     @record_timestamps: bool
 
-    def initialize: (untyped model, untyped inserts, on_duplicate: untyped, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+    def initialize: (untyped relation, untyped connection, untyped inserts, on_duplicate: untyped, ?update_only: untyped?, ?returning: untyped?, ?unique_by: untyped?, ?record_timestamps: bool?) -> void
 
     def record_timestamps?: () -> bool
 
@@ -347,10 +338,10 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
   def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
   def offset: (Integer) -> self
   def offset!: (Integer) -> self
-  def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
-               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
-  def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
-  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
+  def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Model) -> void } -> nil
+               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) -> Enumerator[Model, nil]
+  def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Array[Model]) -> void } -> nil
+  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped, ?use_ranges: bool?) { (self) -> void } -> nil
   def sum: (?untyped? column_name) -> untyped
          | [T] (?T initial_value) { (Model) -> T } -> T
   def destroy_all: () -> untyped
@@ -445,10 +436,10 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
   def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
   def offset: (Integer) -> Relation
   def lock: (?untyped locks) -> Relation
-  def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
-               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
-  def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
-  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
+  def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Model) -> void } -> nil
+               | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) -> Enumerator[Model, nil]
+  def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Array[Model]) -> void } -> nil
+  def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped, ?use_ranges: bool?) { (Relation) -> void } -> nil
   def sum: (?untyped? column_name) -> untyped
          | [T] (?T initial_value) { (Model) -> T } -> T
   def destroy_all: () -> untyped

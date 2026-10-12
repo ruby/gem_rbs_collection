@@ -1,15 +1,17 @@
 module ActiveRecord
   class Base
-    # https://guides.rubyonrails.org/v8.0/active_record_callbacks.html#multiple-callback-conditions
-    # https://guides.rubyonrails.org/v8.0/active_record_validations.html#combining-validation-conditions
+    # https://guides.rubyonrails.org/v8.1/active_record_callbacks.html#multiple-callback-conditions
+    # https://guides.rubyonrails.org/v8.1/active_record_validations.html#combining-validation-conditions
     type conditions[T] = ActiveModel::Validations::ClassMethods::conditions[T]
 
     # puts ActiveRecord::Base.singleton_class.ancestors.map(&:to_s).select { |s| /ClassMethods$/.match?(s) }.map{ |s| "extend ::#{s}" }.sort
     extend ::ActiveModel::AttributeMethods::ClassMethods
+    extend ::ActiveModel::AttributeRegistration::ClassMethods
     extend ::ActiveModel::Conversion::ClassMethods
     extend ::ActiveModel::SecurePassword::ClassMethods
     extend ::ActiveModel::Validations::Callbacks::ClassMethods
     extend ::ActiveModel::Validations::ClassMethods
+    extend ::ActiveRecord::Aggregations::ClassMethods
     extend ::ActiveRecord::Associations::ClassMethods
     extend ::ActiveRecord::AttributeMethods::ClassMethods
     extend ::ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods
@@ -19,6 +21,7 @@ module ActiveRecord
     extend ::ActiveRecord::AttributeMethods::Write::ClassMethods
     extend ::ActiveRecord::Attributes::ClassMethods
     extend ::ActiveRecord::AutosaveAssociation::ClassMethods
+    extend ::ActiveRecord::Callbacks::ClassMethods
     extend ::ActiveRecord::Core::ClassMethods
     extend ::ActiveRecord::CounterCache::ClassMethods
     extend ::ActiveRecord::Inheritance::ClassMethods
@@ -28,6 +31,7 @@ module ActiveRecord
     extend ::ActiveRecord::NestedAttributes::ClassMethods
     extend ::ActiveRecord::NoTouching::ClassMethods
     extend ::ActiveRecord::Persistence::ClassMethods
+    extend ::ActiveRecord::QueryCache::ClassMethods
     extend ::ActiveRecord::ReadonlyAttributes::ClassMethods
     extend ::ActiveRecord::Reflection::ClassMethods
     extend ::ActiveRecord::Sanitization::ClassMethods
@@ -35,6 +39,7 @@ module ActiveRecord
     extend ::ActiveRecord::Scoping::Default::ClassMethods
     extend ::ActiveRecord::Scoping::Named::ClassMethods
     extend ::ActiveRecord::SecureToken::ClassMethods
+    extend ::ActiveRecord::SignedId::ClassMethods
     extend ::ActiveRecord::Store::ClassMethods
     extend ::ActiveRecord::Suppressor::ClassMethods
     extend ::ActiveRecord::Timestamp::ClassMethods
@@ -231,12 +236,6 @@ module ActiveRecord
     def attribute_aliases: () -> untyped
     def attribute_aliases?: () -> bool
 
-    def self.attribute_method_matchers: () -> untyped
-    def self.attribute_method_matchers?: () -> bool
-    def self.attribute_method_matchers=: (untyped) -> untyped
-    def attribute_method_matchers: () -> untyped
-    def attribute_method_matchers?: () -> bool
-
     def self.skip_time_zone_conversion_for_attributes: () -> untyped
     def self.skip_time_zone_conversion_for_attributes?: () -> bool
     def self.skip_time_zone_conversion_for_attributes=: (untyped) -> untyped
@@ -248,12 +247,6 @@ module ActiveRecord
     def self.time_zone_aware_types=: (untyped) -> untyped
     def time_zone_aware_types: () -> untyped
     def time_zone_aware_types?: () -> bool
-
-    def self.partial_writes: () -> untyped
-    def self.partial_writes?: () -> bool
-    def self.partial_writes=: (untyped) -> untyped
-    def partial_writes: () -> untyped
-    def partial_writes?: () -> bool
 
     def self.record_timestamps: () -> untyped
     def self.record_timestamps?: () -> bool
@@ -284,51 +277,13 @@ module ActiveRecord
     attr_accessor self.logger: untyped
     def logger: () -> untyped
 
-    attr_accessor self.verbose_query_logs: untyped
-    def verbose_query_logs: () -> untyped
-
-    attr_accessor self.default_timezone: untyped
-    def default_timezone: () -> untyped
-
-    attr_accessor self.schema_format: untyped
-    def schema_format: () -> untyped
-
-    attr_accessor self.error_on_ignored_order: untyped
-    def error_on_ignored_order: () -> untyped
-
-    attr_accessor self.allow_unsafe_raw_sql: untyped
-    def allow_unsafe_raw_sql: () -> untyped
-
-    attr_accessor self.timestamped_migrations: untyped
-    def timestamped_migrations: () -> untyped
-
-    attr_accessor self.dump_schema_after_migration: untyped
-    def dump_schema_after_migration: () -> untyped
-
-    attr_accessor self.dump_schemas: untyped
-    def dump_schemas: () -> untyped
-
-    attr_accessor self.warn_on_records_fetched_greater_than: untyped
-    def warn_on_records_fetched_greater_than: () -> untyped
-
-    attr_accessor self.maintain_test_schema: untyped
-
     attr_accessor self.belongs_to_required_by_default: untyped
-
-    attr_accessor self.connection_handlers: untyped
-
-    attr_accessor self.writing_role: untyped
-
-    attr_accessor self.reading_role: untyped
 
     attr_accessor self.primary_key_prefix_type: untyped
     def primary_key_prefix_type: () -> untyped
 
     attr_accessor self.time_zone_aware_attributes: untyped
     def time_zone_aware_attributes: () -> untyped
-
-    attr_accessor self.index_nested_attribute_errors: untyped
-    def index_nested_attribute_errors: () -> untyped
 
     private
 
@@ -350,9 +305,6 @@ module ActiveRecord
 
       def not: (untyped opts, *untyped rest) -> Relation
 
-      private
-
-      def not_behaves_as_nor?: (untyped opts) -> (false | untyped)
     end
   end
 
@@ -379,7 +331,7 @@ module ActiveRecord
     #
     #   Post.find_by_sql ["SELECT title FROM posts WHERE author = ? AND created > ?", author_id, start_date]
     #   Post.find_by_sql ["SELECT body FROM comments WHERE author = :user_id OR approved_by = :user_id", { :user_id => user_id }]
-    def find_by_sql: (untyped sql, ?untyped binds, ?preparable: untyped? preparable) ?{ () -> untyped } -> untyped
+    def find_by_sql: (untyped sql, ?untyped binds, ?preparable: untyped? preparable, ?allow_retry: bool) ?{ () -> untyped } -> untyped
   end
 end
 
@@ -480,10 +432,10 @@ module ActiveRecord
       def limit!: (Integer | Arel::Nodes::SqlLiteral | nil) -> self
       def offset: (Integer) -> self
       def offset!: (Integer) -> self
-      def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
-                   | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
-      def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
-      def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (self) -> void } -> nil
+      def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Model) -> void } -> nil
+                   | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) -> Enumerator[Model, nil]
+      def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Array[Model]) -> void } -> nil
+      def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped, ?use_ranges: bool?) { (self) -> void } -> nil
       def sum: (?untyped? column_name) -> untyped
              | [T] (?T initial_value) { (Model) -> T } -> T
       def destroy_all: () -> untyped
@@ -577,10 +529,10 @@ module ActiveRecord
       def limit: (Integer | Arel::Nodes::SqlLiteral | nil) -> Relation
       def offset: (Integer) -> Relation
       def lock: (?untyped locks) -> Relation
-      def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Model) -> void } -> nil
-                   | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) -> Enumerator[Model, nil]
-      def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool) { (Array[Model]) -> void } -> nil
-      def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
+      def find_each: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Model) -> void } -> nil
+                   | (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) -> Enumerator[Model, nil]
+      def find_in_batches: (?batch_size: Integer, ?start: Integer, ?finish: Integer, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped) { (Array[Model]) -> void } -> nil
+      def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped, ?use_ranges: bool?) { (Relation) -> void } -> nil
       def sum: (?untyped? column_name) -> untyped
              | [T] (?T initial_value) { (Model) -> T } -> T
       def destroy_all: () -> untyped
@@ -661,7 +613,7 @@ module ActiveRecord
     #
     # NOTE: By its nature, batch processing is subject to race conditions if
     # other processes are modifying the database.
-    def find_each: (?error_on_ignore: untyped? error_on_ignore, ?batch_size: ::Integer batch_size, ?finish: untyped? finish, ?start: untyped? start) ?{ (untyped) -> untyped } -> untyped
+    def find_each: (?error_on_ignore: untyped? error_on_ignore, ?batch_size: ::Integer batch_size, ?finish: untyped? finish, ?start: untyped? start, ?cursor: untyped cursor, ?order: untyped order) ?{ (untyped) -> untyped } -> untyped
   end
 end
 
@@ -903,4 +855,30 @@ module ActiveRecord
   module NoTouching
     def touch: (*untyped, **untyped) -> untyped
   end
+end
+
+# Configuration that moved from ActiveRecord::Base to the ActiveRecord
+# module in Rails 7.0 and 7.1
+module ActiveRecord
+  attr_accessor self.verbose_query_logs: untyped
+
+  attr_accessor self.default_timezone: untyped
+
+  attr_accessor self.schema_format: untyped
+
+  attr_accessor self.error_on_ignored_order: untyped
+
+  attr_accessor self.timestamped_migrations: untyped
+
+  attr_accessor self.dump_schema_after_migration: untyped
+
+  attr_accessor self.dump_schemas: untyped
+
+  attr_accessor self.maintain_test_schema: untyped
+
+  attr_accessor self.writing_role: untyped
+
+  attr_accessor self.reading_role: untyped
+
+  attr_accessor self.index_nested_attribute_errors: untyped
 end
