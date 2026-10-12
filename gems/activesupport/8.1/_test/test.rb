@@ -114,3 +114,7 @@ class RescuableTest
     rescue_with_handler(StandardError.new)&.message
   end
 end
+
+# Test methods whose block is optional
+ActiveSupport::Notifications.instrument("test.active_support", { key: 1 })
+{ a: 1 }.with_indifferent_access.update({ b: 2 })

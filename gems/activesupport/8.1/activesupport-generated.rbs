@@ -1013,11 +1013,11 @@ module ActiveSupport
 
       def expanded_version: (untyped key) -> untyped
 
-      def instrument: (untyped operation, untyped key, ?untyped? options) { (?) -> untyped } -> untyped
+      def instrument: (untyped operation, untyped key, ?untyped? options) ?{ (?) -> untyped } -> untyped
 
-      def instrument_multi: (untyped operation, untyped keys, ?untyped? options) { (?) -> untyped } -> untyped
+      def instrument_multi: (untyped operation, untyped keys, ?untyped? options) ?{ (?) -> untyped } -> untyped
 
-      def _instrument: (untyped operation, ?multi: bool, ?options: untyped?, **untyped payload) { (?) -> untyped } -> untyped
+      def _instrument: (untyped operation, ?multi: bool, ?options: untyped?, **untyped payload) ?{ (?) -> untyped } -> untyped
 
       def handle_expired_entry: (untyped entry, untyped key, untyped options) -> untyped
 
@@ -2279,7 +2279,7 @@ module ActiveSupport
 
       def initialize: (untyped name, untyped config) -> void
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       def index: (untyped o) -> untyped
 
@@ -2367,7 +2367,7 @@ module ActiveSupport
       #   an argument.
       # * <tt>:prepend</tt> - If +true+, the callback will be prepended to the
       #   existing chain rather than appended.
-      def set_callback: (untyped name, *untyped filter_list) { (?) -> untyped } -> untyped
+      def set_callback: (untyped name, *untyped filter_list) ?{ (?) -> untyped } -> untyped
 
       # Skip a previously set callback. Like #set_callback, <tt>:if</tt> or
       # <tt>:unless</tt> options may be passed in order to control when the
@@ -2404,7 +2404,7 @@ module ActiveSupport
       #
       # An <tt>ArgumentError</tt> will be raised if the callback has not
       # already been set (unless the <tt>:raise</tt> option is set to <tt>false</tt>).
-      def skip_callback: (untyped name, *untyped filter_list) { (?) -> untyped } -> untyped
+      def skip_callback: (untyped name, *untyped filter_list) ?{ (?) -> untyped } -> untyped
 
       # Remove all set callbacks for the given event.
       def reset_callbacks: (untyped name) -> untyped
@@ -2655,12 +2655,12 @@ module ActiveSupport
     # Evaluate given block in context of base class,
     # so that you can write class macros here.
     # When you define more than one +included+ block, it raises an exception.
-    def included: (?untyped? base) { () -> untyped } -> untyped
+    def included: (?untyped? base) ?{ () -> untyped } -> untyped
 
     # Evaluate given block in context of base class,
     # so that you can write class macros here.
     # When you define more than one +prepended+ block, it raises an exception.
-    def prepended: (?untyped? base) { (?) -> untyped } -> (untyped | nil | untyped | untyped)
+    def prepended: (?untyped? base) ?{ (?) -> untyped } -> (untyped | nil | untyped | untyped)
 
     # Define class methods from given block.
     # You can define private class methods as well.
@@ -4490,7 +4490,7 @@ end
 
 module Kernel
   # class_eval on an object acts like +singleton_class.class_eval+.
-  def class_eval: (*untyped args) { (?) -> untyped } -> untyped
+  def class_eval: (*untyped args) ?{ (?) -> untyped } -> untyped
 end
 
 class LoadError
@@ -4835,7 +4835,7 @@ class Module
   #
   #   Person.class_variable_get("@@hair_colors") # => [:brown, :black, :blonde, :red]
   #   Person.class_variable_get("@@hair_styles") # => [:long, :short]
-  def mattr_accessor: (*untyped syms, ?instance_reader: bool, ?instance_writer: bool, ?instance_accessor: bool, ?default: untyped?) { (?) -> untyped } -> untyped
+  def mattr_accessor: (*untyped syms, ?instance_reader: bool, ?instance_writer: bool, ?instance_accessor: bool, ?default: untyped?) ?{ (?) -> untyped } -> untyped
 
   alias cattr_accessor mattr_accessor
 end
@@ -6967,10 +6967,10 @@ module ActiveSupport
     def self.attribute: (*untyped names, ?default: untyped) -> untyped
 
     # Calls this callback before #reset is called on the instance. Used for resetting external collaborators that depend on current values.
-    def self.before_reset: (*untyped methods) { (?) -> untyped } -> untyped
+    def self.before_reset: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
     # Calls this callback after #reset is called on the instance. Used for resetting external collaborators, like Time.zone.
-    def self.resets: (*untyped methods) { (?) -> untyped } -> untyped
+    def self.resets: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
     alias self.after_reset self.resets
 
@@ -7051,7 +7051,7 @@ module ActiveSupport
     #   end
     #   # => { a: 100, b: 450, c: { c1: 300 } }
     #
-    def deep_merge: (untyped other) { (?) -> untyped } -> untyped
+    def deep_merge: (untyped other) ?{ (?) -> untyped } -> untyped
 
     # Same as #deep_merge, but modifies +self+.
     def deep_merge!: (untyped other) ?{ (?) -> untyped } -> untyped
@@ -7463,7 +7463,7 @@ end
 module ActiveSupport
   class Deprecation
     class DeprecationProxy
-      def self.new: (*untyped args, **untyped kwargs) { (?) -> untyped } -> untyped
+      def self.new: (*untyped args, **untyped kwargs) ?{ (?) -> untyped } -> untyped
 
       # Don't give a deprecation warning on inspect since test/unit and error
       # logs rely on it for diagnostics.
@@ -7471,7 +7471,7 @@ module ActiveSupport
 
       private
 
-      def method_missing: (untyped called, *untyped args) { (?) -> untyped } -> untyped
+      def method_missing: (untyped called, *untyped args) ?{ (?) -> untyped } -> untyped
     end
 
     # DeprecatedObjectProxy transforms an object into a deprecated one. It takes an object, a deprecation message, and
@@ -7552,7 +7552,7 @@ module ActiveSupport
     #        (Backtrace information…)
     #        ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
     class DeprecatedConstantProxy < ::Module
-      def self.new: (*untyped args, **untyped options) { (?) -> untyped } -> untyped
+      def self.new: (*untyped args, **untyped options) ?{ (?) -> untyped } -> untyped
 
       def initialize: (untyped old_const, untyped new_const, untyped deprecator, ?message: ::String) -> void
 
@@ -8740,7 +8740,7 @@ module ActiveSupport
     #   Rails.event.subscribe(subscriber) { |event| event[:name].start_with?("user.") }
     #   Rails.event.subscribe(subscriber) { |event| event[:payload].is_a?(UserEvent) }
     #
-    def subscribe: (untyped subscriber) { (?) -> untyped } -> untyped
+    def subscribe: (untyped subscriber) ?{ (?) -> untyped } -> untyped
 
     # Unregister an event subscriber. Accepts either a subscriber or a class.
     #
@@ -9050,9 +9050,9 @@ module ActiveSupport
 
     def self.complete!: () -> nil
 
-    def self.to_run: (*untyped args) { (?) -> untyped } -> untyped
+    def self.to_run: (*untyped args) ?{ (?) -> untyped } -> untyped
 
-    def self.to_complete: (*untyped args) { (?) -> untyped } -> untyped
+    def self.to_complete: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     RunHook: untyped
 
@@ -9364,7 +9364,7 @@ module ActiveSupport
     #   hash_1[:key] = 10
     #   hash_2['key'] = 12
     #   hash_1.update(hash_2) { |key, old, new| old + new } # => {"key"=>22}
-    def update: (*untyped other_hashes) { (?) -> untyped } -> self
+    def update: (*untyped other_hashes) ?{ (?) -> untyped } -> self
 
     alias merge! update
 
@@ -9456,7 +9456,7 @@ module ActiveSupport
     #   hash.fetch_values('a', 'b') # => ["x", "y"]
     #   hash.fetch_values('a', 'c') { |key| 'z' } # => ["x", "z"]
     #   hash.fetch_values('a', 'c') # => KeyError: key not found: "c"
-    def fetch_values: (*untyped indices) { (?) -> untyped } -> untyped
+    def fetch_values: (*untyped indices) ?{ (?) -> untyped } -> untyped
 
     # Returns a shallow copy of the hash.
     #
@@ -9471,7 +9471,7 @@ module ActiveSupport
     # This method has the same semantics of +update+, except it does not
     # modify the receiver but rather returns a new hash with indifferent
     # access with the result of the merge.
-    def merge: (*untyped hashes) { (?) -> untyped } -> untyped
+    def merge: (*untyped hashes) ?{ (?) -> untyped } -> untyped
 
     # Like +merge+ but the other way around: Merges the receiver into the
     # argument and returns a new hash with indifferent access as result:
@@ -11498,7 +11498,7 @@ module ActiveSupport
 
       def clear_rotations: () -> self
 
-      def on_rotation: () { (?) -> untyped } -> untyped
+      def on_rotation: () ?{ (?) -> untyped } -> untyped
 
       private
 
@@ -11520,7 +11520,7 @@ module ActiveSupport
 
       def rotate: (*untyped args, **untyped options) -> untyped
 
-      def on_rotation: () { (?) -> untyped } -> self
+      def on_rotation: () ?{ (?) -> untyped } -> self
 
       def fall_back_to: (untyped fallback) -> self
 
@@ -12002,7 +12002,7 @@ module ActiveSupport
 
     def self.publish_event: (untyped event) -> untyped
 
-    def self.instrument: (untyped name, ?::Hash[untyped, untyped] payload) { (untyped) -> untyped } -> untyped
+    def self.instrument: (untyped name, ?::Hash[untyped, untyped] payload) ?{ (untyped) -> untyped } -> untyped
 
     # Subscribe to a given event name with the passed +block+.
     #
@@ -12032,7 +12032,7 @@ module ActiveSupport
     #   ActiveSupport::Notifications.subscribe(:render) {|event| ...}
     #   #=> ArgumentError (pattern must be specified as a String, Regexp or empty)
     #
-    def self.subscribe: (?untyped? pattern, ?untyped? callback) { (?) -> untyped } -> untyped
+    def self.subscribe: (?untyped? pattern, ?untyped? callback) ?{ (?) -> untyped } -> untyped
 
     # Performs the same functionality as #subscribe, but the +start+ and
     # +finish+ block arguments are in monotonic time instead of wall-clock
@@ -12040,7 +12040,7 @@ module ActiveSupport
     # Daylights Savings). Use +monotonic_subscribe+ when accuracy of time
     # duration is important. For example, computing elapsed time between
     # two events.
-    def self.monotonic_subscribe: (?untyped? pattern, ?untyped? callback) { (?) -> untyped } -> untyped
+    def self.monotonic_subscribe: (?untyped? pattern, ?untyped? callback) ?{ (?) -> untyped } -> untyped
 
     def self.subscribed: (untyped callback, ?untyped? pattern, ?monotonic: bool) { () -> untyped } -> untyped
 
@@ -12077,7 +12077,7 @@ module ActiveSupport
 
       def inspect: () -> ::String
 
-      def subscribe: (?untyped? pattern, ?untyped? callable, ?monotonic: bool) { (?) -> untyped } -> untyped
+      def subscribe: (?untyped? pattern, ?untyped? callable, ?monotonic: bool) ?{ (?) -> untyped } -> untyped
 
       def unsubscribe: (untyped subscriber_or_name) -> untyped
 
@@ -13008,7 +13008,7 @@ module ActiveSupport
 
     private
 
-    def method_missing: (untyped method, *untyped arguments) { (?) -> untyped } -> untyped
+    def method_missing: (untyped method, *untyped arguments) ?{ (?) -> untyped } -> untyped
 
     def respond_to_missing?: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
   end
@@ -13223,13 +13223,13 @@ module ActiveSupport
   #
   class Reloader < ::ActiveSupport::ExecutionWrapper
     # Registers a callback that will run once at application startup and every time the code is reloaded.
-    def self.to_prepare: (*untyped args) { (?) -> untyped } -> untyped
+    def self.to_prepare: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     # Registers a callback that will run immediately before the classes are unloaded.
-    def self.before_class_unload: (*untyped args) { (?) -> untyped } -> untyped
+    def self.before_class_unload: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     # Registers a callback that will run immediately after the classes are unloaded.
-    def self.after_class_unload: (*untyped args) { (?) -> untyped } -> untyped
+    def self.after_class_unload: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     # Initiate a manual reload
     def self.reload!: () -> untyped
@@ -13256,7 +13256,7 @@ module ActiveSupport
 
     def run!: () -> untyped
 
-    def class_unload!: () { (?) -> untyped } -> untyped
+    def class_unload!: () ?{ (?) -> untyped } -> untyped
 
     def complete!: () -> untyped
   end
@@ -14582,10 +14582,10 @@ module ActiveSupport
 
       module ClassMethods
         # Add a callback, which runs before <tt>TestCase#setup</tt>.
-        def setup: (*untyped args) { (?) -> untyped } -> untyped
+        def setup: (*untyped args) ?{ (?) -> untyped } -> untyped
 
         # Add a callback, which runs after <tt>TestCase#teardown</tt>.
-        def teardown: (*untyped args) { (?) -> untyped } -> untyped
+        def teardown: (*untyped args) ?{ (?) -> untyped } -> untyped
       end
 
       def before_setup: () -> untyped
@@ -14696,7 +14696,7 @@ module ActiveSupport
       #     User.create.created_at # => Sun, 10 Nov 2013 15:34:49 EST -05:00
       #   end
       #   Time.current # => Sat, 09 Nov 2013 15:34:49 EST -05:00
-      def travel: (untyped duration, ?with_usec: bool) { (?) -> untyped } -> untyped
+      def travel: (untyped duration, ?with_usec: bool) ?{ () -> untyped } -> untyped
 
       # Changes current time to the given time by stubbing +Time.now+, +Time.new+,
       # +Date.today+, and +DateTime.now+ to return the time or date passed into this method.
@@ -14779,7 +14779,7 @@ module ActiveSupport
       #     User.create.created_at # => Sun, 09 Jul 2017 15:34:49 EST -05:00
       #   end
       #   Time.current # => Sun, 09 Jul 2017 15:34:50 EST -05:00
-      def freeze_time: (?untyped date_or_time, ?with_usec: bool) { (?) -> untyped } -> untyped
+      def freeze_time: (?untyped date_or_time, ?with_usec: bool) ?{ () -> untyped } -> untyped
 
       private
 
