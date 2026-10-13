@@ -51,3 +51,11 @@ ChatChannel.broadcast_to("room", { body: "hi" })
 ChatChannel.channel_name
 ActionCable.server.broadcast("chat", { body: "hi" })
 ChatChannel.broadcasting_for("room").size
+
+class ChatChannelTest < ActionCable::Channel::TestCase
+  tests ChatChannel
+end
+
+class ConnectionTest < ActionCable::Connection::TestCase
+  tests ApplicationCable::Connection
+end

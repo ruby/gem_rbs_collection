@@ -665,6 +665,10 @@ module ActionCable
     #       end
     #     end
     class TestCase < ::ActiveSupport::TestCase
+      extend ::ActionCable::Channel::TestCase::Behavior::ClassMethods
+
+      extend ::ActiveSupport::Testing::ConstantLookup::ClassMethods
+
       module Behavior
         def _channel_class: () -> untyped
 
@@ -1370,6 +1374,10 @@ module ActionCable
     #     end
     #
     class TestCase < ::ActiveSupport::TestCase
+      extend ::ActionCable::Connection::TestCase::Behavior::ClassMethods
+
+      extend ::ActiveSupport::Testing::ConstantLookup::ClassMethods
+
       module Behavior
         def _connection_class: () -> untyped
 
@@ -1550,6 +1558,8 @@ module ActionCable
     # `ActionCable.server.remote_connections.where(*)`. Exists solely for the
     # purpose of calling #disconnect on that connection.
     class RemoteConnection
+      extend ::ActionCable::Connection::Identification::ClassMethods
+
       class InvalidIdentifiersError < ::StandardError
       end
 
@@ -1772,6 +1782,8 @@ module ActionCable
   module Server
     # Worker used by Server.send_async to do connection work in threads.
     class Worker
+      extend ::ActiveSupport::Callbacks::ClassMethods
+
       def self.connection: () -> untyped
       def self.connection=: (untyped value) -> untyped
       def connection: () -> untyped
