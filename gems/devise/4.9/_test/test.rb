@@ -1,6 +1,7 @@
 require "devise"
 require "active_record"
 require "action_controller"
+require "action_view"
 
 class CustomConfirmationsController < Devise::ConfirmationsController
 end
@@ -75,10 +76,27 @@ class ApplicationController < ActionController::Base
     is_flashing_format?
     request_format
   end
+
+  def links
+    new_session_path(:user)
+    destroy_session_url(:user)
+    edit_password_path(User.new)
+    cancel_registration_path(:user)
+    cancel_registration_url(:user, host: "example.com")
+    new_confirmation_url(:user)
+    unlock_path(:user, unlock_token: "token")
+  end
 end
 
 class ApiController < ActionController::API
   def create
     sign_in(User.new, store: false)
+    session_url(:user)
+  end
+end
+
+class CustomView < ActionView::Base
+  def sign_up_link
+    new_registration_path(:user)
   end
 end
