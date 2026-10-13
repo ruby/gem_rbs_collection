@@ -34,3 +34,6 @@ blob.url(expires_in: 5.minutes).size
 blob.service_url_for_direct_upload.size
 blob.service_headers_for_direct_upload.each_value(&:size)
 blob.image? || blob.video?
+
+ActiveStorage::Variant.new(blob, { resize_to_limit: [100, 100] }).download
+ActiveStorage::Preview.new(blob, { resize_to_limit: [100, 100] }).download
