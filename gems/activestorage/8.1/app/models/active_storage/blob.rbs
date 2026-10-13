@@ -179,4 +179,19 @@ class ActiveStorage::Blob < ActiveStorage::Record
 
   # Returns an instance of service, which can be configured globally or per attachment
   def service: () -> untyped
+
+  # Columns and associations, which rbs prototype doesn't see
+  attr_accessor content_type: String?
+
+  attr_accessor metadata: Hash[String, untyped]
+
+  attr_accessor service_name: String
+
+  attr_accessor byte_size: Integer
+
+  attr_accessor checksum: String?
+
+  def created_at: () -> ActiveSupport::TimeWithZone
+
+  def attachments: () -> untyped
 end

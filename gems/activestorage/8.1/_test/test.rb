@@ -13,3 +13,15 @@ user = User.new
 one = ActiveStorage::Attached::One.new("one_image", user)
 one.url
 ActiveStorage::Blob.new.signed_id(purpose: :download).size
+
+blob = ActiveStorage::Blob.new
+blob.content_type&.start_with?("image/")
+blob.byte_size + 1
+blob.checksum&.size
+blob.metadata["width"]
+blob.service_name.to_sym
+blob.created_at.to_date
+attachment = ActiveStorage::Attachment.new
+attachment.name.to_sym
+attachment.blob.byte_size
+attachment.created_at.to_date
