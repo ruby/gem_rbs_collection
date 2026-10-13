@@ -20,3 +20,44 @@ module ActionCable
     end
   end
 end
+
+# Return types of commonly used methods
+module ActionCable
+  def self?.server: () -> ActionCable::Server::Base
+
+  module Connection
+    class Base
+      private
+
+      def request: () -> ActionDispatch::Request
+
+      def cookies: () -> ActionDispatch::Cookies::CookieJar
+    end
+  end
+
+  module Channel
+    class Base
+      attr_reader params: ActiveSupport::HashWithIndifferentAccess[String, untyped]
+
+      attr_reader connection: ActionCable::Connection::Base
+
+      attr_reader identifier: String
+    end
+
+    module Broadcasting
+      def broadcasting_for: (untyped model) -> String
+
+      module ClassMethods
+        def broadcasting_for: (untyped broadcastables) -> String
+      end
+    end
+
+    module Naming
+      def channel_name: () -> String
+
+      module ClassMethods
+        def channel_name: () -> String
+      end
+    end
+  end
+end

@@ -9,6 +9,11 @@ module ApplicationCable
     rescue_from(ArgumentError) { |exception| exception.message }
     before_command :authorize
 
+    def connect
+      reject_unauthorized_connection unless cookies.encrypted[:user_id]
+      request.remote_ip
+    end
+
     private
 
     def authorize
@@ -25,7 +30,11 @@ class ChatChannel < ApplicationCable::Channel
   after_subscribe :greet
 
   def subscribed
-    stream_from "chat"
+    stream_from "chat_#{params[:room]}"
+    connection.statistics
+    identifier.size
+    broadcasting_for("room").size
+    channel_name.size
     stream_for "room", ->(message) { transmit(message) }
   end
 
@@ -40,3 +49,5 @@ end
 
 ChatChannel.broadcast_to("room", { body: "hi" })
 ChatChannel.channel_name
+ActionCable.server.broadcast("chat", { body: "hi" })
+ChatChannel.broadcasting_for("room").size

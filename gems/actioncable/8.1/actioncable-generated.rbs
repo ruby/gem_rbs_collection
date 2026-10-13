@@ -26,9 +26,6 @@
 # :include: ../README.md
 module ActionCable
   INTERNAL: { message_types: { welcome: "welcome", disconnect: "disconnect", ping: "ping", confirmation: "confirm_subscription", rejection: "reject_subscription" }, disconnect_reasons: { unauthorized: "unauthorized", invalid_request: "invalid_request", server_restart: "server_restart", remote: "remote" }, default_mount_path: "/cable", protocols: ::Array["actioncable-v1-json" | "actioncable-unsupported"] }
-
-  # Singleton instance of the server
-  def self?.server: () -> untyped
 end
 
 module ActionCable
@@ -147,12 +144,6 @@ module ActionCable
 
       include ::ActiveSupport::Rescuable
 
-      attr_reader params: untyped
-
-      attr_reader connection: untyped
-
-      attr_reader identifier: untyped
-
       # A list of method names that should be considered actions. This includes all
       # public instance methods on a channel, less any internal methods (defined on
       # Base), adding back in any methods that are internal, but still exist on the
@@ -248,20 +239,10 @@ module ActionCable
         # Broadcast a hash to a unique broadcasting for this array of `broadcastables` in this channel.
         def broadcast_to: (untyped broadcastables, untyped message) -> untyped
 
-        # Returns a unique broadcasting identifier for this `model` in this channel:
-        #
-        #     CommentsChannel.broadcasting_for("all") # => "comments:all"
-        #
-        # You can pass an array of objects as a target (e.g. Active Record model), and it would
-        # be serialized into a string under the hood.
-        def broadcasting_for: (untyped broadcastables) -> untyped
-
         private
 
         def serialize_broadcasting: (untyped object) -> untyped
       end
-
-      def broadcasting_for: (untyped model) -> untyped
 
       def broadcast_to: (untyped model, untyped message) -> untyped
     end
@@ -341,17 +322,7 @@ module ActionCable
       extend ::ActiveSupport::Concern
 
       module ClassMethods
-        # Returns the name of the channel, underscored, without the `Channel` ending. If
-        # the channel is in a namespace, then the namespaces are represented by single
-        # colon separators in the channel name.
-        #
-        #     ChatChannel.channel_name # => 'chat'
-        #     Chats::AppearancesChannel.channel_name # => 'chats:appearances'
-        #     FooChats::BarAppearancesChannel.channel_name # => 'foo_chats:bar_appearances'
-        def channel_name: () -> untyped
       end
-
-      def channel_name: () -> untyped
     end
   end
 end
@@ -945,14 +916,6 @@ module ActionCable
       attr_reader websocket: untyped
 
       attr_reader message_buffer: untyped
-
-      # The request that initiated the WebSocket connection is available here. This
-      # gives access to the environment, cookies, etc.
-      def request: () -> untyped
-
-      # The cookies of the request that initiated the WebSocket connection. Useful for
-      # performing authorization checks.
-      def cookies: () -> untyped
 
       def encode: (untyped cable_message) -> untyped
 
