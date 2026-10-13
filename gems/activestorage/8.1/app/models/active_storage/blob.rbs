@@ -49,8 +49,6 @@ class ActiveStorage::Blob < ActiveStorage::Record
   # the valid signed id can't find a record.
   def self.find_signed!: (untyped id, ?record: untyped? record, ?purpose: ::Symbol purpose) -> untyped
 
-  def self.build_after_upload: (io: untyped io, filename: untyped filename, ?content_type: untyped? content_type, ?metadata: untyped? metadata, ?service_name: untyped? service_name, ?identify: bool identify, ?record: untyped? record) -> untyped
-
   def self.build_after_unfurling: (io: untyped io, filename: untyped filename, ?key: untyped? key, ?content_type: untyped? content_type, ?metadata: untyped? metadata, ?service_name: untyped? service_name, ?identify: bool identify, ?record: untyped? record) -> untyped
 
   def self.create_after_unfurling!: (io: untyped io, filename: untyped filename, ?key: untyped? key, ?content_type: untyped? content_type, ?metadata: untyped? metadata, ?service_name: untyped? service_name, ?identify: bool identify, ?record: untyped? record) -> untyped
@@ -113,8 +111,6 @@ class ActiveStorage::Blob < ActiveStorage::Record
   # the URL should only be exposed as a redirect from a stable, possibly authenticated URL. Hiding the
   # URL behind a redirect also allows you to change services without updating all URLs.
   def url: (?expires_in: untyped expires_in, ?disposition: ::Symbol disposition, ?filename: untyped? filename, **untyped options) -> untyped
-
-  alias service_url url
 
   # Returns a URL that can be used to directly upload a file for this blob on the service. This URL is intended to be
   # short-lived for security and only generated on-demand by the client-side JavaScript responsible for doing the uploading.
