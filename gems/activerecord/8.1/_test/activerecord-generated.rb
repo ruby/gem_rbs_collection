@@ -64,3 +64,10 @@ User.sanitize_sql_for_conditions(Arel::SelectManager.new)
 User.sanitize_sql(["name = ?", "bob"])
 User.sanitize_sql_for_order(:id)
 User.sanitize_sql_for_order({ id: :desc })
+
+# ClassMethods of the concerns the generated classes include
+ActiveRecord::Relation.create(User)
+ActiveRecord::ConnectionAdapters::AbstractAdapter.quote_column_name("name")
+ActiveRecord::ConnectionAdapters::AbstractAdapter.define_callbacks(:notify)
+ActiveRecord::PendingMigrationError.action("Run pending migrations") { nil }
+ActiveRecord::Schema.define(version: 1) { nil }

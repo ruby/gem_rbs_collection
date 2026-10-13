@@ -1,0 +1,53 @@
+class ActiveRecord::ConnectionAdapters::AbstractAdapter
+  extend ::ActiveRecord::ConnectionAdapters::Quoting::ClassMethods
+
+  extend ::ActiveSupport::Callbacks::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::AbstractMysqlAdapter
+  extend ::ActiveRecord::ConnectionAdapters::MySQL::Quoting::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::Column
+  extend ::ActiveRecord::ConnectionAdapters::Deduplicable::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::MySQL::TypeMetadata
+  extend ::ActiveRecord::ConnectionAdapters::Deduplicable::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
+  extend ::ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::PostgreSQL::TypeMetadata
+  extend ::ActiveRecord::ConnectionAdapters::Deduplicable::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::SqlTypeMetadata
+  extend ::ActiveRecord::ConnectionAdapters::Deduplicable::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::SQLite3Adapter
+  extend ::ActiveRecord::ConnectionAdapters::SQLite3::Quoting::ClassMethods
+end
+
+class ActiveRecord::NoDatabaseError
+  extend ::ActiveSupport::ActionableError::ClassMethods
+end
+
+class ActiveRecord::PendingMigrationError
+  extend ::ActiveSupport::ActionableError::ClassMethods
+end
+
+class ActiveRecord::Relation
+  extend ::ActiveRecord::Delegation::ClassMethods
+end
+
+class ActiveRecord::Schema
+  extend ::ActiveRecord::Schema::Definition::ClassMethods
+end
+
+class ActiveRecord::Generators::Base
+  extend ::ActiveRecord::Generators::Migration::ClassMethods
+end
