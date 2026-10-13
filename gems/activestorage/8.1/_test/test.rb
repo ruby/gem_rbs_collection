@@ -25,3 +25,12 @@ attachment = ActiveStorage::Attachment.new
 attachment.name.to_sym
 attachment.blob.byte_size
 attachment.created_at.to_date
+
+blob.key.size
+blob.filename.extension.upcase
+blob.filename.base.upcase
+blob.filename.to_s.upcase
+blob.url(expires_in: 5.minutes).size
+blob.service_url_for_direct_upload.size
+blob.service_headers_for_direct_upload.each_value(&:size)
+blob.image? || blob.video?

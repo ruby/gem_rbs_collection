@@ -87,37 +87,37 @@ class ActiveStorage::Blob < ActiveStorage::Record
   # secure-token format from Rails in lower case. So it'll look like: xtapjjcjiudrlk3tmwyjgpuobabd.
   # This key is not intended to be revealed directly to the user.
   # Always refer to blobs using the signed_id or a verified form of the key.
-  def key: () -> untyped
+  def key: () -> String
 
   # Returns an ActiveStorage::Filename instance of the filename that can be
   # queried for basename, extension, and a sanitized version of the filename
   # that's safe to use in URLs.
-  def filename: () -> untyped
+  def filename: () -> ActiveStorage::Filename
 
   # Returns true if the content_type of this blob is in the image range, like image/png.
-  def image?: () -> untyped
+  def image?: () -> bool?
 
   # Returns true if the content_type of this blob is in the audio range, like audio/mpeg.
-  def audio?: () -> untyped
+  def audio?: () -> bool?
 
   # Returns true if the content_type of this blob is in the video range, like video/mp4.
-  def video?: () -> untyped
+  def video?: () -> bool?
 
   # Returns true if the content_type of this blob is in the text range, like text/plain.
-  def text?: () -> untyped
+  def text?: () -> bool?
 
   # Returns the URL of the blob on the service. This returns a permanent URL for public files, and returns a
   # short-lived URL for private files. Private files are signed, and not for public use. Instead,
   # the URL should only be exposed as a redirect from a stable, possibly authenticated URL. Hiding the
   # URL behind a redirect also allows you to change services without updating all URLs.
-  def url: (?expires_in: untyped expires_in, ?disposition: ::Symbol disposition, ?filename: untyped? filename, **untyped options) -> untyped
+  def url: (?expires_in: untyped expires_in, ?disposition: ::Symbol disposition, ?filename: untyped? filename, **untyped options) -> String
 
   # Returns a URL that can be used to directly upload a file for this blob on the service. This URL is intended to be
   # short-lived for security and only generated on-demand by the client-side JavaScript responsible for doing the uploading.
-  def service_url_for_direct_upload: (?expires_in: untyped expires_in) -> untyped
+  def service_url_for_direct_upload: (?expires_in: untyped expires_in) -> String
 
   # Returns a Hash of headers for +service_url_for_direct_upload+ requests.
-  def service_headers_for_direct_upload: () -> untyped
+  def service_headers_for_direct_upload: () -> Hash[String, String]
 
   def content_type_for_serving: () -> untyped
 
