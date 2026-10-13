@@ -13,6 +13,19 @@ module ActionMailer
     include ActionView::Layouts
     extend ActionView::Layouts::ClassMethods
 
+    # ClassMethods of the concerns included in ActionMailer::Base and the ones they include
+    extend ActionMailer::Callbacks::ClassMethods
+    extend ActionMailer::DeliveryMethods::ClassMethods
+    extend ActionMailer::Rescuable::ClassMethods
+    extend ActionMailer::Parameterized::ClassMethods
+    extend ActionMailer::Previews::ClassMethods
+    extend ActionMailer::FormBuilder::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
+    extend ActiveSupport::Rescuable::ClassMethods
+    extend AbstractController::Caching::Fragments::ClassMethods
+    extend ActionView::Rendering::ClassMethods
+    extend ActionView::ViewPaths::ClassMethods
+
     def self.default: (**untyped) -> void
 
     def self.layout: (String) -> void

@@ -2,6 +2,15 @@ module RailsGuides
   class ApplicationMailer < ActionMailer::Base
     default from: 'from@example.com'
     layout 'mailer'
+
+    before_deliver :log_delivery
+    rescue_from(ArgumentError) { |exception| exception.message }
+    self.raise_delivery_errors = true
+
+    private
+
+    def log_delivery
+    end
   end
 
   class NotifierMailer < ApplicationMailer
