@@ -17,3 +17,15 @@ rich_text.name.to_sym
 rich_text.body&.to_html
 rich_text.embeds.attached?
 rich_text.updated_at.to_date
+rich_text.to_s.size
+rich_text.to_plain_text.size
+rich_text.to_trix_html&.size
+if (content = rich_text.body)
+  content.links.first&.size
+  content.attachments.first&.to_html
+  content.gallery_attachments.size
+  content.to_plain_text.size
+  content.to_trix_html.size
+  content.to_html.size
+  content.to_s.size
+end

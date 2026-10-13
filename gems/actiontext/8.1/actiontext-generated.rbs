@@ -198,38 +198,10 @@ module ActionText
   #     message.content.to_s # => "<div>safeunsafe</div>"
   #     message.content.to_plain_text # => "safeunsafe"
   class RichText < ::ActionText::Record
-    def to_s: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def nil?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def blank?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def present?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
-
-    # Returns a plain-text version of the markup contained by the `body` attribute,
-    # with tags removed but HTML entities encoded.
-    #
-    #     message = Message.create!(content: "<h1>Funny times!</h1>")
-    #     message.content.to_plain_text # => "Funny times!"
-    #
-    # NOTE: that the returned string is not HTML safe and should not be rendered in
-    # browsers.
-    #
-    #     message = Message.create!(content: "&lt;script&gt;alert()&lt;/script&gt;")
-    #     message.content.to_plain_text # => "<script>alert()</script>"
-    def to_plain_text: () -> untyped
-
-    # Returns the `body` attribute in a format that makes it editable in the Trix
-    # editor. Previews of attachments are rendered inline.
-    #
-    #     content = "<h1>Funny Times!</h1><figure data-trix-attachment='{\"sgid\":\"..."\}'></figure>"
-    #     message = Message.create!(content: content)
-    #     message.content.to_trix_html # =>
-    #     # <div class="trix-content">
-    #     #   <h1>Funny times!</h1>
-    #     #   <figure data-trix-attachment='{\"sgid\":\"..."\}'>
-    #     #      <img src="http://example.org/rails/active_storage/.../funny.jpg">
-    #     #   </figure>
-    #     # </div>
-    def to_trix_html: () -> untyped
   end
 end
 
@@ -625,24 +597,7 @@ module ActionText
 
     def initialize: (?untyped? content, ?::Hash[untyped, untyped] options) -> void
 
-    # Extracts links from the HTML fragment:
-    #
-    #     html = '<a href="http://example.com/">Example</a>'
-    #     content = ActionText::Content.new(html)
-    #     content.links # => ["http://example.com/"]
-    def links: () -> untyped
-
-    # Extracts ActionText::Attachment objects from the HTML fragment:
-    #
-    #     attachable = ActiveStorage::Blob.first
-    #     html = %Q(<action-text-attachment sgid="#{attachable.attachable_sgid}" caption="Captioned"></action-text-attachment>)
-    #     content = ActionText::Content.new(html)
-    #     content.attachments # => [#<ActionText::Attachment attachable=#<ActiveStorage::Blob...
-    def attachments: () -> untyped
-
     def attachment_galleries: () -> untyped
-
-    def gallery_attachments: () -> untyped
 
     # Extracts ActionText::Attachable objects from the HTML fragment:
     #
@@ -658,39 +613,9 @@ module ActionText
 
     def render_attachment_galleries: () { (?) -> untyped } -> untyped
 
-    # Returns a plain-text version of the markup contained by the content, with tags
-    # removed but HTML entities encoded.
-    #
-    #     content = ActionText::Content.new("<h1>Funny times!</h1>")
-    #     content.to_plain_text # => "Funny times!"
-    #
-    #     content = ActionText::Content.new("<div onclick='action()'>safe<script>unsafe</script></div>")
-    #     content.to_plain_text # => "safe"
-    #
-    # NOTE: that the returned string is not HTML safe and should not be rendered in
-    # browsers without additional sanitization.
-    #
-    #     content = ActionText::Content.new("&lt;script&gt;alert()&lt;/script&gt;")
-    #     content.to_plain_text # => "<script>alert()</script>"
-    #     ActionText::ContentHelper.sanitizer.sanitize(content.to_plain_text) # => ""
-    def to_plain_text: () -> untyped
-
-    def to_trix_html: () -> untyped
-
-    def to_html: () -> untyped
-
     def to_rendered_html_with_layout: () -> untyped
 
     def to_partial_path: () -> "action_text/contents/content"
-
-    # Safely transforms Content into an HTML String.
-    #
-    #     content = ActionText::Content.new("<h1>Funny times!</h1>")
-    #     content.to_s # => "<h1>Funny times!</h1>"
-    #
-    #     content = ActionText::Content.new("<div onclick='action()'>safe<script>unsafe</script></div>")
-    #     content.to_s # => "<div>safeunsafe</div>"
-    def to_s: () -> untyped
 
     def as_json: (*untyped) -> untyped
 
