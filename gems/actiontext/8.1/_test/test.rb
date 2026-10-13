@@ -9,3 +9,5 @@ class Comment < ActiveRecord::Base
 end
 
 ActionView::Helpers::FormBuilder.new(:article, Article.new, ActionView::Base.empty, {}).rich_textarea(:content, class: "editor")
+ActionText::Content.render(partial: "action_text/contents/content")
+ActionText::Attachment.fragment_by_minifying_attachments("<p>text</p>")

@@ -333,6 +333,10 @@ end
 module ActionText
   module Attachables
     class ContentAttachment
+      extend ::ActiveModel::Conversion::ClassMethods
+
+      extend ::ActiveModel::Validations::ClassMethods
+
       include ::ActiveModel::Model
 
       def self.from_node: (untyped node) -> untyped
@@ -402,6 +406,10 @@ end
 
 module ActionText
   class AttachmentGallery
+    extend ::ActiveModel::Conversion::ClassMethods
+
+    extend ::ActiveModel::Validations::ClassMethods
+
     include ::ActiveModel::Model
 
     TAG_NAME: "div"
@@ -443,6 +451,10 @@ module ActionText
   #     attachment = ActionText::Attachment.from_attachable(attachable)
   #     attachment.to_html # => "<action-text-attachment sgid=\"BAh7CEk..."
   class Attachment
+    extend ::ActionText::Attachments::Minification::ClassMethods
+
+    extend ::ActionText::Attachments::TrixConversion::ClassMethods
+
     def self.tag_name: () -> untyped
     def self.tag_name=: (untyped value) -> untyped
     def tag_name: () -> untyped
@@ -591,6 +603,10 @@ module ActionText
   #     body.to_s # => "<h1>Funny times!</h1>"
   #     body.to_plain_text # => "Funny times!"
   class Content
+    extend ::ActionText::Serialization::ClassMethods
+
+    extend ::ActionText::Rendering::ClassMethods
+
     def deconstruct: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def blank?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
