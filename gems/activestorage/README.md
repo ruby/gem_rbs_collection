@@ -13,6 +13,7 @@ If you have any questions, please contact the maintainers. Refer to `_reviewers.
 ## Target gems
 
 - actioncable
+- actionmailbox
 - actionmailer
 - actionpack
 - actiontext
