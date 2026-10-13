@@ -1,0 +1,2215 @@
+# The generated code is based on Ruby on Rails source code
+# You can find the license of Ruby on Rails from following.
+
+#Copyright (c) 37signals LLC
+#
+#Permission is hereby granted, free of charge, to any person obtaining
+#a copy of this software and associated documentation files (the
+#"Software"), to deal in the Software without restriction, including
+#without limitation the rights to use, copy, modify, merge, publish,
+#distribute, sublicense, and/or sell copies of the Software, and to
+#permit persons to whom the Software is furnished to do so, subject to
+#the following conditions:
+#
+#The above copyright notice and this permission notice shall be
+#included in all copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# :markup: markdown
+# :include: ../README.md
+module ActionCable
+  INTERNAL: { message_types: { welcome: "welcome", disconnect: "disconnect", ping: "ping", confirmation: "confirm_subscription", rejection: "reject_subscription" }, disconnect_reasons: { unauthorized: "unauthorized", invalid_request: "invalid_request", server_restart: "server_restart", remote: "remote" }, default_mount_path: "/cable", protocols: ::Array["actioncable-v1-json" | "actioncable-unsupported"] }
+
+  # Singleton instance of the server
+  def self?.server: () -> untyped
+end
+
+module ActionCable
+  module Channel
+    # # Action Cable Channel Base
+    #
+    # The channel provides the basic structure of grouping behavior into logical
+    # units when communicating over the WebSocket connection. You can think of a
+    # channel like a form of controller, but one that's capable of pushing content
+    # to the subscriber in addition to simply responding to the subscriber's direct
+    # requests.
+    #
+    # Channel instances are long-lived. A channel object will be instantiated when
+    # the cable consumer becomes a subscriber, and then lives until the consumer
+    # disconnects. This may be seconds, minutes, hours, or even days. That means you
+    # have to take special care not to do anything silly in a channel that would
+    # balloon its memory footprint or whatever. The references are forever, so they
+    # won't be released as is normally the case with a controller instance that gets
+    # thrown away after every request.
+    #
+    # Long-lived channels (and connections) also mean you're responsible for
+    # ensuring that the data is fresh. If you hold a reference to a user record, but
+    # the name is changed while that reference is held, you may be sending stale
+    # data if you don't take precautions to avoid it.
+    #
+    # The upside of long-lived channel instances is that you can use instance
+    # variables to keep reference to objects that future subscriber requests can
+    # interact with. Here's a quick example:
+    #
+    #     class ChatChannel < ApplicationCable::Channel
+    #       def subscribed
+    #         @room = Chat::Room[params[:room_number]]
+    #       end
+    #
+    #       def speak(data)
+    #         @room.speak data, user: current_user
+    #       end
+    #     end
+    #
+    # The #speak action simply uses the Chat::Room object that was created when the
+    # channel was first subscribed to by the consumer when that subscriber wants to
+    # say something in the room.
+    #
+    # ## Action processing
+    #
+    # Unlike subclasses of ActionController::Base, channels do not follow a RESTful
+    # constraint form for their actions. Instead, Action Cable operates through a
+    # remote-procedure call model. You can declare any public method on the channel
+    # (optionally taking a `data` argument), and this method is automatically
+    # exposed as callable to the client.
+    #
+    # Example:
+    #
+    #     class AppearanceChannel < ApplicationCable::Channel
+    #       def subscribed
+    #         @connection_token = generate_connection_token
+    #       end
+    #
+    #       def unsubscribed
+    #         current_user.disappear @connection_token
+    #       end
+    #
+    #       def appear(data)
+    #         current_user.appear @connection_token, on: data['appearing_on']
+    #       end
+    #
+    #       def away
+    #         current_user.away @connection_token
+    #       end
+    #
+    #       private
+    #         def generate_connection_token
+    #           SecureRandom.hex(36)
+    #         end
+    #     end
+    #
+    # In this example, the subscribed and unsubscribed methods are not callable
+    # methods, as they were already declared in ActionCable::Channel::Base, but
+    # `#appear` and `#away` are. `#generate_connection_token` is also not callable,
+    # since it's a private method. You'll see that appear accepts a data parameter,
+    # which it then uses as part of its model call. `#away` does not, since it's
+    # simply a trigger action.
+    #
+    # Also note that in this example, `current_user` is available because it was
+    # marked as an identifying attribute on the connection. All such identifiers
+    # will automatically create a delegation method of the same name on the channel
+    # instance.
+    #
+    # ## Rejecting subscription requests
+    #
+    # A channel can reject a subscription request in the #subscribed callback by
+    # invoking the #reject method:
+    #
+    #     class ChatChannel < ApplicationCable::Channel
+    #       def subscribed
+    #         @room = Chat::Room[params[:room_number]]
+    #         reject unless current_user.can_access?(@room)
+    #       end
+    #     end
+    #
+    # In this example, the subscription will be rejected if the `current_user` does
+    # not have access to the chat room. On the client-side, the `Channel#rejected`
+    # callback will get invoked when the server rejects the subscription request.
+    class Base
+      def logger: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      include ::ActionCable::Channel::Callbacks
+
+      include ::ActionCable::Channel::PeriodicTimers
+
+      include ::ActionCable::Channel::Streams
+
+      include ::ActionCable::Channel::Naming
+
+      include ::ActionCable::Channel::Broadcasting
+
+      include ::ActiveSupport::Rescuable
+
+      attr_reader params: untyped
+
+      attr_reader connection: untyped
+
+      attr_reader identifier: untyped
+
+      # A list of method names that should be considered actions. This includes all
+      # public instance methods on a channel, less any internal methods (defined on
+      # Base), adding back in any methods that are internal, but still exist on the
+      # class itself.
+      #
+      # #### Returns
+      # *   `Set` - A set of all methods that should be considered actions.
+      def self.action_methods: () -> untyped
+
+      # action_methods are cached and there is sometimes need to refresh them.
+      # ::clear_action_methods! allows you to do that, so next time you run
+      # action_methods, they will be recalculated.
+      def self.clear_action_methods!: () -> untyped
+
+      # Refresh the cached action_methods when a new action_method is added.
+      def self.method_added: (untyped name) -> untyped
+
+      def self.internal_methods: () -> untyped
+
+      def initialize: (untyped connection, untyped identifier, ?::Hash[untyped, untyped] params) -> void
+
+      # Extract the action name from the passed data and process it via the channel.
+      # The process will ensure that the action requested is a public method on the
+      # channel declared by the user (so not one of the callbacks like #subscribed).
+      def perform_action: (untyped data) -> untyped
+
+      # This method is called after subscription has been added to the connection and
+      # confirms or rejects the subscription.
+      def subscribe_to_channel: () -> untyped
+
+      # Called by the cable connection when it's cut, so the channel has a chance to
+      # cleanup with callbacks. This method is not intended to be called directly by
+      # the user. Instead, override the #unsubscribed callback.
+      def unsubscribe_from_channel: () -> untyped
+
+      def unsubscribed?: () -> untyped
+
+      private
+
+      # Called once a consumer has become a subscriber of the channel. Usually the
+      # place to set up any streams you want this channel to be sending to the
+      # subscriber.
+      def subscribed: () -> nil
+
+      # Called once a consumer has cut its cable connection. Can be used for cleaning
+      # up connections or marking users as offline or the like.
+      def unsubscribed: () -> nil
+
+      # Transmit a hash of data to the subscriber. The hash will automatically be
+      # wrapped in a JSON envelope with the proper channel identifier marked as the
+      # recipient.
+      def transmit: (untyped data, ?via: untyped?) -> untyped
+
+      def ensure_confirmation_sent: () -> (nil | untyped)
+
+      def defer_subscription_confirmation!: () -> untyped
+
+      def defer_subscription_confirmation?: () -> untyped
+
+      def subscription_confirmation_sent?: () -> untyped
+
+      def reject: () -> untyped
+
+      def subscription_rejected?: () -> untyped
+
+      def delegate_connection_identifiers: () -> untyped
+
+      def extract_action: (untyped data) -> untyped
+
+      def processable_action?: (untyped action) -> (untyped | nil)
+
+      def dispatch_action: (untyped action, untyped data) -> untyped
+
+      def action_signature: (untyped action, untyped data) -> untyped
+
+      def parameter_filter: () -> untyped
+
+      def transmit_subscription_confirmation: () -> (untyped | nil)
+
+      def reject_subscription: () -> untyped
+
+      def transmit_subscription_rejection: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Channel
+    module Broadcasting
+      extend ::ActiveSupport::Concern
+
+      module ClassMethods
+        # Broadcast a hash to a unique broadcasting for this array of `broadcastables` in this channel.
+        def broadcast_to: (untyped broadcastables, untyped message) -> untyped
+
+        # Returns a unique broadcasting identifier for this `model` in this channel:
+        #
+        #     CommentsChannel.broadcasting_for("all") # => "comments:all"
+        #
+        # You can pass an array of objects as a target (e.g. Active Record model), and it would
+        # be serialized into a string under the hood.
+        def broadcasting_for: (untyped broadcastables) -> untyped
+
+        private
+
+        def serialize_broadcasting: (untyped object) -> untyped
+      end
+
+      def broadcasting_for: (untyped model) -> untyped
+
+      def broadcast_to: (untyped model, untyped message) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Channel
+    # # Action Cable Channel Callbacks
+    #
+    # Action Cable Channel provides callback hooks that are invoked during the life
+    # cycle of a channel:
+    #
+    # *   [before_subscribe](rdoc-ref:ClassMethods#before_subscribe)
+    # *   [after_subscribe](rdoc-ref:ClassMethods#after_subscribe) (aliased as
+    #     [on_subscribe](rdoc-ref:ClassMethods#on_subscribe))
+    # *   [before_unsubscribe](rdoc-ref:ClassMethods#before_unsubscribe)
+    # *   [after_unsubscribe](rdoc-ref:ClassMethods#after_unsubscribe) (aliased as
+    #     [on_unsubscribe](rdoc-ref:ClassMethods#on_unsubscribe))
+    #
+    #
+    # #### Example
+    #
+    #     class ChatChannel < ApplicationCable::Channel
+    #       after_subscribe :send_welcome_message, unless: :subscription_rejected?
+    #       after_subscribe :track_subscription
+    #
+    #       private
+    #         def send_welcome_message
+    #           broadcast_to(...)
+    #         end
+    #
+    #         def track_subscription
+    #           # ...
+    #         end
+    #     end
+    #
+    module Callbacks
+      extend ::ActiveSupport::Concern
+
+      include ::ActiveSupport::Callbacks
+
+      INTERNAL_METHODS: ::Array[:_run_subscribe_callbacks | :_run_unsubscribe_callbacks]
+
+      module ClassMethods
+        def before_subscribe: (*untyped methods) { (?) -> untyped } -> untyped
+
+        # This callback will be triggered after the Base#subscribed method is called,
+        # even if the subscription was rejected with the Base#reject method.
+        #
+        # To trigger the callback only on successful subscriptions, use the
+        # Base#subscription_rejected? method:
+        #
+        #     after_subscribe :my_method, unless: :subscription_rejected?
+        #
+        def after_subscribe: (*untyped methods) { (?) -> untyped } -> untyped
+
+        alias on_subscribe after_subscribe
+
+        def before_unsubscribe: (*untyped methods) { (?) -> untyped } -> untyped
+
+        def after_unsubscribe: (*untyped methods) { (?) -> untyped } -> untyped
+
+        alias on_unsubscribe after_unsubscribe
+
+        private
+
+        def internal_methods: () -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module Channel
+    module Naming
+      extend ::ActiveSupport::Concern
+
+      module ClassMethods
+        # Returns the name of the channel, underscored, without the `Channel` ending. If
+        # the channel is in a namespace, then the namespaces are represented by single
+        # colon separators in the channel name.
+        #
+        #     ChatChannel.channel_name # => 'chat'
+        #     Chats::AppearancesChannel.channel_name # => 'chats:appearances'
+        #     FooChats::BarAppearancesChannel.channel_name # => 'foo_chats:bar_appearances'
+        def channel_name: () -> untyped
+      end
+
+      def channel_name: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Channel
+    module PeriodicTimers
+      def periodic_timers=: (untyped value) -> untyped
+
+      extend ::ActiveSupport::Concern
+
+      module ClassMethods
+        def periodic_timers: () -> untyped
+
+        def periodic_timers=: (untyped value) -> untyped
+
+        def periodic_timers?: () -> bool
+
+        # Periodically performs a task on the channel, like updating an online user
+        # counter, polling a backend for new status messages, sending regular
+        # "heartbeat" messages, or doing some internal work and giving progress updates.
+        #
+        # Pass a method name or lambda argument or provide a block to call. Specify the
+        # calling period in seconds using the `every:` keyword argument.
+        #
+        #     periodically :transmit_progress, every: 5.seconds
+        #
+        #     periodically every: 3.minutes do
+        #       transmit action: :update_count, count: current_count
+        #     end
+        #
+        def periodically: (?untyped? callback_or_method_name, every: untyped) ?{ (?) -> untyped } -> untyped
+      end
+
+      private
+
+      def active_periodic_timers: () -> untyped
+
+      def start_periodic_timers: () -> untyped
+
+      def start_periodic_timer: (untyped callback, every: untyped) -> untyped
+
+      def stop_periodic_timers: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Channel
+    # # Action Cable Channel Streams
+    #
+    # Streams allow channels to route broadcastings to the subscriber. A
+    # broadcasting is, as discussed elsewhere, a pubsub queue where any data placed
+    # into it is automatically sent to the clients that are connected at that time.
+    # It's purely an online queue, though. If you're not streaming a broadcasting at
+    # the very moment it sends out an update, you will not get that update, even if
+    # you connect after it has been sent.
+    #
+    # Most commonly, the streamed broadcast is sent straight to the subscriber on
+    # the client-side. The channel just acts as a connector between the two parties
+    # (the broadcaster and the channel subscriber). Here's an example of a channel
+    # that allows subscribers to get all new comments on a given page:
+    #
+    #     class CommentsChannel < ApplicationCable::Channel
+    #       def follow(data)
+    #         stream_from "comments_for_#{data['recording_id']}"
+    #       end
+    #
+    #       def unfollow
+    #         stop_all_streams
+    #       end
+    #     end
+    #
+    # Based on the above example, the subscribers of this channel will get whatever
+    # data is put into the, let's say, `comments_for_45` broadcasting as soon as
+    # it's put there.
+    #
+    # An example broadcasting for this channel looks like so:
+    #
+    #     ActionCable.server.broadcast "comments_for_45", { author: 'DHH', content: 'Rails is just swell' }
+    #
+    # If you have a stream that is related to a model, then the broadcasting used
+    # can be generated from the model and channel. The following example would
+    # subscribe to a broadcasting like `comments:Z2lkOi8vVGVzdEFwcC9Qb3N0LzE`.
+    #
+    #     class CommentsChannel < ApplicationCable::Channel
+    #       def subscribed
+    #         post = Post.find(params[:id])
+    #         stream_for post
+    #       end
+    #     end
+    #
+    # You can then broadcast to this channel using:
+    #
+    #     CommentsChannel.broadcast_to(@post, @comment)
+    #
+    # If you don't just want to parlay the broadcast unfiltered to the subscriber,
+    # you can also supply a callback that lets you alter what is sent out. The below
+    # example shows how you can use this to provide performance introspection in the
+    # process:
+    #
+    #     class ChatChannel < ApplicationCable::Channel
+    #       def subscribed
+    #         @room = Chat::Room[params[:room_number]]
+    #
+    #         stream_for @room, coder: ActiveSupport::JSON do |message|
+    #           if message['originated_at'].present?
+    #             elapsed_time = (Time.now.to_f - message['originated_at']).round(2)
+    #
+    #             ActiveSupport::Notifications.instrument :performance, measurement: 'Chat.message_delay', value: elapsed_time, action: :timing
+    #             logger.info "Message took #{elapsed_time}s to arrive"
+    #           end
+    #
+    #           transmit message
+    #         end
+    #       end
+    #     end
+    #
+    # You can stop streaming from all broadcasts by calling #stop_all_streams.
+    module Streams
+      def pubsub: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      extend ::ActiveSupport::Concern
+
+      # Start streaming from the named `broadcasting` pubsub queue. Optionally, you
+      # can pass a `callback` that'll be used instead of the default of just
+      # transmitting the updates straight to the subscriber. Pass `coder:
+      # ActiveSupport::JSON` to decode messages as JSON before passing to the
+      # callback. Defaults to `coder: nil` which does no decoding, passes raw
+      # messages.
+      def stream_from: (untyped broadcasting, ?untyped? callback, ?coder: untyped?) { (?) -> untyped } -> (nil | untyped)
+
+      # Start streaming the pubsub queue for the `broadcastables` in this channel. Optionally,
+      # you can pass a `callback` that'll be used instead of the default of just
+      # transmitting the updates straight to the subscriber.
+      #
+      # Pass `coder: ActiveSupport::JSON` to decode messages as JSON before passing to
+      # the callback. Defaults to `coder: nil` which does no decoding, passes raw
+      # messages.
+      def stream_for: (untyped broadcastables, ?untyped? callback, ?coder: untyped?) { (?) -> untyped } -> untyped
+
+      # Unsubscribes streams from the named `broadcasting`.
+      def stop_stream_from: (untyped broadcasting) -> untyped
+
+      # Unsubscribes streams for the `model`.
+      def stop_stream_for: (untyped model) -> untyped
+
+      # Unsubscribes all streams associated with this channel from the pubsub queue.
+      def stop_all_streams: () -> untyped
+
+      # Calls stream_for with the given `model` if it's present to start streaming,
+      # otherwise rejects the subscription.
+      def stream_or_reject_for: (untyped model) -> untyped
+
+      private
+
+      def streams: () -> untyped
+
+      # Always wrap the outermost handler to invoke the user handler on the worker
+      # pool rather than blocking the event loop.
+      def worker_pool_stream_handler: (untyped broadcasting, untyped user_handler, ?coder: untyped?) -> untyped
+
+      # May be overridden to add instrumentation, logging, specialized error handling,
+      # or other forms of handler decoration.
+      #
+      # TODO: Tests demonstrating this.
+      def stream_handler: (untyped broadcasting, untyped user_handler, ?coder: untyped?) -> untyped
+
+      # May be overridden to change the default stream handling behavior which decodes
+      # JSON and transmits to the client.
+      #
+      # TODO: Tests demonstrating this.
+      #
+      # TODO: Room for optimization. Update transmit API to be coder-aware so we can
+      # no-op when pubsub and connection are both JSON-encoded. Then we can skip
+      # decode+encode if we're just proxying messages.
+      def default_stream_handler: (untyped broadcasting, coder: untyped) -> untyped
+
+      def stream_decoder: (?untyped handler, coder: untyped) -> untyped
+
+      def stream_transmitter: (?untyped handler, broadcasting: untyped) -> untyped
+
+      def identity_handler: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Channel
+    class NonInferrableChannelError < ::StandardError
+      def initialize: (untyped name) -> void
+    end
+
+    # # Action Cable Channel Stub
+    #
+    # Stub `stream_from` to track streams for the channel. Add public aliases for
+    # `subscription_confirmation_sent?` and `subscription_rejected?`.
+    module ChannelStub
+      def confirmed?: () -> untyped
+
+      def rejected?: () -> untyped
+
+      def stream_from: (untyped broadcasting, *untyped) -> untyped
+
+      def stop_all_streams: () -> untyped
+
+      def streams: () -> untyped
+
+      # Make periodic timers no-op
+      def start_periodic_timers: () -> nil
+
+      alias stop_periodic_timers start_periodic_timers
+    end
+
+    class ConnectionStub
+      def pubsub: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def config: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      attr_reader server: untyped
+
+      attr_reader transmissions: untyped
+
+      attr_reader identifiers: untyped
+
+      attr_reader subscriptions: untyped
+
+      attr_reader logger: untyped
+
+      def initialize: (?::Hash[untyped, untyped] identifiers) -> void
+
+      def transmit: (untyped cable_message) -> untyped
+
+      def connection_identifier: () -> untyped
+
+      private
+
+      def connection_gid: (untyped ids) -> untyped
+    end
+
+    # Superclass for Action Cable channel functional tests.
+    #
+    # ## Basic example
+    #
+    # Functional tests are written as follows:
+    # 1.  First, one uses the `subscribe` method to simulate subscription creation.
+    # 2.  Then, one asserts whether the current state is as expected. "State" can be
+    #     anything: transmitted messages, subscribed streams, etc.
+    #
+    #
+    # For example:
+    #
+    #     class ChatChannelTest < ActionCable::Channel::TestCase
+    #       def test_subscribed_with_room_number
+    #         # Simulate a subscription creation
+    #         subscribe room_number: 1
+    #
+    #         # Asserts that the subscription was successfully created
+    #         assert subscription.confirmed?
+    #
+    #         # Asserts that the channel subscribes connection to a stream
+    #         assert_has_stream "chat_1"
+    #
+    #         # Asserts that the channel subscribes connection to a specific
+    #         # stream created for a model
+    #         assert_has_stream_for Room.find(1)
+    #       end
+    #
+    #       def test_does_not_stream_with_incorrect_room_number
+    #         subscribe room_number: -1
+    #
+    #         # Asserts that not streams was started
+    #         assert_no_streams
+    #       end
+    #
+    #       def test_does_not_subscribe_without_room_number
+    #         subscribe
+    #
+    #         # Asserts that the subscription was rejected
+    #         assert subscription.rejected?
+    #       end
+    #     end
+    #
+    # You can also perform actions:
+    #     def test_perform_speak
+    #       subscribe room_number: 1
+    #
+    #       perform :speak, message: "Hello, Rails!"
+    #
+    #       assert_equal "Hello, Rails!", transmissions.last["text"]
+    #     end
+    #
+    # ## Special methods
+    #
+    # ActionCable::Channel::TestCase will also automatically provide the following
+    # instance methods for use in the tests:
+    #
+    # connection
+    # :   An ActionCable::Channel::ConnectionStub, representing the current HTTP
+    #     connection.
+    #
+    # subscription
+    # :   An instance of the current channel, created when you call `subscribe`.
+    #
+    # transmissions
+    # :   A list of all messages that have been transmitted into the channel.
+    #
+    #
+    # ## Channel is automatically inferred
+    #
+    # ActionCable::Channel::TestCase will automatically infer the channel under test
+    # from the test class name. If the channel cannot be inferred from the test
+    # class name, you can explicitly set it with `tests`.
+    #
+    #     class SpecialEdgeCaseChannelTest < ActionCable::Channel::TestCase
+    #       tests SpecialChannel
+    #     end
+    #
+    # ## Specifying connection identifiers
+    #
+    # You need to set up your connection manually to provide values for the
+    # identifiers. To do this just use:
+    #
+    #     stub_connection(user: users(:john))
+    #
+    # ## Testing broadcasting
+    #
+    # ActionCable::Channel::TestCase enhances ActionCable::TestHelper assertions
+    # (e.g. `assert_broadcasts`) to handle broadcasting to models:
+    #
+    #     # in your channel
+    #     def speak(data)
+    #       broadcast_to room, text: data["message"]
+    #     end
+    #
+    #     def test_speak
+    #       subscribe room_id: rooms(:chat).id
+    #
+    #       assert_broadcast_on(rooms(:chat), text: "Hello, Rails!") do
+    #         perform :speak, message: "Hello, Rails!"
+    #       end
+    #     end
+    class TestCase < ::ActiveSupport::TestCase
+      module Behavior
+        def _channel_class: () -> untyped
+
+        def _channel_class?: () -> bool
+
+        def _channel_class=: (untyped value) -> untyped
+
+        extend ::ActiveSupport::Concern
+
+        include ::ActiveSupport::Testing::ConstantLookup
+
+        include ::ActionCable::TestHelper
+
+        CHANNEL_IDENTIFIER: "test_stub"
+
+        module ClassMethods
+          def _channel_class: () -> untyped
+
+          def _channel_class=: (untyped value) -> untyped
+
+          def _channel_class?: () -> bool
+
+          def tests: (untyped channel) -> untyped
+
+          def channel_class: () -> untyped
+
+          def determine_default_channel: (untyped name) -> untyped
+        end
+
+        # Set up test connection with the specified identifiers:
+        #
+        #     class ApplicationCable < ActionCable::Connection::Base
+        #       identified_by :user, :token
+        #     end
+        #
+        #     stub_connection(user: users[:john], token: 'my-secret-token')
+        def stub_connection: (?::Hash[untyped, untyped] identifiers) -> untyped
+
+        # Subscribe to the channel under test. Optionally pass subscription parameters
+        # as a Hash.
+        def subscribe: (?::Hash[untyped, untyped] params) -> untyped
+
+        # Unsubscribe the subscription under test.
+        def unsubscribe: () -> untyped
+
+        # Perform action on a channel.
+        #
+        # NOTE: Must be subscribed.
+        def perform: (untyped action, ?::Hash[untyped, untyped] data) -> untyped
+
+        # Returns messages transmitted into channel
+        def transmissions: () -> untyped
+
+        # Enhance TestHelper assertions to handle non-String broadcastings
+        def assert_broadcasts: (untyped stream_or_object, *untyped args) -> untyped
+
+        def assert_broadcast_on: (untyped stream_or_object, *untyped args) -> untyped
+
+        # Asserts that no streams have been started.
+        #
+        #     def test_assert_no_started_stream
+        #       subscribe
+        #       assert_no_streams
+        #     end
+        #
+        def assert_no_streams: () -> untyped
+
+        # Asserts that the specified stream has been started.
+        #
+        #     def test_assert_started_stream
+        #       subscribe
+        #       assert_has_stream 'messages'
+        #     end
+        #
+        def assert_has_stream: (untyped stream) -> untyped
+
+        # Asserts that the specified stream for a model has started.
+        #
+        #     def test_assert_started_stream_for
+        #       subscribe id: 42
+        #       assert_has_stream_for User.find(42)
+        #     end
+        #
+        def assert_has_stream_for: (untyped object) -> untyped
+
+        # Asserts that the specified stream has not been started.
+        #
+        #     def test_assert_no_started_stream
+        #       subscribe
+        #       assert_has_no_stream 'messages'
+        #     end
+        #
+        def assert_has_no_stream: (untyped stream) -> untyped
+
+        # Asserts that the specified stream for a model has not started.
+        #
+        #     def test_assert_no_started_stream_for
+        #       subscribe id: 41
+        #       assert_has_no_stream_for User.find(42)
+        #     end
+        #
+        def assert_has_no_stream_for: (untyped object) -> untyped
+
+        private
+
+        def check_subscribed!: () -> (untyped | nil)
+
+        def broadcasting_for: (untyped stream_or_object) -> untyped
+      end
+
+      include ::ActionCable::Channel::TestCase::Behavior
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    module Authorization
+      class UnauthorizedError < ::StandardError
+      end
+
+      # Closes the WebSocket connection if it is open and returns an "unauthorized"
+      # reason.
+      def reject_unauthorized_connection: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # # Action Cable Connection Base
+    #
+    # For every WebSocket connection the Action Cable server accepts, a Connection
+    # object will be instantiated. This instance becomes the parent of all of the
+    # channel subscriptions that are created from there on. Incoming messages are
+    # then routed to these channel subscriptions based on an identifier sent by the
+    # Action Cable consumer. The Connection itself does not deal with any specific
+    # application logic beyond authentication and authorization.
+    #
+    # Here's a basic example:
+    #
+    #     module ApplicationCable
+    #       class Connection < ActionCable::Connection::Base
+    #         identified_by :current_user
+    #
+    #         def connect
+    #           self.current_user = find_verified_user
+    #           logger.add_tags current_user.name
+    #         end
+    #
+    #         def disconnect
+    #           # Any cleanup work needed when the cable connection is cut.
+    #         end
+    #
+    #         private
+    #           def find_verified_user
+    #             User.find_by_identity(cookies.encrypted[:identity_id]) ||
+    #               reject_unauthorized_connection
+    #           end
+    #       end
+    #     end
+    #
+    # First, we declare that this connection can be identified by its current_user.
+    # This allows us to later be able to find all connections established for that
+    # current_user (and potentially disconnect them). You can declare as many
+    # identification indexes as you like. Declaring an identification means that an
+    # attr_accessor is automatically set for that key.
+    #
+    # Second, we rely on the fact that the WebSocket connection is established with
+    # the cookies from the domain being sent along. This makes it easy to use signed
+    # cookies that were set when logging in via a web interface to authorize the
+    # WebSocket connection.
+    #
+    # Finally, we add a tag to the connection-specific logger with the name of the
+    # current user to easily distinguish their messages in the log.
+    #
+    # Pretty simple, eh?
+    class Base
+      def event_loop: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def pubsub: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def config: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      include ::ActionCable::Connection::Identification
+
+      include ::ActionCable::Connection::InternalChannel
+
+      include ::ActionCable::Connection::Authorization
+
+      include ::ActionCable::Connection::Callbacks
+
+      include ::ActiveSupport::Rescuable
+
+      attr_reader server: untyped
+
+      attr_reader env: untyped
+
+      attr_reader subscriptions: untyped
+
+      attr_reader logger: untyped
+
+      attr_reader worker_pool: untyped
+
+      attr_reader protocol: untyped
+
+      def initialize: (untyped server, untyped env, ?coder: untyped) -> void
+
+      # Called by the server when a new WebSocket connection is established. This
+      # configures the callbacks intended for overwriting by the user. This method
+      # should not be called directly -- instead rely upon on the #connect (and
+      # #disconnect) callbacks.
+      def process: () -> untyped
+
+      # Decodes WebSocket messages and dispatches them to subscribed channels.
+      # WebSocket message transfer encoding is always JSON.
+      def receive: (untyped websocket_message) -> untyped
+
+      def dispatch_websocket_message: (untyped websocket_message) -> untyped
+
+      def handle_channel_command: (untyped payload) -> untyped
+
+      def transmit: (untyped cable_message) -> untyped
+
+      # Close the WebSocket connection.
+      def close: (?reason: untyped?, ?reconnect: bool) -> untyped
+
+      # Invoke a method on the connection asynchronously through the pool of thread
+      # workers.
+      def send_async: (untyped method, *untyped arguments) -> untyped
+
+      # Return a basic hash of statistics for the connection keyed with `identifier`,
+      # `started_at`, `subscriptions`, and `request_id`. This can be returned by a
+      # health check against the connection.
+      def statistics: () -> { identifier: untyped, started_at: untyped, subscriptions: untyped, request_id: untyped }
+
+      def beat: () -> untyped
+
+      def on_open: () -> untyped
+
+      def on_message: (untyped message) -> untyped
+
+      def on_error: (untyped message) -> untyped
+
+      def on_close: (untyped reason, untyped code) -> untyped
+
+      def inspect: () -> ::String
+
+      private
+
+      attr_reader websocket: untyped
+
+      attr_reader message_buffer: untyped
+
+      # The request that initiated the WebSocket connection is available here. This
+      # gives access to the environment, cookies, etc.
+      def request: () -> untyped
+
+      # The cookies of the request that initiated the WebSocket connection. Useful for
+      # performing authorization checks.
+      def cookies: () -> untyped
+
+      def encode: (untyped cable_message) -> untyped
+
+      def decode: (untyped websocket_message) -> untyped
+
+      def handle_open: () -> untyped
+
+      def handle_close: () -> untyped
+
+      def send_welcome_message: () -> untyped
+
+      def allow_request_origin?: () -> (true | untyped)
+
+      def respond_to_successful_request: () -> untyped
+
+      def respond_to_invalid_request: () -> ::Array[404 | ::Hash[untyped, "text/plain; charset=utf-8"] | ::Array["Page not found"]]
+
+      # Tags are declared in the server but computed in the connection. This allows us
+      # per-connection tailored tags.
+      def new_tagged_logger: () -> untyped
+
+      def started_request_message: () -> untyped
+
+      def finished_request_message: () -> untyped
+
+      def invalid_request_message: () -> untyped
+
+      def successful_request_message: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # # Action Cable Connection Callbacks
+    #
+    # The [before_command](rdoc-ref:ClassMethods#before_command),
+    # [after_command](rdoc-ref:ClassMethods#after_command), and
+    # [around_command](rdoc-ref:ClassMethods#around_command) callbacks are invoked
+    # when sending commands to the client, such as when subscribing, unsubscribing,
+    # or performing an action.
+    #
+    # #### Example
+    #
+    #     module ApplicationCable
+    #       class Connection < ActionCable::Connection::Base
+    #         identified_by :user
+    #
+    #         around_command :set_current_account
+    #
+    #         private
+    #
+    #         def set_current_account
+    #           # Now all channels could use Current.account
+    #           Current.set(account: user.account) { yield }
+    #         end
+    #       end
+    #     end
+    #
+    module Callbacks
+      extend ::ActiveSupport::Concern
+
+      include ::ActiveSupport::Callbacks
+
+      module ClassMethods
+        def before_command: (*untyped methods) { (?) -> untyped } -> untyped
+
+        def after_command: (*untyped methods) { (?) -> untyped } -> untyped
+
+        def around_command: (*untyped methods) { (?) -> untyped } -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # -
+    # This class is heavily based on faye-websocket-ruby
+    #
+    # Copyright (c) 2010-2015 James Coglan
+    class ClientSocket
+      def self.determine_url: (untyped env) -> ::String
+
+      def self.secure_request?: (untyped env) -> bool
+
+      CONNECTING: 0
+
+      OPEN: 1
+
+      CLOSING: 2
+
+      CLOSED: 3
+
+      attr_reader env: untyped
+
+      attr_reader url: untyped
+
+      def initialize: (untyped env, untyped event_target, untyped event_loop, untyped protocols) -> void
+
+      def start_driver: () -> (nil | untyped)
+
+      def rack_response: () -> ::Array[-1 | ::Hash[untyped, untyped] | ::Array[untyped]]
+
+      def write: (untyped data) -> untyped
+
+      def transmit: (untyped message) -> (false | untyped)
+
+      def close: (?untyped? code, ?untyped? reason) -> untyped
+
+      def parse: (untyped data) -> untyped
+
+      def client_gone: () -> untyped
+
+      def alive?: () -> untyped
+
+      def protocol: () -> untyped
+
+      private
+
+      def open: () -> (nil | untyped)
+
+      def receive_message: (untyped data) -> (nil | untyped)
+
+      def emit_error: (untyped message) -> (nil | untyped)
+
+      def begin_close: (untyped reason, untyped code) -> (nil | untyped)
+
+      def finalize_close: () -> (nil | untyped)
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    module Identification
+      def identifiers: () -> untyped
+
+      def identifiers?: () -> bool
+
+      def identifiers=: (untyped value) -> untyped
+
+      extend ::ActiveSupport::Concern
+
+      module ClassMethods
+        def identifiers: () -> untyped
+
+        def identifiers=: (untyped value) -> untyped
+
+        def identifiers?: () -> bool
+
+        # Mark a key as being a connection identifier index that can then be used to
+        # find the specific connection again later. Common identifiers are current_user
+        # and current_account, but could be anything, really.
+        #
+        # Note that anything marked as an identifier will automatically create a
+        # delegate by the same name on any channel instances created off the connection.
+        def identified_by: (*untyped identifiers) -> untyped
+      end
+
+      # Return a single connection identifier that combines the value of all the
+      # registered identifiers into a single gid.
+      def connection_identifier: () -> untyped
+
+      private
+
+      def connection_gid: (untyped ids) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # # Action Cable InternalChannel
+    #
+    # Makes it possible for the RemoteConnection to disconnect a specific
+    # connection.
+    module InternalChannel
+      extend ::ActiveSupport::Concern
+
+      private
+
+      def internal_channel: () -> ::String
+
+      def subscribe_to_internal_channel: () -> (untyped | nil)
+
+      def unsubscribe_from_internal_channel: () -> (untyped | nil)
+
+      def process_internal_message: (untyped message) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # Allows us to buffer messages received from the WebSocket before the Connection
+    # has been fully initialized, and is ready to receive them.
+    class MessageBuffer
+      def initialize: (untyped connection) -> void
+
+      def append: (untyped message) -> untyped
+
+      def processing?: () -> untyped
+
+      def process!: () -> untyped
+
+      private
+
+      attr_reader connection: untyped
+
+      attr_reader buffered_messages: untyped
+
+      def valid?: (untyped message) -> untyped
+
+      def receive: (untyped message) -> untyped
+
+      def buffer: (untyped message) -> untyped
+
+      def receive_buffered_messages: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    class StreamEventLoop
+      def initialize: () -> void
+
+      def timer: (untyped interval) { (?) -> untyped } -> untyped
+
+      def post: (?untyped? task) { (?) -> untyped } -> untyped
+
+      def attach: (untyped io, untyped stream) -> untyped
+
+      def detach: (untyped io, untyped stream) -> untyped
+
+      def writes_pending: (untyped io) -> untyped
+
+      def stop: () -> untyped
+
+      private
+
+      def spawn: () -> (nil | true | untyped)
+
+      def wakeup: () -> untyped
+
+      def run: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # -
+    # This class is heavily based on faye-websocket-ruby
+    #
+    # Copyright (c) 2010-2015 James Coglan
+    class Stream
+      def initialize: (untyped event_loop, untyped socket) -> void
+
+      def each: () { (?) -> untyped } -> untyped
+
+      def close: () -> untyped
+
+      def shutdown: () -> untyped
+
+      def write: (untyped data) -> untyped
+
+      def flush_write_buffer: () -> untyped
+
+      def receive: (untyped data) -> untyped
+
+      def hijack_rack_socket: () -> (nil | untyped)
+
+      private
+
+      def clean_rack_hijack: () -> (nil | untyped)
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # # Action Cable Connection Subscriptions
+    #
+    # Collection class for all the channel subscriptions established on a given
+    # connection. Responsible for routing incoming commands that arrive on the
+    # connection to the proper channel.
+    class Subscriptions
+      def logger: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      def initialize: (untyped connection) -> void
+
+      def execute_command: (untyped data) -> untyped
+
+      def add: (untyped data) -> (nil | untyped)
+
+      def remove: (untyped data) -> untyped
+
+      def remove_subscription: (untyped subscription) -> untyped
+
+      def perform_action: (untyped data) -> untyped
+
+      def identifiers: () -> untyped
+
+      def unsubscribe_from_all: () -> untyped
+
+      private
+
+      attr_reader connection: untyped
+
+      attr_reader subscriptions: untyped
+
+      def find: (untyped data) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # # Action Cable Connection TaggedLoggerProxy
+    #
+    # Allows the use of per-connection tags against the server logger. This wouldn't
+    # work using the traditional ActiveSupport::TaggedLogging enhanced Rails.logger,
+    # as that logger will reset the tags between requests. The connection is
+    # long-lived, so it needs its own set of tags for its independent duration.
+    class TaggedLoggerProxy
+      attr_reader tags: untyped
+
+      def initialize: (untyped logger, tags: untyped) -> void
+
+      def add_tags: (*untyped tags) -> untyped
+
+      def tag: (untyped logger) { () -> untyped } -> untyped
+
+      private
+
+      def log: (untyped type, untyped message) { (?) -> untyped } -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    class NonInferrableConnectionError < ::StandardError
+      def initialize: (untyped name) -> void
+    end
+
+    module Assertions
+      # Asserts that the connection is rejected (via
+      # `reject_unauthorized_connection`).
+      #
+      #     # Asserts that connection without user_id fails
+      #     assert_reject_connection { connect params: { user_id: '' } }
+      def assert_reject_connection: () { (?) -> untyped } -> untyped
+    end
+
+    class TestCookies < ::ActiveSupport::HashWithIndifferentAccess[untyped, untyped]
+      def []=: (untyped name, untyped options) -> untyped
+    end
+
+    # We don't want to use the whole "encryption stack" for connection unit-tests,
+    # but we want to make sure that users test against the correct types of cookies
+    # (i.e. signed or encrypted or plain)
+    class TestCookieJar < ::ActionCable::Connection::TestCookies
+      def signed: () -> untyped
+
+      def encrypted: () -> untyped
+    end
+
+    class TestRequest < ::ActionDispatch::TestRequest
+      attr_accessor session: untyped
+
+      attr_accessor cookie_jar: untyped
+    end
+
+    module TestConnection
+      attr_reader logger: untyped
+
+      attr_reader request: untyped
+
+      def initialize: (untyped request) -> void
+    end
+
+    # # Action Cable Connection TestCase
+    #
+    # Unit test Action Cable connections.
+    #
+    # Useful to check whether a connection's `identified_by` gets assigned properly
+    # and that any improper connection requests are rejected.
+    #
+    # ## Basic example
+    #
+    # Unit tests are written by first simulating a connection attempt by calling
+    # `connect` and then asserting state, e.g. identifiers, have been assigned.
+    #
+    #     class ApplicationCable::ConnectionTest < ActionCable::Connection::TestCase
+    #       def test_connects_with_proper_cookie
+    #         # Simulate the connection request with a cookie.
+    #         cookies["user_id"] = users(:john).id
+    #
+    #         connect
+    #
+    #         # Assert the connection identifier matches the fixture.
+    #         assert_equal users(:john).id, connection.user.id
+    #       end
+    #
+    #       def test_rejects_connection_without_proper_cookie
+    #         assert_reject_connection { connect }
+    #       end
+    #     end
+    #
+    # `connect` accepts additional information about the HTTP request with the
+    # `params`, `headers`, `session`, and Rack `env` options.
+    #
+    #     def test_connect_with_headers_and_query_string
+    #       connect params: { user_id: 1 }, headers: { "X-API-TOKEN" => "secret-my" }
+    #
+    #       assert_equal "1", connection.user.id
+    #       assert_equal "secret-my", connection.token
+    #     end
+    #
+    #     def test_connect_with_params
+    #       connect params: { user_id: 1 }
+    #
+    #       assert_equal "1", connection.user.id
+    #     end
+    #
+    # You can also set up the correct cookies before the connection request:
+    #
+    #     def test_connect_with_cookies
+    #       # Plain cookies:
+    #       cookies["user_id"] = 1
+    #
+    #       # Or signed/encrypted:
+    #       # cookies.signed["user_id"] = 1
+    #       # cookies.encrypted["user_id"] = 1
+    #
+    #       connect
+    #
+    #       assert_equal "1", connection.user_id
+    #     end
+    #
+    # ## Connection is automatically inferred
+    #
+    # ActionCable::Connection::TestCase will automatically infer the connection
+    # under test from the test class name. If the connection cannot be inferred from
+    # the test class name, you can explicitly set it with `tests`.
+    #
+    #     class ConnectionTest < ActionCable::Connection::TestCase
+    #       tests ApplicationCable::Connection
+    #     end
+    #
+    class TestCase < ::ActiveSupport::TestCase
+      module Behavior
+        def _connection_class: () -> untyped
+
+        def _connection_class?: () -> bool
+
+        def _connection_class=: (untyped value) -> untyped
+
+        extend ::ActiveSupport::Concern
+
+        DEFAULT_PATH: "/cable"
+
+        include ::ActiveSupport::Testing::ConstantLookup
+
+        include ::ActionCable::Connection::Assertions
+
+        module ClassMethods
+          def _connection_class: () -> untyped
+
+          def _connection_class=: (untyped value) -> untyped
+
+          def _connection_class?: () -> bool
+
+          def tests: (untyped connection) -> untyped
+
+          def connection_class: () -> untyped
+
+          def determine_default_connection: (untyped name) -> untyped
+        end
+
+        # Performs connection attempt to exert #connect on the connection under test.
+        #
+        # Accepts request path as the first argument and the following request options:
+        #
+        # *   params – URL parameters (Hash)
+        # *   headers – request headers (Hash)
+        # *   session – session data (Hash)
+        # *   env – additional Rack env configuration (Hash)
+        def connect: (?untyped path, **untyped request_params) -> untyped
+
+        # Exert #disconnect on the connection under test.
+        def disconnect: () -> untyped
+
+        def cookies: () -> untyped
+
+        private
+
+        def build_test_request: (untyped path, ?params: untyped?, ?headers: ::Hash[untyped, untyped], ?session: ::Hash[untyped, untyped], ?env: ::Hash[untyped, untyped]) -> untyped
+      end
+
+      include ::ActionCable::Connection::TestCase::Behavior
+    end
+  end
+end
+
+module ActionCable
+  module Connection
+    # # Action Cable Connection WebSocket
+    #
+    # Wrap the real socket to minimize the externally-presented API
+    class WebSocket
+      def initialize: (untyped env, untyped event_target, untyped event_loop, ?protocols: untyped) -> void
+
+      def possible?: () -> untyped
+
+      def alive?: () -> untyped
+
+      def transmit: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+      def close: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
+
+      def protocol: () -> untyped
+
+      def rack_response: () -> untyped
+
+      private
+
+      attr_reader websocket: untyped
+    end
+  end
+end
+
+module ActionCable
+  def self.deprecator: () -> untyped
+end
+
+module ActionCable
+  class Engine < ::Rails::Engine
+  end
+end
+
+module ActionCable
+  # Returns the currently loaded version of Action Cable as a `Gem::Version`.
+  def self.gem_version: () -> untyped
+
+  module VERSION
+    MAJOR: 8
+
+    MINOR: 1
+
+    TINY: 4
+
+    PRE: nil
+
+    STRING: untyped
+  end
+end
+
+module ActionCable
+  module Helpers
+    module ActionCableHelper
+      # Returns an "action-cable-url" meta tag with the value of the URL specified in
+      # your configuration. Ensure this is above your JavaScript tag:
+      #
+      #     <head>
+      #       <%= action_cable_meta_tag %>
+      #       <%= javascript_include_tag 'application', 'data-turbo-track' => 'reload' %>
+      #     </head>
+      #
+      # This is then used by Action Cable to determine the URL of your WebSocket
+      # server. Your JavaScript can then connect to the server without needing to
+      # specify the URL directly:
+      #
+      #     import Cable from "@rails/actioncable"
+      #     window.Cable = Cable
+      #     window.App = {}
+      #     App.cable = Cable.createConsumer()
+      #
+      # Make sure to specify the correct server location in each of your environment
+      # config files:
+      #
+      #     config.action_cable.mount_path = "/cable123"
+      #     <%= action_cable_meta_tag %> would render:
+      #     => <meta name="action-cable-url" content="/cable123" />
+      #
+      #     config.action_cable.url = "ws://actioncable.com"
+      #     <%= action_cable_meta_tag %> would render:
+      #     => <meta name="action-cable-url" content="ws://actioncable.com" />
+      #
+      def action_cable_meta_tag: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  # # Action Cable Remote Connections
+  #
+  # If you need to disconnect a given connection, you can go through the
+  # RemoteConnections. You can find the connections you're looking for by
+  # searching for the identifier declared on the connection. For example:
+  #
+  #     module ApplicationCable
+  #       class Connection < ActionCable::Connection::Base
+  #         identified_by :current_user
+  #         ....
+  #       end
+  #     end
+  #
+  #     ActionCable.server.remote_connections.where(current_user: User.find(1)).disconnect
+  #
+  # This will disconnect all the connections established for `User.find(1)`,
+  # across all servers running on all machines, because it uses the internal
+  # channel that all of these servers are subscribed to.
+  #
+  # By default, server sends a "disconnect" message with "reconnect" flag set to
+  # true. You can override it by specifying the `reconnect` option:
+  #
+  #     ActionCable.server.remote_connections.where(current_user: User.find(1)).disconnect(reconnect: false)
+  class RemoteConnections
+    attr_reader server: untyped
+
+    def initialize: (untyped server) -> void
+
+    def where: (untyped identifier) -> untyped
+
+    # # Action Cable Remote Connection
+    #
+    # Represents a single remote connection found via
+    # `ActionCable.server.remote_connections.where(*)`. Exists solely for the
+    # purpose of calling #disconnect on that connection.
+    class RemoteConnection
+      class InvalidIdentifiersError < ::StandardError
+      end
+
+      include ::ActionCable::Connection::Identification
+
+      include ::ActionCable::Connection::InternalChannel
+
+      def initialize: (untyped server, untyped ids) -> void
+
+      # Uses the internal channel to disconnect the connection.
+      def disconnect: (?reconnect: bool) -> untyped
+
+      attr_reader server: untyped
+
+      private
+
+      def set_identifier_instance_vars: (untyped ids) -> untyped
+
+      def valid_identifiers?: (untyped ids) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Server
+    # # Action Cable Server Base
+    #
+    # A singleton ActionCable::Server instance is available via ActionCable.server.
+    # It's used by the Rack process that starts the Action Cable server, but is also
+    # used by the user to reach the RemoteConnections object, which is used for
+    # finding and disconnecting connections across all servers.
+    #
+    # Also, this is the server instance used for broadcasting. See Broadcasting for
+    # more information.
+    class Base
+      def self.config: () -> untyped
+      def self.config=: (untyped value) -> untyped
+      def logger: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+      include ::ActionCable::Server::Broadcasting
+
+      include ::ActionCable::Server::Connections
+
+      attr_reader config: untyped
+
+      def self.logger: () -> untyped
+
+      attr_reader mutex: untyped
+
+      def initialize: (?config: untyped) -> void
+
+      # Called by Rack to set up the server.
+      def call: (untyped env) -> untyped
+
+      # Disconnect all the connections identified by `identifiers` on this server or
+      # any others via RemoteConnections.
+      def disconnect: (untyped identifiers) -> untyped
+
+      def restart: () -> untyped
+
+      # Gateway to RemoteConnections. See that class for details.
+      def remote_connections: () -> untyped
+
+      def event_loop: () -> untyped
+
+      # The worker pool is where we run connection callbacks and channel actions. We
+      # do as little as possible on the server's main thread. The worker pool is an
+      # executor service that's backed by a pool of threads working from a task queue.
+      # The thread pool size maxes out at 4 worker threads by default. Tune the size
+      # yourself with `config.action_cable.worker_pool_size`.
+      #
+      # Using Active Record, Redis, etc within your channel actions means you'll get a
+      # separate connection from each thread in the worker pool. Plan your deployment
+      # accordingly: 5 servers each running 5 Puma workers each running an 8-thread
+      # worker pool means at least 200 database connections.
+      #
+      # Also, ensure that your database connection pool size is as least as large as
+      # your worker pool size. Otherwise, workers may oversubscribe the database
+      # connection pool and block while they wait for other workers to release their
+      # connections. Use a smaller worker pool or a larger database connection pool
+      # instead.
+      def worker_pool: () -> untyped
+
+      # Adapter used for all streams/broadcasting.
+      def pubsub: () -> untyped
+
+      # All of the identifiers applied to the connection class associated with this
+      # server.
+      def connection_identifiers: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Server
+    # # Action Cable Server Broadcasting
+    #
+    # Broadcasting is how other parts of your application can send messages to a
+    # channel's subscribers. As explained in Channel, most of the time, these
+    # broadcastings are streamed directly to the clients subscribed to the named
+    # broadcasting. Let's explain with a full-stack example:
+    #
+    #     class WebNotificationsChannel < ApplicationCable::Channel
+    #       def subscribed
+    #         stream_from "web_notifications_#{current_user.id}"
+    #       end
+    #     end
+    #
+    #     # Somewhere in your app this is called, perhaps from a NewCommentJob:
+    #     ActionCable.server.broadcast \
+    #       "web_notifications_1", { title: "New things!", body: "All that's fit for print" }
+    #
+    #     # Client-side JavaScript, which assumes you've already requested the right to send web notifications:
+    #     App.cable.subscriptions.create("WebNotificationsChannel", {
+    #       received: function(data) {
+    #         new Notification(data['title'], { body: data['body'] })
+    #       }
+    #     })
+    module Broadcasting
+      # Broadcast a hash directly to a named `broadcasting`. This will later be JSON
+      # encoded.
+      def broadcast: (untyped broadcasting, untyped message, ?coder: untyped) -> untyped
+
+      # Returns a broadcaster for a named `broadcasting` that can be reused. Useful
+      # when you have an object that may need multiple spots to transmit to a specific
+      # broadcasting over and over.
+      def broadcaster_for: (untyped broadcasting, ?coder: untyped) -> untyped
+
+      class Broadcaster
+        attr_reader server: untyped
+
+        attr_reader broadcasting: untyped
+
+        attr_reader coder: untyped
+
+        def initialize: (untyped server, untyped broadcasting, coder: untyped) -> void
+
+        def broadcast: (untyped message) -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module Server
+    # # Action Cable Server Configuration
+    #
+    # An instance of this configuration object is available via
+    # ActionCable.server.config, which allows you to tweak Action Cable
+    # configuration in a Rails config initializer.
+    class Configuration
+      attr_accessor logger: untyped
+
+      attr_accessor log_tags: untyped
+
+      attr_accessor connection_class: untyped
+
+      attr_accessor worker_pool_size: untyped
+
+      attr_accessor disable_request_forgery_protection: untyped
+
+      attr_accessor allowed_request_origins: untyped
+
+      attr_accessor allow_same_origin_as_host: untyped
+
+      attr_accessor filter_parameters: untyped
+
+      attr_accessor cable: untyped
+
+      attr_accessor url: untyped
+
+      attr_accessor mount_path: untyped
+
+      attr_accessor precompile_assets: untyped
+
+      attr_accessor health_check_path: untyped
+
+      attr_accessor health_check_application: untyped
+
+      def initialize: () -> void
+
+      # Returns constant of subscription adapter specified in config/cable.yml. If the
+      # adapter cannot be found, this will default to the Redis adapter. Also makes
+      # sure proper dependencies are required.
+      def pubsub_adapter: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Server
+    # # Action Cable Server Connections
+    #
+    # Collection class for all the connections that have been established on this
+    # specific server. Remember, usually you'll run many Action Cable servers, so
+    # you can't use this collection as a full list of all of the connections
+    # established against your application. Instead, use RemoteConnections for that.
+    module Connections
+      BEAT_INTERVAL: 3
+
+      def connections: () -> untyped
+
+      def add_connection: (untyped connection) -> untyped
+
+      def remove_connection: (untyped connection) -> untyped
+
+      # WebSocket connection implementations differ on when they'll mark a connection
+      # as stale. We basically never want a connection to go stale, as you then can't
+      # rely on being able to communicate with the connection. To solve this, a 3
+      # second heartbeat runs on all connections. If the beat fails, we automatically
+      # disconnect.
+      def setup_heartbeat_timer: () -> untyped
+
+      def open_connections_statistics: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Server
+    # Worker used by Server.send_async to do connection work in threads.
+    class Worker
+      def self.connection: () -> untyped
+      def self.connection=: (untyped value) -> untyped
+      def connection: () -> untyped
+      def connection=: (untyped value) -> untyped
+
+      include ::ActiveSupport::Callbacks
+
+      include ::ActionCable::Server::Worker::ActiveRecordConnectionManagement
+
+      attr_reader executor: untyped
+
+      def initialize: (?max_size: ::Integer) -> void
+
+      # Stop processing work: any work that has not already started running will be
+      # discarded from the queue
+      def halt: () -> untyped
+
+      def stopping?: () -> untyped
+
+      def work: (untyped connection) { (?) -> untyped } -> untyped
+
+      def async_exec: (untyped receiver, *untyped args, connection: untyped) { (?) -> untyped } -> untyped
+
+      def async_invoke: (untyped receiver, untyped method, *untyped args, ?connection: untyped) { (?) -> untyped } -> untyped
+
+      def invoke: (untyped receiver, untyped method, *untyped args, connection: untyped) { (?) -> untyped } -> untyped
+
+      private
+
+      def logger: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module Server
+    class Worker
+      module ActiveRecordConnectionManagement
+        extend ::ActiveSupport::Concern
+
+        def with_database_connections: () { (?) -> untyped } -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    class Async < ::ActionCable::SubscriptionAdapter::Inline
+      private
+
+      def new_subscriber_map: () -> untyped
+
+      class AsyncSubscriberMap < ::ActionCable::SubscriptionAdapter::SubscriberMap
+        def initialize: (untyped event_loop) -> void
+
+        def add_subscriber: (*untyped) -> untyped
+
+        def invoke_callback: (*untyped) -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    class Base
+      attr_reader logger: untyped
+
+      attr_reader server: untyped
+
+      def initialize: (untyped server) -> void
+
+      def broadcast: (untyped channel, untyped payload) -> untyped
+
+      def subscribe: (untyped channel, untyped message_callback, ?untyped? success_callback) -> untyped
+
+      def unsubscribe: (untyped channel, untyped message_callback) -> untyped
+
+      def shutdown: () -> untyped
+
+      def identifier: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    module ChannelPrefix
+      def broadcast: (untyped channel, untyped payload) -> untyped
+
+      def subscribe: (untyped channel, untyped callback, ?untyped? success_callback) -> untyped
+
+      def unsubscribe: (untyped channel, untyped callback) -> untyped
+
+      private
+
+      # Returns the channel name, including channel_prefix specified in cable.yml
+      def channel_with_prefix: (untyped channel) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    class Inline < ::ActionCable::SubscriptionAdapter::Base
+      def initialize: (*untyped) -> void
+
+      def broadcast: (untyped channel, untyped payload) -> untyped
+
+      def subscribe: (untyped channel, untyped callback, ?untyped? success_callback) -> untyped
+
+      def unsubscribe: (untyped channel, untyped callback) -> untyped
+
+      def shutdown: () -> nil
+
+      private
+
+      def subscriber_map: () -> untyped
+
+      def new_subscriber_map: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    class PostgreSQL < ::ActionCable::SubscriptionAdapter::Base
+      prepend ::ActionCable::SubscriptionAdapter::ChannelPrefix
+
+      def initialize: (*untyped) -> void
+
+      def broadcast: (untyped channel, untyped payload) -> untyped
+
+      def subscribe: (untyped channel, untyped callback, ?untyped? success_callback) -> untyped
+
+      def unsubscribe: (untyped channel, untyped callback) -> untyped
+
+      def shutdown: () -> untyped
+
+      def with_subscriptions_connection: () { (untyped) -> untyped } -> untyped
+
+      def with_broadcast_connection: () { (untyped) -> untyped } -> untyped
+
+      private
+
+      def channel_identifier: (untyped channel) -> untyped
+
+      def listener: () -> untyped
+
+      def verify!: (untyped pg_conn) -> (untyped | nil)
+
+      class Listener < ::ActionCable::SubscriptionAdapter::SubscriberMap
+        def initialize: (untyped adapter, untyped event_loop) -> void
+
+        def listen: () -> untyped
+
+        def shutdown: () -> untyped
+
+        def add_channel: (untyped channel, untyped on_success) -> untyped
+
+        def remove_channel: (untyped channel) -> untyped
+
+        def invoke_callback: (*untyped) -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    class Redis < ::ActionCable::SubscriptionAdapter::Base
+      def self.redis_connector: () -> untyped
+      def self.redis_connector=: (untyped value) -> untyped
+      def redis_connector: () -> untyped
+      def redis_connector=: (untyped value) -> untyped
+
+      prepend ::ActionCable::SubscriptionAdapter::ChannelPrefix
+
+      def initialize: (*untyped) -> void
+
+      def broadcast: (untyped channel, untyped payload) -> untyped
+
+      def subscribe: (untyped channel, untyped callback, ?untyped? success_callback) -> untyped
+
+      def unsubscribe: (untyped channel, untyped callback) -> untyped
+
+      def shutdown: () -> (untyped | nil)
+
+      def redis_connection_for_subscriptions: () -> untyped
+
+      private
+
+      def listener: () -> untyped
+
+      def redis_connection_for_broadcasts: () -> untyped
+
+      def redis_connection: () -> untyped
+
+      def config_options: () -> untyped
+
+      class Listener < ::ActionCable::SubscriptionAdapter::SubscriberMap
+        def initialize: (untyped adapter, untyped config_options, untyped event_loop) -> void
+
+        def listen: (untyped conn) -> untyped
+
+        def shutdown: () -> (nil | untyped)
+
+        def add_channel: (untyped channel, untyped on_success) -> untyped
+
+        def remove_channel: (untyped channel) -> untyped
+
+        def invoke_callback: (*untyped) -> untyped
+
+        private
+
+        def ensure_listener_running: () -> untyped
+
+        def when_connected: () { (?) -> untyped } -> untyped
+
+        def retry_connecting?: () -> bool
+
+        def resubscribe: () -> untyped
+
+        def reset: () -> untyped
+
+        CONNECTION_ERRORS: ::Array[untyped]
+
+        class SubscribedClient
+          def initialize: (untyped raw_client) -> void
+
+          def subscribe: (*untyped channel) -> untyped
+
+          def unsubscribe: (*untyped channel) -> untyped
+
+          private
+
+          def send_command: (*untyped command) -> nil
+        end
+
+        def extract_subscribed_client: (untyped conn) -> untyped
+      end
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    class SubscriberMap
+      def initialize: () -> void
+
+      def add_subscriber: (untyped channel, untyped subscriber, untyped on_success) -> untyped
+
+      def remove_subscriber: (untyped channel, untyped subscriber) -> untyped
+
+      def broadcast: (untyped channel, untyped message) -> (nil | untyped)
+
+      def add_channel: (untyped channel, untyped on_success) -> (untyped | nil)
+
+      def remove_channel: (untyped channel) -> nil
+
+      def invoke_callback: (untyped callback, untyped message) -> untyped
+    end
+  end
+end
+
+module ActionCable
+  module SubscriptionAdapter
+    # ## Test adapter for Action Cable
+    #
+    # The test adapter should be used only in testing. Along with
+    # ActionCable::TestHelper it makes a great tool to test your Rails application.
+    #
+    # To use the test adapter set `adapter` value to `test` in your
+    # `config/cable.yml` file.
+    #
+    # NOTE: `Test` adapter extends the `ActionCable::SubscriptionAdapter::Async`
+    # adapter, so it could be used in system tests too.
+    class Test < ::ActionCable::SubscriptionAdapter::Async
+      def broadcast: (untyped channel, untyped payload) -> untyped
+
+      def broadcasts: (untyped channel) -> untyped
+
+      def clear_messages: (untyped channel) -> untyped
+
+      def clear: () -> untyped
+
+      private
+
+      def channels_data: () -> untyped
+    end
+  end
+end
+
+module ActionCable
+  class TestCase < ::ActiveSupport::TestCase
+    include ::ActionCable::TestHelper
+  end
+end
+
+module ActionCable
+  # Provides helper methods for testing Action Cable broadcasting
+  module TestHelper
+    def broadcasts: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def clear_messages: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def before_setup: () -> untyped
+
+    def after_teardown: () -> untyped
+
+    # Asserts that the number of broadcasted messages to the stream matches the
+    # given number.
+    #
+    #     def test_broadcasts
+    #       assert_broadcasts 'messages', 0
+    #       ActionCable.server.broadcast 'messages', { text: 'hello' }
+    #       assert_broadcasts 'messages', 1
+    #       ActionCable.server.broadcast 'messages', { text: 'world' }
+    #       assert_broadcasts 'messages', 2
+    #     end
+    #
+    # If a block is passed, that block should cause the specified number of messages
+    # to be broadcasted.
+    #
+    #     def test_broadcasts_again
+    #       assert_broadcasts('messages', 1) do
+    #         ActionCable.server.broadcast 'messages', { text: 'hello' }
+    #       end
+    #
+    #       assert_broadcasts('messages', 2) do
+    #         ActionCable.server.broadcast 'messages', { text: 'hi' }
+    #         ActionCable.server.broadcast 'messages', { text: 'how are you?' }
+    #       end
+    #     end
+    #
+    def assert_broadcasts: (untyped stream, untyped number) ?{ (?) -> untyped } -> untyped
+
+    # Asserts that no messages have been sent to the stream.
+    #
+    #     def test_no_broadcasts
+    #       assert_no_broadcasts 'messages'
+    #       ActionCable.server.broadcast 'messages', { text: 'hi' }
+    #       assert_broadcasts 'messages', 1
+    #     end
+    #
+    # If a block is passed, that block should not cause any message to be sent.
+    #
+    #     def test_broadcasts_again
+    #       assert_no_broadcasts 'messages' do
+    #         # No job messages should be sent from this block
+    #       end
+    #     end
+    #
+    # Note: This assertion is simply a shortcut for:
+    #
+    #     assert_broadcasts 'messages', 0, &block
+    #
+    def assert_no_broadcasts: (untyped stream) { (?) -> untyped } -> untyped
+
+    # Returns the messages that are broadcasted in the block.
+    #
+    #     def test_broadcasts
+    #       messages = capture_broadcasts('messages') do
+    #         ActionCable.server.broadcast 'messages', { text: 'hi' }
+    #         ActionCable.server.broadcast 'messages', { text: 'how are you?' }
+    #       end
+    #       assert_equal 2, messages.length
+    #       assert_equal({ text: 'hi' }, messages.first)
+    #       assert_equal({ text: 'how are you?' }, messages.last)
+    #     end
+    #
+    def capture_broadcasts: (untyped stream) { (?) -> untyped } -> untyped
+
+    # Asserts that the specified message has been sent to the stream.
+    #
+    #     def test_assert_transmitted_message
+    #       ActionCable.server.broadcast 'messages', text: 'hello'
+    #       assert_broadcast_on('messages', text: 'hello')
+    #     end
+    #
+    # If a block is passed, that block should cause a message with the specified
+    # data to be sent.
+    #
+    #     def test_assert_broadcast_on_again
+    #       assert_broadcast_on('messages', text: 'hello') do
+    #         ActionCable.server.broadcast 'messages', text: 'hello'
+    #       end
+    #     end
+    #
+    def assert_broadcast_on: (untyped stream, untyped data) ?{ (?) -> untyped } -> untyped
+
+    def pubsub_adapter: () -> untyped
+
+    private
+
+    def new_broadcasts_from: (untyped current_messages, untyped stream, untyped assertion) { (?) -> untyped } -> untyped
+  end
+end
+
+module ActionCable
+  # Returns the currently loaded version of Action Cable as a `Gem::Version`.
+  def self.version: () -> untyped
+end
