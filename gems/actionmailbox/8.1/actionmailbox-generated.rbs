@@ -894,7 +894,7 @@ module ActionMailbox
     #       part.body "<h1>Please join us for a party at Bag End</h1>"
     #     end
     #   end
-    def create_inbound_email_from_mail: (?status: ::Symbol, **untyped mail_options) { (?) -> untyped } -> untyped
+    def create_inbound_email_from_mail: (?status: ::Symbol, **untyped mail_options) ?{ (?) -> untyped } -> untyped
 
     # Create an InboundEmail using the raw rfc822 +source+ as text.
     def create_inbound_email_from_source: (untyped source, ?status: ::Symbol) -> untyped
@@ -905,7 +905,7 @@ module ActionMailbox
 
     # Create an InboundEmail using the same options or block as
     # create_inbound_email_from_mail, then immediately route it for processing.
-    def receive_inbound_email_from_mail: (**untyped kwargs) { (?) -> untyped } -> untyped
+    def receive_inbound_email_from_mail: (**untyped kwargs) ?{ (?) -> untyped } -> untyped
 
     # Create an InboundEmail using the same arguments as create_inbound_email_from_source and immediately route it
     # to processing.
@@ -935,11 +935,11 @@ end
 module ActionMailbox
   module Callbacks
     module ClassMethods
-      def before_processing: (*untyped methods) { (?) -> untyped } -> untyped
+      def before_processing: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
-      def after_processing: (*untyped methods) { (?) -> untyped } -> untyped
+      def after_processing: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
-      def around_processing: (*untyped methods) { (?) -> untyped } -> untyped
+      def around_processing: (*untyped methods) ?{ (?) -> untyped } -> untyped
     end
   end
 end

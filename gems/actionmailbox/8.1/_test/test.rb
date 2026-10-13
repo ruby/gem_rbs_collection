@@ -4,10 +4,17 @@
 require "actionmailbox"
 
 class ForwardsMailbox < ActionMailbox::Base
+  before_processing :require_sender
+
   def process
     mail.subject
     inbound_email.message_id.size
     bounced! unless inbound_email.processed?
+  end
+
+  private
+
+  def require_sender
   end
 end
 
@@ -26,3 +33,10 @@ inbound_email.processing! if inbound_email.pending?
 inbound_email.mail.subject
 inbound_email.source.size
 inbound_email.processed? || ForwardsMailbox.receive(inbound_email)
+
+class ForwardsMailboxTest < ActionMailbox::TestCase
+  def test_receive
+    receive_inbound_email_from_mail(to: "save@example.com", subject: "Hello")
+    create_inbound_email_from_mail(to: "save@example.com")
+  end
+end
