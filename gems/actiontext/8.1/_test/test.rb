@@ -11,3 +11,9 @@ end
 ActionView::Helpers::FormBuilder.new(:article, Article.new, ActionView::Base.empty, {}).rich_textarea(:content, class: "editor")
 ActionText::Content.render(partial: "action_text/contents/content")
 ActionText::Attachment.fragment_by_minifying_attachments("<p>text</p>")
+
+rich_text = ActionText::RichText.new
+rich_text.name.to_sym
+rich_text.body&.to_html
+rich_text.embeds.attached?
+rich_text.updated_at.to_date

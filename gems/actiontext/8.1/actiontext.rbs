@@ -14,3 +14,20 @@ module ActiveRecord
     extend ActionText::Attribute::ClassMethods
   end
 end
+
+module ActionText
+  class RichText
+    # Columns and associations, which rbs prototype doesn't see
+    attr_accessor name: String
+
+    attr_accessor body: ActionText::Content?
+
+    def record: () -> untyped
+
+    def embeds: () -> ActiveStorage::Attached::Many
+
+    def created_at: () -> ActiveSupport::TimeWithZone
+
+    def updated_at: () -> ActiveSupport::TimeWithZone
+  end
+end
