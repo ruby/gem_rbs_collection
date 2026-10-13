@@ -37,3 +37,29 @@ module ActionMailbox
     def bounced!: () -> void
   end
 end
+
+# Return types of commonly used methods
+module ActionMailbox
+  class Base
+    attr_reader inbound_email: ActionMailbox::InboundEmail
+
+    # Delegated to inbound_email
+    def mail: () -> Mail::Message
+
+    def delivered!: () -> void
+
+    def bounced!: () -> void
+
+    def self.receive: (ActionMailbox::InboundEmail inbound_email) -> untyped
+
+    def initialize: (ActionMailbox::InboundEmail inbound_email) -> void
+  end
+
+  class InboundEmail
+    def mail: () -> Mail::Message
+
+    def source: () -> String
+
+    def processed?: () -> bool
+  end
+end

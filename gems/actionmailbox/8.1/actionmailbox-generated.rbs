@@ -492,12 +492,6 @@ module ActionMailbox
 
     include ::ActionMailbox::InboundEmail::Routable
 
-    def mail: () -> untyped
-
-    def source: () -> untyped
-
-    def processed?: () -> untyped
-
     def instrumentation_payload: () -> { id: untyped, message_id: untyped, status: untyped }
   end
 end
@@ -634,9 +628,6 @@ module ActionMailbox
 
     extend ::ActiveSupport::Rescuable::ClassMethods
 
-    def mail: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
-    def delivered!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
-    def bounced!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def logger: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
 
     include ::ActiveSupport::Rescuable
@@ -644,12 +635,6 @@ module ActionMailbox
     include ::ActionMailbox::Callbacks
 
     include ::ActionMailbox::Routing
-
-    attr_reader inbound_email: untyped
-
-    def self.receive: (untyped inbound_email) -> untyped
-
-    def initialize: (untyped inbound_email) -> void
 
     def perform_processing: () -> untyped
 

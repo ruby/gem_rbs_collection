@@ -5,6 +5,9 @@ require "actionmailbox"
 
 class ForwardsMailbox < ActionMailbox::Base
   def process
+    mail.subject
+    inbound_email.message_id.size
+    bounced! unless inbound_email.processed?
   end
 end
 
@@ -20,3 +23,6 @@ inbound_email.created_at.to_date
 inbound_email.raw_email.attached?
 inbound_email.delivered! unless inbound_email.bounced? || inbound_email.failed?
 inbound_email.processing! if inbound_email.pending?
+inbound_email.mail.subject
+inbound_email.source.size
+inbound_email.processed? || ForwardsMailbox.receive(inbound_email)
