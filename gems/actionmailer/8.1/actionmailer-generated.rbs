@@ -726,14 +726,14 @@ module ActionMailer
     module ClassMethods
       # Defines a callback that will get called right before the
       # message is sent to the delivery method.
-      def before_deliver: (*untyped filters) { (?) -> untyped } -> untyped
+      def before_deliver: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called right after the
       # message's delivery method is finished.
-      def after_deliver: (*untyped filters) { (?) -> untyped } -> untyped
+      def after_deliver: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called around the message's deliver method.
-      def around_deliver: (*untyped filters) { (?) -> untyped } -> untyped
+      def around_deliver: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       def internal_methods: () -> untyped
     end
@@ -746,9 +746,9 @@ module ActionMailer
 
     attr_reader responses: untyped
 
-    def initialize: (untyped context) { (?) -> untyped } -> void
+    def initialize: (untyped context) ?{ (?) -> untyped } -> void
 
-    def any: (*untyped args) { (?) -> untyped } -> untyped
+    def any: (*untyped args) ?{ (?) -> untyped } -> untyped
 
     alias all any
 
@@ -1440,7 +1440,7 @@ module ActionMailer
     # Note: This assertion is simply a shortcut for:
     #
     #   assert_emails 0, &block
-    def assert_no_emails: () { (?) -> untyped } -> untyped
+    def assert_no_emails: () ?{ (?) -> untyped } -> untyped
 
     # Asserts that the number of emails enqueued for later delivery matches
     # the given number.
@@ -1466,7 +1466,7 @@ module ActionMailer
     #       ContactMailer.welcome.deliver_later
     #     end
     #   end
-    def assert_enqueued_emails: (untyped number) { (?) -> untyped } -> untyped
+    def assert_enqueued_emails: (untyped number) ?{ (?) -> untyped } -> untyped
 
     # Asserts that a specific email has been enqueued, optionally
     # matching arguments and/or params.
@@ -1521,7 +1521,7 @@ module ActionMailer
     #       ContactMailer.welcome.deliver_later
     #     end
     #   end
-    def assert_enqueued_email_with: (untyped mailer, untyped method, ?params: untyped?, ?args: untyped?, ?queue: untyped?) { (?) -> untyped } -> untyped
+    def assert_enqueued_email_with: (untyped mailer, untyped method, ?params: untyped?, ?args: untyped?, ?queue: untyped?) ?{ (?) -> untyped } -> untyped
 
     # Asserts that no emails are enqueued for later delivery.
     #
@@ -1538,7 +1538,7 @@ module ActionMailer
     #       # No emails should be enqueued from this block
     #     end
     #   end
-    def assert_no_enqueued_emails: () { (?) -> untyped } -> untyped
+    def assert_no_enqueued_emails: () ?{ (?) -> untyped } -> untyped
 
     # Delivers all enqueued emails. If a block is given, delivers all of the emails
     # that were enqueued throughout the duration of the block. If a block is
@@ -1576,7 +1576,7 @@ module ActionMailer
     #
     # If the +:at+ option is specified, then only delivers emails enqueued to deliver
     # immediately or before the given time.
-    def deliver_enqueued_emails: (?queue: untyped?, ?at: untyped?) { (?) -> untyped } -> untyped
+    def deliver_enqueued_emails: (?queue: untyped?, ?at: untyped?) ?{ (?) -> untyped } -> untyped
 
     # Returns any emails that are sent in the block.
     #

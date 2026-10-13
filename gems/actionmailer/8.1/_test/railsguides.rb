@@ -40,3 +40,14 @@ end
 
 delivery = RailsGuides::NotifierMailer.welcome("first user")
 delivery.deliver_now unless delivery.processed?
+
+class NotifierMailerTest < ActionMailer::TestCase
+  def test_welcome
+    assert_no_emails
+    assert_no_enqueued_emails
+    RailsGuides::NotifierMailer.welcome("first user").deliver_later
+    assert_enqueued_emails 1
+    assert_enqueued_email_with RailsGuides::NotifierMailer, :welcome, args: ["first user"]
+    deliver_enqueued_emails
+  end
+end
