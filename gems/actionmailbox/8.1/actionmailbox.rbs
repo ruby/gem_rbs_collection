@@ -1,0 +1,39 @@
+# Methods rbs prototype doesn't see, which aren't generated from the source
+module ActionMailbox
+  class InboundEmail
+    # Columns of action_mailbox_inbound_emails
+    attr_accessor status: String
+
+    attr_accessor message_id: String
+
+    attr_accessor message_checksum: String
+
+    def created_at: () -> ActiveSupport::TimeWithZone
+
+    def updated_at: () -> ActiveSupport::TimeWithZone
+
+    # has_one_attached :raw_email
+    def raw_email: () -> ActiveStorage::Attached::One
+
+    # enum :status, %i[ pending processing delivered failed bounced ]
+    def pending?: () -> bool
+
+    def pending!: () -> void
+
+    def processing?: () -> bool
+
+    def processing!: () -> void
+
+    def delivered?: () -> bool
+
+    def delivered!: () -> void
+
+    def failed?: () -> bool
+
+    def failed!: () -> void
+
+    def bounced?: () -> bool
+
+    def bounced!: () -> void
+  end
+end
