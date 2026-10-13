@@ -51,3 +51,106 @@ end
 class ActiveRecord::Generators::Base
   extend ::ActiveRecord::Generators::Migration::ClassMethods
 end
+
+module ActiveRecord::ConnectionAdapters::ColumnMethods
+  extend ::ActiveRecord::ConnectionAdapters::ColumnMethods::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::TableDefinition
+  extend ::ActiveRecord::ConnectionAdapters::ColumnMethods::ClassMethods
+end
+
+class ActiveRecord::ConnectionAdapters::Table
+  extend ::ActiveRecord::ConnectionAdapters::ColumnMethods::ClassMethods
+end
+
+module ActiveRecord::ConnectionAdapters::MySQL::ColumnMethods
+  extend ::ActiveRecord::ConnectionAdapters::ColumnMethods::ClassMethods
+end
+
+module ActiveRecord::ConnectionAdapters::PostgreSQL::ColumnMethods
+  extend ::ActiveRecord::ConnectionAdapters::ColumnMethods::ClassMethods
+end
+
+module ActiveRecord::Encryption
+  extend ::ActiveRecord::Encryption::Contexts::ClassMethods
+
+  extend ::ActiveRecord::Encryption::Configurable::ClassMethods
+end
+
+module ActiveRecord::ConnectionAdapters::ColumnMethods::ClassMethods
+  private
+
+  def define_column_methods: (*untyped column_types) -> untyped
+end
+
+module ActiveRecord::Encryption::Configurable::ClassMethods
+  def encrypted_attribute_declaration_listeners: () -> untyped
+
+  def encrypted_attribute_declaration_listeners=: (untyped value) -> untyped
+
+  def configure: (?primary_key: untyped?, ?deterministic_key: untyped?, ?key_derivation_salt: untyped?, **untyped properties) -> untyped
+
+  # Register callback to be invoked when an encrypted attribute is declared.
+  #
+  # === Example
+  #
+  #   ActiveRecord::Encryption.on_encrypted_attribute_declared do |klass, attribute_name|
+  #     ...
+  #   end
+  def on_encrypted_attribute_declared: () { (?) -> untyped } -> untyped
+
+  def encrypted_attribute_was_declared: (untyped klass, untyped name) -> untyped
+end
+
+module ActiveRecord::Encryption::Contexts::ClassMethods
+  def custom_contexts: () -> untyped
+
+  def custom_contexts=: (untyped value) -> untyped
+
+  def with_encryption_context: (untyped properties) { () -> untyped } -> untyped
+
+  # Runs the provided block in an encryption context where encryption is disabled:
+  #
+  # * Reading encrypted content will return its ciphertexts.
+  # * Writing encrypted content will write its clear text.
+  def without_encryption: () { (?) -> untyped } -> untyped
+
+  # Runs the provided block in an encryption context where:
+  #
+  # * Reading encrypted content will return its ciphertext.
+  # * Writing encrypted content will fail.
+  def protecting_encrypted_data: () { (?) -> untyped } -> untyped
+
+  def reset_default_context: () -> untyped
+end
+
+module ActiveRecord::Encryption::EncryptableRecord::ClassMethods
+  def encrypted_attributes: () -> untyped
+
+  def encrypted_attributes=: (untyped value) -> untyped
+
+  def encrypted_attributes?: () -> bool
+
+  private
+
+  def scheme_for: (?key_provider: untyped?, ?key: untyped?, ?deterministic: bool, ?support_unencrypted_data: untyped?, ?downcase: bool, ?ignore_case: bool, ?previous: untyped, **untyped context_properties) -> untyped
+
+  def global_previous_schemes_for: (untyped scheme) -> untyped
+
+  def encrypt_attribute: (untyped name, ?key_provider: untyped?, ?key: untyped?, ?deterministic: bool, ?support_unencrypted_data: untyped?, ?downcase: bool, ?ignore_case: bool, ?previous: untyped, ?compress: bool, ?compressor: untyped?, **untyped context_properties) -> untyped
+
+  def preserve_original_encrypted: (untyped name) -> untyped
+
+  def override_accessors_to_preserve_original: (untyped name, untyped original_attribute_name) -> untyped
+
+  def load_schema!: () -> untyped
+
+  def add_length_validation_for_encrypted_columns: () -> untyped
+
+  def validate_column_size: (untyped attribute_name) -> (untyped | nil)
+end
+
+module ActiveRecord::Encryption::ExtendedDeterministicQueries::CoreQueries::ClassMethods
+  def find_by: (*untyped args) -> untyped
+end

@@ -71,3 +71,14 @@ ActiveRecord::ConnectionAdapters::AbstractAdapter.quote_column_name("name")
 ActiveRecord::ConnectionAdapters::AbstractAdapter.define_callbacks(:notify)
 ActiveRecord::PendingMigrationError.action("Run pending migrations") { nil }
 ActiveRecord::Schema.define(version: 1) { nil }
+
+# ActiveRecord::Encryption's configuration and contexts
+ActiveRecord::Encryption.config.primary_key
+ActiveRecord::Encryption.configure(primary_key: "key", deterministic_key: "dkey", key_derivation_salt: "salt")
+ActiveRecord::Encryption.on_encrypted_attribute_declared { |klass, name| [klass, name] }
+ActiveRecord::Encryption.without_encryption { User.first }
+ActiveRecord::Encryption.protecting_encrypted_data { User.first }
+ActiveRecord::Encryption.with_encryption_context(encryptor: ActiveRecord::Encryption::NullEncryptor.new) { User.first }
+ActiveRecord::Encryption.context.encryptor
+ActiveRecord::Encryption.key_provider
+User.encrypted_attributes
