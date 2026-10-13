@@ -60,3 +60,16 @@ module ActiveJob
     end
   end
 end
+
+# Methods rbs prototype doesn't see, which aren't generated from the source
+module ActiveJob
+  class Base
+    # cattr_accessor and class_attribute in Logging's included block
+    def self.logger: () -> untyped
+    def self.logger=: (untyped value) -> untyped
+
+    def self.log_arguments: () -> untyped
+    def self.log_arguments=: (untyped value) -> untyped
+    def self.log_arguments?: () -> bool
+  end
+end

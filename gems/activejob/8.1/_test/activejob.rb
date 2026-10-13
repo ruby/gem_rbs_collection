@@ -23,3 +23,6 @@ end
 
 SendMessageJob.perform_now
 SendMessageJob.set(queue: :another_queue).perform_later(flag: false)
+
+SendMessageJob.logger = SendMessageJob.logger
+SendMessageJob.log_arguments = false
