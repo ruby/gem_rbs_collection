@@ -49,3 +49,12 @@ end
 if (enqueued = job.enqueue(queue: :low))
   enqueued.job_id.upcase
 end
+
+class SendMessageJobTest < ActiveJob::TestCase
+  def test_enqueue
+    assert_no_enqueued_jobs
+    SendMessageJob.perform_later
+    assert_enqueued_jobs 1
+    assert_no_performed_jobs
+  end
+end

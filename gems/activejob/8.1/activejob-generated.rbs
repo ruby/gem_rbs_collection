@@ -222,7 +222,7 @@ module ActiveJob
       #     end
       #   end
       #
-      def before_perform: (*untyped filters) { (?) -> untyped } -> untyped
+      def before_perform: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called right after the
       # job's perform method has finished.
@@ -239,7 +239,7 @@ module ActiveJob
       #     end
       #   end
       #
-      def after_perform: (*untyped filters) { (?) -> untyped } -> untyped
+      def after_perform: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called around the job's perform method.
       #
@@ -270,7 +270,7 @@ module ActiveJob
       #     end
       #   end
       #
-      def around_perform: (*untyped filters) { (?) -> untyped } -> untyped
+      def around_perform: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called right before the
       # job is enqueued.
@@ -287,7 +287,7 @@ module ActiveJob
       #     end
       #   end
       #
-      def before_enqueue: (*untyped filters) { (?) -> untyped } -> untyped
+      def before_enqueue: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called right after the
       # job is enqueued.
@@ -305,7 +305,7 @@ module ActiveJob
       #     end
       #   end
       #
-      def after_enqueue: (*untyped filters) { (?) -> untyped } -> untyped
+      def after_enqueue: (*untyped filters) ?{ (?) -> untyped } -> untyped
 
       # Defines a callback that will get called around the enqueuing
       # of the job.
@@ -324,7 +324,7 @@ module ActiveJob
       #     end
       #   end
       #
-      def around_enqueue: (*untyped filters) { (?) -> untyped } -> untyped
+      def around_enqueue: (*untyped filters) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -939,7 +939,7 @@ module ActiveJob
 
       private
 
-      def job_or_instantiate: (*untyped args) { (?) -> untyped } -> untyped
+      def job_or_instantiate: (*untyped args) ?{ (?) -> untyped } -> untyped
     end
 
     private
@@ -1176,7 +1176,7 @@ module ActiveJob
 
     def perform_now: () -> untyped
 
-    def instrument: (untyped operation, ?::Hash[untyped, untyped] payload) { (?) -> untyped } -> untyped
+    def instrument: (untyped operation, ?::Hash[untyped, untyped] payload) ?{ (?) -> untyped } -> untyped
 
     private
 
@@ -1233,9 +1233,9 @@ module ActiveJob
 
     def logger: () -> untyped
 
-    def info: (?untyped? progname) { (?) -> untyped } -> (nil | untyped)
+    def info: (?untyped? progname) ?{ (?) -> untyped } -> (nil | untyped)
 
-    def error: (?untyped? progname) { (?) -> untyped } -> (nil | untyped)
+    def error: (?untyped? progname) ?{ (?) -> untyped } -> (nil | untyped)
 
     def log_enqueue_source: () -> untyped
 
@@ -2287,7 +2287,7 @@ module ActiveJob
     # Note: This assertion is simply a shortcut for:
     #
     #   assert_enqueued_jobs 0, &block
-    def assert_no_enqueued_jobs: (?only: untyped?, ?except: untyped?, ?queue: untyped?) { (?) -> untyped } -> untyped
+    def assert_no_enqueued_jobs: (?only: untyped?, ?except: untyped?, ?queue: untyped?) ?{ (?) -> untyped } -> untyped
 
     # Asserts that the number of performed jobs matches the given number.
     # If no block is passed, <tt>perform_enqueued_jobs</tt>
@@ -2429,7 +2429,7 @@ module ActiveJob
     # Note: This assertion is simply a shortcut for:
     #
     #   assert_performed_jobs 0, &block
-    def assert_no_performed_jobs: (?only: untyped?, ?except: untyped?, ?queue: untyped?) { (?) -> untyped } -> untyped
+    def assert_no_performed_jobs: (?only: untyped?, ?except: untyped?, ?queue: untyped?) ?{ (?) -> untyped } -> untyped
 
     # Asserts that the job has been enqueued with the given arguments.
     #
@@ -2627,9 +2627,9 @@ module ActiveJob
 
     def filter_as_proc: (untyped filter) -> untyped
 
-    def enqueued_jobs_with: (?only: untyped?, ?except: untyped?, ?queue: untyped?, ?at: untyped?) { (?) -> untyped } -> untyped
+    def enqueued_jobs_with: (?only: untyped?, ?except: untyped?, ?queue: untyped?, ?at: untyped?) ?{ (?) -> untyped } -> untyped
 
-    def performed_jobs_with: (?only: untyped?, ?except: untyped?, ?queue: untyped?) { (?) -> untyped } -> untyped
+    def performed_jobs_with: (?only: untyped?, ?except: untyped?, ?queue: untyped?) ?{ (?) -> untyped } -> untyped
 
     def flush_enqueued_jobs: (?only: untyped?, ?except: untyped?, ?queue: untyped?, ?at: untyped?) -> untyped
 
