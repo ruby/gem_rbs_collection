@@ -51,3 +51,6 @@ class NotifierMailerTest < ActionMailer::TestCase
     deliver_enqueued_emails
   end
 end
+
+RailsGuides::ApplicationMailer.deliver_later_queue_name = :low
+RailsGuides::ApplicationMailer.delivery_job = ActionMailer::MailDeliveryJob
