@@ -48,6 +48,8 @@ end
 # authentication. If your files require access control consider implementing
 # {Authenticated Controllers}[https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers].
 class ActiveStorage::Blobs::ProxyController < ::ActiveStorage::BaseController
+  extend ::ActionController::Live::ClassMethods
+
   include ::ActiveStorage::SetBlob
 
   include ::ActiveStorage::Streaming
@@ -151,6 +153,8 @@ end
 # authentication. If your files require access control consider implementing
 # {Authenticated Controllers}[https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers].
 class ActiveStorage::Representations::ProxyController < ::ActiveStorage::Representations::BaseController
+  extend ::ActionController::Live::ClassMethods
+
   include ::ActiveStorage::Streaming
 
   include ::ActiveStorage::DisableSession
@@ -1717,6 +1721,8 @@ module ActiveStorage
   # When processed, Active Record will insert database records for each fixture
   # entry and will ensure the Active Storage relationship is intact.
   class FixtureSet
+    extend ::ActiveRecord::SecureToken::ClassMethods
+
     include ::ActiveSupport::Testing::FileFixtures
 
     include ::ActiveRecord::SecureToken

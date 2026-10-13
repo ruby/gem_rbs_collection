@@ -37,3 +37,5 @@ blob.image? || blob.video?
 
 ActiveStorage::Variant.new(blob, { resize_to_limit: [100, 100] }).download
 ActiveStorage::Preview.new(blob, { resize_to_limit: [100, 100] }).download
+
+ActiveStorage::FixtureSet.generate_unique_secure_token(length: 28)
