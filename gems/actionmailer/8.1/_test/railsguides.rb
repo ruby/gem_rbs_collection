@@ -51,6 +51,8 @@ delivery = RailsGuides::NotifierMailer.welcome("first user")
 delivery.deliver_now unless delivery.processed?
 
 class NotifierMailerTest < ActionMailer::TestCase
+  tests RailsGuides::NotifierMailer
+
   def test_welcome
     assert_no_emails
     assert_no_enqueued_emails

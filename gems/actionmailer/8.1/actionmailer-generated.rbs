@@ -1292,6 +1292,10 @@ module ActionMailer
   end
 
   class TestCase < ::ActiveSupport::TestCase
+    extend ::ActionMailer::TestCase::Behavior::ClassMethods
+
+    extend ::ActiveSupport::Testing::ConstantLookup::ClassMethods
+
     module ClearTestDeliveries
       extend ::ActiveSupport::Concern
 
