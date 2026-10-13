@@ -81,7 +81,7 @@ class ActiveStorage::Blob < ActiveStorage::Record
   def self.signed_id_verifier: () -> untyped
 
   # Returns a signed ID for this blob that's suitable for reference on the client-side without fear of tampering.
-  def signed_id: () -> untyped
+  def signed_id: (?purpose: Symbol, ?expires_in: untyped, ?expires_at: untyped) -> String
 
   # Returns the key pointing to the file on the service that's associated with this blob. The key is the
   # secure-token format from Rails in lower case. So it'll look like: xtapjjcjiudrlk3tmwyjgpuobabd.

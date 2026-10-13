@@ -49,7 +49,7 @@ module ActiveStorage
         ?dependent: ::Symbol dependent,
         ?service: (::String | ::Symbol | nil) service,
         ?strict_loading: bool strict_loading
-      ) -> void
+      ) ?{ (ActiveStorage::Reflection::HasOneAttachedReflection reflection) -> void } -> void
 
       # Specifies the relation between multiple attachments and the model.
       #
@@ -95,7 +95,7 @@ module ActiveStorage
         ?dependent: ::Symbol dependent,
         ?service: (::String | ::Symbol | nil) service,
         ?strict_loading: bool strict_loading
-      ) -> void
+      ) ?{ (ActiveStorage::Reflection::HasManyAttachedReflection reflection) -> void } -> void
     end
 
     def attachment_changes: () -> void
