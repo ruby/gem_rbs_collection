@@ -73,3 +73,46 @@ module ActiveJob
     def self.log_arguments?: () -> bool
   end
 end
+
+# Return types of commonly used methods
+module ActiveJob
+  module Core
+    attr_accessor arguments: Array[untyped]
+
+    attr_accessor job_id: String
+
+    attr_accessor executions: Integer
+
+    attr_accessor exception_executions: Hash[String, Integer]
+
+    attr_accessor locale: String?
+
+    attr_accessor timezone: String?
+
+    attr_accessor enqueued_at: Time?
+
+    def successfully_enqueued?: () -> bool?
+
+    attr_accessor enqueue_error: EnqueueError?
+  end
+
+  module QueueName
+    def queue_name: () -> String
+  end
+
+  module QueuePriority
+    def priority: () -> Integer?
+  end
+
+  module Enqueuing
+    def enqueue: (?Hash[Symbol, untyped] options) -> (self | false)
+
+    module ClassMethods
+      def perform_later: (*untyped, **untyped) ?{ (ActiveJob::Base job) -> void } -> (ActiveJob::Base | false)
+    end
+  end
+
+  class ConfiguredJob
+    def perform_later: (*untyped, **untyped) ?{ (ActiveJob::Base job) -> void } -> (ActiveJob::Base | false)
+  end
+end

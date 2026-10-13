@@ -334,8 +334,6 @@ module ActiveJob
     def initialize: (untyped job_class, ?::Hash[untyped, untyped] options) -> void
 
     def perform_now: (*untyped, **untyped) ?{ (?) -> untyped } -> untyped
-
-    def perform_later: (*untyped, **untyped) ?{ (untyped) -> untyped } -> untyped
   end
 end
 
@@ -804,16 +802,10 @@ module ActiveJob
   module Core
     extend ::ActiveSupport::Concern
 
-    # Job arguments
-    attr_accessor arguments: untyped
-
     attr_writer serialized_arguments: untyped
 
     # Time when the job should be performed
     attr_accessor scheduled_at: untyped
-
-    # Job Identifier
-    attr_accessor job_id: untyped
 
     # Queue in which the job will reside.
     attr_writer queue_name: untyped
@@ -824,31 +816,8 @@ module ActiveJob
     # ID optionally provided by adapter
     attr_accessor provider_job_id: untyped
 
-    # Number of times this job has been executed (which increments on every retry, like after an exception).
-    attr_accessor executions: untyped
-
-    # Hash that contains the number of times this job handled errors for each specific retry_on declaration.
-    # Keys are the string representation of the exceptions listed in the retry_on declaration,
-    # while its associated value holds the number of executions where the corresponding retry_on
-    # declaration handled one of its listed exceptions.
-    attr_accessor exception_executions: untyped
-
-    # I18n.locale to be used during the job.
-    attr_accessor locale: untyped
-
-    # Timezone to be used during the job.
-    attr_accessor timezone: untyped
-
-    # Track when a job was enqueued
-    attr_accessor enqueued_at: untyped
-
     # Track whether the adapter received the job successfully.
     attr_writer successfully_enqueued: untyped
-
-    def successfully_enqueued?: () -> untyped
-
-    # Track any exceptions raised by the backend so callers can inspect the errors.
-    attr_accessor enqueue_error: untyped
 
     # These methods will be included into any Active Job object, adding
     # helpers for de/serialization and creation of job instances.
@@ -968,52 +937,10 @@ module ActiveJob
 
       def enqueue_after_transaction_commit=: (untyped value) -> untyped
 
-      # Push a job onto the queue. By default the arguments must be either String,
-      # Integer, Float, NilClass, TrueClass, FalseClass, BigDecimal, Symbol, Date,
-      # Time, DateTime, ActiveSupport::TimeWithZone, ActiveSupport::Duration,
-      # Hash, ActiveSupport::HashWithIndifferentAccess, Array, Range, or
-      # GlobalID::Identification instances, although this can be extended by adding
-      # custom serializers.
-      #
-      # Returns an instance of the job class queued with arguments available in
-      # Job#arguments or +false+ if the enqueue did not succeed.
-      #
-      # After the attempted enqueue, the job will be yielded to an optional block.
-      #
-      # If Active Job is used conjointly with Active Record, and #perform_later is called
-      # inside an Active Record transaction, then the enqueue is implicitly deferred to after
-      # the transaction is committed, or dropped if it's rolled back. In such case #perform_later
-      # will return the job instance like if it was successfully enqueued, but will still return
-      # +false+ if a callback prevented the job from being enqueued.
-      #
-      # This behavior can be changed on a per job basis:
-      #
-      #  class NotificationJob < ApplicationJob
-      #    self.enqueue_after_transaction_commit = false
-      #  end
-      def perform_later: (*untyped, **untyped) ?{ (untyped) -> untyped } -> untyped
-
       private
 
       def job_or_instantiate: (*untyped args) { (?) -> untyped } -> untyped
     end
-
-    # Enqueues the job to be performed by the queue adapter.
-    #
-    # ==== Options
-    # * <tt>:wait</tt> - Enqueues the job with the specified delay
-    # * <tt>:wait_until</tt> - Enqueues the job at the time specified
-    # * <tt>:queue</tt> - Enqueues the job on the specified queue
-    # * <tt>:priority</tt> - Enqueues the job with the specified priority
-    #
-    # ==== Examples
-    #
-    #    my_job_instance.enqueue
-    #    my_job_instance.enqueue wait: 5.minutes
-    #    my_job_instance.enqueue queue: :important
-    #    my_job_instance.enqueue wait_until: Date.tomorrow.midnight
-    #    my_job_instance.enqueue priority: 10
-    def enqueue: (?::Hash[untyped, untyped] options) -> untyped
 
     private
 
@@ -1917,9 +1844,6 @@ module ActiveJob
 
       def queue_name_from_part: (untyped part_name) -> untyped
     end
-
-    # Returns the name of the queue the job will be run on.
-    def queue_name: () -> untyped
   end
 end
 
@@ -1973,9 +1897,6 @@ module ActiveJob
       #   end
       def queue_with_priority: (?untyped? priority) ?{ (?) -> untyped } -> untyped
     end
-
-    # Returns the priority that the job will be created with
-    def priority: () -> untyped
   end
 end
 
