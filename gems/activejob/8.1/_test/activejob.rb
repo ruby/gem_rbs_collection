@@ -8,6 +8,8 @@ class SendMessageJob < ActiveJob::Base
 
   around_perform :around_task
 
+  rescue_from(ActiveJob::DeserializationError) { |exception| exception.message }
+
   def perform(*args)
     # Do something later
   end
