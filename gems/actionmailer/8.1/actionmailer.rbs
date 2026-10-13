@@ -47,7 +47,10 @@ module ActionMailer
   end
 
   class MessageDelivery
-    def deliver_later: (?wait: untyped, ?wait_until: untyped, ?queue: untyped, ?priority: Integer) -> void
+    # The enqueued job, or false if it couldn't be enqueued
+    def deliver_later: (?wait: untyped, ?wait_until: untyped, ?queue: untyped, ?priority: Integer) -> (ActiveJob::Base | false)
+
+    def deliver_later!: (?wait: untyped, ?wait_until: untyped, ?queue: untyped, ?priority: Integer) -> (ActiveJob::Base | false)
 
     def deliver_now: () -> void
 
@@ -76,5 +79,20 @@ module ActionMailer
     def deliver_later_queue_name: () -> untyped
     def deliver_later_queue_name=: (untyped value) -> untyped
     def deliver_later_queue_name?: () -> bool
+  end
+end
+
+# Return types of commonly used methods
+module ActionMailer
+  module DeliveryMethods
+    module ClassMethods
+      # Delegated to Mail::TestMailer
+      def deliveries: () -> Array[Mail::Message]
+      def deliveries=: (Array[Mail::Message] deliveries) -> Array[Mail::Message]
+    end
+  end
+
+  module TestHelper
+    def capture_emails: () { () -> void } -> Array[Mail::Message]
   end
 end

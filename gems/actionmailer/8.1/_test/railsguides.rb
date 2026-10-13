@@ -63,3 +63,19 @@ end
 
 RailsGuides::ApplicationMailer.deliver_later_queue_name = :low
 RailsGuides::ApplicationMailer.delivery_job = ActionMailer::MailDeliveryJob
+
+if (job = RailsGuides::NotifierMailer.welcome("first user").deliver_later(wait: 1.hour))
+  job.job_id.upcase
+end
+if (job = RailsGuides::NotifierMailer.welcome("first user").deliver_later!)
+  job.job_id.upcase
+end
+ActionMailer::Base.deliveries.last&.subject
+ActionMailer::Base.deliveries.clear
+
+class NotifierMailerTest
+  def test_capture
+    emails = capture_emails { RailsGuides::NotifierMailer.welcome("first user").deliver_later }
+    emails.first&.to
+  end
+end
