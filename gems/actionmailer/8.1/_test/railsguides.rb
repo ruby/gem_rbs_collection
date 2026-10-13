@@ -37,3 +37,6 @@ module RailsGuides
   NotifierMailer.welcome("first user").message
   NotifierMailer.welcome("first user").deliver_later
 end
+
+delivery = RailsGuides::NotifierMailer.welcome("first user")
+delivery.deliver_now unless delivery.processed?
