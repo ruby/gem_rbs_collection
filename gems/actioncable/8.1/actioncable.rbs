@@ -1,11 +1,22 @@
+# ClassMethods of the concerns included in the base classes and the ones they include
 module ActionCable
   module Connection
     class Base
+      extend ActionCable::Connection::Identification::ClassMethods
+      extend ActionCable::Connection::Callbacks::ClassMethods
+      extend ActiveSupport::Callbacks::ClassMethods
+      extend ActiveSupport::Rescuable::ClassMethods
     end
   end
 
   module Channel
     class Base
+      extend ActionCable::Channel::Callbacks::ClassMethods
+      extend ActionCable::Channel::PeriodicTimers::ClassMethods
+      extend ActionCable::Channel::Naming::ClassMethods
+      extend ActionCable::Channel::Broadcasting::ClassMethods
+      extend ActiveSupport::Callbacks::ClassMethods
+      extend ActiveSupport::Rescuable::ClassMethods
     end
   end
 end
