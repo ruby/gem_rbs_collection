@@ -307,7 +307,7 @@ module ActionCable
       INTERNAL_METHODS: ::Array[:_run_subscribe_callbacks | :_run_unsubscribe_callbacks]
 
       module ClassMethods
-        def before_subscribe: (*untyped methods) { (?) -> untyped } -> untyped
+        def before_subscribe: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
         # This callback will be triggered after the Base#subscribed method is called,
         # even if the subscription was rejected with the Base#reject method.
@@ -317,13 +317,13 @@ module ActionCable
         #
         #     after_subscribe :my_method, unless: :subscription_rejected?
         #
-        def after_subscribe: (*untyped methods) { (?) -> untyped } -> untyped
+        def after_subscribe: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
         alias on_subscribe after_subscribe
 
-        def before_unsubscribe: (*untyped methods) { (?) -> untyped } -> untyped
+        def before_unsubscribe: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
-        def after_unsubscribe: (*untyped methods) { (?) -> untyped } -> untyped
+        def after_unsubscribe: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
         alias on_unsubscribe after_unsubscribe
 
@@ -482,7 +482,7 @@ module ActionCable
       # ActiveSupport::JSON` to decode messages as JSON before passing to the
       # callback. Defaults to `coder: nil` which does no decoding, passes raw
       # messages.
-      def stream_from: (untyped broadcasting, ?untyped? callback, ?coder: untyped?) { (?) -> untyped } -> (nil | untyped)
+      def stream_from: (untyped broadcasting, ?untyped? callback, ?coder: untyped?) ?{ (?) -> untyped } -> (nil | untyped)
 
       # Start streaming the pubsub queue for the `broadcastables` in this channel. Optionally,
       # you can pass a `callback` that'll be used instead of the default of just
@@ -491,7 +491,7 @@ module ActionCable
       # Pass `coder: ActiveSupport::JSON` to decode messages as JSON before passing to
       # the callback. Defaults to `coder: nil` which does no decoding, passes raw
       # messages.
-      def stream_for: (untyped broadcastables, ?untyped? callback, ?coder: untyped?) { (?) -> untyped } -> untyped
+      def stream_for: (untyped broadcastables, ?untyped? callback, ?coder: untyped?) ?{ (?) -> untyped } -> untyped
 
       # Unsubscribes streams from the named `broadcasting`.
       def stop_stream_from: (untyped broadcasting) -> untyped
@@ -1018,11 +1018,11 @@ module ActionCable
       include ::ActiveSupport::Callbacks
 
       module ClassMethods
-        def before_command: (*untyped methods) { (?) -> untyped } -> untyped
+        def before_command: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
-        def after_command: (*untyped methods) { (?) -> untyped } -> untyped
+        def after_command: (*untyped methods) ?{ (?) -> untyped } -> untyped
 
-        def around_command: (*untyped methods) { (?) -> untyped } -> untyped
+        def around_command: (*untyped methods) ?{ (?) -> untyped } -> untyped
       end
     end
   end
@@ -1183,7 +1183,7 @@ module ActionCable
 
       def timer: (untyped interval) { (?) -> untyped } -> untyped
 
-      def post: (?untyped? task) { (?) -> untyped } -> untyped
+      def post: (?untyped? task) ?{ (?) -> untyped } -> untyped
 
       def attach: (untyped io, untyped stream) -> untyped
 
@@ -1213,7 +1213,7 @@ module ActionCable
     class Stream
       def initialize: (untyped event_loop, untyped socket) -> void
 
-      def each: () { (?) -> untyped } -> untyped
+      def each: () ?{ (?) -> untyped } -> untyped
 
       def close: () -> untyped
 
@@ -1290,7 +1290,7 @@ module ActionCable
 
       private
 
-      def log: (untyped type, untyped message) { (?) -> untyped } -> untyped
+      def log: (untyped type, untyped message) ?{ (?) -> untyped } -> untyped
     end
   end
 end
@@ -1832,9 +1832,9 @@ module ActionCable
 
       def async_exec: (untyped receiver, *untyped args, connection: untyped) { (?) -> untyped } -> untyped
 
-      def async_invoke: (untyped receiver, untyped method, *untyped args, ?connection: untyped) { (?) -> untyped } -> untyped
+      def async_invoke: (untyped receiver, untyped method, *untyped args, ?connection: untyped) ?{ (?) -> untyped } -> untyped
 
-      def invoke: (untyped receiver, untyped method, *untyped args, connection: untyped) { (?) -> untyped } -> untyped
+      def invoke: (untyped receiver, untyped method, *untyped args, connection: untyped) ?{ (?) -> untyped } -> untyped
 
       private
 
@@ -2167,7 +2167,7 @@ module ActionCable
     #
     #     assert_broadcasts 'messages', 0, &block
     #
-    def assert_no_broadcasts: (untyped stream) { (?) -> untyped } -> untyped
+    def assert_no_broadcasts: (untyped stream) ?{ (?) -> untyped } -> untyped
 
     # Returns the messages that are broadcasted in the block.
     #

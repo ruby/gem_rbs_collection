@@ -1,5 +1,8 @@
 module ApplicationCable
   class Connection < ActionCable::Connection::Base
+    private
+
+    def authorize: () -> void
   end
 
   class Channel < ActionCable::Channel::Base
@@ -7,7 +10,11 @@ module ApplicationCable
 end
 
 class ChatChannel < ApplicationCable::Channel
+  def subscribed: () -> void
+
   private
 
   def refresh: () -> void
+
+  def greet: () -> void
 end
