@@ -1,0 +1,62 @@
+module ActiveJob
+  class Base
+    extend ActiveJob::Callbacks::ClassMethods
+    extend ActiveJob::Core::ClassMethods
+    extend ActiveJob::Enqueuing::ClassMethods
+    extend ActiveJob::Exceptions::ClassMethods
+    extend ActiveJob::Execution::ClassMethods
+    extend ActiveJob::QueueAdapter::ClassMethods
+    extend ActiveJob::QueueName::ClassMethods
+    extend ActiveJob::QueuePriority::ClassMethods
+
+    def self.queue_as: (*untyped) -> void
+                     | ...
+    def self.queue_with_priority: (?untyped? priority) -> void
+                                | ...
+    def self.before_perform: (*untyped filters) -> void
+                           | ...
+    def self.after_perform: (*untyped filters) -> void
+                          | ...
+    def self.around_perform: (*untyped filters) -> void
+                           | ...
+    def self.before_enqueue: (*untyped filters) -> void
+                           | ...
+    def self.after_enqueue: (*untyped filters) -> void
+                          | ...
+    def self.around_enqueue: (*untyped filters) -> void
+                           | ...
+    def self.retry_on: (*untyped) -> void
+                     | ...
+    def self.discard_on: (*untyped) -> void
+                       | ...
+  end
+end
+
+module ActiveJob
+  module QueueAdapters
+    # == Sidekiq adapter for Active Job
+    #
+    # Simple, efficient background processing for Ruby. Sidekiq uses threads to
+    # handle many jobs at the same time in the same process. It does not
+    # require Rails but will integrate tightly with it to make background
+    # processing dead simple.
+    #
+    # Read more about Sidekiq {here}[http://sidekiq.org].
+    #
+    # To use Sidekiq set the queue_adapter config to +:sidekiq+.
+    #
+    #   Rails.application.config.active_job.queue_adapter = :sidekiq
+    class SidekiqAdapter
+      def enqueue: (untyped job) -> untyped
+
+      def enqueue_at: (untyped job, untyped timestamp) -> untyped
+
+      class JobWrapper
+        # nodoc:
+        include Sidekiq::Job
+
+        def perform: (untyped job_data) -> untyped
+      end
+    end
+  end
+end
