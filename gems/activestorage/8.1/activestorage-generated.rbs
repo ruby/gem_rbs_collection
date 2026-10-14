@@ -1,0 +1,2473 @@
+# The generated code is based on Ruby on Rails source code
+# You can find the license of Ruby on Rails from following.
+
+#Copyright (c) David Heinemeier Hansson, 37signals LLC
+#
+#Permission is hereby granted, free of charge, to any person obtaining
+#a copy of this software and associated documentation files (the
+#"Software"), to deal in the Software without restriction, including
+#without limitation the rights to use, copy, modify, merge, publish,
+#distribute, sublicense, and/or sell copies of the Software, and to
+#permit persons to whom the Software is furnished to do so, subject to
+#the following conditions:
+#
+#The above copyright notice and this permission notice shall be
+#included in all copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# The base class for all Active Storage controllers.
+class ActiveStorage::BaseController < ::ActionController::Base
+  include ::ActiveStorage::SetCurrent
+end
+
+# Finds a blob by a +signed_id+ and proxies the file through the application.
+# The blob is streamed from storage directly to the response. This avoids having
+# a redirect and makes files easier to cache.
+#
+# The +signed_id+s make URLs hard to guess but permanent by design, allowing the URLs to be cached.
+# The response sets the HTTP cache to public and allows browsers and proxies to cache it indefinitely.
+#
+# The URLs created for this controller are set to never expire by default.
+# To make URLs expire, pass the +expires_in+ option when generating the URL:
+#
+#   rails_storage_proxy_url(blob, expires_in: 1.minute)
+#
+# Or set the default for all Active Storage URLs:
+#
+#   config.active_storage.urls_expire_in = 1.day
+#
+# WARNING: All Active Storage controllers are publicly accessible by default.
+# Anyone who knows the URL can access the file, even if the rest of your application requires
+# authentication. If your files require access control consider implementing
+# {Authenticated Controllers}[https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers].
+class ActiveStorage::Blobs::ProxyController < ::ActiveStorage::BaseController
+  extend ::ActionController::Live::ClassMethods
+
+  include ::ActiveStorage::SetBlob
+
+  include ::ActiveStorage::Streaming
+
+  include ::ActiveStorage::DisableSession
+
+  def show: () -> untyped
+end
+
+# Finds a blob by a +signed_id+ and redirects to a blob's expiring service URL.
+#
+# The +signed_id+s make URLs hard to guess but permanent by design, allowing the URLs to be cached.
+#
+# The URLs created for this controller are set to never expire by default.
+# To make URLs expire, pass the +expires_in+ option when generating the URL:
+#
+#   rails_storage_redirect_url(blob, expires_in: 1.minute)
+#
+# Or set the default for all Active Storage URLs:
+#
+#   config.active_storage.urls_expire_in = 1.day
+#
+# The service URLs are set to expire in 5 minutes by default.
+# The default can be changed for all service URLs:
+#
+#   config.active_storage.service_urls_expire_in = 1.hour
+#
+# WARNING: All Active Storage controllers are publicly accessible by default.
+# Anyone who knows the URL can access the file, even if the rest of your application requires
+# authentication. If your files require access control consider implementing
+# {Authenticated Controllers}[https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers].
+class ActiveStorage::Blobs::RedirectController < ::ActiveStorage::BaseController
+  include ::ActiveStorage::SetBlob
+
+  def show: () -> untyped
+end
+
+# Creates a new blob on the server side in anticipation of a direct-to-service upload from the client side.
+# When the client-side upload is completed, the signed_blob_id can be submitted as part of the form to reference
+# the blob that was created up front.
+class ActiveStorage::DirectUploadsController < ::ActiveStorage::BaseController
+  def create: () -> untyped
+
+  private
+
+  def blob_args: () -> untyped
+
+  def direct_upload_json: (untyped blob) -> untyped
+end
+
+# Serves files stored with the disk service in the same way that the cloud services do.
+# This means using expiring, signed URLs that are meant for immediate access, not permanent linking.
+# Always go through the BlobsController, or your own authenticated controller, rather than directly
+# to the service URL.
+class ActiveStorage::DiskController < ::ActiveStorage::BaseController
+  include ::ActiveStorage::FileServer
+
+  def show: () -> untyped
+
+  def update: () -> untyped
+
+  private
+
+  def named_disk_service: (untyped name) -> untyped
+
+  def decode_verified_key: () -> untyped
+
+  def decode_verified_token: () -> untyped
+
+  def acceptable_content?: (untyped token) -> untyped
+end
+
+class ActiveStorage::Representations::BaseController < ::ActiveStorage::BaseController
+  include ::ActiveStorage::SetBlob
+
+  private
+
+  def blob_scope: () -> untyped
+
+  def set_representation: () -> untyped
+end
+
+# Finds a representation by a +signed_id+ and a +variation_key+, and proxies the file through the application.
+# The representation is streamed from storage directly to the response. This avoids having
+# a redirect and makes files easier to cache.
+#
+# The +signed_id+s make URLs hard to guess but permanent by design, allowing the URLs to be cached.
+# The response sets the HTTP cache to public and allows browsers and proxies to cache it indefinitely.
+#
+# The URLs created for this controller are set to never expire by default.
+# To make URLs expire, pass the +expires_in+ option when generating the URL:
+#
+#   rails_storage_proxy_url(representation, expires_in: 1.minute)
+#
+# Or set the default for all Active Storage URLs:
+#
+#   config.active_storage.urls_expire_in = 1.day
+#
+# WARNING: All Active Storage controllers are publicly accessible by default.
+# Anyone who knows the URL can access the file, even if the rest of your application requires
+# authentication. If your files require access control consider implementing
+# {Authenticated Controllers}[https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers].
+class ActiveStorage::Representations::ProxyController < ::ActiveStorage::Representations::BaseController
+  extend ::ActionController::Live::ClassMethods
+
+  include ::ActiveStorage::Streaming
+
+  include ::ActiveStorage::DisableSession
+
+  def show: () -> untyped
+end
+
+# Finds a representation by a +signed_id+ and a +variation_key+, and redirects to a representation's expiring
+# service URL.
+#
+# The +signed_id+s make URLs hard to guess but permanent by design, allowing the URLs to be cached.
+#
+# The URLs created for this controller are set to never expire by default.
+# To make URLs expire, pass the +expires_in+ option when generating the URL:
+#
+#   rails_storage_redirect_url(representation, expires_in: 1.minute)
+#
+# Or set the default for all Active Storage URLs:
+#
+#   config.active_storage.urls_expire_in = 1.day
+#
+# The service URLs are set to expire in 5 minutes by default.
+# The default can be changed for all service URLs:
+#
+#   config.active_storage.service_urls_expire_in = 1.hour
+#
+# WARNING: All Active Storage controllers are publicly accessible by default.
+# Anyone who knows the URL can access the file, even if the rest of your application requires
+# authentication. If your files require access control consider implementing
+# {Authenticated Controllers}[https://guides.rubyonrails.org/active_storage_overview.html#authenticated-controllers].
+class ActiveStorage::Representations::RedirectController < ::ActiveStorage::Representations::BaseController
+  def show: () -> untyped
+end
+
+# This concern disables the session in order to allow caching by default in some CDNs as CloudFlare.
+module ActiveStorage::DisableSession
+  extend ::ActiveSupport::Concern
+end
+
+module ActiveStorage::FileServer
+  private
+
+  def serve_file: (untyped path, content_type: untyped, disposition: untyped) -> untyped
+end
+
+module ActiveStorage::SetBlob
+  extend ::ActiveSupport::Concern
+
+  private
+
+  def set_blob: () -> untyped
+
+  def blob_scope: () -> untyped
+end
+
+# Sets the <tt>ActiveStorage::Current.url_options</tt> attribute, which the disk service uses to generate URLs.
+# Include this concern in custom controllers that call ActiveStorage::Blob#url,
+# ActiveStorage::Variant#url, or ActiveStorage::Preview#url so the disk service can
+# generate URLs using the same host, protocol, and port as the current request.
+module ActiveStorage::SetCurrent
+  extend ::ActiveSupport::Concern
+end
+
+module ActiveStorage::Streaming
+  extend ::ActiveSupport::Concern
+
+  DEFAULT_BLOB_STREAMING_DISPOSITION: "inline"
+
+  include ::ActionController::DataStreaming
+
+  include ::ActionController::Live
+
+  private
+
+  # Stream the blob in byte ranges specified through the header
+  def send_blob_byte_range_data: (untyped blob, untyped range_header, ?disposition: untyped?) -> untyped
+
+  def ranges_valid?: (untyped ranges) -> (false | untyped)
+
+  # Stream the blob from storage directly to the response. The disposition can be controlled by setting +disposition+.
+  # The content type and filename is set directly from the +blob+.
+  def send_blob_stream: (untyped blob, ?disposition: untyped?) -> untyped
+end
+
+# Provides asynchronous analysis of ActiveStorage::Blob records via ActiveStorage::Blob#analyze_later.
+class ActiveStorage::AnalyzeJob < ::ActiveStorage::BaseJob
+  def perform: (untyped blob) -> untyped
+end
+
+class ActiveStorage::BaseJob < ::ActiveJob::Base
+end
+
+# Provides asynchronous mirroring of directly-uploaded blobs.
+class ActiveStorage::MirrorJob < ::ActiveStorage::BaseJob
+  def perform: (untyped key, checksum: untyped) -> untyped
+end
+
+class ActiveStorage::PreviewImageJob < ::ActiveStorage::BaseJob
+  def perform: (untyped blob, untyped variations) -> untyped
+end
+
+# Provides asynchronous purging of ActiveStorage::Blob records via ActiveStorage::Blob#purge_later.
+class ActiveStorage::PurgeJob < ::ActiveStorage::BaseJob
+  def perform: (untyped blob) -> untyped
+end
+
+class ActiveStorage::TransformJob < ::ActiveStorage::BaseJob
+  def perform: (untyped blob, untyped transformations) -> untyped
+end
+
+# = Active Storage \Attachment
+#
+# Attachments associate records with blobs. Usually that's a one record-many blobs relationship,
+# but it is possible to associate many different records with the same blob. A foreign-key constraint
+# on the attachments table prevents blobs from being purged if they’re still attached to any records.
+#
+# Attachments also have access to all methods from ActiveStorage::Blob.
+#
+# If you wish to preload attachments or blobs, you can use these scopes:
+#
+#   # preloads attachments, their corresponding blobs, and variant records (if using `ActiveStorage.track_variants`)
+#   User.all.with_attached_avatars
+#
+#   # preloads blobs and variant records (if using `ActiveStorage.track_variants`)
+#   User.first.avatars.with_all_variant_records
+class ActiveStorage::Attachment
+  def signed_id: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+  # Returns an ActiveStorage::Variant or ActiveStorage::VariantWithRecord
+  # instance for the attachment with the set of +transformations+ provided.
+  # Example:
+  #
+  #   avatar.variant(resize_to_limit: [100, 100]).processed.url
+  #
+  # or if you are using pre-defined variants:
+  #
+  #   avatar.variant(:thumb).processed.url
+  #
+  # See ActiveStorage::Blob::Representable#variant for more information.
+  #
+  # Raises an +ArgumentError+ if +transformations+ is a +Symbol+ which is an
+  # unknown pre-defined variant of the attachment.
+  def variant: (untyped transformations) -> untyped
+
+  # Returns an ActiveStorage::Preview instance for the attachment with the set
+  # of +transformations+ provided.
+  # Example:
+  #
+  #   video.preview(resize_to_limit: [100, 100]).processed.url
+  #
+  # or if you are using pre-defined variants:
+  #
+  #   video.preview(:thumb).processed.url
+  #
+  # See ActiveStorage::Blob::Representable#preview for more information.
+  #
+  # Raises an +ArgumentError+ if +transformations+ is a +Symbol+ which is an
+  # unknown pre-defined variant of the attachment.
+  def preview: (untyped transformations) -> untyped
+
+  # Returns an ActiveStorage::Preview or an ActiveStorage::Variant for the
+  # attachment with set of +transformations+ provided.
+  # Example:
+  #
+  #   avatar.representation(resize_to_limit: [100, 100]).processed.url
+  #
+  # or if you are using pre-defined variants:
+  #
+  #   avatar.representation(:thumb).processed.url
+  #
+  # See ActiveStorage::Blob::Representable#representation for more information.
+  #
+  # Raises an +ArgumentError+ if +transformations+ is a +Symbol+ which is an
+  # unknown pre-defined variant of the attachment.
+  def representation: (untyped transformations) -> untyped
+
+  private
+
+  def analyze_blob_later: () -> (untyped | nil)
+
+  def mirror_blob_later: () -> untyped
+
+  def transform_variants_later: () -> untyped
+
+  def purge_dependent_blob: () -> (untyped | nil)
+
+  def dependent: () -> untyped
+
+  def named_variants: () -> untyped
+
+  def transformations_by_name: (untyped transformations) -> untyped
+end
+
+# = Active Storage \Blob
+#
+# A blob is a record that contains the metadata about a file and a key for where that file resides on the service.
+# Blobs can be created in two ways:
+#
+# 1. Ahead of the file being uploaded server-side to the service, via <tt>create_and_upload!</tt>. A rewindable
+#    <tt>io</tt> with the file contents must be available at the server for this operation.
+# 2. Ahead of the file being directly uploaded client-side to the service, via <tt>create_before_direct_upload!</tt>.
+#
+# The first option doesn't require any client-side JavaScript integration, and can be used by any other back-end
+# service that deals with files. The second option is faster, since you're not using your own server as a staging
+# point for uploads, and can work with deployments like Heroku that do not provide large amounts of disk space.
+#
+# Blobs are intended to be immutable in as-so-far as their reference to a specific file goes. You're allowed to
+# update a blob's metadata on a subsequent pass, but you should not update the key or change the uploaded file.
+# If you need to create a derivative or otherwise change the blob, simply create a new blob and purge the old one.
+#
+# When using a custom +key+, the value is treated as trusted. Using untrusted user input
+# as the key may result in unexpected behavior.
+class ActiveStorage::Blob
+  def self.services: () -> untyped
+  def self.services=: (untyped value) -> untyped
+  def self.services?: () -> bool
+  def services: () -> untyped
+  def services?: () -> bool
+  def services=: (untyped value) -> untyped
+  def self.service: () -> untyped
+  def self.service=: (untyped value) -> untyped
+  def self.service?: () -> bool
+
+  # FIXME: these property should never have been stored in the metadata.
+  # The blob table should be migrated to have dedicated columns for theses.
+  PROTECTED_METADATA: ::Array["analyzed" | "identified" | "composed"]
+
+  def self.scope_for_strict_loading: () -> untyped
+
+  # Concatenate multiple blobs into a single "composed" blob.
+  def self.compose: (untyped blobs, filename: untyped, ?key: untyped?, ?content_type: untyped?, ?metadata: untyped?) -> untyped
+
+  def self.filter_metadata: (untyped metadata) -> untyped
+
+  include ::ActiveStorage::Blob::Analyzable
+
+  include ::ActiveStorage::Blob::Identifiable
+
+  include ::ActiveStorage::Blob::Representable
+
+  include ::ActiveStorage::Blob::Servable
+
+  def custom_metadata: () -> untyped
+
+  def custom_metadata=: (untyped metadata) -> untyped
+
+  def compose: (untyped keys) -> untyped
+
+  def service_metadata: () -> ({ content_type: untyped, disposition: :attachment, filename: untyped, custom_metadata: untyped } | { content_type: untyped, custom_metadata: untyped })
+
+  # Downloads a part of the file associated with this blob.
+  def download_chunk: (untyped range) -> untyped
+
+  private
+
+  def compute_checksum_in_chunks: (untyped io) -> untyped
+
+  def extract_content_type: (untyped io) -> untyped
+
+  def web_image?: () -> untyped
+
+  def touch_attachments: () -> untyped
+
+  def update_service_metadata: () -> (untyped | nil)
+end
+
+# = Active Storage \Blob \Analyzable
+module ActiveStorage::Blob::Analyzable
+  # Extracts and stores metadata from the file associated with this blob using a relevant analyzer. Active Storage comes
+  # with built-in analyzers for images and videos. See ActiveStorage::Analyzer::ImageAnalyzer and
+  # ActiveStorage::Analyzer::VideoAnalyzer for information about the specific attributes they extract and the third-party
+  # libraries they require.
+  #
+  # To choose the analyzer for a blob, Active Storage calls +accept?+ on each registered analyzer in order. It uses the
+  # first analyzer for which +accept?+ returns true when given the blob. If no registered analyzer accepts the blob, no
+  # metadata is extracted from it.
+  #
+  # In a \Rails application, add or remove analyzers by manipulating +Rails.application.config.active_storage.analyzers+
+  # in an initializer:
+  #
+  #   # Add a custom analyzer for Microsoft Office documents:
+  #   Rails.application.config.active_storage.analyzers.append DOCXAnalyzer
+  #
+  #   # Remove the built-in video analyzer:
+  #   Rails.application.config.active_storage.analyzers.delete ActiveStorage::Analyzer::VideoAnalyzer
+  #
+  # Outside of a \Rails application, manipulate +ActiveStorage.analyzers+ instead.
+  #
+  # You won't ordinarily need to call this method from a \Rails application. New blobs are automatically and asynchronously
+  # analyzed via #analyze_later when they're attached for the first time.
+  def analyze: () -> untyped
+
+  # Enqueues an ActiveStorage::AnalyzeJob which calls #analyze, or calls #analyze inline based on analyzer class configuration.
+  #
+  # This method is automatically called for a blob when it's attached for the first time. You can call it to analyze a blob
+  # again (e.g. if you add a new analyzer or modify an existing one).
+  def analyze_later: () -> untyped
+
+  # Returns true if the blob has been analyzed.
+  def analyzed?: () -> untyped
+
+  private
+
+  def extract_metadata_via_analyzer: () -> untyped
+
+  def analyzer: () -> untyped
+
+  def analyzer_class: () -> untyped
+end
+
+# = Active Storage \Blob \Identifiable
+module ActiveStorage::Blob::Identifiable
+  def identify: () -> untyped
+
+  def identify_without_saving: () -> (untyped | nil)
+
+  def identified?: () -> untyped
+
+  private
+
+  def identify_content_type: () -> untyped
+
+  def download_identifiable_chunk: () -> (untyped | "")
+end
+
+module ActiveStorage::Blob::Representable
+  extend ::ActiveSupport::Concern
+
+  # Returns an ActiveStorage::Variant or ActiveStorage::VariantWithRecord instance with the set of +transformations+ provided.
+  # This is only relevant for image files, and it allows any image to be transformed for size, colors, and the like. Example:
+  #
+  #   avatar.variant(resize_to_limit: [100, 100]).processed.url
+  #
+  # This will create and process a variant of the avatar blob that's constrained to a height and width of 100px.
+  # Then it'll upload said variant to the service according to a derivative key of the blob and the transformations.
+  #
+  # Frequently, though, you don't actually want to transform the variant right away. But rather simply refer to a
+  # specific variant that can be created by a controller on-demand. Like so:
+  #
+  #   <%= image_tag Current.user.avatar.variant(resize_to_limit: [100, 100]) %>
+  #
+  # This will create a URL for that specific blob with that specific variant, which the ActiveStorage::Representations::ProxyController
+  # or ActiveStorage::Representations::RedirectController can then produce on-demand.
+  #
+  # Raises ActiveStorage::InvariableError if the variant processor cannot
+  # transform the blob. To determine whether a blob is variable, call
+  # ActiveStorage::Blob#variable?.
+  #
+  # ==== Options
+  #
+  # Options are defined by the {image_processing gem}[https://github.com/janko/image_processing],
+  # and depend on which variant processor you are using:
+  # {Vips}[https://github.com/janko/image_processing/blob/master/doc/vips.md] or
+  # {MiniMagick}[https://github.com/janko/image_processing/blob/master/doc/minimagick.md].
+  # However, both variant processors support the following options:
+  #
+  # [+:resize_to_limit+]
+  #   Downsizes the image to fit within the specified dimensions while retaining
+  #   the original aspect ratio. Will only resize the image if it's larger than
+  #   the specified dimensions.
+  #
+  #       user.avatar.variant(resize_to_limit: [100, 100])
+  #
+  # [+:resize_to_fit+]
+  #   Resizes the image to fit within the specified dimensions while retaining
+  #   the original aspect ratio. Will downsize the image if it's larger than the
+  #   specified dimensions or upsize if it's smaller.
+  #
+  #       user.avatar.variant(resize_to_fit: [100, 100])
+  #
+  # [+:resize_to_fill+]
+  #   Resizes the image to fill the specified dimensions while retaining the
+  #   original aspect ratio. If necessary, will crop the image in the larger
+  #   dimension.
+  #
+  #       user.avatar.variant(resize_to_fill: [100, 100])
+  #
+  # [+:resize_and_pad+]
+  #   Resizes the image to fit within the specified dimensions while retaining
+  #   the original aspect ratio. If necessary, will pad the remaining area with
+  #   transparent color if source image has alpha channel, black otherwise.
+  #
+  #       user.avatar.variant(resize_and_pad: [100, 100])
+  #
+  # [+:crop+]
+  #   Extracts an area from an image. The first two arguments are the left and
+  #   top edges of area to extract, while the last two arguments are the width
+  #   and height of the area to extract.
+  #
+  #       user.avatar.variant(crop: [20, 50, 300, 300])
+  #
+  # [+:rotate+]
+  #   Rotates the image by the specified angle.
+  #
+  #       user.avatar.variant(rotate: 90)
+  #
+  # Some options, including those listed above, can accept additional
+  # processor-specific values which can be passed as a trailing hash:
+  #
+  #     <!-- Vips supports configuring `crop` for many of its transformations -->
+  #     <%= image_tag user.avatar.variant(resize_to_fill: [100, 100, { crop: :centre }]) %>
+  #
+  # If migrating an existing application between MiniMagick and Vips, you will
+  # need to update processor-specific options:
+  #
+  #     <!-- MiniMagick -->
+  #     <%= image_tag user.avatar.variant(resize_to_limit: [100, 100], format: :jpeg,
+  #           sampling_factor: "4:2:0", strip: true, interlace: "JPEG", colorspace: "sRGB", quality: 80) %>
+  #
+  #     <!-- Vips -->
+  #     <%= image_tag user.avatar.variant(resize_to_limit: [100, 100], format: :jpeg,
+  #           saver: { subsample_mode: "on", strip: true, interlace: true, quality: 80 }) %>
+  #
+  def variant: (untyped transformations) -> untyped
+
+  # Returns true if the variant processor can transform the blob (its content
+  # type is in +ActiveStorage.variable_content_types+).
+  def variable?: () -> untyped
+
+  # Returns an ActiveStorage::Preview instance with the set of +transformations+ provided. A preview is an image generated
+  # from a non-image blob. Active Storage comes with built-in previewers for videos and PDF documents. The video previewer
+  # extracts the first frame from a video and the PDF previewer extracts the first page from a PDF document.
+  #
+  #   blob.preview(resize_to_limit: [100, 100]).processed.url
+  #
+  # Avoid processing previews synchronously in views. Instead, link to a controller action that processes them on demand.
+  # Active Storage provides one, but you may want to create your own (for example, if you need authentication). Here’s
+  # how to use the built-in version:
+  #
+  #   <%= image_tag video.preview(resize_to_limit: [100, 100]) %>
+  #
+  # This method raises ActiveStorage::UnpreviewableError if no previewer accepts the receiving blob. To determine
+  # whether a blob is accepted by any previewer, call ActiveStorage::Blob#previewable?.
+  def preview: (untyped transformations) -> untyped
+
+  # Returns true if any registered previewer accepts the blob. By default, this will return true for videos and PDF documents.
+  def previewable?: () -> untyped
+
+  # Returns an ActiveStorage::Preview for a previewable blob or an ActiveStorage::Variant for a variable image blob.
+  #
+  #   blob.representation(resize_to_limit: [100, 100]).processed.url
+  #
+  # Raises ActiveStorage::UnrepresentableError if the receiving blob is neither variable nor previewable. Call
+  # ActiveStorage::Blob#representable? to determine whether a blob is representable.
+  #
+  # See ActiveStorage::Blob#preview and ActiveStorage::Blob#variant for more information.
+  def representation: (untyped transformations) -> untyped
+
+  # Returns true if the blob is variable or previewable.
+  def representable?: () -> untyped
+
+  def preview_image_needed_before_processing_variants?: () -> untyped
+
+  def create_preview_image_later: (untyped variations) -> (untyped | nil)
+
+  def preprocessed: (untyped transformations) -> (untyped | nil)
+
+  private
+
+  def default_variant_transformations: () -> { format: untyped }
+
+  def default_variant_format: () -> (untyped | :png)
+
+  def format: () -> untyped
+
+  def variant_class: () -> untyped
+end
+
+module ActiveStorage::Blob::Servable
+  def content_type_for_serving: () -> untyped
+
+  def forced_disposition_for_serving: () -> (:attachment | nil)
+
+  private
+
+  def forcibly_serve_as_binary?: () -> untyped
+
+  def allowed_inline?: () -> untyped
+end
+
+class ActiveStorage::Current
+end
+
+# = Active Storage \Filename
+#
+# Encapsulates a string representing a filename to provide convenient access to parts of it and sanitization.
+# A Filename instance is returned by ActiveStorage::Blob#filename, and is comparable so it can be used for sorting.
+class ActiveStorage::Filename
+  include ::Comparable
+
+  # Returns a Filename instance based on the given filename. If the filename is a Filename, it is
+  # returned unmodified. If it is a String, it is passed to ActiveStorage::Filename.new.
+  def self.wrap: (untyped filename) -> untyped
+
+  def initialize: (untyped filename) -> void
+
+  def as_json: (*untyped) -> untyped
+
+  def <=>: (untyped other) -> untyped
+end
+
+class ActiveStorage::NamedVariant
+  attr_reader transformations: untyped
+
+  attr_reader preprocessed: untyped
+
+  def initialize: (untyped transformations) -> void
+
+  def preprocessed?: (untyped record) -> untyped
+end
+
+# = Active Storage \Preview
+#
+# Some non-image blobs can be previewed: that is, they can be presented as images. A video blob can be previewed by
+# extracting its first frame, and a PDF blob can be previewed by extracting its first page.
+#
+# A previewer extracts a preview image from a blob. Active Storage provides previewers for videos and PDFs.
+# ActiveStorage::Previewer::VideoPreviewer is used for videos whereas ActiveStorage::Previewer::PopplerPDFPreviewer
+# and ActiveStorage::Previewer::MuPDFPreviewer are used for PDFs. Build custom previewers by
+# subclassing ActiveStorage::Previewer and implementing the requisite methods. Consult the ActiveStorage::Previewer
+# documentation for more details on what's required of previewers.
+#
+# To choose the previewer for a blob, Active Storage calls +accept?+ on each registered previewer in order. It uses the
+# first previewer for which +accept?+ returns true when given the blob. In a \Rails application, add or remove previewers
+# by manipulating +Rails.application.config.active_storage.previewers+ in an initializer:
+#
+#   Rails.application.config.active_storage.previewers
+#   # => [ ActiveStorage::Previewer::PopplerPDFPreviewer, ActiveStorage::Previewer::MuPDFPreviewer, ActiveStorage::Previewer::VideoPreviewer ]
+#
+#   # Add a custom previewer for Microsoft Office documents:
+#   Rails.application.config.active_storage.previewers << DOCXPreviewer
+#   # => [ ActiveStorage::Previewer::PopplerPDFPreviewer, ActiveStorage::Previewer::MuPDFPreviewer, ActiveStorage::Previewer::VideoPreviewer, DOCXPreviewer ]
+#
+# Outside of a \Rails application, modify +ActiveStorage.previewers+ instead.
+#
+# The built-in previewers rely on third-party system libraries. Specifically, the built-in video previewer requires
+# {FFmpeg}[https://www.ffmpeg.org]. Two PDF previewers are provided: one requires {Poppler}[https://poppler.freedesktop.org],
+# and the other requires {muPDF}[https://mupdf.com] (version 1.8 or newer). To preview PDFs, install either Poppler or muPDF.
+#
+# These libraries are not provided by \Rails. You must install them yourself to use the built-in previewers. Before you
+# install and use third-party software, make sure you understand the licensing implications of doing so.
+class ActiveStorage::Preview
+  def filename: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def content_type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+  include ::ActiveStorage::Blob::Servable
+
+  class UnprocessedError < ::StandardError
+  end
+
+  attr_reader blob: untyped
+
+  attr_reader variation: untyped
+
+  def initialize: (untyped blob, untyped variation_or_variation_key) -> void
+
+  # Processes the preview if it has not been processed yet. Returns the receiving +ActiveStorage::Preview+ instance for convenience:
+  #
+  #   blob.preview(resize_to_limit: [100, 100]).processed.url
+  #
+  # Processing a preview generates an image from its blob and attaches the preview image to the blob. Because the preview
+  # image is stored with the blob, it is only generated once.
+  def processed: () -> self
+
+  # Returns the blob's attached preview image.
+  def image: () -> untyped
+
+  # Returns the URL of the preview's variant on the service. Raises ActiveStorage::Preview::UnprocessedError if the
+  # preview has not been processed yet.
+  #
+  # This method synchronously processes a variant of the preview image, so do not call it in views. Instead, generate
+  # a stable URL that redirects to the URL returned by this method.
+  def url: (**untyped options) -> untyped
+
+  # Returns a combination key of the blob and the variation that together identifies a specific variant.
+  def key: () -> untyped
+
+  # Downloads the file associated with this preview's variant. If no block is
+  # given, the entire file is read into memory and returned. That'll use a lot
+  # of RAM for very large files. If a block is given, then the download is
+  # streamed and yielded in chunks. Raises ActiveStorage::Preview::UnprocessedError
+  # if the preview has not been processed yet.
+  def download: () ?{ (?) -> untyped } -> untyped
+
+  private
+
+  def processed?: () -> untyped
+
+  def process: () -> untyped
+
+  def variant: () -> untyped
+
+  def variant?: () -> untyped
+
+  def presentation: () -> untyped
+
+  def previewer: () -> untyped
+
+  def previewer_class: () -> untyped
+end
+
+class ActiveStorage::Record
+end
+
+class ActiveStorage::VariantRecord < ::ActiveStorage::Record
+end
+
+# = Active Storage \Variant With Record
+#
+# Like an ActiveStorage::Variant, but keeps detail about the variant in the database as an
+# ActiveStorage::VariantRecord. This is only used if +ActiveStorage.track_variants+ is enabled.
+class ActiveStorage::VariantWithRecord
+  def service: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def content_type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def key: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def url: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def download: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+  include ::ActiveStorage::Blob::Servable
+
+  attr_reader blob: untyped
+
+  attr_reader variation: untyped
+
+  def initialize: (untyped blob, untyped variation) -> void
+
+  def processed: () -> self
+
+  def image: () -> untyped
+
+  def filename: () -> untyped
+
+  # Destroys record and deletes file from service.
+  def destroy: () -> untyped
+
+  private
+
+  def processed?: () -> untyped
+
+  def process: () -> untyped
+
+  def transform_blob: () { (io: untyped, filename: untyped, content_type: untyped, service_name: untyped) -> untyped } -> untyped
+
+  def create_or_find_record: (image: untyped) -> untyped
+
+  def record: () -> untyped
+end
+
+# = Active Storage \Variant
+#
+# Image blobs can have variants that are the result of a set of transformations applied to the original.
+# These variants are used to create thumbnails, fixed-size avatars, or any other derivative image from the
+# original.
+#
+# Variants rely on {ImageProcessing}[https://github.com/janko/image_processing] gem for the actual transformations
+# of the file, so you must add <tt>gem "image_processing"</tt> to your Gemfile if you wish to use variants. By
+# default, images will be processed with {libvips}[http://libvips.github.io/libvips/] using the
+# {ruby-vips}[https://github.com/libvips/ruby-vips] gem, but you can also switch to the
+# {ImageMagick}[http://imagemagick.org] processor operated by the {MiniMagick}[https://github.com/minimagick/minimagick]
+# gem).
+#
+#   Rails.application.config.active_storage.variant_processor
+#   # => :vips
+#
+#   Rails.application.config.active_storage.variant_processor = :mini_magick
+#   # => :mini_magick
+#
+# Note that to create a variant it's necessary to download the entire blob file from the service. Because of this process,
+# you also want to be considerate about when the variant is actually processed. You shouldn't be processing variants inline
+# in a template, for example. Delay the processing to an on-demand controller, like the one provided in
+# ActiveStorage::Representations::ProxyController and ActiveStorage::Representations::RedirectController.
+#
+# To refer to such a delayed on-demand variant, simply link to the variant through the resolved route provided
+# by Active Storage like so:
+#
+#   <%= image_tag Current.user.avatar.variant(resize_to_limit: [100, 100]) %>
+#
+# This will create a URL for that specific blob with that specific variant, which the ActiveStorage::Representations::ProxyController
+# or ActiveStorage::Representations::RedirectController can then produce on-demand.
+#
+# When you do want to actually produce the variant needed, call +processed+. This will check that the variant
+# has already been processed and uploaded to the service, and, if so, just return that. Otherwise it will perform
+# the transformations, upload the variant to the service, and return itself again. Example:
+#
+#   avatar.variant(resize_to_limit: [100, 100]).processed.url
+#
+# This will create and process a variant of the avatar blob that's constrained to a height and width of 100.
+# Then it'll upload said variant to the service according to a derivative key of the blob and the transformations.
+#
+# You can combine any number of ImageMagick/libvips operations into a variant, as well as any macros provided by the
+# ImageProcessing gem (such as +resize_to_limit+):
+#
+#   avatar.variant(resize_to_limit: [800, 800], colourspace: "b-w", rotate: "-90")
+#
+# Visit the following links for a list of available ImageProcessing commands and ImageMagick/libvips operations:
+#
+# * {ImageProcessing::MiniMagick}[https://github.com/janko/image_processing/blob/master/doc/minimagick.md#methods]
+# * {ImageMagick reference}[https://www.imagemagick.org/script/mogrify.php]
+# * {ImageProcessing::Vips}[https://github.com/janko/image_processing/blob/master/doc/vips.md#methods]
+# * {ruby-vips reference}[http://www.rubydoc.info/gems/ruby-vips/Vips/Image]
+class ActiveStorage::Variant
+  def service: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def content_type: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+  include ::ActiveStorage::Blob::Servable
+
+  attr_reader blob: untyped
+
+  attr_reader variation: untyped
+
+  def initialize: (untyped blob, untyped variation_or_variation_key) -> void
+
+  # Returns the variant instance itself after it's been processed or an existing processing has been found on the service.
+  def processed: () -> self
+
+  # Returns a combination key of the blob and the variation that together identifies a specific variant.
+  def key: () -> ::String
+
+  # Returns the URL of the blob variant on the service. See ActiveStorage::Blob#url for details.
+  #
+  # Use <tt>url_for(variant)</tt> (or the implied form, like <tt>link_to variant</tt> or <tt>redirect_to variant</tt>) to get the stable URL
+  # for a variant that points to the ActiveStorage::Representations::ProxyController or ActiveStorage::Representations::RedirectController,
+  # which in turn will use this +url+ method for its redirection.
+  def url: (?expires_in: untyped, ?disposition: ::Symbol) -> untyped
+
+  # Downloads the file associated with this variant. If no block is given, the entire file is read into memory and returned.
+  # That'll use a lot of RAM for very large files. If a block is given, then the download is streamed and yielded in chunks.
+  def download: () ?{ (?) -> untyped } -> untyped
+
+  def filename: () -> untyped
+
+  # Returns the receiving variant. Allows ActiveStorage::Variant and ActiveStorage::Preview instances to be used interchangeably.
+  def image: () -> self
+
+  # Deletes variant file from service.
+  def destroy: () -> untyped
+
+  private
+
+  def processed?: () -> untyped
+
+  def process: () -> untyped
+end
+
+# = Active Storage \Variation
+#
+# A set of transformations that can be applied to a blob to create a variant. This class is exposed via
+# the ActiveStorage::Blob#variant method and should rarely be used directly.
+#
+# In case you do need to use this directly, it's instantiated using a hash of transformations where
+# the key is the command and the value is the arguments. Example:
+#
+#   ActiveStorage::Variation.new(resize_to_limit: [100, 100], colourspace: "b-w", rotate: "-90", saver: { trim: true })
+#
+# The options map directly to {ImageProcessing}[https://github.com/janko/image_processing] commands.
+class ActiveStorage::Variation
+  attr_reader transformations: untyped
+
+  # Returns a Variation instance based on the given variator. If the variator is a Variation, it is
+  # returned unmodified. If it is a String, it is passed to ActiveStorage::Variation.decode. Otherwise,
+  # it is assumed to be a transformations Hash and is passed directly to the constructor.
+  def self.wrap: (untyped variator) -> untyped
+
+  # Returns a Variation instance with the transformations that were encoded by +encode+.
+  def self.decode: (untyped key) -> untyped
+
+  # Returns a signed key for the +transformations+, which can be used to refer to a specific
+  # variation in a URL or combined key (like <tt>ActiveStorage::Variant#key</tt>).
+  def self.encode: (untyped transformations) -> untyped
+
+  def initialize: (untyped transformations) -> void
+
+  def default_to: (untyped defaults) -> untyped
+
+  # Accepts a File object, performs the +transformations+ against it, and
+  # saves the transformed image into a temporary file.
+  def transform: (untyped file) { (?) -> untyped } -> untyped
+
+  def format: () -> untyped
+
+  def content_type: () -> untyped
+
+  # Returns a signed key for all the +transformations+ that this variation was instantiated with.
+  def key: () -> untyped
+
+  def digest: () -> untyped
+
+  private
+
+  def transformer: () -> untyped
+end
+
+# :markup: markdown
+# :include: ../README.md
+module ActiveStorage
+  def self.logger: () -> untyped
+
+  def self.logger=: (untyped value) -> untyped
+
+  def logger: () -> untyped
+
+  def logger=: (untyped value) -> untyped
+
+  def self.verifier: () -> untyped
+
+  def self.verifier=: (untyped value) -> untyped
+
+  def verifier: () -> untyped
+
+  def verifier=: (untyped value) -> untyped
+
+  def self.variant_processor: () -> untyped
+
+  def self.variant_processor=: (untyped value) -> untyped
+
+  def variant_processor: () -> untyped
+
+  def variant_processor=: (untyped value) -> untyped
+
+  def self.variant_transformer: () -> untyped
+
+  def self.variant_transformer=: (untyped value) -> untyped
+
+  def variant_transformer: () -> untyped
+
+  def variant_transformer=: (untyped value) -> untyped
+
+  def self.queues: () -> untyped
+
+  def self.queues=: (untyped value) -> untyped
+
+  def queues: () -> untyped
+
+  def queues=: (untyped value) -> untyped
+
+  def self.previewers: () -> untyped
+
+  def self.previewers=: (untyped value) -> untyped
+
+  def previewers: () -> untyped
+
+  def previewers=: (untyped value) -> untyped
+
+  def self.analyzers: () -> untyped
+
+  def self.analyzers=: (untyped value) -> untyped
+
+  def analyzers: () -> untyped
+
+  def analyzers=: (untyped value) -> untyped
+
+  def self.paths: () -> untyped
+
+  def self.paths=: (untyped value) -> untyped
+
+  def paths: () -> untyped
+
+  def paths=: (untyped value) -> untyped
+
+  def self.variable_content_types: () -> untyped
+
+  def self.variable_content_types=: (untyped value) -> untyped
+
+  def variable_content_types: () -> untyped
+
+  def variable_content_types=: (untyped value) -> untyped
+
+  def self.web_image_content_types: () -> untyped
+
+  def self.web_image_content_types=: (untyped value) -> untyped
+
+  def web_image_content_types: () -> untyped
+
+  def web_image_content_types=: (untyped value) -> untyped
+
+  def self.binary_content_type: () -> untyped
+
+  def self.binary_content_type=: (untyped value) -> untyped
+
+  def binary_content_type: () -> untyped
+
+  def binary_content_type=: (untyped value) -> untyped
+
+  def self.content_types_to_serve_as_binary: () -> untyped
+
+  def self.content_types_to_serve_as_binary=: (untyped value) -> untyped
+
+  def content_types_to_serve_as_binary: () -> untyped
+
+  def content_types_to_serve_as_binary=: (untyped value) -> untyped
+
+  def self.content_types_allowed_inline: () -> untyped
+
+  def self.content_types_allowed_inline=: (untyped value) -> untyped
+
+  def content_types_allowed_inline: () -> untyped
+
+  def content_types_allowed_inline=: (untyped value) -> untyped
+
+  def self.supported_image_processing_methods: () -> untyped
+
+  def self.supported_image_processing_methods=: (untyped value) -> untyped
+
+  def supported_image_processing_methods: () -> untyped
+
+  def supported_image_processing_methods=: (untyped value) -> untyped
+
+  def self.unsupported_image_processing_arguments: () -> untyped
+
+  def self.unsupported_image_processing_arguments=: (untyped value) -> untyped
+
+  def unsupported_image_processing_arguments: () -> untyped
+
+  def unsupported_image_processing_arguments=: (untyped value) -> untyped
+
+  def self.streaming_chunk_max_size: () -> untyped
+
+  def self.streaming_chunk_max_size=: (untyped value) -> untyped
+
+  def streaming_chunk_max_size: () -> untyped
+
+  def streaming_chunk_max_size=: (untyped value) -> untyped
+
+  def self.service_urls_expire_in: () -> untyped
+
+  def self.service_urls_expire_in=: (untyped value) -> untyped
+
+  def service_urls_expire_in: () -> untyped
+
+  def service_urls_expire_in=: (untyped value) -> untyped
+
+  def self.touch_attachment_records: () -> untyped
+
+  def self.touch_attachment_records=: (untyped value) -> untyped
+
+  def touch_attachment_records: () -> untyped
+
+  def touch_attachment_records=: (untyped value) -> untyped
+
+  def self.urls_expire_in: () -> untyped
+
+  def self.urls_expire_in=: (untyped value) -> untyped
+
+  def urls_expire_in: () -> untyped
+
+  def urls_expire_in=: (untyped value) -> untyped
+
+  def self.routes_prefix: () -> untyped
+
+  def self.routes_prefix=: (untyped value) -> untyped
+
+  def routes_prefix: () -> untyped
+
+  def routes_prefix=: (untyped value) -> untyped
+
+  def self.draw_routes: () -> untyped
+
+  def self.draw_routes=: (untyped value) -> untyped
+
+  def draw_routes: () -> untyped
+
+  def draw_routes=: (untyped value) -> untyped
+
+  def self.resolve_model_to_route: () -> untyped
+
+  def self.resolve_model_to_route=: (untyped value) -> untyped
+
+  def resolve_model_to_route: () -> untyped
+
+  def resolve_model_to_route=: (untyped value) -> untyped
+
+  def self.track_variants: () -> untyped
+
+  def self.track_variants=: (untyped value) -> untyped
+
+  def track_variants: () -> untyped
+
+  def track_variants=: (untyped value) -> untyped
+
+  def self.checksum_implementation: () -> untyped
+
+  def self.checksum_implementation=: (untyped value) -> untyped
+
+  def self.streaming_max_ranges: () -> untyped
+
+  def self.streaming_max_ranges=: (untyped value) -> untyped
+
+  def self.video_preview_arguments: () -> untyped
+
+  def self.video_preview_arguments=: (untyped value) -> untyped
+
+  def video_preview_arguments: () -> untyped
+
+  def video_preview_arguments=: (untyped value) -> untyped
+
+  extend ::ActiveSupport::Autoload
+
+  module Transformers
+    extend ::ActiveSupport::Autoload
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Analyzer
+  #
+  # This is an abstract base class for analyzers, which extract metadata from blobs. See
+  # ActiveStorage::Analyzer::VideoAnalyzer for an example of a concrete subclass.
+  class Analyzer
+    attr_reader blob: untyped
+
+    # Implement this method in a concrete subclass. Have it return true when given a blob from which
+    # the analyzer can extract metadata.
+    def self.accept?: (untyped blob) -> false
+
+    # Implement this method in concrete subclasses. It will determine if blob analysis
+    # should be done in a job or performed inline. By default, analysis is enqueued in a job.
+    def self.analyze_later?: () -> true
+
+    def initialize: (untyped blob) -> void
+
+    # Override this method in a concrete subclass. Have it return a Hash of metadata.
+    def metadata: () -> untyped
+
+    private
+
+    # Downloads the blob to a tempfile on disk. Yields the tempfile.
+    def download_blob_to_tempfile: () { (?) -> untyped } -> untyped
+
+    def logger: () -> untyped
+
+    def tmpdir: () -> untyped
+
+    def instrument: (untyped analyzer) ?{ (?) -> untyped } -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage Audio \Analyzer
+  #
+  # Extracts duration (seconds), bit_rate (bits/s), sample_rate (hertz) and tags (internal metadata) from an audio blob.
+  #
+  # Example:
+  #
+  #   ActiveStorage::Analyzer::AudioAnalyzer.new(blob).metadata
+  #   # => { duration: 5.0, bit_rate: 320340, sample_rate: 44100, tags: { encoder: "Lavc57.64", ... } }
+  #
+  # This analyzer requires the {FFmpeg}[https://www.ffmpeg.org] system library, which is not provided by \Rails.
+  class Analyzer::AudioAnalyzer < ::ActiveStorage::Analyzer
+    def self.accept?: (untyped blob) -> untyped
+
+    def metadata: () -> untyped
+
+    private
+
+    def duration: () -> untyped
+
+    def bit_rate: () -> untyped
+
+    def sample_rate: () -> untyped
+
+    def tags: () -> untyped
+
+    def audio_stream: () -> untyped
+
+    def streams: () -> untyped
+
+    def probe: () -> untyped
+
+    def probe_from: (untyped file) -> untyped
+
+    def ffprobe_path: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage Image \Analyzer
+  #
+  # This is an abstract base class for image analyzers, which extract width and height from an image blob.
+  #
+  # If the image contains EXIF data indicating its angle is 90 or 270 degrees, its width and height are swapped for convenience.
+  #
+  # Example:
+  #
+  #   ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick.new(blob).metadata
+  #   # => { width: 4104, height: 2736 }
+  class Analyzer::ImageAnalyzer < ::ActiveStorage::Analyzer
+    extend ::ActiveSupport::Autoload
+
+    def self.accept?: (untyped blob) -> untyped
+
+    def metadata: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # This analyzer relies on the third-party {MiniMagick}[https://github.com/minimagick/minimagick] gem. MiniMagick requires
+  # the {ImageMagick}[http://www.imagemagick.org] system library.
+  class Analyzer::ImageAnalyzer::ImageMagick < ::ActiveStorage::Analyzer::ImageAnalyzer
+    def self.accept?: (untyped blob) -> untyped
+
+    private
+
+    def read_image: () { (untyped) -> untyped } -> (::Hash[untyped, untyped] | untyped)
+
+    def rotated_image?: (untyped image) -> untyped
+  end
+end
+
+module ActiveStorage
+  # This analyzer relies on the third-party {ruby-vips}[https://github.com/libvips/ruby-vips] gem. Ruby-vips requires
+  # the {libvips}[https://libvips.github.io/libvips/] system library.
+  class Analyzer::ImageAnalyzer::Vips < ::ActiveStorage::Analyzer::ImageAnalyzer
+    def self.accept?: (untyped blob) -> untyped
+
+    private
+
+    def read_image: () { (untyped) -> untyped } -> untyped
+
+    ROTATIONS: ::Regexp
+
+    def rotated_image?: (untyped image) -> untyped
+  end
+end
+
+module ActiveStorage
+  class Analyzer::NullAnalyzer < ::ActiveStorage::Analyzer
+    def self.accept?: (untyped blob) -> true
+
+    def self.analyze_later?: () -> false
+
+    def metadata: () -> ::Hash[untyped, untyped]
+  end
+end
+
+module ActiveStorage
+  # = Active Storage Video \Analyzer
+  #
+  # Extracts the following from a video blob:
+  #
+  # * Width (pixels)
+  # * Height (pixels)
+  # * Duration (seconds)
+  # * Angle (degrees)
+  # * Display aspect ratio
+  # * Audio (true if file has an audio channel, false if not)
+  # * Video (true if file has an video channel, false if not)
+  #
+  # Example:
+  #
+  #   ActiveStorage::Analyzer::VideoAnalyzer.new(blob).metadata
+  #   # => { width: 640.0, height: 480.0, duration: 5.0, angle: 0, display_aspect_ratio: [4, 3], audio: true, video: true }
+  #
+  # When a video's angle is 90, -90, 270 or -270 degrees, its width and height are automatically swapped for convenience.
+  #
+  # This analyzer requires the {FFmpeg}[https://www.ffmpeg.org] system library, which is not provided by \Rails.
+  class Analyzer::VideoAnalyzer < ::ActiveStorage::Analyzer
+    def self.accept?: (untyped blob) -> untyped
+
+    def metadata: () -> untyped
+
+    private
+
+    def width: () -> untyped
+
+    def height: () -> untyped
+
+    def duration: () -> untyped
+
+    def angle: () -> (untyped | nil)
+
+    def display_matrix: () -> untyped
+
+    def display_aspect_ratio: () -> (untyped | nil)
+
+    def rotated?: () -> untyped
+
+    def audio?: () -> untyped
+
+    def video?: () -> untyped
+
+    def computed_height: () -> (untyped | nil)
+
+    def encoded_width: () -> (untyped | nil)
+
+    def encoded_height: () -> (untyped | nil)
+
+    def display_height_scale: () -> (untyped | nil)
+
+    def tags: () -> untyped
+
+    def side_data: () -> untyped
+
+    def video_stream: () -> untyped
+
+    def audio_stream: () -> untyped
+
+    def streams: () -> untyped
+
+    def container: () -> untyped
+
+    def probe: () -> untyped
+
+    def probe_from: (untyped file) -> untyped
+
+    def ffprobe_path: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Attached
+  #
+  # Abstract base class for the concrete ActiveStorage::Attached::One and ActiveStorage::Attached::Many
+  # classes that both provide proxy access to the blob association for a record.
+  class Attached
+    private
+
+    def change: () -> untyped
+  end
+end
+
+module ActiveStorage
+  module Attached::Changes
+    extend ::ActiveSupport::Autoload
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::CreateMany
+    attr_reader name: untyped
+
+    attr_reader attachables: untyped
+
+    attr_reader pending_uploads: untyped
+
+    attr_accessor record: untyped
+
+    def initialize: (untyped name, untyped record, untyped attachables, ?pending_uploads: untyped) -> void
+
+    def attachments: () -> untyped
+
+    def blobs: () -> untyped
+
+    def upload: () -> untyped
+
+    def save: () -> untyped
+
+    private
+
+    def subchanges: () -> untyped
+
+    def build_subchange_from: (untyped attachable) -> untyped
+
+    def subchanges_without_blobs: () -> untyped
+
+    def assign_associated_attachments: () -> untyped
+
+    def reset_associated_blobs: () -> untyped
+
+    def persisted_or_new_attachments: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::CreateOneOfMany < ::ActiveStorage::Attached::Changes::CreateOne
+    private
+
+    def find_attachment: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::CreateOne
+    attr_reader name: untyped
+
+    attr_reader attachable: untyped
+
+    attr_accessor record: untyped
+
+    def initialize: (untyped name, untyped record, untyped attachable) -> void
+
+    def attachment: () -> untyped
+
+    def blob: () -> untyped
+
+    def upload: () -> untyped
+
+    def save: () -> untyped
+
+    private
+
+    def find_or_build_attachment: () -> untyped
+
+    def find_attachment: () -> (untyped | nil)
+
+    def build_attachment: () -> untyped
+
+    def find_or_build_blob: () -> untyped
+
+    def attachment_service_name: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::DeleteMany
+    attr_reader name: untyped
+
+    attr_accessor record: untyped
+
+    def initialize: (untyped name, untyped record) -> void
+
+    def attachables: () -> ::Array[untyped]
+
+    def attachments: () -> untyped
+
+    def blobs: () -> untyped
+
+    def save: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::DeleteOne
+    attr_reader name: untyped
+
+    attr_accessor record: untyped
+
+    def initialize: (untyped name, untyped record) -> void
+
+    def attachment: () -> nil
+
+    def save: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::DetachMany
+    attr_reader name: untyped
+
+    attr_reader record: untyped
+
+    attr_reader attachments: untyped
+
+    def initialize: (untyped name, untyped record, untyped attachments) -> void
+
+    def detach: () -> (untyped | nil)
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::DetachOne
+    attr_reader name: untyped
+
+    attr_reader record: untyped
+
+    attr_reader attachment: untyped
+
+    def initialize: (untyped name, untyped record, untyped attachment) -> void
+
+    def detach: () -> (untyped | nil)
+
+    private
+
+    def reset: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::PurgeMany
+    attr_reader name: untyped
+
+    attr_reader record: untyped
+
+    attr_reader attachments: untyped
+
+    def initialize: (untyped name, untyped record, untyped attachments) -> void
+
+    def purge: () -> untyped
+
+    def purge_later: () -> untyped
+
+    private
+
+    def reset: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Attached::Changes::PurgeOne
+    attr_reader name: untyped
+
+    attr_reader record: untyped
+
+    attr_reader attachment: untyped
+
+    def initialize: (untyped name, untyped record, untyped attachment) -> void
+
+    def purge: () -> untyped
+
+    def purge_later: () -> untyped
+
+    private
+
+    def reset: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Attached \Many
+  #
+  # Decorated proxy object representing of multiple attachments to a model.
+  class Attached::Many
+    def purge: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def purge_later: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def as_json: (?untyped? options) -> untyped
+
+    private
+
+    def purge_many: () -> untyped
+
+    def detach_many: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Attached \Model
+  #
+  # Provides the class-level DSL for declaring an Active Record model's attachments.
+  module Attached::Model
+    extend ::ActiveSupport::Concern
+
+    def self.validate_service_configuration: (untyped service_name, untyped model_class, untyped association_name) -> untyped
+
+    def self.validate_global_service_configuration: (untyped model_class) -> (untyped | nil)
+
+    attr_writer attachment_changes: untyped
+
+    def initialize_dup: (*untyped) -> untyped
+
+    def becomes: (untyped klass) -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Attached \One
+  #
+  # Representation of a single attachment to a model.
+  class Attached::One
+    # Returns the attachment record's JSON representation, or +nil+ when no
+    # attachment is present.
+    def as_json: (?untyped? options) -> (untyped | nil)
+
+    private
+
+    def purge_one: () -> untyped
+
+    def detach_one: () -> untyped
+  end
+end
+
+module ActiveStorage
+  def self.deprecator: () -> untyped
+end
+
+module ActiveStorage
+  class Downloader
+    attr_reader service: untyped
+
+    def initialize: (untyped service) -> void
+
+    def open: (untyped key, ?checksum: untyped?, ?verify: bool, ?name: ::String, ?tmpdir: untyped?) { (untyped) -> untyped } -> untyped
+
+    private
+
+    def open_tempfile: (untyped name, ?untyped? tmpdir) { (untyped) -> untyped } -> untyped
+
+    def download: (untyped key, untyped file) -> untyped
+
+    def verify_integrity_of: (untyped file, checksum: untyped) -> (untyped | nil)
+  end
+end
+
+module ActiveStorage
+  class Engine < ::Rails::Engine
+  end
+end
+
+module ActiveStorage
+  # Generic base class for all Active Storage exceptions.
+  class Error < ::StandardError
+  end
+
+  # Raised when ActiveStorage::Blob#variant is called on a blob that isn't variable.
+  # Use ActiveStorage::Blob#variable? to determine whether a blob is variable.
+  class InvariableError < ::ActiveStorage::Error
+  end
+
+  # Raised when ActiveStorage::Blob#preview is called on a blob that isn't previewable.
+  # Use ActiveStorage::Blob#previewable? to determine whether a blob is previewable.
+  class UnpreviewableError < ::ActiveStorage::Error
+  end
+
+  # Raised when ActiveStorage::Blob#representation is called on a blob that isn't representable.
+  # Use ActiveStorage::Blob#representable? to determine whether a blob is representable.
+  class UnrepresentableError < ::ActiveStorage::Error
+  end
+
+  # Raised when uploaded or downloaded data does not match a precomputed checksum.
+  # Indicates that a network error or a software bug caused data corruption.
+  class IntegrityError < ::ActiveStorage::Error
+  end
+
+  # Raised when ActiveStorage::Blob#download is called on a blob where the
+  # backing file is no longer present in its service.
+  class FileNotFoundError < ::ActiveStorage::Error
+  end
+
+  # Raised when a Previewer is unable to generate a preview image.
+  class PreviewError < ::ActiveStorage::Error
+  end
+
+  # Raised when a storage key resolves to a path outside the service's root
+  # directory, indicating a potential path traversal attack.
+  class InvalidKeyError < ::ActiveStorage::Error
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \FixtureSet
+  #
+  # Fixtures are a way of organizing data that you want to test against; in
+  # short, sample data.
+  #
+  # To learn more about fixtures, read the ActiveRecord::FixtureSet documentation.
+  #
+  # === YAML
+  #
+  # Like other Active Record-backed models, ActiveStorage::Attachment and
+  # ActiveStorage::Blob records inherit from ActiveRecord::Base instances and
+  # therefore can be populated by fixtures.
+  #
+  # Consider a hypothetical <tt>Article</tt> model class, its related
+  # fixture data, as well as fixture data for related ActiveStorage::Attachment
+  # and ActiveStorage::Blob records:
+  #
+  #   # app/models/article.rb
+  #   class Article < ApplicationRecord
+  #     has_one_attached :thumbnail
+  #   end
+  #
+  # <code></code>
+  #
+  #   # fixtures/active_storage/blobs.yml
+  #   first_thumbnail_blob: <%= ActiveStorage::FixtureSet.blob filename: "first.png" %>
+  #
+  # <code></code>
+  #
+  #   # fixtures/active_storage/attachments.yml
+  #   first_thumbnail_attachment:
+  #     name: thumbnail
+  #     record: first (Article)
+  #     blob: first_thumbnail_blob
+  #
+  # When processed, Active Record will insert database records for each fixture
+  # entry and will ensure the Active Storage relationship is intact.
+  class FixtureSet
+    extend ::ActiveRecord::SecureToken::ClassMethods
+
+    include ::ActiveSupport::Testing::FileFixtures
+
+    include ::ActiveRecord::SecureToken
+
+    # Generate a YAML-encoded representation of an ActiveStorage::Blob
+    # instance's attributes, resolve the file relative to the directory mentioned
+    # by ActiveSupport::Testing::FileFixtures.file_fixture, and upload
+    # the file to the Service
+    #
+    # ==== Examples
+    #
+    #   # tests/fixtures/active_storage/blobs.yml
+    #   second_thumbnail_blob: <%= ActiveStorage::FixtureSet.blob(
+    #     filename: "second.svg",
+    #   ) %>
+    #
+    #   third_thumbnail_blob: <%= ActiveStorage::FixtureSet.blob(
+    #     filename: "third.svg",
+    #     content_type: "image/svg+xml",
+    #     service_name: "public"
+    #   ) %>
+    #
+    def self.blob: (filename: untyped, **untyped attributes) -> untyped
+
+    def prepare: (untyped instance, **untyped attributes) -> untyped
+  end
+end
+
+module ActiveStorage
+  # Returns the currently loaded version of Active Storage as a +Gem::Version+.
+  def self.gem_version: () -> untyped
+
+  module VERSION
+    MAJOR: 8
+
+    MINOR: 1
+
+    TINY: 4
+
+    PRE: nil
+
+    STRING: untyped
+  end
+end
+
+module ActiveStorage
+  class LogSubscriber < ::ActiveSupport::LogSubscriber
+    def service_upload: (untyped event) -> untyped
+
+    def service_download: (untyped event) -> untyped
+
+    alias service_streaming_download service_download
+
+    def preview: (untyped event) -> untyped
+
+    def service_delete: (untyped event) -> untyped
+
+    def service_delete_prefixed: (untyped event) -> untyped
+
+    def service_exist: (untyped event) -> untyped
+
+    def service_url: (untyped event) -> untyped
+
+    def service_mirror: (untyped event) -> untyped
+
+    def logger: () -> untyped
+
+    private
+
+    def info: (untyped event, untyped colored_message) -> untyped
+
+    def debug: (untyped event, untyped colored_message) -> untyped
+
+    def log_prefix_for_service: (untyped event) -> untyped
+
+    def key_in: (untyped event) -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Previewer
+  #
+  # This is an abstract base class for previewers, which generate images from blobs. See
+  # ActiveStorage::Previewer::MuPDFPreviewer and ActiveStorage::Previewer::VideoPreviewer for
+  # examples of concrete subclasses.
+  class Previewer
+    attr_reader blob: untyped
+
+    # Implement this method in a concrete subclass. Have it return true when given a blob from which
+    # the previewer can generate an image.
+    def self.accept?: (untyped blob) -> false
+
+    def initialize: (untyped blob) -> void
+
+    # Override this method in a concrete subclass. Have it yield an attachable preview image (i.e.
+    # anything accepted by ActiveStorage::Attached::One#attach). Pass the additional options to
+    # the underlying blob that is created.
+    def preview: (**untyped options) -> untyped
+
+    private
+
+    # Downloads the blob to a tempfile on disk. Yields the tempfile.
+    def download_blob_to_tempfile: () { (?) -> untyped } -> untyped
+
+    # Executes a system command, capturing its binary output in a tempfile. Yields the tempfile.
+    #
+    # Use this method to shell out to a system library (e.g. muPDF or FFmpeg) for preview image
+    # generation. The resulting tempfile can be used as the +:io+ value in an attachable Hash:
+    #
+    #   def preview
+    #     download_blob_to_tempfile do |input|
+    #       draw "my-drawing-command", input.path, "--format", "png", "-" do |output|
+    #         yield io: output, filename: "#{blob.filename.base}.png", content_type: "image/png"
+    #       end
+    #     end
+    #   end
+    #
+    # The output tempfile is opened in the directory returned by #tmpdir.
+    def draw: (*untyped argv) { (untyped) -> untyped } -> untyped
+
+    def open_tempfile: () { (untyped) -> untyped } -> untyped
+
+    def instrument: (untyped operation, ?::Hash[untyped, untyped] payload) ?{ (?) -> untyped } -> untyped
+
+    def service_name: () -> untyped
+
+    def capture: (*untyped argv, to: untyped) -> untyped
+
+    def logger: () -> untyped
+
+    def tmpdir: () -> untyped
+  end
+end
+
+module ActiveStorage
+  class Previewer::MuPDFPreviewer < ::ActiveStorage::Previewer
+    def self.accept?: (untyped blob) -> untyped
+
+    def self.pdf?: (untyped content_type) -> untyped
+
+    def self.mutool_path: () -> untyped
+
+    def self.mutool_exists?: () -> untyped
+
+    def preview: (**untyped options) { (untyped) -> untyped } -> untyped
+
+    private
+
+    def draw_first_page_from: (untyped file) { (?) -> untyped } -> untyped
+  end
+end
+
+module ActiveStorage
+  class Previewer::PopplerPDFPreviewer < ::ActiveStorage::Previewer
+    def self.accept?: (untyped blob) -> untyped
+
+    def self.pdf?: (untyped content_type) -> untyped
+
+    def self.pdftoppm_path: () -> untyped
+
+    def self.pdftoppm_exists?: () -> untyped
+
+    def preview: (**untyped options) { (untyped) -> untyped } -> untyped
+
+    private
+
+    def draw_first_page_from: (untyped file) { (?) -> untyped } -> untyped
+  end
+end
+
+module ActiveStorage
+  class Previewer::VideoPreviewer < ::ActiveStorage::Previewer
+    def self.accept?: (untyped blob) -> untyped
+
+    def self.ffmpeg_exists?: () -> untyped
+
+    def self.ffmpeg_path: () -> untyped
+
+    def preview: (**untyped options) { (untyped) -> untyped } -> untyped
+
+    private
+
+    def draw_relevant_frame_from: (untyped file) { (?) -> untyped } -> untyped
+  end
+end
+
+module ActiveStorage
+  module Reflection
+    class HasAttachedReflection < ::ActiveRecord::Reflection::MacroReflection
+      def variant: (untyped name, untyped transformations) -> untyped
+
+      def named_variants: () -> untyped
+    end
+
+    # Holds all the metadata about a has_one_attached attachment as it was
+    # specified in the Active Record class.
+    class HasOneAttachedReflection
+    end
+
+    # Holds all the metadata about a has_many_attached attachment as it was
+    # specified in the Active Record class.
+    class HasManyAttachedReflection
+    end
+
+    module ReflectionExtension
+      def add_attachment_reflection: (untyped model, untyped name, untyped reflection) -> untyped
+
+      private
+
+      def reflection_class_for: (untyped macro) -> untyped
+    end
+
+    module ActiveRecordExtensions
+      def attachment_reflections: () -> untyped
+
+      def attachment_reflections?: () -> bool
+
+      extend ::ActiveSupport::Concern
+
+      module ClassMethods
+        def attachment_reflections: () -> untyped
+
+        def attachment_reflections=: (untyped value) -> untyped
+
+        def attachment_reflections?: () -> bool
+      end
+    end
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Service
+  #
+  # Abstract class serving as an interface for concrete services.
+  #
+  # The available services are:
+  #
+  # * +Disk+, to manage attachments saved directly on the hard drive.
+  # * +GCS+, to manage attachments through Google Cloud Storage.
+  # * +S3+, to manage attachments through Amazon S3.
+  # * +Mirror+, to be able to use several services to manage attachments.
+  #
+  # Inside a \Rails application, you can set-up your services through the
+  # generated <tt>config/storage.yml</tt> file and reference one
+  # of the aforementioned constant under the +service+ key. For example:
+  #
+  #   local:
+  #     service: Disk
+  #     root: <%= Rails.root.join("storage") %>
+  #
+  # You can checkout the service's constructor to know which keys are required.
+  #
+  # Then, in your application's configuration, you can specify the service to
+  # use like this:
+  #
+  #   config.active_storage.service = :local
+  #
+  # If you are using Active Storage outside of a Ruby on \Rails application, you
+  # can configure the service to use like this:
+  #
+  #   ActiveStorage::Blob.service = ActiveStorage::Service.configure(
+  #     :local,
+  #     { local: {service: "Disk",  root: Pathname("/tmp/foo/storage") } }
+  #   )
+  class Service
+    extend ::ActiveSupport::Autoload
+
+    attr_accessor name: untyped
+
+    # Configure an Active Storage service by name from a set of configurations,
+    # typically loaded from a YAML file. The Active Storage engine uses this
+    # to set the global Active Storage service when the app boots.
+    def self.configure: (untyped service_name, untyped configurations) -> untyped
+
+    # Override in subclasses that stitch together multiple services and hence
+    # need to build additional services using the configurator.
+    #
+    # Passes the configurator and all of the service's config as keyword args.
+    #
+    # See MirrorService for an example.
+    def self.build: (configurator: untyped, name: untyped, ?service: untyped?, **untyped service_config) -> untyped
+
+    # Upload the +io+ to the +key+ specified. If a +checksum+ is provided, the service will
+    # ensure a match when the upload has completed or raise an ActiveStorage::IntegrityError.
+    def upload: (untyped key, untyped io, ?checksum: untyped?, **untyped options) -> untyped
+
+    # Update metadata for the file identified by +key+ in the service.
+    # Override in subclasses only if the service needs to store specific
+    # metadata that has to be updated upon identification.
+    def update_metadata: (untyped key, **untyped metadata) -> nil
+
+    # Return the content of the file at the +key+.
+    def download: (untyped key) -> untyped
+
+    # Return the partial content in the byte +range+ of the file at the +key+.
+    def download_chunk: (untyped key, untyped range) -> untyped
+
+    def open: (*untyped args, **untyped options) { (?) -> untyped } -> untyped
+
+    # Concatenate multiple files into a single "composed" file.
+    def compose: (untyped source_keys, untyped destination_key, ?filename: untyped?, ?content_type: untyped?, ?disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    # Delete the file at the +key+.
+    def delete: (untyped key) -> untyped
+
+    # Delete files at keys starting with the +prefix+.
+    def delete_prefixed: (untyped prefix) -> untyped
+
+    # Return +true+ if a file exists at the +key+.
+    def exist?: (untyped key) -> untyped
+
+    # Returns the URL for the file at the +key+. This returns a permanent URL for public files, and returns a
+    # short-lived URL for private files. For private files you can provide the +disposition+ (+:inline+ or +:attachment+),
+    # +filename+, and +content_type+ that you wish the file to be served with on request. Additionally, you can also provide
+    # the amount of seconds the URL will be valid for, specified in +expires_in+.
+    def url: (untyped key, **untyped options) -> untyped
+
+    # Returns a signed, temporary URL that a direct upload file can be PUT to on the +key+.
+    # The URL will be valid for the amount of seconds specified in +expires_in+.
+    # You must also provide the +content_type+, +content_length+, and +checksum+ of the file
+    # that will be uploaded. All these attributes will be validated by the service upon upload.
+    def url_for_direct_upload: (untyped key, expires_in: untyped, content_type: untyped, content_length: untyped, checksum: untyped, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    # Returns a Hash of headers for +url_for_direct_upload+ requests.
+    def headers_for_direct_upload: (untyped key, filename: untyped, content_type: untyped, content_length: untyped, checksum: untyped, ?custom_metadata: ::Hash[untyped, untyped]) -> ::Hash[untyped, untyped]
+
+    def public?: () -> untyped
+
+    def inspect: () -> ::String
+
+    private
+
+    def private_url: (untyped key, expires_in: untyped, filename: untyped, disposition: untyped, content_type: untyped, **untyped) -> untyped
+
+    def public_url: (untyped key, **untyped) -> untyped
+
+    def custom_metadata_headers: (untyped metadata) -> untyped
+
+    def instrument: (untyped operation, ?::Hash[untyped, untyped] payload) ?{ (?) -> untyped } -> untyped
+
+    def service_name: () -> untyped
+
+    def content_disposition_with: (filename: untyped, ?type: ::String) -> untyped
+  end
+end
+
+module ActiveStorage
+  class Service::Configurator
+    attr_reader configurations: untyped
+
+    def self.build: (untyped service_name, untyped configurations) -> untyped
+
+    def initialize: (untyped configurations) -> void
+
+    def build: (untyped service_name) -> untyped
+
+    def inspect: () -> ::String
+
+    private
+
+    def config_for: (untyped name) -> untyped
+
+    def resolve: (untyped class_name) -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \Disk \Service
+  #
+  # Wraps a local disk path as an Active Storage service. See ActiveStorage::Service for the generic API
+  # documentation that applies to all services.
+  class Service::DiskService < ::ActiveStorage::Service
+    attr_accessor root: untyped
+
+    def initialize: (root: untyped, ?public: bool, **untyped options) -> void
+
+    def upload: (untyped key, untyped io, ?checksum: untyped?, **untyped) -> untyped
+
+    def download: (untyped key) ?{ (?) -> untyped } -> untyped
+
+    def download_chunk: (untyped key, untyped range) -> untyped
+
+    def delete: (untyped key) -> untyped
+
+    def delete_prefixed: (untyped prefix) -> untyped
+
+    def exist?: (untyped key) -> untyped
+
+    def url_for_direct_upload: (untyped key, expires_in: untyped, content_type: untyped, content_length: untyped, checksum: untyped, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    def headers_for_direct_upload: (untyped key, content_type: untyped, **untyped) -> { "Content-Type" => untyped }
+
+    # Every filesystem operation in DiskService resolves paths through this method (or through
+    # make_path_for, which delegates here). This is the primary filesystem security check: all
+    # path-traversal protection is enforced here. New methods that touch the filesystem MUST use
+    # path_for or make_path_for -- never construct paths from +root+ directly.
+    def path_for: (untyped key) -> untyped
+
+    def compose: (untyped source_keys, untyped destination_key, **untyped) -> untyped
+
+    private
+
+    def private_url: (untyped key, expires_in: untyped, filename: untyped, content_type: untyped, disposition: untyped, **untyped) -> untyped
+
+    def public_url: (untyped key, filename: untyped, ?content_type: untyped?, ?disposition: ::Symbol, **untyped) -> untyped
+
+    def generate_url: (untyped key, expires_in: untyped, filename: untyped, content_type: untyped, disposition: untyped) -> untyped
+
+    def stream: (untyped key) { (untyped) -> untyped } -> untyped
+
+    def folder_for: (untyped key) -> untyped
+
+    def escape_glob_metacharacters: (untyped path) -> untyped
+
+    def make_path_for: (untyped key) -> untyped
+
+    def ensure_integrity_of: (untyped key, untyped checksum) -> (untyped | nil)
+
+    def url_helpers: () -> untyped
+
+    def url_options: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \GCS \Service
+  #
+  # Wraps the Google Cloud Storage as an Active Storage service. See ActiveStorage::Service for the generic API
+  # documentation that applies to all services.
+  class Service::GCSService < ::ActiveStorage::Service
+    class MetadataServerError < ::ActiveStorage::Error
+    end
+
+    class MetadataServerNotFoundError < ::ActiveStorage::Error
+    end
+
+    def initialize: (?public: bool, **untyped config) -> void
+
+    def upload: (untyped key, untyped io, ?checksum: untyped?, ?content_type: untyped?, ?disposition: untyped?, ?filename: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    def download: (untyped key) ?{ (?) -> untyped } -> untyped
+
+    def update_metadata: (untyped key, content_type: untyped, ?disposition: untyped?, ?filename: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    def download_chunk: (untyped key, untyped range) -> untyped
+
+    def delete: (untyped key) -> untyped
+
+    def delete_prefixed: (untyped prefix) -> untyped
+
+    def exist?: (untyped key) -> untyped
+
+    def url_for_direct_upload: (untyped key, expires_in: untyped, checksum: untyped, ?custom_metadata: ::Hash[untyped, untyped], **untyped) -> untyped
+
+    def headers_for_direct_upload: (untyped key, checksum: untyped, ?filename: untyped?, ?disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped], **untyped) -> untyped
+
+    def compose: (untyped source_keys, untyped destination_key, ?filename: untyped?, ?content_type: untyped?, ?disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    # Returns the IAM client used for direct uploads and signed URLs.
+    # By default, the authorization for the IAM client is set to
+    # {Application Default Credentials}[https://docs.cloud.google.com/docs/authentication/application-default-credentials],
+    # fetched once at instantiation time, then refreshed automatically when expired.
+    # This can be set to a different value to use other authorization methods.
+    #
+    #   ActiveStorage::Blob.service.iam_client.authorization = Google::Auth::ImpersonatedServiceAccountCredentials.new(options)
+    def iam_client: () -> untyped
+
+    private
+
+    def private_url: (untyped key, expires_in: untyped, filename: untyped, content_type: untyped, disposition: untyped, **untyped) -> untyped
+
+    def public_url: (untyped key, **untyped) -> untyped
+
+    attr_reader config: untyped
+
+    def file_for: (untyped key, ?skip_lookup: bool) -> untyped
+
+    # Reads the file for the given key in chunks, yielding each to the block.
+    def stream: (untyped key) { (untyped) -> untyped } -> untyped
+
+    def bucket: () -> untyped
+
+    def client: () -> untyped
+
+    def issuer: () -> untyped
+
+    def email_from_metadata_server: () -> untyped
+
+    def signer: () -> untyped
+
+    def custom_metadata_headers: (untyped metadata) -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage Mirror \Service
+  #
+  # Wraps a set of mirror services and provides a single ActiveStorage::Service object that will all
+  # have the files uploaded to them. A +primary+ service is designated to answer calls to:
+  # * +download+
+  # * +exist?+
+  # * +url+
+  # * +url_for_direct_upload+
+  # * +headers_for_direct_upload+
+  class Service::MirrorService < ::ActiveStorage::Service
+    def download: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def download_chunk: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def exist?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def url: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def url_for_direct_upload: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def headers_for_direct_upload: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def path_for: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def compose: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    attr_reader primary: untyped
+
+    attr_reader mirrors: untyped
+
+    # Stitch together from named services.
+    def self.build: (primary: untyped, mirrors: untyped, name: untyped, configurator: untyped, **untyped options) -> untyped
+
+    def initialize: (primary: untyped, mirrors: untyped) -> void
+
+    # Upload the +io+ to the +key+ specified to all services. The upload to the primary service is done synchronously
+    # whereas the upload to the mirrors is done asynchronously. If a +checksum+ is provided, all services will
+    # ensure a match when the upload has completed or raise an ActiveStorage::IntegrityError.
+    def upload: (untyped key, untyped io, ?checksum: untyped?, **untyped options) -> untyped
+
+    # Delete the file at the +key+ on all services.
+    def delete: (untyped key) -> untyped
+
+    # Delete files at keys starting with the +prefix+ on all services.
+    def delete_prefixed: (untyped prefix) -> untyped
+
+    def mirror_later: (untyped key, checksum: untyped) -> untyped
+
+    # Copy the file at the +key+ from the primary service to each of the mirrors where it doesn't already exist.
+    def mirror: (untyped key, checksum: untyped) -> untyped
+
+    private
+
+    def each_service: () { (?) -> untyped } -> untyped
+
+    def perform_across_services: (untyped method, *untyped args) -> untyped
+  end
+end
+
+module ActiveStorage
+  class Service::Registry
+    def initialize: (untyped configurations) -> void
+
+    def fetch: (untyped name) ?{ (untyped) -> untyped } -> untyped
+
+    def inspect: () -> ::String
+
+    private
+
+    attr_reader configurations: untyped
+
+    attr_reader services: untyped
+
+    def configurator: () -> untyped
+  end
+end
+
+module ActiveStorage
+  # = Active Storage \S3 \Service
+  #
+  # Wraps the Amazon Simple Storage Service (S3) as an Active Storage service.
+  # See ActiveStorage::Service for the generic API documentation that applies to all services.
+  class Service::S3Service < ::ActiveStorage::Service
+    attr_reader client: untyped
+
+    attr_reader bucket: untyped
+
+    attr_reader multipart_upload_threshold: untyped
+
+    attr_reader upload_options: untyped
+
+    def initialize: (bucket: untyped, ?upload: ::Hash[untyped, untyped], ?public: bool, **untyped options) -> void
+
+    def upload: (untyped key, untyped io, ?checksum: untyped?, ?filename: untyped?, ?content_type: untyped?, ?disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped], **untyped) -> untyped
+
+    def download: (untyped key) ?{ (?) -> untyped } -> untyped
+
+    def download_chunk: (untyped key, untyped range) -> untyped
+
+    def delete: (untyped key) -> untyped
+
+    def delete_prefixed: (untyped prefix) -> untyped
+
+    def exist?: (untyped key) -> untyped
+
+    def url_for_direct_upload: (untyped key, expires_in: untyped, content_type: untyped, content_length: untyped, checksum: untyped, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    def headers_for_direct_upload: (untyped key, content_type: untyped, checksum: untyped, ?filename: untyped?, ?disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped], **untyped) -> ::Hash["Content-Type" | "Content-MD5" | "Content-Disposition" | untyped, untyped]
+
+    def compose: (untyped source_keys, untyped destination_key, ?filename: untyped?, ?content_type: untyped?, ?disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    private
+
+    def upload_stream: (key: untyped, **untyped options) { (?) -> untyped } -> untyped
+
+    def private_url: (untyped key, expires_in: untyped, filename: untyped, disposition: untyped, content_type: untyped, **untyped client_opts) -> untyped
+
+    def public_url: (untyped key, **untyped client_opts) -> untyped
+
+    MAXIMUM_UPLOAD_PARTS_COUNT: 10000
+
+    MINIMUM_UPLOAD_PART_SIZE: untyped
+
+    def upload_with_single_part: (untyped key, untyped io, ?checksum: untyped?, ?content_type: untyped?, ?content_disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    def upload_with_multipart: (untyped key, untyped io, ?content_type: untyped?, ?content_disposition: untyped?, ?custom_metadata: ::Hash[untyped, untyped]) -> untyped
+
+    def object_for: (untyped key) -> untyped
+
+    # Reads the object for the given key in chunks, yielding each to the block.
+    def stream: (untyped key) { (untyped) -> untyped } -> untyped
+
+    def custom_metadata_headers: (untyped metadata) -> untyped
+  end
+end
+
+module ActiveStorage
+  class StructuredEventSubscriber < ::ActiveSupport::StructuredEventSubscriber
+    def service_upload: (untyped event) -> untyped
+
+    def service_download: (untyped event) -> untyped
+
+    def service_streaming_download: (untyped event) -> untyped
+
+    def preview: (untyped event) -> untyped
+
+    def service_delete: (untyped event) -> untyped
+
+    def service_delete_prefixed: (untyped event) -> untyped
+
+    def service_exist: (untyped event) -> untyped
+
+    def service_url: (untyped event) -> untyped
+
+    def service_mirror: (untyped event) -> untyped
+  end
+end
+
+module ActiveStorage
+  module Transformers
+    class ImageMagick < ::ActiveStorage::Transformers::ImageProcessingTransformer
+      private
+
+      def processor: () -> untyped
+
+      def validate_transformation: (untyped name, untyped argument) -> untyped
+
+      def validate_arg_string: (untyped argument) -> untyped
+
+      def validate_arg_array: (untyped argument) -> untyped
+
+      def validate_arg_hash: (untyped argument) -> untyped
+    end
+  end
+end
+
+module ActiveStorage
+  module Transformers
+    class ImageProcessingTransformer < ::ActiveStorage::Transformers::Transformer
+      private
+
+      class UnsupportedImageProcessingMethod < ::StandardError
+      end
+
+      class UnsupportedImageProcessingArgument < ::StandardError
+      end
+
+      def process: (untyped file, format: untyped) -> untyped
+
+      def operations: () -> untyped
+
+      def validate_transformation: (untyped name, untyped argument) -> (untyped | nil)
+    end
+  end
+end
+
+module ActiveStorage
+  module Transformers
+    class NullTransformer < ::ActiveStorage::Transformers::Transformer
+      private
+
+      def process: (untyped file, format: untyped) -> untyped
+    end
+  end
+end
+
+module ActiveStorage
+  module Transformers
+    # = Active Storage \Transformers \Transformer
+    #
+    # A Transformer applies a set of transformations to an image.
+    #
+    # The following concrete subclasses are included in Active Storage:
+    #
+    # * ActiveStorage::Transformers::ImageProcessingTransformer:
+    #   backed by ImageProcessing, a common interface for MiniMagick and ruby-vips
+    class Transformer
+      attr_reader transformations: untyped
+
+      def initialize: (untyped transformations) -> void
+
+      # Applies the transformations to the source image in +file+, producing a target image in the
+      # specified +format+. Yields an open Tempfile containing the target image. Closes and unlinks
+      # the output tempfile after yielding to the given block. Returns the result of the block.
+      def transform: (untyped file, format: untyped) { (untyped) -> untyped } -> untyped
+
+      private
+
+      # Returns an open Tempfile containing a transformed image in the given +format+.
+      # All subclasses implement this method.
+      def process: (untyped file, format: untyped) -> untyped
+    end
+  end
+end
+
+module ActiveStorage
+  module Transformers
+    class Vips < ::ActiveStorage::Transformers::ImageProcessingTransformer
+      def processor: () -> untyped
+    end
+  end
+end
+
+module ActiveStorage
+  # Returns the currently loaded version of Active Storage as a +Gem::Version+.
+  def self.version: () -> untyped
+end
+
+module ActiveStorage
+  module Attached::Model
+    module ClassMethods
+    end
+  end
+end
+
+module ActiveStorage::Blobs
+end
+
+module ActiveStorage::Representations
+end
