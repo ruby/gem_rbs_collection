@@ -42,3 +42,9 @@ Rails.application.deprecators[:railties]
 # Methods whose block is optional
 Rails.application.rake_tasks
 SampleApp::Application.console
+
+# Accessors defined with mattr_accessor and class_attribute, and delegated methods
+Rails::Info.properties
+Rails::Generators.namespace = SampleApp
+Rails.initialized?
+Rails.application.isolated?

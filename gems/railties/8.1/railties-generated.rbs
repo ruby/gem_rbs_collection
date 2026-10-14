@@ -23,6 +23,10 @@
 #WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Minitest
+  def self.run_via: () -> untyped
+
+  def run_via: () -> untyped
+
   class BacktraceFilterWithFallback
     def initialize: (untyped preferred, untyped fallback) -> void
 
@@ -63,6 +67,10 @@ end
 
 # :include: ../README.rdoc
 module Rails
+  def self.initialize!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+  def self.initialized?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
   extend ::ActiveSupport::Autoload
 
   extend ::ActiveSupport::Benchmarkable
@@ -205,6 +213,9 @@ module Rails
   # 10. Run +config.before_eager_load+ and +eager_load!+ if +eager_load+ is +true+.
   # 11. Run +config.after_initialize+ callbacks.
   class Application < ::Rails::Engine
+    def default_url_options: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def default_url_options=: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     def self.inherited: (untyped base) -> untyped
 
     def self.instance: () -> untyped
@@ -676,6 +687,9 @@ end
 module Rails
   class Application
     class RoutesReloader
+      def execute_if_updated: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+      def updated?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       include ::ActiveSupport::Callbacks
 
       attr_reader route_sets: untyped
@@ -790,6 +804,25 @@ end
 
 module Rails
   class CodeStatistics
+    def self.directories: () -> untyped
+    def self.directories=: (untyped value) -> untyped
+    def self.directories?: () -> bool
+    def directories: () -> untyped
+    def directories?: () -> bool
+    def directories=: (untyped value) -> untyped
+    def self.test_types: () -> untyped
+    def self.test_types=: (untyped value) -> untyped
+    def self.test_types?: () -> bool
+    def test_types: () -> untyped
+    def test_types?: () -> bool
+    def test_types=: (untyped value) -> untyped
+    def self.pattern: () -> untyped
+    def self.pattern=: (untyped value) -> untyped
+    def self.pattern?: () -> bool
+    def pattern: () -> untyped
+    def pattern?: () -> bool
+    def pattern=: (untyped value) -> untyped
+
     DIRECTORIES: ::Array[::Array["Controllers" | "app/controllers"] | ::Array["Helpers" | "app/helpers"] | ::Array["Jobs" | "app/jobs"] | ::Array["Models" | "app/models"] | ::Array["Mailers" | "app/mailers"] | ::Array["Mailboxes" | "app/mailboxes"] | ::Array["Channels" | "app/channels"] | ::Array["Views" | "app/views"] | ::Array["JavaScripts" | "app/assets/javascripts"] | ::Array["Stylesheets" | "app/assets/stylesheets"] | ::Array["JavaScript" | "app/javascript"] | ::Array["Libraries" | "lib/"] | ::Array["APIs" | "app/apis"] | ::Array["Controller tests" | "test/controllers"] | ::Array["Helper tests" | "test/helpers"] | ::Array["Job tests" | "test/jobs"] | ::Array["Model tests" | "test/models"] | ::Array["Mailer tests" | "test/mailers"] | ::Array["Mailbox tests" | "test/mailboxes"] | ::Array["Channel tests" | "test/channels"] | ::Array["Integration tests" | "test/integration"] | ::Array["System tests" | "test/system"]]
 
     TEST_TYPES: ::Array["Controller tests" | "Helper tests" | "Model tests" | "Mailer tests" | "Mailbox tests" | "Channel tests" | "Job tests" | "Integration tests" | "System tests"]
@@ -926,6 +959,11 @@ end
 module Rails
   module Command
     class Base < ::Thor
+      def self.bin: () -> untyped
+      def self.bin=: (untyped value) -> untyped
+      def self.bin?: () -> bool
+      def executable: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       class Error < ::Thor::Error
       end
 
@@ -1086,6 +1124,14 @@ end
 
 module Rails
   module Generators
+    def self.namespace: () -> untyped
+
+    def self.namespace=: (untyped value) -> untyped
+
+    def namespace: () -> untyped
+
+    def namespace=: (untyped value) -> untyped
+
     class AppGenerator
       # We want to exit on failure to be kind to other libraries
       # This is only when accessing via CLI
@@ -2109,6 +2155,13 @@ module Rails
   #   # load Blog::Engine with highest priority, followed by application and other railties
   #   config.railties_order = [Blog::Engine, :main_app, :all]
   class Engine < ::Rails::Railtie
+    def self.eager_load!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def middleware: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def root: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def paths: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def engine_name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def isolated?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     attr_accessor self.called_from: untyped
 
     attr_accessor self.isolated: untyped
@@ -3725,6 +3778,14 @@ end
 module Rails
   module Generators
     module ModelHelpers
+      def self.skip_warn: () -> untyped
+
+      def self.skip_warn=: (untyped value) -> untyped
+
+      def skip_warn: () -> untyped
+
+      def skip_warn=: (untyped value) -> untyped
+
       PLURAL_MODEL_NAME_WARN_MESSAGE: "[WARNING] The model name '%s' was recognized as a plural, using the singular '%s' instead. Override with --force-plural or setup custom inflection rules for this noun before running the generator."
 
       IRREGULAR_MODEL_NAME_WARN_MESSAGE: "[WARNING] Rails cannot recover singular form from its plural form '%s'.\nPlease setup custom inflection rules for this noun before running the generator in config/initializers/inflections.rb.\n"
@@ -4074,6 +4135,7 @@ end
 module Rails
   module Generators
     class ApplicationRecordGenerator < ::Rails::Generators::Base
+      def self.desc: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     end
   end
 end
@@ -4342,6 +4404,8 @@ end
 module Rails
   module Generators
     class ModelGenerator < ::Rails::Generators::NamedBase
+      def self.desc: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
       include ::Rails::Generators::ModelHelpers
     end
   end
@@ -4903,11 +4967,59 @@ module Rails
   module Generators
     module Testing
       module Behavior
+        def current_path: () -> untyped
+
+        def current_path?: () -> bool
+
+        def current_path=: (untyped value) -> untyped
+
+        def default_arguments: () -> untyped
+
+        def default_arguments?: () -> bool
+
+        def default_arguments=: (untyped value) -> untyped
+
+        def destination_root: () -> untyped
+
+        def destination_root?: () -> bool
+
+        def destination_root=: (untyped value) -> untyped
+
+        def generator_class: () -> untyped
+
+        def generator_class?: () -> bool
+
+        def generator_class=: (untyped value) -> untyped
+
         extend ::ActiveSupport::Concern
 
         include ::ActiveSupport::Testing::Stream
 
         module ClassMethods
+          def current_path: () -> untyped
+
+          def current_path=: (untyped value) -> untyped
+
+          def current_path?: () -> bool
+
+          def default_arguments: () -> untyped
+
+          def default_arguments=: (untyped value) -> untyped
+
+          def default_arguments?: () -> bool
+
+          def destination_root: () -> untyped
+
+          def destination_root=: (untyped value) -> untyped
+
+          def destination_root?: () -> bool
+
+          def generator_class: () -> untyped
+
+          def generator_class=: (untyped value) -> untyped
+
+          def generator_class?: () -> bool
+
           # Sets which generator should be tested:
           #
           #   tests AppGenerator
@@ -5043,6 +5155,14 @@ module Rails
   # Rails::InfoController responses. These include the active \Rails version,
   # Ruby version, Rack version, and so on.
   module Info
+    def self.properties: () -> untyped
+
+    def self.properties=: (untyped value) -> untyped
+
+    def properties: () -> untyped
+
+    def properties=: (untyped value) -> untyped
+
     def self.names: () -> untyped
 
     def self.value_for: (untyped property_name) -> (untyped | nil)
@@ -5477,6 +5597,8 @@ module Rails
   #
   # Be sure to look at the documentation of those specific classes for more information.
   class Railtie
+    def railtie_name: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
     extend ::ActiveSupport::DescendantsTracker
 
     include ::Rails::Initializable
@@ -5565,6 +5687,8 @@ module Rails
       extend ::ActiveSupport::Concern
 
       module ClassMethods
+        def config: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
         def inherited: (untyped base) -> untyped
 
         def instance: () -> untyped
@@ -5758,6 +5882,11 @@ end
 
 module Rails
   class TestUnitReporter < ::Minitest::StatisticsReporter
+    def self.app_root: () -> untyped
+    def self.app_root=: (untyped value) -> untyped
+    def self.executable: () -> untyped
+    def self.executable=: (untyped value) -> untyped
+
     def prerecord: (untyped test_class, untyped test_name) -> untyped
 
     def record: (untyped result) -> untyped
@@ -5799,6 +5928,11 @@ module Rails
     end
 
     class Runner
+      def self.filters: () -> untyped
+      def filters: () -> untyped
+      def self.load_test_files: () -> untyped
+      def load_test_files: () -> untyped
+
       TEST_FOLDERS: ::Array[:models | :helpers | :channels | :controllers | :mailers | :integration | :jobs | :mailboxes]
 
       PATH_ARGUMENT_PATTERN: ::Regexp
