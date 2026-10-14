@@ -1,0 +1,114 @@
+module Rails
+  module Configuration
+    class MiddlewareStackProxy
+      def delete: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      def insert_before: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      alias insert insert_before
+
+      def insert_after: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      def swap: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      def unshift: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      def use: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      def move_before: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+
+      alias move move_before
+
+      def move_after: (*untyped, **untyped) ?{ (?) -> untyped } -> void
+    end
+  end
+end
+
+module Rails
+  class Engine
+    class Configuration
+      # Holds the built ActionDispatch::MiddlewareStack once Engine#app is called,
+      # but typed as the proxy used while configuring the application
+      def middleware: () -> Rails::Configuration::MiddlewareStackProxy
+
+      def middleware=: (Rails::Configuration::MiddlewareStackProxy | ActionDispatch::MiddlewareStack) -> void
+    end
+
+    # Defines the routes for this engine. If a block is given to
+    # routes, it is appended to the engine.
+    def routes: () ?{ () [self: ActionDispatch::Routing::Mapper] -> void } -> ActionDispatch::Routing::RouteSet
+  end
+end
+
+module Rails
+  module Generators
+    class PluginGenerator < AppBase
+      # It is necessary to satisfy alias target.
+      def app_path: () -> untyped
+    end
+  end
+end
+
+module Rails
+  class Application
+    def config: () -> ::Rails::Application::Configuration
+
+    def initialized?: () -> bool
+
+    def key_generator: (?String secret_key_base) -> ActiveSupport::CachingKeyGenerator
+
+    def message_verifiers: () -> ActiveSupport::MessageVerifiers
+
+    def message_verifier: (String | Symbol verifier_name) -> ActiveSupport::MessageVerifier
+
+    def deprecators: () -> ActiveSupport::Deprecation::Deprecators
+
+    def secret_key_base: () -> String
+
+    def credentials: () -> ActiveSupport::EncryptedConfiguration
+
+    def eager_load!: () -> void
+  end
+
+  def self.application: () -> Rails::Application
+
+  def self.configuration: () -> ::Rails::Application::Configuration
+
+  def self.backtrace_cleaner: () -> Rails::BacktraceCleaner
+
+  # nil before an application is defined, but typed non-nil like `application`
+  def self.root: () -> Pathname
+
+  def self.env: () -> ActiveSupport::EnvironmentInquirer
+
+  def self.env=: (String environment) -> void
+
+  def self.error: () -> ActiveSupport::ErrorReporter
+
+  def self.event: () -> ActiveSupport::EventReporter
+
+  def self.groups: (*String | Symbol | Hash[untyped, untyped] groups) -> Array[String | Symbol]
+
+  # nil before an application is defined, but typed non-nil like `application`
+  def self.public_path: () -> Pathname
+
+  def self.autoloaders: () -> Rails::Autoloaders
+
+  def self.version: () -> String
+
+  # nil until the application is initialized, but typed non-nil like `application`
+  attr_accessor self.cache: ActiveSupport::Cache::Store
+
+  class Railtie
+    class Configuration
+      def app_middleware: () -> Rails::Configuration::MiddlewareStackProxy
+    end
+
+    def configure: () { (Rails::Application) [self: Rails::Application] -> void } -> void
+    def self.config: () -> ::Rails::Application::Configuration
+  end
+
+  class Railties
+    extend Initializable::ClassMethods
+  end
+end

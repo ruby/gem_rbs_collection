@@ -1,0 +1,28 @@
+module ApplicationCable
+  class Connection < ActionCable::Connection::Base
+    def connect: () -> void
+
+    private
+
+    def authorize: () -> void
+  end
+
+  class Channel < ActionCable::Channel::Base
+  end
+end
+
+class ChatChannel < ApplicationCable::Channel
+  def subscribed: () -> void
+
+  private
+
+  def refresh: () -> void
+
+  def greet: () -> void
+end
+
+class ChatChannelTest < ActionCable::Channel::TestCase
+end
+
+class ConnectionTest < ActionCable::Connection::TestCase
+end
