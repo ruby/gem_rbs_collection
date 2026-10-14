@@ -1,0 +1,120 @@
+module ActiveJob
+  class Base
+    extend ActiveJob::Callbacks::ClassMethods
+    extend ActiveJob::Core::ClassMethods
+    extend ActiveJob::Enqueuing::ClassMethods
+    extend ActiveJob::Exceptions::ClassMethods
+    extend ActiveJob::Execution::ClassMethods
+    extend ActiveJob::QueueAdapter::ClassMethods
+    extend ActiveJob::QueueName::ClassMethods
+    extend ActiveJob::QueuePriority::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
+    extend ActiveSupport::Rescuable::ClassMethods
+
+    def self.queue_as: (*untyped) -> void
+                     | ...
+    def self.queue_with_priority: (?untyped? priority) -> void
+                                | ...
+    def self.before_perform: (*untyped filters) -> void
+                           | ...
+    def self.after_perform: (*untyped filters) -> void
+                          | ...
+    def self.around_perform: (*untyped filters) -> void
+                           | ...
+    def self.before_enqueue: (*untyped filters) -> void
+                           | ...
+    def self.after_enqueue: (*untyped filters) -> void
+                          | ...
+    def self.around_enqueue: (*untyped filters) -> void
+                           | ...
+    def self.retry_on: (*untyped) -> void
+                     | ...
+    def self.discard_on: (*untyped) -> void
+                       | ...
+  end
+end
+
+module ActiveJob
+  module QueueAdapters
+    # == Sidekiq adapter for Active Job
+    #
+    # Simple, efficient background processing for Ruby. Sidekiq uses threads to
+    # handle many jobs at the same time in the same process. It does not
+    # require Rails but will integrate tightly with it to make background
+    # processing dead simple.
+    #
+    # Read more about Sidekiq {here}[http://sidekiq.org].
+    #
+    # To use Sidekiq set the queue_adapter config to +:sidekiq+.
+    #
+    #   Rails.application.config.active_job.queue_adapter = :sidekiq
+    class SidekiqAdapter
+      def enqueue: (untyped job) -> untyped
+
+      def enqueue_at: (untyped job, untyped timestamp) -> untyped
+
+      class JobWrapper
+        # nodoc:
+        include Sidekiq::Job
+
+        def perform: (untyped job_data) -> untyped
+      end
+    end
+  end
+end
+
+# Methods rbs prototype doesn't see, which aren't generated from the source
+module ActiveJob
+  class Base
+    # cattr_accessor and class_attribute in Logging's included block
+    def self.logger: () -> untyped
+    def self.logger=: (untyped value) -> untyped
+
+    def self.log_arguments: () -> untyped
+    def self.log_arguments=: (untyped value) -> untyped
+    def self.log_arguments?: () -> bool
+  end
+end
+
+# Return types of commonly used methods
+module ActiveJob
+  module Core
+    attr_accessor arguments: Array[untyped]
+
+    attr_accessor job_id: String
+
+    attr_accessor executions: Integer
+
+    attr_accessor exception_executions: Hash[String, Integer]
+
+    attr_accessor locale: String?
+
+    attr_accessor timezone: String?
+
+    attr_accessor enqueued_at: Time?
+
+    def successfully_enqueued?: () -> bool?
+
+    attr_accessor enqueue_error: EnqueueError?
+  end
+
+  module QueueName
+    def queue_name: () -> String
+  end
+
+  module QueuePriority
+    def priority: () -> Integer?
+  end
+
+  module Enqueuing
+    def enqueue: (?Hash[Symbol, untyped] options) -> (self | false)
+
+    module ClassMethods
+      def perform_later: (*untyped, **untyped) ?{ (ActiveJob::Base job) -> void } -> (ActiveJob::Base | false)
+    end
+  end
+
+  class ConfiguredJob
+    def perform_later: (*untyped, **untyped) ?{ (ActiveJob::Base job) -> void } -> (ActiveJob::Base | false)
+  end
+end
