@@ -1,0 +1,34 @@
+module RailsGuides
+  class ApplicationMailer < ActionMailer::Base
+    private
+
+    def log_delivery: () -> void
+  end
+
+  class NotifierMailer < ApplicationMailer
+    @account: untyped
+
+    def welcome: (untyped) -> Mail::Message
+
+    def self.welcome: (untyped) -> ActionMailer::MessageDelivery
+  end
+
+  class UserMailer < ApplicationMailer
+    @user: untyped
+    @url: String
+
+    def welcome_email: () -> Mail::Message
+  end
+
+  class I18nUserMailer < ApplicationMailer
+    def welcome: (String email, String username) -> Mail::Message
+  end
+end
+
+class NotifierMailerTest < ActionMailer::TestCase
+  def test_welcome: () -> void
+end
+
+class NotifierMailerTest
+  def test_capture: () -> void
+end
