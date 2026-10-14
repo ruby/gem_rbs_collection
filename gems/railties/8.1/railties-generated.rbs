@@ -687,6 +687,8 @@ end
 module Rails
   class Application
     class RoutesReloader
+      extend ::ActiveSupport::Callbacks::ClassMethods
+
       def execute_if_updated: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
       def updated?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
 
@@ -870,6 +872,8 @@ end
 
 module Rails
   module Command
+    extend ::Rails::Command::Behavior::ClassMethods
+
     extend ::ActiveSupport::Autoload
 
     class CorrectableNameError < ::StandardError
@@ -1124,6 +1128,8 @@ end
 
 module Rails
   module Generators
+    extend ::Rails::Command::Behavior::ClassMethods
+
     def self.namespace: () -> untyped
 
     def self.namespace=: (untyped value) -> untyped
@@ -2155,6 +2161,8 @@ module Rails
   #   # load Blog::Engine with highest priority, followed by application and other railties
   #   config.railties_order = [Blog::Engine, :main_app, :all]
   class Engine < ::Rails::Railtie
+    extend ::ActiveSupport::Callbacks::ClassMethods
+
     def self.eager_load!: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def middleware: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
     def root: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
@@ -4699,6 +4707,8 @@ module Rails
     #     setup :prepare_destination
     #   end
     class TestCase < ::ActiveSupport::TestCase
+      extend ::Rails::Generators::Testing::Behavior::ClassMethods
+
       include ::Rails::Generators::Testing::Behavior
 
       include ::Rails::Generators::Testing::SetupAndTeardown
@@ -6020,4 +6030,34 @@ end
 # The actual (private) implementation of the Rake task zeitwerk:check.
 class Rails::ZeitwerkChecker
   def self.check: () -> untyped
+end
+
+module Rails
+  module Command
+    module Behavior
+      module ClassMethods
+        def no_color!: () -> untyped
+
+        # Track all command subclasses.
+        def subclasses: () -> untyped
+
+        private
+
+        # Prints a list of generators.
+        def print_list: (untyped base, untyped namespaces) -> (nil | untyped)
+
+        # Receives namespaces in an array and tries to find matching generators
+        # in the load path.
+        def lookup: (untyped namespaces) -> (nil | untyped)
+
+        # This will try to load any command in the load path to show in help.
+        def lookup!: () -> untyped
+
+        # Convert namespaces to paths by replacing ":" for "/" and adding
+        # an extra lookup. For example, "rails:model" should be searched
+        # in both: "rails/model/model_generator" and "rails/model_generator".
+        def namespaces_to_paths: (untyped namespaces) -> untyped
+      end
+    end
+  end
 end

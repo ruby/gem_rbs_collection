@@ -48,3 +48,13 @@ Rails::Info.properties
 Rails::Generators.namespace = SampleApp
 Rails.initialized?
 Rails.application.isolated?
+
+# Class methods of the concerns included
+Rails::Command.subclasses
+Rails::Engine.set_callback(:load_seed, :before) { nil }
+
+class SampleGeneratorTest < Rails::Generators::TestCase
+  tests Rails::Generators::ModelGenerator
+  destination "tmp"
+  arguments %w[user]
+end
