@@ -122,6 +122,10 @@ module Rack
   end
 
   # A Hash that downcases its keys, for response headers
+  # Included by the errors raised for bad requests, like QueryParser::InvalidParameterError
+  module BadRequest : Exception
+  end
+
   class Headers < Hash[String, String | Array[String]]
     def self.[]: (*untyped items) -> instance
   end
@@ -160,12 +164,11 @@ module Rack
   end
 
   class Cascade
-    NotFound: [Integer, Hash[String, String], Array[bot]]
-
     attr_reader apps: Array[untyped]
     def initialize: (untyped apps, ?[Integer, Integer] cascade_for) -> void
     def call: (untyped env) -> [Integer, Hash[String, String], Array[bot]]?
     def add: (untyped app) -> Array[untyped]
+    alias << add
     def include?: (untyped app) -> bool
   end
 
@@ -236,6 +239,8 @@ module Rack
       attr_reader response: BufferedResponse?
       def initialize: (nil body, Request request, BufferedResponse? response, untyped handlers) ?{ () -> untyped } -> void
       def each: () -> untyped
+      def call: (untyped stream) -> untyped
+      def respond_to?: (Symbol method_name, ?bool include_all) -> bool
     end
 
     class BufferedResponse
@@ -427,6 +432,13 @@ module Rack
     def close: () -> nil
     def add: (untyped severity, ?nil message, ?nil progname) -> nil
     def <<: (untyped msg) -> nil
+    def log: (untyped severity, ?untyped message, ?untyped progname) ?{ () -> untyped } -> nil
+    def reopen: (?untyped logdev) -> nil
+    def debug!: () -> nil
+    def info!: () -> nil
+    def warn!: () -> nil
+    def error!: () -> nil
+    def fatal!: () -> nil
   end
 
   class Reloader
@@ -495,11 +507,15 @@ module Rack
 
   class Request
     ALLOWED_SCHEMES: Array[String]
-    SCHEME_WHITELIST: Array[String]
     include Helpers
     include Env
 
+    attr_accessor self.ip_filter: ^(String) -> untyped
+    attr_accessor self.forwarded_priority: Array[Symbol]
+    attr_accessor self.x_forwarded_proto_priority: Array[Symbol]
+
     def initialize: (env) -> void
+    def ip: () -> String?
     def params: () -> Hash[untyped, untyped]
     def update_param: (top k, top v) -> void
     def delete_param: (top k) -> bot
@@ -578,6 +594,7 @@ module Rack
       def media_type_params: () -> Hash[String, String]
       def content_charset: () -> String?
       def form_data?: () -> bool
+      def form_pairs: () -> Array[[String, untyped]]
       def parseable_data?: () -> bool
       def GET: () -> Hash[untyped, untyped]
       def POST: () -> Hash[untyped, untyped]
@@ -598,6 +615,7 @@ module Rack
       def wrap_ipv6: (String host) -> String
       def parse_http_accept_header: (_ToS header) -> Array[[String?, Float]]
       def query_parser: () -> QueryParser
+      attr_writer query_parser: QueryParser
       def parse_query: (String qs, ?String? d) -> Hash[String, String | Array[String]]
       # FIXME: What exactly does #parse_multipart return?
       def parse_multipart: () -> bot
@@ -617,8 +635,9 @@ module Rack
     attr_accessor length: Integer
     attr_accessor status: _ToI
     attr_accessor body: _Each[String]
-    attr_reader headers: _Each[[String, String]]
+    attr_reader headers: Headers
     def initialize: (?nil | _Each[String] | _ToStr body, ?_ToI status, ?_Each[[String, String]] headers) -> void
+    def no_entity_body?: () -> bool
     def redirect: (String target, ?_ToI status) -> void
     def chunked?: () -> bool
     def finish: () -> response
@@ -653,6 +672,8 @@ module Rack
       def method_not_allowed?: () -> bool
       def precondition_failed?: () -> bool
       def unprocessable?: () -> bool
+      def not_acceptable?: () -> bool
+      def request_timeout?: () -> bool
       def redirect?: () -> bool
       def include?: (untyped header) -> bool
       def add_header: (String key, String v) -> String
@@ -714,29 +735,36 @@ module Rack
     DEFAULT_SEP: Regexp
     COMMON_SEP: Hash[String, Regexp]
 
-    def self.make_default: (Integer key_space_limit, Integer param_depth_limit) -> QueryParser
+    def self.make_default: (Integer param_depth_limit, **untyped options) -> QueryParser
     attr_reader param_depth_limit: Integer
-    def initialize: (singleton(Params) params_class, Integer key_space_limit, Integer param_depth_limit) -> void
+    attr_reader bytesize_limit: Integer
+    def initialize: (singleton(Params) params_class, Integer param_depth_limit, ?bytesize_limit: Integer, ?params_limit: Integer) -> void
     def parse_query: (untyped qs, ?nil d) -> Hash[String?, (Array[(Array[nil] | Hash[String?, untyped] | Params | String)?] | Hash[String?, (Array[untyped] | Hash[String?, untyped] | Params | String)?] | Params | String)?]
     def parse_nested_query: (untyped qs, ?nil d) -> Hash[String?, (Array[(Array[nil] | Params | String)?] | Hash[String?, (Params | String)?] | Params | String)?]
-    def normalize_params: ((Array[(Array[nil] | Hash[String?, untyped] | Params | String)?] | Hash[String?, (Array[untyped] | Hash[String?, untyped] | Params | String)?] | Params | String)? params, String? name, String? v, Integer depth) -> (Array[(Array[(Params | String)?] | Hash[String?, (Params | String)?] | Params | String)?] | Hash[String?, (Array[(Params | String)?] | Hash[String?, (Params | String)?] | Params | String)?] | Params | String)?
+    def normalize_params: ((Array[(Array[nil] | Hash[String?, untyped] | Params | String)?] | Hash[String?, (Array[untyped] | Hash[String?, untyped] | Params | String)?] | Params | String)? params, String? name, String? v, ?Integer _depth) -> (Array[(Array[(Params | String)?] | Hash[String?, (Params | String)?] | Params | String)?] | Hash[String?, (Array[(Params | String)?] | Hash[String?, (Params | String)?] | Params | String)?] | Params | String)?
     def make_params: () -> Params
     def new_depth_limit: (untyped param_depth_limit) -> QueryParser
+    def parse_query_pairs: (String? qs, ?String? separator) -> Array[[String, String]]
 
     private
 
     def params_hash_type?: ((Array[(Array[nil] | Hash[String?, untyped] | Params | String)?] | Hash[String?, (Array[untyped] | Hash[String?, untyped] | Params | String)?] | Params | String)? obj) -> bool
     def params_hash_has_key?: ((Array[nil] | Hash[String?, untyped] | Params | String)? hash, String? key) -> bool
-    def unescape: (String s) -> untyped
+    def unescape: (String string, ?Encoding encoding) -> String
 
     class ParameterTypeError < TypeError
+      include BadRequest
+    end
+
+    class QueryLimitError < RangeError
+      include BadRequest
     end
 
     class InvalidParameterError < ArgumentError
+      include BadRequest
     end
 
-    class ParamsTooDeepError < RangeError
-    end
+    class ParamsTooDeepError = QueryLimitError
 
     class Params
       def initialize: (Integer limit) -> void
@@ -750,10 +778,6 @@ module Rack
   module Utils
     DEFAULT_SEP: Regexp
     COMMON_SEP: Hash[String, Regexp]
-    RFC2822_DAY_NAME: Array[String]
-    RFC2822_MONTH_NAME: Array[String]
-    ESCAPE_HTML: Hash[String, String]
-    ESCAPE_HTML_PATTERN: Regexp
     HTTP_STATUS_CODES: Hash[Integer, String]
     STATUS_WITH_NO_ENTITY_BODY: Hash[true, true]
     SYMBOL_TO_STATUS_CODE: Hash[untyped, untyped]
@@ -770,6 +794,11 @@ module Rack
     def self.unescape: (String s, ?Encoding encoding) -> untyped
     def self.param_depth_limit: () -> untyped
     def self.param_depth_limit=: (untyped v) -> untyped
+    attr_accessor self.default_query_parser: QueryParser
+    attr_accessor self.multipart_total_part_limit: Integer
+    attr_accessor self.multipart_file_limit: Integer
+    def self.multipart_part_limit: () -> Integer
+    def self.multipart_part_limit=: (Integer) -> Integer
     def clock_time: () -> (Float | Integer)
     def self.clock_time: () -> (Float | Integer)
     def parse_query: (String? qs, ?String? d) { () -> untyped } -> untyped
@@ -794,6 +823,10 @@ module Rack
     def self.parse_cookies_header: (String? header) -> untyped
     def set_cookie_header!: (untyped header, untyped key, untyped value) -> nil
     def self.set_cookie_header!: (untyped header, untyped key, untyped value) -> nil
+    def self?.set_cookie_header: (String key, String | Hash[Symbol, untyped] value) -> String
+    def self?.delete_set_cookie_header: (String key, ?Hash[Symbol, untyped] value) -> String
+    def self?.delete_set_cookie_header!: (String | Array[String] | nil header, String key, ?Hash[Symbol, untyped] value) -> (String | Array[String])
+    def self?.forwarded_values: (String? forwarded_header) -> Hash[Symbol, Array[String]]?
     def delete_cookie_header!: (untyped header, untyped key, ?Hash[bot, bot] value) -> nil
     def self.delete_cookie_header!: (untyped header, untyped key, ?Hash[bot, bot] value) -> nil
     def rfc2822: (untyped time) -> untyped
@@ -825,45 +858,44 @@ module Rack
     EOL: String
     MULTIPART_BOUNDARY: String
     MULTIPART: Regexp
-    TOKEN: Regexp
-    CONDISP: Regexp
-    VALUE: Regexp
-    BROKEN: Regexp
     MULTIPART_CONTENT_TYPE: Regexp
     MULTIPART_CONTENT_DISPOSITION: Regexp
     MULTIPART_CONTENT_ID: Regexp
-    ATTRIBUTE_CHAR: Regexp
-    ATTRIBUTE: Regexp
-    SECTION: Regexp
-    REGULAR_PARAMETER_NAME: Regexp
-    REGULAR_PARAMETER: Regexp
-    EXTENDED_OTHER_NAME: Regexp
-    EXTENDED_OTHER_VALUE: Regexp
-    EXTENDED_OTHER_PARAMETER: Regexp
-    EXTENDED_INITIAL_NAME: Regexp
-    EXTENDED_INITIAL_VALUE: Regexp
-    EXTENDED_INITIAL_PARAMETER: Regexp
-    EXTENDED_PARAMETER: Regexp
-    DISPPARM: Regexp
-    RFC2183: Regexp
 
     def self.parse_multipart: (untyped env, ?untyped params) -> nil
     def self.extract_multipart: (Request | Request::Helpers req, ?untyped params) -> nil
     def self.build_multipart: (nil params, ?bool first) -> (Hash[bot, bot] | String)?
 
     class MultipartPartLimitError < Errno::EMFILE
+      include BadRequest
+    end
+
+    class MultipartTotalPartLimitError < StandardError
+      include BadRequest
+    end
+
+    class MissingInputError < StandardError
+      include BadRequest
+    end
+
+    class EmptyContentError < ::EOFError
+      include BadRequest
+    end
+
+    class BoundaryTooLongError < StandardError
+      include BadRequest
     end
 
     class Parser
       BUFSIZE: Integer
       TEXT_PLAIN: String
       TEMPFILE_FACTORY: Proc
-      BOUNDARY_REGEX: Regexp
       EMPTY: MultipartInfo
       CHARSET: String
 
       def self.parse_boundary: (String? content_type) -> String?
       def self.parse: (String? io, Integer? content_length, String? content_type, Proc | String tmpfile, Integer | String bufsize, untyped qp) -> MultipartInfo
+      def parse: (untyped io) -> void
       attr_reader state: :CONSUME_TOKEN | :DONE | :FAST_FORWARD | :MIME_BODY | :MIME_HEAD
       def initialize: (String boundary, Proc | String tempfile, Integer | String bufsize, untyped query_parser) -> void
       def result: () -> MultipartInfo
@@ -926,7 +958,8 @@ module Rack
       attr_reader original_filename: String?
       attr_accessor content_type: String
       def initialize: (?nil filepath, ?String ct, ?false bin, ?path: untyped, ?content_type: untyped, ?binary: untyped, ?filename: nil, ?io: nil) -> void
-      def path: () -> nil
+      def path: () -> String?
+      alias local_path path
       def respond_to?: (*untyped args) -> bool
       def method_missing: (untyped method_name, *untyped args) -> untyped
     end
@@ -959,11 +992,19 @@ module Rack
   end
 
   class RewindableInput
+    # Makes rack.input rewindable
+    class Middleware
+      include _Application
+
+      def initialize: (_Application app) -> void
+    end
+
     def initialize: (IO | String | StringIO io) -> void
     def gets: () -> String?
     def read: (*untyped args) -> untyped
     def each: () -> untyped
     def rewind: () -> untyped
+    def size: () -> Integer
     def close: () -> nil
 
     private
@@ -973,8 +1014,6 @@ module Rack
   end
 
   class MockRequest
-    DEFAULT_ENV: env
-
     def initialize: (_Application app) -> void
     def get: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
     def post: (?String uri, ?Hash[Symbol, untyped] opts) -> MockResponse
@@ -1001,7 +1040,7 @@ module Rack
   class MockResponse < Response
     alias self.[] self.new
     attr_reader original_headers: _Each[[String, String]]
-    attr_reader cookies: Hash[String, CGI::Cookie]
+    attr_reader cookies: Hash[String, Cookie]
     attr_accessor errors: String
     # FIXME: write SPEC-specified duck type for errors parameter
     def initialize: (_ToI status, _Each[[String, String]] headers, nil | _Each[String] | _ToStr body, ?untyped errors) -> void
@@ -1009,11 +1048,21 @@ module Rack
     def match: (Regexp | string other) -> MatchData?
     def body: () -> String
     def empty?: () -> bool
-    def cookie: (String name) -> CGI::Cookie?
+    def cookie: (String name) -> Cookie?
 
     private
 
-    def parse_cookies_from_header: () -> Hash[String, CGI::Cookie]
+    def parse_cookies_from_header: () -> Hash[String, Cookie]
     def identify_cookie_attributes: (String cookie_filling) -> Hash[String, untyped]
+
+    class Cookie
+      attr_reader name: String
+      attr_reader value: Array[String]
+      attr_reader path: String?
+      attr_reader domain: String?
+      attr_reader expires: Time?
+      attr_reader secure: bool
+      def initialize: (Hash[String, untyped] args) -> void
+    end
   end
 end
