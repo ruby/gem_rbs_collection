@@ -76,3 +76,24 @@ class QuxController < ActionController::Base
     controller_name.camelize
   end
 end
+
+# ClassMethods of the concerns Base and API include
+ActionController::Base.use_renderers(:json)
+ActionController::API.use_renderers(:json)
+ActionController::Base.allowed_redirect_hosts = ["example.com"]
+ActionController::API.allowed_redirect_hosts = ["example.com"]
+ActionController::Base.define_callbacks(:notify)
+ActionController::API.prepend_view_path("app/views")
+
+# ClassMethods of the concerns the generated classes include
+class FooControllerTest < ActionController::TestCase
+  tests FooController
+end
+
+class FooIntegrationTest < ActionDispatch::IntegrationTest
+  register_encoder :xml
+  with_routing { |routes| routes }
+end
+
+ActionDispatch::Request.parameter_parsers = {}
+ActionDispatch::Callbacks.define_callbacks(:notify)

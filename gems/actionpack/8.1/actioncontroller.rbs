@@ -14,12 +14,17 @@ module ActionController
     extend Helpers::ClassMethods
     extend AbstractController::Helpers::ClassMethods
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
+    extend Redirecting::ClassMethods
     include ActionView::Layouts
     extend ::ActionView::Layouts::ClassMethods
+    extend ::ActionView::Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Rendering
     extend Rendering::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include EtagWithTemplateDigest
@@ -60,7 +65,9 @@ module ActionController
     extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
+    extend Rescue::ClassMethods
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
     include Instrumentation
@@ -75,9 +82,14 @@ module ActionController
     # https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_controller/api.rb#L116-L147
     include AbstractController::Rendering
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
+    extend Redirecting::ClassMethods
     include ApiRendering
+    extend Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include BasicImplicitRender
@@ -95,7 +107,9 @@ module ActionController
     extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
+    extend Rescue::ClassMethods
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
     include Instrumentation

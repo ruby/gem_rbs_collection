@@ -1,0 +1,25 @@
+class ActionView::Base
+  extend ::ActionView::Helpers::UrlHelper::ClassMethods
+
+  extend ::ActionView::Helpers::SanitizeHelper::ClassMethods
+end
+
+class ActionView::Helpers::Tags::Base
+  extend ::ActionView::Helpers::SanitizeHelper::ClassMethods
+
+  extend ::ActionView::Helpers::UrlHelper::ClassMethods
+end
+
+class ActionView::TestCase
+  extend ::ActionView::TestCase::Behavior::ClassMethods
+
+  extend ::ActiveSupport::Testing::ConstantLookup::ClassMethods
+
+  extend ::ActionView::Helpers::UrlHelper::ClassMethods
+
+  extend ::ActionView::Helpers::SanitizeHelper::ClassMethods
+
+  extend ::AbstractController::Helpers::ClassMethods
+
+  extend ::ActionDispatch::Assertions::RoutingAssertions::ClassMethods
+end
