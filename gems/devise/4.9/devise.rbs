@@ -139,22 +139,92 @@ module Devise
 
       def is_flashing_format?: () -> bool
     end
+
+    # Proxies to the scoped devise routes, generated from `Devise::URL_HELPERS`,
+    # e.g. `new_session_path(:user)` calls `new_user_session_path`.
+    # See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise/controllers/url_helpers.rb
+    module UrlHelpers
+      def session_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def session_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_session_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_session_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def destroy_session_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def destroy_session_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def password_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def password_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_password_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_password_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def edit_password_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def edit_password_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def registration_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def registration_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_registration_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_registration_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def edit_registration_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def edit_registration_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def cancel_registration_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def cancel_registration_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def confirmation_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def confirmation_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_confirmation_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_confirmation_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def unlock_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def unlock_url: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_unlock_path: (untyped resource_or_scope, *untyped args) -> String
+
+      def new_unlock_url: (untyped resource_or_scope, *untyped args) -> String
+    end
   end
 end
 
 # NOTE: Devise includes its controller helpers into every controller through
 # `ActiveSupport.on_load(:action_controller)`, which runs for both
-# `ActionController::Base` and `ActionController::API`.
+# `ActionController::Base` and `ActionController::API`, and its URL helpers
+# into views through `ActiveSupport.on_load(:action_view)`.
 # See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise/rails.rb#L24-L26
-# See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise.rb#L463-L467
+# See: https://github.com/heartcombo/devise/blob/v4.9.4/lib/devise.rb#L463-L472
 module ActionController
   class Base
     include Devise::Controllers::Helpers
+    include Devise::Controllers::UrlHelpers
     extend Devise::Controllers::Helpers::ClassMethods
   end
 
   class API
     include Devise::Controllers::Helpers
+    include Devise::Controllers::UrlHelpers
     extend Devise::Controllers::Helpers::ClassMethods
+  end
+end
+
+module ActionView
+  class Base
+    include Devise::Controllers::UrlHelpers
   end
 end
