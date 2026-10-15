@@ -35,6 +35,10 @@ task.stories.each { |story| story.created_at }
 task.tags.map(&:name)
 task.projects(per_page: 10).first&.gid
 task.dependents.size
+task.start_at&.length
+task.assignee_section&.gid
+task.permalink_url.length
+project.completed_by&.gid
 project.tasks(per_page: 50, options: { fields: ["name"] }).first&.name
 Asana::Resources::Task.find_by_tag(client, tag: "6").to_a
 client.portfolios.find_by_id("5").custom_field_settings.map(&:is_important)

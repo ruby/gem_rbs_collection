@@ -299,6 +299,13 @@ module Asana
       attr_reader parent: Hash[String, String]?
       attr_reader view_url: String?
 
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def permanent_url: () -> String?
+      def size: () -> Integer
+      def connected_to_app: () -> bool
+
       def self.find_by_id: (client client, String id, ?options: options) -> Attachment
       def self.find_by_task: (client client, task: String, ?per_page: Integer, ?options: options) -> Collection[Attachment]
     end
@@ -323,6 +330,36 @@ module Asana
       attr_reader enum_options: Array[Hash[String, untyped]]?
       attr_reader precision: Integer?
 
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def enabled: () -> bool
+      def representation_type: () -> String
+      def id_prefix: () -> String?
+      def input_restrictions: () -> Array[String]
+      def is_formula_field: () -> bool
+      def is_lookup_field: () -> bool
+      def date_value: () -> Resource?
+      def enum_value: () -> Resource?
+      def multi_enum_values: () -> Array[Resource]
+      def number_value: () -> Numeric?
+      def text_value: () -> String?
+      def display_value: () -> String?
+      def format: () -> String
+      def currency_code: () -> String?
+      def custom_label: () -> String?
+      def custom_label_position: () -> String?
+      def is_global_to_workspace: () -> bool
+      def has_notifications_enabled: () -> bool
+      def asana_created_field: () -> String?
+      def is_value_read_only: () -> bool
+      def created_by: () -> Resource?
+      def people_value: () -> Array[Resource]
+      def reference_value: () -> Array[Resource]
+      def html_text_value: () -> String?
+      def privacy_setting: () -> String
+      def default_access_level: () -> String
+
       def self.find_by_id: (client client, String id, ?options: options) -> CustomField
       # Wraps its elements as plain Resources, not CustomFields.
       def self.find_by_workspace: (client client, workspace: String, ?per_page: Integer, ?options: options) -> Collection[Resource]
@@ -336,6 +373,23 @@ module Asana
       def owner: %a{implicitly-returns-nil} () -> Hash[String, String]
       def created_at: %a{implicitly-returns-nil} () -> String
       attr_reader created_by: Hash[String, String]?
+
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def resource_subtype: () -> String
+      def archived: () -> bool
+      def start_on: () -> String?
+      def due_on: () -> String?
+      def default_access_level: () -> String
+      def public: () -> bool
+      def current_status_update: () -> Resource?
+      def custom_fields: () -> Array[Resource]
+      def permalink_url: () -> String
+      def privacy_setting: () -> String
+      def project_templates: () -> Array[Resource]
+      def custom_type: () -> Resource?
+
       def custom_field_settings: (?options: options) -> Collection[CustomFieldSetting]
       def color: %a{implicitly-returns-nil} () -> String
       def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
@@ -373,6 +427,25 @@ module Asana
       attr_reader team: Hash[String, String]?
       def layout: %a{implicitly-returns-nil} () -> String
 
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def resource_subtype: () -> String
+      def icon: () -> String?
+      def current_status_update: () -> Resource?
+      def default_view: () -> String
+      def privacy_setting: () -> String
+      def default_access_level: () -> String
+      def minimum_access_level_for_customization: () -> String
+      def minimum_access_level_for_sharing: () -> String
+      def completed: () -> bool
+      def completed_at: () -> String?
+      def completed_by: () -> Resource?
+      def permalink_url: () -> String
+      def project_brief: () -> Resource?
+      def created_from_template: () -> Resource?
+      def custom_type: () -> Resource?
+
       def self.create: (client client, workspace: String, ?team: String?, ?options: options, **untyped data) -> Project
       def self.find_by_id: (client client, String id, ?options: options) -> Project
       def self.find_all: (client client, ?workspace: String?, ?team: String?, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: options) -> Collection[Project]
@@ -387,6 +460,11 @@ module Asana
       def name: %a{implicitly-returns-nil} () -> String
       def project: %a{implicitly-returns-nil} () -> Hash[String, String]
       def created_at: %a{implicitly-returns-nil} () -> String
+
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def projects: () -> Array[Resource]
 
       def self.find_by_id: (client client, String id, ?options: options) -> Section
       def update: (?options: options, **untyped data) -> Section
@@ -409,6 +487,49 @@ module Asana
       def source: %a{implicitly-returns-nil} () -> String
       def type: %a{implicitly-returns-nil} () -> String
 
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def sticker_name: () -> String
+      def is_editable: () -> bool
+      def hearted: () -> bool
+      def hearts: () -> Array[Resource]
+      def num_hearts: () -> Integer
+      def reaction_summary: () -> Array[Resource]
+      def previews: () -> Array[Resource]
+      def old_name: () -> String
+      def new_name: () -> String?
+      def old_dates: () -> Resource
+      def new_dates: () -> Resource
+      def old_resource_subtype: () -> String
+      def new_resource_subtype: () -> String
+      def story: () -> Resource
+      def assignee: () -> Resource
+      def follower: () -> Resource
+      def old_section: () -> Resource
+      def new_section: () -> Resource
+      def task: () -> Resource
+      def project: () -> Resource
+      def tag: () -> Resource
+      def custom_field: () -> Resource
+      def old_text_value: () -> String
+      def new_text_value: () -> String
+      def old_number_value: () -> Integer?
+      def new_number_value: () -> Integer
+      def old_enum_value: () -> Resource
+      def new_enum_value: () -> Resource
+      def old_date_value: () -> Resource
+      def new_date_value: () -> Resource
+      def old_people_value: () -> Array[Resource]
+      def new_people_value: () -> Array[Resource]
+      def old_multi_enum_values: () -> Array[Resource]
+      def new_multi_enum_values: () -> Array[Resource]
+      def new_approval_status: () -> String
+      def old_approval_status: () -> String
+      def duplicate_of: () -> Resource
+      def duplicated_from: () -> Resource
+      def dependency: () -> Resource
+
       def self.find_by_id: (client client, String id, ?options: options) -> Story
       def self.find_by_task: (client client, task: String, ?per_page: Integer, ?options: options) -> Collection[Story]
       def update: (?text: String?, ?html_text: String?, ?is_pinned: bool?, ?options: options, **untyped data) -> Story
@@ -422,6 +543,12 @@ module Asana
       def name: %a{implicitly-returns-nil} () -> String
       attr_reader color: String?
       def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
+
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def notes: () -> String
+      def permalink_url: () -> String
 
       def self.create: (client client, workspace: String, ?options: options, **untyped data) -> Tag
       def self.find_by_id: (client client, String id, ?options: options) -> Tag
@@ -462,6 +589,25 @@ module Asana
       attr_reader start_on: String?
       def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
 
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def created_by: () -> Resource
+      def approval_status: () -> String
+      def assigned_by: () -> Resource?
+      def completed_by: () -> Resource?
+      def hearted: () -> bool
+      def hearts: () -> Array[Resource]
+      def has_subtasks_date_mismatch: () -> bool
+      def num_hearts: () -> Integer
+      def start_at: () -> String?
+      def actual_time_minutes: () -> Numeric?
+      def assignee_section: () -> Resource?
+      def custom_type: () -> Resource?
+      def custom_type_status_option: () -> Resource?
+      def effective_memberships: () -> Array[Resource]
+      def permalink_url: () -> String
+
       def self.create: (client client, ?workspace: String?, ?options: options, **untyped data) -> Task
       def self.find_by_id: (client client, String id, ?options: options) -> Task
       def self.find_all: (client client, ?assignee: String?, ?workspace: String?, ?project: String?, ?section: String?, ?tag: String?, ?user_task_list: String?, ?completed_since: String?, ?modified_since: String?, ?per_page: Integer, ?options: options) -> Collection[Task]
@@ -489,6 +635,12 @@ module Asana
       def workspaces: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
 
       # Wraps the response as a plain Resource, not a User.
+
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def custom_fields: () -> Array[Resource]
+
       def self.me: (client client, ?options: options) -> Resource
       def self.find_by_id: (client client, String id, ?options: options) -> User
       def self.find_all: (client client, ?workspace: String?, ?per_page: Integer, ?options: options) -> Collection[User]
@@ -516,6 +668,14 @@ module Asana
       attr_reader last_failure_at: String?
       attr_reader last_failure_content: String?
 
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def delivery_retry_count: () -> Integer
+      def next_attempt_after: () -> String
+      def failure_deletion_timestamp: () -> String
+      def filters: () -> Array[Resource]
+
       def self.create: (client client, resource: String, target: String, ?options: options, **untyped data) -> Webhook
       def self.get_all: (client client, workspace: String, ?resource: String?, ?per_page: Integer, ?options: options) -> Collection[Webhook]
     end
@@ -525,6 +685,11 @@ module Asana
       attr_reader resource_type: String
       def name: %a{implicitly-returns-nil} () -> String
       def is_organization: %a{implicitly-returns-nil} () -> bool
+
+      # Fields the gem answers only through Resource#method_missing, which
+      # wraps nested objects in a plain Resource and raises NoMethodError
+      # unless the request's fields option included the field.
+      def email_domains: () -> Array[String]
 
       def self.find_by_id: (client client, String id, ?options: options) -> Workspace
       def self.find_all: (client client, ?per_page: Integer, ?options: options) -> Collection[Workspace]
