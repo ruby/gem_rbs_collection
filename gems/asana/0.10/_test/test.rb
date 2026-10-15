@@ -32,6 +32,12 @@ task.custom_fields&.size
 task.subtasks(per_page: 50).each { |subtask| subtask.gid }
 task.dependencies.to_a.size
 task.stories.each { |story| story.created_at }
+task.tags.map(&:name)
+task.projects(per_page: 10).first&.gid
+task.dependents.size
+project.tasks(per_page: 50, options: { fields: ["name"] }).first&.name
+Asana::Resources::Task.find_by_tag(client, tag: "6").to_a
+client.portfolios.find_by_id("5").custom_field_settings.map(&:is_important)
 task.update(completed: true).completed
 task.attach(filename: "notes.txt", mime: "text/plain", io: StringIO.new("hello")).name
 

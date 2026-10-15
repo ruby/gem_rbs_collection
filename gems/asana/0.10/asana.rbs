@@ -238,6 +238,9 @@ module Asana
     class AttachmentsBase < Resource
     end
 
+    class CustomFieldSettingsBase < Resource
+    end
+
     class CustomFieldsBase < Resource
       def self.get_custom_fields_for_workspace: (client client, workspace_gid: String, ?options: options) -> Collection[CustomField]
     end
@@ -298,6 +301,16 @@ module Asana
       def self.find_by_task: (client client, task: String, ?per_page: Integer, ?options: options) -> Collection[Attachment]
     end
 
+    class CustomFieldSetting < CustomFieldSettingsBase
+      attr_reader gid: String
+      def resource_type: %a{implicitly-returns-nil} () -> String
+      def created_at: %a{implicitly-returns-nil} () -> String
+      def is_important: %a{implicitly-returns-nil} () -> bool
+      def parent: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def project: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def custom_field: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+    end
+
     class CustomField < CustomFieldsBase
       attr_reader gid: String
       attr_reader resource_type: String
@@ -321,7 +334,7 @@ module Asana
       def owner: %a{implicitly-returns-nil} () -> Hash[String, untyped]
       def created_at: %a{implicitly-returns-nil} () -> String
       attr_reader created_by: Hash[String, untyped]?
-      def custom_field_settings: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      def custom_field_settings: (?options: options) -> Collection[CustomFieldSetting]
       def color: %a{implicitly-returns-nil} () -> String
       def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
       def members: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
@@ -363,6 +376,7 @@ module Asana
       def self.find_all: (client client, ?workspace: String?, ?team: String?, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: options) -> Collection[Project]
       def self.find_by_workspace: (client client, workspace: String, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: options) -> Collection[Project]
       def update: (?options: options, **untyped data) -> Project
+      def tasks: (?per_page: Integer, ?options: options) -> Collection[Task]
     end
 
     class Section < SectionsBase
@@ -428,7 +442,6 @@ module Asana
       def completed: %a{implicitly-returns-nil} () -> bool
       attr_reader completed_at: String?
       def custom_fields: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
-      def dependents: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
       attr_reader due_on: String?
       attr_reader due_at: String?
       attr_reader external: Hash[String, untyped]?
@@ -444,14 +457,15 @@ module Asana
       def num_likes: %a{implicitly-returns-nil} () -> Integer
       def num_subtasks: %a{implicitly-returns-nil} () -> Integer
       attr_reader parent: Hash[String, untyped]?
-      def projects: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
       attr_reader start_on: String?
       def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
-      def tags: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
 
       def self.create: (client client, ?workspace: String?, ?options: options, **untyped data) -> Task
       def self.find_by_id: (client client, String id, ?options: options) -> Task
       def self.find_all: (client client, ?assignee: String?, ?workspace: String?, ?project: String?, ?section: String?, ?tag: String?, ?user_task_list: String?, ?completed_since: String?, ?modified_since: String?, ?per_page: Integer, ?options: options) -> Collection[Task]
+      def self.find_by_project: (client client, ?project: String?, ?projectId: String?, ?per_page: Integer, ?options: options) -> Collection[Task]
+      def self.find_by_tag: (client client, tag: String, ?per_page: Integer, ?options: options) -> Collection[Task]
+      def self.find_by_section: (client client, section: String, ?per_page: Integer, ?options: options) -> Collection[Task]
 
       def update: (?options: options, **untyped data) -> Task
       # The gem also declares `attr_reader :dependencies`; this method,
@@ -459,6 +473,9 @@ module Asana
       def dependencies: (?options: options) -> Collection[Task]
       def subtasks: (?per_page: Integer, ?options: options) -> Collection[Task]
       def stories: (?per_page: Integer, ?options: options) -> Collection[Story]
+      def dependents: (?options: options) -> Collection[Task]
+      def projects: (?per_page: Integer, ?options: options) -> Collection[Project]
+      def tags: (?per_page: Integer, ?options: options) -> Collection[Tag]
     end
 
     class User < UsersBase
