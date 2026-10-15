@@ -10,7 +10,7 @@ workspace_gid = workspace&.gid || "1"
 workspace&.name&.upcase
 
 me = client.users.me
-me.to_h["gid"]
+me.gid.length
 
 project = client.projects.find_by_id("2", options: { fields: ["name", "due_date"] })
 project.due_date&.length

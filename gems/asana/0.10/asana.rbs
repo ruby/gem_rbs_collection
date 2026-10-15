@@ -192,6 +192,9 @@ module Asana
       extend ResponseHelper
 
       def initialize: (Hash[String, untyped] data, client: client) -> void
+      # Every Asana object carries a gid, including the plain Resources that
+      # nested objects and some endpoints (e.g. Users.me) are wrapped in.
+      def gid: () -> String
       def refresh: () -> self
       def to_h: () -> Hash[String, untyped]
 
