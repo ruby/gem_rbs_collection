@@ -182,6 +182,8 @@ module Asana
     # Resource attributes are nil when the request's `fields` option leaves
     # them out. Those are declared `implicitly-returns-nil`; attributes the
     # API itself can return as null (e.g. Task#due_on) are optional types.
+    # References to other objects arrive in compact form ({ "gid" =>,
+    # "name" =>, "resource_type" => }), so they are Hash[String, String].
 
     module ResponseHelper
       def parse: (HttpClient::Response response) -> [untyped, Hash[String, untyped]]
@@ -294,7 +296,7 @@ module Asana
       attr_reader download_url: String?
       attr_reader host: String?
       def name: %a{implicitly-returns-nil} () -> String
-      attr_reader parent: Hash[String, untyped]?
+      attr_reader parent: Hash[String, String]?
       attr_reader view_url: String?
 
       def self.find_by_id: (client client, String id, ?options: options) -> Attachment
@@ -306,8 +308,8 @@ module Asana
       def resource_type: %a{implicitly-returns-nil} () -> String
       def created_at: %a{implicitly-returns-nil} () -> String
       def is_important: %a{implicitly-returns-nil} () -> bool
-      def parent: %a{implicitly-returns-nil} () -> Hash[String, untyped]
-      def project: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def parent: %a{implicitly-returns-nil} () -> Hash[String, String]
+      def project: %a{implicitly-returns-nil} () -> Hash[String, String]
       def custom_field: %a{implicitly-returns-nil} () -> Hash[String, untyped]
     end
 
@@ -331,13 +333,13 @@ module Asana
       attr_reader gid: String
       attr_reader resource_type: String
       def name: %a{implicitly-returns-nil} () -> String
-      def owner: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def owner: %a{implicitly-returns-nil} () -> Hash[String, String]
       def created_at: %a{implicitly-returns-nil} () -> String
-      attr_reader created_by: Hash[String, untyped]?
+      attr_reader created_by: Hash[String, String]?
       def custom_field_settings: (?options: options) -> Collection[CustomFieldSetting]
       def color: %a{implicitly-returns-nil} () -> String
-      def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
-      def members: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
+      def members: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
 
       def self.find_by_id: (client client, String id, ?options: options) -> Portfolio
       def self.find_all: (client client, workspace: String, owner: String, ?per_page: Integer, ?options: options) -> Collection[Portfolio]
@@ -351,7 +353,7 @@ module Asana
       attr_reader gid: String
       attr_reader resource_type: String
       def name: %a{implicitly-returns-nil} () -> String
-      attr_reader owner: Hash[String, untyped]?
+      attr_reader owner: Hash[String, String]?
       attr_reader current_status: Hash[String, untyped]?
       attr_reader due_date: String?
       attr_reader due_on: String?
@@ -360,15 +362,15 @@ module Asana
       def modified_at: %a{implicitly-returns-nil} () -> String
       def archived: %a{implicitly-returns-nil} () -> bool
       def public: %a{implicitly-returns-nil} () -> bool
-      def members: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
-      def followers: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      def members: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
+      def followers: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
       def custom_fields: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
       def custom_field_settings: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
       attr_reader color: String?
       def notes: %a{implicitly-returns-nil} () -> String
       def html_notes: %a{implicitly-returns-nil} () -> String
-      def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
-      attr_reader team: Hash[String, untyped]?
+      def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
+      attr_reader team: Hash[String, String]?
       def layout: %a{implicitly-returns-nil} () -> String
 
       def self.create: (client client, workspace: String, ?team: String?, ?options: options, **untyped data) -> Project
@@ -383,7 +385,7 @@ module Asana
       attr_reader gid: String
       attr_reader resource_type: String
       def name: %a{implicitly-returns-nil} () -> String
-      def project: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def project: %a{implicitly-returns-nil} () -> Hash[String, String]
       def created_at: %a{implicitly-returns-nil} () -> String
 
       def self.find_by_id: (client client, String id, ?options: options) -> Section
@@ -395,13 +397,13 @@ module Asana
       attr_reader resource_type: String
       def resource_subtype: %a{implicitly-returns-nil} () -> String
       def created_at: %a{implicitly-returns-nil} () -> String
-      attr_reader created_by: Hash[String, untyped]?
+      attr_reader created_by: Hash[String, String]?
       def liked: %a{implicitly-returns-nil} () -> bool
       def likes: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
       def num_likes: %a{implicitly-returns-nil} () -> Integer
       def text: %a{implicitly-returns-nil} () -> String
       def html_text: %a{implicitly-returns-nil} () -> String
-      def target: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def target: %a{implicitly-returns-nil} () -> Hash[String, String]
       def is_pinned: %a{implicitly-returns-nil} () -> bool
       def is_edited: %a{implicitly-returns-nil} () -> bool
       def source: %a{implicitly-returns-nil} () -> String
@@ -416,10 +418,10 @@ module Asana
       attr_reader gid: String
       attr_reader resource_type: String
       def created_at: %a{implicitly-returns-nil} () -> String
-      def followers: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      def followers: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
       def name: %a{implicitly-returns-nil} () -> String
       attr_reader color: String?
-      def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
 
       def self.create: (client client, workspace: String, ?options: options, **untyped data) -> Tag
       def self.find_by_id: (client client, String id, ?options: options) -> Tag
@@ -436,7 +438,7 @@ module Asana
       attr_reader gid: String
       attr_reader resource_type: String
       def resource_subtype: %a{implicitly-returns-nil} () -> String
-      attr_reader assignee: Hash[String, untyped]?
+      attr_reader assignee: Hash[String, String]?
       attr_reader assignee_status: String?
       def created_at: %a{implicitly-returns-nil} () -> String
       def completed: %a{implicitly-returns-nil} () -> bool
@@ -444,21 +446,21 @@ module Asana
       def custom_fields: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
       attr_reader due_on: String?
       attr_reader due_at: String?
-      attr_reader external: Hash[String, untyped]?
-      def followers: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      attr_reader external: Hash[String, String]?
+      def followers: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
       def is_rendered_as_separator: %a{implicitly-returns-nil} () -> bool
       def liked: %a{implicitly-returns-nil} () -> bool
       def likes: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
-      def memberships: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      def memberships: %a{implicitly-returns-nil} () -> Array[Hash[String, Hash[String, String]]]
       def modified_at: %a{implicitly-returns-nil} () -> String
       def name: %a{implicitly-returns-nil} () -> String
       def notes: %a{implicitly-returns-nil} () -> String
       def html_notes: %a{implicitly-returns-nil} () -> String
       def num_likes: %a{implicitly-returns-nil} () -> Integer
       def num_subtasks: %a{implicitly-returns-nil} () -> Integer
-      attr_reader parent: Hash[String, untyped]?
+      attr_reader parent: Hash[String, String]?
       attr_reader start_on: String?
-      def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
 
       def self.create: (client client, ?workspace: String?, ?options: options, **untyped data) -> Task
       def self.find_by_id: (client client, String id, ?options: options) -> Task
@@ -484,7 +486,7 @@ module Asana
       def name: %a{implicitly-returns-nil} () -> String
       attr_reader email: String?
       attr_reader photo: Hash[String, String]?
-      def workspaces: %a{implicitly-returns-nil} () -> Array[Hash[String, untyped]]
+      def workspaces: %a{implicitly-returns-nil} () -> Array[Hash[String, String]]
 
       # Wraps the response as a plain Resource, not a User.
       def self.me: (client client, ?options: options) -> Resource
@@ -497,8 +499,8 @@ module Asana
       attr_reader gid: String
       attr_reader resource_type: String
       def name: %a{implicitly-returns-nil} () -> String
-      def owner: %a{implicitly-returns-nil} () -> Hash[String, untyped]
-      def workspace: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def owner: %a{implicitly-returns-nil} () -> Hash[String, String]
+      def workspace: %a{implicitly-returns-nil} () -> Hash[String, String]
 
       def self.find_by_id: (client client, String id, ?options: options) -> UserTaskList
     end
@@ -506,7 +508,7 @@ module Asana
     class Webhook < WebhooksBase
       attr_reader gid: String
       attr_reader resource_type: String
-      def resource: %a{implicitly-returns-nil} () -> Hash[String, untyped]
+      def resource: %a{implicitly-returns-nil} () -> Hash[String, String]
       def target: %a{implicitly-returns-nil} () -> String
       def active: %a{implicitly-returns-nil} () -> bool
       def created_at: %a{implicitly-returns-nil} () -> String
