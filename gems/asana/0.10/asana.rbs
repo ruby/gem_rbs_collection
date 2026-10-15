@@ -1,0 +1,508 @@
+module Asana
+  VERSION: String
+
+  # Asana::Client#tasks, #projects, etc. are defined with define_method over
+  # Resources::Registry and return a ResourceProxy, which forwards every call
+  # to the resource class's singleton method with the HTTP client prepended.
+  # Each interface below is that resource's singleton API minus the leading
+  # client argument.
+  class Client
+    class Configuration
+      def initialize: () -> void
+      def authentication: (:access_token, String value) -> void
+                        | (:oauth2, untyped value) -> void
+      def faraday_adapter: (Symbol adapter) -> void
+      def configure_faraday: () { (untyped conn) -> void } -> void
+      def debug_mode: () -> void
+      def log_asana_change_warnings: (boolish value) -> void
+      def default_headers: (Hash[String, String] value) -> void
+      def to_h: () -> Hash[Symbol, untyped]
+    end
+
+    class ResourceProxy
+      def initialize: (client: HttpClient, resource: singleton(Resources::Resource)) -> void
+    end
+
+    interface _Attachments
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Attachment
+      def find_by_task: (task: String, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Attachment]
+    end
+
+    interface _CustomFields
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::CustomField
+      def find_by_workspace: (workspace: String, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Resource]
+      def get_custom_fields_for_workspace: (workspace_gid: String, ?options: Resources::options) -> Resources::Collection[Resources::CustomField]
+    end
+
+    interface _Portfolios
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Portfolio
+      def find_all: (workspace: String, owner: String, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Portfolio]
+      def get_items_for_portfolio: (portfolio_gid: String, ?options: Resources::options) -> Resources::Collection[Resources::Project]
+    end
+
+    interface _Projects
+      def create: (workspace: String, ?team: String?, ?options: Resources::options, **untyped data) -> Resources::Project
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Project
+      def find_all: (?workspace: String?, ?team: String?, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Project]
+      def find_by_workspace: (workspace: String, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Project]
+    end
+
+    interface _Sections
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Section
+      def get_sections_for_project: (project_gid: String, ?options: Resources::options) -> Resources::Collection[Resources::Section]
+      def add_task_for_section: (section_gid: String, ?options: Resources::options, **untyped data) -> untyped
+    end
+
+    interface _Stories
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Story
+      def find_by_task: (task: String, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Story]
+    end
+
+    interface _Tags
+      def create: (workspace: String, ?options: Resources::options, **untyped data) -> Resources::Tag
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Tag
+      def find_all: (?workspace: String?, ?team: String?, ?archived: bool?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Tag]
+      def find_by_workspace: (workspace: String, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Tag]
+      def get_tags_for_workspace: (workspace_gid: String, ?options: Resources::options) -> Resources::Collection[Resources::Tag]
+    end
+
+    interface _Tasks
+      def create: (?workspace: String?, ?options: Resources::options, **untyped data) -> Resources::Task
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Task
+      def find_all: (?assignee: String?, ?workspace: String?, ?project: String?, ?section: String?, ?tag: String?, ?user_task_list: String?, ?completed_since: String?, ?modified_since: String?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Task]
+      def get_task: (task_gid: String, ?options: Resources::options) -> Resources::Task
+      def get_tasks: (?assignee: String?, ?project: String?, ?section: String?, ?workspace: String?, ?completed_since: String?, ?modified_since: String?, ?options: Resources::options) -> Resources::Collection[Resources::Task]
+      def get_subtasks_for_task: (task_gid: String, ?options: Resources::options) -> Resources::Collection[Resources::Task]
+      def update_task: (task_gid: String, ?options: Resources::options, **untyped data) -> Resources::Task
+      def add_project_for_task: (task_gid: String, ?options: Resources::options, **untyped data) -> untyped
+      def search_tasks_for_workspace: (workspace_gid: String, ?options: Resources::options, **untyped filters) -> Resources::Collection[Resources::Task]
+    end
+
+    interface _UserTaskLists
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::UserTaskList
+      def get_user_task_list_for_user: (user_gid: String, ?workspace: String?, ?options: Resources::options) -> Resources::UserTaskList
+    end
+
+    interface _Users
+      def me: (?options: Resources::options) -> Resources::Resource
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::User
+      def find_all: (?workspace: String?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::User]
+      def find_by_workspace: (workspace: String, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::User]
+    end
+
+    interface _Webhooks
+      def create: (resource: String, target: String, ?options: Resources::options, **untyped data) -> Resources::Webhook
+      def create_webhook: (?options: Resources::options, **untyped data) -> Resources::Webhook
+      def get_all: (workspace: String, ?resource: String?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Webhook]
+    end
+
+    interface _Workspaces
+      def find_by_id: (String id, ?options: Resources::options) -> Resources::Workspace
+      def find_all: (?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Workspace]
+    end
+
+    def initialize: () { (Configuration config) -> void } -> void
+
+    def get: (String url, **untyped args) -> HttpClient::Response
+    def post: (String url, **untyped args) -> HttpClient::Response
+    def put: (String url, **untyped args) -> HttpClient::Response
+    def delete: (String url, **untyped args) -> HttpClient::Response
+
+    def attachments: () -> _Attachments
+    def custom_fields: () -> _CustomFields
+    def portfolios: () -> _Portfolios
+    def projects: () -> _Projects
+    def sections: () -> _Sections
+    def stories: () -> _Stories
+    def tags: () -> _Tags
+    def tasks: () -> _Tasks
+    def user_task_lists: () -> _UserTaskLists
+    def users: () -> _Users
+    def webhooks: () -> _Webhooks
+    def workspaces: () -> _Workspaces
+  end
+
+  class HttpClient
+    class Response
+      attr_reader faraday_env: untyped
+      attr_reader status: Integer
+      attr_reader body: Hash[String, untyped]
+      attr_reader headers: Hash[String, String]
+    end
+
+    def get: (String resource_uri, ?params: Hash[Symbol, untyped], ?options: Resources::options) -> Response
+    def put: (String resource_uri, ?body: Hash[Symbol, untyped], ?options: Resources::options) -> Response
+    def post: (String resource_uri, ?body: Hash[Symbol, untyped], ?upload: untyped, ?options: Resources::options) -> Response
+    def delete: (String resource_uri, ?params: Hash[Symbol, untyped], ?options: Resources::options) -> Response
+  end
+
+  module Errors
+    class APIError < StandardError
+      attr_accessor response: HttpClient::Response?
+    end
+
+    class NotAuthorized < APIError
+    end
+
+    class PremiumOnly < APIError
+    end
+
+    class Forbidden < APIError
+    end
+
+    class NotFound < APIError
+    end
+
+    class ServerError < APIError
+      attr_accessor phrase: String
+      def initialize: (String phrase) -> void
+    end
+
+    class InvalidRequest < APIError
+      attr_accessor errors: Array[String]
+      def initialize: (Array[String] errors) -> void
+    end
+
+    class RateLimitEnforced < APIError
+      attr_accessor retry_after_seconds: Integer
+      def initialize: (Integer retry_after_seconds) -> void
+    end
+  end
+
+  module Resources
+    # The request I/O options every endpoint accepts, e.g.
+    # { fields: ['name'], expand: ['projects'], pretty: true }.
+    type options = Hash[Symbol, untyped]
+
+    # Resource class methods take the client they send requests through:
+    # an Asana::HttpClient when reached through Asana::Client's proxies, or an
+    # Asana::Client when called directly (it answers the same verbs).
+    type client = Asana::Client | Asana::HttpClient
+
+    module ResponseHelper
+      def parse: (HttpClient::Response response) -> [untyped, Hash[String, untyped]]
+    end
+
+    class Resource
+      include ResponseHelper
+      extend ResponseHelper
+
+      def initialize: (Hash[String, untyped] data, client: client) -> void
+      def refresh: () -> self
+      def to_h: () -> Hash[String, untyped]
+
+      private
+
+      def client: () -> client
+      def refresh_with: (Hash[String, untyped] data) -> self
+    end
+
+    class Collection[T]
+      include Enumerable[T]
+      include ResponseHelper
+
+      attr_reader elements: Array[T]
+
+      def initialize: ([Array[Hash[String, untyped]], Hash[String, untyped]] response, ?type: singleton(Resource), client: client) -> void
+      def each: () { (T) -> void } -> void
+              | () -> Enumerator[T, void]
+      def last: () -> T?
+      def size: () -> Integer
+      alias length size
+      def next_page: () -> Collection[T]?
+    end
+
+    module AttachmentUploading
+      # Anything Faraday::FilePart can read the upload from, e.g. a StringIO.
+      interface _Readable
+        def read: () -> String?
+      end
+
+      def attach: (filename: String, mime: String, ?io: _Readable?, ?options: options, **untyped data) -> Attachment
+    end
+
+    module EventSubscription
+      def events: (?wait: Integer, ?options: options) -> untyped
+    end
+
+    # Generated endpoint classes. Each concrete resource below inherits its
+    # generated API endpoints from one of these.
+
+    class AttachmentsBase < Resource
+    end
+
+    class CustomFieldsBase < Resource
+      def self.get_custom_fields_for_workspace: (client client, workspace_gid: String, ?options: options) -> Collection[CustomField]
+    end
+
+    class PortfoliosBase < Resource
+      def self.get_items_for_portfolio: (client client, portfolio_gid: String, ?options: options) -> Collection[Project]
+    end
+
+    class ProjectsBase < Resource
+    end
+
+    class SectionsBase < Resource
+      def self.get_sections_for_project: (client client, project_gid: String, ?options: options) -> Collection[Section]
+      def self.add_task_for_section: (client client, section_gid: String, ?options: options, **untyped data) -> untyped
+    end
+
+    class StoriesBase < Resource
+    end
+
+    class TagsBase < Resource
+      def self.get_tags_for_workspace: (client client, workspace_gid: String, ?options: options) -> Collection[Tag]
+    end
+
+    class TasksBase < Resource
+      def self.get_task: (client client, task_gid: String, ?options: options) -> Task
+      def self.get_tasks: (client client, ?assignee: String?, ?project: String?, ?section: String?, ?workspace: String?, ?completed_since: String?, ?modified_since: String?, ?options: options) -> Collection[Task]
+      def self.get_subtasks_for_task: (client client, task_gid: String, ?options: options) -> Collection[Task]
+      def self.update_task: (client client, task_gid: String, ?options: options, **untyped data) -> Task
+      def self.add_project_for_task: (client client, task_gid: String, ?options: options, **untyped data) -> untyped
+      def self.search_tasks_for_workspace: (client client, workspace_gid: String, ?options: options, **untyped filters) -> Collection[Task]
+    end
+
+    class UsersBase < Resource
+    end
+
+    class UserTaskListsBase < Resource
+      def self.get_user_task_list_for_user: (client client, user_gid: String, ?workspace: String?, ?options: options) -> UserTaskList
+    end
+
+    class WebhooksBase < Resource
+      def self.create_webhook: (client client, ?options: options, **untyped data) -> Webhook
+    end
+
+    class WorkspacesBase < Resource
+    end
+
+    class Attachment < AttachmentsBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader created_at: String?
+      attr_reader download_url: String?
+      attr_reader host: String?
+      attr_reader name: String?
+      attr_reader parent: Hash[String, untyped]?
+      attr_reader view_url: String?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> Attachment
+      def self.find_by_task: (client client, task: String, ?per_page: Integer, ?options: options) -> Collection[Attachment]
+    end
+
+    class CustomField < CustomFieldsBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader resource_subtype: String?
+      attr_reader name: String?
+      attr_reader description: String?
+      attr_reader type: String?
+      attr_reader enum_options: Array[Hash[String, untyped]]?
+      attr_reader precision: Integer?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> CustomField
+      # Wraps its elements as plain Resources, not CustomFields.
+      def self.find_by_workspace: (client client, workspace: String, ?per_page: Integer, ?options: options) -> Collection[Resource]
+      def update: (?options: options, **untyped data) -> CustomField
+    end
+
+    class Portfolio < PortfoliosBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader name: String?
+      attr_reader owner: Hash[String, untyped]?
+      attr_reader created_at: String?
+      attr_reader created_by: Hash[String, untyped]?
+      attr_reader custom_field_settings: Array[Hash[String, untyped]]?
+      attr_reader color: String?
+      attr_reader workspace: Hash[String, untyped]?
+      attr_reader members: Array[Hash[String, untyped]]?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> Portfolio
+      def self.find_all: (client client, workspace: String, owner: String, ?per_page: Integer, ?options: options) -> Collection[Portfolio]
+      def update: (?options: options, **untyped data) -> Portfolio
+      def get_items: (?options: options) -> Collection[Resource]
+    end
+
+    class Project < ProjectsBase
+      include EventSubscription
+
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader name: String?
+      attr_reader owner: Hash[String, untyped]?
+      attr_reader current_status: Hash[String, untyped]?
+      attr_reader due_date: String?
+      attr_reader due_on: String?
+      attr_reader start_on: String?
+      attr_reader created_at: String?
+      attr_reader modified_at: String?
+      attr_reader archived: bool?
+      attr_reader public: bool?
+      attr_reader members: Array[Hash[String, untyped]]?
+      attr_reader followers: Array[Hash[String, untyped]]?
+      attr_reader custom_fields: Array[Hash[String, untyped]]?
+      attr_reader custom_field_settings: Array[Hash[String, untyped]]?
+      attr_reader color: String?
+      attr_reader notes: String?
+      attr_reader html_notes: String?
+      attr_reader workspace: Hash[String, untyped]?
+      attr_reader team: Hash[String, untyped]?
+      attr_reader layout: String?
+
+      def self.create: (client client, workspace: String, ?team: String?, ?options: options, **untyped data) -> Project
+      def self.find_by_id: (client client, String id, ?options: options) -> Project
+      def self.find_all: (client client, ?workspace: String?, ?team: String?, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: options) -> Collection[Project]
+      def self.find_by_workspace: (client client, workspace: String, ?is_template: bool?, ?archived: bool?, ?per_page: Integer, ?options: options) -> Collection[Project]
+      def update: (?options: options, **untyped data) -> Project
+    end
+
+    class Section < SectionsBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader name: String?
+      attr_reader project: Hash[String, untyped]?
+      attr_reader created_at: String?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> Section
+      def update: (?options: options, **untyped data) -> Section
+    end
+
+    class Story < StoriesBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader resource_subtype: String?
+      attr_reader created_at: String?
+      attr_reader created_by: Hash[String, untyped]?
+      attr_reader liked: bool?
+      attr_reader likes: Array[Hash[String, untyped]]?
+      attr_reader num_likes: Integer?
+      attr_reader text: String?
+      attr_reader html_text: String?
+      attr_reader target: Hash[String, untyped]?
+      attr_reader is_pinned: bool?
+      attr_reader is_edited: bool?
+      attr_reader source: String?
+      attr_reader type: String?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> Story
+      def self.find_by_task: (client client, task: String, ?per_page: Integer, ?options: options) -> Collection[Story]
+      def update: (?text: String?, ?html_text: String?, ?is_pinned: bool?, ?options: options, **untyped data) -> Story
+    end
+
+    class Tag < TagsBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader created_at: String?
+      attr_reader followers: Array[Hash[String, untyped]]?
+      attr_reader name: String?
+      attr_reader color: String?
+      attr_reader workspace: Hash[String, untyped]?
+
+      def self.create: (client client, workspace: String, ?options: options, **untyped data) -> Tag
+      def self.find_by_id: (client client, String id, ?options: options) -> Tag
+      def self.find_all: (client client, ?workspace: String?, ?team: String?, ?archived: bool?, ?per_page: Integer, ?options: options) -> Collection[Tag]
+      def self.find_by_workspace: (client client, workspace: String, ?per_page: Integer, ?options: options) -> Collection[Tag]
+      def update: (?options: options, **untyped data) -> Tag
+      def get_tasks_with_tag: (?per_page: Integer, ?options: options) -> Collection[Task]
+    end
+
+    class Task < TasksBase
+      include AttachmentUploading
+      include EventSubscription
+
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader resource_subtype: String?
+      attr_reader assignee: Hash[String, untyped]?
+      attr_reader assignee_status: String?
+      attr_reader created_at: String?
+      attr_reader completed: bool?
+      attr_reader completed_at: String?
+      attr_reader custom_fields: Array[Hash[String, untyped]]?
+      attr_reader dependents: Array[Hash[String, untyped]]?
+      attr_reader due_on: String?
+      attr_reader due_at: String?
+      attr_reader external: Hash[String, untyped]?
+      attr_reader followers: Array[Hash[String, untyped]]?
+      attr_reader is_rendered_as_separator: bool?
+      attr_reader liked: bool?
+      attr_reader likes: Array[Hash[String, untyped]]?
+      attr_reader memberships: Array[Hash[String, untyped]]?
+      attr_reader modified_at: String?
+      attr_reader name: String?
+      attr_reader notes: String?
+      attr_reader html_notes: String?
+      attr_reader num_likes: Integer?
+      attr_reader num_subtasks: Integer?
+      attr_reader parent: Hash[String, untyped]?
+      attr_reader projects: Array[Hash[String, untyped]]?
+      attr_reader start_on: String?
+      attr_reader workspace: Hash[String, untyped]?
+      attr_reader tags: Array[Hash[String, untyped]]?
+
+      def self.create: (client client, ?workspace: String?, ?options: options, **untyped data) -> Task
+      def self.find_by_id: (client client, String id, ?options: options) -> Task
+      def self.find_all: (client client, ?assignee: String?, ?workspace: String?, ?project: String?, ?section: String?, ?tag: String?, ?user_task_list: String?, ?completed_since: String?, ?modified_since: String?, ?per_page: Integer, ?options: options) -> Collection[Task]
+
+      def update: (?options: options, **untyped data) -> Task
+      # The gem also declares `attr_reader :dependencies`; this method,
+      # defined later, replaces it and fetches the dependencies from the API.
+      def dependencies: (?options: options) -> Collection[Task]
+      def subtasks: (?per_page: Integer, ?options: options) -> Collection[Task]
+      def stories: (?per_page: Integer, ?options: options) -> Collection[Story]
+    end
+
+    class User < UsersBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader name: String?
+      attr_reader email: String?
+      attr_reader photo: Hash[String, String]?
+      attr_reader workspaces: Array[Hash[String, untyped]]?
+
+      # Wraps the response as a plain Resource, not a User.
+      def self.me: (client client, ?options: options) -> Resource
+      def self.find_by_id: (client client, String id, ?options: options) -> User
+      def self.find_all: (client client, ?workspace: String?, ?per_page: Integer, ?options: options) -> Collection[User]
+      def self.find_by_workspace: (client client, workspace: String, ?per_page: Integer, ?options: options) -> Collection[User]
+    end
+
+    class UserTaskList < UserTaskListsBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader name: String?
+      attr_reader owner: Hash[String, untyped]?
+      attr_reader workspace: Hash[String, untyped]?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> UserTaskList
+    end
+
+    class Webhook < WebhooksBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader resource: Hash[String, untyped]?
+      attr_reader target: String?
+      attr_reader active: bool?
+      attr_reader created_at: String?
+      attr_reader last_success_at: String?
+      attr_reader last_failure_at: String?
+      attr_reader last_failure_content: String?
+
+      def self.create: (client client, resource: String, target: String, ?options: options, **untyped data) -> Webhook
+      def self.get_all: (client client, workspace: String, ?resource: String?, ?per_page: Integer, ?options: options) -> Collection[Webhook]
+    end
+
+    class Workspace < WorkspacesBase
+      attr_reader gid: String
+      attr_reader resource_type: String
+      attr_reader name: String?
+      attr_reader is_organization: bool?
+
+      def self.find_by_id: (client client, String id, ?options: options) -> Workspace
+      def self.find_all: (client client, ?per_page: Integer, ?options: options) -> Collection[Workspace]
+      def update: (?options: options, **untyped data) -> Workspace
+    end
+  end
+end
