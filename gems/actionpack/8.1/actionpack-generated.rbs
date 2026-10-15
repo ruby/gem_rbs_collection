@@ -2189,22 +2189,8 @@ module ActionController
         extend ::ActiveSupport::Concern
 
         module ClassMethods
-          # Enables HTTP Basic authentication.
-          #
-          # See ActionController::HttpAuthentication::Basic for example usage.
-          def http_basic_authenticate_with: (name: untyped, password: untyped, ?realm: untyped?, **untyped options) -> untyped
         end
-
-        def http_basic_authenticate_or_request_with: (name: untyped, password: untyped, ?realm: untyped?, ?message: untyped?) -> untyped
-
-        def authenticate_or_request_with_http_basic: (?untyped? realm, ?untyped? message) { (?) -> untyped } -> untyped
-
-        def authenticate_with_http_basic: () { (?) -> untyped } -> untyped
-
-        def request_http_basic_authentication: (?::String realm, ?untyped? message) -> untyped
       end
-
-      def authenticate: (untyped request) { (?) -> untyped } -> (untyped | nil)
 
       def has_basic_credentials?: (untyped request) -> untyped
 
@@ -2217,8 +2203,6 @@ module ActionController
       def auth_param: (untyped request) -> untyped
 
       def encode_credentials: (untyped user_name, untyped password) -> ::String
-
-      def authentication_request: (untyped controller, untyped realm, untyped message) -> untyped
     end
 
     # # HTTP Digest authentication
@@ -2268,23 +2252,7 @@ module ActionController
       extend ::ActionController::HttpAuthentication::Digest
 
       module ControllerMethods
-        # Authenticate using an HTTP Digest, or otherwise render an HTTP header
-        # requesting the client to send a Digest.
-        #
-        # See ActionController::HttpAuthentication::Digest for example usage.
-        def authenticate_or_request_with_http_digest: (?::String realm, ?untyped? message) { (?) -> untyped } -> untyped
-
-        # Authenticate using an HTTP Digest. Returns true if authentication is
-        # successful, false otherwise.
-        def authenticate_with_http_digest: (?::String realm) { (?) -> untyped } -> untyped
-
-        # Render an HTTP header requesting the client to send a Digest for
-        # authentication.
-        def request_http_digest_authentication: (?::String realm, ?untyped? message) -> untyped
       end
-
-      # Returns true on a valid response, false otherwise.
-      def authenticate: (untyped request, untyped realm) { (?) -> untyped } -> untyped
 
       # Returns false unless the request credentials response value matches the
       # expected value. First try the password as a ha1 digest password. If this
@@ -2306,8 +2274,6 @@ module ActionController
       def decode_credentials: (untyped header) -> untyped
 
       def authentication_header: (untyped controller, untyped realm) -> untyped
-
-      def authentication_request: (untyped controller, untyped realm, ?untyped? message) -> untyped
 
       def secret_token: (untyped request) -> untyped
 

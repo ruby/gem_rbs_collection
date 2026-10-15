@@ -1,0 +1,83 @@
+module RailsGuides
+  class ApplicationMailer < ActionMailer::Base
+    default from: 'from@example.com'
+    layout 'mailer'
+
+    before_deliver :log_delivery
+    rescue_from(ArgumentError) { |exception| exception.message }
+    self.raise_delivery_errors = true
+
+    private
+
+    def log_delivery
+    end
+  end
+
+  class NotifierMailer < ApplicationMailer
+    default from: 'no-reply@example.com',
+            return_path: 'system@example.com'
+
+    def welcome(recipient)
+      @account = recipient
+      mail(to: recipient,
+           bcc: ["bcc@example.com", "Order Watcher <watcher@example.com>"])
+    end
+
+    # @dynamic self.welcome
+  end
+
+  class UserMailer < ApplicationMailer
+    default from: 'notifications@example.com'
+
+    def welcome_email
+      @user = params[:user]
+      @url  = 'http://example.com/login'
+      mail(to: "@user", subject: 'Welcome to My Awesome Site')
+    end
+  end
+
+  class I18nUserMailer < ActionMailer::Base
+    def welcome(email, username)
+      mail(to: email, subject: default_i18n_subject(user: username))
+    end
+  end
+
+  NotifierMailer.welcome("first user").deliver_now
+  NotifierMailer.welcome("first user").message
+  NotifierMailer.welcome("first user").deliver_later
+end
+
+delivery = RailsGuides::NotifierMailer.welcome("first user")
+delivery.deliver_now unless delivery.processed?
+
+class NotifierMailerTest < ActionMailer::TestCase
+  tests RailsGuides::NotifierMailer
+
+  def test_welcome
+    assert_no_emails
+    assert_no_enqueued_emails
+    RailsGuides::NotifierMailer.welcome("first user").deliver_later
+    assert_enqueued_emails 1
+    assert_enqueued_email_with RailsGuides::NotifierMailer, :welcome, args: ["first user"]
+    deliver_enqueued_emails
+  end
+end
+
+RailsGuides::ApplicationMailer.deliver_later_queue_name = :low
+RailsGuides::ApplicationMailer.delivery_job = ActionMailer::MailDeliveryJob
+
+if (job = RailsGuides::NotifierMailer.welcome("first user").deliver_later(wait: 1.hour))
+  job.job_id.upcase
+end
+if (job = RailsGuides::NotifierMailer.welcome("first user").deliver_later!)
+  job.job_id.upcase
+end
+ActionMailer::Base.deliveries.last&.subject
+ActionMailer::Base.deliveries.clear
+
+class NotifierMailerTest
+  def test_capture
+    emails = capture_emails { RailsGuides::NotifierMailer.welcome("first user").deliver_later }
+    emails.first&.to
+  end
+end

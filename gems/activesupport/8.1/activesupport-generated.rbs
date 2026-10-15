@@ -487,15 +487,11 @@ module ActiveSupport
     # The +key+ argument can also respond to +cache_key+ or +to_param+.
     def self.expand_cache_key: (untyped key, ?untyped? namespace) -> untyped
 
-    private
-
     def self.retrieve_cache_key: (untyped key) -> untyped
 
     # Obtains the specified cache store class, given the name of the +store+.
     # Raises an error when the store class cannot be found.
     def self.retrieve_store_class: (untyped store) -> untyped
-
-    public
 
     # = Active Support \Cache \Store
     #
@@ -1239,7 +1235,7 @@ module ActiveSupport
 
       def write_entry: (untyped key, untyped entry, **untyped options) -> bool
 
-      def write_serialized_entry: (untyped key, untyped payload, **untyped options) -> (false | true)
+      def write_serialized_entry: (untyped key, untyped payload, **untyped options) -> bool
 
       def delete_entry: (untyped key, **untyped options) -> (untyped | false)
 
@@ -1803,7 +1799,7 @@ module ActiveSupport
     module SerializerWithFallback
       def self.[]: (untyped format) -> untyped
 
-      def load: (untyped dumped) -> (untyped | untyped | nil)
+      def load: (untyped dumped) -> (untyped | nil)
 
       private
 
@@ -2648,9 +2644,9 @@ module ActiveSupport
 
     def self.extended: (untyped base) -> untyped
 
-    def append_features: (untyped base) -> (false | false | untyped)
+    def append_features: (untyped base) -> (false | untyped)
 
-    def prepend_features: (untyped base) -> (false | false | untyped)
+    def prepend_features: (untyped base) -> (false | untyped)
 
     # Evaluate given block in context of base class,
     # so that you can write class macros here.
@@ -2660,7 +2656,7 @@ module ActiveSupport
     # Evaluate given block in context of base class,
     # so that you can write class macros here.
     # When you define more than one +prepended+ block, it raises an exception.
-    def prepended: (?untyped? base) ?{ (?) -> untyped } -> (untyped | nil | untyped | untyped)
+    def prepended: (?untyped? base) ?{ (?) -> untyped } -> (untyped | nil)
 
     # Define class methods from given block.
     # You can define private class methods as well.
@@ -4548,7 +4544,6 @@ class Module
 end
 
 class Module
-  private
 end
 
 # == Attribute Accessors per Thread
@@ -5191,7 +5186,7 @@ class Module
   #       Kernel.warn message
   #     end
   #   end
-  def deprecate: (*untyped method_names, deprecator: untyped, **untyped options) -> (untyped | untyped | nil)
+  def deprecate: (*untyped method_names, deprecator: untyped, **untyped options) -> (untyped | nil)
 end
 
 class Module
@@ -5811,7 +5806,7 @@ end
 
 # Use `IPAddr#as_json` from the IPAddr gem if the version is 1.2.7 or higher.
 class IPAddr
-  def as_json: (?untyped? options) -> (untyped | untyped | ::String)
+  def as_json: (?untyped? options) -> (untyped | ::String)
 end
 
 class Process::Status
@@ -7419,9 +7414,9 @@ module ActiveSupport
 
       private
 
-      def deprecation_disallowed?: (untyped message) -> (false | true | untyped)
+      def deprecation_disallowed?: (untyped message) -> (bool | untyped)
 
-      def explicitly_allowed?: (untyped message) -> (false | true | untyped)
+      def explicitly_allowed?: (untyped message) -> (bool | untyped)
     end
   end
 end
@@ -8489,8 +8484,6 @@ module ActiveSupport
 
     def self.with_tags: (*untyped args, **untyped kwargs) { () -> untyped } -> untyped
 
-    private
-
     def self.resolve_tags: (untyped args, untyped kwargs) -> untyped
   end
 
@@ -8978,7 +8971,7 @@ module ActiveSupport
 
       def normalize_dirs!: () -> untyped
 
-      def changed: (untyped modified, untyped added, untyped removed) -> (untyped | nil | nil)
+      def changed: (untyped modified, untyped added, untyped removed) -> (untyped | nil)
 
       def watching?: (untyped file) -> untyped
 
@@ -9026,8 +9019,6 @@ module ActiveSupport
     def self.flush: () -> untyped
 
     def self.current_attributes_instances: () -> untyped
-
-    private
 
     def self.record: () -> untyped
   end
@@ -9162,7 +9153,7 @@ module ActiveSupport
     def execute: () -> untyped
 
     # Execute the block given if updated.
-    def execute_if_updated: () ?{ () -> untyped } -> (true | false)
+    def execute_if_updated: () ?{ () -> untyped } -> bool
 
     private
 
@@ -10199,8 +10190,6 @@ module ActiveSupport
     #     Rails.logger.warn("Attempted to decode invalid JSON: #{some_string}")
     #   end
     def self.parse_error: () -> untyped
-
-    private
 
     def self.convert_dates_from: (untyped data) -> untyped
   end
@@ -12045,8 +12034,6 @@ module ActiveSupport
 
     def self.instrumenter: () -> untyped
 
-    private
-
     def self.registry: () -> untyped
   end
 end
@@ -13267,7 +13254,6 @@ module ActiveSupport
     extend ::ActiveSupport::Concern
 
     module ClassMethods
-      private
     end
   end
 end
@@ -13307,7 +13293,7 @@ module ActiveSupport
 
     def rotate: (untyped previous_value) -> untyped
 
-    def secure_compare!: (untyped other_value, ?on_rotation: untyped) -> (true | true | untyped)
+    def secure_compare!: (untyped other_value, ?on_rotation: untyped) -> (true | untyped)
   end
 end
 
@@ -14137,8 +14123,6 @@ module ActiveSupport
 
         def self.report: (untyped error, **untyped kwargs) -> true
 
-        private
-
         def self.subscribe: () -> (nil | untyped)
       end
 
@@ -14202,7 +14186,7 @@ module ActiveSupport
 
           def inspect: () -> ::String
 
-          def matches?: (untyped name, untyped payload, untyped tags) -> (false | true)
+          def matches?: (untyped name, untyped payload, untyped tags) -> bool
 
           private
 
@@ -14212,8 +14196,6 @@ module ActiveSupport
         def self.emit: (untyped event) -> true
 
         def self.record: () { () -> untyped } -> untyped
-
-        private
 
         def self.subscribe: () -> (nil | untyped)
 
@@ -14554,7 +14536,7 @@ module ActiveSupport
 
       def show_execution_info: () -> untyped
 
-      def execution_info: () -> (::String | ::String | nil)
+      def execution_info: () -> (::String | nil)
     end
   end
 end

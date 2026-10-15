@@ -14,12 +14,17 @@ module ActionController
     extend Helpers::ClassMethods
     extend AbstractController::Helpers::ClassMethods
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
+    extend Redirecting::ClassMethods
     include ActionView::Layouts
     extend ::ActionView::Layouts::ClassMethods
+    extend ::ActionView::Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Rendering
     extend Rendering::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include EtagWithTemplateDigest
@@ -60,7 +65,9 @@ module ActionController
     extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
+    extend Rescue::ClassMethods
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
     include Instrumentation
@@ -75,9 +82,14 @@ module ActionController
     # https://github.com/rails/rails/blob/v8.1.4/actionpack/lib/action_controller/api.rb#L116-L147
     include AbstractController::Rendering
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
+    extend Redirecting::ClassMethods
     include ApiRendering
+    extend Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include BasicImplicitRender
@@ -95,7 +107,9 @@ module ActionController
     extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
+    extend Rescue::ClassMethods
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
     include Instrumentation
@@ -113,14 +127,14 @@ module ActionController
       extend ::ActionController::HttpAuthentication::Token
 
       module ControllerMethods
-        def authenticate_or_request_with_http_token: (?String realm, ?String? message) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> untyped
+        def authenticate_or_request_with_http_token: [T] (?String realm, ?String? message) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> T } -> (T | String)
 
-        def authenticate_with_http_token: () { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> boolish
+        def authenticate_with_http_token: [T] () { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> T } -> T?
 
-        def request_http_token_authentication: (?String realm, ?String? message) -> void
+        def request_http_token_authentication: (?String realm, ?String? message) -> String
       end
 
-      def authenticate: (instance controller) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> boolish
+      def authenticate: [T] (instance controller) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> T } -> T?
 
       def token_and_options: (ActionDispatch::Request request) -> [String, ActiveSupport::HashWithIndifferentAccess[untyped, untyped]]?
 
@@ -134,7 +148,41 @@ module ActionController
 
       def encode_credentials: (String token, ?::Hash[untyped, untyped] options) -> ::String
 
-      def authentication_request: (instance controller, String realm, ?String? message) -> void
+      def authentication_request: (instance controller, String realm, ?String? message) -> String
+    end
+
+    module Basic
+      module ControllerMethods
+        module ClassMethods
+          def http_basic_authenticate_with: (name: String, password: String, ?realm: String?, **untyped options) -> void
+        end
+
+        def http_basic_authenticate_or_request_with: (name: String, password: String, ?realm: String?, ?message: String?) -> (true | String)
+
+        def authenticate_or_request_with_http_basic: [T] (?String? realm, ?String? message) { (String? name, String? password) -> T } -> (T | String)
+
+        def authenticate_with_http_basic: [T] () { (String? name, String? password) -> T } -> T?
+
+        def request_http_basic_authentication: (?String realm, ?String? message) -> String
+      end
+
+      def authenticate: [T] (ActionDispatch::Request request) { (String? name, String? password) -> T } -> T?
+
+      def authentication_request: (ActionController::Metal controller, String realm, String? message) -> String
+    end
+
+    module Digest
+      module ControllerMethods
+        def authenticate_or_request_with_http_digest: (?String realm, ?String? message) { (String? username) -> String? } -> (true | String)
+
+        def authenticate_with_http_digest: (?String realm) { (String? username) -> String? } -> bool?
+
+        def request_http_digest_authentication: (?String realm, ?String? message) -> String
+      end
+
+      def authenticate: (ActionDispatch::Request request, String realm) { (String? username) -> String? } -> bool?
+
+      def authentication_request: (ActionController::Metal controller, String realm, ?String? message) -> String
     end
   end
 end

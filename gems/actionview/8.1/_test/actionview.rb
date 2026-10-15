@@ -126,3 +126,12 @@ end
     end
   end
 end
+
+# ClassMethods of the concerns the generated classes include
+ActionView::Base.full_sanitizer
+ActionView::Helpers::Tags::Base.sanitizer_vendor
+
+class UrlHelperTest < ActionView::TestCase
+  tests ActionView::Helpers::UrlHelper
+  helper_method :current_user
+end
