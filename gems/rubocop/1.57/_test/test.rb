@@ -65,3 +65,8 @@ class MyExtractor
     }]
   end
 end
+
+options, paths = RuboCop::Options.new.parse(['--stdin', 'example.rb'])
+options[:stdin] = 'puts 1'
+options.key?(:autocorrect)
+paths.first&.end_with?('.rb')
