@@ -1,0 +1,98 @@
+module ActionMailer
+  class Base < AbstractController::Base
+    include AbstractController::Rendering
+    include AbstractController::Helpers
+    extend AbstractController::Helpers::ClassMethods
+    include AbstractController::Translation
+    include AbstractController::AssetPaths
+    include AbstractController::Callbacks
+    extend AbstractController::Callbacks::ClassMethods
+    include AbstractController::Caching
+    extend AbstractController::Caching::ClassMethods
+
+    include ActionView::Layouts
+    extend ActionView::Layouts::ClassMethods
+
+    # ClassMethods of the concerns included in ActionMailer::Base and the ones they include
+    extend ActionMailer::Callbacks::ClassMethods
+    extend ActionMailer::DeliveryMethods::ClassMethods
+    extend ActionMailer::Rescuable::ClassMethods
+    extend ActionMailer::Parameterized::ClassMethods
+    extend ActionMailer::Previews::ClassMethods
+    extend ActionMailer::FormBuilder::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
+    extend ActiveSupport::Rescuable::ClassMethods
+    extend AbstractController::Caching::Fragments::ClassMethods
+    extend ActionView::Rendering::ClassMethods
+    extend ActionView::ViewPaths::ClassMethods
+
+    def self.default: (**untyped) -> void
+
+    def self.layout: (String) -> void
+
+    def mail: (**untyped) ?{ (untyped) -> void } -> Mail::Message
+
+    def self.with: (**untyped) -> untyped
+
+    def params: () -> Hash[untyped, untyped]
+
+    def self?.email_address_with_name: (String, String) -> String
+
+    def headers: () -> Mail::Message
+               | (Hash[untyped, untyped]) -> untyped
+
+    private
+
+    def default_i18n_subject: (?Hash[untyped, untyped] interpolations) -> String
+  end
+
+  class MessageDelivery
+    # The enqueued job, or false if it couldn't be enqueued
+    def deliver_later: (?wait: untyped, ?wait_until: untyped, ?queue: untyped, ?priority: Integer) -> (ActiveJob::Base | false)
+
+    def deliver_later!: (?wait: untyped, ?wait_until: untyped, ?queue: untyped, ?priority: Integer) -> (ActiveJob::Base | false)
+
+    def deliver_now: () -> void
+
+    def deliver_now!: () -> void
+
+    def message: () -> Mail::Message
+
+    def processed?: () -> boolish
+  end
+end
+
+# Methods rbs prototype doesn't see, which aren't generated from the source
+module ActionMailer
+  class Base
+    # class_attribute in QueuedDelivery's included block
+    def self.delivery_job: () -> untyped
+    def self.delivery_job=: (untyped value) -> untyped
+    def self.delivery_job?: () -> bool
+    def delivery_job: () -> untyped
+    def delivery_job=: (untyped value) -> untyped
+    def delivery_job?: () -> bool
+
+    def self.deliver_later_queue_name: () -> untyped
+    def self.deliver_later_queue_name=: (untyped value) -> untyped
+    def self.deliver_later_queue_name?: () -> bool
+    def deliver_later_queue_name: () -> untyped
+    def deliver_later_queue_name=: (untyped value) -> untyped
+    def deliver_later_queue_name?: () -> bool
+  end
+end
+
+# Return types of commonly used methods
+module ActionMailer
+  module DeliveryMethods
+    module ClassMethods
+      # Delegated to Mail::TestMailer
+      def deliveries: () -> Array[Mail::Message]
+      def deliveries=: (Array[Mail::Message] deliveries) -> Array[Mail::Message]
+    end
+  end
+
+  module TestHelper
+    def capture_emails: () { () -> void } -> Array[Mail::Message]
+  end
+end

@@ -122,3 +122,7 @@ ActiveSupport::Notifications.instrument("test.active_support", { key: 1 })
 # Test ActiveSupport::EnvironmentInquirer
 env = ActiveSupport::EnvironmentInquirer.new("production")
 env.production? && !env.local?
+
+# ClassMethods of the concerns the generated classes include
+ActiveSupport::CurrentAttributes.define_callbacks(:notify)
+ActiveSupport::ExecutionWrapper.define_callbacks(:notify)

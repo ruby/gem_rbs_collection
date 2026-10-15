@@ -304,7 +304,6 @@ module ActiveRecord
       def initialize: (Relation scope) -> void
 
       def not: (untyped opts, *untyped rest) -> Relation
-
     end
   end
 
@@ -904,13 +903,6 @@ module ActiveRecord
     def self.partial_inserts?: () -> bool
     def partial_inserts: () -> untyped
     def partial_inserts?: () -> bool
-
-    def self.encrypted_attributes: () -> untyped
-    def self.encrypted_attributes=: (untyped value) -> untyped
-    def self.encrypted_attributes?: () -> bool
-    def encrypted_attributes: () -> untyped
-    def encrypted_attributes=: (untyped value) -> untyped
-    def encrypted_attributes?: () -> bool
   end
 
   module Encryption
@@ -927,6 +919,39 @@ module ActiveRecord
       attr_accessor encryptor: untyped
 
       attr_accessor frozen_encryption: untyped
+    end
+
+    module Configurable
+      module ClassMethods
+        # mattr_reader in the included block
+        def config: () -> ActiveRecord::Encryption::Config
+
+        # delegate(*Context::PROPERTIES, to: :context)
+        def key_provider: () -> untyped
+
+        def key_generator: () -> untyped
+
+        def cipher: () -> untyped
+
+        def message_serializer: () -> untyped
+
+        def encryptor: () -> untyped
+
+        def frozen_encryption: () -> untyped
+      end
+    end
+
+    module Contexts
+      module ClassMethods
+        def context: () -> ActiveRecord::Encryption::Context
+
+        def current_custom_context: () -> ActiveRecord::Encryption::Context?
+
+        # mattr_accessor in the included block
+        def default_context: () -> ActiveRecord::Encryption::Context
+
+        def default_context=: (ActiveRecord::Encryption::Context value) -> ActiveRecord::Encryption::Context
+      end
     end
   end
 end

@@ -110,3 +110,6 @@ Signup.validators.first&.kind&.to_proc
 Signup.validators_on(:email).first&.options&.fetch(:if)
 Signup.attribute_method?(:email)
 ActiveModel::Type.lookup(:string).cast("x")
+
+# ClassMethods of the concerns the generated classes include
+ActiveModel::Type::Value.serialize_cast_value_compatible?
