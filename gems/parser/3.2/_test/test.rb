@@ -80,5 +80,16 @@ class TestBuilder < Parser::Builders::Default
   def token_value
     value(["foo", nil]).upcase
   end
+
+  def token_string_value
+    string_value(["foo", nil]).upcase
+  end
+
+  def token_loc(range)
+    loc(["foo", range])&.source
+    loc(nil)&.source
+  end
 end
 TestBuilder.new.token_value
+TestBuilder.new.token_string_value
+TestBuilder.new.token_loc(range)
