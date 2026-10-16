@@ -75,3 +75,10 @@ if node.loc.is_a? Parser::Source::Map::Send
   node.loc.begin
   node.loc.end
 end
+
+class TestBuilder < Parser::Builders::Default
+  def token_value
+    value(["foo", nil]).upcase
+  end
+end
+TestBuilder.new.token_value
