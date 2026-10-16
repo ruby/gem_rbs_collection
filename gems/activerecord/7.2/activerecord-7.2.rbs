@@ -8,6 +8,11 @@ module ActiveRecord
     extend SecurePassword::ClassMethods
     include TokenFor
     extend TokenFor::ClassMethods
+    include SignedId
+    extend SignedId::ClassMethods
+
+    # Several modules included after Persistence override it
+    def reload: (?Hash[Symbol, untyped]? options) -> self
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def and: (::ActiveRecord::Relation) -> Relation
@@ -18,6 +23,8 @@ module ActiveRecord
   end
 
   module Core
+    include ActiveModel::Access
+
     def values_at: (*Symbol | String) -> Array[untyped]
     def strict_loading!: (?bool value, ?mode: Symbol) -> bool
     def strict_loading?: () -> bool
@@ -192,6 +199,11 @@ module ActiveRecord
       # multiple objects when given an Array of Hashes.
       def create!: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
                  | (?untyped? attributes) ?{ (instance) -> void } -> instance
+
+      # Builds an object (or multiple objects) and returns either the built object or a list of built
+      # objects.
+      def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
+               | (?untyped? attributes) ?{ (instance) -> void } -> instance
     end
   end
 
@@ -466,4 +478,28 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
            | (Symbol | String column_name) -> ::Integer
   def create_with: (nil | Hash[untyped, untyped]) -> Relation
   def sole: () -> Model
+end
+
+module ActiveRecord
+  module SignedId
+    extend ActiveSupport::Concern
+
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
+
+    module ClassMethods
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
+
+      def find_signed: (untyped signed_id, ?purpose: untyped) -> untyped
+
+      def find_signed!: (untyped signed_id, ?purpose: untyped) -> untyped
+
+      def signed_id_verifier: () -> untyped
+
+      def signed_id_verifier=: (untyped verifier) -> untyped
+
+      def combine_signed_id_purposes: (untyped purpose) -> untyped
+    end
+  end
 end

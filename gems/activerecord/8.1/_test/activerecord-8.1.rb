@@ -192,4 +192,12 @@ module Test
   User.abstract_class? && User.sti_name.upcase
   User.readonly_attributes.first&.upcase
   User.connection_pool.db_config
+
+  # Records built, reloaded, compared and validated
+  built = User.build(name: 'James') { |user| user.articles }
+  built.articles
+  User.build([{ name: 'James' }, { name: 'John' }]).first&.articles
+  built.reload.articles
+  (built <=> User.new)&.positive?
+  built.validate & built.valid?
 end
