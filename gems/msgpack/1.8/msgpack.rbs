@@ -1,0 +1,256 @@
+module MessagePack
+  VERSION: String
+
+  DefaultFactory: Factory
+
+  type packer_options = {
+    ?compatibility_mode: boolish,
+    ?read_reference_threshold: Integer,
+    ?write_reference_threshold: Integer,
+    ?io_buffer_size: Integer
+  }
+
+  type unpacker_options = {
+    ?symbolize_keys: boolish,
+    ?freeze: boolish,
+    ?allow_unknown_ext: boolish,
+    ?key_cache: boolish,
+    ?read_reference_threshold: Integer,
+    ?write_reference_threshold: Integer,
+    ?io_buffer_size: Integer
+  }
+
+  def self?.pack: (untyped v, ?packer_options? options) -> String
+                | (untyped v, ::_Writer io, ?packer_options? options) -> nil
+  alias self.dump self.pack
+  alias dump pack
+
+  def self?.load: (String src, ?unpacker_options? options) -> untyped
+                | (::_Reader | ::_ReaderPartial io, ?unpacker_options? options) -> untyped
+  alias self.unpack self.load
+  alias unpack load
+
+  module CoreExt
+    def to_msgpack: () -> String
+                  | (Packer packer) -> Packer
+                  | (::_Writer io) -> nil
+  end
+
+  class UnpackError < StandardError
+  end
+
+  class MalformedFormatError < UnpackError
+  end
+
+  class StackError < UnpackError
+  end
+
+  module TypeError
+  end
+
+  class UnexpectedTypeError < UnpackError
+    include TypeError
+  end
+
+  class UnknownExtTypeError < UnpackError
+  end
+
+  class ExtensionValue < Struct[untyped]
+    include CoreExt
+
+    attr_accessor type: Integer
+    attr_accessor payload: String
+
+    def self.new: (Integer type, String payload) -> instance
+  end
+
+  class Buffer
+    def clear: () -> nil
+    def size: () -> Integer
+    def empty?: () -> bool
+    def io: () -> untyped
+    def flush: () -> self
+    def to_str: () -> String
+    alias to_s to_str
+    def to_a: () -> Array[String]
+  end
+
+  class Packer
+    def initialize: (?packer_options? options) -> void
+                  | (::_Writer? io, ?packer_options? options) -> void
+
+    def compatibility_mode?: () -> bool
+    def buffer: () -> Buffer
+
+    def write: (untyped v) -> self
+    alias pack write
+    def write_nil: () -> self
+    def write_true: () -> self
+    def write_false: () -> self
+    def write_float: (Numeric v) -> self
+    def write_float32: (Numeric v) -> self
+    def write_int: (Integer v) -> self
+    def write_string: (String v) -> self
+    def write_bin: (String v) -> self
+    def write_symbol: (Symbol v) -> self
+    def write_array: (Array[untyped] v) -> self
+    def write_hash: (Hash[untyped, untyped] v) -> self
+    def write_extension: (ExtensionValue v) -> self
+    def write_ext: (Integer type, String payload) -> self
+    def write_array_header: (Integer n) -> self
+    def write_map_header: (Integer n) -> self
+    def write_bin_header: (Integer n) -> self
+
+    def flush: () -> self
+    def reset: () -> nil
+    alias clear reset
+    def size: () -> Integer
+    def empty?: () -> bool
+    def write_to: (::_Writer io) -> Integer
+    def to_str: () -> String
+    alias to_s to_str
+    def to_a: () -> Array[String]
+
+    # Returns nil when the packer writes to an IO.
+    def full_pack: () -> String?
+
+    def register_type: (Integer type, Module klass, Symbol | String method_name) -> nil
+                     | (Integer type, Module klass) { (untyped object) -> String } -> nil
+    def registered_types: () -> Array[{ type: Integer, class: Module, packer: Proc }]
+    def type_registered?: (Module | Integer klass_or_type) -> bool
+  end
+
+  class Unpacker
+    def initialize: (?unpacker_options? options) -> void
+                  | ((::_Reader | ::_ReaderPartial)? io, ?unpacker_options? options) -> void
+
+    def symbolize_keys?: () -> bool
+    def freeze?: () -> bool
+    def allow_unknown_ext?: () -> bool
+    def buffer: () -> Buffer
+
+    def feed: (String data) -> self
+    alias feed_reference feed
+
+    def read: () -> untyped
+    alias unpack read
+    def skip: () -> nil
+    def skip_nil: () -> bool
+    def read_array_header: () -> Integer
+    def read_map_header: () -> Integer
+
+    def each: () { (untyped object) -> void } -> nil
+            | () -> Enumerator[untyped, nil]
+    def feed_each: (String data) { (untyped object) -> void } -> nil
+                 | (String data) -> Enumerator[untyped, nil]
+
+    def reset: () -> nil
+    def full_unpack: () -> untyped
+
+    def register_type: (Integer type, Module klass, Symbol | String method_name) -> nil
+                     | (Integer type, ?Module? klass) { (String data) -> untyped } -> nil
+    def registered_types: () -> Array[{ type: Integer, class: Module?, unpacker: Proc }]
+    def type_registered?: (Module | Integer klass_or_type) -> bool
+  end
+
+  class Factory
+    def initialize: () -> void
+
+    def packer: (?packer_options? options) -> Packer
+              | (::_Writer? io, ?packer_options? options) -> Packer
+    def unpacker: (?unpacker_options? options) -> Unpacker
+                | ((::_Reader | ::_ReaderPartial)? io, ?unpacker_options? options) -> Unpacker
+
+    def register_type: (
+                         Integer type,
+                         Module klass,
+                         ?{
+                           ?packer: Proc | Method | Symbol | String,
+                           ?unpacker: Proc | Method | Symbol | String,
+                           ?recursive: boolish,
+                           ?optimized_symbols_parsing: boolish,
+                           ?oversized_integer_extension: boolish
+                         }? options
+                       ) -> nil
+    def registered_types: (?:both | :packer | :unpacker selector) -> Array[Hash[Symbol, untyped]]
+    def type_registered?: (Module | Integer klass_or_type, ?:both | :packer | :unpacker selector) -> bool
+
+    def load: (String src, ?unpacker_options? options) -> untyped
+            | (::_Reader | ::_ReaderPartial io, ?unpacker_options? options) -> untyped
+    alias unpack load
+
+    def dump: (untyped v, ?packer_options? options) -> String
+            | (untyped v, ::_Writer io, ?packer_options? options) -> nil
+    alias pack dump
+
+    def freeze: () -> self
+    def pool: (?Integer size, **untyped options) -> Pool
+
+    class Pool
+      def load: (String data) -> untyped
+      def dump: (untyped object) -> String
+      def packer: [T] () { (Packer packer) -> T } -> T
+      def unpacker: [T] () { (Unpacker unpacker) -> T } -> T
+    end
+  end
+
+  class Timestamp
+    TYPE: Integer
+    TIMESTAMP32_MAX_SEC: Integer
+    TIMESTAMP64_MAX_SEC: Integer
+
+    attr_reader sec: Integer
+    attr_reader nsec: Integer
+
+    def initialize: (Integer sec, Integer nsec) -> void
+
+    def self.from_msgpack_ext: (String data) -> Timestamp
+    def self.to_msgpack_ext: (Integer sec, Integer nsec) -> String
+    def to_msgpack_ext: () -> String
+    def ==: (untyped other) -> bool
+  end
+
+  module Time
+    Packer: ^(::Time time) -> String
+    Unpacker: ^(String payload) -> ::Time
+  end
+end
+
+class NilClass
+  include MessagePack::CoreExt
+end
+
+class TrueClass
+  include MessagePack::CoreExt
+end
+
+class FalseClass
+  include MessagePack::CoreExt
+end
+
+class Integer
+  include MessagePack::CoreExt
+end
+
+class Float
+  include MessagePack::CoreExt
+end
+
+class String
+  include MessagePack::CoreExt
+end
+
+class Symbol
+  include MessagePack::CoreExt
+
+  def self.from_msgpack_ext: (String data) -> Symbol
+  def to_msgpack_ext: () -> String
+end
+
+class Array[unchecked out Elem]
+  include MessagePack::CoreExt
+end
+
+class Hash[unchecked out K, unchecked out V]
+  include MessagePack::CoreExt
+end
