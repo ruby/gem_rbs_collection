@@ -50,6 +50,16 @@ module Parser
     end
   end
 
+  module Builders
+    class Default
+      private
+
+      def value: [T] ([T, Source::Range] token) -> T
+      def string_value: ([String, Source::Range] token) -> String
+      def loc: ([top, Source::Range]? token) -> Source::Range?
+    end
+  end
+
   module Source
     class Range
       attr_reader source_buffer: Buffer
