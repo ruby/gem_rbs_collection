@@ -56,3 +56,7 @@ User.all.sum(0.0) { |user| user.age.to_f }.next_float
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
+
+# Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
+Article.where(id: 1).pluck(:id).size
+Article.where(id: 1).pluck(:id, "title").first&.size

@@ -82,3 +82,7 @@ ActiveRecord::Encryption.with_encryption_context(encryptor: ActiveRecord::Encryp
 ActiveRecord::Encryption.context.encryptor
 ActiveRecord::Encryption.key_provider
 User.encrypted_attributes
+
+# Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
+Article.where(id: 1).pluck(:id).size
+Article.where(id: 1).pluck(:id, "title").first&.size
