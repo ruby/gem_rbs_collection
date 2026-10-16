@@ -3683,7 +3683,7 @@ class DateTime
 
   # Layers additional behavior on DateTime#<=> so that Time and
   # ActiveSupport::TimeWithZone instances can be compared with a DateTime.
-  def <=>: (untyped other) -> untyped
+  def <=>: (untyped other) -> Integer?
 end
 
 class DateTime
@@ -3702,7 +3702,7 @@ class DateTime
   def formatted_offset: (?bool colon, ?untyped? alternate_utc_string) -> untyped
 
   # Overrides the default inspect method with a human readable one, e.g., "Mon, 21 Feb 2005 14:30:00 +0000".
-  def readable_inspect: () -> untyped
+  def readable_inspect: () -> String
 
   alias default_inspect inspect
 
@@ -3852,7 +3852,7 @@ class Date
   def change: (untyped options) -> untyped
 
   # Allow Date to be compared with Time by converting to DateTime and relying on the <=> from there.
-  def compare_with_coercion: (untyped other) -> untyped
+  def compare_with_coercion: (untyped other) -> Integer?
 
   alias compare_without_coercion <=>
 end
@@ -3863,7 +3863,7 @@ class Date
   alias to_formatted_s to_fs
 
   # Overrides the default inspect method with a human readable one, e.g., "Mon, 21 Feb 2005"
-  def readable_inspect: () -> untyped
+  def readable_inspect: () -> String
 
   alias default_inspect inspect
 end
@@ -5658,7 +5658,7 @@ class Object
   #
   # False for method objects;
   # true otherwise.
-  def duplicable?: () -> true
+  def duplicable?: () -> bool
 end
 
 class Method
@@ -5719,7 +5719,7 @@ module ActiveSupport
 end
 
 class Module
-  def as_json: (?untyped? options) -> untyped
+  def as_json: (?untyped? options) -> String?
 end
 
 class Object
@@ -6462,7 +6462,7 @@ class String
 end
 
 class Object
-  def html_safe?: () -> false
+  def html_safe?: () -> bool
 end
 
 class Numeric
@@ -6755,13 +6755,13 @@ class Time
 
   # Layers additional behavior on Time#<=> so that DateTime and ActiveSupport::TimeWithZone instances
   # can be chronologically compared with a Time
-  def compare_with_coercion: (untyped other) -> untyped
+  def compare_with_coercion: (untyped other) -> Integer?
 
   alias compare_without_coercion <=>
 
   # Layers additional behavior on Time#eql? so that ActiveSupport::TimeWithZone instances
   # can be eql? to an equivalent Time
-  def eql_with_coercion: (untyped other) -> untyped
+  def eql_with_coercion: (untyped other) -> bool
 
   alias eql_without_coercion eql?
 
@@ -7709,7 +7709,7 @@ module ActiveSupport
     end
 
     module ReloadedClassesFiltering
-      def subclasses: () -> untyped
+      def subclasses: () -> Array[Class]
 
       def descendants: () -> untyped
     end
