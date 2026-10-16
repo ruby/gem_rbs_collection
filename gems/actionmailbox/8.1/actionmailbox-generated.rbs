@@ -1,0 +1,988 @@
+# The generated code is based on Ruby on Rails source code
+# You can find the license of Ruby on Rails from following.
+
+#MIT License
+#
+#Copyright (c) 37signals LLC
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+
+module ActionMailbox
+  def self.ingress: () -> untyped
+
+  def self.ingress=: (untyped value) -> untyped
+
+  def ingress: () -> untyped
+
+  def ingress=: (untyped value) -> untyped
+
+  def self.logger: () -> untyped
+
+  def self.logger=: (untyped value) -> untyped
+
+  def logger: () -> untyped
+
+  def logger=: (untyped value) -> untyped
+
+  def self.incinerate: () -> untyped
+
+  def self.incinerate=: (untyped value) -> untyped
+
+  def incinerate: () -> untyped
+
+  def incinerate=: (untyped value) -> untyped
+
+  def self.incinerate_after: () -> untyped
+
+  def self.incinerate_after=: (untyped value) -> untyped
+
+  def incinerate_after: () -> untyped
+
+  def incinerate_after=: (untyped value) -> untyped
+
+  def self.queues: () -> untyped
+
+  def self.queues=: (untyped value) -> untyped
+
+  def queues: () -> untyped
+
+  def queues=: (untyped value) -> untyped
+
+  def self.storage_service: () -> untyped
+
+  def self.storage_service=: (untyped value) -> untyped
+
+  def storage_service: () -> untyped
+
+  def storage_service=: (untyped value) -> untyped
+
+  # The base class for all Action Mailbox ingress controllers.
+  class BaseController < ::ActionController::Base
+    private
+
+    def ensure_configured: () -> (untyped | nil)
+
+    def ingress_name: () -> untyped
+
+    def authenticate_by_password: () -> untyped
+
+    def password: () -> untyped
+  end
+end
+
+module ActionMailbox
+  # Ingests inbound emails from Mailgun. Requires the following parameters:
+  #
+  # - +body-mime+: The full RFC 822 message
+  # - +timestamp+: The current time according to Mailgun as the number of seconds passed since the UNIX epoch
+  # - +token+: A randomly-generated, 50-character string
+  # - +signature+: A hexadecimal HMAC-SHA256 of the timestamp concatenated with the token, generated using the Mailgun Signing key
+  #
+  # Authenticates requests by validating their signatures.
+  #
+  # Returns:
+  #
+  # - <tt>204 No Content</tt> if an inbound email is successfully recorded and enqueued for routing to the appropriate mailbox
+  # - <tt>401 Unauthorized</tt> if the request's signature could not be validated, or if its timestamp is more than 2 minutes old
+  # - <tt>404 Not Found</tt> if Action Mailbox is not configured to accept inbound emails from Mailgun
+  # - <tt>422 Unprocessable Entity</tt> if the request is missing required parameters
+  # - <tt>500 Server Error</tt> if the Mailgun Signing key is missing, or one of the Active Record database,
+  #   the Active Storage service, or the Active Job backend is misconfigured or unavailable
+  #
+  # == Usage
+  #
+  # 1. Give Action Mailbox your Mailgun Signing key (which you can find under Settings -> Security & Users -> API security in Mailgun)
+  #    so it can authenticate requests to the Mailgun ingress.
+  #
+  #    Use <tt>bin/rails credentials:edit</tt> to add your Signing key to your application's encrypted credentials under
+  #    +action_mailbox.mailgun_signing_key+, where Action Mailbox will automatically find it:
+  #
+  #        action_mailbox:
+  #          mailgun_signing_key: ...
+  #
+  #    Alternatively, provide your Signing key in the +MAILGUN_INGRESS_SIGNING_KEY+ environment variable.
+  #
+  # 2. Tell Action Mailbox to accept emails from Mailgun:
+  #
+  #        # config/environments/production.rb
+  #        config.action_mailbox.ingress = :mailgun
+  #
+  # 3. {Configure Mailgun}[https://documentation.mailgun.com/en/latest/user_manual.html#receiving-forwarding-and-storing-messages]
+  #    to forward inbound emails to +/rails/action_mailbox/mailgun/inbound_emails/mime+.
+  #
+  #    If your application lived at <tt>https://example.com</tt>, you would specify the fully-qualified URL
+  #    <tt>https://example.com/rails/action_mailbox/mailgun/inbound_emails/mime</tt>.
+  class Ingresses::Mailgun::InboundEmailsController < ::ActionMailbox::BaseController
+    def create: () -> untyped
+
+    private
+
+    def mail: () -> untyped
+
+    def authenticate: () -> (untyped | nil)
+
+    def authenticated?: () -> untyped
+
+    def key: () -> untyped
+
+    class Authenticator
+      attr_reader key: untyped
+
+      attr_reader timestamp: untyped
+
+      attr_reader token: untyped
+
+      attr_reader signature: untyped
+
+      def initialize: (key: untyped, timestamp: untyped, token: untyped, signature: untyped) -> void
+
+      def authenticated?: () -> untyped
+
+      private
+
+      def signed?: () -> untyped
+
+      # Allow for 2 minutes of drift between Mailgun time and local server time.
+      def recent?: () -> untyped
+
+      def expected_signature: () -> untyped
+    end
+  end
+end
+
+module ActionMailbox
+  # Ingests inbound emails from Mandrill.
+  #
+  # Requires a +mandrill_events+ parameter containing a JSON array of Mandrill inbound email event objects.
+  # Each event is expected to have a +msg+ object containing a full RFC 822 message in its +raw_msg+ property.
+  #
+  # Returns:
+  #
+  # - <tt>204 No Content</tt> if an inbound email is successfully recorded and enqueued for routing to the appropriate mailbox
+  # - <tt>401 Unauthorized</tt> if the request's signature could not be validated
+  # - <tt>404 Not Found</tt> if Action Mailbox is not configured to accept inbound emails from Mandrill
+  # - <tt>422 Unprocessable Entity</tt> if the request is missing required parameters
+  # - <tt>500 Server Error</tt> if the Mandrill API key is missing, or one of the Active Record database,
+  #   the Active Storage service, or the Active Job backend is misconfigured or unavailable
+  class Ingresses::Mandrill::InboundEmailsController < ::ActionMailbox::BaseController
+    def create: () -> untyped
+
+    def health_check: () -> untyped
+
+    private
+
+    def raw_emails: () -> untyped
+
+    def events: () -> untyped
+
+    def authenticate: () -> (untyped | nil)
+
+    def authenticated?: () -> untyped
+
+    def key: () -> untyped
+
+    class Authenticator
+      attr_reader request: untyped
+
+      attr_reader key: untyped
+
+      def initialize: (untyped request, untyped key) -> void
+
+      def authenticated?: () -> untyped
+
+      private
+
+      def given_signature: () -> untyped
+
+      def expected_signature: () -> untyped
+
+      def message: () -> untyped
+    end
+  end
+end
+
+module ActionMailbox
+  # Ingests inbound emails from Postmark. Requires a +RawEmail+ parameter containing a full RFC 822 message.
+  #
+  # Authenticates requests using HTTP basic access authentication. The username is always +actionmailbox+, and the
+  # password is read from the application's encrypted credentials or an environment variable. See the Usage section below.
+  #
+  # Note that basic authentication is insecure over unencrypted HTTP. An attacker that intercepts cleartext requests to
+  # the Postmark ingress can learn its password. You should only use the Postmark ingress over HTTPS.
+  #
+  # Returns:
+  #
+  # - <tt>204 No Content</tt> if an inbound email is successfully recorded and enqueued for routing to the appropriate mailbox
+  # - <tt>401 Unauthorized</tt> if the request's signature could not be validated
+  # - <tt>404 Not Found</tt> if Action Mailbox is not configured to accept inbound emails from Postmark
+  # - <tt>422 Unprocessable Entity</tt> if the request is missing the required +RawEmail+ parameter
+  # - <tt>500 Server Error</tt> if the ingress password is not configured, or if one of the Active Record database,
+  #   the Active Storage service, or the Active Job backend is misconfigured or unavailable
+  #
+  # == Usage
+  #
+  # 1. Tell Action Mailbox to accept emails from Postmark:
+  #
+  #        # config/environments/production.rb
+  #        config.action_mailbox.ingress = :postmark
+  #
+  # 2. Generate a strong password that Action Mailbox can use to authenticate requests to the Postmark ingress.
+  #
+  #    Use <tt>bin/rails credentials:edit</tt> to add the password to your application's encrypted credentials under
+  #    +action_mailbox.ingress_password+, where Action Mailbox will automatically find it:
+  #
+  #        action_mailbox:
+  #          ingress_password: ...
+  #
+  #    Alternatively, provide the password in the +RAILS_INBOUND_EMAIL_PASSWORD+ environment variable.
+  #
+  # 3. {Configure Postmark}[https://postmarkapp.com/manual#configure-your-inbound-webhook-url] to forward inbound emails
+  #    to +/rails/action_mailbox/postmark/inbound_emails+ with the username +actionmailbox+ and the password you
+  #    previously generated. If your application lived at <tt>https://example.com</tt>, you would configure your
+  #    Postmark inbound webhook with the following fully-qualified URL:
+  #
+  #        https://actionmailbox:PASSWORD@example.com/rails/action_mailbox/postmark/inbound_emails
+  #
+  #    *NOTE:* When configuring your Postmark inbound webhook, be sure to check the box labeled *"Include raw email
+  #    content in JSON payload"*. Action Mailbox needs the raw email content to work.
+  class Ingresses::Postmark::InboundEmailsController < ::ActionMailbox::BaseController
+    def create: () -> untyped
+
+    private
+
+    def mail: () -> untyped
+  end
+end
+
+module ActionMailbox
+  # Ingests inbound emails relayed from an SMTP server.
+  #
+  # Authenticates requests using HTTP basic access authentication. The username is always +actionmailbox+, and the
+  # password is read from the application's encrypted credentials or an environment variable. See the Usage section below.
+  #
+  # Note that basic authentication is insecure over unencrypted HTTP. An attacker that intercepts cleartext requests to
+  # the ingress can learn its password. You should only use this ingress over HTTPS.
+  #
+  # Returns:
+  #
+  # - <tt>204 No Content</tt> if an inbound email is successfully recorded and enqueued for routing to the appropriate mailbox
+  # - <tt>401 Unauthorized</tt> if the request could not be authenticated
+  # - <tt>404 Not Found</tt> if Action Mailbox is not configured to accept inbound emails relayed from an SMTP server
+  # - <tt>415 Unsupported Media Type</tt> if the request does not contain an RFC 822 message
+  # - <tt>500 Server Error</tt> if the ingress password is not configured, or if one of the Active Record database,
+  #   the Active Storage service, or the Active Job backend is misconfigured or unavailable
+  #
+  # == Usage
+  #
+  # 1. Tell Action Mailbox to accept emails from an SMTP relay:
+  #
+  #        # config/environments/production.rb
+  #        config.action_mailbox.ingress = :relay
+  #
+  # 2. Generate a strong password that Action Mailbox can use to authenticate requests to the ingress.
+  #
+  #    Use <tt>bin/rails credentials:edit</tt> to add the password to your application's encrypted credentials under
+  #    +action_mailbox.ingress_password+, where Action Mailbox will automatically find it:
+  #
+  #        action_mailbox:
+  #          ingress_password: ...
+  #
+  #    Alternatively, provide the password in the +RAILS_INBOUND_EMAIL_PASSWORD+ environment variable.
+  #
+  # 3. Configure your SMTP server to pipe inbound emails to the appropriate ingress command, providing the +URL+ of the
+  #    relay ingress and the +INGRESS_PASSWORD+ you previously generated.
+  #
+  #    If your application lives at <tt>https://example.com</tt>, you would configure the Postfix SMTP server to pipe
+  #    inbound emails to the following command:
+  #
+  #        $ bin/rails action_mailbox:ingress:postfix URL=https://example.com/rails/action_mailbox/postfix/inbound_emails INGRESS_PASSWORD=...
+  #
+  #    Built-in ingress commands are available for these popular SMTP servers:
+  #
+  #    - Exim (<tt>bin/rails action_mailbox:ingress:exim</tt>)
+  #    - Postfix (<tt>bin/rails action_mailbox:ingress:postfix</tt>)
+  #    - Qmail (<tt>bin/rails action_mailbox:ingress:qmail</tt>)
+  class Ingresses::Relay::InboundEmailsController < ::ActionMailbox::BaseController
+    def create: () -> untyped
+
+    private
+
+    def require_valid_rfc822_message: () -> (untyped | nil)
+  end
+end
+
+module ActionMailbox
+  # Ingests inbound emails from SendGrid. Requires an +email+ parameter containing a full RFC 822 message.
+  #
+  # Authenticates requests using HTTP basic access authentication. The username is always +actionmailbox+, and the
+  # password is read from the application's encrypted credentials or an environment variable. See the Usage section below.
+  #
+  # Note that basic authentication is insecure over unencrypted HTTP. An attacker that intercepts cleartext requests to
+  # the SendGrid ingress can learn its password. You should only use the SendGrid ingress over HTTPS.
+  #
+  # Returns:
+  #
+  # - <tt>204 No Content</tt> if an inbound email is successfully recorded and enqueued for routing to the appropriate mailbox
+  # - <tt>401 Unauthorized</tt> if the request's signature could not be validated
+  # - <tt>404 Not Found</tt> if Action Mailbox is not configured to accept inbound emails from SendGrid
+  # - <tt>422 Unprocessable Entity</tt> if the request is missing the required +email+ parameter
+  # - <tt>500 Server Error</tt> if the ingress password is not configured, or if one of the Active Record database,
+  #   the Active Storage service, or the Active Job backend is misconfigured or unavailable
+  #
+  # == Usage
+  #
+  # 1. Tell Action Mailbox to accept emails from SendGrid:
+  #
+  #        # config/environments/production.rb
+  #        config.action_mailbox.ingress = :sendgrid
+  #
+  # 2. Generate a strong password that Action Mailbox can use to authenticate requests to the SendGrid ingress.
+  #
+  #    Use <tt>bin/rails credentials:edit</tt> to add the password to your application's encrypted credentials under
+  #    +action_mailbox.ingress_password+, where Action Mailbox will automatically find it:
+  #
+  #        action_mailbox:
+  #          ingress_password: ...
+  #
+  #    Alternatively, provide the password in the +RAILS_INBOUND_EMAIL_PASSWORD+ environment variable.
+  #
+  # 3. {Configure SendGrid Inbound Parse}[https://sendgrid.com/docs/for-developers/parsing-email/setting-up-the-inbound-parse-webhook/]
+  #    to forward inbound emails to +/rails/action_mailbox/sendgrid/inbound_emails+ with the username +actionmailbox+ and
+  #    the password you previously generated. If your application lived at <tt>https://example.com</tt>, you would
+  #    configure SendGrid with the following fully-qualified URL:
+  #
+  #        https://actionmailbox:PASSWORD@example.com/rails/action_mailbox/sendgrid/inbound_emails
+  #
+  #    *NOTE:* When configuring your SendGrid Inbound Parse webhook, be sure to check the box labeled *"Post the raw,
+  #    full MIME message."* Action Mailbox needs the raw MIME message to work.
+  class Ingresses::Sendgrid::InboundEmailsController < ::ActionMailbox::BaseController
+    def create: () -> untyped
+
+    private
+
+    def mail: () -> untyped
+
+    def envelope: () -> untyped
+  end
+end
+
+module Rails
+  class Conductor::ActionMailbox::InboundEmailsController < ::Rails::Conductor::BaseController
+    def index: () -> untyped
+
+    def new: () -> nil
+
+    def show: () -> untyped
+
+    def create: () -> untyped
+
+    private
+
+    def new_mail: () -> untyped
+
+    def mail_params: () -> untyped
+
+    def create_inbound_email: (untyped mail) -> untyped
+  end
+end
+
+module Rails
+  class Conductor::ActionMailbox::InboundEmails::SourcesController < ::Rails::Conductor::BaseController
+    def new: () -> nil
+
+    def create: () -> untyped
+  end
+end
+
+module Rails
+  # Incinerating will destroy an email that is due and has already been processed.
+  class Conductor::ActionMailbox::IncineratesController < ::Rails::Conductor::BaseController
+    def create: () -> untyped
+  end
+end
+
+module Rails
+  # Rerouting will run routing and processing on an email that has already been, or attempted to be, processed.
+  class Conductor::ActionMailbox::ReroutesController < ::Rails::Conductor::BaseController
+    def create: () -> untyped
+
+    private
+
+    def reroute: (untyped inbound_email) -> untyped
+  end
+end
+
+module Rails
+  # TODO: Move this to Rails::Conductor gem
+  class Conductor::BaseController < ::ActionController::Base
+    private
+
+    def ensure_development_env: () -> (untyped | nil)
+  end
+end
+
+module ActionMailbox
+  # You can configure when this +IncinerationJob+ will be run as a time-after-processing using the
+  # +config.action_mailbox.incinerate_after+ or +ActionMailbox.incinerate_after+ setting.
+  #
+  # Since this incineration is set for the future, it'll automatically ignore any <tt>InboundEmail</tt>s
+  # that have already been deleted and discard itself if so.
+  #
+  # You can disable incinerating processed emails by setting +config.action_mailbox.incinerate+ or
+  # +ActionMailbox.incinerate+ to +false+.
+  class IncinerationJob < ::ActiveJob::Base
+    def self.schedule: (untyped inbound_email) -> untyped
+
+    def perform: (untyped inbound_email) -> untyped
+  end
+end
+
+module ActionMailbox
+  # Routing a new InboundEmail is an asynchronous operation, which allows the ingress controllers to quickly
+  # accept new incoming emails without being burdened to hang while they're actually being processed.
+  class RoutingJob < ::ActiveJob::Base
+    def perform: (untyped inbound_email) -> untyped
+  end
+end
+
+module ActionMailbox
+  # The +InboundEmail+ is an Active Record that keeps a reference to the raw email stored in Active Storage
+  # and tracks the status of processing. By default, incoming emails will go through the following lifecycle:
+  #
+  # * Pending: Just received by one of the ingress controllers and scheduled for routing.
+  # * Processing: During active processing, while a specific mailbox is running its #process method.
+  # * Delivered: Successfully processed by the specific mailbox.
+  # * Failed: An exception was raised during the specific mailbox's execution of the +#process+ method.
+  # * Bounced: Rejected processing by the specific mailbox and bounced to sender.
+  #
+  # Once the +InboundEmail+ has reached the status of being either +delivered+, +failed+, or +bounced+,
+  # it'll count as having been +#processed?+. Once processed, the +InboundEmail+ will be scheduled for
+  # automatic incineration at a later point.
+  #
+  # When working with an +InboundEmail+, you'll usually interact with the parsed version of the source,
+  # which is available as a +Mail+ object from +#mail+. But you can also access the raw source directly
+  # using the +#source+ method.
+  #
+  # Examples:
+  #
+  #   inbound_email.mail.from # => 'david@loudthinking.com'
+  #   inbound_email.source # Returns the full rfc822 source of the email as text
+  class InboundEmail < ::ActionMailbox::Record
+    extend ::ActionMailbox::InboundEmail::MessageId::ClassMethods
+
+    include ::ActionMailbox::InboundEmail::Incineratable
+
+    include ::ActionMailbox::InboundEmail::MessageId
+
+    include ::ActionMailbox::InboundEmail::Routable
+
+    def instrumentation_payload: () -> { id: untyped, message_id: untyped, status: untyped }
+  end
+end
+
+# Ensure that the +InboundEmail+ is automatically scheduled for later incineration if the status has been
+# changed to +processed+. The later incineration will be invoked at the time specified by the
+# +ActionMailbox.incinerate_after+ time using the +IncinerationJob+.
+module ActionMailbox::InboundEmail::Incineratable
+  extend ::ActiveSupport::Concern
+
+  def incinerate_later: () -> untyped
+
+  def incinerate: () -> untyped
+end
+
+module ActionMailbox
+  # Command class for carrying out the actual incineration of the +InboundMail+ that's been scheduled
+  # for removal. Before the incineration – which really is just a call to +#destroy!+ – is run, we verify
+  # that it's both eligible (by virtue of having already been processed) and time to do so (that is,
+  # the +InboundEmail+ was processed after the +incinerate_after+ time).
+  class InboundEmail::Incineratable::Incineration
+    def initialize: (untyped inbound_email) -> void
+
+    def run: () -> (untyped | nil)
+
+    private
+
+    def due?: () -> untyped
+
+    def processed?: () -> untyped
+  end
+end
+
+# The +Message-ID+ as specified by rfc822 is supposed to be a unique identifier for that individual email.
+# That makes it an ideal tracking token for debugging and forensics, just like +X-Request-Id+ does for
+# web request.
+#
+# If an inbound email does not, against the rfc822 mandate, specify a Message-ID, one will be generated
+# using the approach from +Mail::MessageIdField+.
+module ActionMailbox::InboundEmail::MessageId
+  extend ::ActiveSupport::Concern
+end
+
+# A newly received +InboundEmail+ will not be routed synchronously as part of ingress controller's receival.
+# Instead, the routing will be done asynchronously, using a +RoutingJob+, to ensure maximum parallel capacity.
+#
+# By default, all newly created +InboundEmail+ records that have the status of +pending+, which is the default,
+# will be scheduled for automatic, deferred routing.
+module ActionMailbox::InboundEmail::Routable
+  extend ::ActiveSupport::Concern
+
+  # Enqueue a +RoutingJob+ for this +InboundEmail+.
+  def route_later: () -> untyped
+
+  # Route this +InboundEmail+ using the routing rules declared on the +ApplicationMailbox+.
+  def route: () -> untyped
+end
+
+module ActionMailbox
+  class Record < ::ActiveRecord::Base
+  end
+end
+
+# :markup: markdown
+# :include: ../README.md
+module ActionMailbox
+  extend ::ActiveSupport::Autoload
+end
+
+module ActionMailbox
+  # = Action Mailbox \Base
+  #
+  # The base class for all application mailboxes. Not intended to be inherited from directly. Inherit from
+  # +ApplicationMailbox+ instead, as that's where the app-specific routing is configured. This routing
+  # is specified in the following ways:
+  #
+  #   class ApplicationMailbox < ActionMailbox::Base
+  #     # Any of the recipients of the mail (whether to, cc, bcc) are matched against the regexp.
+  #     routing /^replies@/i => :replies
+  #
+  #     # Any of the recipients of the mail (whether to, cc, bcc) needs to be an exact match for the string.
+  #     routing "help@example.com" => :help
+  #
+  #     # Any callable (proc, lambda, etc) object is passed the inbound_email record and is a match if true.
+  #     routing ->(inbound_email) { inbound_email.mail.to.size > 2 } => :multiple_recipients
+  #
+  #     # Any object responding to #match? is called with the inbound_email record as an argument. Match if true.
+  #     routing CustomAddress.new => :custom
+  #
+  #     # Any inbound_email that has not been already matched will be sent to the BackstopMailbox.
+  #     routing :all => :backstop
+  #   end
+  #
+  # Application mailboxes need to override the #process method, which is invoked by the framework after
+  # callbacks have been run. The callbacks available are: +before_processing+, +after_processing+, and
+  # +around_processing+. The primary use case is to ensure that certain preconditions to processing are fulfilled
+  # using +before_processing+ callbacks.
+  #
+  # If a precondition fails to be met, you can halt the processing using the +#bounced!+ method,
+  # which will silently prevent any further processing, but not actually send out any bounce notice. You
+  # can also pair this behavior with the invocation of an Action Mailer class responsible for sending out
+  # an actual bounce email. This is done using the #bounce_with method, which takes the mail object returned
+  # by an Action Mailer method, like so:
+  #
+  #   class ForwardsMailbox < ApplicationMailbox
+  #     before_processing :ensure_sender_is_a_user
+  #
+  #     private
+  #       def ensure_sender_is_a_user
+  #         unless User.exists?(email_address: mail.from)
+  #           bounce_with UserRequiredMailer.missing(inbound_email)
+  #         end
+  #       end
+  #   end
+  #
+  # During the processing of the inbound email, the status will be tracked. Before processing begins,
+  # the email will normally have the +pending+ status. Once processing begins, just before callbacks
+  # and the #process method is called, the status is changed to +processing+. If processing is allowed to
+  # complete, the status is changed to +delivered+. If a bounce is triggered, then +bounced+. If an unhandled
+  # exception is bubbled up, then +failed+.
+  #
+  # Exceptions can be handled at the class level using the familiar
+  # ActiveSupport::Rescuable approach:
+  #
+  #   class ForwardsMailbox < ApplicationMailbox
+  #     rescue_from(ApplicationSpecificVerificationError) { bounced! }
+  #   end
+  class Base
+    extend ::ActionMailbox::Routing::ClassMethods
+
+    extend ::ActionMailbox::Callbacks::ClassMethods
+
+    extend ::ActiveSupport::Callbacks::ClassMethods
+
+    extend ::ActiveSupport::Rescuable::ClassMethods
+
+    def logger: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    include ::ActiveSupport::Rescuable
+
+    include ::ActionMailbox::Callbacks
+
+    include ::ActionMailbox::Routing
+
+    def perform_processing: () -> untyped
+
+    def process: () -> nil
+
+    def finished_processing?: () -> untyped
+
+    # Enqueues the given +message+ for delivery and changes the inbound email's status to +:bounced+.
+    def bounce_with: (untyped message) -> untyped
+
+    # Immediately sends the given +message+ and changes the inbound email's status to +:bounced+.
+    def bounce_now_with: (untyped message) -> untyped
+
+    private
+
+    def instrumentation_payload: () -> { mailbox: self, inbound_email: untyped }
+
+    def track_status_of_inbound_email: () { () -> untyped } -> untyped
+  end
+end
+
+module ActionMailbox
+  # = Action Mailbox \Callbacks
+  #
+  # Defines the callbacks related to processing.
+  module Callbacks
+    extend ::ActiveSupport::Concern
+
+    include ::ActiveSupport::Callbacks
+
+    TERMINATOR: untyped
+  end
+end
+
+module ActionMailbox
+  def self.deprecator: () -> untyped
+end
+
+module ActionMailbox
+  class Engine < ::Rails::Engine
+  end
+end
+
+module ActionMailbox
+  # Returns the currently loaded version of Action Mailbox as a +Gem::Version+.
+  def self.gem_version: () -> untyped
+
+  module VERSION
+    MAJOR: 8
+
+    MINOR: 1
+
+    TINY: 4
+
+    PRE: nil
+
+    STRING: untyped
+  end
+end
+
+module Mail
+  class Address
+    def ==: (untyped other_address) -> untyped
+  end
+end
+
+module Mail
+  class Address
+    def self.wrap: (untyped address) -> untyped
+  end
+end
+
+module Mail
+  class Message
+    def from_address: () -> untyped
+
+    def reply_to_address: () -> untyped
+
+    def recipients_addresses: () -> untyped
+
+    def to_addresses: () -> untyped
+
+    def cc_addresses: () -> untyped
+
+    def bcc_addresses: () -> untyped
+
+    def x_original_to_addresses: () -> untyped
+
+    def x_forwarded_to_addresses: () -> untyped
+
+    private
+
+    def address_list: (untyped obj) -> untyped
+  end
+end
+
+module Mail
+  def self.from_source: (untyped source) -> untyped
+end
+
+module Mail
+  class Message
+    def recipients: () -> untyped
+  end
+end
+
+module ActionMailbox
+  class Relayer
+    class Result
+      def success?: () -> untyped
+
+      def failure?: () -> untyped
+
+      def transient_failure?: () -> untyped
+
+      def permanent_failure?: () -> untyped
+    end
+
+    CONTENT_TYPE: "message/rfc822"
+
+    USER_AGENT: ::String
+
+    attr_reader uri: untyped
+
+    attr_reader username: untyped
+
+    attr_reader password: untyped
+
+    def initialize: (url: untyped, password: untyped, ?username: ::String) -> void
+
+    def relay: (untyped source) -> untyped
+
+    private
+
+    def post: (untyped source) -> untyped
+
+    def client: () -> untyped
+  end
+end
+
+module ActionMailbox
+  # = Action Mailbox \Router
+  #
+  # Encapsulates the routes that live on the ApplicationMailbox and performs the actual routing when
+  # an inbound_email is received.
+  class Router
+    class RoutingError < ::StandardError
+    end
+
+    def initialize: () -> void
+
+    def add_routes: (untyped routes) -> untyped
+
+    def add_route: (untyped address, to: untyped) -> untyped
+
+    def route: (untyped inbound_email) -> untyped
+
+    def mailbox_for: (untyped inbound_email) -> untyped
+
+    private
+
+    attr_reader routes: untyped
+  end
+end
+
+module ActionMailbox
+  # Encapsulates a route, which can then be matched against an inbound_email and provide a lookup of the matching
+  # mailbox class. See examples for the different route addresses and how to use them in the ActionMailbox::Base
+  # documentation.
+  class Router::Route
+    attr_reader address: untyped
+
+    attr_reader mailbox_name: untyped
+
+    def initialize: (untyped address, to: untyped) -> void
+
+    def match?: (untyped inbound_email) -> untyped
+
+    def mailbox_class: () -> untyped
+
+    private
+
+    def ensure_valid_address: () -> (untyped | nil)
+  end
+end
+
+module ActionMailbox
+  # See ActionMailbox::Base for how to specify routing.
+  module Routing
+    def router: () -> untyped
+
+    def router=: (untyped value) -> untyped
+
+    extend ::ActiveSupport::Concern
+  end
+end
+
+module ActionMailbox
+  class TestCase < ::ActiveSupport::TestCase
+    include ::ActionMailbox::TestHelper
+  end
+end
+
+module ActionMailbox
+  module TestHelper
+    # Create an InboundEmail record using an eml fixture in the format of message/rfc822
+    # referenced with +fixture_name+ located in +test/fixtures/files/fixture_name+.
+    def create_inbound_email_from_fixture: (untyped fixture_name, ?status: ::Symbol) -> untyped
+
+    # Creates an InboundEmail by specifying through options or a block.
+    #
+    # ==== Options
+    #
+    # * <tt>:status</tt> - The +status+ to set for the created InboundEmail.
+    #   For possible statuses, see its documentation.
+    #
+    # ==== Creating a simple email
+    #
+    # When you only need to set basic fields like +from+, +to+, +subject+, and
+    # +body+, you can pass them directly as options.
+    #
+    #   create_inbound_email_from_mail(from: "david@loudthinking.com", subject: "Hello!")
+    #
+    # ==== Creating a multi-part email
+    #
+    # When you need to create a more intricate email, like a multi-part email
+    # that contains both a plaintext version and an HTML version, you can pass a
+    # block.
+    #
+    #   create_inbound_email_from_mail do
+    #     to "David Heinemeier Hansson <david@loudthinking.com>"
+    #     from "Bilbo Baggins <bilbo@bagend.com>"
+    #     subject "Come down to the Shire!"
+    #
+    #     text_part do
+    #       body "Please join us for a party at Bag End"
+    #     end
+    #
+    #     html_part do
+    #       body "<h1>Please join us for a party at Bag End</h1>"
+    #     end
+    #   end
+    #
+    # As with +Mail.new+, you can also use a block parameter to define the parts
+    # of the message:
+    #
+    #   create_inbound_email_from_mail do |mail|
+    #     mail.to "David Heinemeier Hansson <david@loudthinking.com>"
+    #     mail.from "Bilbo Baggins <bilbo@bagend.com>"
+    #     mail.subject "Come down to the Shire!"
+    #
+    #     mail.text_part do |part|
+    #       part.body "Please join us for a party at Bag End"
+    #     end
+    #
+    #     mail.html_part do |part|
+    #       part.body "<h1>Please join us for a party at Bag End</h1>"
+    #     end
+    #   end
+    def create_inbound_email_from_mail: (?status: ::Symbol, **untyped mail_options) ?{ (?) -> untyped } -> untyped
+
+    # Create an InboundEmail using the raw rfc822 +source+ as text.
+    def create_inbound_email_from_source: (untyped source, ?status: ::Symbol) -> untyped
+
+    # Create an InboundEmail from fixture using the same arguments as create_inbound_email_from_fixture
+    # and immediately route it to processing.
+    def receive_inbound_email_from_fixture: (*untyped args) -> untyped
+
+    # Create an InboundEmail using the same options or block as
+    # create_inbound_email_from_mail, then immediately route it for processing.
+    def receive_inbound_email_from_mail: (**untyped kwargs) ?{ (?) -> untyped } -> untyped
+
+    # Create an InboundEmail using the same arguments as create_inbound_email_from_source and immediately route it
+    # to processing.
+    def receive_inbound_email_from_source: (*untyped args) -> untyped
+  end
+end
+
+module ActionMailbox
+  # Returns the currently loaded version of Action Mailbox as a +Gem::Version+.
+  def self.version: () -> untyped
+end
+
+module ActionMailbox::InboundEmail::MessageId
+  module ClassMethods
+    def create_and_extract_message_id!: (untyped source, **untyped options) -> untyped
+
+    private
+
+    def extract_message_id: (untyped source) -> untyped
+
+    def generate_missing_message_id: (untyped message_checksum) -> untyped
+
+    def create_and_upload_raw_email!: (untyped source) -> untyped
+  end
+end
+
+module ActionMailbox
+  module Callbacks
+    module ClassMethods
+      def before_processing: (*untyped methods) ?{ (?) -> untyped } -> untyped
+
+      def after_processing: (*untyped methods) ?{ (?) -> untyped } -> untyped
+
+      def around_processing: (*untyped methods) ?{ (?) -> untyped } -> untyped
+    end
+  end
+end
+
+module ActionMailbox
+  module Routing
+    module ClassMethods
+      def router: () -> untyped
+
+      def router=: (untyped value) -> untyped
+
+      def routing: (untyped routes) -> untyped
+
+      def route: (untyped inbound_email) -> untyped
+
+      def mailbox_for: (untyped inbound_email) -> untyped
+    end
+  end
+end
+
+module ActionMailbox::Ingresses
+end
+
+module ActionMailbox::Ingresses::Mailgun
+end
+
+module ActionMailbox::Ingresses::Mandrill
+end
+
+module ActionMailbox::Ingresses::Postmark
+end
+
+module ActionMailbox::Ingresses::Relay
+end
+
+module ActionMailbox::Ingresses::Sendgrid
+end
+
+module Rails::Conductor
+end
+
+module Rails::Conductor::ActionMailbox
+end
+
+module Rails::Conductor::ActionMailbox::InboundEmails
+end
