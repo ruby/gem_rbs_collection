@@ -9374,33 +9374,33 @@ module ActiveRecord
     end
 
     module ColumnMethods
-      def bigint: (*untyped names, **untyped options) -> untyped
+      def bigint: (*String | Symbol names, **untyped options) -> void
 
-      def binary: (*untyped names, **untyped options) -> untyped
+      def binary: (*String | Symbol names, **untyped options) -> void
 
-      def boolean: (*untyped names, **untyped options) -> untyped
+      def boolean: (*String | Symbol names, **untyped options) -> void
 
-      def date: (*untyped names, **untyped options) -> untyped
+      def date: (*String | Symbol names, **untyped options) -> void
 
-      def datetime: (*untyped names, **untyped options) -> untyped
+      def datetime: (*String | Symbol names, **untyped options) -> void
 
-      def decimal: (*untyped names, **untyped options) -> untyped
+      def decimal: (*String | Symbol names, **untyped options) -> void
 
-      def float: (*untyped names, **untyped options) -> untyped
+      def float: (*String | Symbol names, **untyped options) -> void
 
-      def integer: (*untyped names, **untyped options) -> untyped
+      def integer: (*String | Symbol names, **untyped options) -> void
 
-      def json: (*untyped names, **untyped options) -> untyped
+      def json: (*String | Symbol names, **untyped options) -> void
 
-      def string: (*untyped names, **untyped options) -> untyped
+      def string: (*String | Symbol names, **untyped options) -> void
 
-      def text: (*untyped names, **untyped options) -> untyped
+      def text: (*String | Symbol names, **untyped options) -> void
 
-      def time: (*untyped names, **untyped options) -> untyped
+      def time: (*String | Symbol names, **untyped options) -> void
 
-      def timestamp: (*untyped names, **untyped options) -> untyped
+      def timestamp: (*String | Symbol names, **untyped options) -> void
 
-      def virtual: (*untyped names, **untyped options) -> untyped
+      def virtual: (*String | Symbol names, **untyped options) -> void
 
       extend ::ActiveSupport::Concern
 
@@ -10127,7 +10127,7 @@ module ActiveRecord
       #     SELECT * FROM orders INNER JOIN line_items ON order_id=orders.id
       #
       # See also TableDefinition#column for details on how to create columns.
-      def create_table: (untyped table_name, ?id: ::Symbol, ?primary_key: untyped?, ?force: untyped?, **untyped options) ?{ (?) -> untyped } -> untyped
+      def create_table: (String | Symbol table_name, ?id: untyped, ?primary_key: untyped, ?force: untyped, **untyped options) ?{ (TableDefinition t) -> void } -> untyped
 
       # Returns a TableDefinition object containing information about the table that would be created
       # if the same arguments were passed to #create_table. See #create_table for information about
@@ -10196,7 +10196,7 @@ module ActiveRecord
       #     part_id bigint NOT NULL,
       #   ) ENGINE=InnoDB DEFAULT CHARSET=utf8
       #
-      def create_join_table: (untyped table_1, untyped table_2, ?column_options: ::Hash[untyped, untyped], **untyped options) ?{ (untyped) -> untyped } -> untyped
+      def create_join_table: (String | Symbol table_1, String | Symbol table_2, ?column_options: Hash[Symbol, untyped], **untyped options) ?{ (TableDefinition t) -> void } -> untyped
 
       # Builds a TableDefinition object for a join table.
       #
@@ -10291,7 +10291,7 @@ module ActiveRecord
       #  end
       #
       # See also Table for details on all of the various column transformations.
-      def change_table: (untyped table_name, ?untyped base, **untyped options) { (untyped) -> untyped } -> untyped
+      def change_table: (String | Symbol table_name, ?untyped base, **untyped options) { (Table t) -> void } -> untyped
 
       # Renames a table.
       #
