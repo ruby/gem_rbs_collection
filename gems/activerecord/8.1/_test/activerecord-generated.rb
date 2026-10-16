@@ -82,3 +82,7 @@ ActiveRecord::Encryption.with_encryption_context(encryptor: ActiveRecord::Encryp
 ActiveRecord::Encryption.context.encryptor
 ActiveRecord::Encryption.key_provider
 User.encrypted_attributes
+
+# Relation#new and its alias build return the model
+User.where(age: 20).build(age: 21) { |user| user.something }.something
+User.where(age: 20).new([{ age: 21 }]).first&.something

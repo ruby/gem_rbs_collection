@@ -56,3 +56,7 @@ User.all.sum(0.0) { |user| user.age.to_f }.next_float
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
+
+# Relation#new and its alias build return the model
+User.where(age: 20).build(age: 21) { |user| user.something }.something
+User.where(age: 20).new([{ age: 21 }]).first&.something
