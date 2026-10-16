@@ -5,6 +5,7 @@ def Symbol!(_) end
 def Array!(_) end
 def Node!(_) end
 def Bool!(_) end
+def Integer!(_) end
 
 # AST::Node
 
@@ -13,7 +14,7 @@ node2 = AST::Node.new(:x, [:foo, 42])
 AST::Node.new(:x, [:foo, 42], { y: 1 })
 
 Array!  node1.children
-String! node1.hash
+Integer! node1.hash
 Symbol! node1.type
 Bool!   node1 == node2
 Node!   node1.append 42
@@ -24,6 +25,7 @@ String! node1.inspect
 Node!   node1.to_ast
 String! node1.to_sexp
 Array!  node1.to_sexp_array
+Array!  node1.deconstruct
 Node!   node1.updated
 Node!   node1.updated(:foo)
 Node!   node1.updated(:foo, [])
