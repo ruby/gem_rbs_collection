@@ -77,12 +77,12 @@ if node.loc.is_a? Parser::Source::Map::Send
 end
 
 class TestBuilder < Parser::Builders::Default
-  def token_value
-    value(["foo", nil]).upcase
+  def token_value(range)
+    value(["foo", range]).upcase
   end
 
-  def token_string_value
-    string_value(["foo", nil]).upcase
+  def token_string_value(range)
+    string_value(["foo", range]).upcase
   end
 
   def token_loc(range)
@@ -90,6 +90,6 @@ class TestBuilder < Parser::Builders::Default
     loc(nil)&.source
   end
 end
-TestBuilder.new.token_value
-TestBuilder.new.token_string_value
+TestBuilder.new.token_value(range)
+TestBuilder.new.token_string_value(range)
 TestBuilder.new.token_loc(range)
