@@ -1,0 +1,1018 @@
+# The generated code is based on Ruby on Rails source code
+# You can find the license of Ruby on Rails from following.
+
+#MIT License
+#
+#Copyright (c) 37signals LLC
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
+
+module ActionText
+  module ContentHelper
+    def self.sanitizer: () -> untyped
+
+    def self.sanitizer=: (untyped value) -> untyped
+
+    def sanitizer: () -> untyped
+
+    def sanitizer=: (untyped value) -> untyped
+
+    def self.allowed_tags: () -> untyped
+
+    def self.allowed_tags=: (untyped value) -> untyped
+
+    def allowed_tags: () -> untyped
+
+    def allowed_tags=: (untyped value) -> untyped
+
+    def self.allowed_attributes: () -> untyped
+
+    def self.allowed_attributes=: (untyped value) -> untyped
+
+    def allowed_attributes: () -> untyped
+
+    def allowed_attributes=: (untyped value) -> untyped
+
+    def self.scrubber: () -> untyped
+
+    def self.scrubber=: (untyped value) -> untyped
+
+    def scrubber: () -> untyped
+
+    def scrubber=: (untyped value) -> untyped
+
+    def render_action_text_content: (untyped content) -> untyped
+
+    def sanitize_content_attachment: (untyped content_attachment) -> untyped
+
+    def sanitize_action_text_content: (untyped content) -> untyped
+
+    def render_action_text_attachments: (untyped content) -> untyped
+
+    def render_action_text_attachment: (untyped attachment, ?locals: ::Hash[untyped, untyped]) -> untyped
+
+    def sanitizer_allowed_tags: () -> untyped
+
+    def sanitizer_allowed_attributes: () -> untyped
+  end
+end
+
+module ActionText
+  module TagHelper
+    def self.id: () -> untyped
+
+    def self.id=: (untyped value) -> untyped
+
+    # Returns a `trix-editor` tag that instantiates the Trix JavaScript editor as
+    # well as a hidden field that Trix will write to on changes, so the content will
+    # be sent on form submissions.
+    #
+    # #### Options
+    # *   `:class` - Defaults to "trix-content" so that default styles will be
+    #     applied. Setting this to a different value will prevent default styles
+    #     from being applied.
+    # *   `[:data][:direct_upload_url]` - Defaults to `rails_direct_uploads_url`.
+    # *   `[:data][:blob_url_template]` - Defaults to
+    #     `rails_service_blob_url(":signed_id", ":filename")`.
+    #
+    #
+    # #### Example
+    #
+    #     rich_textarea_tag "content", message.content
+    #     # <input type="hidden" name="content" id="trix_input_post_1">
+    #     # <trix-editor id="content" input="trix_input_post_1" class="trix-content" ...></trix-editor>
+    #
+    #     rich_textarea_tag "content", nil do
+    #       "<h1>Default content</h1>"
+    #     end
+    #     # <input type="hidden" name="content" id="trix_input_post_1" value="&lt;h1&gt;Default content&lt;/h1&gt;">
+    #     # <trix-editor id="content" input="trix_input_post_1" class="trix-content" ...></trix-editor>
+    def rich_textarea_tag: (untyped name, ?untyped? value, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> untyped
+
+    alias rich_text_area_tag rich_textarea_tag
+  end
+end
+
+module ActionView::Helpers
+  class Tags::ActionText < ::ActionView::Helpers::Tags::Base
+    def dom_id: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    include ::ActionView::Helpers::Tags::Placeholderable
+
+    def render: () ?{ (?) -> untyped } -> untyped
+  end
+
+  module FormHelper
+    # Returns a `trix-editor` tag that instantiates the Trix JavaScript editor as
+    # well as a hidden field that Trix will write to on changes, so the content will
+    # be sent on form submissions.
+    #
+    # #### Options
+    # *   `:class` - Defaults to "trix-content" which ensures default styling is
+    #     applied.
+    # *   `:value` - Adds a default value to the HTML input tag.
+    # *   `[:data][:direct_upload_url]` - Defaults to `rails_direct_uploads_url`.
+    # *   `[:data][:blob_url_template]` - Defaults to
+    #     `rails_service_blob_url(":signed_id", ":filename")`.
+    #
+    #
+    # #### Example
+    #     rich_textarea :message, :content
+    #     # <input type="hidden" name="message[content]" id="message_content_trix_input_message_1">
+    #     # <trix-editor id="content" input="message_content_trix_input_message_1" class="trix-content" ...></trix-editor>
+    #
+    #     rich_textarea :message, :content, value: "<h1>Default message</h1>"
+    #     # <input type="hidden" name="message[content]" id="message_content_trix_input_message_1" value="&lt;h1&gt;Default message&lt;/h1&gt;">
+    #     # <trix-editor id="content" input="message_content_trix_input_message_1" class="trix-content" ...></trix-editor>
+    #
+    #     rich_textarea :message, :content do
+    #       "<h1>Default message</h1>"
+    #     end
+    #     # <input type="hidden" name="message[content]" id="message_content_trix_input_message_1" value="&lt;h1&gt;Default message&lt;/h1&gt;">
+    #     # <trix-editor id="content" input="message_content_trix_input_message_1" class="trix-content" ...></trix-editor>
+    def rich_textarea: (untyped object_name, untyped method, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> untyped
+
+    alias rich_text_area rich_textarea
+  end
+
+  class FormBuilder
+    # Wraps ActionView::Helpers::FormHelper#rich_textarea for form builders:
+    #
+    #     <%= form_with model: @message do |f| %>
+    #       <%= f.rich_textarea :content %>
+    #     <% end %>
+    #
+    # Please refer to the documentation of the base helper for details.
+    def rich_textarea: (untyped method, ?::Hash[untyped, untyped] options) ?{ (?) -> untyped } -> untyped
+
+    alias rich_text_area rich_textarea
+  end
+end
+
+module ActionText
+  class EncryptedRichText < ::ActionText::RichText
+  end
+end
+
+module ActionText
+  class Record < ::ActiveRecord::Base
+  end
+end
+
+module ActionText
+  # # Action Text RichText
+  #
+  # The RichText record holds the content produced by the Trix editor in a
+  # serialized `body` attribute. It also holds all the references to the embedded
+  # files, which are stored using Active Storage. This record is then associated
+  # with the Active Record model the application desires to have rich text content
+  # using the `has_rich_text` class method.
+  #
+  #     class Message < ActiveRecord::Base
+  #       has_rich_text :content
+  #     end
+  #
+  #     message = Message.create!(content: "<h1>Funny times!</h1>")
+  #     message.content #=> #<ActionText::RichText....
+  #     message.content.to_s # => "<h1>Funny times!</h1>"
+  #     message.content.to_plain_text # => "Funny times!"
+  #
+  #     message = Message.create!(content: "<div onclick='action()'>safe<script>unsafe</script></div>")
+  #     message.content #=> #<ActionText::RichText....
+  #     message.content.to_s # => "<div>safeunsafe</div>"
+  #     message.content.to_plain_text # => "safeunsafe"
+  class RichText < ::ActionText::Record
+    def nil?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def blank?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def present?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  end
+end
+
+# :markup: markdown
+# :include: ../README.md
+module ActionText
+  extend ::ActiveSupport::Autoload
+
+  module Attachables
+    extend ::ActiveSupport::Autoload
+  end
+
+  module Attachments
+    extend ::ActiveSupport::Autoload
+  end
+
+  def self.html_document_class: () -> untyped
+
+  def self.html_document_fragment_class: () -> untyped
+end
+
+module ActionText
+  # # Action Text Attachable
+  #
+  # Include this module to make a record attachable to an ActionText::Content.
+  #
+  #     class Person < ApplicationRecord
+  #       include ActionText::Attachable
+  #     end
+  #
+  #     person = Person.create! name: "Javan"
+  #     html = %Q(<action-text-attachment sgid="#{person.attachable_sgid}"></action-text-attachment>)
+  #     content = ActionText::Content.new(html)
+  #     content.attachables # => [person]
+  module Attachable
+    extend ::ActiveSupport::Concern
+
+    LOCATOR_NAME: "attachable"
+
+    # Extracts the `ActionText::Attachable` from the attachment HTML node:
+    #
+    #     person = Person.create! name: "Javan"
+    #     html = %Q(<action-text-attachment sgid="#{person.attachable_sgid}"></action-text-attachment>)
+    #     fragment = ActionText::Fragment.wrap(html)
+    #     attachment_node = fragment.find_all(ActionText::Attachment.tag_name).first
+    #     ActionText::Attachable.from_node(attachment_node) # => person
+    def self.from_node: (untyped node) -> untyped
+
+    def self.from_attachable_sgid: (untyped sgid, ?::Hash[untyped, untyped] options) -> untyped
+
+    def self.attachable_from_sgid: (untyped sgid) -> untyped
+
+    # Returns the Signed Global ID for the attachable. The purpose of the ID is set
+    # to 'attachable' so it can't be reused for other purposes.
+    def attachable_sgid: () -> untyped
+
+    def attachable_content_type: () -> untyped
+
+    def attachable_filename: () -> (untyped | nil)
+
+    def attachable_filesize: () -> untyped
+
+    def attachable_metadata: () -> untyped
+
+    def previewable_attachable?: () -> false
+
+    # Returns the path to the partial that is used for rendering the attachable in
+    # Trix. Defaults to `to_partial_path`.
+    #
+    # Override to render a different partial:
+    #
+    #     class User < ApplicationRecord
+    #       def to_trix_content_attachment_partial_path
+    #         "users/trix_content_attachment"
+    #       end
+    #     end
+    def to_trix_content_attachment_partial_path: () -> untyped
+
+    # Returns the path to the partial that is used for rendering the attachable.
+    # Defaults to `to_partial_path`.
+    #
+    # Override to render a different partial:
+    #
+    #     class User < ApplicationRecord
+    #       def to_attachable_partial_path
+    #         "users/attachable"
+    #       end
+    #     end
+    def to_attachable_partial_path: () -> untyped
+
+    def to_rich_text_attributes: (?::Hash[untyped, untyped] attributes) -> untyped
+
+    private
+
+    def attribute_names_for_serialization: () -> untyped
+
+    def read_attribute_for_serialization: (untyped key) -> (untyped | nil)
+  end
+end
+
+module ActionText
+  module Attachables
+    class ContentAttachment
+      extend ::ActiveModel::Conversion::ClassMethods
+
+      extend ::ActiveModel::Validations::ClassMethods
+
+      include ::ActiveModel::Model
+
+      def self.from_node: (untyped node) -> untyped
+
+      attr_accessor content_type: untyped
+
+      attr_accessor content: untyped
+
+      def attachable_plain_text_representation: (untyped caption) -> untyped
+
+      def to_html: () -> untyped
+
+      def to_s: () -> untyped
+
+      def to_partial_path: () -> "action_text/attachables/content_attachment"
+
+      private
+
+      def content_instance: () -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Attachables
+    class MissingAttachable
+      extend ::ActiveModel::Naming
+
+      DEFAULT_PARTIAL_PATH: "action_text/attachables/missing_attachable"
+
+      def initialize: (untyped sgid) -> void
+
+      def to_partial_path: () -> untyped
+
+      def model: () -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Attachables
+    class RemoteImage
+      extend ::ActiveModel::Naming
+
+      def self.from_node: (untyped node) -> (untyped | nil)
+
+      def self.content_type_is_image?: (untyped content_type) -> untyped
+
+      def self.attributes_from_node: (untyped node) -> { url: untyped, content_type: untyped, width: untyped, height: untyped }
+
+      attr_reader url: untyped
+
+      attr_reader content_type: untyped
+
+      attr_reader width: untyped
+
+      attr_reader height: untyped
+
+      def initialize: (?::Hash[untyped, untyped] attributes) -> void
+
+      def attachable_plain_text_representation: (untyped caption) -> ::String
+
+      def to_partial_path: () -> "action_text/attachables/remote_image"
+    end
+  end
+end
+
+module ActionText
+  class AttachmentGallery
+    extend ::ActiveModel::Conversion::ClassMethods
+
+    extend ::ActiveModel::Validations::ClassMethods
+
+    include ::ActiveModel::Model
+
+    TAG_NAME: "div"
+
+    def self.fragment_by_canonicalizing_attachment_galleries: (untyped content) -> untyped
+
+    def self.fragment_by_replacing_attachment_gallery_nodes: (untyped content) { (untyped) -> untyped } -> untyped
+
+    def self.find_attachment_gallery_nodes: (untyped content) -> untyped
+
+    def self.from_node: (untyped node) -> untyped
+
+    def self.attachment_selector: () -> ::String
+
+    def self.selector: () -> ::String
+
+    attr_reader node: untyped
+
+    def initialize: (untyped node) -> void
+
+    def attachments: () -> untyped
+
+    def size: () -> untyped
+
+    def inspect: () -> ::String
+  end
+end
+
+module ActionText
+  # # Action Text Attachment
+  #
+  # Attachments serialize attachables to HTML or plain text.
+  #
+  #     class Person < ApplicationRecord
+  #       include ActionText::Attachable
+  #     end
+  #
+  #     attachable = Person.create! name: "Javan"
+  #     attachment = ActionText::Attachment.from_attachable(attachable)
+  #     attachment.to_html # => "<action-text-attachment sgid=\"BAh7CEk..."
+  class Attachment
+    extend ::ActionText::Attachments::Minification::ClassMethods
+
+    extend ::ActionText::Attachments::TrixConversion::ClassMethods
+
+    def self.tag_name: () -> untyped
+    def self.tag_name=: (untyped value) -> untyped
+    def tag_name: () -> untyped
+    def tag_name=: (untyped value) -> untyped
+    def to_param: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    include ::ActionText::Attachments::TrixConversion
+
+    include ::ActionText::Attachments::Minification
+
+    include ::ActionText::Attachments::Caching
+
+    ATTRIBUTES: ::Array["sgid" | "content-type" | "url" | "href" | "filename" | "filesize" | "width" | "height" | "previewable" | "presentation" | "caption" | "content"]
+
+    def self.fragment_by_canonicalizing_attachments: (untyped content) -> untyped
+
+    def self.from_node: (untyped node, ?untyped? attachable) -> untyped
+
+    def self.from_attachables: (untyped attachables) -> untyped
+
+    def self.from_attachable: (untyped attachable, ?::Hash[untyped, untyped] attributes) -> (untyped | nil)
+
+    def self.from_attributes: (untyped attributes, ?untyped? attachable) -> (untyped | nil)
+
+    def self.node_from_attributes: (untyped attributes) -> (untyped | nil)
+
+    def self.process_attributes: (untyped attributes) -> untyped
+
+    attr_reader node: untyped
+
+    attr_reader attachable: untyped
+
+    def initialize: (untyped node, untyped attachable) -> void
+
+    def caption: () -> untyped
+
+    def full_attributes: () -> untyped
+
+    def with_full_attributes: () -> untyped
+
+    # Converts the attachment to plain text.
+    #
+    #     attachable = ActiveStorage::Blob.find_by filename: "racecar.jpg"
+    #     attachment = ActionText::Attachment.from_attachable(attachable)
+    #     attachment.to_plain_text # => "[racecar.jpg]"
+    #
+    # Use the `caption` when set:
+    #
+    #     attachment = ActionText::Attachment.from_attachable(attachable, caption: "Vroom vroom")
+    #     attachment.to_plain_text # => "[Vroom vroom]"
+    #
+    # The presentation can be overridden by implementing the
+    # `attachable_plain_text_representation` method:
+    #
+    #     class Person < ApplicationRecord
+    #       include ActionText::Attachable
+    #
+    #       def attachable_plain_text_representation
+    #         "[#{name}]"
+    #       end
+    #     end
+    #
+    #     attachable = Person.create! name: "Javan"
+    #     attachment = ActionText::Attachment.from_attachable(attachable)
+    #     attachment.to_plain_text # => "[Javan]"
+    def to_plain_text: () -> untyped
+
+    # Converts the attachment to HTML.
+    #
+    #     attachable = Person.create! name: "Javan"
+    #     attachment = ActionText::Attachment.from_attachable(attachable)
+    #     attachment.to_html # => "<action-text-attachment sgid=\"BAh7CEk...
+    def to_html: () -> untyped
+
+    def to_s: () -> untyped
+
+    def inspect: () -> ::String
+
+    private
+
+    def node_attributes: () -> untyped
+
+    def attachable_attributes: () -> untyped
+
+    def sgid_attributes: () -> untyped
+  end
+end
+
+module ActionText
+  module Attachments
+    module Caching
+      def cache_key: (*untyped args) -> untyped
+
+      private
+
+      def cache_digest: () -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Attachments
+    module Minification
+      extend ::ActiveSupport::Concern
+    end
+  end
+end
+
+module ActionText
+  module Attachments
+    module TrixConversion
+      extend ::ActiveSupport::Concern
+
+      def to_trix_attachment: (?untyped content) -> untyped
+
+      private
+
+      def trix_attachment_content: () -> (untyped | nil)
+    end
+  end
+end
+
+module ActionText
+  module Attribute
+    extend ::ActiveSupport::Concern
+  end
+end
+
+module ActionText
+  # # Action Text Content
+  #
+  # The `ActionText::Content` class wraps an HTML fragment to add support for
+  # parsing, rendering and serialization. It can be used to extract links and
+  # attachments, convert the fragment to plain text, or serialize the fragment to
+  # the database.
+  #
+  # The ActionText::RichText record serializes the `body` attribute as
+  # `ActionText::Content`.
+  #
+  #     class Message < ActiveRecord::Base
+  #       has_rich_text :content
+  #     end
+  #
+  #     message = Message.create!(content: "<h1>Funny times!</h1>")
+  #     body = message.content.body # => #<ActionText::Content "<div class=\"trix-conte...">
+  #     body.to_s # => "<h1>Funny times!</h1>"
+  #     body.to_plain_text # => "Funny times!"
+  class Content
+    extend ::ActionText::Serialization::ClassMethods
+
+    extend ::ActionText::Rendering::ClassMethods
+
+    def deconstruct: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def blank?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def empty?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def html_safe: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+    def present?: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    include ::ActionText::Rendering
+
+    include ::ActionText::Serialization
+
+    include ::ActionText::ContentHelper
+
+    attr_reader fragment: untyped
+
+    def self.fragment_by_canonicalizing_content: (untyped content) -> untyped
+
+    def initialize: (?untyped? content, ?::Hash[untyped, untyped] options) -> void
+
+    def attachment_galleries: () -> untyped
+
+    # Extracts ActionText::Attachable objects from the HTML fragment:
+    #
+    #     attachable = ActiveStorage::Blob.first
+    #     html = %Q(<action-text-attachment sgid="#{attachable.attachable_sgid}" caption="Captioned"></action-text-attachment>)
+    #     content = ActionText::Content.new(html)
+    #     content.attachables # => [attachable]
+    def attachables: () -> untyped
+
+    def append_attachables: (untyped attachables) -> untyped
+
+    def render_attachments: (**untyped options) { (?) -> untyped } -> untyped
+
+    def render_attachment_galleries: () { (?) -> untyped } -> untyped
+
+    def to_rendered_html_with_layout: () -> untyped
+
+    def to_partial_path: () -> "action_text/contents/content"
+
+    def as_json: (*untyped) -> untyped
+
+    def inspect: () -> ::String
+
+    def ==: (untyped other) -> (untyped | nil)
+
+    private
+
+    def attachment_nodes: () -> untyped
+
+    def attachment_gallery_nodes: () -> untyped
+
+    def attachment_for_node: (untyped node, ?with_full_attributes: bool) -> untyped
+
+    def attachment_gallery_for_node: (untyped node) -> untyped
+  end
+end
+
+module ActionText
+  def self.deprecator: () -> untyped
+end
+
+module ActionText
+  module Encryption
+    def encrypt: () -> untyped
+
+    def decrypt: () -> untyped
+
+    private
+
+    def encrypt_rich_texts: () -> untyped
+
+    def decrypt_rich_texts: () -> untyped
+
+    def has_encrypted_rich_texts?: () -> untyped
+
+    def encryptable_rich_texts: () -> untyped
+  end
+end
+
+module ActionText
+  class Engine < ::Rails::Engine
+  end
+end
+
+module ActionText
+  # # Action Text FixtureSet
+  #
+  # Fixtures are a way of organizing data that you want to test against; in short,
+  # sample data.
+  #
+  # To learn more about fixtures, read the ActiveRecord::FixtureSet documentation.
+  #
+  # ### YAML
+  #
+  # Like other Active Record-backed models, ActionText::RichText records inherit
+  # from ActiveRecord::Base instances and can therefore be populated by fixtures.
+  #
+  # Consider an `Article` class:
+  #
+  #     class Article < ApplicationRecord
+  #       has_rich_text :content
+  #     end
+  #
+  # To declare fixture data for the related `content`, first declare fixture data
+  # for `Article` instances in `test/fixtures/articles.yml`:
+  #
+  #     first:
+  #       title: An Article
+  #
+  # Then declare the ActionText::RichText fixture data in
+  # `test/fixtures/action_text/rich_texts.yml`, making sure to declare each
+  # entry's `record:` key as a polymorphic relationship:
+  #
+  #     first:
+  #       record: first (Article)
+  #       name: content
+  #       body: <div>Hello, world.</div>
+  #
+  # When processed, Active Record will insert database records for each fixture
+  # entry and will ensure the Action Text relationship is intact.
+  class FixtureSet
+    # Fixtures support Action Text attachments as part of their `body` HTML.
+    #
+    # ### Examples
+    #
+    # For example, consider a second `Article` fixture declared in
+    # `test/fixtures/articles.yml`:
+    #
+    #     second:
+    #       title: Another Article
+    #
+    # You can attach a mention of `articles(:first)` to `second`'s `content` by
+    # embedding a call to `ActionText::FixtureSet.attachment` in the `body:` value
+    # in `test/fixtures/action_text/rich_texts.yml`:
+    #
+    #     second:
+    #       record: second (Article)
+    #       name: content
+    #       body: <div>Hello, <%= ActionText::FixtureSet.attachment("articles", :first) %></div>
+    #
+    def self.attachment: (untyped fixture_set_name, untyped label, ?column_type: ::Symbol) -> ::String
+  end
+end
+
+module ActionText
+  class Fragment
+    def deconstruct: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    def self.wrap: (untyped fragment_or_html) -> untyped
+
+    def self.from_html: (untyped html) -> untyped
+
+    attr_reader source: untyped
+
+    def initialize: (untyped source) -> void
+
+    def find_all: (untyped selector) -> untyped
+
+    def update: () { (untyped) -> untyped } -> untyped
+
+    def replace: (untyped selector) { (untyped) -> untyped } -> untyped
+
+    def to_plain_text: () -> untyped
+
+    def to_html: () -> untyped
+
+    def to_s: () -> untyped
+  end
+end
+
+module ActionText
+  # Returns the currently loaded version of Action Text as a `Gem::Version`.
+  def self.gem_version: () -> untyped
+
+  module VERSION
+    MAJOR: 8
+
+    MINOR: 1
+
+    TINY: 4
+
+    PRE: nil
+
+    STRING: untyped
+  end
+end
+
+module ActionText
+  module HtmlConversion
+    extend ::ActionText::HtmlConversion
+
+    def node_to_html: (untyped node) -> untyped
+
+    def fragment_for_html: (untyped html) -> untyped
+
+    def create_element: (untyped tag_name, ?::Hash[untyped, untyped] attributes) -> untyped
+
+    private
+
+    def document: () -> untyped
+  end
+end
+
+module ActionText
+  module PlainTextConversion
+    extend ::ActionText::PlainTextConversion
+
+    def node_to_plain_text: (untyped node) -> untyped
+
+    private
+
+    def plain_text_for_node: (untyped node, untyped child_values) -> untyped
+
+    def plain_text_method_for_node: (untyped node) -> ::Symbol
+
+    def plain_text_for_child_values: (untyped child_values) -> untyped
+
+    def plain_text_for_unsupported_node: (untyped node, untyped _child_values) -> ""
+
+    def plain_text_for_block: (untyped node, untyped child_values) -> ::String
+
+    def plain_text_for_list: (untyped node, untyped child_values) -> ::String
+
+    def plain_text_for_br_node: (untyped node, untyped _child_values) -> "\n"
+
+    def plain_text_for_text_node: (untyped node, untyped _child_values) -> untyped
+
+    def plain_text_for_div_node: (untyped node, untyped child_values) -> ::String
+
+    def plain_text_for_figcaption_node: (untyped node, untyped child_values) -> ::String
+
+    def plain_text_for_blockquote_node: (untyped node, untyped child_values) -> (::String | untyped)
+
+    def plain_text_for_li_node: (untyped node, untyped child_values) -> ::String
+
+    def remove_trailing_newlines: (untyped text) -> untyped
+
+    def bullet_for_li_node: (untyped node) -> ::String
+
+    def list_node_name_for_li_node: (untyped node) -> untyped
+
+    def indentation_for_li_node: (untyped node) -> untyped
+
+    def list_node_depth_for_node: (untyped node) -> untyped
+
+    def break_if_nested_list: (untyped node, untyped text) -> (::String | untyped)
+
+    class BottomUpReducer
+      def initialize: (untyped node) -> void
+
+      def reduce: () { (?) -> untyped } -> untyped
+
+      private
+
+      def traverse_bottom_up: (untyped node) { (?) -> untyped } -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Rendering
+    def render: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+
+    extend ::ActiveSupport::Concern
+  end
+end
+
+module ActionText
+  module Serialization
+    extend ::ActiveSupport::Concern
+
+    def _dump: (*untyped) -> untyped
+  end
+end
+
+module ActionText
+  module SystemTestHelper
+    # Locates a Trix editor and fills it in with the given HTML.
+    #
+    # The editor can be found by:
+    #
+    # *   its `id`
+    # *   its `placeholder`
+    # *   the text from its `label` element
+    # *   its `aria-label`
+    # *   the `name` of its input
+    #
+    # Additional options are forwarded to Capybara as filters
+    #
+    # Examples:
+    #
+    #     # <trix-editor id="message_content" ...></trix-editor>
+    #     fill_in_rich_textarea "message_content", with: "Hello <em>world!</em>"
+    #
+    #     # <trix-editor placeholder="Your message here" ...></trix-editor>
+    #     fill_in_rich_textarea "Your message here", with: "Hello <em>world!</em>"
+    #
+    #     # <label for="message_content">Message content</label>
+    #     # <trix-editor id="message_content" ...></trix-editor>
+    #     fill_in_rich_textarea "Message content", with: "Hello <em>world!</em>"
+    #
+    #     # <trix-editor aria-label="Message content" ...></trix-editor>
+    #     fill_in_rich_textarea "Message content", with: "Hello <em>world!</em>"
+    #
+    #     # <input id="trix_input_1" name="message[content]" type="hidden">
+    #     # <trix-editor input="trix_input_1"></trix-editor>
+    #     fill_in_rich_textarea "message[content]", with: "Hello <em>world!</em>"
+    def fill_in_rich_textarea: (?untyped? locator, with: untyped, **untyped) -> untyped
+
+    alias fill_in_rich_text_area fill_in_rich_textarea
+  end
+end
+
+module ActionText
+  class TrixAttachment
+    TAG_NAME: "figure"
+
+    SELECTOR: "[data-trix-attachment]"
+
+    COMPOSED_ATTRIBUTES: ::Array["caption" | "presentation"]
+
+    ATTRIBUTES: untyped
+
+    ATTRIBUTE_TYPES: { "previewable" => untyped, "filesize" => untyped, "width" => untyped, "height" => untyped, default: untyped }
+
+    def self.from_attributes: (untyped attributes) -> untyped
+
+    def self.process_attributes: (untyped attributes) -> untyped
+
+    def self.transform_attribute_keys: (untyped attributes) -> untyped
+
+    def self.typecast_attribute_values: (untyped attributes) -> untyped
+
+    attr_reader node: untyped
+
+    def initialize: (untyped node) -> void
+
+    def attributes: () -> untyped
+
+    def to_html: () -> untyped
+
+    def to_s: () -> untyped
+
+    private
+
+    def attachment_attributes: () -> untyped
+
+    def composed_attributes: () -> untyped
+
+    def read_json_object_attribute: (untyped name) -> untyped
+
+    def read_json_attribute: (untyped name) -> (untyped | nil)
+  end
+end
+
+module ActionText
+  # Returns the currently loaded version of Action Text as a `Gem::Version`.
+  def self.version: () -> untyped
+end
+
+module ActionText
+  module Attachable
+    module ClassMethods
+      def from_attachable_sgid: (untyped sgid) -> untyped
+
+      # Returns the path to the partial that is used for rendering missing
+      # attachables. Defaults to "action_text/attachables/missing_attachable".
+      #
+      # Override to render a different partial:
+      #
+      #     class User < ApplicationRecord
+      #       def self.to_missing_attachable_partial_path
+      #         "users/missing_attachable"
+      #       end
+      #     end
+      def to_missing_attachable_partial_path: () -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Attachments
+    module Minification
+      module ClassMethods
+        def fragment_by_minifying_attachments: (untyped content) -> untyped
+      end
+    end
+  end
+end
+
+module ActionText
+  module Attachments
+    module TrixConversion
+      module ClassMethods
+        def fragment_by_converting_trix_attachments: (untyped content) -> untyped
+
+        def from_trix_attachment: (untyped trix_attachment) -> untyped
+      end
+    end
+  end
+end
+
+module ActionText
+  module Attribute
+    module ClassMethods
+    end
+  end
+end
+
+module ActionText
+  module Rendering
+    module ClassMethods
+      def action_controller_renderer: () -> untyped
+
+      def with_renderer: (untyped renderer) { () -> untyped } -> untyped
+
+      def render: (*untyped args) ?{ (?) -> untyped } -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Serialization
+    module ClassMethods
+      def load: (untyped content) -> (untyped | nil)
+
+      def dump: (untyped content) -> untyped
+    end
+  end
+end
+
+module ActionText
+  module Serialization
+    module ClassMethods
+      alias _load load
+    end
+  end
+end
