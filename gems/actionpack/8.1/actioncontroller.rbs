@@ -32,6 +32,7 @@ module ActionController
     include Caching
     include AbstractController::Caching
     extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::ConfigMethods
     extend AbstractController::Caching::Fragments::ClassMethods
     include MimeResponds
     include ImplicitRender
@@ -99,6 +100,7 @@ module ActionController
     include Caching
     include AbstractController::Caching
     extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::ConfigMethods
     extend AbstractController::Caching::Fragments::ClassMethods
     include DataStreaming
     include DefaultHeaders
@@ -367,7 +369,23 @@ module AbstractController
   end
 end
 
+module AbstractController
+  class Base
+    # Refresh the cached action_methods when a new action_method is added.
+    def self.method_added: (Symbol name) -> void
+  end
+end
+
 module ActionController
+  module Rescue
+    # Override this method if you want to customize when detailed exceptions must be
+    # shown. This method is only called when `consider_all_requests_local` is
+    # `false`. By default, it returns `false`, but someone may set it to
+    # `request.local?` so local requests in production still show the detailed
+    # exception pages.
+    def show_detailed_exceptions?: () -> bool
+  end
+
   class Metal
     attr_accessor request: ActionDispatch::Request
 

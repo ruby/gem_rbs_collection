@@ -98,9 +98,6 @@ module AbstractController
 
     def self.configure: () { (untyped) -> untyped } -> untyped
 
-    # Refresh the cached action_methods when a new action_method is added.
-    def self.method_added: (untyped name) -> untyped
-
     def self.eager_load!: () -> nil
 
     # Calls the action going through the entire Action Dispatch stack.
@@ -4242,13 +4239,6 @@ module ActionController
     module ClassMethods
       def handler_for_rescue: (untyped exception, *untyped, **untyped) ?{ (?) -> untyped } -> (untyped | nil)
     end
-
-    # Override this method if you want to customize when detailed exceptions must be
-    # shown. This method is only called when `consider_all_requests_local` is
-    # `false`. By default, it returns `false`, but someone may set it to
-    # `request.local?` so local requests in production still show the detailed
-    # exception pages.
-    def show_detailed_exceptions?: () -> false
 
     private
 

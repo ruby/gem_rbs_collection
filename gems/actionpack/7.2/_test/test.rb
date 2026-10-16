@@ -31,3 +31,30 @@ class AuthController < ActionController::Base
     request_http_digest_authentication("Admin", "Denied").length
   end
 end
+
+# Controller accessors, and the ClassMethods of the concerns Base includes
+class AccessorsController < ActionController::Base
+  permissions_policy(only: :index) { |policy| policy }
+  log_at :debug, if: -> { true }
+  set_callback(:process_action, :before, :show)
+  cache_store
+
+  def self.method_added(name)
+    super
+    name.to_proc
+  end
+
+  def show
+    params.permit(:name)
+    self.params = { name: "foo" }
+    cookies.signed
+    flash.now[:notice] = "Saved"
+    flash.keep
+    request.path_parameters
+    response.status
+  end
+
+  def show_detailed_exceptions?
+    request.local?
+  end
+end

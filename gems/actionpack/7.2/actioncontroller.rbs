@@ -1,6 +1,6 @@
 module ActionController
   interface _API_and_Base
-    def flash: () -> untyped
+    def flash: () -> ActionDispatch::Flash::FlashHash
   end
 
   class Base < Metal
@@ -27,6 +27,7 @@ module ActionController
     include Caching
     include AbstractController::Caching
     extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::ConfigMethods
     extend AbstractController::Caching::Fragments::ClassMethods
     include MimeResponds
     include ImplicitRender
@@ -42,6 +43,8 @@ module ActionController
     extend RequestForgeryProtection::ClassMethods
     include ContentSecurityPolicy
     extend ContentSecurityPolicy::ClassMethods
+    include PermissionsPolicy
+    extend PermissionsPolicy::ClassMethods
     include ForceSSL
     extend ForceSSL::ClassMethods
     include Streaming
@@ -52,8 +55,11 @@ module ActionController
     include HttpAuthentication::Token::ControllerMethods
     include DefaultHeaders
     extend DefaultHeaders::ClassMethods
+    include Logging
+    extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
@@ -81,8 +87,11 @@ module ActionController
     include DataStreaming
     include DefaultHeaders
     extend DefaultHeaders::ClassMethods
+    include Logging
+    extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
@@ -320,5 +329,76 @@ end
 module ActionController
   module Rendering
     def render_to_string: (*untyped args) ?{ () -> untyped } -> ::String
+  end
+end
+
+module AbstractController
+  class Base
+    # Refresh the cached action_methods when a new action_method is added.
+    def self.method_added: (Symbol name) -> void
+  end
+end
+
+module ActionController
+  class Metal
+    attr_accessor request: ActionDispatch::Request
+
+    attr_accessor response: ActionDispatch::Response
+  end
+
+  module StrongParameters
+    # Returns a new ActionController::Parameters object that
+    # has been instantiated with the <tt>request.parameters</tt>.
+    def params: () -> ActionController::Parameters
+
+    # Assigns the given +value+ to the +params+ hash. If +value+
+    # is a Hash, this will create an ActionController::Parameters
+    # object that has been instantiated with the given +value+ hash.
+    def params=: (Hash[untyped, untyped] | ActionController::Parameters value) -> void
+  end
+
+  module Cookies
+    private
+
+    def cookies: () -> ActionDispatch::Cookies::CookieJar
+  end
+
+  module Rescue
+    # Override this method if you want to customize when detailed
+    # exceptions must be shown. This method is only called when
+    # +consider_all_requests_local+ is +false+. By default, it returns
+    # +false+, but someone may set it to <tt>request.local?</tt> so local
+    # requests in production still show the detailed exception pages.
+    def show_detailed_exceptions?: () -> bool
+  end
+
+  module Logging
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      # Set a different log level per request.
+      #
+      #     # Use the debug log level if a particular cookie is set.
+      #     class ApplicationController < ActionController::Base
+      #       log_at :debug, if: -> { cookies[:debug] }
+      #     end
+      #
+      def log_at: (Symbol | Integer level, **untyped options) -> void
+    end
+  end
+
+  module PermissionsPolicy
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      # Overrides parts of the globally configured `Feature-Policy` header:
+      #
+      #     class PagesController < ApplicationController
+      #       permissions_policy do |policy|
+      #         policy.geolocation "https://example.com"
+      #       end
+      #     end
+      def permissions_policy: (**untyped options) ?{ (untyped policy) -> void } -> void
+    end
   end
 end

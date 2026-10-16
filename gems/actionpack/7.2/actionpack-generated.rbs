@@ -100,9 +100,6 @@ module AbstractController
     # * <tt>String</tt>
     def self.controller_path: () -> untyped
 
-    # Refresh the cached action_methods when a new action_method is added.
-    def self.method_added: (untyped name) -> untyped
-
     # Calls the action going through the entire action dispatch stack.
     #
     # The actual method that is called is determined by calling
@@ -1257,10 +1254,6 @@ module ActionController
   # nodoc:
   module Cookies
     extend ActiveSupport::Concern
-
-    private
-
-    def cookies: () -> untyped
   end
 end
 
@@ -2956,13 +2949,6 @@ module ActionController
 
     include ActiveSupport::Rescuable
 
-    # Override this method if you want to customize when detailed
-    # exceptions must be shown. This method is only called when
-    # +consider_all_requests_local+ is +false+. By default, it returns
-    # +false+, but someone may set it to <tt>request.local?</tt> so local
-    # requests in production still show the detailed exception pages.
-    def show_detailed_exceptions?: () -> false
-
     private
 
     def process_action: (*untyped args) -> untyped
@@ -3801,14 +3787,6 @@ module ActionController
   # See ActionController::Parameters.require and ActionController::Parameters.permit
   # for more information.
   module StrongParameters
-    # Returns a new ActionController::Parameters object that
-    # has been instantiated with the <tt>request.parameters</tt>.
-    def params: () -> untyped
-
-    # Assigns the given +value+ to the +params+ hash. If +value+
-    # is a Hash, this will create an ActionController::Parameters
-    # object that has been instantiated with the given +value+ hash.
-    def params=: (untyped value) -> untyped
   end
 end
 
@@ -3956,10 +3934,6 @@ module ActionController
 
     # Delegates to the class' <tt>controller_name</tt>.
     def controller_name: () -> untyped
-
-    attr_accessor response(@_response): untyped
-
-    attr_accessor request(@_request): untyped
 
     def initialize: () -> untyped
 
@@ -7624,26 +7598,6 @@ module ActionDispatch
       alias merge! update
 
       def replace: (untyped h) -> untyped
-
-      # Sets a flash that will not be available to the next action, only to the current.
-      #
-      #     flash.now[:message] = "Hello current action"
-      #
-      # This method enables you to use the flash as a central messaging system in your app.
-      # When you need to pass an object to the next action, you use the standard flash assign (<tt>[]=</tt>).
-      # When you need to pass an object to the current action, you use <tt>now</tt>, and your object will
-      # vanish when the current action is done.
-      #
-      # Entries set via <tt>now</tt> are accessed the same way as standard entries: <tt>flash['my-key']</tt>.
-      #
-      # Also, brings two convenience accessors:
-      #
-      #   flash.now.alert = "Beware now!"
-      #   # Equivalent to flash.now[:alert] = "Beware now!"
-      #
-      #   flash.now.notice = "Good luck now!"
-      #   # Equivalent to flash.now[:notice] = "Good luck now!"
-      def now: () -> untyped
 
       # Keeps either the entire current flash or a specific flash entry available for the next action:
       #

@@ -117,3 +117,18 @@ class AuthController < ActionController::Base
     request_http_digest_authentication("Admin", "Denied").length
   end
 end
+
+# Caching config methods, and overrides of method_added and show_detailed_exceptions?
+class OverridesController < ActionController::Base
+  cache_store
+
+  def self.method_added(name)
+    super
+    name.to_proc
+  end
+
+  def show_detailed_exceptions?
+    request.local?
+  end
+end
+ActionController::API.cache_store
