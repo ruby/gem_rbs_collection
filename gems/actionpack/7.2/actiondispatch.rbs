@@ -86,31 +86,33 @@ module ActionDispatch
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   get 'bacon', to: 'food#bacon'
-        def get: (*untyped args) ?{ () -> untyped } -> untyped
+        def get: (*untyped args) ?{ () -> untyped } -> self
 
         # Define a route that only recognizes HTTP POST.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   post 'bacon', to: 'food#bacon'
-        def post: (*untyped args) ?{ () -> untyped } -> untyped
+        def post: (*untyped args) ?{ () -> untyped } -> self
 
         # Define a route that only recognizes HTTP PATCH.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   patch 'bacon', to: 'food#bacon'
-        def patch: (*untyped args) ?{ () -> untyped } -> untyped
+        def patch: (*untyped args) ?{ () -> untyped } -> self
 
         # Define a route that only recognizes HTTP PUT.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   put 'bacon', to: 'food#bacon'
-        def put: (*untyped args) ?{ () -> untyped } -> untyped
+        def put: (*untyped args) ?{ () -> untyped } -> self
 
         # Define a route that only recognizes HTTP DELETE.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   delete 'broccoli', to: 'food#broccoli'
-        def delete: (*untyped args) ?{ () -> untyped } -> untyped
+        def delete: (*untyped args) ?{ () -> untyped } -> self
+
+        def options: (*untyped args) ?{ () -> untyped } -> self
 
         private
 
@@ -139,7 +141,7 @@ module ActionDispatch
         #
         # === Options
         # Takes same options as resources[rdoc-ref:#resources]
-        def resource: (*untyped resources) ?{ () -> untyped } -> untyped
+        def resource: (*untyped resources) ?{ () -> untyped } -> self
 
         # In Rails, a resourceful route provides a mapping between HTTP verbs
         # and URLs and controller actions. By convention, each action also maps
@@ -278,9 +280,49 @@ module ActionDispatch
         #
         #   # resource actions are at /admin/posts.
         #   resources :posts, path: "admin/posts"
-        def resources: (*untyped resources) ?{ () -> untyped } -> untyped
+        def resources: (*untyped resources) ?{ () -> untyped } -> self
 
         def new: [T] () { () -> T } -> T
+
+        def collection: [T] () { () -> T } -> T
+
+        def member: [T] () { () -> T } -> T
+
+        def nested: () { () -> void } -> self
+
+        def namespace: (untyped path, ?::Hash[untyped, untyped] options) { () -> void } -> self
+
+        def shallow: [T] () { () -> T } -> T
+
+        def match: (untyped path, *untyped rest) ?{ () -> untyped } -> self
+
+        def root: (untyped path, ?::Hash[untyped, untyped] options) -> self
+      end
+
+      module Base
+        def mount: (untyped app, ?untyped? options) -> self
+
+        def with_default_scope: (untyped scope) { () [self: ActionDispatch::Routing::Mapper] -> void } -> self
+
+        def has_named_route?: (untyped name) -> bool
+      end
+
+      module Scoping
+        def scope: (*untyped args) { () -> void } -> self
+
+        def controller: [T] (untyped controller) { () -> T } -> T
+
+        def namespace: (untyped path, ?::Hash[untyped, untyped] options) { () -> void } -> self
+
+        def constraints: (?untyped constraints) { () -> void } -> self
+
+        def defaults: [T] (?::Hash[untyped, untyped] defaults) { () -> T } -> T
+      end
+
+      module Concerns
+        def concern: (untyped name, ?untyped? callable) ?{ (::Hash[untyped, untyped] options) [self: ActionDispatch::Routing::Mapper] -> void } -> untyped
+
+        def concerns: (*untyped args) -> ::Array[untyped]
       end
     end
   end

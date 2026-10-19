@@ -118,9 +118,28 @@ class AuthController < ActionController::Base
   end
 end
 
-# Resources#new returns the block value
+# Routing DSL methods return the mapper or their block value
 ActionDispatch::Routing::RouteSet.new.draw do
-  resources :photos do
+  resources(:photos) do
+    collection { get :search }.has_named_route?(:search_photos)
+    member { "preview" }.upcase
     new { 1 }.succ
-  end
+    shallow { [1] }.first
+    nested { resources :comments }.has_named_route?(:photo_comments)
+    namespace(:admin) { resource :stats }.has_named_route?(:admin_stats)
+  end.has_named_route?(:photos)
+
+  scope(module: "admin") { get "dashboard", to: "dashboard#show" }.has_named_route?(:dashboard)
+  namespace(:api) { resources :posts }.has_named_route?(:api_posts)
+  constraints(subdomain: "api") { put "sync", to: "sync#update" }.has_named_route?(:sync)
+  controller(:pages) { 1 }.succ
+  defaults(format: :json) { "json" }.upcase
+  with_default_scope(module: "v1") { get "ping", to: "ping#show" }.has_named_route?(:ping)
+
+  concern(:taggable) { |options| options.size }
+  concerns(:taggable).size
+
+  get("status", to: "status#show").post("status", to: "status#create").has_named_route?(:status)
+  match("/hello", to: "hello#index", via: :get).size
+  root("home#index").size
 end
