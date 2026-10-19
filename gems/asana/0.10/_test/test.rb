@@ -38,6 +38,7 @@ task.dependents.size
 task.start_at&.length
 task.assignee_section&.gid
 task.permalink_url.length
+task.add_project(project: project.gid, section: sections.first&.gid)
 project.completed_by&.gid
 project.tasks(per_page: 50, options: { fields: ["name"] }).first&.name
 Asana::Resources::Task.find_by_tag(client, tag: "6").to_a
