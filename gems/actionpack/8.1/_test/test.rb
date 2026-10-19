@@ -117,3 +117,10 @@ class AuthController < ActionController::Base
     request_http_digest_authentication("Admin", "Denied").length
   end
 end
+
+# Resources#new returns the block value
+ActionDispatch::Routing::RouteSet.new.draw do
+  resources :photos do
+    new { 1 }.succ
+  end
+end
