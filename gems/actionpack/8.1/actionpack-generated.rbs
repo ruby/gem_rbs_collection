@@ -10663,23 +10663,6 @@ module ActionDispatch
         #
         def match: (untyped path, ?untyped? options) -> nil
 
-        # Mount a Rack-based application to be used within the application.
-        #
-        #     mount SomeRackApp, at: "some_route"
-        #
-        # For options, see `match`, as `mount` uses it internally.
-        #
-        # All mounted applications come with routing helpers to access them. These are
-        # named after the class specified, so for the above example the helper is either
-        # `some_rack_app_path` or `some_rack_app_url`. To customize this helper's name,
-        # use the `:as` option:
-        #
-        #     mount(SomeRackApp, at: "some_route", as: "exciting")
-        #
-        # This will generate the `exciting_path` and `exciting_url` helpers which can be
-        # used to navigate to this mounted app.
-        def mount: (?untyped? app, ?untyped? deprecated_options, ?as: untyped, ?via: untyped?, ?at: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> self
-
         def default_url_options=: (untyped options) -> untyped
 
         alias default_url_options default_url_options=
@@ -10698,19 +10681,6 @@ module ActionDispatch
       end
 
       module HttpHelpers
-        # Define a route that only recognizes HTTP OPTIONS. For supported arguments, see
-        # [match](rdoc-ref:Base#match)
-        #
-        #     options 'carrots', to: 'food#carrots'
-        def options: (*untyped path_or_actions, ?as: untyped, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> self
-
-        # Define a route that recognizes HTTP CONNECT (and GET) requests. More
-        # specifically this recognizes HTTP/1 protocol upgrade requests and HTTP/2
-        # CONNECT requests with the protocol pseudo header. For supported arguments,
-        # see [match](rdoc-ref:Base#match)
-        #
-        #     connect 'live', to: 'live#index'
-        def connect: (*untyped path_or_actions, ?as: untyped, ?to: untyped?, ?controller: untyped?, ?action: untyped?, ?on: untyped?, ?defaults: untyped?, ?constraints: untyped?, ?anchor: bool, ?format: bool, ?path: untyped?, ?internal: untyped?, **untyped mapping) ?{ (?) -> untyped } -> self
       end
 
       # You may wish to organize groups of controllers under a namespace. Most
