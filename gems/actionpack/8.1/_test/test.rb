@@ -117,3 +117,12 @@ class AuthController < ActionController::Base
     request_http_digest_authentication("Admin", "Denied").length
   end
 end
+
+# render_to_body returns what the including class renders, so it can be truthy
+class BodyRenderer
+  include AbstractController::Rendering
+
+  def show
+    render_to_body(template: "show") ? "rendered" : "empty"
+  end
+end
