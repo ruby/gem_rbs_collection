@@ -179,6 +179,14 @@ module Asana
     # Asana::Client when called directly (it answers the same verbs).
     type client = Asana::Client | Asana::HttpClient
 
+    # A nested object in compact form that Resource#method_missing wraps in
+    # a plain Resource, which answers each of its fields by method_missing.
+    interface _CompactResource
+      def gid: () -> String
+      def name: () -> String
+      def resource_type: () -> String
+    end
+
     # Resource attributes are nil when the request's `fields` option leaves
     # them out. Those are declared `implicitly-returns-nil`; attributes the
     # API itself can return as null (e.g. Task#due_on) are optional types.
@@ -602,7 +610,7 @@ module Asana
       def num_hearts: () -> Integer
       def start_at: () -> String?
       def actual_time_minutes: () -> Numeric?
-      def assignee_section: () -> Resource?
+      def assignee_section: () -> (Resource & _CompactResource)?
       def custom_type: () -> Resource?
       def custom_type_status_option: () -> Resource?
       def effective_memberships: () -> Array[Resource]

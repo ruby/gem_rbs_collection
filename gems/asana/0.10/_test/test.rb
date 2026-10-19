@@ -37,6 +37,7 @@ task.projects(per_page: 10).first&.gid
 task.dependents.size
 task.start_at&.length
 task.assignee_section&.gid
+task.assignee_section&.name&.upcase
 task.permalink_url.length
 task.add_project(project: project.gid, section: sections.first&.gid)
 project.completed_by&.gid
