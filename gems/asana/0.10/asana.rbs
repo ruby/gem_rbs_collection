@@ -71,7 +71,7 @@ module Asana
       def find_by_id: (String id, ?options: Resources::options) -> Resources::Task
       def find_all: (?assignee: String?, ?workspace: String?, ?project: String?, ?section: String?, ?tag: String?, ?user_task_list: String?, ?completed_since: String?, ?modified_since: String?, ?per_page: Integer, ?options: Resources::options) -> Resources::Collection[Resources::Task]
       def get_task: (task_gid: String, ?options: Resources::options) -> Resources::Task
-      def get_tasks: (?assignee: String?, ?project: String?, ?section: String?, ?workspace: String?, ?completed_since: String?, ?modified_since: String?, ?options: Resources::options) -> Resources::Collection[Resources::Task]
+      def get_tasks: (?assignee: String?, ?project: String?, ?section: String?, ?workspace: String?, ?completed_since: String?, ?per_page: Integer, ?modified_since: String?, ?options: Resources::options) -> Resources::Collection[Resources::Task]
       def get_subtasks_for_task: (task_gid: String, ?options: Resources::options) -> Resources::Collection[Resources::Task]
       def update_task: (task_gid: String, ?options: Resources::options, **untyped data) -> Resources::Task
       def add_project_for_task: (task_gid: String, ?options: Resources::options, **untyped data) -> untyped
@@ -268,7 +268,7 @@ module Asana
 
     class TasksBase < Resource
       def self.get_task: (client client, task_gid: String, ?options: options) -> Task
-      def self.get_tasks: (client client, ?assignee: String?, ?project: String?, ?section: String?, ?workspace: String?, ?completed_since: String?, ?modified_since: String?, ?options: options) -> Collection[Task]
+      def self.get_tasks: (client client, ?assignee: String?, ?project: String?, ?section: String?, ?workspace: String?, ?completed_since: String?, ?per_page: Integer, ?modified_since: String?, ?options: options) -> Collection[Task]
       def self.get_subtasks_for_task: (client client, task_gid: String, ?options: options) -> Collection[Task]
       def self.update_task: (client client, task_gid: String, ?options: options, **untyped data) -> Task
       def self.add_project_for_task: (client client, task_gid: String, ?options: options, **untyped data) -> untyped

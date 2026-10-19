@@ -19,7 +19,7 @@ client.projects.find_all(workspace: workspace_gid, archived: false).map(&:gid)
 sections = client.sections.get_sections_for_project(project_gid: project.gid)
 sections.each do |section|
   section.name&.strip
-  client.tasks.get_tasks(section: section.gid, options: { fields: ["name", "completed"] }).each do |task|
+  client.tasks.get_tasks(section: section.gid, per_page: 100, options: { fields: ["name", "completed"] }).each do |task|
     task.completed
   end
 end
