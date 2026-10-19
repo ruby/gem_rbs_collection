@@ -1,0 +1,65 @@
+# Methods rbs prototype doesn't see, which aren't generated from the source
+module ActionMailbox
+  class InboundEmail
+    # Columns of action_mailbox_inbound_emails
+    attr_accessor status: String
+
+    attr_accessor message_id: String
+
+    attr_accessor message_checksum: String
+
+    def created_at: () -> ActiveSupport::TimeWithZone
+
+    def updated_at: () -> ActiveSupport::TimeWithZone
+
+    # has_one_attached :raw_email
+    def raw_email: () -> ActiveStorage::Attached::One
+
+    # enum :status, %i[ pending processing delivered failed bounced ]
+    def pending?: () -> bool
+
+    def pending!: () -> void
+
+    def processing?: () -> bool
+
+    def processing!: () -> void
+
+    def delivered?: () -> bool
+
+    def delivered!: () -> void
+
+    def failed?: () -> bool
+
+    def failed!: () -> void
+
+    def bounced?: () -> bool
+
+    def bounced!: () -> void
+  end
+end
+
+# Return types of commonly used methods
+module ActionMailbox
+  class Base
+    attr_reader inbound_email: ActionMailbox::InboundEmail
+
+    # Delegated to inbound_email
+    def mail: () -> Mail::Message
+
+    def delivered!: () -> void
+
+    def bounced!: () -> void
+
+    def self.receive: (ActionMailbox::InboundEmail inbound_email) -> untyped
+
+    def initialize: (ActionMailbox::InboundEmail inbound_email) -> void
+  end
+
+  class InboundEmail
+    def mail: () -> Mail::Message
+
+    def source: () -> String
+
+    def processed?: () -> bool
+  end
+end
