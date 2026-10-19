@@ -1,0 +1,487 @@
+module GLI
+  VERSION: String
+
+  include App
+
+  # Prints a warning that GLI 2 no longer supports this entry point.
+  def self.run: (*untyped args) -> Integer
+
+  type options_hash = Hash[Symbol | String, untyped]
+
+  type action_block = ^(options_hash global_options, options_hash options, Array[String] arguments) -> void
+
+  type name = Symbol | String
+
+  type names = name | Array[name]
+
+  type argument_option = :optional | :multiple
+
+  # Methods for declaring flags, switches, descriptions and commands.
+  # Shared by GLI::App and GLI::Command.
+  module DSL
+    def desc: (String description) -> String
+
+    alias d desc
+
+    def long_desc: (String long_desc) -> String
+
+    def arg_name: (String name, ?argument_option | Array[argument_option] options) -> void
+
+    def arg: (name name, ?argument_option | Array[argument_option] options) -> Array[Argument]
+
+    def default_value: (untyped val) -> untyped
+
+    def flag: (*names names,
+               ?desc: String?,
+               ?long_desc: String?,
+               ?default_value: untyped,
+               ?arg_name: String?,
+               ?must_match: Regexp | Array[String] | Hash[String, untyped],
+               ?type: Module,
+               ?mask: bool,
+               ?required: bool,
+               ?multiple: bool) -> Flag
+
+    alias f flag
+
+    def switch: (*names names,
+                 ?desc: String?,
+                 ?long_desc: String?,
+                 ?default_value: bool?,
+                 ?negatable: bool) -> Switch
+
+    alias s switch
+
+    def clear_nexts: () -> void
+
+    def command: (*names names) { (Command command) -> void } -> Command
+               | (Hash[name, Array[name]] compound) -> Commands::CompoundCommand
+
+    alias c command
+
+    def command_missing: () { (Symbol command_name, options_hash global_options) -> Command? } -> void
+
+    def flags_declaration_order: () -> Array[Flag]
+
+    def switches_declaration_order: () -> Array[Switch]
+  end
+
+  # Behavior of a running app, mixed into GLI::App.
+  module AppSupport
+    def error_device=: (IO e) -> IO
+
+    def context_description: () -> String
+
+    def reset: () -> void
+
+    def exe_name: () -> String
+
+    def commands_declaration_order: () -> Array[Command]
+
+    def version_string: () -> String?
+
+    def get_default_command: () -> Symbol
+
+    # Runs the app and returns the exit code for the process.
+    def run: (Array[String] args) -> Integer
+
+    def config_file_name: () -> String?
+
+    def accepts: () -> Hash[Module, ^(String) -> untyped]
+
+    def parse_config: () -> Hash[String, untyped]
+
+    def stderr: () -> IO
+
+    def flags: () -> Hash[Symbol, Flag]
+
+    def switches: () -> Hash[Symbol, Switch]
+
+    def commands: () -> Hash[Symbol, Command]
+
+    def pre_block: () -> ^(options_hash global_options, Command command, options_hash options, Array[String] arguments) -> boolish
+
+    def post_block: () -> ^(options_hash global_options, Command command, options_hash options, Array[String] arguments) -> void
+
+    def around_blocks: () -> Array[^(options_hash global_options, Command command, options_hash options, Array[String] arguments, ^() -> untyped code) -> untyped]
+
+    def help_sort_type: () -> (:alpha | :manually)
+
+    def help_text_wrap_type: () -> (:to_terminal | :verbatim | :one_line | :tty_only)
+
+    def synopsis_format_type: () -> (:full | :terminal | :compact)
+
+    def argument_handling_strategy: () -> (:loose | :strict)
+
+    def subcommand_option_handling_strategy: () -> (:legacy | :normal)
+
+    def autocomplete: () -> bool
+  end
+
+  # Extend a class or module with GLI::App to declare a command-line app.
+  #
+  #   class MyApp
+  #     extend GLI::App
+  #
+  #     program_desc 'Describe your app'
+  #     command :hello do |c|
+  #       c.action { |global_options, options, args| puts 'hello' }
+  #     end
+  #   end
+  #   exit MyApp.run(ARGV)
+  module App
+    include DSL
+
+    include AppSupport
+
+    def commands_from: (String path) -> void
+
+    def program_desc: (?String? description) -> String?
+
+    def program_long_desc: (?String? description) -> String?
+
+    def hide_commands_without_desc: (?bool? hide) -> bool
+
+    def skips_pre: () -> true
+
+    def skips_post: () -> true
+
+    def skips_around: () -> true
+
+    def config_file: (String filename) -> String
+
+    def pre: () { (options_hash global_options, Command command, options_hash options, Array[String] arguments) -> boolish } -> void
+
+    def post: () { (options_hash global_options, Command command, options_hash options, Array[String] arguments) -> void } -> void
+
+    def around: () { (options_hash global_options, Command command, options_hash options, Array[String] arguments, ^() -> untyped code) -> untyped } -> void
+
+    # The block returns false to skip GLI's own error message.
+    def on_error: () { (Exception exception) -> boolish } -> void
+
+    def version: (String version) -> Switch
+
+    def preserve_argv: (?bool preserve) -> bool
+
+    def use_openstruct: (bool use_openstruct) -> bool
+
+    def accept: (Module object) { (String value) -> untyped } -> void
+
+    def exit_now!: (String message, ?Integer exit_code) -> bot
+
+    def help_now!: (?String? message) -> bot
+
+    def sort_help: (:alpha | :manually sort_type) -> (:alpha | :manually)
+
+    def wrap_help_text: (:to_terminal | :verbatim | :one_line | :tty_only wrap_type) -> (:to_terminal | :verbatim | :one_line | :tty_only)
+
+    def synopsis_format: (:full | :terminal | :compact format) -> (:full | :terminal | :compact)
+
+    # Deprecated; prints a warning.
+    def program_name: (?untyped override) -> nil
+
+    def default_command: (name command) -> Symbol
+
+    def subcommand_option_handling: (:legacy | :normal handling_strategy) -> (:legacy | :normal)
+
+    def arguments: (:loose | :strict handling_strategy) -> (:loose | :strict)
+
+    def autocomplete_commands: (bool boolean) -> bool
+  end
+
+  class CommandLineToken
+    attr_reader name: Symbol
+
+    attr_reader aliases: Array[Symbol]?
+
+    attr_reader description: String?
+
+    attr_reader long_description: String?
+
+    def initialize: (names names, String? description, ?String? long_description) -> void
+
+    def <=>: (CommandLineToken other) -> Integer?
+
+    def names_and_aliases: () -> Array[String]
+  end
+
+  class CommandLineOption < CommandLineToken
+    attr_accessor default_value: untyped
+
+    attr_accessor associated_command: Command?
+
+    def initialize: (names names, ?Hash[Symbol, untyped] options) -> void
+
+    def self.name_as_string: (name name, ?bool negatable) -> String
+  end
+
+  class Flag < CommandLineOption
+    attr_reader must_match: Regexp | Array[String] | Hash[String, untyped] | nil
+
+    attr_reader type: Module?
+
+    attr_reader argument_name: String
+
+    def initialize: (names names, Hash[Symbol, untyped] options) -> void
+
+    def required?: () -> bool?
+
+    def multiple?: () -> bool?
+
+    def safe_default_value: () -> untyped
+
+    def arguments_for_option_parser: () -> Array[untyped]
+
+    def all_forms: (?String joiner) -> String
+  end
+
+  class Switch < CommandLineOption
+    attr_reader negatable: bool
+
+    def initialize: (names names, ?Hash[Symbol, untyped] options) -> void
+
+    def arguments_for_option_parser: () -> Array[String]
+
+    def negatable?: () -> bool
+
+    def required?: () -> false
+  end
+
+  class Argument
+    attr_reader name: name
+
+    attr_reader options: Array[argument_option]
+
+    def initialize: (name name, ?Array[argument_option] options) -> void
+
+    def optional?: () -> bool
+
+    def multiple?: () -> bool
+  end
+
+  # Methods of GLI::Command that its subclasses share.
+  module CommandSupport
+    attr_accessor parent: untyped
+
+    def context_description: () -> String
+
+    def nodoc: () -> boolish
+
+    def arguments_description: () -> String
+
+    def arguments_options: () -> Array[argument_option]
+
+    def arguments: () -> Array[Argument]
+
+    def skips_pre: () -> bool?
+
+    def skips_post: () -> bool?
+
+    def skips_around: () -> bool?
+
+    def names: () -> String
+
+    def examples: () -> Array[Hash[Symbol, String]]
+
+    def commands_declaration_order: () -> Array[Command]
+
+    def flags: () -> Hash[Symbol, Flag]
+
+    def switches: () -> Hash[Symbol, Switch]
+
+    def commands: () -> Hash[Symbol, Command]
+
+    def default_description: () -> String?
+
+    def execute: (options_hash global_options, options_hash options, Array[String] arguments) -> untyped
+
+    def topmost_ancestor: () -> Command
+
+    def has_action?: () -> bool
+
+    def get_default_command: () -> Symbol?
+  end
+
+  # The object yielded by GLI::DSL#command.
+  class Command < CommandLineToken
+    include DSL
+
+    include CommandSupport
+
+    class ParentKey
+      def to_sym: () -> Symbol
+    end
+
+    PARENT: ParentKey
+
+    def initialize: (Hash[Symbol, untyped] options) -> void
+
+    def example: (String example_invocation, ?desc: String) -> void
+
+    def default_command: (name command_name) -> name
+
+    def action: () { (options_hash global_options, options_hash options, Array[String] arguments) -> void } -> void
+
+    def default_desc: (String desc) -> String
+
+    def has_option?: (String option) -> bool
+
+    def name_for_help: () -> Array[String]
+
+    def self.name_as_string: (name name, ?bool negatable) -> String
+  end
+
+  # Hash-like options passed to action blocks when the app calls use_openstruct(true).
+  #
+  # GLI::Options subclasses OpenStruct, but RBS 4 ships no OpenStruct
+  # signatures, so the OpenStruct methods are declared here instead.
+  class Options
+    def initialize: (?Hash[name, untyped]? hash) -> void
+
+    def to_h: () -> Hash[Symbol, untyped]
+
+    def each_pair: () { ([Symbol, untyped]) -> void } -> self
+                 | () -> Enumerator[[Symbol, untyped], self]
+
+    def dig: (name name, *untyped names) -> untyped
+
+    def delete_field: (name name) -> untyped
+
+    def []: (name k) -> untyped
+
+    def []=: (name k, untyped v) -> untyped
+
+    def map: [T] () { ([Symbol, untyped]) -> T } -> Array[T]
+  end
+
+  class OptionParsingResult
+    attr_accessor global_options: options_hash
+
+    attr_accessor command: Command?
+
+    attr_accessor command_options: options_hash
+
+    attr_accessor arguments: Array[String]
+
+    def convert_to_openstruct!: () -> self
+
+    def to_a: () -> [options_hash, Command?, options_hash, Array[String]]
+  end
+
+  module StandardException
+    def exit_code: () -> Integer
+  end
+
+  class RequestHelp < StandardError
+    include StandardException
+
+    attr_reader command_in_context: Command?
+
+    def initialize: (Command? command_in_context) -> void
+  end
+
+  class BadCommandLine < StandardError
+    include StandardException
+  end
+
+  class PreconditionFailed < StandardError
+    include StandardException
+  end
+
+  class UnknownCommand < BadCommandLine
+  end
+
+  class AmbiguousCommand < BadCommandLine
+  end
+
+  class UnknownGlobalArgument < BadCommandLine
+  end
+
+  class CommandException < BadCommandLine
+    attr_reader command_in_context: Command
+
+    def initialize: (String message, Command command_in_context, ?Integer? exit_code) -> void
+  end
+
+  class BadCommandOptionsOrArguments < BadCommandLine
+    attr_reader command_in_context: Command
+
+    def initialize: (String message, Command command) -> void
+  end
+
+  class MissingRequiredArgumentsException < BadCommandOptionsOrArguments
+    attr_reader num_arguments_received: Integer
+
+    attr_reader range_arguments_accepted: Range[Integer]
+
+    def initialize: (Command command, Integer num_arguments_received, Range[Integer] range_arguments_accepted) -> void
+  end
+
+  class MissingRequiredOptionsException < BadCommandOptionsOrArguments
+    def initialize: (Command command, Array[CommandLineOption] missing_required_options) -> void
+  end
+
+  class UnknownCommandArgument < CommandException
+  end
+
+  # Raised by GLI::App#exit_now! to exit with a given status.
+  class CustomExit < StandardError
+    include StandardException
+
+    attr_reader exit_code: Integer
+
+    def initialize: (String message, Integer exit_code) -> void
+  end
+
+  class Terminal
+    def self.default_size: () -> [Integer, Integer]
+
+    def self.default_size=: ([Integer, Integer] size) -> [Integer, Integer]
+
+    def self.instance: () -> Terminal
+
+    def self.command_exists?: (String command) -> bool
+
+    def command_exists?: (String command) -> bool
+
+    # Width and height of the terminal.
+    def size: () -> [Integer, Integer]
+  end
+
+  class InitConfig < Command
+    def initialize: (String config_file_name, Hash[Symbol, Command] commands, Hash[Symbol, Flag] flags, Hash[Symbol, Switch] switches) -> void
+  end
+
+  module Commands
+    # The built-in help command.
+    class Help < Command
+      def self.skips_pre=: (bool skips_pre) -> bool
+
+      def self.skips_post=: (bool skips_post) -> bool
+
+      def self.skips_around=: (bool skips_around) -> bool
+
+      def initialize: (App app, ?IO output, ?IO error) -> void
+
+      def skips_pre: () -> bool
+
+      def skips_post: () -> bool
+
+      def skips_around: () -> bool
+    end
+
+    # The built-in _doc command.
+    class Doc < Command
+      def initialize: (App app) -> void
+
+      def nodoc: () -> true
+
+      def document: (untyped document_listener) -> void
+    end
+
+    # A command made by passing a Hash to GLI::DSL#command, which runs other commands in turn.
+    class CompoundCommand < Command
+      def initialize: (untyped base, Hash[name, Array[name]] configuration, ?Hash[Symbol, untyped] options) -> void
+    end
+  end
+end
