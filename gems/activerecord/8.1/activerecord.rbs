@@ -362,12 +362,58 @@ end
 module ActiveRecord
   module Delegation
     def table_name: () -> String
+
+    # Methods delegated to `records` by ActiveRecord::Delegation.
+    # They are typed here with the model type because the generated definitions in Delegation are untyped.
+    # RBS has no way to declare delegation or to reuse only some method types of `Array[Model]`,
+    # so the signatures are copied from `Array` in core RBS and activesupport.
+    interface _DelegateToRecords[Model]
+      def to_xml: (?Hash[untyped, untyped] options) ?{ (untyped) -> untyped } -> String
+      def encode_with: (untyped coder) -> void
+      def length: () -> Integer
+      def join: (?string? separator) -> String
+      def intersect?: (array[untyped] other) -> bool
+      def []: (int index) -> Model?
+            | (int start, int length) -> Array[Model]?
+            | (range[int] range) -> Array[Model]?
+      def &: (array[untyped] other) -> Array[Model]
+      def |: [T] (array[T] other) -> Array[Model | T]
+      def +: [T] (array[T] other) -> Array[Model | T]
+      def -: (array[untyped] other) -> Array[Model]
+      def sample: (?random: ::Array::_Rand) -> Model?
+                | (int n, ?random: ::Array::_Rand) -> Array[Model]
+      def reverse: () -> Array[Model]
+      def rotate: (?int count) -> Array[Model]
+      def compact: () -> Array[Model]
+      def in_groups: (Integer number) ?{ (Array[Model?]) -> void } -> Array[Array[Model?]]
+                   | [T] (Integer number, T fill_with) ?{ (Array[Model | T]) -> void } -> Array[Array[Model | T]]
+      def in_groups_of: (Integer number) ?{ (Array[Model?]) -> void } -> Array[Array[Model?]]
+                      | [T] (Integer number, T fill_with) ?{ (Array[Model | T]) -> void } -> Array[Array[Model | T]]
+      def to_sentence: (?Hash[Symbol, untyped] options) -> String
+      def to_fs: (?Symbol format) -> String
+      def to_formatted_s: (?Symbol format) -> String
+      def as_json: (?untyped options) -> Array[untyped]
+      def shuffle: (?random: ::Array::_Rand) -> Array[Model]
+      def split: (?untyped value) -> Array[Array[Model]]
+               | () { (Model) -> boolish } -> Array[Array[Model]]
+      def slice: (int index) -> Model?
+               | (int start, int length) -> Array[Model]?
+               | (range[int] range) -> Array[Model]?
+      def index: (untyped obj) -> Integer?
+               | () { (Model) -> boolish } -> Integer?
+               | () -> Enumerator[Model, Integer?]
+      def rindex: (untyped obj) -> Integer?
+                | () { (Model) -> boolish } -> Integer?
+                | () -> Enumerator[Model, Integer?]
+    end
   end
 end
 
 module ActiveRecord
   class Relation
     module Methods[Model, PrimaryKey]
+      include ::ActiveRecord::Delegation::_DelegateToRecords[Model]
+
       def all: () -> self
       def ids: () -> Array[PrimaryKey]
       def none: () -> self
