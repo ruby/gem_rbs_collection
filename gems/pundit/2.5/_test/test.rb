@@ -35,8 +35,27 @@ class ApplicationController < ActionController::Base
     authorize(post, :update?)
     policy(post)
     policy_scope(Post)
+    policy_scope(Post, policy_scope_class: PostPolicy::Scope)
+    pundit_user
+    pundit.policy!(post)
+    pundit_policy_authorized?
+    pundit_policy_scoped?
+    permitted_attributes(post, :update)
+    pundit_params_for(post)
+    pundit_reset!
+
+    Pundit.authorize(nil, post, :update?)
+    Pundit.policy_scope!(nil, Post)
+    Pundit::PolicyFinder.new(post).param_key
+    Pundit::Context.new(user: nil).authorize(post, query: :update?, policy_class: PostPolicy)
+
+    error = Pundit::NotAuthorizedError.new(query: :update?, record: post, policy: PostPolicy.new(nil, post))
+    error.query
+    error.record
+    Pundit::NotAuthorizedError.new("denied")
 
     raise Pundit::NotAuthorizedError
     raise Pundit::NotDefinedError
+    raise Pundit::AuthorizationNotPerformedError
   end
 end

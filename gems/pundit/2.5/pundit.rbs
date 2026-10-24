@@ -1,8 +1,67 @@
 module Pundit
-  class NotAuthorizedError < StandardError
+  class Error < StandardError
   end
 
-  class NotDefinedError < StandardError
+  class NotAuthorizedError < Error
+    attr_reader query: Symbol | String | nil
+    attr_reader record: untyped
+    attr_reader policy: untyped
+
+    def initialize: (?String | Hash[Symbol, untyped] options) -> void
+  end
+
+  class InvalidConstructorError < Error
+  end
+
+  class AuthorizationNotPerformedError < Error
+  end
+
+  class PolicyScopingNotPerformedError < AuthorizationNotPerformedError
+  end
+
+  class NotDefinedError < Error
+  end
+
+  def self.authorize: [T] (untyped user, T record, Symbol | String query, ?policy_class: untyped, ?cache: untyped) -> T
+
+  def self.policy_scope: (untyped user, untyped scope) -> untyped
+
+  def self.policy_scope!: (untyped user, untyped scope) -> untyped
+
+  def self.policy: (untyped user, untyped record) -> untyped
+
+  def self.policy!: (untyped user, untyped record) -> untyped
+
+  class Context
+    attr_reader user: untyped
+
+    def initialize: (user: untyped, ?policy_cache: untyped) -> void
+
+    def authorize: [T] (T possibly_namespaced_record, query: Symbol | String, policy_class: untyped) -> T
+
+    def policy: (untyped record) -> untyped
+
+    def policy!: (untyped record) -> untyped
+
+    def policy_scope: (untyped scope) -> untyped
+
+    def policy_scope!: (untyped scope) -> untyped
+  end
+
+  class PolicyFinder
+    attr_reader object: untyped
+
+    def initialize: (untyped object) -> void
+
+    def scope: () -> Class?
+
+    def policy: () -> Class?
+
+    def scope!: () -> Class
+
+    def policy!: () -> Class
+
+    def param_key: () -> String
   end
 
   module Authorization
@@ -10,9 +69,7 @@ module Pundit
 
     def policy: (untyped record) -> untyped
 
-    def policy_scope: [T] (T scope, ?policy_scope_class: untyped?) -> T?
-
-    def policy_scope!: [T] (T scope, ?policy_scope_class: untyped?) -> T
+    def policy_scope: (untyped scope, ?policy_scope_class: untyped?) -> untyped
 
     def verify_authorized: () -> void
 
@@ -21,5 +78,23 @@ module Pundit
     def skip_authorization: () -> void
 
     def skip_policy_scope: () -> void
+
+    def pundit: () -> Context
+
+    def pundit_user: () -> untyped
+
+    def pundit_reset!: () -> void
+
+    def pundit_policy_authorized?: () -> bool
+
+    def pundit_policy_scoped?: () -> bool
+
+    def policies: () -> Hash[untyped, untyped]
+
+    def policy_scopes: () -> Hash[untyped, untyped]
+
+    def permitted_attributes: (untyped record, ?Symbol | String action) -> ActionController::Parameters
+
+    def pundit_params_for: (untyped record) -> ActionController::Parameters
   end
 end
