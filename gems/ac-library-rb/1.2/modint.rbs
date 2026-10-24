@@ -1,0 +1,44 @@
+module AcLibraryRb
+  class ModInt
+    def initialize: (?Integer val) -> void
+
+    def self.set_mod: (Integer mod) -> void
+    def self.mod=: (Integer mod) -> void
+    def self.mod: () -> Integer
+    def self.raw: (Integer val) -> AcLibraryRb::ModInt
+
+    def val: () -> Integer
+    alias to_i val
+
+    def inv: () -> AcLibraryRb::ModInt
+
+    type rhs = AcLibraryRb::ModInt | Integer
+
+    def +: (rhs other) -> AcLibraryRb::ModInt
+    def -: (rhs other) -> AcLibraryRb::ModInt
+    def *: (rhs other) -> AcLibraryRb::ModInt
+    def /: (rhs other) -> AcLibraryRb::ModInt
+    def **: (Integer n) -> AcLibraryRb::ModInt
+    alias pow **
+  end
+end
+
+class Integer
+  def to_m: () -> AcLibraryRb::ModInt
+  def +: (AcLibraryRb::ModInt other) -> AcLibraryRb::ModInt
+       | ...
+  def -: (AcLibraryRb::ModInt other) -> AcLibraryRb::ModInt
+       | ...
+  def *: (AcLibraryRb::ModInt other) -> AcLibraryRb::ModInt
+       | ...
+  def /: (AcLibraryRb::ModInt other) -> AcLibraryRb::ModInt
+       | ...
+end
+
+class String
+  def to_m: () -> AcLibraryRb::ModInt
+end
+
+module Kernel
+  def ModInt: (Integer mod) -> AcLibraryRb::ModInt
+end
