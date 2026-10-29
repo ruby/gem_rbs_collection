@@ -44,6 +44,10 @@ User.create_with(name: 'name', age: 1)
 User.create_with(nil)
 User.find_by_sql("SELECT * FROM users")
 
+# Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
+Article.where(id: 1).pluck(:id).size
+Article.where(id: 1).pluck(:id, "title").first&.size
+
 User.sum(:age)
 User.sum(&:age).times
 User.sum { |user| user.age }.times
@@ -55,7 +59,3 @@ User.all.sum(0.0) { |user| user.age.to_f }.next_float
 
 t = User.arel_table
 User.limit(10).select(:id, "name", t[:age].as("years"), t[:email])
-
-# Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
-Article.where(id: 1).pluck(:id).size
-Article.where(id: 1).pluck(:id, "title").first&.size
