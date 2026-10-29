@@ -81,36 +81,338 @@ module ActionDispatch
     end
 
     class Mapper
+      # A route path, resource name, controller, or action.
+      type path = String | Symbol
+
+      # HTTP verbs the route recognizes, such as `:get`, `[:get, :post]`, or `:all`.
+      type via = Symbol | Array[Symbol]
+
+      # `true` requires a format segment, `false` drops it, and a String or Regexp constrains it.
+      type format = bool | String | Regexp | nil
+
+      # Values accepted by the `:only` and `:except` resource options.
+      type actions = path | Array[path]
+
+      # Values accepted by the `:to` option: `"controller#action"`, an action name, a Rack application, or a controller class.
+      type endpoint = String | ^(Rack::env env) -> Rack::response | Rack::_Application | singleton(ActionController::Metal)
+
+      # Request constraints are objects responding to `matches?`, or callables taking the request.
+      interface _RequestMatcher
+        def matches?: (ActionDispatch::Request request) -> boolish
+      end
+
+      type request_constraint = ^(ActionDispatch::Request request) -> boolish | _RequestMatcher
+
+      # Segment constraints (`{ id: /\d+/ }`) and request conditions (`{ subdomain: "api" }`), or a request constraint.
+      type constraints = Hash[Symbol, untyped] | request_constraint
+
+      # The scope a member, collection, or new route is added to.
+      type on = :member | :collection | :new
+
+      # A concern defined with a callable receives the mapper and the options given to `concerns`.
+      interface _Concern
+        def call: (ActionDispatch::Routing::Mapper mapper, Hash[Symbol, untyped] options) -> void
+      end
+
+      module Base
+        # Mount a Rack-based application to be used within the application.
+        #
+        #     mount SomeRackApp, at: "some_route"
+        #
+        # For options, see `match`, as `mount` uses it internally.
+        #
+        # All mounted applications come with routing helpers to access them. These are
+        # named after the class specified, so for the above example the helper is either
+        # `some_rack_app_path` or `some_rack_app_url`. To customize this helper's name,
+        # use the `:as` option:
+        #
+        #     mount(SomeRackApp, at: "some_route", as: "exciting")
+        #
+        # This will generate the `exciting_path` and `exciting_url` helpers which can be
+        # used to navigate to this mounted app.
+        def mount: (untyped app, at: String, ?as: path?, ?via: via, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+                 | (Hash[untyped, untyped] app_to_path_and_options) -> self
+
+        def with_default_scope: (Hash[Symbol, untyped] scope) { () [self: ActionDispatch::Routing::Mapper] -> void } -> self
+
+        # Query if the following named route was already defined.
+        def has_named_route?: (path name) -> bool
+      end
+
       module HttpHelpers
         # Define a route that only recognizes HTTP GET.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   get 'bacon', to: 'food#bacon'
-        def get: (*untyped args) ?{ () -> untyped } -> untyped
+        def get: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+               | (Hash[path, untyped] path_to_endpoint_and_options) -> self
 
         # Define a route that only recognizes HTTP POST.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   post 'bacon', to: 'food#bacon'
-        def post: (*untyped args) ?{ () -> untyped } -> untyped
+        def post: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+                | (Hash[path, untyped] path_to_endpoint_and_options) -> self
 
         # Define a route that only recognizes HTTP PATCH.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   patch 'bacon', to: 'food#bacon'
-        def patch: (*untyped args) ?{ () -> untyped } -> untyped
+        def patch: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+                 | (Hash[path, untyped] path_to_endpoint_and_options) -> self
 
         # Define a route that only recognizes HTTP PUT.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   put 'bacon', to: 'food#bacon'
-        def put: (*untyped args) ?{ () -> untyped } -> untyped
+        def put: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+               | (Hash[path, untyped] path_to_endpoint_and_options) -> self
 
         # Define a route that only recognizes HTTP DELETE.
         # For supported arguments, see match[rdoc-ref:Base#match]
         #
         #   delete 'broccoli', to: 'food#broccoli'
-        def delete: (*untyped args) ?{ () -> untyped } -> untyped
+        def delete: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+                  | (Hash[path, untyped] path_to_endpoint_and_options) -> self
+
+        # Define a route that only recognizes HTTP OPTIONS. For supported arguments, see
+        # [match](rdoc-ref:Base#match)
+        #
+        #     options 'carrots', to: 'food#carrots'
+        def options: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+                   | (Hash[path, untyped] path_to_endpoint_and_options) -> self
+
+        # Define a route that recognizes HTTP CONNECT (and GET) requests. More
+        # specifically this recognizes HTTP/1 protocol upgrade requests and HTTP/2
+        # CONNECT requests with the protocol pseudo header. For supported arguments,
+        # see [match](rdoc-ref:Base#match)
+        #
+        #     connect 'live', to: 'live#index'
+        def connect: (path path, ?as: path?, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> self
+                   | (Hash[path, untyped] path_to_endpoint_and_options) -> self
+      end
+
+      module Scoping
+        # Scopes a set of routes to the given default options.
+        #
+        # Take the following route definition as an example:
+        #
+        #     scope path: ":account_id", as: "account" do
+        #       resources :projects
+        #     end
+        #
+        # This generates helpers such as `account_projects_path`, just like `resources`
+        # does. The difference here being that the routes generated are like
+        # /:account_id/projects, rather than /accounts/:account_id/projects.
+        #
+        # ### Options
+        #
+        # Takes same options as `Base#match` and `Resources#resources`.
+        #
+        #     # route /posts (without the prefix /admin) to Admin::PostsController
+        #     scope module: "admin" do
+        #       resources :posts
+        #     end
+        #
+        #     # prefix the posts resource's requests with '/admin'
+        #     scope path: "/admin" do
+        #       resources :posts
+        #     end
+        #
+        #     # prefix the routing helper name: sekret_posts_path instead of posts_path
+        #     scope as: "sekret" do
+        #       resources :posts
+        #     end
+        def scope: (*(path | Array[path]) paths, ?only: actions, ?except: actions, ?module: path, ?path: path, ?as: path, ?controller: path, ?action: path, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], ?shallow: bool, ?shallow_path: path, ?shallow_prefix: path, ?path_names: Hash[Symbol, String], ?format: format, ?via: via, ?to: endpoint, **untyped) { () -> void } -> self
+
+        # Scopes routes to a specific controller
+        #
+        #     controller "food" do
+        #       match "bacon", action: :bacon, via: :get
+        #     end
+        def controller: [T] (path controller) { () -> T } -> T
+
+        # Scopes routes to a specific namespace. For example:
+        #
+        #     namespace :admin do
+        #       resources :posts
+        #     end
+        #
+        # This generates the following routes:
+        #
+        #         admin_posts GET       /admin/posts(.:format)          admin/posts#index
+        #         admin_posts POST      /admin/posts(.:format)          admin/posts#create
+        #      new_admin_post GET       /admin/posts/new(.:format)      admin/posts#new
+        #     edit_admin_post GET       /admin/posts/:id/edit(.:format) admin/posts#edit
+        #          admin_post GET       /admin/posts/:id(.:format)      admin/posts#show
+        #          admin_post PATCH/PUT /admin/posts/:id(.:format)      admin/posts#update
+        #          admin_post DELETE    /admin/posts/:id(.:format)      admin/posts#destroy
+        #
+        # ### Options
+        #
+        # The `:path`, `:as`, `:module`, `:shallow_path`, and `:shallow_prefix` options
+        # all default to the name of the namespace.
+        #
+        # For options, see `Base#match`. For `:shallow_path` option, see
+        # `Resources#resources`.
+        #
+        #     # accessible through /sekret/posts rather than /admin/posts
+        #     namespace :admin, path: "sekret" do
+        #       resources :posts
+        #     end
+        #
+        #     # maps to Sekret::PostsController rather than Admin::PostsController
+        #     namespace :admin, module: "sekret" do
+        #       resources :posts
+        #     end
+        #
+        #     # generates sekret_posts_path rather than admin_posts_path
+        #     namespace :admin, as: "sekret" do
+        #       resources :posts
+        #     end
+        def namespace: (path name, ?as: path, ?path: path, ?shallow_path: path, ?shallow_prefix: path, ?module: path, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], **untyped) { () -> void } -> self
+
+        # ### Parameter Restriction
+        # Allows you to constrain the nested routes based on a set of rules. For
+        # instance, in order to change the routes to allow for a dot character in the
+        # `id` parameter:
+        #
+        #     constraints(id: /\d+\.\d+/) do
+        #       resources :posts
+        #     end
+        #
+        # Now routes such as `/posts/1` will no longer be valid, but `/posts/1.1` will
+        # be. The `id` parameter must match the constraint passed in for this example.
+        #
+        # You may use this to also restrict other parameters:
+        #
+        #     resources :posts do
+        #       constraints(post_id: /\d+\.\d+/) do
+        #         resources :comments
+        #       end
+        #     end
+        #
+        # ### Restricting based on IP
+        #
+        # Routes can also be constrained to an IP or a certain range of IP addresses:
+        #
+        #     constraints(ip: /192\.168\.\d+\.\d+/) do
+        #       resources :posts
+        #     end
+        #
+        # Any user connecting from the 192.168.* range will be able to see this
+        # resource, where as any user connecting outside of this range will be told
+        # there is no such route.
+        #
+        # ### Dynamic request matching
+        #
+        # Requests to routes can be constrained based on specific criteria:
+        #
+        #     constraints(-> (req) { /iPhone/.match?(req.env["HTTP_USER_AGENT"]) }) do
+        #       resources :iphones
+        #     end
+        #
+        # You are able to move this logic out into a class if it is too complex for
+        # routes. This class must have a `matches?` method defined on it which either
+        # returns `true` if the user should be given access to that route, or `false` if
+        # the user should not.
+        #
+        #     class Iphone
+        #       def self.matches?(request)
+        #         /iPhone/.match?(request.env["HTTP_USER_AGENT"])
+        #       end
+        #     end
+        #
+        # An expected place for this code would be `lib/constraints`.
+        #
+        # This class is then used like this:
+        #
+        #     constraints(Iphone) do
+        #       resources :iphones
+        #     end
+        def constraints: (?constraints constraints) { () -> void } -> self
+
+        # Allows you to set default parameters for a route, such as this:
+        #
+        #     defaults id: 'home' do
+        #       match 'scoped_pages/(:id)', to: 'pages#show'
+        #     end
+        #
+        # Using this, the `:id` parameter here will default to 'home'.
+        def defaults: [T] (?Hash[Symbol, untyped] defaults) { () -> T } -> T
+      end
+
+      module Concerns
+        # Define a routing concern using a name.
+        #
+        # Concerns may be defined inline, using a block, or handled by another object,
+        # by passing that object as the second parameter.
+        #
+        # The concern object, if supplied, should respond to `call`, which will receive
+        # two parameters:
+        #
+        #     * The current mapper
+        #     * A hash of options which the concern object may use
+        #
+        # Options may also be used by concerns defined in a block by accepting a block
+        # parameter. So, using a block, you might do something as simple as limit the
+        # actions available on certain resources, passing standard resource options
+        # through the concern:
+        #
+        #     concern :commentable do |options|
+        #       resources :comments, options
+        #     end
+        #
+        #     resources :posts, concerns: :commentable
+        #     resources :archived_posts do
+        #       # Don't allow comments on archived posts
+        #       concerns :commentable, only: [:index, :show]
+        #     end
+        #
+        # Or, using a callable object, you might implement something more specific to
+        # your application, which would be out of place in your routes file.
+        #
+        #     # purchasable.rb
+        #     class Purchasable
+        #       def initialize(defaults = {})
+        #         @defaults = defaults
+        #       end
+        #
+        #       def call(mapper, options = {})
+        #         options = @defaults.merge(options)
+        #         mapper.resources :purchases
+        #         mapper.resources :receipts
+        #         mapper.resources :returns if options[:returnable]
+        #       end
+        #     end
+        #
+        #     # routes.rb
+        #     concern :purchasable, Purchasable.new(returnable: true)
+        #
+        #     resources :toys, concerns: :purchasable
+        #     resources :electronics, concerns: :purchasable
+        #     resources :pets do
+        #       concerns :purchasable, returnable: false
+        #     end
+        #
+        # Any routing helpers can be used inside a concern. If using a callable, they're
+        # accessible from the Mapper that's passed to `call`.
+        def concern: (Symbol name, (^(ActionDispatch::Routing::Mapper mapper, Hash[Symbol, untyped] options) -> void) callable) -> ^(ActionDispatch::Routing::Mapper mapper, Hash[Symbol, untyped] options) -> void
+                   | (Symbol name, _Concern callable) -> _Concern
+                   | (Symbol name) { (Hash[Symbol, untyped] options) [self: ActionDispatch::Routing::Mapper] -> void } -> ^(ActionDispatch::Routing::Mapper mapper, Hash[Symbol, untyped] options) -> void
+
+        # Use the named concerns
+        #
+        #     resources :posts do
+        #       concerns :commentable
+        #     end
+        #
+        # Concerns also work in any routes helper that you want to use:
+        #
+        #     namespace :posts do
+        #       concerns :commentable
+        #     end
+        def concerns: (*(Symbol | Array[Symbol]) names, **untyped options) -> Array[Symbol]
       end
 
       module Resources
@@ -135,7 +437,7 @@ module ActionDispatch
         #
         # === Options
         # Takes same options as resources[rdoc-ref:#resources]
-        def resource: (*untyped resources) ?{ () -> untyped } -> untyped
+        def resource: (*path resources, ?as: path, ?controller: path, ?path: path, ?only: actions, ?except: actions, ?param: path, ?concerns: Symbol | Array[Symbol], ?shallow: bool, ?module: path, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], ?path_names: Hash[Symbol, String], ?shallow_path: path, ?shallow_prefix: path, ?format: format, **untyped) ?{ () -> void } -> self
 
         # In Rails, a resourceful route provides a mapping between HTTP verbs
         # and URLs and controller actions. By convention, each action also maps
@@ -274,7 +576,66 @@ module ActionDispatch
         #
         #   # resource actions are at /admin/posts.
         #   resources :posts, path: "admin/posts"
-        def resources: (*untyped resources) ?{ () -> untyped } -> untyped
+        def resources: (*path resources, ?as: path, ?controller: path, ?path: path, ?only: actions, ?except: actions, ?param: path, ?concerns: Symbol | Array[Symbol], ?shallow: bool, ?module: path, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], ?path_names: Hash[Symbol, String], ?shallow_path: path, ?shallow_prefix: path, ?format: format, **untyped) ?{ () -> void } -> self
+
+        # To add a route to the collection:
+        #
+        #     resources :photos do
+        #       collection do
+        #         get 'search'
+        #       end
+        #     end
+        #
+        # This will enable Rails to recognize paths such as `/photos/search` with GET,
+        # and route to the search action of `PhotosController`. It will also create the
+        # `search_photos_url` and `search_photos_path` route helpers.
+        def collection: [T] () { () -> T } -> T
+
+        # To add a member route, add a member block into the resource block:
+        #
+        #     resources :photos do
+        #       member do
+        #         get 'preview'
+        #       end
+        #     end
+        #
+        # This will recognize `/photos/1/preview` with GET, and route to the preview
+        # action of `PhotosController`. It will also create the `preview_photo_url` and
+        # `preview_photo_path` helpers.
+        def member: [T] () { () -> T } -> T
+
+        def new: [T] () { () -> T } -> T
+
+        def nested: () { () -> void } -> self
+
+        # See ActionDispatch::Routing::Mapper::Scoping#namespace.
+        def namespace: (path name, ?as: path, ?path: path, ?shallow_path: path, ?shallow_prefix: path, ?module: path, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], **untyped) { () -> void } -> self
+
+        def shallow: [T] () { () -> T } -> T
+
+        # Matches a URL pattern to one or more routes. For more information, see
+        # [match](rdoc-ref:Base#match).
+        #
+        #     match 'path', to: 'controller#action', via: :post
+        #     match 'otherpath', on: :member, via: :get
+        def match: (path path, ?as: path?, ?via: via, ?to: endpoint, ?controller: path, ?action: path, ?on: on, ?defaults: Hash[Symbol, untyped], ?constraints: constraints, ?anchor: bool, ?format: format, ?path: path, ?internal: bool, **untyped) -> Array[path]
+                 | (Hash[path, untyped] path_to_endpoint_and_options) -> Array[path]
+
+        # You can specify what Rails should route "/" to with the root method:
+        #
+        #     root to: 'pages#main'
+        #
+        # For options, see `match`, as `root` uses it internally.
+        #
+        # You can also pass a string which will expand
+        #
+        #     root 'pages#main'
+        #
+        # You should put the root route at the top of `config/routes.rb`, because this
+        # means it will be matched first. As this is the most popular route of most
+        # Rails applications, this is beneficial.
+        def root: (String to, ?as: path?, ?via: via, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], ?format: format, **untyped) -> Array[String]
+                | (to: endpoint, ?as: path?, ?via: via, ?constraints: constraints, ?defaults: Hash[Symbol, untyped], ?format: format, **untyped) -> Array[String]
       end
     end
   end

@@ -1,9 +1,47 @@
 module Parser
-  CurrentRuby: Parser::Base
+  CurrentRuby: singleton(Parser::Base)
 
   class Base < Racc::Parser
-    def parse: (String string, ?String file, ?Integer line) -> Parser::AST::Node?
-    def parse_with_comments: (String string, ?String file, ?Integer line) -> [Parser::AST::Node?, Array[Source::Comment]]
+    def self.parse: (String string, ?String file, ?Integer line) -> Parser::AST::Node?
+    def self.parse_with_comments: (String string, ?String file, ?Integer line) -> [Parser::AST::Node?, Array[Source::Comment]]
+
+    attr_reader diagnostics: Diagnostic::Engine
+
+    def version: () -> Integer
+    def parse: (Source::Buffer source_buffer) -> Parser::AST::Node?
+    def parse_with_comments: (Source::Buffer source_buffer) -> [Parser::AST::Node?, Array[Source::Comment]]
+  end
+
+  class SyntaxError < StandardError
+    attr_reader diagnostic: Diagnostic
+
+    def initialize: (Diagnostic diagnostic) -> void
+  end
+
+  class UnknownEncodingInMagicComment < ArgumentError
+  end
+
+  class Diagnostic
+    LEVELS: Array[Symbol]
+
+    attr_reader level: Symbol
+    attr_reader reason: Symbol
+    attr_reader arguments: Hash[Symbol, untyped]
+    attr_reader location: Source::Range
+    attr_reader highlights: Array[Source::Range]
+
+    def initialize: (Symbol level, Symbol reason, Hash[Symbol, untyped]? arguments, Source::Range location, ?Array[Source::Range] highlights) -> void
+    def message: () -> String
+    def render: () -> Array[String]
+
+    class Engine
+      attr_accessor consumer: (^(Diagnostic) -> void)?
+      attr_accessor all_errors_are_fatal: bool
+      attr_accessor ignore_warnings: bool
+
+      def initialize: (?(^(Diagnostic) -> void)? consumer) -> void
+      def process: (Diagnostic diagnostic) -> self
+    end
   end
 
   class Ruby18 < Base
@@ -47,6 +85,16 @@ module Parser
       end
 
       include Mixin
+    end
+  end
+
+  module Builders
+    class Default
+      private
+
+      def value: [T] ([T, Source::Range] token) -> T
+      def string_value: ([String, Source::Range] token) -> String
+      def loc: ([top, Source::Range]? token) -> Source::Range?
     end
   end
 

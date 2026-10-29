@@ -75,3 +75,47 @@ if node.loc.is_a? Parser::Source::Map::Send
   node.loc.begin
   node.loc.end
 end
+
+class TestBuilder < Parser::Builders::Default
+  def token_value(range)
+    value(["foo", range]).upcase
+  end
+
+  def token_string_value(range)
+    string_value(["foo", range]).upcase
+  end
+
+  def token_loc(range)
+    loc(["foo", range])&.source
+    loc(nil)&.source
+  end
+end
+TestBuilder.new.token_value(range)
+TestBuilder.new.token_string_value(range)
+TestBuilder.new.token_loc(range)
+
+parser = Parser::CurrentRuby.new
+parser.version + 1
+parser.diagnostics.all_errors_are_fatal = true
+parser.diagnostics.ignore_warnings = true
+parser.diagnostics.consumer = ->(diagnostic) { diagnostic.render.join("\n") }
+source_buffer = Parser::Source::Buffer.new("(string)", source: "foo(1)")
+parser.parse(source_buffer)&.type
+ast, ast_comments = parser.parse_with_comments(source_buffer)
+ast&.type
+ast_comments.map(&:text)
+Parser::CurrentRuby.parse("1", "(file)", 1)
+Parser::CurrentRuby.parse_with_comments("1", "(file)", 1)
+
+begin
+  Parser::CurrentRuby.parse("foo(")
+rescue Parser::SyntaxError => error
+  error.diagnostic.level.to_s
+  error.diagnostic.reason.to_s
+  error.diagnostic.message.upcase
+  error.diagnostic.location.source
+  error.diagnostic.highlights.map(&:source)
+  error.diagnostic.arguments.keys
+rescue Parser::UnknownEncodingInMagicComment => error
+  error.message
+end
