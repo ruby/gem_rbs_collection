@@ -1,0 +1,56 @@
+module CacheMethod
+  VERSION: String
+
+  MUTEX: Thread::Mutex
+
+  CACHE_KEY_JOINER: String
+
+  def self.config: () -> Config
+
+  def self.resolve_cache_key: (untyped obj) -> untyped
+
+  def self.digest: (untyped obj) -> String
+
+  class Config
+    def initialize: () -> void
+
+    def generational=: (boolish boolean) -> boolish
+
+    def generational?: () -> bool
+
+    # Wrapped with `Cache.wrap` from the cache gem.
+    def storage=: (?untyped storage) -> untyped
+
+    def storage: () -> untyped
+
+    def default_ttl=: (Integer seconds) -> Integer
+
+    def default_ttl: () -> Integer
+
+    def default_generational_ttl=: (Integer seconds) -> Integer
+
+    def default_generational_ttl: () -> Integer
+  end
+
+  # Included into Object, so every object and class gets these methods.
+  module InstanceMethods : BasicObject
+    def cache_method_clear: (Symbol | String method_id) -> void
+
+    def cache_method_cached?: (Symbol | String method_id, *untyped args) -> bool
+  end
+
+  # Included into Class and Module, so class bodies can call these methods.
+  module ClassMethods
+    def cache_method: (Symbol | String method_id, ?Integer? ttl) -> Symbol
+
+    def cache_method_clear_on: (Symbol | String method_id, Symbol | String cache_method_clear_id) -> Symbol
+  end
+end
+
+class Object
+  include CacheMethod::InstanceMethods
+end
+
+class Module
+  include CacheMethod::ClassMethods
+end
