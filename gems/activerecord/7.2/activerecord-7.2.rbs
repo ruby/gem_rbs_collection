@@ -270,6 +270,30 @@ module Arel
 end
 
 module ActiveRecord
+  module SignedId
+    extend ActiveSupport::Concern
+
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
+
+    module ClassMethods
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
+
+      def find_signed: (untyped signed_id, ?purpose: untyped) -> untyped
+
+      def find_signed!: (untyped signed_id, ?purpose: untyped) -> untyped
+
+      def signed_id_verifier: () -> untyped
+
+      def signed_id_verifier=: (untyped verifier) -> untyped
+
+      def combine_signed_id_purposes: (untyped purpose) -> untyped
+    end
+  end
+end
+
+module ActiveRecord
   class Relation
     module Methods[Model, PrimaryKey]
       def and: (::ActiveRecord::Relation) -> self
@@ -478,28 +502,4 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
            | (Symbol | String column_name) -> ::Integer
   def create_with: (nil | Hash[untyped, untyped]) -> Relation
   def sole: () -> Model
-end
-
-module ActiveRecord
-  module SignedId
-    extend ActiveSupport::Concern
-
-    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
-
-    module ClassMethods
-      def signed_id_verifier_secret: () -> untyped
-
-      def signed_id_verifier_secret=: (untyped value) -> untyped
-
-      def find_signed: (untyped signed_id, ?purpose: untyped) -> untyped
-
-      def find_signed!: (untyped signed_id, ?purpose: untyped) -> untyped
-
-      def signed_id_verifier: () -> untyped
-
-      def signed_id_verifier=: (untyped verifier) -> untyped
-
-      def combine_signed_id_purposes: (untyped purpose) -> untyped
-    end
-  end
 end

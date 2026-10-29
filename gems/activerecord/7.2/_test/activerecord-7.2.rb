@@ -99,13 +99,6 @@ module Test
   users.first.articles
   User.create([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
 
-  user = User.create!(name: 'James')
-  user.articles
-  User.create!(name: 'James') { |user| user.articles }
-  users = User.create!([{name: 'James'}, {name: 'John'}])
-  users.first.articles
-  User.create!([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
-
   # Records built, reloaded, compared, sliced and signed
   built = User.build(name: 'James') { |user| user.articles }
   built.articles
@@ -116,4 +109,11 @@ module Test
   built.validate & built.valid?
   built.signed_id(purpose: :login).length
   User.find_signed(built.signed_id)
+
+  user = User.create!(name: 'James')
+  user.articles
+  User.create!(name: 'James') { |user| user.articles }
+  users = User.create!([{name: 'James'}, {name: 'John'}])
+  users.first.articles
+  User.create!([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
 end
