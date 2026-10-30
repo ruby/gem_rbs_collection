@@ -21,8 +21,8 @@ class SendMessageJob < ActiveJob::Base
   end
 end
 
-SendMessageJob.perform_now
-SendMessageJob.set(queue: :another_queue).perform_later(flag: false)
-
 SendMessageJob.default_queue_name = "low"
 SendMessageJob.default_queue_name.upcase
+
+SendMessageJob.perform_now
+SendMessageJob.set(queue: :another_queue).perform_later(flag: false)
