@@ -1977,7 +1977,7 @@ class Array[unchecked out Elem]
   #   Blog.all.to_formatted_s(:db)  # => "1,2,3"
   #   Blog.none.to_formatted_s(:db) # => "null"
   #   [1,2].to_formatted_s          # => "[1, 2]"
-  def to_formatted_s: (?::Symbol format) -> untyped
+  alias to_formatted_s to_fs
 
   alias to_default_s to_s
 end
@@ -2295,7 +2295,7 @@ class Date
   #   # config/initializers/date_formats.rb
   #   Date::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Date::DATE_FORMATS[:short_ordinal] = ->(date) { date.strftime("%B #{date.day.ordinalize}") }
-  def to_formatted_s: (?::Symbol format) -> untyped
+  alias to_formatted_s to_fs
 
   alias to_default_s to_s
 
@@ -2756,7 +2756,7 @@ class DateTime
   #   # config/initializers/time_formats.rb
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal] = lambda { |time| time.strftime("%B #{time.day.ordinalize}") }
-  def to_formatted_s: (?::Symbol format) -> untyped
+  alias to_formatted_s to_fs
 
   alias to_default_s to_s
 
@@ -4249,7 +4249,7 @@ class NilClass
 end
 
 class String
-  def as_json: (?untyped? options) -> untyped
+  def as_json: (?untyped? options) -> self
 end
 
 class Numeric
@@ -5279,7 +5279,7 @@ class Time
   #   # config/initializers/time_formats.rb
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal]  = ->(time) { time.strftime("%B #{time.day.ordinalize}") }
-  def to_formatted_s: (?::Symbol format) -> untyped
+  alias to_formatted_s to_fs
 
   alias to_default_s to_s
 
