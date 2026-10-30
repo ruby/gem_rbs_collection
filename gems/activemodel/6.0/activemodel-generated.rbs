@@ -2486,7 +2486,7 @@ module ActiveModel
 
       include Helpers::TimeValue
 
-      def type: () -> :datetime
+      def type: () -> Symbol
 
       private
 
@@ -2511,7 +2511,7 @@ module ActiveModel
 
       BIGDECIMAL_PRECISION: ::Integer
 
-      def type: () -> :decimal
+      def type: () -> Symbol
 
       def type_cast_for_schema: (untyped value) -> untyped
 
@@ -2638,7 +2638,7 @@ module ActiveModel
   module Type
     class ImmutableString < Value
       # :nodoc:
-      def type: () -> :string
+      def type: () -> Symbol
 
       def serialize: (untyped value) -> untyped
 
@@ -2661,7 +2661,7 @@ module ActiveModel
 
       def initialize: () -> untyped
 
-      def type: () -> :integer
+      def type: () -> Symbol
 
       def deserialize: (untyped value) -> (nil | untyped)
 
@@ -2763,7 +2763,7 @@ module ActiveModel
 
       def initialize: (?scale: untyped? scale, ?limit: untyped? limit, ?precision: untyped? precision) -> untyped
 
-      def type: () -> nil
+      def type: () -> Symbol?
 
       # Converts a value from database input to the appropriate ruby type. The
       # return value of this method will be returned from
@@ -2793,7 +2793,7 @@ module ActiveModel
 
       def type_cast_for_schema: (untyped value) -> untyped
 
-      def binary?: () -> false
+      def binary?: () -> bool
 
       # Determines whether a value has changed for dirty checking. +old_value+
       # and +new_value+ will always be type-cast. Types should not need to
