@@ -12030,7 +12030,7 @@ module ActiveRecord
     def frozen?: () -> untyped
 
     # Allows sort on objects
-    def <=>: (untyped other_object) -> untyped
+    def <=>: (untyped other_object) -> Integer?
 
     def present?: () -> true
 
@@ -12051,9 +12051,6 @@ module ActiveRecord
     # Takes a PP and prettily prints this record to it, allowing you to get a nice result from <tt>pp record</tt>
     # when pp is required.
     def pretty_print: (untyped pp) -> untyped
-
-    # Returns a hash of the given methods with their names as keys and returned values as values.
-    def slice: (*untyped methods) -> untyped
 
     private
 
@@ -16487,7 +16484,7 @@ module ActiveRecord
     #     end
     #   end
     #
-    def reload: (?untyped? options) -> untyped
+    def reload: (?Hash[Symbol, untyped]? options) -> self
 
     # Saves the record with the updated_at/on attributes set to the current time
     # or the time specified.
@@ -21918,7 +21915,7 @@ module ActiveRecord
     #
     # \Validations with no <tt>:on</tt> option will run no matter the context. \Validations with
     # some <tt>:on</tt> option will only run in the specified context.
-    def valid?: (?untyped? context) -> untyped
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
 
     alias validate valid?
 

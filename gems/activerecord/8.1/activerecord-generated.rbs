@@ -15257,7 +15257,7 @@ module ActiveRecord
     def freeze: () -> self
 
     # Allows sort on objects
-    def <=>: (untyped other_object) -> untyped
+    def <=>: (untyped other_object) -> Integer?
 
     def present?: () -> true
 
@@ -22042,7 +22042,8 @@ module ActiveRecord
       #   User.build([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }]) do |u|
       #     u.is_admin = false
       #   end
-      def build: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
+      def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
+               | (?untyped? attributes) ?{ (instance) -> void } -> instance
 
       # Given an attributes hash, +instantiate+ returns a new instance of
       # the appropriate class. Accepts only keys as strings.
@@ -29523,7 +29524,7 @@ module ActiveRecord
     #
     # \Validations with no <tt>:on</tt> option will run no matter the context. \Validations with
     # some <tt>:on</tt> option will only run in the specified context.
-    def valid?: (?untyped? context) -> untyped
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
 
     alias validate valid?
 
