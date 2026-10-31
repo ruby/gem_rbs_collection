@@ -8642,7 +8642,7 @@ module ActiveRecord
 
       def commit_records: () -> untyped
 
-      def full_rollback?: () -> true
+      def full_rollback?: () -> bool
 
       def joinable?: () -> untyped
 
@@ -8825,15 +8825,15 @@ module ActiveRecord
 
       # Does this adapter support DDL rollbacks in transactions? That is, would
       # CREATE TABLE or ALTER TABLE get rolled back by a transaction?
-      def supports_ddl_transactions?: () -> false
+      def supports_ddl_transactions?: () -> bool
 
-      def supports_bulk_alter?: () -> false
+      def supports_bulk_alter?: () -> bool
 
       # Does this adapter support savepoints?
-      def supports_savepoints?: () -> false
+      def supports_savepoints?: () -> bool
 
       # Does this adapter support application-enforced advisory locking?
-      def supports_advisory_locks?: () -> false
+      def supports_advisory_locks?: () -> bool
 
       # Should primary key values be selected from their corresponding
       # sequence before the insert statement? If true, next_sequence_value
@@ -8843,54 +8843,54 @@ module ActiveRecord
       def supports_partitioned_indexes?: () -> false
 
       # Does this adapter support index sort order?
-      def supports_index_sort_order?: () -> false
+      def supports_index_sort_order?: () -> bool
 
       # Does this adapter support partial indices?
-      def supports_partial_index?: () -> false
+      def supports_partial_index?: () -> bool
 
       # Does this adapter support expression indices?
-      def supports_expression_index?: () -> false
+      def supports_expression_index?: () -> bool
 
       # Does this adapter support explain?
-      def supports_explain?: () -> false
+      def supports_explain?: () -> bool
 
       # Does this adapter support setting the isolation level for a transaction?
-      def supports_transaction_isolation?: () -> false
+      def supports_transaction_isolation?: () -> bool
 
       # Does this adapter support database extensions?
-      def supports_extensions?: () -> false
+      def supports_extensions?: () -> bool
 
       # Does this adapter support creating indexes in the same statement as
       # creating the table?
-      def supports_indexes_in_create?: () -> false
+      def supports_indexes_in_create?: () -> bool
 
       # Does this adapter support creating foreign key constraints?
-      def supports_foreign_keys?: () -> false
+      def supports_foreign_keys?: () -> bool
 
       # Does this adapter support creating invalid constraints?
-      def supports_validate_constraints?: () -> false
+      def supports_validate_constraints?: () -> bool
 
       # Does this adapter support creating foreign key constraints
       # in the same statement as creating the table?
       def supports_foreign_keys_in_create?: () -> untyped
 
       # Does this adapter support views?
-      def supports_views?: () -> false
+      def supports_views?: () -> bool
 
       # Does this adapter support materialized views?
-      def supports_materialized_views?: () -> false
+      def supports_materialized_views?: () -> bool
 
       # Does this adapter support datetime with precision?
-      def supports_datetime_with_precision?: () -> false
+      def supports_datetime_with_precision?: () -> bool
 
       # Does this adapter support json data type?
-      def supports_json?: () -> false
+      def supports_json?: () -> bool
 
       # Does this adapter support metadata comments on database objects (tables, columns, indexes)?
-      def supports_comments?: () -> false
+      def supports_comments?: () -> bool
 
       # Can comments for tables, columns, and indexes be specified in create/alter table statements?
-      def supports_comments_in_create?: () -> false
+      def supports_comments_in_create?: () -> bool
 
       # Does this adapter support multi-value insert?
       def supports_multi_insert?: () -> true
@@ -8899,20 +8899,20 @@ module ActiveRecord
       def supports_virtual_columns?: () -> false
 
       # Does this adapter support foreign/external tables?
-      def supports_foreign_tables?: () -> false
+      def supports_foreign_tables?: () -> bool
 
       # Does this adapter support optimizer hints?
       def supports_optimizer_hints?: () -> false
 
-      def supports_common_table_expressions?: () -> false
+      def supports_common_table_expressions?: () -> bool
 
-      def supports_lazy_transactions?: () -> false
+      def supports_lazy_transactions?: () -> bool
 
-      def supports_insert_returning?: () -> false
+      def supports_insert_returning?: () -> bool
 
-      def supports_insert_on_duplicate_skip?: () -> false
+      def supports_insert_on_duplicate_skip?: () -> bool
 
-      def supports_insert_on_duplicate_update?: () -> false
+      def supports_insert_on_duplicate_update?: () -> bool
 
       def supports_insert_conflict_target?: () -> false
 
@@ -8971,7 +8971,7 @@ module ActiveRecord
       def clear_cache!: () -> untyped
 
       # Returns true if its required to reload the connection between requests for development mode.
-      def requires_reloading?: () -> false
+      def requires_reloading?: () -> bool
 
       # Checks whether the connection to the database is still active (i.e. not stale).
       # This is done under the hood by calling #active?. If the connection
@@ -10056,7 +10056,7 @@ module ActiveRecord
         class Bit < ActiveModel::Type::Value
           # :nodoc:
           # :nodoc:
-          def type: () -> :bit
+          def type: () -> Symbol
 
           def cast_value: (untyped value) -> untyped
 
@@ -10116,7 +10116,7 @@ module ActiveRecord
         class Cidr < ActiveModel::Type::Value
           # :nodoc:
           # :nodoc:
-          def type: () -> :cidr
+          def type: () -> Symbol
 
           def type_cast_for_schema: (untyped value) -> untyped
 
@@ -11958,7 +11958,7 @@ module ActiveRecord
 
       def type_caster: () -> TypeCaster::Map
 
-      def _internal?: () -> false
+      def _internal?: () -> bool
 
       private
 
@@ -12242,7 +12242,7 @@ module ActiveRecord
 
       def migrations_paths: () -> untyped
 
-      def url_config?: () -> false
+      def url_config?: () -> bool
 
       def to_legacy_hash: () -> ::Hash[untyped, untyped]
 
@@ -16596,7 +16596,7 @@ module ActiveRecord
 
     # The name of the method used to touch a +belongs_to+ association when the
     # +:touch+ option is used.
-    def belongs_to_touch_method: () -> :touch
+    def belongs_to_touch_method: () -> Symbol
 
     def _raise_readonly_record_error: () -> untyped
   end
@@ -16785,7 +16785,7 @@ module ActiveRecord
       #     PolymorphicReflection
       #     RuntimeReflection
       # :nodoc:
-      def through_reflection?: () -> false
+      def through_reflection?: () -> bool
 
       def table_name: () -> untyped
 
@@ -16995,7 +16995,7 @@ module ActiveRecord
       # Returns whether or not this association reflection is for a collection
       # association. Returns +true+ if the +macro+ is either +has_many+ or
       # +has_and_belongs_to_many+, +false+ otherwise.
-      def collection?: () -> false
+      def collection?: () -> bool
 
       # Returns whether or not the association should be validated as part of
       # the parent's validation.
@@ -17009,10 +17009,10 @@ module ActiveRecord
       def validate?: () -> untyped
 
       # Returns +true+ if +self+ is a +belongs_to+ reflection.
-      def belongs_to?: () -> false
+      def belongs_to?: () -> bool
 
       # Returns +true+ if +self+ is a +has_one+ reflection.
-      def has_one?: () -> false
+      def has_one?: () -> bool
 
       def association_class: () -> untyped
 
@@ -21418,7 +21418,7 @@ module ActiveRecord
     class Json < ActiveModel::Type::Value
       include ActiveModel::Type::Helpers::Mutable
 
-      def type: () -> :json
+      def type: () -> Symbol
 
       def deserialize: (untyped value) -> untyped
 

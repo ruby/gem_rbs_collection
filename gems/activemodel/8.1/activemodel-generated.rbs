@@ -894,7 +894,7 @@ module ActiveModel
 
     def type_cast: (*untyped) -> untyped
 
-    def initialized?: () -> true
+    def initialized?: () -> bool
 
     def came_from_user?: () -> false
 
@@ -2310,7 +2310,7 @@ module ActiveModel
     include ::ActiveModel::Naming
 
     # Returns the +i18n_scope+ for the class. Override if you want custom lookup.
-    def i18n_scope: () -> :activemodel
+    def i18n_scope: () -> Symbol
 
     # When localizing a string, it goes through the lookup returned by this
     # method, which is used in ActiveModel::Name#human,
@@ -2468,7 +2468,7 @@ module ActiveModel
 
       include ::ActiveModel::Type::Helpers::TimeValue
 
-      def type: () -> :datetime
+      def type: () -> Symbol
 
       def mutable?: () -> true
 
@@ -2583,7 +2583,7 @@ module ActiveModel
 
       BIGDECIMAL_PRECISION: 18
 
-      def type: () -> :decimal
+      def type: () -> Symbol
 
       def type_cast_for_schema: (untyped value) -> untyped
 
@@ -2675,7 +2675,7 @@ module ActiveModel
   module Type
     module Helpers
       module Immutable
-        def mutable?: () -> false
+        def mutable?: () -> bool
       end
     end
   end
@@ -2802,7 +2802,7 @@ module ActiveModel
 
       def initialize: (**untyped args) -> void
 
-      def type: () -> :string
+      def type: () -> Symbol
 
       def serialize: (untyped value) -> untyped
 
@@ -2867,7 +2867,7 @@ module ActiveModel
 
       def initialize: (**untyped) -> void
 
-      def type: () -> :integer
+      def type: () -> Symbol
 
       def deserialize: (untyped value) -> (nil | untyped)
 
@@ -3038,7 +3038,7 @@ module ActiveModel
 
       # Returns the unique type name as a Symbol. Subclasses should override
       # this method.
-      def type: () -> nil
+      def type: () -> Symbol?
 
       # Converts a value from database input to the appropriate ruby type. The
       # return value of this method will be returned from
@@ -3072,7 +3072,7 @@ module ActiveModel
 
       # These predicates are not documented, as I need to look further into
       # their use, and see if they can be removed entirely.
-      def binary?: () -> false
+      def binary?: () -> bool
 
       # Determines whether a value has changed for dirty checking. +old_value+
       # and +new_value+ will always be type-cast. Types should not need to
@@ -3114,7 +3114,7 @@ module ActiveModel
 
       def serialized?: () -> false
 
-      def mutable?: () -> true
+      def mutable?: () -> bool
 
       def as_json: (*untyped) -> untyped
 

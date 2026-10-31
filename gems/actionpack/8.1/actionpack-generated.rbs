@@ -136,7 +136,7 @@ module AbstractController
     # Returns true if the given controller is capable of rendering a path. A
     # subclass of `AbstractController::Base` may return false. An Email controller
     # for example does not support paths, only full URLs.
-    def self.supports_path?: () -> true
+    def self.supports_path?: () -> bool
 
     def config: () -> untyped
 
@@ -6464,7 +6464,7 @@ module Mime
 
     def html?: () -> untyped
 
-    def all?: () -> false
+    def all?: () -> bool
 
     attr_reader string: untyped
 
@@ -7655,17 +7655,17 @@ module ActionDispatch
 
         def type: () -> untyped
 
-        def symbol?: () -> false
+        def symbol?: () -> bool
 
-        def literal?: () -> false
+        def literal?: () -> bool
 
-        def terminal?: () -> false
+        def terminal?: () -> bool
 
-        def star?: () -> false
+        def star?: () -> bool
 
-        def cat?: () -> false
+        def cat?: () -> bool
 
-        def group?: () -> false
+        def group?: () -> bool
       end
 
       class Terminal < ::ActionDispatch::Journey::Nodes::Node
@@ -7675,7 +7675,7 @@ module ActionDispatch
       end
 
       class Literal < ::ActionDispatch::Journey::Nodes::Terminal
-        def literal?: () -> true
+        def literal?: () -> bool
 
         def type: () -> :LITERAL
       end
@@ -10226,9 +10226,9 @@ end
 module ActionDispatch
   module Routing
     class Endpoint
-      def dispatcher?: () -> false
+      def dispatcher?: () -> bool
 
-      def redirect?: () -> false
+      def redirect?: () -> bool
 
       def matches?: (untyped req) -> true
 
@@ -10862,7 +10862,7 @@ module ActionDispatch
 
           def shallow?: () -> untyped
 
-          def singleton?: () -> false
+          def singleton?: () -> bool
 
           private
 

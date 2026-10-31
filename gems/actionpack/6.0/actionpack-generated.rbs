@@ -140,7 +140,7 @@ module AbstractController
     # a path. A subclass of +AbstractController::Base+
     # may return false. An Email controller for example does not
     # support paths, only full URLs.
-    def self.supports_path?: () -> true
+    def self.supports_path?: () -> bool
 
     private
 
@@ -5045,7 +5045,7 @@ module Mime
 
     def html?: () -> untyped
 
-    def all?: () -> false
+    def all?: () -> bool
 
     attr_reader string: untyped
 
@@ -6258,17 +6258,17 @@ module ActionDispatch
 
         def type: () -> untyped
 
-        def symbol?: () -> false
+        def symbol?: () -> bool
 
-        def literal?: () -> false
+        def literal?: () -> bool
 
-        def terminal?: () -> false
+        def terminal?: () -> bool
 
-        def star?: () -> false
+        def star?: () -> bool
 
-        def cat?: () -> false
+        def cat?: () -> bool
 
-        def group?: () -> false
+        def group?: () -> bool
       end
 
       class Terminal < Node
@@ -6280,7 +6280,7 @@ module ActionDispatch
 
       class Literal < Terminal
         # :nodoc:
-        def literal?: () -> true
+        def literal?: () -> bool
 
         def type: () -> :LITERAL
       end
@@ -8455,9 +8455,9 @@ module ActionDispatch
   module Routing
     class Endpoint
       # :nodoc:
-      def dispatcher?: () -> false
+      def dispatcher?: () -> bool
 
-      def redirect?: () -> false
+      def redirect?: () -> bool
 
       def matches?: (untyped req) -> true
 
@@ -9250,7 +9250,7 @@ module ActionDispatch
 
           def shallow?: () -> untyped
 
-          def singleton?: () -> false
+          def singleton?: () -> bool
         end
 
         class SingletonResource < Resource
