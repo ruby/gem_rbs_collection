@@ -17520,7 +17520,8 @@ module ActiveRecord
     #
     # See also #ids.
     #
-    def pluck: (*untyped column_names) -> untyped
+    def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+             | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
 
     # Pick the value(s) from the named column(s) in the current relation.
     # This is short-hand for <tt>relation.limit(1).pluck(*column_names).first</tt>, and is primarily useful

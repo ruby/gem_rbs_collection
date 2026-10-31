@@ -24469,7 +24469,8 @@ module ActiveRecord
     #   # SELECT people.id FROM people
     #
     # See also #ids.
-    def pluck: (*untyped column_names) -> untyped
+    def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+             | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
 
     # Same as #pluck, but performs the query asynchronously and returns an
     # ActiveRecord::Promise.
