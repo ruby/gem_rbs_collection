@@ -20,3 +20,9 @@ module SampleApp
   end
 end
 
+class TrackingApplication < Rails::Application
+  def self.inherited(base)
+    super
+    base.name
+  end
+end

@@ -58,3 +58,10 @@ class SampleGeneratorTest < Rails::Generators::TestCase
   destination "tmp"
   arguments %w[user]
 end
+
+class TrackingApplication < Rails::Application
+  def self.inherited(base)
+    super
+    base.name
+  end
+end
