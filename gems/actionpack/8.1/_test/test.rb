@@ -118,6 +118,21 @@ class AuthController < ActionController::Base
   end
 end
 
+# Caching config methods, and overrides of method_added and show_detailed_exceptions?
+class OverridesController < ActionController::Base
+  cache_store
+
+  def self.method_added(name)
+    super
+    name.to_proc
+  end
+
+  def show_detailed_exceptions?
+    request.local?
+  end
+end
+ActionController::API.cache_store
+
 # Routing DSL forms from the Rails routing guide
 class AdminConstraint
   def matches?(request)
