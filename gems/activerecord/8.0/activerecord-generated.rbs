@@ -7826,7 +7826,7 @@ module ActiveRecord
       #     SELECT * FROM orders INNER JOIN line_items ON order_id=orders.id
       #
       # See also TableDefinition#column for details on how to create columns.
-      def create_table: (untyped table_name, **untyped options) { (untyped) -> untyped } -> untyped
+      def create_table: (String | Symbol table_name, ?id: untyped, ?primary_key: untyped, ?force: untyped, **untyped options) ?{ (TableDefinition t) -> void } -> untyped
 
       # Creates a new join table with the name created using the lexical order of the first two
       # arguments. These arguments can be a String or a Symbol.
@@ -7866,7 +7866,7 @@ module ActiveRecord
       #     part_id bigint NOT NULL,
       #   ) ENGINE=InnoDB DEFAULT CHARSET=utf8
       #
-      def create_join_table: (untyped table_1, untyped table_2, ?column_options: ::Hash[untyped, untyped] column_options, **untyped options) { (untyped) -> untyped } -> untyped
+      def create_join_table: (String | Symbol table_1, String | Symbol table_2, ?column_options: Hash[Symbol, untyped], **untyped options) ?{ (TableDefinition t) -> void } -> untyped
 
       # Drops the join table specified by the given arguments.
       # See #create_join_table for details.
@@ -7948,7 +7948,7 @@ module ActiveRecord
       #  end
       #
       # See also Table for details on all of the various column transformations.
-      def change_table: (untyped table_name, **untyped options) { (untyped) -> untyped } -> untyped
+      def change_table: (String | Symbol table_name, ?untyped base, **untyped options) { (Table t) -> void } -> untyped
 
       # Renames a table.
       #
