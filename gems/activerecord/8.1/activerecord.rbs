@@ -620,6 +620,53 @@ end
 
 module ActiveRecord
   module Calculations
+    # Use #pluck as a shortcut to select one or more attributes without
+    # loading an entire record object per row.
+    #
+    #   Person.pluck(:name)
+    #
+    # instead of
+    #
+    #   Person.all.map(&:name)
+    #
+    # Pluck returns an Array of attribute values type-casted to match
+    # the plucked column names, if they can be deduced. Plucking an SQL fragment
+    # returns String values by default.
+    #
+    #   Person.pluck(:name)
+    #   # SELECT people.name FROM people
+    #   # => ['David', 'Jeremy', 'Jose']
+    #
+    #   Person.pluck(:id, :name)
+    #   # SELECT people.id, people.name FROM people
+    #   # => [[1, 'David'], [2, 'Jeremy'], [3, 'Jose']]
+    #
+    #   Person.distinct.pluck(:role)
+    #   # SELECT DISTINCT role FROM people
+    #   # => ['admin', 'member', 'guest']
+    #
+    #   Person.where(age: 21).limit(5).pluck(:id)
+    #   # SELECT people.id FROM people WHERE people.age = 21 LIMIT 5
+    #   # => [2, 3]
+    #
+    #   Comment.joins(:person).pluck(:id, person: :id)
+    #   # SELECT comments.id, person.id FROM comments INNER JOIN people person ON person.id = comments.person_id
+    #   # => [[1, 2], [2, 2]]
+    #
+    #   Comment.joins(:person).pluck(:id, person: [:id, :name])
+    #   # SELECT comments.id, person.id, person.name FROM comments INNER JOIN people person ON person.id = comments.person_id
+    #   # => [[1, 2, 'David'], [2, 2, 'David']]
+    #
+    #   Person.pluck(Arel.sql('DATEDIFF(updated_at, created_at)'))
+    #   # SELECT DATEDIFF(updated_at, created_at) FROM people
+    #   # => ['0', '27761', '173']
+    #
+    # Be aware that #pluck ignores any previous select clauses
+    #
+    #   Person.select(:name).pluck(:id)
+    #   # SELECT people.id FROM people
+    #
+    # See also #ids.
     def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
              | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
   end
