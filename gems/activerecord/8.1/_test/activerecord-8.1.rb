@@ -193,3 +193,17 @@ module Test
   User.readonly_attributes.first&.upcase
   User.connection_pool.db_config
 end
+
+# Schema statements yield table definitions with the column methods
+ActiveRecord::Base.lease_connection.create_table(:products, id: :uuid) do |t|
+  t.string :name, :sku, null: false
+  t.integer :quantity, limit: 4
+  t.decimal :price, precision: 10, scale: 2
+  t.numeric :ratio
+  t.blob :data
+  t.virtual :name_upper, type: :string, as: "UPPER(name)", stored: true
+  t.timestamps
+end
+ActiveRecord::Base.lease_connection.create_table(:tags)
+ActiveRecord::Base.lease_connection.create_join_table(:products, :tags) { |t| t.bigint :position }
+ActiveRecord::Base.lease_connection.change_table(:products) { |t| t.boolean :active, default: false }
