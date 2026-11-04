@@ -618,6 +618,13 @@ module ActiveRecord
   end
 end
 
+module ActiveRecord
+  module Calculations
+    def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+             | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
+  end
+end
+
 module Arel
   class Table
     def []: (untyped name) -> Arel::Attributes::Attribute
