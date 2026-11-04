@@ -60,3 +60,6 @@ class SendMessageJobTest < ActiveJob::TestCase
     assert_no_performed_jobs
   end
 end
+
+SendMessageJob.default_queue_name = "low"
+SendMessageJob.default_queue_name.upcase
