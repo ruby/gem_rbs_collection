@@ -8,6 +8,11 @@ module ActiveRecord
     extend SecurePassword::ClassMethods
     include TokenFor
     extend TokenFor::ClassMethods
+    include SignedId
+    extend SignedId::ClassMethods
+
+    # Several modules included after Persistence override it
+    def reload: (?Hash[Symbol, untyped]? options) -> self
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def and: (::ActiveRecord::Relation) -> Relation
@@ -18,9 +23,14 @@ module ActiveRecord
   end
 
   module Core
+    include ActiveModel::Access
+
     def values_at: (*Symbol | String) -> Array[untyped]
     def strict_loading!: (?bool value, ?mode: Symbol) -> bool
     def strict_loading?: () -> bool
+
+    # Allows sort on objects
+    def <=>: (untyped other_object) -> Integer?
   end
 
   class Relation
@@ -157,6 +167,56 @@ module ActiveRecord
   module Persistence
     def previously_persisted?: () -> bool
 
+    # Reloads the record from the database.
+    #
+    # This method finds the record by its primary key (which could be assigned
+    # manually) and modifies the receiver in-place:
+    #
+    #   account = Account.new
+    #   # => #<Account id: nil, email: nil>
+    #   account.id = 1
+    #   account.reload
+    #   # Account Load (1.2ms)  SELECT "accounts".* FROM "accounts" WHERE "accounts"."id" = $1 LIMIT 1  [["id", 1]]
+    #   # => #<Account id: 1, email: 'account@example.com'>
+    #
+    # Attributes are reloaded from the database, and caches busted, in
+    # particular the associations cache and the QueryCache.
+    #
+    # If the record no longer exists in the database ActiveRecord::RecordNotFound
+    # is raised. Otherwise, in addition to the in-place modification the method
+    # returns +self+ for convenience.
+    #
+    # The optional <tt>:lock</tt> flag option allows you to lock the reloaded record:
+    #
+    #   reload(lock: true) # reload with pessimistic locking
+    #
+    # Reloading is commonly used in test suites to test something is actually
+    # written to the database, or when some action modifies the corresponding
+    # row in the database but not the object in memory:
+    #
+    #   assert account.deposit!(25)
+    #   assert_equal 25, account.credit        # check it is updated in memory
+    #   assert_equal 25, account.reload.credit # check it is also persisted
+    #
+    # Another common use case is optimistic locking handling:
+    #
+    #   def with_optimistic_retry
+    #     begin
+    #       yield
+    #     rescue ActiveRecord::StaleObjectError
+    #       begin
+    #         # Reload lock_version in particular.
+    #         reload
+    #       rescue ActiveRecord::RecordNotFound
+    #         # If the record is gone there is nothing to do.
+    #       else
+    #         retry
+    #       end
+    #     end
+    #   end
+    #
+    def reload: (?Hash[Symbol, untyped]? options) -> self
+
     module ClassMethods
       # Creates an object (or multiple objects) and saves it to the database, if validations pass.
       # The resulting object is returned whether the object was saved successfully to the database or not.
@@ -192,7 +252,26 @@ module ActiveRecord
       # multiple objects when given an Array of Hashes.
       def create!: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
                  | (?untyped? attributes) ?{ (instance) -> void } -> instance
+
+      # Builds an object (or multiple objects) and returns either the built object or a list of built
+      # objects.
+      def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
+               | (?untyped? attributes) ?{ (instance) -> void } -> instance
     end
+  end
+
+  module Validations
+    # Runs all the validations within the specified context. Returns +true+ if
+    # no errors are found, +false+ otherwise.
+    #
+    # Aliased as #validate.
+    #
+    # If the argument is +false+ (default is +nil+), the context is set to <tt>:create</tt> if
+    # {new_record?}[rdoc-ref:Persistence#new_record?] is +true+, and to <tt>:update</tt> if it is not.
+    #
+    # \Validations with no <tt>:on</tt> option will run no matter the context. \Validations with
+    # some <tt>:on</tt> option will only run in the specified context.
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
   end
 
   class InsertAll
@@ -254,6 +333,30 @@ module Arel
 
   module FactoryMethods
     def cast: (untyped name, untyped type) -> Nodes::NamedFunction
+  end
+end
+
+module ActiveRecord
+  module SignedId
+    extend ActiveSupport::Concern
+
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
+
+    module ClassMethods
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
+
+      def find_signed: (untyped signed_id, ?purpose: untyped) -> untyped
+
+      def find_signed!: (untyped signed_id, ?purpose: untyped) -> untyped
+
+      def signed_id_verifier: () -> untyped
+
+      def signed_id_verifier=: (untyped verifier) -> untyped
+
+      def combine_signed_id_purposes: (untyped purpose) -> untyped
+    end
   end
 end
 

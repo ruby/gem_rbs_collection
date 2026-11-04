@@ -99,6 +99,17 @@ module Test
   users.first.articles
   User.create([{name: 'James'}, {name: 'John'}]) { |user| user.articles }
 
+  # Records built, reloaded, compared, sliced and signed
+  built = User.build(name: 'James') { |user| user.articles }
+  built.articles
+  User.build([{ name: 'James' }, { name: 'John' }]).first&.articles
+  built.reload.articles
+  built.slice(:name, 'id').keys
+  (built <=> User.new)&.positive?
+  built.validate & built.valid?
+  built.signed_id(purpose: :login).length
+  User.find_signed(built.signed_id)
+
   user = User.create!(name: 'James')
   user.articles
   User.create!(name: 'James') { |user| user.articles }
