@@ -697,3 +697,29 @@ module ActionDispatch
     end
   end
 end
+
+module ActionDispatch
+  class Flash
+    class FlashHash
+      # Sets a flash that will not be available to the next action, only to the current.
+      #
+      #     flash.now[:message] = "Hello current action"
+      #
+      # This method enables you to use the flash as a central messaging system in your app.
+      # When you need to pass an object to the next action, you use the standard flash assign (<tt>[]=</tt>).
+      # When you need to pass an object to the current action, you use <tt>now</tt>, and your object will
+      # vanish when the current action is done.
+      #
+      # Entries set via <tt>now</tt> are accessed the same way as standard entries: <tt>flash['my-key']</tt>.
+      #
+      # Also, brings two convenience accessors:
+      #
+      #   flash.now.alert = "Beware now!"
+      #   # Equivalent to flash.now[:alert] = "Beware now!"
+      #
+      #   flash.now.notice = "Good luck now!"
+      #   # Equivalent to flash.now[:notice] = "Good luck now!"
+      def now: () -> ActionDispatch::Flash::FlashNow
+    end
+  end
+end
