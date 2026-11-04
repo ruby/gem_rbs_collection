@@ -150,6 +150,8 @@ class Array[unchecked out Elem]
   #   Blog.none.to_fs(:db) # => "null"
   #   [1,2].to_fs          # => "[1, 2]"
   def to_fs: (?Symbol format) -> String
+
+  alias to_formatted_s to_fs
 end
 
 # active_support/core_ext/numeric/conversions.rb
@@ -317,6 +319,8 @@ class Date
   #   Date::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Date::DATE_FORMATS[:short_ordinal] = ->(date) { date.strftime("%B #{date.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  alias to_formatted_s to_fs
 end
 
 # active_support/core_ext/time/conversions.rb
@@ -348,6 +352,8 @@ class Time
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal]  = ->(time) { time.strftime("%B #{time.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  alias to_formatted_s to_fs
 end
 
 # active_support/core_ext/date_time/conversions.rb
@@ -378,4 +384,11 @@ class DateTime
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal] = lambda { |time| time.strftime("%B #{time.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  alias to_formatted_s to_fs
+end
+
+# active_support/core_ext/object/json.rb
+class String
+  def as_json: (?untyped? options) -> self
 end
