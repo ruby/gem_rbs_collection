@@ -288,3 +288,13 @@ module ActionController
     def render_to_string: (*untyped args) ?{ () -> untyped } -> ::String
   end
 end
+
+module AbstractController
+  class Base
+    # Returns true if the given controller is capable of rendering
+    # a path. A subclass of +AbstractController::Base+
+    # may return false. An Email controller for example does not
+    # support paths, only full URLs.
+    def self.supports_path?: () -> bool
+  end
+end

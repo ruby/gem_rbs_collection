@@ -511,3 +511,38 @@ module ActiveModel
     def human_attribute_name: (String | Symbol attribute, ?::Hash[Symbol, untyped] options) -> String
   end
 end
+
+module ActiveModel
+  class Attribute
+    def initialized?: () -> bool
+  end
+
+  module Translation
+    # Returns the +i18n_scope+ for the class. Overwrite if you want custom lookup.
+    def i18n_scope: () -> Symbol
+  end
+
+  module Type
+    class DateTime
+      def type: () -> Symbol
+    end
+
+    class Decimal
+      def type: () -> Symbol
+    end
+
+    class ImmutableString
+      def type: () -> Symbol
+    end
+
+    class Integer
+      def type: () -> Symbol
+    end
+
+    class Value
+      def type: () -> Symbol?
+
+      def binary?: () -> bool
+    end
+  end
+end

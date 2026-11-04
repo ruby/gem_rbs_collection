@@ -133,11 +133,6 @@ module AbstractController
     # callback needs to be terminated in AbstractController::Callbacks.
     def performed?: () -> untyped
 
-    # Returns true if the given controller is capable of rendering a path. A
-    # subclass of `AbstractController::Base` may return false. An Email controller
-    # for example does not support paths, only full URLs.
-    def self.supports_path?: () -> bool
-
     def config: () -> untyped
 
     def inspect: () -> ::String
@@ -6467,8 +6462,6 @@ module Mime
 
     def html?: () -> untyped
 
-    def all?: () -> bool
-
     attr_reader string: untyped
 
     attr_reader synonyms: untyped
@@ -7658,17 +7651,6 @@ module ActionDispatch
 
         def type: () -> untyped
 
-        def symbol?: () -> bool
-
-        def literal?: () -> bool
-
-        def terminal?: () -> bool
-
-        def star?: () -> bool
-
-        def cat?: () -> bool
-
-        def group?: () -> bool
       end
 
       class Terminal < ::ActionDispatch::Journey::Nodes::Node
@@ -7678,8 +7660,6 @@ module ActionDispatch
       end
 
       class Literal < ::ActionDispatch::Journey::Nodes::Terminal
-        def literal?: () -> bool
-
         def type: () -> :LITERAL
       end
 
@@ -10229,10 +10209,6 @@ end
 module ActionDispatch
   module Routing
     class Endpoint
-      def dispatcher?: () -> bool
-
-      def redirect?: () -> bool
-
       def matches?: (untyped req) -> true
 
       def app: () -> self
@@ -10864,8 +10840,6 @@ module ActionDispatch
           def nested_scope: () -> ::String
 
           def shallow?: () -> untyped
-
-          def singleton?: () -> bool
 
           private
 

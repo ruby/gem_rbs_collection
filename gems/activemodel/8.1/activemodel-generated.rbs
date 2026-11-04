@@ -894,8 +894,6 @@ module ActiveModel
 
     def type_cast: (*untyped) -> untyped
 
-    def initialized?: () -> bool
-
     def came_from_user?: () -> false
 
     def has_been_read?: () -> untyped
@@ -2309,9 +2307,6 @@ module ActiveModel
   module Translation
     include ::ActiveModel::Naming
 
-    # Returns the +i18n_scope+ for the class. Override if you want custom lookup.
-    def i18n_scope: () -> Symbol
-
     # When localizing a string, it goes through the lookup returned by this
     # method, which is used in ActiveModel::Name#human,
     # ActiveModel::Errors#full_messages and
@@ -2468,8 +2463,6 @@ module ActiveModel
 
       include ::ActiveModel::Type::Helpers::TimeValue
 
-      def type: () -> Symbol
-
       def mutable?: () -> true
 
       private
@@ -2583,8 +2576,6 @@ module ActiveModel
 
       BIGDECIMAL_PRECISION: 18
 
-      def type: () -> Symbol
-
       def type_cast_for_schema: (untyped value) -> untyped
 
       private
@@ -2675,7 +2666,6 @@ module ActiveModel
   module Type
     module Helpers
       module Immutable
-        def mutable?: () -> bool
       end
     end
   end
@@ -2802,8 +2792,6 @@ module ActiveModel
 
       def initialize: (**untyped args) -> void
 
-      def type: () -> Symbol
-
       def serialize: (untyped value) -> untyped
 
       def serialize_cast_value: (untyped value) -> untyped
@@ -2866,8 +2854,6 @@ module ActiveModel
       DEFAULT_LIMIT: 4
 
       def initialize: (**untyped) -> void
-
-      def type: () -> Symbol
 
       def deserialize: (untyped value) -> (nil | untyped)
 
@@ -3036,10 +3022,6 @@ module ActiveModel
       # parameter is some other object.
       def serializable?: (untyped value) ?{ (?) -> untyped } -> true
 
-      # Returns the unique type name as a Symbol. Subclasses should override
-      # this method.
-      def type: () -> Symbol?
-
       # Converts a value from database input to the appropriate ruby type. The
       # return value of this method will be returned from
       # ActiveRecord::AttributeMethods::Read#read_attribute. The default
@@ -3069,10 +3051,6 @@ module ActiveModel
       # Type casts a value for schema dumping. This method is private, as we are
       # hoping to remove it entirely.
       def type_cast_for_schema: (untyped value) -> untyped
-
-      # These predicates are not documented, as I need to look further into
-      # their use, and see if they can be removed entirely.
-      def binary?: () -> bool
 
       # Determines whether a value has changed for dirty checking. +old_value+
       # and +new_value+ will always be type-cast. Types should not need to
@@ -3113,8 +3091,6 @@ module ActiveModel
       def assert_valid_value: (untyped _) -> nil
 
       def serialized?: () -> false
-
-      def mutable?: () -> bool
 
       def as_json: (*untyped) -> untyped
 

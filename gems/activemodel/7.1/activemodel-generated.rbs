@@ -88,8 +88,6 @@ module ActiveModel
 
     def type_cast: () -> untyped
 
-    def initialized?: () -> bool
-
     def came_from_user?: () -> false
 
     def has_been_read?: () -> untyped
@@ -2372,9 +2370,6 @@ module ActiveModel
   module Translation
     include ActiveModel::Naming
 
-    # Returns the +i18n_scope+ for the class. Overwrite if you want custom lookup.
-    def i18n_scope: () -> Symbol
-
     # When localizing a string, it goes through the lookup returned by this
     # method, which is used in ActiveModel::Name#human,
     # ActiveModel::Errors#full_messages and
@@ -2485,8 +2480,6 @@ module ActiveModel
 
       include Helpers::TimeValue
 
-      def type: () -> Symbol
-
       private
 
       def cast_value: (untyped value) -> (untyped | nil)
@@ -2509,8 +2502,6 @@ module ActiveModel
       include Helpers::Numeric
 
       BIGDECIMAL_PRECISION: ::Integer
-
-      def type: () -> Symbol
 
       def type_cast_for_schema: (untyped value) -> untyped
 
@@ -2636,9 +2627,6 @@ end
 module ActiveModel
   module Type
     class ImmutableString < Value
-      # :nodoc:
-      def type: () -> Symbol
-
       def serialize: (untyped value) -> untyped
 
       private
@@ -2659,8 +2647,6 @@ module ActiveModel
       DEFAULT_LIMIT: ::Integer
 
       def initialize: () -> untyped
-
-      def type: () -> Symbol
 
       def deserialize: (untyped value) -> (nil | untyped)
 
@@ -2762,8 +2748,6 @@ module ActiveModel
 
       def initialize: (?scale: untyped? scale, ?limit: untyped? limit, ?precision: untyped? precision) -> untyped
 
-      def type: () -> Symbol?
-
       # Converts a value from database input to the appropriate ruby type. The
       # return value of this method will be returned from
       # ActiveRecord::AttributeMethods::Read#read_attribute. The default
@@ -2791,8 +2775,6 @@ module ActiveModel
       def serialize: (untyped value) -> untyped
 
       def type_cast_for_schema: (untyped value) -> untyped
-
-      def binary?: () -> bool
 
       # Determines whether a value has changed for dirty checking. +old_value+
       # and +new_value+ will always be type-cast. Types should not need to
