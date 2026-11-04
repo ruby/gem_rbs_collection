@@ -150,6 +150,14 @@ class Array[unchecked out Elem]
   #   Blog.none.to_fs(:db) # => "null"
   #   [1,2].to_fs          # => "[1, 2]"
   def to_fs: (?Symbol format) -> String
+
+  # Extends <tt>Array#to_s</tt> to convert a collection of elements into a
+  # comma separated id list if <tt>:db</tt> argument is given as the format.
+  #
+  #   Blog.all.to_formatted_s(:db)  # => "1,2,3"
+  #   Blog.none.to_formatted_s(:db) # => "null"
+  #   [1,2].to_formatted_s          # => "[1, 2]"
+  alias to_formatted_s to_fs
 end
 
 # active_support/core_ext/numeric/conversions.rb
@@ -317,6 +325,32 @@ class Date
   #   Date::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Date::DATE_FORMATS[:short_ordinal] = ->(date) { date.strftime("%B #{date.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  # Convert to a formatted string. See DATE_FORMATS for predefined formats.
+  #
+  # This method is aliased to <tt>to_s</tt>.
+  #
+  #   date = Date.new(2007, 11, 10)       # => Sat, 10 Nov 2007
+  #
+  #   date.to_formatted_s(:db)            # => "2007-11-10"
+  #   date.to_s(:db)                      # => "2007-11-10"
+  #
+  #   date.to_formatted_s(:short)         # => "10 Nov"
+  #   date.to_formatted_s(:number)        # => "20071110"
+  #   date.to_formatted_s(:long)          # => "November 10, 2007"
+  #   date.to_formatted_s(:long_ordinal)  # => "November 10th, 2007"
+  #   date.to_formatted_s(:rfc822)        # => "10 Nov 2007"
+  #   date.to_formatted_s(:iso8601)       # => "2007-11-10"
+  #
+  # == Adding your own date formats to to_formatted_s
+  # You can add your own formats to the Date::DATE_FORMATS hash.
+  # Use the format name as the hash key and either a strftime string
+  # or Proc instance that takes a date argument as the value.
+  #
+  #   # config/initializers/date_formats.rb
+  #   Date::DATE_FORMATS[:month_and_year] = '%B %Y'
+  #   Date::DATE_FORMATS[:short_ordinal] = ->(date) { date.strftime("%B #{date.day.ordinalize}") }
+  alias to_formatted_s to_fs
 end
 
 # active_support/core_ext/time/conversions.rb
@@ -348,6 +382,33 @@ class Time
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal]  = ->(time) { time.strftime("%B #{time.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  # Converts to a formatted string. See DATE_FORMATS for built-in formats.
+  #
+  # This method is aliased to <tt>to_s</tt>.
+  #
+  #   time = Time.now                    # => 2007-01-18 06:10:17 -06:00
+  #
+  #   time.to_formatted_s(:time)         # => "06:10"
+  #   time.to_s(:time)                   # => "06:10"
+  #
+  #   time.to_formatted_s(:db)           # => "2007-01-18 06:10:17"
+  #   time.to_formatted_s(:number)       # => "20070118061017"
+  #   time.to_formatted_s(:short)        # => "18 Jan 06:10"
+  #   time.to_formatted_s(:long)         # => "January 18, 2007 06:10"
+  #   time.to_formatted_s(:long_ordinal) # => "January 18th, 2007 06:10"
+  #   time.to_formatted_s(:rfc822)       # => "Thu, 18 Jan 2007 06:10:17 -0600"
+  #   time.to_formatted_s(:iso8601)      # => "2007-01-18T06:10:17-06:00"
+  #
+  # == Adding your own time formats to +to_formatted_s+
+  # You can add your own formats to the Time::DATE_FORMATS hash.
+  # Use the format name as the hash key and either a strftime string
+  # or Proc instance that takes a time argument as the value.
+  #
+  #   # config/initializers/time_formats.rb
+  #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
+  #   Time::DATE_FORMATS[:short_ordinal]  = ->(time) { time.strftime("%B #{time.day.ordinalize}") }
+  alias to_formatted_s to_fs
 end
 
 # active_support/core_ext/date_time/conversions.rb
@@ -378,4 +439,36 @@ class DateTime
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal] = lambda { |time| time.strftime("%B #{time.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  # Convert to a formatted string. See Time::DATE_FORMATS for predefined formats.
+  #
+  # This method is aliased to <tt>to_s</tt>.
+  #
+  # === Examples
+  #   datetime = DateTime.civil(2007, 12, 4, 0, 0, 0, 0)   # => Tue, 04 Dec 2007 00:00:00 +0000
+  #
+  #   datetime.to_formatted_s(:db)            # => "2007-12-04 00:00:00"
+  #   datetime.to_s(:db)                      # => "2007-12-04 00:00:00"
+  #   datetime.to_s(:number)                  # => "20071204000000"
+  #   datetime.to_formatted_s(:short)         # => "04 Dec 00:00"
+  #   datetime.to_formatted_s(:long)          # => "December 04, 2007 00:00"
+  #   datetime.to_formatted_s(:long_ordinal)  # => "December 4th, 2007 00:00"
+  #   datetime.to_formatted_s(:rfc822)        # => "Tue, 04 Dec 2007 00:00:00 +0000"
+  #   datetime.to_formatted_s(:iso8601)       # => "2007-12-04T00:00:00+00:00"
+  #
+  # == Adding your own datetime formats to to_formatted_s
+  # DateTime formats are shared with Time. You can add your own to the
+  # Time::DATE_FORMATS hash. Use the format name as the hash key and
+  # either a strftime string or Proc instance that takes a time or
+  # datetime argument as the value.
+  #
+  #   # config/initializers/time_formats.rb
+  #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
+  #   Time::DATE_FORMATS[:short_ordinal] = lambda { |time| time.strftime("%B #{time.day.ordinalize}") }
+  alias to_formatted_s to_fs
+end
+
+# active_support/core_ext/object/json.rb
+class String
+  def as_json: (?untyped? options) -> self
 end
