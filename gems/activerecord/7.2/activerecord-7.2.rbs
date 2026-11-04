@@ -506,3 +506,15 @@ module ActiveRecord
     end
   end
 end
+
+module ActiveRecord
+  module ConnectionAdapters
+    module SchemaStatements
+      def create_table: (String | Symbol table_name, ?id: untyped, ?primary_key: untyped, ?force: untyped, **untyped options) ?{ (TableDefinition t) -> void } -> untyped
+
+      def create_join_table: (String | Symbol table_1, String | Symbol table_2, ?column_options: Hash[Symbol, untyped], **untyped options) ?{ (TableDefinition t) -> void } -> untyped
+
+      def change_table: (String | Symbol table_name, ?untyped base, **untyped options) { (Table t) -> void } -> untyped
+    end
+  end
+end
