@@ -1,0 +1,17 @@
+module AcLibraryRb
+  class LazySegtree[S, F]
+    def initialize: (Integer | Array[S] v, S e, F id) { (S x, S y) -> S } -> void
+                  | (Integer | Array[S] v, ^(S x, S y) -> S op, S e, ^(F f, S x) -> S mapping, ^(F f, F g) -> F composition, F id) -> void
+                  | (Integer | Array[S] v, S e, F id, ^(S x, S y) -> S op, ^(F f, S x) -> S mapping, ^(F f, F g) -> F composition) -> void
+
+    def set: (Integer pos, S x) -> void
+    def get: (Integer pos) -> S
+    def prod: (Integer l, Integer r) -> S
+    def all_prod: () -> S
+    def apply: (Integer pos, F f) -> void
+             | (Integer l, Integer r, F f) -> void
+    def range_apply: (Integer l, Integer r, F f) -> void
+    def max_right: (Integer l) { (S x) -> boolish } -> Integer
+    def min_left: (Integer r) { (S x) -> boolish } -> Integer
+  end
+end
