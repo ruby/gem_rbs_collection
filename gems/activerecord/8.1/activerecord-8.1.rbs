@@ -21,6 +21,9 @@ module ActiveRecord
     def values_at: (*Symbol | String) -> Array[untyped]
     def strict_loading!: (?bool value, ?mode: Symbol) -> bool
     def strict_loading?: () -> bool
+
+    # Allows sort on objects
+    def <=>: (untyped other_object) -> Integer?
   end
 
   class Relation
@@ -183,7 +186,16 @@ module ActiveRecord
       # multiple objects when given an Array of Hashes.
       def create!: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
                  | (?untyped? attributes) ?{ (instance) -> void } -> instance
+
+      # Builds an object (or multiple objects) and returns either the built object or a list of built
+      # objects.
+      def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
+               | (?untyped? attributes) ?{ (instance) -> void } -> instance
     end
+  end
+
+  module Validations
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
   end
 
   class InsertAll

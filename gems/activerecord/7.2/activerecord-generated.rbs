@@ -12029,9 +12029,6 @@ module ActiveRecord
     # Returns +true+ if the attributes hash has been frozen.
     def frozen?: () -> untyped
 
-    # Allows sort on objects
-    def <=>: (untyped other_object) -> Integer?
-
     def present?: () -> true
 
     def blank?: () -> false
@@ -16435,56 +16432,6 @@ module ActiveRecord
     # Saving is not subjected to validation checks. Returns +true+ if the
     # record could be saved.
     def toggle!: (untyped attribute) -> untyped
-
-    # Reloads the record from the database.
-    #
-    # This method finds the record by its primary key (which could be assigned
-    # manually) and modifies the receiver in-place:
-    #
-    #   account = Account.new
-    #   # => #<Account id: nil, email: nil>
-    #   account.id = 1
-    #   account.reload
-    #   # Account Load (1.2ms)  SELECT "accounts".* FROM "accounts" WHERE "accounts"."id" = $1 LIMIT 1  [["id", 1]]
-    #   # => #<Account id: 1, email: 'account@example.com'>
-    #
-    # Attributes are reloaded from the database, and caches busted, in
-    # particular the associations cache and the QueryCache.
-    #
-    # If the record no longer exists in the database ActiveRecord::RecordNotFound
-    # is raised. Otherwise, in addition to the in-place modification the method
-    # returns +self+ for convenience.
-    #
-    # The optional <tt>:lock</tt> flag option allows you to lock the reloaded record:
-    #
-    #   reload(lock: true) # reload with pessimistic locking
-    #
-    # Reloading is commonly used in test suites to test something is actually
-    # written to the database, or when some action modifies the corresponding
-    # row in the database but not the object in memory:
-    #
-    #   assert account.deposit!(25)
-    #   assert_equal 25, account.credit        # check it is updated in memory
-    #   assert_equal 25, account.reload.credit # check it is also persisted
-    #
-    # Another common use case is optimistic locking handling:
-    #
-    #   def with_optimistic_retry
-    #     begin
-    #       yield
-    #     rescue ActiveRecord::StaleObjectError
-    #       begin
-    #         # Reload lock_version in particular.
-    #         reload
-    #       rescue ActiveRecord::RecordNotFound
-    #         # If the record is gone there is nothing to do.
-    #       else
-    #         retry
-    #       end
-    #     end
-    #   end
-    #
-    def reload: (?Hash[Symbol, untyped]? options) -> self
 
     # Saves the record with the updated_at/on attributes set to the current time
     # or the time specified.
@@ -21904,18 +21851,6 @@ module ActiveRecord
     # Attempts to save the record just like {ActiveRecord::Base#save}[rdoc-ref:Base#save] but
     # will raise an ActiveRecord::RecordInvalid exception instead of returning +false+ if the record is not valid.
     def save!: (**untyped options) -> untyped
-
-    # Runs all the validations within the specified context. Returns +true+ if
-    # no errors are found, +false+ otherwise.
-    #
-    # Aliased as #validate.
-    #
-    # If the argument is +false+ (default is +nil+), the context is set to <tt>:create</tt> if
-    # {new_record?}[rdoc-ref:Persistence#new_record?] is +true+, and to <tt>:update</tt> if it is not.
-    #
-    # \Validations with no <tt>:on</tt> option will run no matter the context. \Validations with
-    # some <tt>:on</tt> option will only run in the specified context.
-    def valid?: (?Symbol | Array[Symbol] context) -> bool
 
     alias validate valid?
 

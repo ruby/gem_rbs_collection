@@ -28,6 +28,9 @@ module ActiveRecord
     def values_at: (*Symbol | String) -> Array[untyped]
     def strict_loading!: (?bool value, ?mode: Symbol) -> bool
     def strict_loading?: () -> bool
+
+    # Allows sort on objects
+    def <=>: (untyped other_object) -> Integer?
   end
 
   class Relation
@@ -163,6 +166,7 @@ module ActiveRecord
 
   module Persistence
     def previously_persisted?: () -> bool
+    def reload: (?Hash[Symbol, untyped]? options) -> self
 
     module ClassMethods
       # Creates an object (or multiple objects) and saves it to the database, if validations pass.
@@ -205,6 +209,10 @@ module ActiveRecord
       def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
                | (?untyped? attributes) ?{ (instance) -> void } -> instance
     end
+  end
+
+  module Validations
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
   end
 
   class InsertAll
