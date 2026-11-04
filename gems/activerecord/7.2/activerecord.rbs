@@ -990,10 +990,14 @@ module ActiveRecord
     module PostgreSQL
       module OID
         class Bit
+          # :nodoc:
+          # :nodoc:
           def type: () -> Symbol
         end
 
         class Cidr
+          # :nodoc:
+          # :nodoc:
           def type: () -> Symbol
         end
       end
@@ -1022,6 +1026,20 @@ module ActiveRecord
 
   module Reflection
     class AbstractReflection
+      # Holds all the methods that are shared between MacroReflection and ThroughReflection.
+      #
+      #   AbstractReflection
+      #     MacroReflection
+      #       AggregateReflection
+      #       AssociationReflection
+      #         HasManyReflection
+      #         HasOneReflection
+      #         BelongsToReflection
+      #         HasAndBelongsToManyReflection
+      #     ThroughReflection
+      #     PolymorphicReflection
+      #     RuntimeReflection
+      # :nodoc:
       def through_reflection?: () -> bool
     end
 
