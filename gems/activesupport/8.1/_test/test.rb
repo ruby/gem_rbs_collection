@@ -126,3 +126,24 @@ env.production? && !env.local?
 # ClassMethods of the concerns the generated classes include
 ActiveSupport::CurrentAttributes.define_callbacks(:notify)
 ActiveSupport::ExecutionWrapper.define_callbacks(:notify)
+
+# Return types of core extensions
+Date.today.readable_inspect.length
+DateTime.now.readable_inspect.length
+Date.today.compare_with_coercion(Time.now)&.positive?
+(DateTime.now <=> Date.today)&.positive?
+Time.now.compare_with_coercion(Time.now)&.positive?
+Time.now.eql_with_coercion(Time.now) & true
+String.as_json&.length
+Object.new.duplicable? & Object.new.html_safe?
+Class.new.subclasses.map(&:name)
+
+class AlwaysSafe
+  def html_safe?
+    [true, false].sample || false
+  end
+
+  def duplicable?
+    [true, false].sample || false
+  end
+end
