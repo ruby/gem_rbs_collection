@@ -30,32 +30,32 @@ module Retryable
   def self.disable: () -> void
 
   def self.with_context: [X] (Symbol context_key,
-                              ?Configuration::options options,
-                              ?contexts: Configuration::contexts?,
-                              ?ensure: Configuration::ensure?,
-                              ?exception_cb: Configuration::exception_cb?,
-                              ?log_method: Configuration::log_method?,
-                              ?matching: Configuration::matching?,
-                              ?not: Configuration::not?,
-                              ?on: Configuration::on?,
-                              ?sleep: Configuration::sleep?,
-                              ?sleep_method: Configuration::sleep_method?,
-                              ?tries: Configuration::tries?,
+                              ?Configuration::option_overrides options,
+                              ?contexts: Configuration::contexts,
+                              ?ensure: Configuration::ensure,
+                              ?exception_cb: Configuration::exception_cb,
+                              ?log_method: Configuration::log_method,
+                              ?matching: Configuration::matching,
+                              ?not: Configuration::not,
+                              ?on: Configuration::on,
+                              ?sleep: Configuration::sleep,
+                              ?sleep_method: Configuration::sleep_method,
+                              ?tries: Configuration::tries,
                              ) ?{ (Integer retries, Exception? retry_exception) -> X } -> X?
 
   alias self.retryable_with_context self.with_context
 
-  def self.retryable: [X] (?Configuration::options options,
-                           ?contexts: Configuration::contexts?,
-                           ?ensure: Configuration::ensure?,
-                           ?exception_cb: Configuration::exception_cb?,
-                           ?log_method: Configuration::log_method?,
-                           ?matching: Configuration::matching?,
-                           ?not: Configuration::not?,
-                           ?on: Configuration::on?,
-                           ?sleep: Configuration::sleep?,
-                           ?sleep_method: Configuration::sleep_method?,
-                           ?tries: Configuration::tries?,
+  def self.retryable: [X] (?Configuration::option_overrides options,
+                           ?contexts: Configuration::contexts,
+                           ?ensure: Configuration::ensure,
+                           ?exception_cb: Configuration::exception_cb,
+                           ?log_method: Configuration::log_method,
+                           ?matching: Configuration::matching,
+                           ?not: Configuration::not,
+                           ?on: Configuration::on,
+                           ?sleep: Configuration::sleep,
+                           ?sleep_method: Configuration::sleep_method,
+                           ?tries: Configuration::tries,
                           ) ?{ (Integer retries, Exception? retry_exception) -> X } -> X?
 
   # Used to set up and modify settings for the retryable.
@@ -71,20 +71,36 @@ module Retryable
                     | :sleep_method
                     | :tries
 
-    type options = {
-      contexts: contexts?,
-      ensure: ensure?,
-      exception_cb: exception_cb?,
-      log_method: log_method?,
-      matching: matching?,
-      not: not?,
-      on: on?,
-      sleep: sleep?,
-      sleep_method: sleep_method?,
-      tries: tries?
+    # Partial overrides accepted by Retryable.retryable, #merge, and stored contexts.
+    # Keys may be omitted; a present key is never nil.
+    type option_overrides = {
+      ?contexts: contexts,
+      ?ensure: ensure,
+      ?exception_cb: exception_cb,
+      ?log_method: log_method,
+      ?matching: matching,
+      ?not: not,
+      ?on: on,
+      ?sleep: sleep,
+      ?sleep_method: sleep_method,
+      ?tries: tries
     }
 
-    type contexts = Hash[Symbol, options]
+    # Complete option set as returned by #to_hash. Every key is present and non-nil.
+    type options = {
+      contexts: contexts,
+      ensure: ensure,
+      exception_cb: exception_cb,
+      log_method: log_method,
+      matching: matching,
+      not: not,
+      on: on,
+      sleep: sleep,
+      sleep_method: sleep_method,
+      tries: tries
+    }
+
+    type contexts = Hash[Symbol, option_overrides]
     type ensure = ^(Integer retries) -> void
     type exception_cb = ^(Exception retry_exception) -> void
     type log_method = ^(Integer retries, Exception? retry_exception) -> void
@@ -127,7 +143,7 @@ module Retryable
     # Returns a hash of all configurable options merged with +hash+
     #
     # @param [Hash] hash A set of configuration options that will take precedence over the defaults
-    def merge: (options hash) -> options
+    def merge: (option_overrides hash) -> options
   end
 
   # This module holds the Retryable version information.
