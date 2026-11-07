@@ -50,6 +50,7 @@ class QuxController < ActionController::Base
     permitted.slice(:name).merge(age: 1).permitted?
     params.except(:token).to_unsafe_h.keys
     params.transform_values(&:to_s).to_query
+    params.exclude?(:token) && params.include?(:name)
 
     request.url.start_with?("https")
     request.host.length
