@@ -21,6 +21,9 @@ module ActiveRecord
     def values_at: (*Symbol | String) -> Array[untyped]
     def strict_loading!: (?bool value, ?mode: Symbol) -> bool
     def strict_loading?: () -> bool
+
+    # Allows sort on objects
+    def <=>: (untyped other_object) -> Integer?
   end
 
   class Relation
@@ -183,7 +186,48 @@ module ActiveRecord
       # multiple objects when given an Array of Hashes.
       def create!: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
                  | (?untyped? attributes) ?{ (instance) -> void } -> instance
+
+      # Builds an object (or multiple objects) and returns either the built object or a list of built
+      # objects.
+      #
+      # The +attributes+ parameter can be either a Hash or an Array of Hashes. These Hashes describe the
+      # attributes on the objects that are to be built.
+      #
+      # ==== Examples
+      #   # Build a single new object
+      #   User.build(first_name: 'Jamie')
+      #
+      #   # Build an Array of new objects
+      #   User.build([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }])
+      #
+      #   # Build a single object and pass it into a block to set other attributes.
+      #   User.build(first_name: 'Jamie') do |u|
+      #     u.is_admin = false
+      #   end
+      #
+      #   # Building an Array of new objects using a block, where the block is executed for each object:
+      #   User.build([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }]) do |u|
+      #     u.is_admin = false
+      #   end
+      def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
+               | (?untyped? attributes) ?{ (instance) -> void } -> instance
     end
+  end
+
+  module Validations
+    # Runs all the validations within the specified context. Returns +true+ if
+    # no errors are found, +false+ otherwise.
+    #
+    # Aliased as #validate.
+    #
+    # If the argument is +false+ (default is +nil+), the context is set to <tt>:create</tt> if
+    # {new_record?}[rdoc-ref:Persistence#new_record?] is +true+, and to <tt>:update</tt> if it is not.
+    # If the argument is an array of contexts, <tt>post.valid?([:create, :update])</tt>, the validations are
+    # run within multiple contexts.
+    #
+    # \Validations with no <tt>:on</tt> option will run no matter the context. \Validations with
+    # some <tt>:on</tt> option will only run in the specified context.
+    def valid?: (?Symbol | Array[Symbol] context) -> bool
   end
 
   class InsertAll
