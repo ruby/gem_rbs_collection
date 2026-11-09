@@ -27,3 +27,5 @@ error.strict_match?(:name, :too_short, count: 5)
 Person.human_attribute_name("name")
 Person.human_attribute_name(:name)
 Person.human_attribute_name("name", default: "Name")
+
+Person.model_name.human
