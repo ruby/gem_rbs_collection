@@ -9274,34 +9274,6 @@ module ActiveRecord
     end
 
     module ColumnMethods
-      def bigint: (*untyped names, **untyped options) -> untyped
-
-      def binary: (*untyped names, **untyped options) -> untyped
-
-      def boolean: (*untyped names, **untyped options) -> untyped
-
-      def date: (*untyped names, **untyped options) -> untyped
-
-      def datetime: (*untyped names, **untyped options) -> untyped
-
-      def decimal: (*untyped names, **untyped options) -> untyped
-
-      def float: (*untyped names, **untyped options) -> untyped
-
-      def integer: (*untyped names, **untyped options) -> untyped
-
-      def json: (*untyped names, **untyped options) -> untyped
-
-      def string: (*untyped names, **untyped options) -> untyped
-
-      def text: (*untyped names, **untyped options) -> untyped
-
-      def time: (*untyped names, **untyped options) -> untyped
-
-      def timestamp: (*untyped names, **untyped options) -> untyped
-
-      def virtual: (*untyped names, **untyped options) -> untyped
-
       extend ::ActiveSupport::Concern
 
       # Appends a primary key definition to the table definition.
@@ -9882,221 +9854,10 @@ module ActiveRecord
       # Returns just a table's primary key
       def primary_key: (untyped table_name) -> untyped
 
-      # Creates a new table with the name +table_name+. +table_name+ may either
-      # be a String or a Symbol.
-      #
-      # There are two ways to work with #create_table. You can use the block
-      # form or the regular form, like this:
-      #
-      # === Block form
-      #
-      #   # create_table() passes a TableDefinition object to the block.
-      #   # This form will not only create the table, but also columns for the
-      #   # table.
-      #
-      #   create_table(:suppliers) do |t|
-      #     t.column :name, :string, limit: 60
-      #     # Other fields here
-      #   end
-      #
-      # === Block form, with shorthand
-      #
-      #   # You can also use the column types as method calls, rather than calling the column method.
-      #   create_table(:suppliers) do |t|
-      #     t.string :name, limit: 60
-      #     # Other fields here
-      #   end
-      #
-      # === Regular form
-      #
-      #   # Creates a table called 'suppliers' with no columns.
-      #   create_table(:suppliers)
-      #   # Add a column to 'suppliers'.
-      #   add_column(:suppliers, :name, :string, {limit: 60})
-      #
-      # The +options+ hash can include the following keys:
-      # [<tt>:id</tt>]
-      #   Whether to automatically add a primary key column. Defaults to true.
-      #   Join tables for {ActiveRecord::Base.has_and_belongs_to_many}[rdoc-ref:Associations::ClassMethods#has_and_belongs_to_many] should set it to false.
-      #
-      #   A Symbol can be used to specify the type of the generated primary key column.
-      #
-      #   A Hash can be used to specify the generated primary key column creation options.
-      #   See {add_column}[rdoc-ref:ConnectionAdapters::SchemaStatements#add_column] for available options.
-      # [<tt>:primary_key</tt>]
-      #   The name of the primary key, if one is to be added automatically.
-      #   Defaults to +id+. If <tt>:id</tt> is false, then this option is ignored.
-      #
-      #   If an array is passed, a composite primary key will be created.
-      #
-      #   Note that Active Record models will automatically detect their
-      #   primary key. This can be avoided by using
-      #   {self.primary_key=}[rdoc-ref:AttributeMethods::PrimaryKey::ClassMethods#primary_key=] on the model
-      #   to define the key explicitly.
-      #
-      # [<tt>:options</tt>]
-      #   Any extra options you want appended to the table definition.
-      # [<tt>:temporary</tt>]
-      #   Make a temporary table.
-      # [<tt>:force</tt>]
-      #   Set to true to drop the table before creating it.
-      #   Set to +:cascade+ to drop dependent objects as well.
-      #   Defaults to false.
-      # [<tt>:if_not_exists</tt>]
-      #   Set to true to avoid raising an error when the table already exists.
-      #   Defaults to false.
-      # [<tt>:as</tt>]
-      #   SQL to use to generate the table. When this option is used, the block is
-      #   ignored, as are the <tt>:id</tt> and <tt>:primary_key</tt> options.
-      #
-      # ====== Add a backend specific option to the generated SQL (MySQL)
-      #
-      #   create_table(:suppliers, options: 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4')
-      #
-      # generates:
-      #
-      #   CREATE TABLE suppliers (
-      #     id bigint auto_increment PRIMARY KEY
-      #   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      #
-      # ====== Rename the primary key column
-      #
-      #   create_table(:objects, primary_key: 'guid') do |t|
-      #     t.column :name, :string, limit: 80
-      #   end
-      #
-      # generates:
-      #
-      #   CREATE TABLE objects (
-      #     guid bigint auto_increment PRIMARY KEY,
-      #     name varchar(80)
-      #   )
-      #
-      # ====== Change the primary key column type
-      #
-      #   create_table(:tags, id: :string) do |t|
-      #     t.column :label, :string
-      #   end
-      #
-      # generates:
-      #
-      #   CREATE TABLE tags (
-      #     id varchar PRIMARY KEY,
-      #     label varchar
-      #   )
-      #
-      # ====== Create a composite primary key
-      #
-      #   create_table(:orders, primary_key: [:product_id, :client_id]) do |t|
-      #     t.belongs_to :product
-      #     t.belongs_to :client
-      #   end
-      #
-      # generates:
-      #
-      #   CREATE TABLE orders (
-      #       product_id bigint NOT NULL,
-      #       client_id bigint NOT NULL
-      #   );
-      #
-      #   ALTER TABLE ONLY "orders"
-      #     ADD CONSTRAINT orders_pkey PRIMARY KEY (product_id, client_id);
-      #
-      # ====== Do not add a primary key column
-      #
-      #   create_table(:categories_suppliers, id: false) do |t|
-      #     t.column :category_id, :bigint
-      #     t.column :supplier_id, :bigint
-      #   end
-      #
-      # generates:
-      #
-      #   CREATE TABLE categories_suppliers (
-      #     category_id bigint,
-      #     supplier_id bigint
-      #   )
-      #
-      # ====== Create a temporary table based on a query
-      #
-      #   create_table(:long_query, temporary: true,
-      #     as: "SELECT * FROM orders INNER JOIN line_items ON order_id=orders.id")
-      #
-      # generates:
-      #
-      #   CREATE TEMPORARY TABLE long_query AS
-      #     SELECT * FROM orders INNER JOIN line_items ON order_id=orders.id
-      #
-      # See also TableDefinition#column for details on how to create columns.
-      def create_table: (untyped table_name, ?id: ::Symbol, ?primary_key: untyped?, ?force: untyped?, **untyped options) ?{ (?) -> untyped } -> untyped
-
       # Returns a TableDefinition object containing information about the table that would be created
       # if the same arguments were passed to #create_table. See #create_table for information about
       # passing a +table_name+, and other additional options that can be passed.
       def build_create_table_definition: (untyped table_name, ?id: ::Symbol, ?primary_key: untyped?, ?force: untyped?, **untyped options) ?{ (untyped) -> untyped } -> untyped
-
-      # Creates a new join table with the name created using the lexical order of the first two
-      # arguments. These arguments can be a String or a Symbol.
-      #
-      #   # Creates a table called 'assemblies_parts' with no id.
-      #   create_join_table(:assemblies, :parts)
-      #
-      #   # Creates a table called 'paper_boxes_papers' with no id.
-      #   create_join_table('papers', 'paper_boxes')
-      #
-      # A duplicate prefix is combined into a single prefix. This is useful for
-      # namespaced models like Music::Artist and Music::Record:
-      #
-      #   # Creates a table called 'music_artists_records' with no id.
-      #   create_join_table('music_artists', 'music_records')
-      #
-      # See {connection.add_reference}[rdoc-ref:SchemaStatements#add_reference]
-      # for details of the options you can use in +column_options+. +column_options+
-      # will be applied to both columns.
-      #
-      # You can pass an +options+ hash which can include the following keys:
-      # [<tt>:table_name</tt>]
-      #   Sets the table name, overriding the default.
-      # [<tt>:options</tt>]
-      #   Any extra options you want appended to the table definition.
-      # [<tt>:temporary</tt>]
-      #   Make a temporary table.
-      # [<tt>:force</tt>]
-      #   Set to true to drop the table before creating it.
-      #   Defaults to false.
-      #
-      # Note that #create_join_table does not create any indices by default; you can use
-      # its block form to do so yourself:
-      #
-      #   create_join_table :products, :categories do |t|
-      #     t.index :product_id
-      #     t.index :category_id
-      #   end
-      #
-      # ====== Add foreign keys with delete cascade
-      #
-      #   create_join_table(:assemblies, :parts, column_options: { foreign_key: { on_delete: :cascade } })
-      #
-      # generates:
-      #
-      #   CREATE TABLE assemblies_parts (
-      #     assembly_id bigint NOT NULL,
-      #     part_id bigint NOT NULL,
-      #     CONSTRAINT fk_rails_0d8a572d89 FOREIGN KEY ("assembly_id") REFERENCES "assemblies" ("id") ON DELETE CASCADE,
-      #     CONSTRAINT fk_rails_ec7b48402b FOREIGN KEY ("part_id") REFERENCES "parts" ("id") ON DELETE CASCADE
-      #   )
-      #
-      # ====== Add a backend specific option to the generated SQL (MySQL)
-      #
-      #   create_join_table(:assemblies, :parts, options: 'ENGINE=InnoDB DEFAULT CHARSET=utf8')
-      #
-      # generates:
-      #
-      #   CREATE TABLE assemblies_parts (
-      #     assembly_id bigint NOT NULL,
-      #     part_id bigint NOT NULL,
-      #   ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-      #
-      def create_join_table: (untyped table_1, untyped table_2, ?column_options: ::Hash[untyped, untyped], **untyped options) ?{ (untyped) -> untyped } -> untyped
 
       # Builds a TableDefinition object for a join table.
       #
@@ -10112,86 +9873,6 @@ module ActiveRecord
       # to provide one in a migration's +change+ method so it can be reverted.
       # In that case, the block will be used by #create_join_table.
       def drop_join_table: (untyped table_1, untyped table_2, **untyped options) -> untyped
-
-      # A block for changing columns in +table+.
-      #
-      #   # change_table() yields a Table instance
-      #   change_table(:suppliers) do |t|
-      #     t.column :name, :string, limit: 60
-      #     # Other column alterations here
-      #   end
-      #
-      # The +options+ hash can include the following keys:
-      # [<tt>:bulk</tt>]
-      #   Set this to true to make this a bulk alter query, such as
-      #
-      #     ALTER TABLE `users` ADD COLUMN age INT, ADD COLUMN birthdate DATETIME ...
-      #
-      #   Defaults to false.
-      #
-      #   Only supported on the MySQL and PostgreSQL adapter, ignored elsewhere.
-      #
-      # ====== Add a column
-      #
-      #   change_table(:suppliers) do |t|
-      #     t.column :name, :string, limit: 60
-      #   end
-      #
-      # ====== Change type of a column
-      #
-      #   change_table(:suppliers) do |t|
-      #     t.change :metadata, :json
-      #   end
-      #
-      # ====== Add 2 integer columns
-      #
-      #   change_table(:suppliers) do |t|
-      #     t.integer :width, :height, null: false, default: 0
-      #   end
-      #
-      # ====== Add created_at/updated_at columns
-      #
-      #   change_table(:suppliers) do |t|
-      #     t.timestamps
-      #   end
-      #
-      # ====== Add a foreign key column
-      #
-      #   change_table(:suppliers) do |t|
-      #     t.references :company
-      #   end
-      #
-      # Creates a <tt>company_id(bigint)</tt> column.
-      #
-      # ====== Add a polymorphic foreign key column
-      #
-      #  change_table(:suppliers) do |t|
-      #    t.belongs_to :company, polymorphic: true
-      #  end
-      #
-      # Creates <tt>company_type(varchar)</tt> and <tt>company_id(bigint)</tt> columns.
-      #
-      # ====== Remove a column
-      #
-      #  change_table(:suppliers) do |t|
-      #    t.remove :company
-      #  end
-      #
-      # ====== Remove several columns
-      #
-      #  change_table(:suppliers) do |t|
-      #    t.remove :company_id
-      #    t.remove :width, :height
-      #  end
-      #
-      # ====== Remove an index
-      #
-      #  change_table(:suppliers) do |t|
-      #    t.remove_index :company_id
-      #  end
-      #
-      # See also Table for details on all of the various column transformations.
-      def change_table: (untyped table_name, ?untyped base, **untyped options) { (untyped) -> untyped } -> untyped
 
       # Renames a table.
       #
@@ -15149,9 +14830,6 @@ module ActiveRecord
     # accessible, even on destroyed records, but cloned models will not be
     # frozen.
     def freeze: () -> self
-
-    # Allows sort on objects
-    def <=>: (untyped other_object) -> untyped
 
     def present?: () -> true
 
@@ -21914,30 +21592,6 @@ module ActiveRecord
     extend ::ActiveSupport::Concern
 
     module ClassMethods
-      # Builds an object (or multiple objects) and returns either the built object or a list of built
-      # objects.
-      #
-      # The +attributes+ parameter can be either a Hash or an Array of Hashes. These Hashes describe the
-      # attributes on the objects that are to be built.
-      #
-      # ==== Examples
-      #   # Build a single new object
-      #   User.build(first_name: 'Jamie')
-      #
-      #   # Build an Array of new objects
-      #   User.build([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }])
-      #
-      #   # Build a single object and pass it into a block to set other attributes.
-      #   User.build(first_name: 'Jamie') do |u|
-      #     u.is_admin = false
-      #   end
-      #
-      #   # Building an Array of new objects using a block, where the block is executed for each object:
-      #   User.build([{ first_name: 'Jamie' }, { first_name: 'Jeremy' }]) do |u|
-      #     u.is_admin = false
-      #   end
-      def build: (?untyped? attributes) ?{ (?) -> untyped } -> untyped
-
       # Given an attributes hash, +instantiate+ returns a new instance of
       # the appropriate class. Accepts only keys as strings.
       #
@@ -24302,55 +23956,6 @@ module ActiveRecord
     #        ...
     #      end
     def calculate: (untyped operation, untyped column_name) -> untyped
-
-    # Use #pluck as a shortcut to select one or more attributes without
-    # loading an entire record object per row.
-    #
-    #   Person.pluck(:name)
-    #
-    # instead of
-    #
-    #   Person.all.map(&:name)
-    #
-    # Pluck returns an Array of attribute values type-casted to match
-    # the plucked column names, if they can be deduced. Plucking an SQL fragment
-    # returns String values by default.
-    #
-    #   Person.pluck(:name)
-    #   # SELECT people.name FROM people
-    #   # => ['David', 'Jeremy', 'Jose']
-    #
-    #   Person.pluck(:id, :name)
-    #   # SELECT people.id, people.name FROM people
-    #   # => [[1, 'David'], [2, 'Jeremy'], [3, 'Jose']]
-    #
-    #   Person.distinct.pluck(:role)
-    #   # SELECT DISTINCT role FROM people
-    #   # => ['admin', 'member', 'guest']
-    #
-    #   Person.where(age: 21).limit(5).pluck(:id)
-    #   # SELECT people.id FROM people WHERE people.age = 21 LIMIT 5
-    #   # => [2, 3]
-    #
-    #   Comment.joins(:person).pluck(:id, person: :id)
-    #   # SELECT comments.id, person.id FROM comments INNER JOIN people person ON person.id = comments.person_id
-    #   # => [[1, 2], [2, 2]]
-    #
-    #   Comment.joins(:person).pluck(:id, person: [:id, :name])
-    #   # SELECT comments.id, person.id, person.name FROM comments INNER JOIN people person ON person.id = comments.person_id
-    #   # => [[1, 2, 'David'], [2, 2, 'David']]
-    #
-    #   Person.pluck(Arel.sql('DATEDIFF(updated_at, created_at)'))
-    #   # SELECT DATEDIFF(updated_at, created_at) FROM people
-    #   # => ['0', '27761', '173']
-    #
-    # Be aware that #pluck ignores any previous select clauses
-    #
-    #   Person.select(:name).pluck(:id)
-    #   # SELECT people.id FROM people
-    #
-    # See also #ids.
-    def pluck: (*untyped column_names) -> untyped
 
     # Same as #pluck, but performs the query asynchronously and returns an
     # ActiveRecord::Promise.
@@ -29389,20 +28994,6 @@ module ActiveRecord
     # Attempts to save the record just like {ActiveRecord::Base#save}[rdoc-ref:Base#save] but
     # will raise an ActiveRecord::RecordInvalid exception instead of returning +false+ if the record is not valid.
     def save!: (**untyped options) -> untyped
-
-    # Runs all the validations within the specified context. Returns +true+ if
-    # no errors are found, +false+ otherwise.
-    #
-    # Aliased as #validate.
-    #
-    # If the argument is +false+ (default is +nil+), the context is set to <tt>:create</tt> if
-    # {new_record?}[rdoc-ref:Persistence#new_record?] is +true+, and to <tt>:update</tt> if it is not.
-    # If the argument is an array of contexts, <tt>post.valid?([:create, :update])</tt>, the validations are
-    # run within multiple contexts.
-    #
-    # \Validations with no <tt>:on</tt> option will run no matter the context. \Validations with
-    # some <tt>:on</tt> option will only run in the specified context.
-    def valid?: (?untyped? context) -> untyped
 
     alias validate valid?
 

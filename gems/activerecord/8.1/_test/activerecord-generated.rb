@@ -65,6 +65,10 @@ User.sanitize_sql(["name = ?", "bob"])
 User.sanitize_sql_for_order(:id)
 User.sanitize_sql_for_order({ id: :desc })
 
+# Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
+Article.where(id: 1).pluck(:id).size
+Article.where(id: 1).pluck(:id, "title").first&.size
+
 # ClassMethods of the concerns the generated classes include
 ActiveRecord::Relation.create(User)
 ActiveRecord::ConnectionAdapters::AbstractAdapter.quote_column_name("name")
@@ -82,3 +86,7 @@ ActiveRecord::Encryption.with_encryption_context(encryptor: ActiveRecord::Encryp
 ActiveRecord::Encryption.context.encryptor
 ActiveRecord::Encryption.key_provider
 User.encrypted_attributes
+
+# Relation#new and its alias build return the model
+User.where(age: 20).build(age: 21) { |user| user.something }.something
+User.where(age: 20).new([{ age: 21 }]).first&.something

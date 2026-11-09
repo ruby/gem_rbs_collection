@@ -50,6 +50,7 @@ class QuxController < ActionController::Base
     permitted.slice(:name).merge(age: 1).permitted?
     params.except(:token).to_unsafe_h.keys
     params.transform_values(&:to_s).to_query
+    params.exclude?(:token) && params.include?(:name)
 
     request.url.start_with?("https")
     request.host.length
@@ -118,6 +119,21 @@ class AuthController < ActionController::Base
   end
 end
 
+# Caching config methods, and overrides of method_added and show_detailed_exceptions?
+class OverridesController < ActionController::Base
+  cache_store
+
+  def self.method_added(name)
+    super
+    name.to_proc
+  end
+
+  def show_detailed_exceptions?
+    request.local?
+  end
+end
+ActionController::API.cache_store
+
 # Routing DSL forms from the Rails routing guide
 class AdminConstraint
   def matches?(request)
@@ -167,4 +183,13 @@ ActionDispatch::Routing::RouteSet.new.draw do
 
   mount Rack::Head.new(->(_env) { [200, { "content-type" => "text/plain" }, ["OK"]] }), at: "/head", as: :head
   with_default_scope(module: "v1") { get "ping", to: "ping#show" }.has_named_route?(:ping)
+end
+
+# render_to_body returns what the including class renders, so it can be truthy
+class BodyRenderer
+  include AbstractController::Rendering
+
+  def show
+    render_to_body(template: "show") ? "rendered" : "empty"
+  end
 end

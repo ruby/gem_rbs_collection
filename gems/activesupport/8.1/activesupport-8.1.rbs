@@ -317,6 +317,9 @@ class Date
   #   Date::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Date::DATE_FORMATS[:short_ordinal] = ->(date) { date.strftime("%B #{date.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  # Overrides the default inspect method with a human readable one, e.g., "Mon, 21 Feb 2005"
+  def readable_inspect: () -> String
 end
 
 # active_support/core_ext/time/conversions.rb
@@ -378,6 +381,16 @@ class DateTime
   #   Time::DATE_FORMATS[:month_and_year] = '%B %Y'
   #   Time::DATE_FORMATS[:short_ordinal] = lambda { |time| time.strftime("%B #{time.day.ordinalize}") }
   def to_fs: (?Symbol format) -> String
+
+  # Overrides the default inspect method with a human readable one, e.g., "Mon, 21 Feb 2005 14:30:00 +0000".
+  def readable_inspect: () -> String
+end
+
+# active_support/core_ext/date_time/calculations.rb
+class DateTime
+  # Layers additional behavior on DateTime#<=> so that Time and
+  # ActiveSupport::TimeWithZone instances can be compared with a DateTime.
+  def <=>: (untyped other) -> Integer?
 end
 
 # active_support/core_ext/date/calculations.rb
@@ -387,6 +400,9 @@ class Date
 
   def -: (ActiveSupport::Duration other) -> self
        | ...
+
+  # Allow Date to be compared with Time by converting to DateTime and relying on the <=> from there.
+  def compare_with_coercion: (untyped other) -> Integer?
 end
 
 # active_support/core_ext/time/calculations.rb
@@ -396,6 +412,41 @@ class Time
 
   def -: (ActiveSupport::Duration other) -> self
        | ...
+
+  # Layers additional behavior on Time#<=> so that DateTime and ActiveSupport::TimeWithZone instances
+  # can be chronologically compared with a Time
+  def compare_with_coercion: (untyped other) -> Integer?
+
+  # Layers additional behavior on Time#eql? so that ActiveSupport::TimeWithZone instances
+  # can be eql? to an equivalent Time
+  def eql_with_coercion: (untyped other) -> bool
+end
+
+# active_support/core_ext/object/duplicable.rb
+class Object
+  # Can you safely dup this object?
+  #
+  # False for method objects;
+  # true otherwise.
+  def duplicable?: () -> bool
+end
+
+# active_support/core_ext/object/json.rb
+class Module
+  def as_json: (?untyped? options) -> String?
+end
+
+# active_support/core_ext/string/output_safety.rb
+class Object
+  def html_safe?: () -> bool
+end
+
+module ActiveSupport
+  module DescendantsTracker
+    module ReloadedClassesFiltering
+      def subclasses: () -> Array[Class]
+    end
+  end
 end
 
 module ActiveSupport

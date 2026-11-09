@@ -40,3 +40,11 @@ Array.wrap(nil)
 Array.wrap([1, 2, 3])
 Array.wrap("hello")
 Array.wrap({a: 1, b: 2})
+
+# to_formatted_s is an alias of to_fs
+[1, 2].to_formatted_s(:db).upcase
+Date.new(2024, 1, 1).to_formatted_s(:db).upcase
+DateTime.new(2024, 1, 1).to_formatted_s.upcase
+Time.at(0).to_formatted_s(:short).upcase
+
+"text".as_json.upcase
