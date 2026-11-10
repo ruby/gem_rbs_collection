@@ -26,3 +26,10 @@ Marcel::MimeType.for Pathname.new("unrecognisable-data"), name: "example", decla
 # Safe fallback to application/octet-stream
 Marcel::MimeType.for StringIO.new(File.read "unrecognisable-data")
 #  => "application/octet-stream"
+
+# Magic: lookups return nil when nothing matches
+magic = Marcel::Magic.by_magic(StringIO.new("GIF89a"))
+magic.subtype if magic
+Marcel::Magic.by_extension(".gif")&.type
+Marcel::Magic.by_path("example.pdf")&.mediatype
+Marcel::Magic.all_by_magic(Tempfile.new).map(&:type)
