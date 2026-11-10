@@ -210,7 +210,7 @@ module ActiveRecord
     def self.implicit_order_column?: () -> bool
     def self.implicit_order_column=: (untyped) -> untyped
 
-    # Defines the name of the table column which will store the class name on single-table
+    # The name of the table column which stores the class name on single-table
     # inheritance situations.
     #
     # The default inheritance column name is +type+, which means it's a
@@ -219,17 +219,22 @@ module ActiveRecord
     # your own model for something else, you can set +inheritance_column+:
     #
     #     self.inheritance_column = 'zoink'
+    #
+    # If you wish to disable single-table inheritance altogether you can set
+    # +inheritance_column+ to +nil+
+    #
+    #     self.inheritance_column = nil
     def self.inheritance_column: () -> String
-
-    # Sets the value of inheritance_column
+    # Defines the name of the table column which will store the class name on single-table
+    # inheritance situations.
     def self.inheritance_column=: (String | Symbol | nil) -> String
 
+    def self.enumerate_columns_in_select_statements: () -> bool
+    def self.enumerate_columns_in_select_statements?: () -> bool
     # Force enumeration of all columns in SELECT statements.
     # e.g. <tt>SELECT first_name, last_name FROM ...</tt> instead of <tt>SELECT * FROM ...</tt>
     # This avoids +PreparedStatementCacheExpired+ errors when a column is added
     # to the database while the app is running.
-    def self.enumerate_columns_in_select_statements: () -> bool
-    def self.enumerate_columns_in_select_statements?: () -> bool
     def self.enumerate_columns_in_select_statements=: (bool) -> bool
 
     # Determines whether to store the full constant name including namespace when using STI.
@@ -240,8 +245,8 @@ module ActiveRecord
     def store_full_sti_class: () -> bool
     def store_full_sti_class?: () -> bool
 
-    # Stores the default scope for the class.
     def self.default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
+    # Stores the default scope for the class.
     def self.default_scopes=: (Array[ActiveRecord::Scoping::DefaultScope]) -> Array[ActiveRecord::Scoping::DefaultScope]
     def default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
 
