@@ -159,28 +159,54 @@ module ActiveRecord
     def default_connection_handler: () -> untyped
     def default_connection_handler?: () -> bool
 
+    # The prefix string to prepend to every table name.
     def self.table_name_prefix: () -> String
     def self.table_name_prefix?: () -> bool
+    # Sets the prefix string to prepend to every table name. So if set to "basecamp_", all table
+    # names will be named like "basecamp_projects", "basecamp_people", etc. This is a convenient
+    # way of creating a namespace for tables in a shared database. By default, the prefix is the
+    # empty string.
+    #
+    # If you are organizing your models within modules you can add a prefix to the models within
+    # a namespace by defining a singleton method in the parent module called table_name_prefix which
+    # returns your chosen prefix.
     def self.table_name_prefix=: (String) -> String
     def table_name_prefix: () -> String
     def table_name_prefix?: () -> bool
 
+    # The suffix string to append to every table name.
     def self.table_name_suffix: () -> String
     def self.table_name_suffix?: () -> bool
+    # Works like +table_name_prefix=+, but appends instead of prepends (set to "_basecamp" gives "projects_basecamp",
+    # "people_basecamp"). By default, the suffix is the empty string.
+    #
+    # If you are organizing your models within modules, you can add a suffix to the models within
+    # a namespace by defining a singleton method in the parent module called table_name_suffix which
+    # returns your chosen suffix.
     def self.table_name_suffix=: (String) -> String
     def table_name_suffix: () -> String
     def table_name_suffix?: () -> bool
 
+    # The name of the schema migrations table. By default, the value is <tt>"schema_migrations"</tt>.
     def self.schema_migrations_table_name: () -> String
     def self.schema_migrations_table_name?: () -> bool
+    # Sets the name of the schema migrations table.
     def self.schema_migrations_table_name=: (String) -> String
 
+    # The name of the internal metadata table. By default, the value is <tt>"ar_internal_metadata"</tt>.
     def self.internal_metadata_table_name: () -> String
     def self.internal_metadata_table_name?: () -> bool
+    # Sets the name of the internal metadata table.
     def self.internal_metadata_table_name=: (String) -> String
 
+    # Indicates whether table names should be the pluralized versions of the corresponding class names.
+    # If true, the default table name for a Product class will be "products". If false, it would just be "product".
+    # See table_name for the full rules on table/class naming. This is true, by default.
     def self.pluralize_table_names: () -> bool
     def self.pluralize_table_names?: () -> bool
+    # Set whether table names should be the pluralized versions of the corresponding class names.
+    # If true, the default table name for a Product class will be "products". If false, it would just be "product".
+    # See table_name for the full rules on table/class naming. This is true, by default.
     def self.pluralize_table_names=: (bool) -> bool
     def pluralize_table_names: () -> bool
     def pluralize_table_names?: () -> bool
@@ -190,22 +216,42 @@ module ActiveRecord
     def self.implicit_order_column=: (untyped) -> untyped
 
     # The name of the table column which stores the class name on single-table
-    # inheritance situations. The default is +type+. Setting it to +nil+ disables
-    # single-table inheritance; the writer stores the value with +to_s+.
+    # inheritance situations.
+    #
+    # The default inheritance column name is +type+, which means it's a
+    # reserved word inside Active Record. To be able to use single-table
+    # inheritance with another column name, or to use the column +type+ in
+    # your own model for something else, you can set +inheritance_column+:
+    #
+    #     self.inheritance_column = 'zoink'
+    #
+    # If you wish to disable single-table inheritance altogether you can set
+    # +inheritance_column+ to +nil+
+    #
+    #     self.inheritance_column = nil
     def self.inheritance_column: () -> String
     def self.inheritance_column?: () -> bool
+    # Defines the name of the table column which will store the class name on single-table
+    # inheritance situations.
     def self.inheritance_column=: (String | Symbol | nil) -> String
 
+    # Force enumeration of all columns in SELECT statements.
+    # e.g. <tt>SELECT first_name, last_name FROM ...</tt> instead of <tt>SELECT * FROM ...</tt>
+    # This avoids +PreparedStatementCacheExpired+ errors when a column is added
+    # to the database while the app is running.
     def self.enumerate_columns_in_select_statements: () -> bool
     def self.enumerate_columns_in_select_statements?: () -> bool
     def self.enumerate_columns_in_select_statements=: (bool) -> bool
 
+    # Determines whether to store the full constant name including namespace when using STI.
+    # This is true, by default.
     def self.store_full_sti_class: () -> bool
     def self.store_full_sti_class?: () -> bool
     def self.store_full_sti_class=: (bool) -> bool
     def store_full_sti_class: () -> bool
     def store_full_sti_class?: () -> bool
 
+    # Stores the default scope for the class.
     def self.default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
     def self.default_scopes=: (Array[ActiveRecord::Scoping::DefaultScope]) -> Array[ActiveRecord::Scoping::DefaultScope]
     def default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
@@ -217,18 +263,30 @@ module ActiveRecord
     def self.unscoped: () -> untyped
                      | ...
 
+    # Indicates the format used to generate the timestamp in the cache key, if
+    # versioning is off. Accepts any of the symbols in +Time::DATE_FORMATS+.
+    #
+    # This is +:usec+, by default.
     def self.cache_timestamp_format: () -> Symbol
     def self.cache_timestamp_format?: () -> bool
     def self.cache_timestamp_format=: (Symbol) -> Symbol
     def cache_timestamp_format: () -> Symbol
     def cache_timestamp_format?: () -> bool
 
+    # Indicates whether to use a stable #cache_key method that is accompanied
+    # by a changing version in the #cache_version method.
+    #
+    # This is +true+, by default on \Rails 5.2 and above.
     def self.cache_versioning: () -> bool
     def self.cache_versioning?: () -> bool
     def self.cache_versioning=: (bool) -> bool
     def cache_versioning: () -> bool
     def cache_versioning?: () -> bool
 
+    # Indicates whether to use a stable #cache_key method that is accompanied
+    # by a changing version in the #cache_version method on collections.
+    #
+    # This is +false+, by default until \Rails 6.1.
     def self.collection_cache_versioning: () -> bool
     def self.collection_cache_versioning?: () -> bool
     def self.collection_cache_versioning=: (bool) -> bool
