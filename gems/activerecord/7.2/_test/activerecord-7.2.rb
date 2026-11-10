@@ -84,6 +84,7 @@ module Test
   User.with_recursive(admin_users: User.where(role: 0))
 
   ActiveRecord::Base.lease_connection.execute('SELECT * FROM users LIMIT 100;')
+  User.all.lease_connection.execute('SELECT * FROM users LIMIT 100;')
 
   User.unscope(:order)
   User.order(:id).unscope(:order)
