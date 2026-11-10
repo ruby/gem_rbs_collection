@@ -338,6 +338,12 @@ end
 
 module AbstractController
   class Base
+    # Returns true if the given controller is capable of rendering
+    # a path. A subclass of +AbstractController::Base+
+    # may return false. An Email controller for example does not
+    # support paths, only full URLs.
+    def self.supports_path?: () -> bool
+
     # Refresh the cached action_methods when a new action_method is added.
     def self.method_added: (Symbol name) -> void
   end

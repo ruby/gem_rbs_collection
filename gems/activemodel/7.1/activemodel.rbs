@@ -513,6 +513,40 @@ module ActiveModel
 end
 
 module ActiveModel
+  class Attribute
+    def initialized?: () -> bool
+  end
+
+  module Translation
+    # Returns the +i18n_scope+ for the class. Overwrite if you want custom lookup.
+    def i18n_scope: () -> Symbol
+  end
+
+  module Type
+    class DateTime
+      def type: () -> Symbol
+    end
+
+    class Decimal
+      def type: () -> Symbol
+    end
+
+    class ImmutableString
+      # :nodoc:
+      def type: () -> Symbol
+    end
+
+    class Integer
+      def type: () -> Symbol
+    end
+
+    class Value
+      def type: () -> Symbol?
+
+      def binary?: () -> bool
+    end
+  end
+
   module Naming
     # Returns an ActiveModel::Name object for module. It can be
     # used to retrieve all kinds of naming-related information
