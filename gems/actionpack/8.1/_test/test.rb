@@ -193,3 +193,6 @@ class BodyRenderer
     render_to_body(template: "show") ? "rendered" : "empty"
   end
 end
+
+# helpers_path holds the configured helper directories
+ActionController::Base.helpers_path = ActionController::Base.helpers_path.map(&:upcase)
