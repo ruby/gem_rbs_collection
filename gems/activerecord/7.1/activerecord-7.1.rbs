@@ -1,5 +1,23 @@
 module ActiveRecord
+  module Scoping
+    class DefaultScope
+      attr_reader scope: untyped
+
+      attr_reader all_queries: untyped
+
+      def initialize: (untyped scope, ?untyped? all_queries) -> void
+    end
+  end
+
   class Base
+    def self.default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
+    def self.default_scopes=: (Array[ActiveRecord::Scoping::DefaultScope]) -> Array[ActiveRecord::Scoping::DefaultScope]
+    def default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
+
+    def self.enumerate_columns_in_select_statements: () -> bool
+    def self.enumerate_columns_in_select_statements?: () -> bool
+    def self.enumerate_columns_in_select_statements=: (bool) -> bool
+
     include Encryption::EncryptableRecord
     extend Encryption::EncryptableRecord::ClassMethods
     include Normalization
