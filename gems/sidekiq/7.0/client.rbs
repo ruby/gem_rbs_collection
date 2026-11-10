@@ -8,15 +8,15 @@ module Sidekiq
 
     attr_accessor redis_pool: ConnectionPool[RedisClientAdapter]
 
-    def self.enqueue: (Class klass, *untyped args) -> void
+    def self.enqueue: (Class klass, *untyped args) -> String?
 
-    def self.enqueue_in: (interval interval, Class klass, *untyped args) -> void
+    def self.enqueue_in: (interval interval, Class klass, *untyped args) -> String?
 
-    def self.enqueue_to: (queue_name queue, Class klass, *untyped args) -> void
+    def self.enqueue_to: (queue_name queue, Class klass, *untyped args) -> String?
 
-    def self.enqueue_to_in: (queue_name queue, interval interval, Class klass, *untyped args) -> void
+    def self.enqueue_to_in: (queue_name queue, interval interval, Class klass, *untyped args) -> String?
 
-    def self.push: (Hash[String, untyped] item) -> String
+    def self.push: (Hash[String, untyped] item) -> String?
 
     def self.push_bulk: (Hash[Symbol | String, untyped] items) -> Array[String?]
 
@@ -24,7 +24,7 @@ module Sidekiq
 
     def middleware: () { (Middleware::Chain chain) -> void } -> Middleware::Chain
 
-    def push: (Hash[String, untyped] item) -> String
+    def push: (Hash[String, untyped] item) -> String?
 
     def push_bulk: (Hash[Symbol | String, untyped] items) -> Array[String?]
 

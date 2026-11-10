@@ -9,7 +9,7 @@ module Sidekiq
     module ClassMethods
       def build_client: () -> Client
 
-      def client_push: (Hash[String, untyped] item) -> String
+      def client_push: (Hash[String, untyped] item) -> String?
 
       def delay: (*untyped args) -> void
 
@@ -17,13 +17,13 @@ module Sidekiq
 
       def delay_until: (*untyped args) -> void
 
-      def perform_async: (*untyped args) -> void
+      def perform_async: (*untyped args) -> String?
 
       alias perform_at perform_in
 
       def perform_bulk: (untyped args, ?batch_size: Integer) -> Array[String?]
 
-      def perform_in: (Time | Numeric interval, *untyped args) -> boolish
+      def perform_in: (Time | Numeric interval, *untyped args) -> String?
 
       def perform_inline: (*untyped args) -> boolish
 
@@ -57,13 +57,13 @@ module Sidekiq
     class Setter
       include Sidekiq::JobUtil
 
-      def perform_async: (*untyped args) -> void
+      def perform_async: (*untyped args) -> (String | true)?
 
       alias perform_at perform_in
 
       def perform_bulk: (untyped args, ?batch_size: Integer) -> Array[String?]
 
-      def perform_in: (Time | Numeric interval, *untyped args) -> boolish
+      def perform_in: (Time | Numeric interval, *untyped args) -> (String | true)?
 
       def perform_inline: (*untyped args) -> boolish
 
