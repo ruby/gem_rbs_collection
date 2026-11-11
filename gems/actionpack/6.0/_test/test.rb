@@ -49,3 +49,7 @@ ActionDispatch::Routing::RouteSet.new.draw do
   mount Rack::Head.new(->(_env) { [200, { "content-type" => "text/plain" }, ["OK"]] }), at: "/head", as: :head
   with_default_scope(module: "v1") { get "ping", to: "ping#show" }.has_named_route?(:ping)
 end
+
+class FooService
+  include ActionDispatch::Routing::RouteSet.new.url_helpers
+end
