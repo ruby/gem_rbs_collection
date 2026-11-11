@@ -1,0 +1,168 @@
+module Dry
+  # DSL for declaring params and options of class initializers
+  #
+  # The readers and the initializer that `param` / `option` define are
+  # generated at runtime and are not described here. Declare them in the
+  # signature of each class that extends this module.
+  module Initializer
+    extend DSL
+
+    VERSION: String
+
+    # The name of a param or an option. Anything works, it is converted with `to_s.to_sym`.
+    type name = Symbol | String | Integer
+
+    # The privacy of the reader. `false` and `nil` skip the reader.
+    type reader = bool | :public | :private | :protected | "public" | "private" | "protected" | nil
+
+    # Gem-related configuration
+    def dry_initializer: () -> Config
+
+    # Adds or redefines a parameter of `#dry_initializer`
+    #
+    # `type` is a coercer: an object that responds to `#call` with one argument
+    # (or two, the second one being the instance), or an array wrapping one.
+    # A block defines a nested `Dry::Initializer::Struct`.
+    def param: (name name, ?untyped type, ?default: untyped, ?optional: boolish, ?as: name, ?reader: reader, ?desc: String?, **untyped opts) ?{ () [self: singleton(Struct)] -> void } -> self
+
+    # Adds or redefines an option of `#dry_initializer`
+    def option: (name name, ?untyped type, ?default: untyped, ?optional: boolish, ?as: name, ?reader: reader, ?desc: String?, **untyped opts) ?{ () [self: singleton(Struct)] -> void } -> self
+
+    # The value assigned to variables that were not given
+    module UNDEFINED
+    end
+
+    # Module-level DSL
+    module DSL
+      # Setting for null (undefined value)
+      attr_reader null: singleton(UNDEFINED)?
+
+      # Returns a version of the module with custom settings
+      def []: (?undefined: boolish, **untyped) -> Module
+
+      # Returns mixin module to be included to target class by hand
+      def define: (?(^() [self: Config] -> void)? procedure) ?{ () [self: Config] -> void } -> Module
+    end
+
+    # Gem-related configuration of some class
+    class Config
+      # Value of unassigned variable
+      attr_reader null: singleton(UNDEFINED)?
+
+      # The class whose config collected by current object
+      attr_reader extended_class: Class?
+
+      # Parent configuration
+      attr_reader parent: Config?
+
+      # Hash of attribute definitions with their source names
+      attr_reader definitions: Hash[Symbol, Definition]
+
+      # Reference to the module to be included into class
+      def mixin: () -> Module
+
+      # List of configs of all subclasses of the `#extended_class`
+      def children: () -> Set[Config]
+
+      # List of definitions for initializer params
+      def params: () -> Array[Definition]
+
+      # List of definitions for initializer options
+      def options: () -> Array[Definition]
+
+      # Adds or redefines a parameter
+      def param: (name name, ?untyped type, ?default: untyped, ?optional: boolish, ?as: name, ?reader: reader, ?desc: String?, **untyped opts) ?{ () [self: singleton(Struct)] -> void } -> void
+
+      # Adds or redefines an option
+      def option: (name name, ?untyped type, ?default: untyped, ?optional: boolish, ?as: name, ?reader: reader, ?desc: String?, **untyped opts) ?{ () [self: singleton(Struct)] -> void } -> void
+
+      # The hash of public attributes for an instance of the `#extended_class`
+      def public_attributes: (untyped instance) -> Hash[Symbol, untyped]
+
+      # The hash of assigned attributes for an instance of the `#extended_class`
+      def attributes: (untyped instance) -> Hash[Symbol, untyped]
+
+      # Code of the `#__dry_initializer_initialize__` method
+      def code: () -> String
+
+      # Finalizes config
+      def finalize: () -> self
+
+      # Human-readable representation of configured params and options
+      def inch: () -> String
+
+      private
+
+      def initialize: (?Class? extended_class, ?null: singleton(UNDEFINED)?) -> void
+    end
+
+    # Base class for parameter or option definitions
+    class Definition
+      attr_reader option: bool
+
+      attr_reader null: singleton(UNDEFINED)?
+
+      attr_reader source: Symbol
+
+      attr_reader target: Symbol
+
+      attr_reader ivar: String
+
+      attr_reader type: untyped
+
+      attr_reader optional: bool
+
+      attr_reader default: untyped
+
+      attr_reader reader: (:public | :private | :protected)?
+
+      attr_reader desc: String?
+
+      def options: () -> Hash[Symbol, untyped]
+
+      def name: () -> String
+
+      alias to_s name
+
+      alias to_str name
+
+      alias inspect name
+
+      def ==: (untyped other) -> bool
+
+      def code: () -> String
+
+      def inch: () -> String
+    end
+
+    # The nested structure that takes nested hashes with indifferent access
+    class Struct
+      extend Initializer
+
+      def self.new: (untyped options) -> instance
+
+      alias self.call self.new
+
+      # Represents event data as a nested hash with deeply stringified keys
+      def to_h: () -> Hash[String, untyped]
+    end
+
+    # Normalizes arguments of `.param` and `.option`.
+    #
+    # Custom dispatchers can be added on top of the stack of default ones.
+    module Dispatchers
+      interface _Dispatcher
+        def call: (**untyped options) -> Hash[Symbol, untyped]
+      end
+
+      # Defines a value to be set to unassigned attributes
+      attr_accessor self.null: untyped
+
+      # Registers a new dispatcher
+      def self.<<: (_Dispatcher dispatcher) -> singleton(Dispatchers)
+
+      # Normalizes the source set of options
+      def self.call: (**untyped options) -> Hash[Symbol, untyped]
+    end
+  end
+end

@@ -1,0 +1,49 @@
+class User
+  extend Dry::Initializer
+
+  attr_reader name: String
+
+  attr_reader role: String
+
+  attr_reader admin: bool
+
+  attr_reader phone: String?
+
+  attr_reader tel: String?
+
+  def initialize: (untyped name, ?untyped role, ?admin: bool, ?phone: String?, ?telefon: String?, ?token: String?, ?password: String?) -> void
+end
+
+class Admin < User
+  attr_reader permissions: Array[untyped]
+
+  def initialize: (untyped name, ?untyped role, ?untyped permissions, ?admin: bool, ?phone: String?, ?telefon: String?, ?token: String?, ?password: String?) -> void
+end
+
+class Article
+  extend Dry::Initializer
+
+  attr_reader tags: Array[String]?
+
+  attr_reader author: Dry::Initializer::Struct?
+
+  def initialize: (?tags: untyped, ?author: untyped) -> void
+end
+
+class Container
+  attr_reader name: String
+
+  attr_reader admin: bool
+
+  def initialize: (untyped name, ?admin: bool) -> void
+end
+
+class Point < Dry::Initializer::Struct
+  attr_reader x: untyped
+
+  attr_reader y: untyped
+end
+
+class IntegerDispatcher
+  def call: (?integer: bool, **untyped opts) -> Hash[Symbol, untyped]
+end
