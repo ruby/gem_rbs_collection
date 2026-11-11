@@ -30,13 +30,12 @@ class Message < ActiveRecord::Base
   end
 
   def announce_later
-    job = broadcast_append_later_to board, target: "messages"
-    job.job_id if job
+    broadcast_append_later_to board, target: "messages"
+    broadcast_action_later action: :prepend
   end
 
   def render_later
-    job = broadcast_render_later
-    job.queue_name if job
+    broadcast_render_later_to board, partial: "messages/message"
   end
 end
 
