@@ -14,12 +14,16 @@ module ActionController
     extend Helpers::ClassMethods
     extend AbstractController::Helpers::ClassMethods
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
     include ActionView::Layouts
     extend ::ActionView::Layouts::ClassMethods
+    extend ::ActionView::Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Rendering
     extend Rendering::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include EtagWithTemplateDigest
@@ -75,9 +79,13 @@ module ActionController
     # https://github.com/rails/rails/blob/v6.0.3.2/actionpack/lib/action_controller/api.rb#L112-L145
     include AbstractController::Rendering
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
     include ApiRendering
+    extend Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include BasicImplicitRender

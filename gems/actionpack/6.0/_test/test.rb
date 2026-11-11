@@ -109,3 +109,24 @@ class AccessorsController < ActionController::Base
     request.local?
   end
 end
+
+# ClassMethods of the concerns Base and API include
+ActionController::Base.use_renderers(:json)
+ActionController::API.use_renderers(:json)
+ActionController::Base.define_callbacks(:notify)
+ActionController::API.prepend_view_path("app/views")
+
+# ClassMethods of the concerns the generated classes include
+class FooController < ActionController::Base
+end
+
+class FooControllerTest < ActionController::TestCase
+  tests FooController
+end
+
+class FooIntegrationTest < ActionDispatch::IntegrationTest
+  register_encoder :xml
+end
+
+ActionDispatch::Request.parameter_parsers = {}
+ActionDispatch::Callbacks.define_callbacks(:notify)
