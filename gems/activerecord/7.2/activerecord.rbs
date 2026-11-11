@@ -132,7 +132,6 @@ module ActiveRecord
 
     def save!: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> void
     def save: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> bool
-    def touch: (*String | Symbol names, ?time: untyped) -> boolish
     def update!: (*untyped) -> self
     def update: (*untyped) -> bool
     def destroy!: () -> self
@@ -946,12 +945,6 @@ module ActiveRecord
 end
 
 module ActiveRecord
-  module NoTouching
-    def touch: (*untyped, **untyped) -> untyped
-  end
-end
-
-module ActiveRecord
   module ConnectionAdapters
     class Transaction
       def full_rollback?: () -> bool
@@ -1063,6 +1056,8 @@ module ActiveRecord
   end
 
   module Persistence
+    def touch: (*String | Symbol names, ?time: untyped) -> boolish
+
     private
 
     # The name of the method used to touch a +belongs_to+ association when the
