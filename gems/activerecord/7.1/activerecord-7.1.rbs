@@ -1,5 +1,38 @@
 module ActiveRecord
+  module Scoping
+    class DefaultScope
+      attr_reader scope: untyped
+
+      attr_reader all_queries: untyped
+
+      def initialize: (untyped scope, ?untyped? all_queries) -> void
+    end
+  end
+
   class Base
+    # Stores the default scope for the class.
+    def self.default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
+    # Stores the default scope for the class.
+    def self.default_scopes=: (Array[ActiveRecord::Scoping::DefaultScope]) -> Array[ActiveRecord::Scoping::DefaultScope]
+    # Stores the default scope for the class.
+    def default_scopes: () -> Array[ActiveRecord::Scoping::DefaultScope]
+
+    # Force enumeration of all columns in SELECT statements.
+    # e.g. <tt>SELECT first_name, last_name FROM ...</tt> instead of <tt>SELECT * FROM ...</tt>
+    # This avoids +PreparedStatementCacheExpired+ errors when a column is added
+    # to the database while the app is running.
+    def self.enumerate_columns_in_select_statements: () -> bool
+    # Force enumeration of all columns in SELECT statements.
+    # e.g. <tt>SELECT first_name, last_name FROM ...</tt> instead of <tt>SELECT * FROM ...</tt>
+    # This avoids +PreparedStatementCacheExpired+ errors when a column is added
+    # to the database while the app is running.
+    def self.enumerate_columns_in_select_statements?: () -> bool
+    # Force enumeration of all columns in SELECT statements.
+    # e.g. <tt>SELECT first_name, last_name FROM ...</tt> instead of <tt>SELECT * FROM ...</tt>
+    # This avoids +PreparedStatementCacheExpired+ errors when a column is added
+    # to the database while the app is running.
+    def self.enumerate_columns_in_select_statements=: (bool) -> bool
+
     include Encryption::EncryptableRecord
     extend Encryption::EncryptableRecord::ClassMethods
     include Normalization
