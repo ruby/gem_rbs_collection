@@ -1072,6 +1072,40 @@ module ActiveRecord
   end
 
   module Persistence
+    # Saves the record with the updated_at/on attributes set to the current time
+    # or the time specified.
+    # Please note that no validation is performed and only the +after_touch+,
+    # +after_commit+ and +after_rollback+ callbacks are executed.
+    #
+    # This method can be passed attribute names and an optional time argument.
+    # If attribute names are passed, they are updated along with updated_at/on
+    # attributes. If no time argument is passed, the current time is used as default.
+    #
+    #   product.touch                         # updates updated_at/on with current time
+    #   product.touch(time: Time.new(2015, 2, 16, 0, 0, 0)) # updates updated_at/on with specified time
+    #   product.touch(:designed_at)           # updates the designed_at attribute and updated_at/on
+    #   product.touch(:started_at, :ended_at) # updates started_at, ended_at and updated_at/on attributes
+    #
+    # If used along with {belongs_to}[rdoc-ref:Associations::ClassMethods#belongs_to]
+    # then +touch+ will invoke +touch+ method on associated object.
+    #
+    #   class Brake < ActiveRecord::Base
+    #     belongs_to :car, touch: true
+    #   end
+    #
+    #   class Car < ActiveRecord::Base
+    #     belongs_to :corporation, touch: true
+    #   end
+    #
+    #   # triggers @brake.car.touch and @brake.car.corporation.touch
+    #   @brake.touch
+    #
+    # Note that +touch+ must be used on a persisted object, or else an
+    # ActiveRecordError will be thrown. For example:
+    #
+    #   ball = Ball.new
+    #   ball.touch(:updated_at)   # => raises ActiveRecordError
+    #
     def touch: (*String | Symbol names, ?time: untyped) -> boolish
 
     private
