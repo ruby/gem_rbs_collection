@@ -1,0 +1,144 @@
+module Erubi
+  VERSION: String
+
+  RANGE_FIRST: Integer
+
+  RANGE_LAST: Integer
+
+  MATCH_METHOD: Symbol
+
+  SKIP_DEFINED_FOR_INSTANCE_VARIABLE: bool
+
+  FREEZE_TEMPLATE_LITERALS: bool
+
+  # Escape characters with their HTML/XML equivalents.
+  def self?.h: (untyped value) -> String
+
+  class Engine
+    # Options of Erubi::Engine.new
+    type properties = {
+      ?bufval: String,
+      ?bufvar: String,
+      ?chain_appends: boolish,
+      ?ensure: boolish,
+      ?escapefunc: String,
+      ?escape: boolish,
+      ?escape_html: boolish,
+      ?filename: String?,
+      ?freeze: boolish,
+      ?freeze_template_literals: boolish,
+      ?literal_prefix: String,
+      ?literal_postfix: String,
+      ?outvar: String,
+      ?postamble: String,
+      ?preamble: String,
+      ?regexp: Regexp,
+      ?src: String,
+      ?trim: boolish
+    }
+
+    # The default regular expression used for scanning.
+    DEFAULT_REGEXP: Regexp
+
+    # The frozen ruby source code generated from the template, which can be evaled.
+    attr_reader src: String
+
+    # The filename of the template, if one was given.
+    attr_reader filename: String?
+
+    # The variable name used for the buffer variable.
+    attr_reader bufvar: String
+
+    def initialize: (String input, ?properties properties) -> void
+
+    private
+
+    def _dup_string_if_frozen: (String string) -> String
+
+    # Add raw text to the template.
+    def add_text: (String text) -> void
+
+    # Add ruby code to the template
+    def add_code: (String code) -> void
+
+    # Add the given ruby expression result to the template,
+    # escaping it based on the indicator given and escape flag.
+    def add_expression: (String? indicator, String code) -> void
+
+    # Add the result of Ruby expression to the template
+    def add_expression_result: (String code) -> void
+
+    # Add the escaped result of Ruby expression to the template
+    def add_expression_result_escaped: (String code) -> void
+
+    # Add the given postamble to the src.
+    def add_postamble: (String postamble) -> void
+
+    # Handle an indicator the engine doesn't know. The base engine raises ArgumentError.
+    def handle: (String? indicator, String code, String? tailch, String? rspace, String? lspace) -> void
+
+    # Make sure the buffer variable is the target of the next append
+    # before yielding to the block.
+    def with_buffer: () { () -> void } -> void
+
+    # Make sure that any current expression has been terminated.
+    def terminate_expression: () -> void
+  end
+
+  # An engine class that supports capturing blocks via the <%= and <%== tags.
+  # Defined in erubi/capture_block.
+  class CaptureBlockEngine < Engine
+    class Buffer < ::String
+      # Convert argument to string when concatening
+      def <<: (untyped v) -> self
+
+      # Escape argument using Erubi.h then then concatenate it to the receiver.
+      def |: (untyped v) -> self
+
+      # Temporarily clear the receiver before yielding to the block, yield the
+      # given args to the block, return any data captured by the receiver, and
+      # restore the original data the receiver contained before returning.
+      def capture: (*untyped args) { (*untyped) -> void } -> self
+
+      private
+
+      def h: (untyped value) -> String
+    end
+
+    private
+
+    def add_expression_op: (String op, String code) -> void
+  end
+
+  # An engine class that supports capturing blocks via the <%|= and <%|== tags,
+  # explicitly ending the captures using <%| end %> blocks.
+  # Defined in erubi/capture_end.
+  class CaptureEndEngine < Engine
+    # Options of Erubi::CaptureEndEngine.new: the ones of Erubi::Engine.new,
+    # and escape_capture and yield_returns_buffer
+    type properties = {
+      ?bufval: String,
+      ?bufvar: String,
+      ?chain_appends: boolish,
+      ?ensure: boolish,
+      ?escapefunc: String,
+      ?escape: boolish,
+      ?escape_html: boolish,
+      ?escape_capture: boolish,
+      ?filename: String?,
+      ?freeze: boolish,
+      ?freeze_template_literals: boolish,
+      ?literal_prefix: String,
+      ?literal_postfix: String,
+      ?outvar: String,
+      ?postamble: String,
+      ?preamble: String,
+      ?regexp: Regexp,
+      ?src: String,
+      ?trim: boolish,
+      ?yield_returns_buffer: boolish
+    }
+
+    def initialize: (String input, ?properties properties) -> void
+  end
+end
