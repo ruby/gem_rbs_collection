@@ -113,3 +113,6 @@ ActiveModel::Type.lookup(:string).cast("x")
 
 # ClassMethods of the concerns the generated classes include
 ActiveModel::Type::Value.serialize_cast_value_compatible?
+
+(error == ActiveModel::Error.new(Person.new, :name)) & true
+error.hash + 1

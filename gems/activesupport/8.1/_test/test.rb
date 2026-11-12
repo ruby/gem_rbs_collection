@@ -161,3 +161,19 @@ class AlwaysSafe
     [true, false].sample || false
   end
 end
+
+duration = 5.minutes
+(duration <=> 1.minute)&.positive?
+comparison = duration <=> 60
+(duration == 300) & true
+duration.eql?(5.minutes) & true
+duration.hash + 1
+(ActiveSupport::Duration === duration) & true
+zoned.eql?(Time.now) & true
+zoned.hash + 1
+(Time === zoned) & true
+
+class CompareRange < Range
+  prepend ActiveSupport::CompareWithRange
+end
+(CompareRange.new(1, 5) === (2..3)) & true

@@ -483,6 +483,9 @@ end
 
 # active_support/core_ext/time/calculations.rb
 class Time
+  # Overriding case equality method so that it returns true for ActiveSupport::TimeWithZone instances
+  def self.===: (untyped other) -> bool
+
   # Layers additional behavior on Time#<=> so that DateTime and ActiveSupport::TimeWithZone instances
   # can be chronologically compared with a Time
   def compare_with_coercion: (untyped other) -> (-1 | 0 | 1 | nil)
@@ -499,6 +502,22 @@ module ActiveSupport
     class Scalar
       def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
     end
+
+    def self.===: (untyped other) -> bool
+
+    # Compares one Duration with another or a Numeric to this Duration.
+    # Numeric values are treated as seconds.
+    def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
+
+    # Returns +true+ if +other+ is also a Duration instance with the
+    # same +value+, or if <tt>other == value</tt>.
+    def ==: (untyped other) -> bool
+
+    # Returns +true+ if +other+ is also a Duration instance, which has the
+    # same parts as this one.
+    def eql?: (untyped other) -> bool
+
+    def hash: () -> Integer
   end
 end
 
@@ -507,6 +526,11 @@ module ActiveSupport
   class TimeWithZone
     # Use the time in UTC for comparisons.
     def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
+
+    # Returns +true+ if +other+ is equal to current object.
+    def eql?: (untyped other) -> bool
+
+    def hash: () -> Integer
   end
 end
 
@@ -516,5 +540,23 @@ module ActiveSupport
     # Compare this time zone to the parameter. The two are compared first on
     # their offsets, and then by name.
     def <=>: (untyped zone) -> (-1 | 0 | 1 | nil)
+  end
+end
+
+# active_support/core_ext/range/compare_range.rb
+module ActiveSupport
+  module CompareWithRange
+    # Extends the default Range#=== to support range comparisons.
+    #  (1..5) === (1..5)  # => true
+    #  (1..5) === (2..3)  # => true
+    #  (1..5) === (1...6) # => true
+    #  (1..5) === (2..6)  # => false
+    #
+    # The native Range#=== behavior is untouched.
+    #  ('a'..'f') === ('c') # => true
+    #  (5..9) === (11) # => false
+    #
+    # The given range must be fully bounded, with both start and end.
+    def ===: (untyped value) -> bool
   end
 end
