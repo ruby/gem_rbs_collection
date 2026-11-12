@@ -3664,29 +3664,6 @@ module ActiveRecord
 
       def records: () -> untyped
 
-      # Adds one or more +records+ to the collection by setting their foreign keys
-      # to the association's primary key. Since <tt><<</tt> flattens its argument list and
-      # inserts each record, +push+ and +concat+ behave identically. Returns +self+
-      # so several appends may be chained together.
-      #
-      #   class Person < ActiveRecord::Base
-      #     has_many :pets
-      #   end
-      #
-      #   person.pets.size # => 0
-      #   person.pets << Pet.new(name: 'Fancy-Fancy')
-      #   person.pets << [Pet.new(name: 'Spook'), Pet.new(name: 'Choo-Choo')]
-      #   person.pets.size # => 3
-      #
-      #   person.id # => 1
-      #   person.pets
-      #   # => [
-      #   #      #<Pet id: 1, name: "Fancy-Fancy", person_id: 1>,
-      #   #      #<Pet id: 2, name: "Spook", person_id: 1>,
-      #   #      #<Pet id: 3, name: "Choo-Choo", person_id: 1>
-      #   #    ]
-      def <<: (*untyped records) -> untyped
-
       alias push <<
 
       alias append <<

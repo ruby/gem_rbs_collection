@@ -215,3 +215,6 @@ end
 ActiveRecord::Base.lease_connection.create_table(:tags)
 ActiveRecord::Base.lease_connection.create_join_table(:products, :tags) { |t| t.bigint :position }
 ActiveRecord::Base.lease_connection.change_table(:products) { |t| t.boolean :active, default: false }
+
+# << returns the collection, or nil when a save fails
+(User.new.articles << Article.new)&.size
