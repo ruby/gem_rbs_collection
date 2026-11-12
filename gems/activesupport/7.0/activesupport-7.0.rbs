@@ -468,6 +468,26 @@ class DateTime
   alias to_formatted_s to_fs
 end
 
+# active_support/core_ext/date_time/calculations.rb
+class DateTime
+  # Layers additional behavior on DateTime#<=> so that Time and
+  # ActiveSupport::TimeWithZone instances can be compared with a DateTime.
+  def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
+end
+
+# active_support/core_ext/date/calculations.rb
+class Date
+  # Allow Date to be compared with Time by converting to DateTime and relying on the <=> from there.
+  def compare_with_coercion: (untyped other) -> (-1 | 0 | 1 | nil)
+end
+
+# active_support/core_ext/time/calculations.rb
+class Time
+  # Layers additional behavior on Time#<=> so that DateTime and ActiveSupport::TimeWithZone instances
+  # can be chronologically compared with a Time
+  def compare_with_coercion: (untyped other) -> (-1 | 0 | 1 | nil)
+end
+
 # active_support/core_ext/object/json.rb
 class String
   def as_json: (?untyped? options) -> self

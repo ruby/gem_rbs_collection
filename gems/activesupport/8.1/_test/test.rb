@@ -133,6 +133,10 @@ DateTime.now.readable_inspect.length
 Date.today.compare_with_coercion(Time.now)&.positive?
 (DateTime.now <=> Date.today)&.positive?
 Time.now.compare_with_coercion(Time.now)&.positive?
+# @type var comparison: -1 | 0 | 1 | nil
+comparison = Date.today.compare_with_coercion(Time.now)
+comparison = Time.now.compare_with_coercion(Date.today)
+comparison = DateTime.now <=> Time.now
 Time.now.eql_with_coercion(Time.now) & true
 String.as_json&.length
 Object.new.duplicable? & Object.new.html_safe?

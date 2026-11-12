@@ -2254,9 +2254,6 @@ class Date
   #   Date.new(2007, 5, 12).change(year: 2005, month: 1) # => Date.new(2005, 1, 12)
   def change: (untyped options) -> untyped
 
-  # Allow Date to be compared with Time by converting to DateTime and relying on the <=> from there.
-  def compare_with_coercion: (untyped other) -> untyped
-
   alias compare_without_coercion <=>
 end
 
@@ -2686,10 +2683,6 @@ class DateTime
 
   # Returns the offset value in seconds.
   def utc_offset: () -> untyped
-
-  # Layers additional behavior on DateTime#<=> so that Time and
-  # ActiveSupport::TimeWithZone instances can be compared with a DateTime.
-  def <=>: (untyped other) -> untyped
 end
 
 class DateTime
@@ -5144,10 +5137,6 @@ class Time
   def minus_with_coercion: (untyped other) -> untyped
 
   alias minus_without_coercion -
-
-  # Layers additional behavior on Time#<=> so that DateTime and ActiveSupport::TimeWithZone instances
-  # can be chronologically compared with a Time
-  def compare_with_coercion: (untyped other) -> untyped
 
   alias compare_without_coercion <=>
 

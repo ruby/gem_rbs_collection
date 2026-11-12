@@ -48,3 +48,11 @@ DateTime.new(2024, 1, 1).to_formatted_s.upcase
 Time.at(0).to_formatted_s(:short).upcase
 
 "text".as_json.upcase
+
+Date.today.compare_with_coercion(Time.now)&.positive?
+(DateTime.now <=> Date.today)&.positive?
+Time.now.compare_with_coercion(Time.now)&.positive?
+# @type var comparison: -1 | 0 | 1 | nil
+comparison = Date.today.compare_with_coercion(Time.now)
+comparison = Time.now.compare_with_coercion(Date.today)
+comparison = DateTime.now <=> Time.now
