@@ -56,3 +56,13 @@ Time.now.compare_with_coercion(Time.now)&.positive?
 comparison = Date.today.compare_with_coercion(Time.now)
 comparison = Time.now.compare_with_coercion(Date.today)
 comparison = DateTime.now <=> Time.now
+utc = ActiveSupport::TimeZone['UTC'] || raise
+tokyo = ActiveSupport::TimeZone['Asia/Tokyo'] || raise
+zoned = ActiveSupport::TimeWithZone.new(Time.now, utc)
+scalar = ActiveSupport::Duration::Scalar.new(1)
+(zoned <=> Time.now)&.positive?
+(utc <=> tokyo)&.positive?
+(scalar <=> 2)&.positive?
+comparison = zoned <=> Time.now
+comparison = utc <=> tokyo
+comparison = scalar <=> 2

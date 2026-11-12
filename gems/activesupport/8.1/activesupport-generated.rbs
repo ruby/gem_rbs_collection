@@ -7719,8 +7719,6 @@ module ActiveSupport
 
       def -@: () -> Scalar
 
-      def <=>: (untyped other) -> untyped
-
       def +: (untyped other) -> untyped
 
       def -: (untyped other) -> untyped
@@ -14853,9 +14851,6 @@ module ActiveSupport
 
     alias to_formatted_s to_fs
 
-    # Use the time in UTC for comparisons.
-    def <=>: (untyped other) -> untyped
-
     alias before? <
 
     alias after? >
@@ -15146,10 +15141,6 @@ module ActiveSupport
     #   zone.formatted_offset        # => "-06:00"
     #   zone.formatted_offset(false) # => "-0600"
     def formatted_offset: (?bool colon, ?untyped? alternate_utc_string) -> untyped
-
-    # Compare this time zone to the parameter. The two are compared first on
-    # their offsets, and then by name.
-    def <=>: (untyped zone) -> (nil | untyped)
 
     # Compare #name and TZInfo identifier to a supplied regexp, returning +true+
     # if a match is found.

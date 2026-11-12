@@ -463,3 +463,29 @@ module ActiveSupport
     def local?: () -> bool
   end
 end
+
+# active_support/duration.rb
+module ActiveSupport
+  class Duration
+    class Scalar
+      def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
+    end
+  end
+end
+
+# active_support/time_with_zone.rb
+module ActiveSupport
+  class TimeWithZone
+    # Use the time in UTC for comparisons.
+    def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
+  end
+end
+
+# active_support/values/time_zone.rb
+module ActiveSupport
+  class TimeZone
+    # Compare this time zone to the parameter. The two are compared first on
+    # their offsets, and then by name.
+    def <=>: (untyped zone) -> (-1 | 0 | 1 | nil)
+  end
+end
