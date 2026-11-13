@@ -173,6 +173,10 @@ module Test
   User.build([{ name: 'James' }, { name: 'John' }]).first&.articles
   built.reload.articles
   (built <=> User.new)&.positive?
+  # @type var comparison: -1 | 0 | 1 | nil
+  comparison = built <=> User.new
+  (built == User.new) & true
+  built.hash + 1
   built.validate & built.valid?
 
   user = User.new

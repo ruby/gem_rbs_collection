@@ -6017,19 +6017,6 @@ end
 
 module ActiveSupport
   module CompareWithRange
-    # Extends the default Range#=== to support range comparisons.
-    #  (1..5) === (1..5)  # => true
-    #  (1..5) === (2..3)  # => true
-    #  (1..5) === (1...6) # => true
-    #  (1..5) === (2..6)  # => false
-    #
-    # The native Range#=== behavior is untouched.
-    #  ('a'..'f') === ('c') # => true
-    #  (5..9) === (11) # => false
-    #
-    # The given range must be fully bounded, with both start and end.
-    def ===: (untyped value) -> untyped
-
     # Extends the default Range#include? to support range comparisons.
     #  (1..5).include?(1..5)  # => true
     #  (1..5).include?(2..3)  # => true
@@ -6577,9 +6564,6 @@ class Time
   include ::DateAndTime::Calculations
 
   COMMON_YEAR_DAYS_IN_MONTH: ::Array[nil | 31 | 28 | 30]
-
-  # Overriding case equality method so that it returns true for ActiveSupport::TimeWithZone instances
-  def self.===: (untyped other) -> untyped
 
   # Returns the number of days in the given month.
   # If no year is specified, it will use the current year.
@@ -7719,8 +7703,6 @@ module ActiveSupport
 
       def -@: () -> Scalar
 
-      def <=>: (untyped other) -> untyped
-
       def +: (untyped other) -> untyped
 
       def -: (untyped other) -> untyped
@@ -7767,8 +7749,6 @@ module ActiveSupport
     # If invalid string is provided, it will raise +ActiveSupport::Duration::ISO8601Parser::ParsingError+.
     def self.parse: (untyped iso8601duration) -> untyped
 
-    def self.===: (untyped other) -> untyped
-
     def self.seconds: (untyped value) -> untyped
 
     def self.minutes: (untyped value) -> untyped
@@ -7807,10 +7787,6 @@ module ActiveSupport
 
     def coerce: (untyped other) -> untyped
 
-    # Compares one Duration with another or a Numeric to this Duration.
-    # Numeric values are treated as seconds.
-    def <=>: (untyped other) -> untyped
-
     # Adds another Duration or a Numeric to this Duration. Numeric values
     # are treated as seconds.
     def +: (untyped other) -> untyped
@@ -7838,10 +7814,6 @@ module ActiveSupport
     alias kind_of? is_a?
 
     def instance_of?: (untyped klass) -> untyped
-
-    # Returns +true+ if +other+ is also a Duration instance with the
-    # same +value+, or if <tt>other == value</tt>.
-    def ==: (untyped other) -> untyped
 
     # Returns the amount of seconds a duration covers as a string.
     # For more information check to_i method.
@@ -7902,12 +7874,6 @@ module ActiveSupport
     #
     #   30.days.in_years # => 0.082
     def in_years: () -> untyped
-
-    # Returns +true+ if +other+ is also a Duration instance, which has the
-    # same parts as this one.
-    def eql?: (untyped other) -> untyped
-
-    def hash: () -> untyped
 
     # Calculates a new Time or Date that is as far in the future
     # as this Duration represents.
@@ -14853,9 +14819,6 @@ module ActiveSupport
 
     alias to_formatted_s to_fs
 
-    # Use the time in UTC for comparisons.
-    def <=>: (untyped other) -> untyped
-
     alias before? <
 
     alias after? >
@@ -14885,11 +14848,6 @@ module ActiveSupport
 
     # Returns true if the current object's time is in the future.
     def future?: () -> untyped
-
-    # Returns +true+ if +other+ is equal to current object.
-    def eql?: (untyped other) -> untyped
-
-    def hash: () -> untyped
 
     # Adds an interval of time to the current object's time and returns that
     # value as a new TimeWithZone object.
@@ -15146,10 +15104,6 @@ module ActiveSupport
     #   zone.formatted_offset        # => "-06:00"
     #   zone.formatted_offset(false) # => "-0600"
     def formatted_offset: (?bool colon, ?untyped? alternate_utc_string) -> untyped
-
-    # Compare this time zone to the parameter. The two are compared first on
-    # their offsets, and then by name.
-    def <=>: (untyped zone) -> (nil | untyped)
 
     # Compare #name and TZInfo identifier to a supplied regexp, returning +true+
     # if a match is found.

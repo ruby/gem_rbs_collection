@@ -133,6 +133,20 @@ DateTime.now.readable_inspect.length
 Date.today.compare_with_coercion(Time.now)&.positive?
 (DateTime.now <=> Date.today)&.positive?
 Time.now.compare_with_coercion(Time.now)&.positive?
+# @type var comparison: -1 | 0 | 1 | nil
+comparison = Date.today.compare_with_coercion(Time.now)
+comparison = Time.now.compare_with_coercion(Date.today)
+comparison = DateTime.now <=> Time.now
+utc = ActiveSupport::TimeZone['UTC'] || raise
+tokyo = ActiveSupport::TimeZone['Asia/Tokyo'] || raise
+zoned = ActiveSupport::TimeWithZone.new(Time.now, utc)
+scalar = ActiveSupport::Duration::Scalar.new(1)
+(zoned <=> Time.now)&.positive?
+(utc <=> tokyo)&.positive?
+(scalar <=> 2)&.positive?
+comparison = zoned <=> Time.now
+comparison = utc <=> tokyo
+comparison = scalar <=> 2
 Time.now.eql_with_coercion(Time.now) & true
 String.as_json&.length
 Object.new.duplicable? & Object.new.html_safe?
@@ -147,3 +161,19 @@ class AlwaysSafe
     [true, false].sample || false
   end
 end
+
+duration = 5.minutes
+(duration <=> 1.minute)&.positive?
+comparison = duration <=> 60
+(duration == 300) & true
+duration.eql?(5.minutes) & true
+duration.hash + 1
+(ActiveSupport::Duration === duration) & true
+zoned.eql?(Time.now) & true
+zoned.hash + 1
+(Time === zoned) & true
+
+class CompareRange < Range
+  prepend ActiveSupport::CompareWithRange
+end
+(CompareRange.new(1, 5) === (2..3)) & true

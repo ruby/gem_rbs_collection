@@ -118,3 +118,10 @@ class BodyRenderer
     render_to_body(template: "show") ? "rendered" : "empty"
   end
 end
+
+params = ActionController::Parameters.new({ name: "Francesco" })
+(params == ActionController::Parameters.new) & true
+mime = Mime::Type.new("text/plain")
+(mime == "text/plain") & true
+mime.eql?(Mime::Type.new("text/html")) & true
+(mime === [mime]) & true
