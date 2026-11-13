@@ -1,0 +1,90 @@
+# active_support/duration.rb
+module ActiveSupport
+  class Duration
+    class Scalar
+      def coerce: (untyped other) -> [Scalar, self]
+                | ...
+
+      def +: (Duration other) -> Duration
+           | (Numeric other) -> Scalar
+           | ...
+
+      def -: (Duration other) -> Duration
+           | (Numeric other) -> Scalar
+           | ...
+
+      def *: (Duration other) -> Duration
+           | (Numeric other) -> Scalar
+           | ...
+
+      def /: (Duration other) -> Numeric
+           | (Numeric other) -> Scalar
+           | ...
+
+      def %: (Duration other) -> Duration
+           | (Numeric other) -> Scalar
+           | ...
+    end
+
+    def coerce: (untyped other) -> [Scalar, self]
+              | ...
+
+    def +: (Duration | Numeric other) -> Duration
+         | ...
+
+    def -: (Duration | Numeric other) -> Duration
+         | ...
+
+    def *: (Duration | Numeric other) -> Duration
+         | ...
+
+    def /: (Duration other) -> Numeric
+         | (Numeric other) -> Duration
+         | ...
+
+    def %: (Duration | Numeric other) -> Duration
+         | ...
+  end
+end
+
+# active_support/core_ext/string/output_safety.rb
+module ActiveSupport
+  class SafeBuffer
+    def []: (*untyped args) -> String?
+
+    def +: (untyped other) -> self
+
+    def *: (untyped _) -> SafeBuffer
+
+    def %: (untyped args) -> self
+  end
+end
+
+# active_support/hash_with_indifferent_access.rb
+module ActiveSupport
+  class HashWithIndifferentAccess[T, U]
+    def self.[]: (*untyped args) -> instance
+
+    # Assigns a new value to the hash:
+    #
+    #   hash = ActiveSupport::HashWithIndifferentAccess.new
+    #   hash[:key] = 'value'
+    #
+    # This value can be later fetched using either +:key+ or <tt>'key'</tt>.
+    #
+    # If the value is a Hash or contains one or multiple Hashes, they will be
+    # converted to +HashWithIndifferentAccess+.
+    def []=: (untyped key, U value) -> U
+
+    # Same as <tt>Hash#[]</tt> where the key passed as argument can be
+    # either a string or a symbol:
+    #
+    #   counters = ActiveSupport::HashWithIndifferentAccess.new
+    #   counters[:foo] = 1
+    #
+    #   counters['foo'] # => 1
+    #   counters[:foo]  # => 1
+    #   counters[:zoo]  # => nil
+    %a{implicitly-returns-nil} def []: (untyped key) -> U
+  end
+end
