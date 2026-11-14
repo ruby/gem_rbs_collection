@@ -312,6 +312,15 @@ module ActiveRecord
                    | (?shards: ::Hash[Symbol, ::Hash[Symbol, Symbol]]) -> Array[ConnectionAdapters::ConnectionPool]
     def lease_connection: () -> ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
+
+  module Delegation
+    # Returns the connection currently associated with the class. This can
+    # also be used to "borrow" the connection to do database work unrelated
+    # to any of the specific Active Records.
+    # The connection will remain leased for the entire duration of the request
+    # or job, or until +#release_connection+ is called.
+    def lease_connection: () -> ActiveRecord::ConnectionAdapters::AbstractAdapter
+  end
 end
 
 module Arel
