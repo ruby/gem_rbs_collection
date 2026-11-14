@@ -1,6 +1,6 @@
 module ActionController
   interface _API_and_Base
-    def flash: () -> untyped
+    def flash: () -> ActionDispatch::Flash::FlashHash
   end
 
   class Base < Metal
@@ -14,12 +14,16 @@ module ActionController
     extend Helpers::ClassMethods
     extend AbstractController::Helpers::ClassMethods
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
     include ActionView::Layouts
     extend ::ActionView::Layouts::ClassMethods
+    extend ::ActionView::Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Rendering
     extend Rendering::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include EtagWithTemplateDigest
@@ -27,6 +31,7 @@ module ActionController
     include Caching
     include AbstractController::Caching
     extend AbstractController::Caching::ClassMethods
+    extend AbstractController::Caching::ConfigMethods
     extend AbstractController::Caching::Fragments::ClassMethods
     include MimeResponds
     include ImplicitRender
@@ -42,6 +47,8 @@ module ActionController
     extend RequestForgeryProtection::ClassMethods
     include ContentSecurityPolicy
     extend ContentSecurityPolicy::ClassMethods
+    include PermissionsPolicy
+    extend PermissionsPolicy::ClassMethods
     include ForceSSL
     extend ForceSSL::ClassMethods
     include Streaming
@@ -52,8 +59,11 @@ module ActionController
     include HttpAuthentication::Token::ControllerMethods
     include DefaultHeaders
     extend DefaultHeaders::ClassMethods
+    include Logging
+    extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
@@ -69,9 +79,13 @@ module ActionController
     # https://github.com/rails/rails/blob/v6.0.3.2/actionpack/lib/action_controller/api.rb#L112-L145
     include AbstractController::Rendering
     include UrlFor
+    extend AbstractController::UrlFor::ClassMethods
     include Redirecting
     include ApiRendering
+    extend Rendering::ClassMethods
+    extend ::ActionView::ViewPaths::ClassMethods
     include Renderers::All
+    extend Renderers::ClassMethods
     include ConditionalGet
     extend ConditionalGet::ClassMethods
     include BasicImplicitRender
@@ -81,8 +95,11 @@ module ActionController
     include DataStreaming
     include DefaultHeaders
     extend DefaultHeaders::ClassMethods
+    include Logging
+    extend Logging::ClassMethods
     include AbstractController::Callbacks
     extend AbstractController::Callbacks::ClassMethods
+    extend ActiveSupport::Callbacks::ClassMethods
     include Rescue
     include ActiveSupport::Rescuable
     extend ActiveSupport::Rescuable::ClassMethods
@@ -101,14 +118,14 @@ module ActionController
       extend ::ActionController::HttpAuthentication::Token
 
       module ControllerMethods
-        def authenticate_or_request_with_http_token: (?String realm, ?String? message) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> untyped
+        def authenticate_or_request_with_http_token: [T] (?String realm, ?String? message) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> T } -> (T | String)
 
-        def authenticate_with_http_token: () { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> boolish
+        def authenticate_with_http_token: [T] () { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> T } -> T?
 
-        def request_http_token_authentication: (?String realm, ?String? message) -> void
+        def request_http_token_authentication: (?String realm, ?String? message) -> String
       end
 
-      def authenticate: (instance controller) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> boolish } -> boolish
+      def authenticate: [T] (instance controller) { (String token, ActiveSupport::HashWithIndifferentAccess[untyped, untyped] options) -> T } -> T?
 
       def token_and_options: (ActionDispatch::Request request) -> [String, ActiveSupport::HashWithIndifferentAccess[untyped, untyped]]?
 
@@ -122,7 +139,41 @@ module ActionController
 
       def encode_credentials: (String token, ?::Hash[untyped, untyped] options) -> ::String
 
-      def authentication_request: (instance controller, String realm, ?String? message) -> void
+      def authentication_request: (instance controller, String realm, ?String? message) -> String
+    end
+
+    module Basic
+      module ControllerMethods
+        module ClassMethods
+          def http_basic_authenticate_with: (name: String, password: String, ?realm: String?, **untyped options) -> void
+        end
+
+        def http_basic_authenticate_or_request_with: (name: String, password: String, ?realm: String?, ?message: String?) -> (true | String)
+
+        def authenticate_or_request_with_http_basic: [T] (?String? realm, ?String? message) { (String? name, String? password) -> T } -> (T | String)
+
+        def authenticate_with_http_basic: [T] () { (String? name, String? password) -> T } -> T?
+
+        def request_http_basic_authentication: (?String realm, ?String? message) -> String
+      end
+
+      def authenticate: [T] (ActionDispatch::Request request) { (String? name, String? password) -> T } -> T?
+
+      def authentication_request: (ActionController::Metal controller, String realm, String? message) -> String
+    end
+
+    module Digest
+      module ControllerMethods
+        def authenticate_or_request_with_http_digest: (?String realm, ?String? message) { (String? username) -> String? } -> (true | String)
+
+        def authenticate_with_http_digest: (?String realm) { (String? username) -> String? } -> bool?
+
+        def request_http_digest_authentication: (?String realm, ?String? message) -> String
+      end
+
+      def authenticate: (ActionDispatch::Request request, String realm) { (String? username) -> String? } -> bool?
+
+      def authentication_request: (ActionController::Metal controller, String realm, ?String? message) -> String
     end
   end
 end
@@ -257,6 +308,9 @@ end
 
 module AbstractController
   module Rendering
+    # Performs the actual template rendering.
+    def render_to_body: (?::Hash[untyped, untyped] options) -> untyped
+
     def render_to_string: (*untyped args) ?{ () -> untyped } -> ::String
   end
 end
@@ -296,5 +350,74 @@ module AbstractController
     # may return false. An Email controller for example does not
     # support paths, only full URLs.
     def self.supports_path?: () -> bool
+
+    # Refresh the cached action_methods when a new action_method is added.
+    def self.method_added: (Symbol name) -> void
+  end
+end
+
+module ActionController
+  class Metal
+    attr_accessor request: ActionDispatch::Request
+
+    attr_accessor response: ActionDispatch::Response
+  end
+
+  module StrongParameters
+    # Returns a new ActionController::Parameters object that
+    # has been instantiated with the <tt>request.parameters</tt>.
+    def params: () -> ActionController::Parameters
+
+    # Assigns the given +value+ to the +params+ hash. If +value+
+    # is a Hash, this will create an ActionController::Parameters
+    # object that has been instantiated with the given +value+ hash.
+    def params=: (Hash[untyped, untyped] | ActionController::Parameters value) -> void
+  end
+
+  module Cookies
+    private
+
+    def cookies: () -> ActionDispatch::Cookies::CookieJar
+  end
+
+  module Rescue
+    # Override this method if you want to customize when detailed
+    # exceptions must be shown. This method is only called when
+    # +consider_all_requests_local+ is +false+. By default, it returns
+    # +false+, but someone may set it to <tt>request.local?</tt> so local
+    # requests in production still show the detailed exception pages.
+    def show_detailed_exceptions?: () -> bool
+  end
+
+  # Rails 6.1 and later; Rails 6.0 lacks this module.
+  module Logging
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      # Set a different log level per request.
+      #
+      #     # Use the debug log level if a particular cookie is set.
+      #     class ApplicationController < ActionController::Base
+      #       log_at :debug, if: -> { cookies[:debug] }
+      #     end
+      #
+      def log_at: (Symbol | Integer level, **untyped options) -> void
+    end
+  end
+
+  # Rails 6.1 and later; Rails 6.0 lacks this module.
+  module PermissionsPolicy
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      # Overrides parts of the globally configured `Feature-Policy` header:
+      #
+      #     class PagesController < ApplicationController
+      #       permissions_policy do |policy|
+      #         policy.geolocation "https://example.com"
+      #       end
+      #     end
+      def permissions_policy: (**untyped options) ?{ (untyped policy) -> void } -> void
+    end
   end
 end
