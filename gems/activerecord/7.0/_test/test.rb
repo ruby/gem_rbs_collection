@@ -23,3 +23,7 @@ ActiveRecord::Base.attribute_method_matchers.map(&:prefix)
 # Signed ids
 ActiveRecord::Base.signed_id_verifier_secret = "secret"
 ActiveRecord::Base.new.signed_id(expires_in: 1.hour, purpose: :login).length
+
+# Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
+Article.where(id: 1).pluck(:id).size
+Article.where(id: 1).pluck(:id, "title").first&.size

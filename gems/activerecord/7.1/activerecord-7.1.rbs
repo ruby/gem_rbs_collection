@@ -280,6 +280,14 @@ module ActiveRecord
   end
 end
 
+module ActiveRecord
+  module Calculations
+    def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+             | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
+             | ...
+  end
+end
+
 interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/TopLevelInterface
   def all: () -> self
   def ids: () -> Array[PrimaryKey]
