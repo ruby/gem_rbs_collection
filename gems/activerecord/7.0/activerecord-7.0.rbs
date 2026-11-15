@@ -35,6 +35,8 @@ module ActiveRecord
 
     include Encryption::EncryptableRecord
     extend Encryption::EncryptableRecord::ClassMethods
+    include SignedId
+    extend SignedId::ClassMethods
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def and: (::ActiveRecord::Relation) -> Relation
@@ -195,6 +197,20 @@ module Arel
 
   class DeleteManager < Arel::TreeManager
     def initialize: (?Arel::Table? table) -> untyped
+  end
+end
+
+module ActiveRecord
+  module SignedId
+    extend ActiveSupport::Concern
+
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?purpose: untyped) -> String
+
+    module ClassMethods
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
+    end
   end
 end
 

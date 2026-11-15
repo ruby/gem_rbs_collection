@@ -41,6 +41,8 @@ module ActiveRecord
     extend SecurePassword::ClassMethods
     include TokenFor
     extend TokenFor::ClassMethods
+    include SignedId
+    extend SignedId::ClassMethods
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def and: (::ActiveRecord::Relation) -> Relation
@@ -260,6 +262,20 @@ module ActiveRecord
   class Base
     module ClassMethods[Model, Relation, PrimaryKey]
       def with: (*untyped args) -> Relation
+    end
+  end
+end
+
+module ActiveRecord
+  module SignedId
+    extend ActiveSupport::Concern
+
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
+
+    module ClassMethods
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
     end
   end
 end

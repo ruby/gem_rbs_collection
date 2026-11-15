@@ -19,3 +19,7 @@ ActiveRecord::Base.record_timestamps = !ActiveRecord::Base.lock_optimistically
 ActiveRecord::Base.enumerate_columns_in_select_statements = !ActiveRecord::Base.cache_versioning
 ActiveRecord::Base.new.record_timestamps = !ActiveRecord::Base.new.pluralize_table_names
 ActiveRecord::Base.attribute_method_matchers.map(&:prefix)
+
+# Signed ids
+ActiveRecord::Base.signed_id_verifier_secret = "secret"
+ActiveRecord::Base.new.signed_id(expires_in: 1.hour, purpose: :login).length

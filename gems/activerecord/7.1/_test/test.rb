@@ -18,3 +18,7 @@ ActiveRecord::Base.time_zone_aware_types.map(&:to_proc)
 ActiveRecord::Base.record_timestamps = !ActiveRecord::Base.lock_optimistically
 ActiveRecord::Base.enumerate_columns_in_select_statements = !ActiveRecord::Base.cache_versioning
 ActiveRecord::Base.new.record_timestamps = !ActiveRecord::Base.new.pluralize_table_names
+
+# Signed ids
+ActiveRecord::Base.signed_id_verifier_secret = "secret"
+ActiveRecord::Base.new.signed_id(expires_at: Time.now + 3600, purpose: :login).length
