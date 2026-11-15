@@ -26,3 +26,7 @@ ActiveRecord::Base.new.signed_id(expires_at: Time.now + 3600, purpose: :login).l
 # Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
 Article.where(id: 1).pluck(:id).size
 Article.where(id: 1).pluck(:id, "title").first&.size
+
+# Records built
+Article.build(title: "Hello") { |article| article.new_record? }.new_record?
+Article.build([{ title: "Hello" }, { title: "World" }]).first&.new_record?
