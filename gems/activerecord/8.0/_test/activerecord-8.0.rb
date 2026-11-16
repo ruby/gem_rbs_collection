@@ -136,6 +136,9 @@ ActiveRecord::Base.lease_connection.create_table(:tags)
 ActiveRecord::Base.lease_connection.create_join_table(:products, :tags) { |t| t.bigint :position }
 ActiveRecord::Base.lease_connection.change_table(:products) { |t| t.boolean :active, default: false }
 
+# << returns the collection, or nil when a save fails
+(User.new.articles << Article.new)&.size
+
 # Configuration class attributes hold the values Rails documents
 ActiveRecord::Base.table_name_prefix.upcase
 ActiveRecord::Base.table_name_suffix.upcase
