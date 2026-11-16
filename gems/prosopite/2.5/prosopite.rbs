@@ -1,0 +1,88 @@
+module Prosopite
+  VERSION: String
+
+  interface _Warnable
+    def warn: (String message) -> untyped
+  end
+
+  type pattern = String | Regexp
+
+  type notification = {
+    queries: Array[String],
+    call_stack: Array[String],
+    duration_ms: Float,
+    fixes: Array[String],
+    fingerprint: String,
+    context: _ToS?
+  }
+
+  class NPlusOneQueriesError < StandardError
+  end
+
+  def self.raise=: (boolish) -> void
+  def self.start_raise: () -> void
+  def self.stop_raise: () -> void
+  def self.local_raise?: () -> bool
+
+  def self.rails_logger=: (boolish) -> void
+  def self.stderr_logger=: (boolish) -> void
+  def self.prosopite_logger=: (bool | String | Pathname | _Warnable | nil) -> void
+  def self.custom_logger=: (_Warnable | false | nil) -> void
+  def self.backtrace_cleaner: () -> ActiveSupport::BacktraceCleaner
+  def self.backtrace_cleaner=: (ActiveSupport::BacktraceCleaner) -> void
+
+  def self.enabled=: (bool) -> void
+  def self.suggest_fixes=: (bool) -> void
+  def self.ignore_pauses=: (boolish) -> void
+
+  def self.allow_stack_paths: () -> Array[pattern]?
+  def self.allow_stack_paths=: (Array[pattern]) -> void
+  def self.focus_stack_paths: () -> Array[pattern]?
+  def self.focus_stack_paths=: (Array[pattern]) -> void
+  def self.ignore_queries: () -> Array[pattern]?
+  def self.ignore_queries=: (Array[pattern]) -> void
+  def self.ignore_location_paths: () -> Array[pattern]?
+  def self.ignore_location_paths=: (Array[pattern]?) -> void
+
+  def self.min_n_queries: () -> Integer?
+  def self.min_n_queries=: (Integer) -> void
+  def self.min_duration_ms: () -> Numeric?
+  def self.min_duration_ms=: (Numeric?) -> void
+  def self.sample_rate: () -> Float?
+  def self.sample_rate=: (Numeric?) -> void
+  def self.display_max_n_queries: () -> Integer?
+  def self.display_max_n_queries=: (Integer?) -> void
+  def self.display_query_count: () -> bool?
+  def self.display_query_count=: (boolish) -> void
+
+  def self.add_footer: () -> bool?
+  def self.add_footer=: (boolish) -> void
+  def self.browser_console: () -> bool?
+  def self.browser_console=: (boolish) -> void
+  def self.github_annotations: () -> bool?
+  def self.github_annotations=: (boolish) -> void
+  def self.json_report: () -> (String | Pathname)?
+  def self.json_report=: ((String | Pathname)?) -> void
+  def self.todo_file: () -> String?
+  def self.todo_file=: ((String | Pathname)?) -> void
+  def self.record_todo: () -> bool?
+  def self.record_todo=: (boolish) -> void
+
+  def self.scan: (?_ToS? context) -> nil
+               | [T] (?_ToS? context) { () -> T } -> T
+  def self.finish: () -> Array[notification]?
+  def self.n_plus_one_queries: () { () -> untyped } -> Array[notification]
+
+  def self.pause: () -> void
+                | [T] () { () -> T } -> T
+  def self.resume: () -> void
+  def self.pause_during: (String event) -> void
+
+  module Middleware
+    class Rack
+    end
+
+    class Sidekiq
+    end
+  end
+end
