@@ -1,0 +1,38 @@
+class User < ActiveRecord::Base
+  def authenticate: (String password) -> (User | false)
+  def admin?: () -> bool
+end
+
+class ApplicationController < ActionController::Base
+  def show: () -> void
+end
+
+class ApiController < ActionController::API
+end
+
+module Oauth
+  class ApplicationsController < Doorkeeper::ApplicationsController
+  end
+
+  class AuthorizationsController < Doorkeeper::AuthorizationsController
+  end
+
+  class AuthorizedApplicationsController < Doorkeeper::AuthorizedApplicationsController
+  end
+
+  class TokensController < Doorkeeper::TokensController
+  end
+
+  class TokenInfoController < Doorkeeper::TokenInfoController
+  end
+end
+
+class OauthErrorReraiser
+  def reraise: (Doorkeeper::OAuth::ErrorResponse oauth_error) -> String
+end
+
+class OauthRequestInspector
+  def pre_auth: (untyped server, User user) -> void
+  def code_request: (Doorkeeper::OAuth::AuthorizationCodeRequest code_request) -> void
+  def refresh_request: (Doorkeeper::OAuth::RefreshTokenRequest refresh_request) -> void
+end

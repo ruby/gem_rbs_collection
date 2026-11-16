@@ -1,0 +1,283 @@
+module Doorkeeper
+  class Application < ::ActiveRecord::Base
+    extend ::_ActiveRecord_Relation_ClassMethods[Application, ActiveRecord_Relation, Integer]
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[Application, Integer]
+      include Enumerable[Application]
+
+      def ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::_ActiveRecord_Relation[Application, Integer]
+      include Enumerable[Application]
+    end
+
+    def self.by_uid: (String uid) -> Application?
+
+    def self.by_uid_and_secret: (String uid, String? secret) -> Application?
+
+    def self.authorized_for: (untyped resource_owner) -> ActiveRecord_Relation
+
+    def self.revoke_tokens_and_grants_for: (Integer id, untyped resource_owner) -> void
+
+    def self.ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+
+    def id: () -> Integer
+
+    def name: () -> String
+
+    def name=: (String value) -> String
+
+    def uid: () -> String
+
+    def uid=: (String value) -> String
+
+    def secret: () -> String?
+
+    def secret=: (String? value) -> String?
+
+    def redirect_uri: () -> String
+
+    def redirect_uri=: (String | Array[String] uris) -> (String | Array[String])
+
+    def scopes: () -> OAuth::Scopes
+
+    def scopes=: (String | Array[Symbol | String] | OAuth::Scopes value) -> void
+
+    def scopes_string: () -> String?
+
+    def includes_scope?: (*Symbol | String required_scopes) -> bool
+
+    def confidential: () -> bool
+
+    def confidential=: (bool value) -> bool
+
+    def confidential?: () -> bool
+
+    def owner: () -> untyped
+
+    def owner=: (untyped owner) -> untyped
+
+    def owner_id: () -> Integer?
+
+    def owner_id=: (Integer? value) -> Integer?
+
+    def owner_type: () -> String?
+
+    def owner_type=: (String? value) -> String?
+
+    def created_at: () -> ActiveSupport::TimeWithZone
+
+    def updated_at: () -> ActiveSupport::TimeWithZone
+
+    def access_grants: () -> AccessGrant::ActiveRecord_Associations_CollectionProxy
+
+    def access_tokens: () -> AccessToken::ActiveRecord_Associations_CollectionProxy
+
+    def authorized_tokens: () -> AccessToken::ActiveRecord_Associations_CollectionProxy
+
+    def renew_secret: () -> void
+
+    def plaintext_secret: () -> String?
+
+    def secret_matches?: (String? input) -> bool
+
+    def authorized_for_resource_owner?: (untyped resource_owner) -> boolish
+  end
+
+  class AccessToken < ::ActiveRecord::Base
+    extend ::_ActiveRecord_Relation_ClassMethods[AccessToken, ActiveRecord_Relation, Integer]
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[AccessToken, Integer]
+      include Enumerable[AccessToken]
+
+      def by_resource_owner: (untyped resource_owner) -> ActiveRecord_Relation
+
+      def active_for: (untyped resource_owner) -> ActiveRecord_Relation
+
+      def not_expired: () -> ActiveRecord_Relation
+
+      def ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::_ActiveRecord_Relation[AccessToken, Integer]
+      include Enumerable[AccessToken]
+
+      def by_resource_owner: (untyped resource_owner) -> ActiveRecord_Relation
+
+      def active_for: (untyped resource_owner) -> ActiveRecord_Relation
+
+      def not_expired: () -> ActiveRecord_Relation
+
+      def ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+    end
+
+    def self.by_token: (String? token) -> AccessToken?
+
+    def self.by_refresh_token: (String? refresh_token) -> AccessToken?
+
+    def self.by_previous_refresh_token: (String? previous_refresh_token) -> AccessToken?
+
+    def self.by_resource_owner: (untyped resource_owner) -> ActiveRecord_Relation
+
+    def self.active_for: (untyped resource_owner) -> ActiveRecord_Relation
+
+    def self.not_expired: () -> ActiveRecord_Relation
+
+    def self.ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+
+    def self.revoke_all_for: (Integer application_id, untyped resource_owner, ?untyped clock) -> void
+
+    def self.find_or_create_for: (application: Application, resource_owner: untyped, scopes: OAuth::Scopes | String, **untyped token_attributes) -> AccessToken
+
+    def self.create_for: (application: Application, resource_owner: untyped, scopes: OAuth::Scopes | String, **untyped token_attributes) -> AccessToken
+
+    def self.authorized_tokens_for: (Integer application_id, untyped resource_owner) -> ActiveRecord_Relation
+
+    def self.last_authorized_token_for: (Integer application_id, untyped resource_owner) -> AccessToken?
+
+    def self.refresh_token_revoked_on_use?: () -> bool
+
+    def id: () -> Integer
+
+    def token: () -> String
+
+    def token=: (String value) -> String
+
+    def refresh_token: () -> String?
+
+    def refresh_token=: (String? value) -> String?
+
+    def previous_refresh_token: () -> String?
+
+    def resource_owner_id: () -> Integer?
+
+    def resource_owner_id=: (Integer? value) -> Integer?
+
+    def application_id: () -> Integer?
+
+    def application_id=: (Integer? value) -> Integer?
+
+    def application: () -> Application?
+
+    def application=: (Application? application) -> Application?
+
+    def expires_in: () -> Integer?
+
+    def expires_in=: (Integer? value) -> Integer?
+
+    def revoked_at: () -> ActiveSupport::TimeWithZone?
+
+    def revoked_at=: (Time? value) -> Time?
+
+    def created_at: () -> ActiveSupport::TimeWithZone
+
+    def scopes: () -> OAuth::Scopes
+
+    def scopes=: (String | Array[Symbol | String] | OAuth::Scopes value) -> void
+
+    def scopes_string: () -> String?
+
+    def includes_scope?: (*Symbol | String required_scopes) -> bool
+
+    def use_refresh_token=: (bool value) -> bool
+
+    def accessible?: () -> bool
+
+    def acceptable?: (Array[Symbol | String] | OAuth::Scopes scopes) -> bool
+
+    def expired?: () -> bool
+
+    def revoked?: () -> bool
+
+    def revoke: (?untyped clock) -> void
+
+    def expires_at: () -> Time?
+
+    def expires_in_seconds: () -> Integer?
+
+    def token_type: () -> String
+
+    def plaintext_token: () -> String?
+
+    def plaintext_refresh_token: () -> String?
+  end
+
+  class AccessGrant < ::ActiveRecord::Base
+    extend ::_ActiveRecord_Relation_ClassMethods[AccessGrant, ActiveRecord_Relation, Integer]
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[AccessGrant, Integer]
+      include Enumerable[AccessGrant]
+
+      def by_resource_owner: (untyped resource_owner) -> ActiveRecord_Relation
+
+      def ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::_ActiveRecord_Relation[AccessGrant, Integer]
+      include Enumerable[AccessGrant]
+
+      def by_resource_owner: (untyped resource_owner) -> ActiveRecord_Relation
+
+      def ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+    end
+
+    def self.by_token: (String? token) -> AccessGrant?
+
+    def self.by_resource_owner: (untyped resource_owner) -> ActiveRecord_Relation
+
+    def self.ordered_by: (Symbol | String attribute, ?(:asc | :desc) direction) -> ActiveRecord_Relation
+
+    def self.revoke_all_for: (Integer application_id, untyped resource_owner, ?untyped clock) -> void
+
+    def id: () -> Integer
+
+    def token: () -> String
+
+    def resource_owner_id: () -> Integer?
+
+    def application_id: () -> Integer?
+
+    def application: () -> Application?
+
+    def expires_in: () -> Integer
+
+    def redirect_uri: () -> String
+
+    def revoked_at: () -> ActiveSupport::TimeWithZone?
+
+    def created_at: () -> ActiveSupport::TimeWithZone
+
+    def code_challenge: () -> String?
+
+    def code_challenge_method: () -> String?
+
+    def scopes: () -> OAuth::Scopes
+
+    def scopes=: (String | Array[Symbol | String] | OAuth::Scopes value) -> void
+
+    def scopes_string: () -> String?
+
+    def includes_scope?: (*Symbol | String required_scopes) -> bool
+
+    def uses_pkce?: () -> bool
+
+    def accessible?: () -> bool
+
+    def expired?: () -> bool
+
+    def revoked?: () -> bool
+
+    def revoke: (?untyped clock) -> void
+
+    def expires_at: () -> Time?
+
+    def plaintext_token: () -> String?
+  end
+end
