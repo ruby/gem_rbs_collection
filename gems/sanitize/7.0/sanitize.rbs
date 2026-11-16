@@ -1,0 +1,114 @@
+class Sanitize
+  VERSION: String
+
+  REGEX_PROTOCOL: Regexp
+
+  type config = Hash[Symbol, untyped]
+
+  type transformer_env = {
+    config: config,
+    node: Nokogiri::XML::Node,
+    node_name: String,
+    is_allowlisted: bool,
+    is_whitelisted: bool,
+    node_allowlist: Set[Nokogiri::XML::Node],
+    node_whitelist: Set[Nokogiri::XML::Node]
+  }
+
+  type transformer = ^(transformer_env) -> top
+                   | Proc
+
+  class Error < StandardError
+  end
+
+  def self.document: (_ToS? html, ?config config) -> String
+
+  def self.fragment: (_ToS? html, ?config config) -> String
+
+  def self.clean: (_ToS? html, ?config config) -> String
+
+  def self.node!: [T < Nokogiri::XML::Node] (T node, ?config config) -> T
+
+  attr_reader config: config
+
+  def initialize: (?config config) -> void
+
+  def document: (_ToS? html) -> String
+
+  def fragment: (_ToS? html) -> String
+
+  def clean: (_ToS? html) -> String
+
+  def node!: [T < Nokogiri::XML::Node] (T node) -> T
+
+  module Config
+    type css_config = {
+      allow_comments: bool,
+      allow_hacks: bool,
+      at_rules_with_properties: Array[String],
+      at_rules_with_styles: Array[String],
+      protocols: Array[String | Symbol],
+      properties: Array[String]
+    }
+
+    type protocols = Hash[String, Hash[String, Array[String | Symbol]]]
+
+    DEFAULT: {
+      add_attributes: Hash[String, Hash[String, String]],
+      allow_comments: bool,
+      allow_doctype: bool,
+      attributes: Hash[String, Array[String | Symbol]],
+      css: Hash[Symbol, untyped],
+      elements: Array[String],
+      parser_options: Hash[Symbol, untyped],
+      protocols: protocols,
+      remove_contents: Array[String],
+      transformers: Array[Sanitize::transformer],
+      whitespace_elements: Hash[String, { before: String, after: String }]
+    }
+
+    RESTRICTED: {
+      elements: Array[String],
+      ?transformers: Array[Sanitize::transformer]
+    }
+
+    BASIC: {
+      elements: Array[String],
+      attributes: Hash[String, Array[String]],
+      add_attributes: Hash[String, Hash[String, String]],
+      protocols: protocols,
+      ?transformers: Array[Sanitize::transformer]
+    }
+
+    RELAXED: {
+      elements: Array[String],
+      allow_doctype: bool,
+      attributes: Hash[String | Symbol, Array[String] | Set[String]],
+      protocols: protocols,
+      css: css_config,
+      ?transformers: Array[Sanitize::transformer]
+    }
+
+    def self.freeze_config: [T] (T config) -> T
+
+    def self.merge: (Hash[untyped, untyped] config, ?Hash[untyped, untyped] other_config) -> Hash[untyped, untyped]
+  end
+
+  class CSS
+    def self.properties: (String css, ?Sanitize::config config) -> String
+
+    def self.stylesheet: (String css, ?Sanitize::config config) -> String
+
+    def self.tree!: (Array[Hash[Symbol, untyped]] tree, ?Sanitize::config config) -> Array[Hash[Symbol, untyped]]
+
+    attr_reader config: Sanitize::config
+
+    def initialize: (?Sanitize::config config) -> void
+
+    def properties: (String css) -> String
+
+    def stylesheet: (String css) -> String
+
+    def tree!: (Array[Hash[Symbol, untyped]] tree) -> Array[Hash[Symbol, untyped]]
+  end
+end
