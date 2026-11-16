@@ -1,0 +1,17 @@
+class NoopApp
+  include Rack::_Application
+end
+
+class ExampleStrategy
+  include OmniAuth::Strategy
+  extend OmniAuth::Strategy::ClassMethods
+end
+
+class ChildStrategy < ExampleStrategy
+end
+
+module Kernel
+  def handle_request: (ExampleStrategy strategy, OmniAuth::env env) -> void
+
+  def handle_failure: (OmniAuth::env env) -> void
+end

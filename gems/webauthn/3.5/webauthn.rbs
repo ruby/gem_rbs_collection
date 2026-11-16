@@ -1,0 +1,347 @@
+module WebAuthn
+  TYPE_PUBLIC_KEY: String
+
+  interface _RootCertificatesFinder
+    def find: (attestation_format: String, aaguid: String?, attestation_certificate_key_id: String?) -> Array[OpenSSL::X509::Certificate]?
+  end
+
+  type encoding = :base64url | :base64 | false
+
+  type user_entity_hash = { id: String, name: String, ?display_name: String? }
+  type rp_entity_hash = { ?id: String?, ?name: String? }
+  type authenticator_selection_hash = {
+    ?authenticator_attachment: String,
+    ?resident_key: String,
+    ?require_resident_key: bool,
+    ?user_verification: String
+  }
+  type credential_descriptor_hash = { type: String, id: String, ?transports: Array[String] }
+
+  def self.configuration: () -> Configuration
+  def self.configure: () { (Configuration) -> void } -> void
+  def self.generate_user_id: () -> String
+  def self.generate_user_handle: () -> String
+
+  module JSONSerializer
+    def as_json: (*untyped) -> Hash[Symbol, untyped]
+  end
+
+  class Encoder
+    STANDARD_ENCODING: :base64url
+
+    def encode: (String data) -> String
+    def decode: (String data) -> String
+  end
+
+  class Configuration
+    attr_reader relying_party: RelyingParty
+
+    attr_accessor algorithms: Array[String]
+    attr_accessor encoding: encoding
+    attr_accessor allowed_origins: Array[String]?
+    attr_accessor allowed_top_origins: Array[String]?
+    attr_accessor verify_attestation_statement: bool
+    attr_accessor verify_cross_origin: bool
+    attr_accessor credential_options_timeout: Integer
+    attr_accessor silent_authentication: bool
+    attr_accessor acceptable_attestation_types: Array[String]
+    attr_reader attestation_root_certificates_finders: Array[_RootCertificatesFinder]
+    attr_accessor legacy_u2f_appid: String?
+
+    def encoder: () -> Encoder
+    def attestation_root_certificates_finders=: (_RootCertificatesFinder | Array[_RootCertificatesFinder]) -> void
+
+    def rp_name: () -> String?
+    def rp_name=: (String? name) -> String?
+    def rp_id: () -> String?
+    def rp_id=: (String? id) -> String?
+  end
+
+  class RelyingParty
+    DEFAULT_ALGORITHMS: Array[String]
+
+    attr_accessor algorithms: Array[String]
+    attr_accessor encoding: encoding
+    attr_accessor allowed_origins: Array[String]?
+    attr_accessor allowed_top_origins: Array[String]?
+    attr_accessor id: String?
+    attr_accessor name: String?
+    attr_accessor verify_attestation_statement: bool
+    attr_accessor verify_cross_origin: bool
+    attr_accessor credential_options_timeout: Integer
+    attr_accessor silent_authentication: bool
+    attr_accessor acceptable_attestation_types: Array[String]
+    attr_accessor legacy_u2f_appid: String?
+    attr_reader attestation_root_certificates_finders: Array[_RootCertificatesFinder]
+
+    def initialize: (
+      ?algorithms: Array[String],
+      ?encoding: encoding,
+      ?allowed_origins: Array[String]?,
+      ?allowed_top_origins: Array[String]?,
+      ?id: String?,
+      ?name: String?,
+      ?verify_attestation_statement: bool,
+      ?verify_cross_origin: bool,
+      ?credential_options_timeout: Integer,
+      ?silent_authentication: bool,
+      ?acceptable_attestation_types: Array[String],
+      ?attestation_root_certificates_finders: _RootCertificatesFinder | Array[_RootCertificatesFinder],
+      ?legacy_u2f_appid: String?
+    ) -> void
+
+    def encoder: () -> Encoder
+    def attestation_root_certificates_finders=: (_RootCertificatesFinder | Array[_RootCertificatesFinder] finders) -> void
+
+    def options_for_registration: (
+      user: user_entity_hash | Hash[Symbol, untyped] | PublicKeyCredential::UserEntity,
+      ?rp: rp_entity_hash | Hash[Symbol, untyped] | PublicKeyCredential::RPEntity,
+      ?exclude: Array[String]?,
+      ?exclude_credentials: Array[credential_descriptor_hash | Hash[Symbol, untyped]]?,
+      ?authenticator_selection: (authenticator_selection_hash | Hash[Symbol, untyped])?,
+      ?attestation: String?,
+      ?attestation_formats: Array[String]?,
+      ?pub_key_cred_params: Array[{ type: String, alg: Integer }]?,
+      ?algs: Array[String | Symbol | Integer]?,
+      ?timeout: Integer?,
+      ?extensions: Hash[String | Symbol, untyped]?,
+      ?hints: Array[String]?
+    ) -> PublicKeyCredential::CreationOptions
+
+    def options_for_authentication: (
+      ?rp_id: String?,
+      ?allow: Array[String]?,
+      ?allow_credentials: Array[credential_descriptor_hash | Hash[Symbol, untyped]]?,
+      ?user_verification: String?,
+      ?timeout: Integer?,
+      ?extensions: Hash[String | Symbol, untyped]?,
+      ?hints: Array[String]?
+    ) -> PublicKeyCredential::RequestOptions
+
+    def verify_registration: (
+      Hash[String, untyped] raw_credential,
+      String challenge,
+      ?user_presence: bool?,
+      ?user_verification: bool?
+    ) -> PublicKeyCredentialWithAttestation
+
+    def verify_authentication: (
+      Hash[String, untyped] raw_credential,
+      String challenge,
+      ?user_presence: bool?,
+      ?user_verification: bool?,
+      public_key: String,
+      sign_count: Integer
+    ) -> PublicKeyCredentialWithAssertion
+                             | [T < _StoredCredential] (
+      Hash[String, untyped] raw_credential,
+      String challenge,
+      ?user_presence: bool?,
+      ?user_verification: bool?,
+      ?public_key: String?,
+      ?sign_count: Integer?
+    ) { (PublicKeyCredentialWithAssertion) -> T } -> [PublicKeyCredentialWithAssertion, T]
+
+    interface _StoredCredential
+      def public_key: () -> String
+      def sign_count: () -> Integer
+    end
+  end
+
+  module Credential
+    def self.options_for_create: (
+      user: user_entity_hash | Hash[Symbol, untyped] | PublicKeyCredential::UserEntity,
+      ?rp: rp_entity_hash | Hash[Symbol, untyped] | PublicKeyCredential::RPEntity,
+      ?exclude: Array[String]?,
+      ?exclude_credentials: Array[credential_descriptor_hash | Hash[Symbol, untyped]]?,
+      ?authenticator_selection: (authenticator_selection_hash | Hash[Symbol, untyped])?,
+      ?attestation: String?,
+      ?attestation_formats: Array[String]?,
+      ?pub_key_cred_params: Array[{ type: String, alg: Integer }]?,
+      ?algs: Array[String | Symbol | Integer]?,
+      ?timeout: Integer?,
+      ?extensions: Hash[String | Symbol, untyped]?,
+      ?hints: Array[String]?,
+      ?relying_party: RelyingParty
+    ) -> PublicKeyCredential::CreationOptions
+
+    def self.options_for_get: (
+      ?rp_id: String?,
+      ?allow: Array[String]?,
+      ?allow_credentials: Array[credential_descriptor_hash | Hash[Symbol, untyped]]?,
+      ?user_verification: String?,
+      ?timeout: Integer?,
+      ?extensions: Hash[String | Symbol, untyped]?,
+      ?hints: Array[String]?,
+      ?relying_party: RelyingParty
+    ) -> PublicKeyCredential::RequestOptions
+
+    def self.from_create: (Hash[String, untyped] credential, ?relying_party: RelyingParty) -> PublicKeyCredentialWithAttestation
+    def self.from_get: (Hash[String, untyped] credential, ?relying_party: RelyingParty) -> PublicKeyCredentialWithAssertion
+  end
+
+  class PublicKeyCredential
+    class InvalidChallengeError < Error
+    end
+
+    class Entity
+      include JSONSerializer
+
+      attr_reader name: String
+    end
+
+    class RPEntity < Entity
+      attr_reader id: String?
+    end
+
+    class UserEntity < Entity
+      attr_reader id: String
+      attr_reader display_name: String
+    end
+
+    class Options
+      include JSONSerializer
+
+      CHALLENGE_LENGTH: Integer
+
+      attr_reader timeout: Integer
+      attr_reader extensions: Hash[String | Symbol, untyped]
+      attr_reader hints: Array[String]?
+      attr_reader relying_party: RelyingParty
+
+      def challenge: () -> String
+    end
+
+    class CreationOptions < Options
+      attr_accessor attestation: String?
+      attr_accessor authenticator_selection: authenticator_selection_hash?
+      attr_accessor exclude: Array[String]?
+      attr_accessor rp: RPEntity
+      attr_accessor user: UserEntity
+
+      def exclude_credentials: () -> Array[credential_descriptor_hash]?
+      def pub_key_cred_params: () -> Array[{ type: String, alg: Integer }]
+    end
+
+    class RequestOptions < Options
+      attr_accessor rp_id: String?
+      attr_accessor allow: Array[String]?
+      attr_accessor user_verification: String?
+
+      def allow_credentials: () -> Array[credential_descriptor_hash]
+    end
+
+    attr_reader type: String
+    attr_reader id: String
+    attr_reader raw_id: String
+    attr_reader client_extension_outputs: Hash[String, untyped]?
+    attr_reader authenticator_attachment: String?
+
+    def response: () -> (AuthenticatorAttestationResponse | AuthenticatorAssertionResponse)
+    def verify: (String challenge, *untyped) -> true
+    def sign_count: () -> Integer?
+    def authenticator_extension_outputs: () -> Hash[String, untyped]?
+    def backup_eligible?: () -> bool?
+    def backed_up?: () -> bool?
+  end
+
+  class PublicKeyCredentialWithAttestation < PublicKeyCredential
+    def response: () -> AuthenticatorAttestationResponse
+    def verify: (String challenge, ?user_presence: bool?, ?user_verification: bool?) -> true
+    def public_key: () -> String?
+    def raw_public_key: () -> String?
+  end
+
+  class PublicKeyCredentialWithAssertion < PublicKeyCredential
+    def response: () -> AuthenticatorAssertionResponse
+    def verify: (
+      String challenge,
+      public_key: String,
+      sign_count: Integer,
+      ?user_presence: bool?,
+      ?user_verification: bool?
+    ) -> true
+    def user_handle: () -> String?
+    def raw_user_handle: () -> String?
+  end
+
+  class AuthenticatorData < BinData::Record
+    def aaguid: () -> String?
+  end
+
+  class AuthenticatorResponse
+  end
+
+  class AuthenticatorAttestationResponse < AuthenticatorResponse
+    def authenticator_data: () -> AuthenticatorData
+  end
+
+  class AuthenticatorAssertionResponse < AuthenticatorResponse
+    def authenticator_data: () -> AuthenticatorData
+  end
+
+  class Error < StandardError
+  end
+
+  class RootCertificateFinderNotSupportedError < Error
+  end
+
+  class ClientDataMissingError < Error
+  end
+
+  class AuthenticatorDataFormatError < Error
+  end
+
+  class AttestedCredentialDataFormatError < Error
+  end
+
+  module AttestationStatement
+    class FormatNotSupportedError < Error
+    end
+  end
+
+  class VerificationError < Error
+  end
+
+  class AuthenticatorDataVerificationError < VerificationError
+  end
+
+  class BackupFlagsVerificationError < VerificationError
+  end
+
+  class ChallengeVerificationError < VerificationError
+  end
+
+  class OriginVerificationError < VerificationError
+  end
+
+  class RpIdVerificationError < VerificationError
+  end
+
+  class TopOriginVerificationError < VerificationError
+  end
+
+  class TypeVerificationError < VerificationError
+  end
+
+  class UserPresenceVerificationError < VerificationError
+  end
+
+  class UserVerifiedVerificationError < VerificationError
+  end
+
+  class AttestationStatementVerificationError < VerificationError
+  end
+
+  class AttestedCredentialVerificationError < VerificationError
+  end
+
+  class CredentialIdLengthVerificationError < VerificationError
+  end
+
+  class SignatureVerificationError < VerificationError
+  end
+
+  class SignCountVerificationError < VerificationError
+  end
+end

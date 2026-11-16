@@ -1,0 +1,36 @@
+module OmniAuth
+  module Strategies
+    class OAuth2
+      include OmniAuth::Strategy
+      extend OmniAuth::Strategy::ClassMethods
+
+      class CallbackError < StandardError
+        attr_accessor error: (String | Symbol)?
+
+        attr_accessor error_reason: String?
+
+        attr_accessor error_uri: String?
+      end
+
+      def self.uid: () { () [self: instance] -> untyped } -> Proc
+                  | () -> Proc?
+
+      def self.info: () { () [self: instance] -> Hash[untyped, untyped]? } -> Proc
+                   | () -> Proc?
+
+      def self.extra: () { () [self: instance] -> Hash[untyped, untyped]? } -> Proc
+                    | () -> Proc?
+
+      def self.credentials: () { () [self: instance] -> Hash[untyped, untyped]? } -> Proc
+                          | () -> Proc?
+
+      attr_accessor access_token: untyped
+
+      def client: () -> untyped
+
+      def authorize_params: () -> Hash[untyped, untyped]
+
+      def token_params: () -> Hash[untyped, untyped]
+    end
+  end
+end

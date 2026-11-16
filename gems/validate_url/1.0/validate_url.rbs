@@ -1,0 +1,23 @@
+module ActiveModel
+  module Validations
+    class UrlValidator < ::ActiveModel::EachValidator
+    end
+
+    module ClassMethods
+      def validates_url: (
+        *Symbol attr_names,
+        ?schemes: Array[String | Symbol] | String | Symbol,
+        ?message: String | Symbol | Proc,
+        ?no_local: boolish,
+        ?public_suffix: boolish,
+        ?accept_array: boolish,
+        ?on: Symbol | Array[Symbol],
+        ?if: conditions[instance],
+        ?unless: conditions[instance],
+        ?allow_nil: boolish,
+        ?allow_blank: boolish,
+        ?strict: boolish
+      ) -> void
+    end
+  end
+end

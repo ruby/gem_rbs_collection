@@ -1,0 +1,99 @@
+module Doorkeeper
+  module Helpers
+    module Controller
+      @current_resource_owner: untyped
+
+      private
+
+      def authenticate_resource_owner!: () -> untyped
+
+      def current_resource_owner: () -> untyped
+    end
+  end
+
+  class ApplicationController < ::ActionController::Base
+    include Helpers::Controller
+  end
+
+  class ApplicationMetalController < ::ActionController::API
+    include Helpers::Controller
+  end
+
+  class ApplicationsController < ApplicationController
+    def index: () -> void
+
+    def show: () -> void
+
+    def new: () -> void
+
+    def create: () -> void
+
+    def edit: () -> void
+
+    def update: () -> void
+
+    def destroy: () -> void
+  end
+
+  class AuthorizationsController < ApplicationController
+    def new: () -> void
+
+    def create: () -> void
+
+    def destroy: () -> void
+
+    @pre_auth: OAuth::PreAuthorization?
+
+    @strategy: untyped
+
+    private
+
+    def pre_auth: () -> OAuth::PreAuthorization
+
+    def pre_auth_params: () -> Hash[Symbol, untyped]
+
+    def pre_auth_param_fields: () -> Array[Symbol]
+
+    def can_authorize_response?: () -> boolish
+
+    def authorize_response: () -> untyped
+
+    def redirect_or_render: (untyped auth) -> void
+
+    def before_successful_authorization: (?OAuth::Hooks::Context? context) -> void
+
+    def after_successful_authorization: (OAuth::Hooks::Context context) -> void
+  end
+
+  class AuthorizedApplicationsController < ApplicationController
+    def index: () -> void
+
+    def destroy: () -> void
+  end
+
+  class TokensController < ApplicationMetalController
+    def create: () -> void
+
+    def revoke: () -> void
+
+    def introspect: () -> void
+
+    @strategy: untyped
+
+    private
+
+    def authorized?: () -> bool?
+
+    def token: () -> AccessToken?
+
+    def authorize_response: () -> untyped
+
+    def before_successful_authorization: (?OAuth::Hooks::Context? context) -> void
+
+    def after_successful_authorization: (OAuth::Hooks::Context context) -> void
+  end
+
+  class TokenInfoController < ApplicationMetalController
+    def show: () -> void
+  end
+end

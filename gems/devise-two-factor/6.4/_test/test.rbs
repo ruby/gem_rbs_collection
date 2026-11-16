@@ -1,0 +1,21 @@
+module UserColumns
+  def otp_secret=: (String? value) -> String?
+  def otp_required_for_login: () -> bool
+  def otp_required_for_login=: (bool value) -> bool
+  def otp_backup_codes: () -> Array[String]?
+  def otp_backup_codes=: (Array[String]? value) -> Array[String]?
+  def consumed_timestep: () -> Integer?
+  def consumed_timestep=: (Integer? value) -> Integer?
+end
+
+class User < ActiveRecord::Base
+  include UserColumns
+  include Devise::Models::TwoFactorAuthenticatable
+  extend Devise::Models::TwoFactorAuthenticatable::ClassMethods
+  include Devise::Models::TwoFactorBackupable
+  extend Devise::Models::TwoFactorBackupable::ClassMethods
+end
+
+class TwoFactorSetup
+  def run: (User user, String code) -> Array[String]
+end

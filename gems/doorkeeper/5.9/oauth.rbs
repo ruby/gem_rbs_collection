@@ -1,0 +1,194 @@
+module Doorkeeper
+  module OAuth
+    AUTHORIZATION_CODE: String
+
+    IMPLICIT: String
+
+    PASSWORD: String
+
+    CLIENT_CREDENTIALS: String
+
+    REFRESH_TOKEN: String
+
+    class Scopes
+      include Enumerable[String]
+
+      def self.from_string: (String? string) -> Scopes
+
+      def self.from_array: (Array[Symbol | String] array) -> Scopes
+
+      def each: () { (String scope) -> void } -> void
+              | () -> Enumerator[String, void]
+
+      def empty?: () -> bool
+
+      def exists?: (Symbol | String scope) -> bool
+
+      def add: (*Symbol | String scopes) -> void
+
+      def all: () -> Array[String]
+
+      def scopes?: (Array[Symbol | String] scopes) -> bool
+
+      def +: (Scopes | Array[Symbol | String] other) -> Scopes
+
+      def &: (Scopes | Array[Symbol | String] other) -> Scopes
+
+      def allowed: (Scopes | Array[Symbol | String] other) -> Scopes
+
+      def to_s: () -> String
+    end
+
+    class Client
+      attr_reader application: Doorkeeper::Application
+
+      def initialize: (Doorkeeper::Application application) -> void
+
+      def self.find: (String uid) -> Client?
+
+      def id: () -> Integer
+
+      def name: () -> String
+
+      def uid: () -> String
+
+      def redirect_uri: () -> String
+
+      def scopes: () -> Scopes
+
+      def confidential: () -> bool
+    end
+
+    class Token
+      def self.authenticate: (ActionDispatch::Request | Doorkeeper::Grape::AuthorizationDecorator request, *Symbol | Proc methods) -> Doorkeeper::AccessToken?
+
+      def self.from_request: (ActionDispatch::Request | Doorkeeper::Grape::AuthorizationDecorator request, *Symbol | Proc methods) -> String?
+
+      def self.from_access_token_param: (ActionDispatch::Request request) -> String?
+
+      def self.from_bearer_param: (ActionDispatch::Request request) -> String?
+
+      def self.from_bearer_authorization: (ActionDispatch::Request request) -> String?
+
+      def self.from_basic_authorization: (ActionDispatch::Request request) -> String?
+    end
+
+    class TokenResponse
+      attr_reader token: Doorkeeper::AccessToken
+
+      def issued_token: () -> Doorkeeper::AccessToken
+
+      def initialize: (Doorkeeper::AccessToken token) -> void
+
+      def body: () -> Hash[String, untyped]
+
+      def status: () -> Symbol
+
+      def headers: () -> Hash[String, String]
+    end
+
+    class BaseResponse
+    end
+
+    class ErrorResponse < BaseResponse
+      def name: () -> Symbol
+
+      def description: () -> String
+
+      def state: () -> String?
+
+      def body: () -> Hash[Symbol, untyped]
+
+      def status: () -> Symbol
+
+      def headers: () -> Hash[String, String]
+
+      def redirectable?: () -> bool
+
+      def raise_exception!: () -> bot
+    end
+
+    class InvalidTokenResponse < ErrorResponse
+      attr_reader reason: Symbol
+
+      def self.from_access_token: (Doorkeeper::AccessToken? access_token, ?Hash[Symbol, untyped] attributes) -> InvalidTokenResponse
+    end
+
+    class ForbiddenTokenResponse < ErrorResponse
+      def self.from_scopes: (Array[Symbol | String] | Scopes scopes, ?Hash[Symbol, untyped] attributes) -> ForbiddenTokenResponse
+    end
+
+    class PreAuthorization
+      attr_reader client: Client
+
+      attr_reader code_challenge: String?
+
+      attr_reader code_challenge_method: String?
+
+      attr_reader redirect_uri: String?
+
+      attr_reader resource_owner: untyped
+
+      attr_reader response_type: String?
+
+      attr_reader response_mode: String?
+
+      attr_reader state: String?
+
+      attr_reader custom_access_token_attributes: Hash[untyped, untyped]
+
+      def initialize: (untyped server, ?Hash[Symbol, untyped] parameters, ?untyped resource_owner) -> void
+
+      def authorizable?: () -> bool
+
+      def client_valid?: () -> bool
+
+      def valid?: () -> bool
+
+      def error: () -> untyped
+
+      def scopes: () -> Scopes
+
+      def scope: () -> String?
+
+      def error_response: () -> ErrorResponse
+
+      def form_post_response?: () -> bool
+    end
+
+    class BaseRequest
+    end
+
+    class AuthorizationCodeRequest < BaseRequest
+      attr_reader grant: Doorkeeper::AccessGrant
+
+      attr_reader client: Client
+
+      attr_reader access_token: Doorkeeper::AccessToken?
+    end
+
+    class RefreshTokenRequest < BaseRequest
+      attr_reader refresh_token: Doorkeeper::AccessToken
+
+      attr_reader client: Client?
+
+      attr_reader access_token: Doorkeeper::AccessToken?
+    end
+
+    module Hooks
+      class Context
+        attr_reader auth: untyped
+
+        attr_reader pre_auth: PreAuthorization?
+
+        def issued_token: () -> Doorkeeper::AccessToken?
+      end
+    end
+
+    module Helpers
+      module ScopeChecker
+        def self.valid?: (scope_str: String, server_scopes: Scopes, ?app_scopes: Scopes?, ?grant_type: String?) -> bool
+      end
+    end
+  end
+end

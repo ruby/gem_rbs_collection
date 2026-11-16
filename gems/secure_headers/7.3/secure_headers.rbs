@@ -1,0 +1,281 @@
+module SecureHeaders
+  VERSION: String
+
+  OPT_OUT: NoOpHeaderConfig
+
+  interface _Request
+    def env: () -> Hash[String, untyped]
+
+    def scheme: () -> String?
+  end
+
+  type target = :both | :enforced | :report_only
+
+  type header_key = :hsts
+                  | :x_frame_options
+                  | :x_content_type_options
+                  | :x_xss_protection
+                  | :x_download_options
+                  | :x_permitted_cross_domain_policies
+                  | :referrer_policy
+                  | :clear_site_data
+                  | :expect_certificate_transparency
+                  | :csp
+                  | :csp_report_only
+                  | :cookies
+                  | :reporting_endpoints
+
+  type source_list = Array[String]
+
+  type csp_directives_record = {
+    ?default_src: source_list,
+    ?base_uri: source_list,
+    ?child_src: source_list,
+    ?connect_src: source_list,
+    ?font_src: source_list,
+    ?form_action: source_list,
+    ?frame_ancestors: source_list,
+    ?frame_src: source_list,
+    ?img_src: source_list,
+    ?manifest_src: source_list,
+    ?media_src: source_list,
+    ?navigate_to: source_list,
+    ?object_src: source_list,
+    ?prefetch_src: source_list,
+    ?report_uri: source_list,
+    ?script_src: source_list,
+    ?script_src_elem: source_list,
+    ?script_src_attr: source_list,
+    ?style_src: source_list,
+    ?style_src_elem: source_list,
+    ?style_src_attr: source_list,
+    ?trusted_types: source_list,
+    ?worker_src: source_list,
+    ?plugin_types: Array[String],
+    ?require_sri_for: Array[String],
+    ?require_trusted_types_for: Array[String],
+    ?sandbox: true | Array[String],
+    ?report_to: String,
+    ?upgrade_insecure_requests: bool,
+    ?report_only: bool,
+    ?preserve_schemes: bool,
+    ?disable_nonce_backwards_compatibility: bool,
+    ?script_nonce: String,
+    ?style_nonce: String
+  }
+
+  type csp_directives = csp_directives_record | Hash[Symbol, untyped]
+
+  type cookie_constraint = true | NoOpHeaderConfig | { only: Array[String] } | { except: Array[String] }
+
+  type cookies_record = {
+    ?secure: cookie_constraint,
+    ?httponly: cookie_constraint,
+    ?samesite: NoOpHeaderConfig | {
+      ?lax: cookie_constraint,
+      ?strict: cookie_constraint,
+      ?none: cookie_constraint
+    }
+  }
+
+  type cookies_config = cookies_record | Hash[Symbol, untyped]
+
+  type expect_ct_config = {
+    ?enforce: bool,
+    max_age: Integer | String,
+    ?report_uri: String
+  }
+
+  class NoOpHeaderConfig
+    include Singleton
+
+    def to_h: () -> Hash[untyped, untyped]
+
+    def opt_out?: () -> true
+
+    def []: (*untyped) -> bot
+
+    def []=: (*untyped) -> bot
+  end
+
+  class ContentSecurityPolicyConfigError < StandardError
+  end
+
+  class CookiesConfigError < StandardError
+  end
+
+  class ContentSecurityPolicyConfig
+    def initialize: (csp_directives hash) -> void
+
+    def []: (Symbol directive) -> untyped
+
+    def []=: (Symbol directive, untyped value) -> untyped
+
+    def merge: (csp_directives new_hash) -> self
+
+    def merge!: (csp_directives new_hash) -> void
+
+    def append: (csp_directives new_hash) -> void
+
+    def to_h: () -> csp_directives_record
+
+    def opt_out?: () -> false
+
+    def report_only?: () -> bool
+
+    def make_report_only: () -> ContentSecurityPolicyReportOnlyConfig
+
+    def ==: (untyped other) -> bool
+  end
+
+  class ContentSecurityPolicyReportOnlyConfig < ContentSecurityPolicyConfig
+  end
+
+  class Configuration
+    class AlreadyConfiguredError < StandardError
+    end
+
+    class NotYetConfiguredError < StandardError
+    end
+
+    class IllegalPolicyModificationError < StandardError
+    end
+
+    def self.default: () ?{ (Configuration) [self: Configuration] -> void } -> Configuration
+
+    alias self.configure self.default
+
+    def self.disable!: () -> void
+
+    def self.disabled?: () -> bool?
+
+    def self.override: (Symbol | String name) { (Configuration) [self: Configuration] -> void } -> void
+
+    def self.named_append: (Symbol | String name) { (_Request) -> csp_directives } -> void
+
+    def hsts: () -> (String | NoOpHeaderConfig | nil)
+
+    def hsts=: (String | NoOpHeaderConfig value) -> void
+
+    def x_frame_options: () -> (String | NoOpHeaderConfig | nil)
+
+    def x_frame_options=: (String | NoOpHeaderConfig value) -> void
+
+    def x_content_type_options: () -> (String | NoOpHeaderConfig | nil)
+
+    def x_content_type_options=: (String | NoOpHeaderConfig value) -> void
+
+    def x_xss_protection: () -> (String | NoOpHeaderConfig | nil)
+
+    def x_xss_protection=: (String | NoOpHeaderConfig value) -> void
+
+    def x_download_options: () -> (String | NoOpHeaderConfig | nil)
+
+    def x_download_options=: (String | NoOpHeaderConfig value) -> void
+
+    def x_permitted_cross_domain_policies: () -> (String | NoOpHeaderConfig | nil)
+
+    def x_permitted_cross_domain_policies=: (String | NoOpHeaderConfig value) -> void
+
+    def referrer_policy: () -> (String | Array[String] | NoOpHeaderConfig | nil)
+
+    def referrer_policy=: (String | Array[String] | NoOpHeaderConfig value) -> void
+
+    def clear_site_data: () -> (true | Array[String] | NoOpHeaderConfig | nil)
+
+    def clear_site_data=: (true | Array[String] | NoOpHeaderConfig value) -> void
+
+    def expect_certificate_transparency: () -> (expect_ct_config | NoOpHeaderConfig | nil)
+
+    def expect_certificate_transparency=: (expect_ct_config | NoOpHeaderConfig value) -> void
+
+    def reporting_endpoints: () -> (Hash[String | Symbol, String] | NoOpHeaderConfig | nil)
+
+    def reporting_endpoints=: (Hash[String | Symbol, String] | NoOpHeaderConfig value) -> void
+
+    def cookies: () -> (cookies_record | NoOpHeaderConfig | nil)
+
+    def cookies=: (cookies_config | NoOpHeaderConfig value) -> void
+
+    def csp: () -> ContentSecurityPolicyConfig
+
+    def csp=: (csp_directives | ContentSecurityPolicyConfig | NoOpHeaderConfig value) -> void
+
+    def csp_report_only: () -> (ContentSecurityPolicyReportOnlyConfig | NoOpHeaderConfig)
+
+    def csp_report_only=: (csp_directives | ContentSecurityPolicyConfig | NoOpHeaderConfig value) -> void
+  end
+
+  module ViewHelpers
+    class UnexpectedHashedScriptException < StandardError
+    end
+
+    def nonced_style_tag: (?(String | Hash[Symbol, untyped]) content_or_options) ?{ () -> void } -> String
+
+    def nonced_javascript_tag: (?(String | Hash[Symbol, untyped]) content_or_options) ?{ () -> void } -> String
+
+    def nonced_stylesheet_link_tag: (*(String | Symbol | Hash[Symbol, untyped]) args) ?{ () -> void } -> String
+
+    def nonced_javascript_include_tag: (*(String | Symbol | Hash[Symbol, untyped]) args) ?{ () -> void } -> String
+
+    def nonced_javascript_pack_tag: (*(String | Symbol | Hash[Symbol, untyped]) args) ?{ () -> void } -> String
+
+    def nonced_stylesheet_pack_tag: (*(String | Symbol | Hash[Symbol, untyped]) args) ?{ () -> void } -> String
+
+    def content_security_policy_nonce: (:script | :style type) -> String
+
+    def content_security_policy_script_nonce: () -> String
+
+    def content_security_policy_style_nonce: () -> String
+
+    def hashed_javascript_tag: (?bool? raise_error_on_unrecognized_hash) { () -> void } -> String
+
+    def hashed_style_tag: (?bool? raise_error_on_unrecognized_hash) { () -> void } -> String
+  end
+
+  def use_secure_headers_override: (Symbol | String name) -> Configuration
+
+  def content_security_policy_script_nonce: () -> String
+
+  def content_security_policy_style_nonce: () -> String
+
+  def opt_out_of_header: (header_key header_key) -> Configuration
+
+  def append_content_security_policy_directives: (csp_directives additions) -> Configuration
+
+  def override_content_security_policy_directives: (csp_directives additions) -> Configuration
+
+  def override_x_frame_options: (String value) -> Configuration
+
+  def use_content_security_policy_named_append: (Symbol | String name) -> Configuration
+
+  def self.override_content_security_policy_directives: (_Request request, csp_directives additions, ?target? target) -> Configuration
+
+  def self.append_content_security_policy_directives: (_Request request, csp_directives additions, ?target? target) -> Configuration
+
+  def self.use_content_security_policy_named_append: (_Request request, Symbol | String name) -> Configuration
+
+  def self.override_x_frame_options: (_Request request, String value) -> Configuration
+
+  def self.opt_out_of_header: (_Request request, header_key header_key) -> Configuration
+
+  def self.opt_out_of_all_protection: (_Request request) -> Configuration
+
+  def self.use_secure_headers_override: (_Request request, Symbol | String name) -> Configuration
+
+  def self.content_security_policy_script_nonce: (_Request request) -> String
+
+  def self.content_security_policy_style_nonce: (_Request request) -> String
+end
+
+class ActionController::Base
+  include SecureHeaders
+end
+
+class ActionController::API
+  include SecureHeaders
+end
+
+class ActionView::Base
+  include SecureHeaders::ViewHelpers
+end

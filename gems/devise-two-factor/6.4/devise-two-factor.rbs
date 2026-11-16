@@ -1,0 +1,59 @@
+module Devise
+  def self.otp_secret_length: () -> Integer
+  def self.otp_secret_length=: (Integer value) -> Integer
+
+  def self.otp_allowed_drift: () -> (Integer | ActiveSupport::Duration)
+  def self.otp_allowed_drift=: (Integer | ActiveSupport::Duration value) -> (Integer | ActiveSupport::Duration)
+
+  def self.otp_secret_encryption_key: () -> String?
+  def self.otp_secret_encryption_key=: (String? value) -> String?
+
+  def self.otp_encrypted_attribute_options: () -> Hash[Symbol, untyped]?
+  def self.otp_encrypted_attribute_options=: (Hash[Symbol, untyped]? value) -> Hash[Symbol, untyped]?
+
+  def self.otp_backup_code_length: () -> Integer
+  def self.otp_backup_code_length=: (Integer value) -> Integer
+
+  def self.otp_number_of_backup_codes: () -> Integer
+  def self.otp_number_of_backup_codes=: (Integer value) -> Integer
+
+  module Models
+    module TwoFactorAuthenticatable
+      include Devise::Models::DatabaseAuthenticatable
+
+      module ClassMethods
+        def otp_secret_length: () -> Integer
+
+        def otp_allowed_drift: () -> (Integer | ActiveSupport::Duration)
+
+        def otp_secret_encryption_key: () -> String?
+
+        def otp_encrypted_attribute_options: () -> Hash[Symbol, untyped]?
+
+        def generate_otp_secret: (?Integer otp_secret_length) -> String
+      end
+
+      attr_accessor otp_attempt: String?
+
+      def otp_secret: () -> String?
+
+      def validate_and_consume_otp!: (String? code, ?Hash[Symbol, untyped] options) -> bool
+
+      def current_otp: () -> String
+
+      def otp_provisioning_uri: (String account, ?Hash[Symbol, untyped] options) -> String
+    end
+
+    module TwoFactorBackupable
+      module ClassMethods
+        def otp_backup_code_length: () -> Integer
+
+        def otp_number_of_backup_codes: () -> Integer
+      end
+
+      def generate_otp_backup_codes!: () -> Array[String]
+
+      def invalidate_otp_backup_code!: (String? code) -> bool
+    end
+  end
+end
