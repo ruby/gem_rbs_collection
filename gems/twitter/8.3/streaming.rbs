@@ -1,0 +1,38 @@
+module Twitter
+  module Streaming
+    class DeletedTweet < Twitter::Identity
+      attr_reader user_id: Integer
+    end
+
+    class Event
+      attr_reader name: Symbol
+      attr_reader source: Twitter::User
+      attr_reader target: Twitter::User
+      attr_reader target_object: (Twitter::List | Twitter::Tweet)?
+    end
+
+    class FriendList < Array[Integer]
+    end
+
+    class StallWarning < Twitter::Base
+      attr_reader code: String
+      attr_reader message: String
+      attr_reader percent_full: Integer
+    end
+
+    type stream_object = Twitter::Tweet | Twitter::DirectMessage | DeletedTweet | Event | FriendList | StallWarning
+
+    class Client < Twitter::Client
+      def filter: (?Twitter::REST::options options) { (stream_object) -> void } -> void
+      def firehose: (?Twitter::REST::options options) { (stream_object) -> void } -> void
+      def sample: (?Twitter::REST::options options) { (stream_object) -> void } -> void
+      def site: (*Twitter::REST::user_reference follow) { (stream_object) -> void } -> void
+              | (*Twitter::REST::user_reference follow, Twitter::REST::options options) { (stream_object) -> void } -> void
+              | (*Twitter::REST::user_reference follow, **untyped options) { (stream_object) -> void } -> void
+      def user: (?Twitter::REST::options options) { (stream_object) -> void } -> void
+      def before_request: () { () -> void } -> self
+                        | () -> Proc
+      def close: () -> void
+    end
+  end
+end

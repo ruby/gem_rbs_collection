@@ -1,0 +1,168 @@
+module Twitter
+  class Identity < Base
+    attr_reader id: Integer
+
+    def initialize: (Hash[Symbol, untyped] attrs) -> void
+  end
+
+  module Creatable
+    def created_at: () -> Time?
+    def created?: () -> bool
+  end
+
+  module Entities
+    def entities?: () -> bool
+    def hashtags: () -> Array[Entity::Hashtag]
+    def hashtags?: () -> bool
+    def symbols: () -> Array[Entity::Symbol]
+    def symbols?: () -> bool
+    def uris: () -> Array[Entity::URI]
+    def urls: () -> Array[Entity::URI]
+    def uris?: () -> bool
+    def urls?: () -> bool
+    def user_mentions: () -> Array[Entity::UserMention]
+    def user_mentions?: () -> bool
+  end
+
+  class Entity < Base
+    attr_reader indices: Array[Integer]
+
+    class Hashtag < Entity
+      attr_reader text: String
+    end
+
+    class Symbol < Entity
+      attr_reader text: String
+    end
+
+    class URI < Entity
+      def display_uri: () -> String?
+      def display_url: () -> String?
+      def expanded_uri: () -> ::URI::Generic?
+      def expanded_url: () -> ::URI::Generic?
+      def uri: () -> ::URI::Generic?
+      def url: () -> ::URI::Generic?
+    end
+
+    class UserMention < Entity
+      attr_reader id: Integer
+      attr_reader name: String
+      attr_reader screen_name: String
+    end
+  end
+
+  class BasicUser < Identity
+    attr_reader screen_name: String
+
+    def following?: () -> bool
+  end
+
+  class User < BasicUser
+    include Creatable
+
+    attr_reader description: String?
+    attr_reader location: String?
+    attr_reader name: String
+    attr_reader lang: String?
+    attr_reader time_zone: String?
+    attr_reader favourites_count: Integer
+    attr_reader followers_count: Integer
+    attr_reader friends_count: Integer
+    attr_reader listed_count: Integer
+    attr_reader statuses_count: Integer
+    attr_reader utc_offset: Integer?
+
+    def favorites_count: () -> Integer
+    def tweets_count: () -> Integer
+    def protected?: () -> bool
+    def verified?: () -> bool
+    def status: () -> Tweet?
+    def tweet: () -> Tweet?
+    def tweet?: () -> bool
+    def uri: () -> ::URI::Generic?
+    def url: () -> ::URI::Generic?
+    def website: () -> ::URI::Generic?
+  end
+
+  class Tweet < Identity
+    include Creatable
+    include Entities
+
+    attr_reader text: String
+    attr_reader lang: String?
+    attr_reader source: String?
+    attr_reader in_reply_to_screen_name: String?
+    attr_reader in_reply_to_status_id: Integer?
+    attr_reader in_reply_to_user_id: Integer?
+    attr_reader favorite_count: Integer
+    attr_reader quote_count: Integer
+    attr_reader reply_count: Integer
+    attr_reader retweet_count: Integer
+
+    def full_text: () -> String
+    def user: () -> User
+    def retweeted_status: () -> Tweet?
+    def retweeted_tweet: () -> Tweet?
+    def quoted_status: () -> Tweet?
+    def quoted_tweet: () -> Tweet?
+    def retweet?: () -> bool
+    def quote?: () -> bool
+    def reply?: () -> bool
+    def favorited?: () -> bool
+    def retweeted?: () -> bool
+    def truncated?: () -> bool
+    def possibly_sensitive?: () -> bool
+    def uri: () -> ::URI::Generic?
+    def url: () -> ::URI::Generic?
+  end
+
+  class DirectMessage < Identity
+    include Creatable
+    include Entities
+
+    attr_reader text: String
+    attr_reader sender_id: Integer
+    attr_reader recipient_id: Integer
+
+    def sender: () -> User
+    def recipient: () -> User
+  end
+
+  class List < Identity
+    attr_reader description: String?
+    attr_reader full_name: String
+    attr_reader mode: String
+    attr_reader name: String
+    attr_reader slug: String
+    attr_reader member_count: Integer
+    attr_reader subscriber_count: Integer
+
+    def user: () -> User
+    def uri: () -> ::URI::Generic
+  end
+
+  class Cursor[out Elem]
+    include ::Enumerable[Elem]
+
+    attr_reader attrs: Hash[Symbol, untyped]
+
+    def to_h: () -> Hash[Symbol, untyped]
+    def to_hash: () -> Hash[Symbol, untyped]
+
+    def each: (?Integer start) { (Elem) -> void } -> self
+            | (?Integer start) -> ::Enumerator[Elem, self]
+  end
+
+  class SearchResults
+    include ::Enumerable[Tweet]
+
+    attr_reader attrs: Hash[Symbol, untyped]
+    attr_reader rate_limit: RateLimit?
+
+    def to_h: () -> Hash[Symbol, untyped]
+    def to_hash: () -> Hash[Symbol, untyped]
+
+    def each: (?Integer start) { (Tweet) -> void } -> self
+            | (?Integer start) -> ::Enumerator[Tweet, self]
+  end
+end
