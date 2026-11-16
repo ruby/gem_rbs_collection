@@ -1,0 +1,42 @@
+module OrderStateMethods
+  def pay: (?String token) -> bool
+  def pay!: (?String token) -> bool
+  def may_pay?: (?String token) -> bool
+  def cancel!: () -> bool
+  def cancel_without_validation!: () -> bool
+  def pending?: () -> bool
+  def paid?: () -> bool
+end
+
+class Order < ActiveRecord::Base
+  include AASM
+  extend AASM::ClassMethods
+  include OrderStateMethods
+
+  def audit: (?String? reason) -> String?
+  def paid_ready?: () -> bool
+  def notify: () -> nil
+  def charge: (String token) -> String
+end
+
+module DocumentStateMethods
+  def publish!: () -> bool
+  def approve_review!: () -> bool
+  def start!: () -> bool
+end
+
+class Document
+  include AASM
+  extend AASM::ClassMethods
+  include DocumentStateMethods
+
+  def announce: () -> nil
+end
+
+module Kernel
+  def use_order: (Order order) -> void
+
+  def inspect_transitions: (Order order, AASM::Core::Event pay_event) -> void
+
+  def rescue_errors: (Order order) -> void
+end
