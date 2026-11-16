@@ -1,0 +1,64 @@
+module ROTP
+  VERSION: String
+
+  DEFAULT_INTERVAL: Integer
+
+  class Base32
+    class Base32Error < RuntimeError
+    end
+
+    def self.decode: (String str) -> String
+
+    def self.encode: (String b) -> String
+
+    def self.random: (?Integer byte_length) -> String
+
+    def self.random_base32: (?Integer str_len) -> String
+  end
+
+  class OTP
+    DEFAULT_DIGITS: Integer
+
+    DEFAULT_DIGEST: String
+
+    attr_reader secret: String
+
+    attr_reader digits: Integer
+
+    attr_reader digest: String
+
+    attr_reader name: String?
+
+    attr_reader issuer: String?
+
+    attr_reader provisioning_params: Hash[Symbol, untyped]
+
+    attr_reader skip_default_uri_params: bool
+
+    def initialize: (String s, ?digits: Integer?, ?digest: String?, ?name: String?, ?issuer: String?, ?provisioning_params: Hash[Symbol, untyped]?, ?skip_default_uri_params: bool) -> void
+
+    def generate_otp: (Integer input) -> String
+  end
+
+  class TOTP < OTP
+    attr_reader interval: Integer
+
+    def initialize: (String s, ?interval: Integer?, ?digits: Integer?, ?digest: String?, ?name: String?, ?issuer: String?, ?provisioning_params: Hash[Symbol, untyped]?, ?skip_default_uri_params: bool) -> void
+
+    def at: (Time | Integer time) -> String
+
+    def now: () -> String
+
+    def verify: (String otp, ?drift_ahead: Integer, ?drift_behind: Integer, ?after: Time | Integer | nil, ?at: Time | Integer) -> Integer?
+
+    def provisioning_uri: (?String? name) -> String
+  end
+
+  class HOTP < OTP
+    def at: (Integer count) -> String
+
+    def verify: (String otp, Integer counter, ?retries: Integer) -> Integer?
+
+    def provisioning_uri: (?String? name, ?Integer initial_count) -> String
+  end
+end
