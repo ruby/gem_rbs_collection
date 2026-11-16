@@ -1,0 +1,29 @@
+module Rack
+  class Cors
+    type origin = String | Regexp | Proc | ^(String source, Rack::env env) -> boolish
+
+    def initialize: (Rack::_Application app, ?debug: boolish, ?logger: ::Logger | ^() -> ::Logger) ?{ (Cors cors) [self: Cors] -> void } -> void
+    def debug?: () -> bool
+    def allow: () { (Resources resources) [self: Resources] -> void } -> void
+    def call: (Rack::env env) -> Rack::response
+
+    class Resources
+      def origins: (*(origin | Array[origin]) origins) ?{ (String source, Rack::env env) -> boolish } -> void
+      def resource: (
+        String | Regexp path,
+        ?headers: :any | String | Array[String | Symbol],
+        ?methods: Symbol | String | Array[Symbol | String],
+        ?expose: String | Array[String],
+        ?credentials: bool,
+        ?max_age: Integer,
+        ?if: Proc | ^(Rack::env env) -> boolish,
+        ?vary: String | Array[String]
+      ) -> Array[Resource]
+    end
+
+    class Resource
+      class CorsMisconfigurationError < StandardError
+      end
+    end
+  end
+end
