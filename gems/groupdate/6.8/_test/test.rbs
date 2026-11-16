@@ -1,0 +1,10 @@
+class User < ActiveRecord::Base
+  extend ActiveRecord::Base::ClassMethods[User, ActiveRecord_Relation, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::Enumerable[User]
+    include ::ActiveRecord::Relation::Methods[User, ::Integer]
+  end
+
+  def created_at: () -> Time
+end
