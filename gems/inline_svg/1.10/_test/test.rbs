@@ -1,0 +1,17 @@
+class SvgToSymbolTransform < InlineSvg::CustomTransformation
+  def transform: (Nokogiri::XML::Document doc) -> Nokogiri::XML::Document
+end
+
+class SvgView < ActionView::Base
+  def render_icons: () -> ActiveSupport::SafeBuffer
+end
+
+class SvgHelperHost
+  include InlineSvg::ActionView::Helpers
+
+  def render_icon: (String name) -> ActiveSupport::SafeBuffer
+end
+
+module IconLoader
+  def self.read: (String name) -> String
+end
