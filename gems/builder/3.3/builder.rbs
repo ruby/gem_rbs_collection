@@ -1,0 +1,31 @@
+module Builder
+  VERSION: String
+
+  class IllegalBlockError < RuntimeError
+  end
+
+  class XmlBase < BasicObject
+    def self.cache_method_calls: () -> bool
+    def self.cache_method_calls=: (boolish value) -> bool
+
+    def tag!: (Symbol | String sym, *untyped args) ?{ (self builder) -> untyped } -> untyped
+    def text!: (String text) -> untyped
+    def <<: (String text) -> untyped
+    def explicit_nil_handling?: () -> bool?
+    def nil?: () -> false
+  end
+
+  class XmlMarkup < XmlBase
+    type options = { ?indent: Integer, ?margin: Integer, ?quote: :single | :double, ?explicit_nil_handling: bool, ?target: untyped }
+
+    def initialize: (?options options) -> void
+    def target!: () -> untyped
+    def comment!: (String comment_text) -> untyped
+    def declare!: (Symbol | String inst, *(String | Symbol) args) ?{ (self builder) -> untyped } -> untyped
+    def instruct!: (?Symbol directive_tag, ?Hash[Symbol, untyped] attrs) -> untyped
+    def cdata!: (String text) -> untyped
+  end
+
+  class XmlEvents < XmlMarkup
+  end
+end
