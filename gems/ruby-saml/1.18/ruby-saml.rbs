@@ -1,0 +1,418 @@
+module OneLogin
+  module RubySaml
+    VERSION: String
+
+    class ValidationError < StandardError
+    end
+
+    class SettingError < StandardError
+    end
+
+    class HttpError < StandardError
+    end
+
+    module ErrorHandling
+      attr_accessor errors: Array[String]
+    end
+
+    class Utils
+      BINDINGS: Hash[Symbol, String]
+
+      def self.format_cert: (String? cert) -> String?
+
+      def self.format_private_key: (String? key) -> String?
+
+      def self.build_cert_object: (String? cert) -> OpenSSL::X509::Certificate?
+
+      def self.build_private_key_object: (String? private_key) -> OpenSSL::PKey::RSA?
+
+      def self.is_cert_expired: (OpenSSL::X509::Certificate | String cert) -> bool
+
+      def self.is_cert_active: (OpenSSL::X509::Certificate | String cert) -> bool
+    end
+
+    class AttributeService
+      type attribute = { name: String, ?name_format: String, ?friendly_name: String, ?attribute_value: String | Array[String] } | Hash[Symbol, untyped]
+
+      attr_reader attributes: Array[attribute]
+      attr_reader name: String?
+      attr_reader index: String | Integer
+
+      def configure: () { () [self: self] -> void } -> void
+
+      def configured?: () -> bool
+
+      def service_name: (String name) -> String
+
+      def service_index: (String | Integer index) -> (String | Integer)
+
+      def add_attribute: (attribute options) -> Array[attribute]
+    end
+
+    class Attributes
+      include Enumerable[[String, Array[String?]]]
+
+      def self.single_value_compatibility: () -> bool
+
+      def self.single_value_compatibility=: (bool value) -> bool
+
+      def attributes: () -> Hash[String, Array[String?]]
+
+      def each: () { ([String, Array[String?]]) -> void } -> Hash[String, Array[String?]]
+
+      def include?: (String | Symbol name) -> bool
+
+      def single: (String | Symbol name) -> String?
+
+      def multi: (String | Symbol name) -> Array[String?]?
+
+      def []: (String | Symbol name) -> (String | Array[String?])?
+
+      def all: () -> Hash[String, Array[String?]]
+
+      def set: (String | Symbol name, Array[String?] values) -> Array[String?]
+
+      def []=: (String | Symbol name, Array[String?] values) -> Array[String?]
+
+      def add: (String | Symbol name, ?String | Array[String?] values) -> Array[String?]
+
+      def fetch: (String | Symbol | Regexp name) -> (String | Array[String?])?
+
+      def ==: (untyped other) -> bool
+    end
+
+    class Settings
+      type overrides = Hash[Symbol | String, untyped]
+
+      type security = {
+        ?authn_requests_signed: bool,
+        ?logout_requests_signed: bool,
+        ?logout_responses_signed: bool,
+        ?want_assertions_signed: bool,
+        ?want_assertions_encrypted: bool,
+        ?want_name_id: bool,
+        ?metadata_signed: bool,
+        ?digest_method: String,
+        ?signature_method: String,
+        ?check_idp_cert_expiration: bool,
+        ?check_sp_cert_expiration: bool,
+        ?strict_audience_validation: bool,
+        ?lowercase_url_encoding: bool
+      }
+
+      def initialize: (?overrides overrides, ?bool keep_security_attributes) -> void
+
+      attr_accessor idp_entity_id: String?
+      attr_accessor idp_sso_service_url: String?
+      attr_accessor idp_slo_service_url: String?
+      attr_accessor idp_slo_response_service_url: String?
+      attr_accessor idp_cert: String?
+      attr_accessor idp_cert_fingerprint: String?
+      attr_accessor idp_cert_fingerprint_algorithm: String?
+      attr_accessor idp_cert_multi: Hash[Symbol | String, Array[String]]?
+      attr_accessor idp_attribute_names: Array[String]?
+      attr_accessor idp_name_qualifier: String?
+      attr_accessor valid_until: String?
+      attr_accessor sp_entity_id: String?
+      attr_accessor issuer: String?
+      attr_accessor assertion_consumer_service_url: String?
+      attr_accessor single_logout_service_url: String?
+      attr_accessor assertion_consumer_logout_service_url: String?
+      attr_accessor sp_name_qualifier: String?
+      attr_accessor name_identifier_format: String?
+      attr_accessor name_identifier_value: String?
+      attr_accessor name_identifier_value_requested: String?
+      attr_accessor sessionindex: String?
+      attr_accessor compress_request: bool
+      attr_accessor compress_response: bool
+      attr_accessor double_quote_xml_attribute_values: bool
+      attr_accessor message_max_bytesize: Integer
+      attr_accessor check_malformed_doc: bool
+      attr_accessor passive: bool?
+      attr_accessor attributes_index: Integer?
+      attr_accessor force_authn: bool?
+      attr_accessor certificate: String?
+      attr_accessor certificate_new: String?
+      attr_accessor private_key: String?
+      attr_accessor sp_cert_multi: Hash[Symbol | String, Array[Hash[Symbol | String, String]]]?
+      attr_accessor authn_context: (String | Array[String])?
+      attr_accessor authn_context_comparison: String?
+      attr_accessor authn_context_decl_ref: (String | Array[String])?
+      attr_accessor security: security
+      attr_accessor soft: bool?
+      attr_reader attribute_consuming_service: AttributeService
+
+      def idp_sso_service_binding: () -> String?
+
+      def idp_sso_service_binding=: ((String | Symbol)? value) -> (String | Symbol)?
+
+      def idp_slo_service_binding: () -> String?
+
+      def idp_slo_service_binding=: ((String | Symbol)? value) -> (String | Symbol)?
+
+      def protocol_binding: () -> String?
+
+      def protocol_binding=: ((String | Symbol)? value) -> (String | Symbol)?
+
+      def assertion_consumer_service_binding: () -> String?
+
+      def assertion_consumer_service_binding=: ((String | Symbol)? value) -> (String | Symbol)?
+
+      def single_logout_service_binding: () -> String?
+
+      def single_logout_service_binding=: ((String | Symbol)? value) -> (String | Symbol)?
+
+      def assertion_consumer_logout_service_binding: () -> String?
+
+      def assertion_consumer_logout_service_binding=: ((String | Symbol)? value) -> (String | Symbol)?
+
+      def get_fingerprint: () -> String?
+
+      def get_idp_cert: () -> OpenSSL::X509::Certificate?
+
+      def get_sp_cert: () -> OpenSSL::X509::Certificate?
+
+      def get_sp_signing_key: () -> OpenSSL::PKey::RSA?
+
+      alias get_sp_key get_sp_signing_key
+
+      def get_sp_cert_new: () -> OpenSSL::X509::Certificate?
+    end
+
+    class SamlMessage
+    end
+
+    class Authrequest < SamlMessage
+      type params = Hash[Symbol | String, String?]
+
+      attr_accessor uuid: String
+
+      def initialize: () -> void
+
+      def request_id: () -> String
+
+      def create: (Settings settings, ?params params) -> String
+    end
+
+    class Logoutrequest < SamlMessage
+      attr_accessor uuid: String
+
+      def initialize: () -> void
+
+      def request_id: () -> String
+
+      def create: (Settings settings, ?Authrequest::params params) -> String
+    end
+
+    class SloLogoutresponse < SamlMessage
+      attr_accessor uuid: String
+
+      def initialize: () -> void
+
+      def response_id: () -> String
+
+      def create: (Settings settings, ?String? request_id, ?String? logout_message, ?Authrequest::params params, ?String? logout_status_code) -> String
+    end
+
+    class SloLogoutrequest < SamlMessage
+      include ErrorHandling
+
+      type options = {
+        ?settings: Settings?,
+        ?allowed_clock_drift: ::_ToF?,
+        ?matches_request_id: String?,
+        ?relax_signature_validation: true,
+        ?get_params: Hash[String, String],
+        ?raw_get_params: Hash[String, String]
+      }
+
+      attr_accessor settings: Settings?
+      attr_accessor soft: bool
+
+      def initialize: (String request, ?options options) -> void
+
+      def is_valid?: (?bool collect_errors) -> bool
+
+      def id: () -> String?
+
+      def issuer: () -> String?
+
+      def name_id: () -> String?
+
+      alias nameid name_id
+
+      def name_id_format: () -> String?
+
+      alias nameid_format name_id_format
+
+      def not_on_or_after: () -> Time?
+
+      def session_indexes: () -> Array[String]
+    end
+
+    class Logoutresponse < SamlMessage
+      include ErrorHandling
+
+      type options = {
+        ?matches_request_id: String?,
+        ?allowed_clock_drift: ::_ToF?,
+        ?relax_signature_validation: true,
+        ?get_params: Hash[String, String],
+        ?raw_get_params: Hash[String, String]
+      }
+
+      attr_accessor settings: Settings?
+      attr_accessor soft: bool
+
+      def initialize: (String response, ?Settings? settings, ?options options) -> void
+
+      def validate: (?bool collect_errors) -> bool
+
+      def response_id: () -> String?
+
+      def success?: () -> bool
+
+      def in_response_to: () -> String?
+
+      def issuer: () -> String?
+
+      def status_code: () -> String?
+
+      def status_message: () -> String?
+    end
+
+    class Response < SamlMessage
+      include ErrorHandling
+
+      type options = {
+        ?settings: Settings?,
+        ?allowed_clock_drift: ::_ToF?,
+        ?check_duplicated_attributes: bool,
+        ?matches_request_id: String?,
+        ?skip_audience: bool,
+        ?skip_authnstatement: bool,
+        ?skip_conditions: bool,
+        ?skip_destination: bool,
+        ?skip_recipient_check: bool,
+        ?skip_subject_confirmation: bool
+      } | Hash[Symbol, untyped]
+
+      attr_accessor settings: Settings?
+      attr_accessor soft: bool
+
+      def initialize: (String response, ?options options) -> void
+
+      def is_valid?: (?bool collect_errors) -> bool
+
+      def name_id: () -> String?
+
+      alias nameid name_id
+
+      def name_id_format: () -> String?
+
+      alias nameid_format name_id_format
+
+      def name_id_spnamequalifier: () -> String?
+
+      def name_id_namequalifier: () -> String?
+
+      def sessionindex: () -> String?
+
+      def attributes: () -> Attributes
+
+      def session_expires_at: () -> Time?
+
+      def authn_instant: () -> String?
+
+      def authn_context_class_ref: () -> String?
+
+      def success?: () -> bool
+
+      def status_code: () -> String?
+
+      def status_message: () -> String?
+
+      def not_before: () -> Time?
+
+      def not_on_or_after: () -> Time?
+
+      def issuers: () -> Array[String]
+
+      def in_response_to: () -> String?
+
+      def destination: () -> String?
+
+      def audiences: () -> Array[String]
+
+      def allowed_clock_drift: () -> Float
+
+      def assertion_encrypted?: () -> bool
+
+      def response_id: () -> String?
+
+      def assertion_id: () -> String?
+    end
+
+    class Metadata
+      def generate: (Settings settings, ?bool pretty_print, ?Time? valid_until, ?Integer? cache_duration) -> String
+    end
+
+    class IdpMetadataParser
+      type bindings = String | Array[String]
+
+      type options = {
+        ?settings: Settings | Settings::overrides,
+        ?entity_id: String?,
+        ?sso_binding: bindings?,
+        ?slo_binding: bindings?,
+        ?name_id_format: bindings?
+      }
+
+      type metadata = {
+        idp_entity_id: String?,
+        name_identifier_format: String?,
+        idp_sso_service_url: String?,
+        idp_sso_service_binding: String?,
+        idp_slo_service_url: String?,
+        idp_slo_service_binding: String?,
+        idp_slo_response_service_url: String?,
+        idp_attribute_names: Array[String],
+        idp_cert: String?,
+        idp_cert_fingerprint: String?,
+        idp_cert_multi: Hash[Symbol, Array[String]]?,
+        valid_until: String?,
+        cache_duration: String?
+      }
+
+      def parse: (String idp_metadata, ?options options) -> Settings
+
+      def parse_remote: (String url, ?bool validate_cert, ?options options) -> Settings
+
+      def parse_to_hash: (String idp_metadata, ?options options) -> metadata
+
+      def parse_remote_to_hash: (String url, ?bool validate_cert, ?options options) -> metadata
+
+      def parse_to_array: (String idp_metadata, ?options options) -> Array[metadata]
+
+      def parse_remote_to_array: (String url, ?bool validate_cert, ?options options) -> Array[metadata]
+    end
+  end
+end
+
+module XMLSecurity
+  class BaseDocument
+    C14N: String
+    DSIG: String
+  end
+
+  class Document < BaseDocument
+    RSA_SHA1: String
+    RSA_SHA256: String
+    RSA_SHA384: String
+    RSA_SHA512: String
+    SHA1: String
+    SHA256: String
+    SHA384: String
+    SHA512: String
+  end
+end
