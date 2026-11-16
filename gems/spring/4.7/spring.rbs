@@ -1,0 +1,19 @@
+module Spring
+  VERSION: String
+
+  attr_accessor self.application_root: String?
+  attr_accessor self.dangerously_allow_disabling_reloading: bool
+  attr_writer self.quiet: bool?
+
+  def self.quiet: () -> bool
+  def self.after_fork: () { () -> void } -> void
+  def self.after_environment_load: () { () -> void } -> void
+  def self.watch: (*(String | Pathname | Array[String | Pathname]) items) -> void
+
+  module Commands
+    class Rake
+      def self.environment_matchers: () -> Hash[String | Regexp | Symbol, String]
+      def self.environment_matchers=: (Hash[String | Regexp | Symbol, String]) -> Hash[String | Regexp | Symbol, String]
+    end
+  end
+end
