@@ -1,0 +1,26 @@
+module Rswag
+  module Ui
+    def self.configure: () { (Configuration) -> void } -> void
+
+    def self.config: () -> Configuration
+
+    def self.deprecator: () -> ActiveSupport::Deprecation
+
+    class Configuration
+      attr_accessor basic_auth_enabled: boolish
+
+      attr_accessor config_object: Hash[Symbol, untyped]
+
+      attr_accessor oauth_config_object: Hash[Symbol, untyped]
+
+      def openapi_endpoint: (String url, String name) -> void
+
+      def swagger_endpoint: (String url, String name) -> void
+
+      def basic_auth_credentials: (String username, String password) -> void
+    end
+
+    class Engine < ::Rails::Engine
+    end
+  end
+end
