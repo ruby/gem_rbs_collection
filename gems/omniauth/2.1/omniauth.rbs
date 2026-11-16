@@ -1,0 +1,326 @@
+module OmniAuth
+  type env = Rack::env
+
+  type rack_response = Rack::response
+
+  interface _EnvCallable
+    def call: (env) -> untyped
+  end
+
+  # A configuration hook. Hooks set to nil are skipped.
+  type hook = _EnvCallable | nil
+
+  class Error < StandardError
+  end
+
+  class NoSessionError < StandardError
+  end
+
+  class AuthenticityError < StandardError
+  end
+
+  def self.strategies: () -> Array[Class]
+
+  def self.config: () -> Configuration
+
+  def self.configure: [T] () { (Configuration) -> T } -> T
+
+  def self.logger: () -> Logger
+
+  def self.mock_auth_for: (String | Symbol provider) -> (AuthHash | Symbol)
+
+  class Configuration
+    def self.instance: () -> Configuration
+
+    def self.default_logger: () -> Logger
+
+    def self.defaults: () -> Hash[Symbol, untyped]
+
+    # Each hook method sets the hook when given a block and returns it
+    # otherwise.
+    def on_failure: () { (env) -> untyped } -> Proc
+                  | () -> _EnvCallable
+
+    def before_callback_phase: () { (env) -> untyped } -> Proc
+                             | () -> hook
+
+    def before_options_phase: () { (env) -> untyped } -> Proc
+                            | () -> hook
+
+    def request_validation_phase: () { (env) -> untyped } -> Proc
+                                | () -> hook
+
+    def before_request_phase: () { (env) -> untyped } -> Proc
+                            | () -> hook
+
+    def after_request_phase: () { (env) -> untyped } -> Proc
+                           | () -> hook
+
+    def add_mock: (String | Symbol provider, ?Hash[String | Symbol, untyped] original) -> AuthHash
+
+    def add_camelization: (String | Symbol name, String | Symbol camelized) -> String
+
+    attr_writer on_failure: _EnvCallable
+    attr_writer before_callback_phase: hook
+    attr_writer before_options_phase: hook
+    attr_writer before_request_phase: hook
+    attr_writer after_request_phase: hook
+    attr_writer request_validation_phase: hook
+
+    attr_accessor failure_raise_out_environments: Array[String]
+    attr_accessor path_prefix: String
+    attr_accessor allowed_request_methods: Array[Symbol]
+    attr_accessor form_css: String
+    attr_accessor test_mode: bool
+    attr_accessor mock_auth: Hash[Symbol, AuthHash | Symbol]
+    attr_accessor full_host: (String | ^(env) -> String | Proc)?
+    attr_accessor camelizations: Hash[String, String]
+    attr_accessor logger: Logger
+    attr_accessor silence_get_warning: bool
+  end
+
+  module Utils
+    def self?.form_css: () -> String
+
+    def self?.deep_merge: (Hash[untyped, untyped] hash, Hash[untyped, untyped] other_hash) -> Hash[untyped, untyped]
+
+    def self?.camelize: (String | Symbol word, ?bool first_letter_in_uppercase) -> String
+  end
+
+  # A Hashie::Mash that lets strategies read and write keys as methods.
+  class KeyStore < Hashie::Mash
+    def initialize: (?Hash[untyped, untyped]? source_hash, ?untyped default) -> void
+
+    def self.override_logging: () -> void
+  end
+
+  # The normalized schema returned by all OmniAuth strategies.
+  class AuthHash < KeyStore
+    def self.subkey_class: () -> singleton(Hashie::Mash)
+
+    def valid?: () -> bool
+
+    def provider: () -> String?
+    def provider?: () -> bool
+    def uid: () -> String?
+    def uid?: () -> bool
+    def info: () -> InfoHash?
+    def info?: () -> bool
+    def info=: (Hash[untyped, untyped]? value) -> Hash[untyped, untyped]?
+    def credentials: () -> Hashie::Mash?
+    def credentials=: (Hash[untyped, untyped]? value) -> Hash[untyped, untyped]?
+    def extra: () -> Hashie::Mash?
+    def extra=: (Hash[untyped, untyped]? value) -> Hash[untyped, untyped]?
+
+    # The user's information, stored under the `info` key.
+    class InfoHash < KeyStore
+      def self.subkey_class: () -> singleton(Hashie::Mash)
+
+      def name: () -> String?
+      def name?: () -> bool
+      def first_name: () -> String?
+      def first_name?: () -> bool
+      def last_name: () -> String?
+      def last_name?: () -> bool
+      def nickname: () -> String?
+      def nickname?: () -> bool
+      def email: () -> String?
+      def email?: () -> bool
+
+      def valid?: () -> bool
+
+      def to_hash: () -> Hash[String, untyped]
+    end
+  end
+
+  class Builder < Rack::Builder
+    def on_failure: () { (env) -> untyped } -> Proc
+
+    def before_options_phase: () { (env) -> untyped } -> Proc
+
+    def before_request_phase: () { (env) -> untyped } -> Proc
+
+    def after_request_phase: () { (env) -> untyped } -> Proc
+
+    def before_callback_phase: () { (env) -> untyped } -> Proc
+
+    def configure: [T] () { (Configuration) -> T } -> T
+
+    # Returns the options merged into every provider, or sets them.
+    def options: (?false | Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+
+    def provider: (Class | String | Symbol klass, *untyped args, **untyped opts) ?{ (*untyped) -> void } -> void
+
+    def call: (env) -> rack_response
+  end
+
+  # The default `on_failure` endpoint: raises in the configured
+  # environments and otherwise redirects to `/auth/failure`.
+  class FailureEndpoint
+    attr_reader env: env
+
+    def self.call: (env) -> rack_response
+
+    def initialize: (env) -> void
+
+    def call: () -> rack_response
+
+    def raise_out!: () -> bot
+
+    def redirect_to_failure: () -> rack_response
+  end
+
+  # Builds the HTML form some strategies show in their request phase.
+  class Form
+    DEFAULT_CSS: String
+
+    attr_accessor options: Hash[Symbol, untyped]
+
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    def self.build: (?Hash[Symbol, untyped] options) { (Form) [self: Form] -> void } -> Form
+
+    def label_field: (String text, String target) -> self
+
+    def input_field: (String type, String name) -> self
+
+    def text_field: (String label, String name) -> self
+
+    def password_field: (String label, String name) -> self
+
+    def button: (String text) -> String
+
+    def html: (String html) -> String
+
+    def fieldset: (String legend, ?Hash[Symbol, untyped] options) { (Form) [self: Form] -> void } -> self
+
+    def header: (String title, String header_info) -> self
+
+    def footer: () -> self
+
+    def to_html: () -> String
+
+    def to_response: () -> rack_response
+  end
+
+  # The mixin every OmniAuth strategy includes. A class that includes it
+  # also needs `extend OmniAuth::Strategy::ClassMethods` in the RBS.
+  module Strategy
+    module ClassMethods
+      def default_options: () -> Options
+
+      def configure: (?Hash[Symbol, untyped]? options) ?{ (Options) -> void } -> untyped
+
+      def option: (Symbol | String name, ?untyped value) -> untyped
+
+      def args: () -> Array[Symbol]
+              | (Array[Symbol] | Symbol args) -> nil
+
+      # The fetcher blocks run with the strategy instance as self.
+      def uid: () { () [self: Strategy] -> untyped } -> Proc
+             | () -> Proc?
+
+      def info: () { () [self: Strategy] -> Hash[untyped, untyped]? } -> Proc
+              | () -> Proc?
+
+      def extra: () { () [self: Strategy] -> Hash[untyped, untyped]? } -> Proc
+               | () -> Proc?
+
+      def credentials: () { () [self: Strategy] -> Hash[untyped, untyped]? } -> Proc
+                     | () -> Proc?
+    end
+
+    # Options for a strategy instance: the class's default options merged
+    # with the ones passed to the strategy.
+    class Options < KeyStore
+      def name: () -> (String | Symbol)
+      # false, true (render the app's own form), or a Rack endpoint
+      def form: () -> untyped
+      def origin_param: () -> (String | false)
+      # A boolean, or something callable that takes the uid
+      def skip_info: () -> untyped
+      def skip_info?: () -> bool
+    end
+
+    attr_reader app: Rack::_Application?
+    attr_reader env: env
+    attr_reader options: Options
+    attr_reader response: untyped
+
+    def initialize: (Rack::_Application? app, *untyped args) ?{ (Options) -> void } -> void
+
+    def log: (Symbol level, String message) -> void
+
+    def call: (env) -> rack_response
+
+    def call!: (env) -> rack_response
+
+    def on_auth_path?: () -> boolish
+
+    def on_request_path?: () -> boolish
+
+    def on_callback_path?: () -> bool
+
+    def on_path?: (String path) -> bool
+
+    def options_request?: () -> bool
+
+    def setup_phase: () -> void
+
+    def request_phase: () -> rack_response
+
+    def callback_phase: () -> rack_response
+
+    def call_app!: (?env env) -> rack_response
+
+    def uid: () -> untyped
+
+    def info: () -> Hash[untyped, untyped]
+
+    def credentials: () -> Hash[untyped, untyped]
+
+    def extra: () -> Hash[untyped, untyped]
+
+    def auth_hash: () -> AuthHash
+
+    def skip_info?: () -> boolish
+
+    def session: () -> Hash[String, untyped]
+
+    def request: () -> Rack::Request
+
+    def name: () -> (String | Symbol)
+
+    def redirect: (String uri) -> rack_response
+
+    def fail!: (String | Symbol message_key, ?Exception? exception) -> rack_response
+
+    def path_prefix: () -> String
+
+    def custom_path: (Symbol kind) -> String?
+
+    def request_path: () -> String
+
+    def callback_path: () -> String
+
+    def setup_path: () -> String
+
+    def current_path: () -> String
+
+    def query_string: () -> String
+
+    def full_host: () -> String
+
+    def callback_url: () -> String
+
+    def script_name: () -> String
+  end
+
+  module Strategies
+    # A strategy for development that asks for a name and email.
+    class Developer
+      include Strategy
+      extend Strategy::ClassMethods
+    end
+  end
+end
