@@ -1,0 +1,44 @@
+module CustomInputs
+end
+
+module AppendComponent : SimpleForm::Inputs::Base
+  def append: (?Hash[Symbol, untyped]? _wrapper_options) -> ActiveSupport::SafeBuffer?
+end
+
+class PercentInput < SimpleForm::Inputs::Base
+end
+
+class UppercaseInput < SimpleForm::Inputs::StringInput
+end
+
+class SelectableInput < SimpleForm::Inputs::CollectionSelectInput
+end
+
+class InspectInput < SimpleForm::Inputs::Base
+end
+
+class CustomFormBuilder < SimpleForm::FormBuilder
+  def labeled_input: (Symbol name) -> String
+end
+
+module MemberAttributes
+  attr_accessor name: String?
+  attr_accessor email: String?
+  attr_accessor note: String?
+  attr_accessor role: String?
+end
+
+class Member
+  include ActiveModel::Model
+  include MemberAttributes
+end
+
+class Post < ActiveRecord::Base
+end
+
+class User < ActiveRecord::Base
+end
+
+module Kernel
+  def render_association_form: (ActionView::Base view, User user) -> String
+end

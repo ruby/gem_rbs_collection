@@ -1,0 +1,321 @@
+module SimpleForm
+  class WrapperNotFound < StandardError
+  end
+
+  type html_class = String | Symbol
+
+  def self.setup: [T] () { (singleton(SimpleForm) config) -> T } -> T
+
+  def self.wrapper: (Symbol | String name) -> Wrappers::Root
+
+  def self.wrappers: (?Symbol name, **untyped options) { (Wrappers::Builder builder) -> untyped } -> Wrappers::Root
+                   | (**untyped options) { (Wrappers::Builder builder) -> untyped } -> Wrappers::Root
+                   | () -> Hash[String, Wrappers::Root]
+
+  def self.include_component: (Module component) -> untyped
+
+  def self.error_method: () -> Symbol
+  def self.error_method=: (Symbol value) -> Symbol
+
+  def self.error_notification_tag: () -> (Symbol | String)
+  def self.error_notification_tag=: (Symbol | String value) -> (Symbol | String)
+
+  def self.error_notification_class: () -> html_class
+  def self.error_notification_class=: (html_class value) -> html_class
+
+  def self.collection_label_methods: () -> Array[Symbol]
+  def self.collection_label_methods=: (Array[Symbol] value) -> Array[Symbol]
+
+  def self.collection_value_methods: () -> Array[Symbol]
+  def self.collection_value_methods=: (Array[Symbol] value) -> Array[Symbol]
+
+  def self.collection_wrapper_tag: () -> (Symbol | String)?
+  def self.collection_wrapper_tag=: ((Symbol | String)? value) -> (Symbol | String)?
+
+  def self.collection_wrapper_class: () -> html_class?
+  def self.collection_wrapper_class=: (html_class? value) -> html_class?
+
+  def self.item_wrapper_tag: () -> (Symbol | String)
+  def self.item_wrapper_tag=: (Symbol | String value) -> (Symbol | String)
+
+  def self.item_wrapper_class: () -> html_class?
+  def self.item_wrapper_class=: (html_class? value) -> html_class?
+
+  def self.label_text: () -> (Proc | ^(String label, String required, bool explicit_label) -> String)
+  def self.label_text=: (Proc | ^(String label, String required, bool explicit_label) -> String value) -> (Proc | ^(String label, String required, bool explicit_label) -> String)
+
+  def self.label_class: () -> html_class?
+  def self.label_class=: (html_class? value) -> html_class?
+
+  def self.boolean_style: () -> (:inline | :nested)
+  def self.boolean_style=: (:inline | :nested value) -> (:inline | :nested)
+
+  def self.default_form_class: () -> html_class?
+  def self.default_form_class=: (html_class? value) -> html_class?
+
+  def self.generate_additional_classes_for: () -> Array[Symbol]
+  def self.generate_additional_classes_for=: (Array[Symbol] value) -> Array[Symbol]
+
+  def self.required_by_default: () -> bool
+  def self.required_by_default=: (bool value) -> bool
+
+  def self.browser_validations: () -> bool
+  def self.browser_validations=: (bool value) -> bool
+
+  def self.input_mappings: () -> Hash[Regexp, Symbol]?
+  def self.input_mappings=: (Hash[Regexp, Symbol]? value) -> Hash[Regexp, Symbol]?
+
+  def self.wrapper_mappings: () -> Hash[Symbol, Symbol]?
+  def self.wrapper_mappings=: (Hash[Symbol, Symbol]? value) -> Hash[Symbol, Symbol]?
+
+  def self.custom_inputs_namespaces: () -> Array[String]
+  def self.custom_inputs_namespaces=: (Array[String] value) -> Array[String]
+
+  def self.time_zone_priority: () -> untyped
+  def self.time_zone_priority=: (untyped value) -> untyped
+
+  def self.country_priority: () -> untyped
+  def self.country_priority=: (untyped value) -> untyped
+
+  def self.translate_labels: () -> bool
+  def self.translate_labels=: (bool value) -> bool
+
+  def self.inputs_discovery: () -> bool
+  def self.inputs_discovery=: (bool value) -> bool
+
+  def self.cache_discovery: () -> bool
+  def self.cache_discovery=: (bool value) -> bool
+
+  def self.button_class: () -> html_class
+  def self.button_class=: (html_class value) -> html_class
+
+  def self.field_error_proc: () -> Proc
+  def self.field_error_proc=: (Proc value) -> Proc
+
+  def self.input_class: () -> html_class?
+  def self.input_class=: (html_class? value) -> html_class?
+
+  def self.include_default_input_wrapper_class: () -> bool
+  def self.include_default_input_wrapper_class=: (bool value) -> bool
+
+  def self.boolean_label_class: () -> html_class?
+  def self.boolean_label_class=: (html_class? value) -> html_class?
+
+  def self.default_wrapper: () -> Symbol
+  def self.default_wrapper=: (Symbol value) -> Symbol
+
+  def self.i18n_scope: () -> (String | Symbol)
+  def self.i18n_scope=: (String | Symbol value) -> (String | Symbol)
+
+  def self.input_field_error_class: () -> html_class?
+  def self.input_field_error_class=: (html_class? value) -> html_class?
+
+  def self.input_field_valid_class: () -> html_class?
+  def self.input_field_valid_class=: (html_class? value) -> html_class?
+
+  module ActionViewExtensions
+    module FormHelper
+      def simple_form_for: (untyped record, ?Hash[Symbol, untyped] options) { (FormBuilder f) -> untyped } -> String
+
+      def simple_fields_for: (untyped record_name, ?untyped record_object, ?Hash[Symbol, untyped] options) { (FormBuilder f) -> untyped } -> String
+    end
+  end
+
+  module Components
+    module Errors
+      def error: (?Hash[Symbol, untyped]? wrapper_options) -> ActiveSupport::SafeBuffer?
+      def full_error: (?Hash[Symbol, untyped]? wrapper_options) -> String?
+      def has_errors?: () -> bool
+      def has_value?: () -> bool
+      def valid?: () -> bool
+    end
+
+    module Hints
+      def hint: (?Hash[Symbol, untyped]? wrapper_options) -> ActiveSupport::SafeBuffer?
+      def has_hint?: () -> bool
+    end
+
+    module Labels
+      def label: (?Hash[Symbol, untyped]? wrapper_options) -> ActiveSupport::SafeBuffer
+      def label_text: (?Hash[Symbol, untyped]? wrapper_options) -> ActiveSupport::SafeBuffer
+      def label_target: () -> (Symbol | String)
+      def label_html_options: () -> Hash[Symbol, untyped]
+    end
+
+    module LabelInput
+      include Labels
+
+      def label_input: (?Hash[Symbol, untyped]? wrapper_options) -> ActiveSupport::SafeBuffer
+    end
+  end
+
+  module Inputs
+    class Base
+      include ERB::Util
+      include ActionView::Helpers::TranslationHelper
+      include Components::Errors
+      include Components::Hints
+      include Components::LabelInput
+
+      @builder: FormBuilder
+
+      attr_reader attribute_name: Symbol | String
+      attr_reader column: untyped
+      attr_reader input_type: Symbol
+      attr_reader reflection: untyped
+      attr_reader options: Hash[Symbol, untyped]
+      attr_reader input_html_options: Hash[Symbol, untyped]
+      attr_reader input_html_classes: Array[html_class]
+      attr_reader html_classes: Array[html_class]
+
+      def self.default_options: () -> Hash[Symbol, untyped]
+      def self.default_options=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
+      def self.enable: (*Symbol keys) -> Hash[Symbol, untyped]
+      def self.disable: (*Symbol keys) -> Hash[Symbol, untyped]
+
+      def template: () -> ActionView::Base
+      def object: () -> untyped
+      def object_name: () -> (Symbol | String)
+      def input: (?Hash[Symbol, untyped]? wrapper_options) -> ActiveSupport::SafeBuffer
+      def input_options: () -> Hash[Symbol, untyped]
+      def additional_classes: () -> Array[Symbol]
+      def input_class: () -> String
+
+      private
+
+      def merge_wrapper_options: (Hash[Symbol, untyped] options, Hash[Symbol, untyped]? wrapper_options) -> Hash[Symbol, untyped]
+    end
+
+    class BlockInput < Base
+    end
+
+    class BooleanInput < Base
+    end
+
+    class CollectionInput < Base
+    end
+
+    class CollectionSelectInput < CollectionInput
+    end
+
+    class CollectionRadioButtonsInput < CollectionInput
+    end
+
+    class CollectionCheckBoxesInput < CollectionRadioButtonsInput
+    end
+
+    class GroupedCollectionSelectInput < CollectionInput
+    end
+
+    class PriorityInput < CollectionSelectInput
+    end
+
+    class WeekdayInput < CollectionSelectInput
+    end
+
+    class ColorInput < Base
+    end
+
+    class DateTimeInput < Base
+    end
+
+    class FileInput < Base
+    end
+
+    class HiddenInput < Base
+    end
+
+    class NumericInput < Base
+    end
+
+    class RangeInput < NumericInput
+    end
+
+    class PasswordInput < Base
+    end
+
+    class RichTextAreaInput < Base
+    end
+
+    class StringInput < Base
+    end
+
+    class TextInput < Base
+    end
+  end
+
+  module Wrappers
+    class Many
+      attr_reader namespace: Symbol?
+      attr_reader defaults: Hash[Symbol, untyped]
+      attr_reader components: Array[Many | Leaf]
+
+      def render: (Inputs::Base input) -> String?
+      def find: (Symbol name) -> (Many | Leaf)?
+    end
+
+    class Root < Many
+      attr_reader options: Hash[Symbol, untyped]
+    end
+
+    class Single < Many
+    end
+
+    class Leaf
+      attr_reader namespace: Symbol
+
+      def render: (Inputs::Base input) -> untyped
+      def find: (Symbol name) -> Leaf?
+    end
+
+    class Builder
+      def use: (Symbol name, ?Hash[Symbol, untyped] options) -> Array[Many | Leaf]
+
+      def optional: (Symbol name, ?Hash[Symbol, untyped] options) -> Array[Many | Leaf]
+
+      def wrapper: (Symbol name, ?Hash[Symbol, untyped] options) { (Builder builder) -> untyped } -> Array[Many | Leaf]
+                 | (Hash[Symbol, untyped] options) { (Builder builder) -> untyped } -> Array[Many | Leaf]
+    end
+  end
+
+  class FormBuilder < ActionView::Helpers::FormBuilder
+    ACTIONS: Hash[String, String]
+
+    attr_reader template: ActionView::Base
+    attr_reader object_name: Symbol | String
+    attr_reader object: untyped
+    attr_reader wrapper: Wrappers::Root
+
+    def self.map_type: (*Symbol types, to: singleton(Inputs::Base)) -> Hash[Symbol, singleton(Inputs::Base)]
+    def self.mappings: () -> Hash[Symbol, singleton(Inputs::Base)]
+
+    def input: (Symbol | String attribute_name, ?Hash[Symbol, untyped] options) ?{ () -> untyped } -> ActiveSupport::SafeBuffer
+    alias attribute input
+
+    def input_field: (Symbol | String attribute_name, ?Hash[Symbol, untyped] options) -> ActiveSupport::SafeBuffer
+
+    def association: (Symbol association, ?Hash[Symbol, untyped] options) ?{ (FormBuilder f) -> untyped } -> String
+
+    def button: (Symbol type, *untyped args) ?{ () -> untyped } -> String
+
+    def error: (Symbol | String attribute_name, ?Hash[Symbol, untyped] options) -> String?
+
+    def full_error: (Symbol | String attribute_name, ?Hash[Symbol, untyped] options) -> String?
+
+    def hint: (Symbol | String attribute_name, ?Hash[Symbol, untyped] options) -> String?
+
+    def label: (Symbol | String attribute_name, *untyped args) ?{ () -> untyped } -> String
+
+    def error_notification: (?Hash[Symbol, untyped] options) -> String?
+
+    def collection_radio_buttons: (Symbol method, untyped collection, untyped value_method, untyped text_method, ?Hash[Symbol, untyped] options, ?Hash[Symbol, untyped] html_options) ?{ (untyped) -> untyped } -> String
+
+    def collection_check_boxes: (Symbol method, untyped collection, untyped value_method, untyped text_method, ?Hash[Symbol, untyped] options, ?Hash[Symbol, untyped] html_options) ?{ (untyped) -> untyped } -> String
+  end
+end
+
+module ActionView
+  class Base
+    include SimpleForm::ActionViewExtensions::FormHelper
+  end
+end
