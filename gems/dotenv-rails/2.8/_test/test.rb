@@ -1,7 +1,6 @@
-# Write Ruby code to test the RBS.
-# It is type checked by `steep check` command.
-
 require 'dotenv'
+require 'rails'
+require 'dotenv/rails'
 
 Dotenv.load
 Dotenv.load('./env_files/file1.env', './env_files/file2.env')
@@ -16,3 +15,5 @@ pp Dotenv.parse('./env_files/file1.env', './env_files/file2.env')['KEY1']
 
 Dotenv.overload('./env_files/file1.env', './env_files/file2.env')
 Dotenv.overload!('./env_files/file1.env', './env_files/file2.env')
+
+Dotenv::Railtie.load

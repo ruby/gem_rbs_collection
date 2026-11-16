@@ -1,0 +1,42 @@
+module Dotenv
+  VERSION: String
+
+  class Error < StandardError
+  end
+
+  class MissingKeys < Error
+  end
+
+  class Environment < Hash[String, String]
+    attr_reader filename: String
+    attr_reader overwrite: bool | :warn
+
+    def initialize: (String filename, ?overwrite: bool | :warn) -> void
+  end
+
+  class Parser
+    def self.call: (String string, ?overwrite: bool) -> Hash[String, String]
+  end
+
+  def self.load: (*String filenames, ?overwrite: bool | :warn, ?ignore: bool) -> Hash[String, String]
+  def self.load!: (*String filenames) -> Hash[String, String]
+  def self.overwrite: (*String filenames) -> Hash[String, String]
+  def self.overwrite!: (*String filenames) -> Hash[String, String]
+  def self.overload: (*String filenames) -> Hash[String, String]
+  def self.overload!: (*String filenames) -> Hash[String, String]
+  def self.parse: (*String filenames, ?overwrite: bool | :warn, ?ignore: bool) ?{ (Environment env) -> Hash[String, String]? } -> Hash[String, String]
+  def self.require_keys: (*String | Array[String] keys) -> void
+  def self.modify: [T] (?Hash[String, String?] env) { () -> T } -> T
+
+  class Rails
+    def self.load: () -> Hash[String, String]
+    def self.files: () -> Array[String]
+    def self.files=: (Array[String] files) -> Array[String]
+    def self.overwrite: () -> (bool | :warn)
+    def self.overwrite=: (bool | :warn overwrite) -> (bool | :warn)
+    def self.autorestore: () -> bool
+    def self.autorestore=: (bool autorestore) -> bool
+  end
+
+  Railtie: singleton(Rails)
+end
