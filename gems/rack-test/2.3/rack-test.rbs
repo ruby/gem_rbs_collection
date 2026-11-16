@@ -1,0 +1,99 @@
+module Rack
+  module Test
+    VERSION: String
+    DEFAULT_HOST: String
+    MULTIPART_BOUNDARY: String
+    START_BOUNDARY: String
+    END_BOUNDARY: String
+
+    type request_env = Hash[String | Symbol, untyped]
+
+    type request_params = Hash[String | Symbol, untyped] | String
+
+    interface _WithApp
+      def app: () -> Rack::_Application
+    end
+
+    class Error < StandardError
+    end
+
+    class CookieJar
+      def []: (String | Symbol name) -> String?
+      def []=: (String | Symbol name, String value) -> void
+      def delete: (String name) -> nil
+      def to_hash: () -> Hash[String, String?]
+    end
+
+    class UploadedFile
+      attr_reader original_filename: String
+      attr_reader tempfile: Tempfile | StringIO
+      attr_accessor content_type: String
+
+      def initialize: (String | Pathname content, ?String content_type, ?boolish binary, ?original_filename: String?) -> void
+                    | (StringIO content, ?String content_type, ?boolish binary, original_filename: String) -> void
+      def path: () -> String
+      alias local_path path
+      def append_to: (String buffer) -> nil
+
+      def read: (?Integer? length, ?String outbuf) -> String?
+      def rewind: () -> Integer
+      def size: () -> Integer
+      def eof?: () -> bool
+      def close: () -> nil
+      def binmode: () -> (Tempfile | StringIO)
+    end
+
+    class Session
+      attr_accessor cookie_jar: CookieJar
+      attr_reader default_host: String
+
+      def initialize: (Rack::_Application app, ?String default_host) -> void
+      def get: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def post: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def put: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def patch: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def delete: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def options: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def head: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def request: (String uri, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def custom_request: (_ToS verb, String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def after_request: () { () -> void } -> void
+      def clear_cookies: () -> CookieJar
+      def set_cookie: (String | Array[String] cookie, ?URI::Generic? uri) -> void
+      def last_request: () -> Rack::Request
+      def last_response: () -> MockResponse
+      def header: (String name, String? value) -> String?
+      def env: (String name, untyped value) -> untyped
+      def basic_authorize: (String username, String password) -> String?
+      alias authorize basic_authorize
+      def follow_redirect!: () -> MockResponse
+      def restore_state: [T] () { () -> T } -> T
+    end
+
+    module Methods : _WithApp
+      def current_session: () -> Session
+      def with_session: [T] (Symbol | String name) { (Session) -> T } -> T
+
+      def request: (String uri, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def get: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def post: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def put: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def patch: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def delete: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def options: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def head: (String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def custom_request: (_ToS verb, String uri, ?request_params params, ?request_env env) ?{ (MockResponse) -> void } -> MockResponse
+      def follow_redirect!: () -> MockResponse
+      def header: (String name, String? value) -> String?
+      def env: (String name, untyped value) -> untyped
+      def set_cookie: (String | Array[String] cookie, ?URI::Generic? uri) -> void
+      def clear_cookies: () -> CookieJar
+      def authorize: (String username, String password) -> String?
+      def basic_authorize: (String username, String password) -> String?
+      def last_response: () -> MockResponse
+      def last_request: () -> Rack::Request
+    end
+  end
+
+  class MockSession = Test::Session
+end
