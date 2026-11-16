@@ -1,0 +1,151 @@
+module Noticed
+  module Deliverable
+    # Yielded to the `deliver_by` (S is Noticed::Notification) and `bulk_deliver_by` (S is
+    # Noticed::Event) blocks. The real object is an
+    # `ActiveSupport::OrderedOptions`, which answers any option name through `method_missing`.
+    # Only the options shared by all delivery methods and the ones of the bundled delivery
+    # methods are declared. Others can be set with `config[:name] = value`.
+    interface _Config[S]
+      def []: (Symbol name) -> untyped
+
+      def []=: (Symbol name, untyped value) -> untyped
+
+      def class=: (String value) -> String
+
+      def if: () -> condition[S]?
+
+      def if=: (condition[S] value) -> condition[S]
+
+      def unless: () -> condition[S]?
+
+      def unless=: (condition[S] value) -> condition[S]
+
+      def before_enqueue: () -> callback[S]?
+
+      def before_enqueue=: (callback[S]? value) -> callback[S]?
+
+      def wait: () -> option[S, ActiveSupport::Duration | Integer]?
+
+      def wait=: (option[S, ActiveSupport::Duration | Integer]? value) -> option[S, ActiveSupport::Duration | Integer]?
+
+      def wait_until: () -> option[S, time]?
+
+      def wait_until=: (option[S, time]? value) -> option[S, time]?
+
+      def queue: () -> option[S, String | Symbol]?
+
+      def queue=: (option[S, String | Symbol]? value) -> option[S, String | Symbol]?
+
+      def priority: () -> option[S, Integer]?
+
+      def priority=: (option[S, Integer]? value) -> option[S, Integer]?
+
+      # :email
+      def mailer: () -> (String | singleton(ActionMailer::Base))?
+
+      def mailer=: (String | singleton(ActionMailer::Base) value) -> (String | singleton(ActionMailer::Base))
+
+      def method: () -> option[S, String | Symbol]?
+
+      def method=: (option[S, String | Symbol] value) -> option[S, String | Symbol]
+
+      def args: () -> option[S, Array[untyped]]?
+
+      def args=: (option[S, Array[untyped]]? value) -> option[S, Array[untyped]]?
+
+      def kwargs: () -> option[S, Hash[Symbol, untyped]]?
+
+      def kwargs=: (option[S, Hash[Symbol, untyped]]? value) -> option[S, Hash[Symbol, untyped]]?
+
+      def params: () -> option[S, Hash[Symbol, untyped]]?
+
+      def params=: (option[S, Hash[Symbol, untyped]]? value) -> option[S, Hash[Symbol, untyped]]?
+
+      def enqueue: () -> option[S, boolish]?
+
+      def enqueue=: (option[S, boolish]? value) -> option[S, boolish]?
+
+      # :action_cable
+      def message: () -> payload[S]?
+
+      def message=: (payload[S]? value) -> payload[S]?
+
+      def channel: () -> (String | Class | Symbol)?
+
+      def channel=: (String | Class | Symbol value) -> (String | Class | Symbol)
+
+      def stream: () -> stream[S]?
+
+      def stream=: (stream[S]? value) -> stream[S]?
+
+      # :webhook
+      def url: () -> option[S, String]?
+
+      def url=: (option[S, String] value) -> option[S, String]
+
+      def headers: () -> option[S, Hash[String, String]]?
+
+      def headers=: (option[S, Hash[String, String]]? value) -> option[S, Hash[String, String]]?
+
+      def json: () -> option[S, Hash[Symbol, untyped]]?
+
+      def json=: (option[S, Hash[Symbol, untyped]]? value) -> option[S, Hash[Symbol, untyped]]?
+
+      def form: () -> option[S, Hash[untyped, untyped]]?
+
+      def form=: (option[S, Hash[untyped, untyped]]? value) -> option[S, Hash[untyped, untyped]]?
+
+      def body: () -> option[S, String]?
+
+      def body=: (option[S, String]? value) -> option[S, String]?
+
+      def basic_auth: () -> option[S, { user: String, pass: String }]?
+
+      def basic_auth=: (option[S, { user: String, pass: String }]? value) -> option[S, { user: String, pass: String }]?
+    end
+
+    type time = Time | ActiveSupport::TimeWithZone
+
+    # A delivery method option. A lambda is evaluated in the context S: the notification for
+    # `deliver_by`, the event for `bulk_deliver_by`. A Symbol is the name of a method. For
+    # `deliver_by`, the options evaluated by the delivery method (`if`, `unless`, the email
+    # options and so on) call it on the notifier with the notification as the argument, and
+    # `wait`, `wait_until`, `queue`, `priority` and `before_enqueue` call a method of S without
+    # arguments. For `bulk_deliver_by`, every option calls a method of S (the event) without
+    # arguments.
+    # A Symbol that names no such method is the value itself, e.g. `config.method = :new_comment`.
+    type option[S, T] = T | Symbol | ^() [self: S] -> T
+
+    type condition[S] = bool | Symbol | ^() [self: S] -> boolish
+
+    type callback[S] = Symbol | ^() [self: S] -> untyped
+
+    type payload[S] = String | Hash[Symbol | String, untyped] | Symbol | ^() [self: S] -> untyped
+
+    type stream[S] = Symbol | String | ::ActiveRecord::Base | ^() [self: S] -> untyped
+
+    type recipients = ::ActiveRecord::Base | _Each[::ActiveRecord::Base]
+
+    module ClassMethods
+      def deliver_by: (Symbol name, ?Hash[Symbol, untyped] options) ?{ (_Config[Noticed::Notification] config) -> void } -> void
+
+      def bulk_deliver_by: (Symbol name, ?Hash[Symbol, untyped] options) ?{ (_Config[Noticed::Event] config) -> void } -> void
+
+      def recipients: (?Symbol | ^() [self: Event] -> untyped option) ?{ () [self: Event] -> untyped } -> void
+
+      def required_params: (*Symbol names) -> Array[Symbol]
+
+      alias required_param required_params
+
+      def with: (Hash[Symbol, untyped] params) -> instance
+
+      def deliver: (?recipients? recipients, ?wait: ActiveSupport::Duration | Integer, ?wait_until: time, ?queue: String | Symbol, ?priority: Integer, ?enqueue_job: boolish) -> instance
+
+      def deliver_later: (?recipients? recipients, ?wait: ActiveSupport::Duration | Integer, ?wait_until: time, ?queue: String | Symbol, ?priority: Integer, ?enqueue_job: boolish) -> instance
+    end
+
+    def deliver: (?recipients? recipients, ?wait: ActiveSupport::Duration | Integer, ?wait_until: time, ?queue: String | Symbol, ?priority: Integer, ?enqueue_job: boolish) -> self
+
+    def deliver_later: (?recipients? recipients, ?wait: ActiveSupport::Duration | Integer, ?wait_until: time, ?queue: String | Symbol, ?priority: Integer, ?enqueue_job: boolish) -> self
+  end
+end

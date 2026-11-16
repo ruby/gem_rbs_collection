@@ -1,0 +1,43 @@
+class User < ActiveRecord::Base
+  def email_notifications?: () -> bool
+
+  def registered_ios?: () -> bool
+end
+
+class Post < ActiveRecord::Base
+  def all_authors: () -> Array[User]
+end
+
+class CommentMailer < ActionMailer::Base
+  def new_comment: () -> Mail::Message
+end
+
+class ApplicationNotifier < Noticed::Event
+end
+
+class NewCommentNotifier < ApplicationNotifier
+  def message: () -> String
+
+  def muted?: (Noticed::Notification notification) -> bool
+
+  def fetch_recipients: () -> Array[User]
+end
+
+class TurboStreamDelivery < Noticed::DeliveryMethod
+  def prepare: () -> untyped
+
+  def describe_config: () -> String
+end
+
+class DigestDelivery < Noticed::BulkDeliveryMethod
+end
+
+class NotificationExamples
+  def deliver: (User user, Post post, Post comment) -> NewCommentNotifier
+
+  def read_event: (NewCommentNotifier event, Post post) -> untyped
+
+  def inbox: (User user) -> untyped
+
+  def notification: (Noticed::Notification notification) -> untyped
+end

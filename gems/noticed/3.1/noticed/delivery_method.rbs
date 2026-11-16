@@ -1,0 +1,67 @@
+module Noticed
+  module RequiredOptions
+    module ClassMethods
+      def required_options: (*Symbol names) -> Array[Symbol]
+
+      alias required_option required_options
+    end
+  end
+
+  class DeliveryMethod < ApplicationJob
+    extend RequiredOptions::ClassMethods
+
+    attr_reader config: Deliverable::_Config[Notification]
+
+    attr_reader event: Event
+
+    attr_reader notification: Notification
+
+    def self.before_deliver: (*untyped args) ?{ () -> untyped } -> void
+
+    def self.around_deliver: (*untyped args) ?{ (untyped job, ^() -> untyped block) -> untyped } -> void
+
+    def self.after_deliver: (*untyped args) ?{ () -> untyped } -> void
+
+    def recipient: () -> untyped
+
+    def record: () -> untyped
+
+    def params: () -> Hash[Symbol, untyped]
+
+    def deliver: () -> untyped
+
+    def evaluate_option: (Symbol name) -> untyped
+  end
+
+  class BulkDeliveryMethod < ApplicationJob
+    extend RequiredOptions::ClassMethods
+
+    attr_reader config: Deliverable::_Config[Event]
+
+    attr_reader event: Event
+
+    def self.before_deliver: (*untyped args) ?{ () -> untyped } -> void
+
+    def self.around_deliver: (*untyped args) ?{ (untyped job, ^() -> untyped block) -> untyped } -> void
+
+    def self.after_deliver: (*untyped args) ?{ () -> untyped } -> void
+
+    def deliver: () -> untyped
+
+    def evaluate_option: (Symbol name) -> untyped
+  end
+
+  module DeliveryMethods
+    class Email < DeliveryMethod
+    end
+
+    class ActionCable < DeliveryMethod
+    end
+
+    class Webhook < DeliveryMethod
+    end
+
+    class Test < DeliveryMethod
+    end
+  end
+end
