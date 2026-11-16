@@ -1,0 +1,239 @@
+module Fog
+  # Global configuration
+  def self.mock!: () -> true
+  def self.unmock!: () -> false
+  def self.mocking: () -> bool
+  def self.mocking?: () -> bool
+  def self.mock?: () -> bool
+
+  def self.credentials: () -> Hash[Symbol, untyped]
+  def self.credentials=: (Hash[untyped, untyped]? credentials) -> Hash[untyped, untyped]?
+  def self.credential: () -> Symbol
+  def self.credential=: (String | Symbol | nil new_credential) -> (String | Symbol | nil)
+  def self.credentials_path: () -> String?
+  def self.credentials_path=: (String? new_credentials_path) -> String?
+
+  def self.timeout: () -> Numeric
+  def self.timeout=: (Numeric timeout) -> Numeric
+  def self.interval: () -> (Numeric | ^(Integer retries) -> Numeric)
+  def self.interval=: (Numeric | ^(Integer retries) -> Numeric interval) -> (Numeric | ^(Integer retries) -> Numeric)
+  def self.max_interval: () -> Numeric
+  def self.max_interval=: (Numeric interval) -> Numeric
+
+  def self.wait_for: (?Numeric timeout, ?(Numeric | ^(Integer retries) -> Numeric) interval) { () -> untyped } -> { duration: Numeric }
+
+  def self.services: () -> Hash[Symbol, Array[Symbol]]
+  def self.providers: () -> Hash[Symbol, String]
+
+  module Core
+    VERSION: String
+  end
+
+  module Errors
+    class Error < StandardError
+      attr_accessor verbose: String?
+    end
+
+    class MockNotImplemented < Error
+    end
+
+    class NotFound < Error
+    end
+
+    class LoadError < Error
+    end
+
+    class TimeoutError < Error
+    end
+
+    class NotImplemented < Error
+    end
+  end
+
+  module Mock
+    def self.reset: () -> void
+  end
+
+  # Mixed into service modules such as Fog::Storage, Fog::Compute and Fog::DNS.
+  # The returned object is the provider's service class instance
+  # (e.g. Fog::Storage::AWS::Real), which fog-core does not know.
+  module ServicesMixin
+    def []: (String | Symbol provider) -> untyped
+    def new: (Hash[Symbol, untyped] attributes) -> untyped
+    def providers: () -> Array[Symbol]
+  end
+
+  module Account
+    extend ServicesMixin
+  end
+
+  module Baremetal
+    extend ServicesMixin
+  end
+
+  module Billing
+    extend ServicesMixin
+  end
+
+  module CDN
+    extend ServicesMixin
+  end
+
+  module Compute
+    extend ServicesMixin
+  end
+
+  module DNS
+    extend ServicesMixin
+  end
+
+  module Identity
+    extend ServicesMixin
+  end
+
+  module Image
+    extend ServicesMixin
+  end
+
+  module Introspection
+    extend ServicesMixin
+  end
+
+  module Metering
+    extend ServicesMixin
+  end
+
+  module Monitoring
+    extend ServicesMixin
+  end
+
+  module Network
+    extend ServicesMixin
+  end
+
+  module NFV
+    extend ServicesMixin
+  end
+
+  module Orchestration
+    extend ServicesMixin
+  end
+
+  module Storage
+    extend ServicesMixin
+  end
+
+  module Support
+    extend ServicesMixin
+  end
+
+  module Volume
+    extend ServicesMixin
+  end
+
+  module VPN
+    extend ServicesMixin
+  end
+
+  # Extended by a provider module (e.g. `module Fog::AWS; extend Fog::Provider`).
+  module Provider
+    def []: (Symbol service_key) -> untyped
+    def service: (Symbol new_service, String constant_string) -> untyped
+    def services: () -> Array[Symbol]
+  end
+
+  # Base class of the provider's service class (e.g. `class Fog::Storage::AWS < Fog::Service`).
+  # `.new` returns the provider's `Real` or `Mock` instance.
+  class Service
+    class Error < Errors::Error
+    end
+
+    class NotFound < Errors::NotFound
+    end
+
+    def self.new: (?Hash[Symbol, untyped] config) -> untyped
+    def self.requires: (*Symbol args) -> Array[Symbol]
+    def self.requirements: () -> Array[Symbol]
+    def self.recognizes: (*Symbol args) -> Array[Symbol]
+    def self.recognized: () -> Array[Symbol]
+    def self.secrets: (*Symbol args) -> Array[Symbol]
+    def self.model_path: (String new_path) -> String
+    def self.request_path: (String new_path) -> String
+    def self.model: (Symbol new_model, ?String? path) -> untyped
+    def self.collection: (Symbol new_collection, ?String? path) -> untyped
+    def self.request: (Symbol new_request, ?String? path) -> untyped
+    def self.collections: () -> Array[Symbol]
+    def self.requests: () -> Array[untyped]
+    def self.mocked_requests: () -> Array[Symbol]
+  end
+
+  module Attributes
+    module ClassMethods
+      def aliases: () -> Hash[untyped, untyped]
+      def associations: () -> Hash[untyped, untyped]
+      def attributes: () -> Array[Symbol]
+      def default_values: () -> Hash[untyped, untyped]
+      def masks: () -> Hash[untyped, untyped]
+      def attribute: (Symbol name, ?Hash[Symbol, untyped] options) -> untyped
+      def identity: (Symbol name, ?Hash[Symbol, untyped] options) -> untyped
+      def has_one: (Symbol name, Symbol collection_name, ?Hash[Symbol, untyped] options) -> untyped
+      def has_many: (Symbol name, Symbol collection_name, ?Hash[Symbol, untyped] options) -> untyped
+      def has_one_identity: (Symbol name, Symbol collection_name, ?Hash[Symbol, untyped] options) -> untyped
+      def has_many_identities: (Symbol name, Symbol collection_name, ?Hash[Symbol, untyped] options) -> untyped
+      def ignore_attributes: (*Symbol | String args) -> Array[String]
+      def ignored_attributes: () -> Array[String]
+    end
+
+    module InstanceMethods
+      def attributes: () -> Hash[untyped, untyped]
+      def associations: () -> Hash[untyped, untyped]
+      def all_attributes: () -> Hash[untyped, untyped]
+      def all_associations: () -> Hash[untyped, untyped]
+      def all_associations_and_attributes: () -> Hash[untyped, untyped]
+      def identity_name: () -> Symbol?
+      def identity: () -> untyped
+      def identity=: (untyped new_identity) -> untyped
+      def merge_attributes: (?Hash[untyped, untyped] new_attributes) -> self
+      def filter_attributes: (*Symbol selected) -> Hash[untyped, untyped]
+      def persisted?: () -> bool
+      def requires: (*Symbol args) -> void
+      def requires_one: (*Symbol args) -> void
+    end
+  end
+
+  class Model
+    extend Attributes::ClassMethods
+    include Attributes::InstanceMethods
+
+    attr_accessor collection: untyped
+    attr_reader service: untyped
+
+    def initialize: (?Hash[Symbol, untyped] new_attributes) -> void
+    def save: () -> untyped
+    def create: () -> untyped
+    def update: () -> untyped
+    def destroy: () -> untyped
+    def reload: () -> self?
+    def to_json: (?untyped options) -> String
+    def wait_for: (?Numeric timeout, ?(Numeric | ^(Integer retries) -> Numeric) interval) { () [self: self] -> untyped } -> { duration: Numeric }
+  end
+
+  class Collection < Array[untyped]
+    extend Attributes::ClassMethods
+    include Attributes::InstanceMethods
+
+    attr_reader service: untyped
+
+    def self.model: (?untyped new_model) -> untyped
+
+    def initialize: (?Hash[Symbol, untyped] attributes) -> void
+    def model: () -> untyped
+    def new: (?Hash[Symbol, untyped] attributes) -> untyped
+    def create: (?Hash[Symbol, untyped] attributes) -> untyped
+    def destroy: (untyped identity) -> untyped
+    def load: (Array[untyped] objects) -> self
+    def reload: () -> self
+    def table: (?Array[Symbol]? attributes) -> untyped
+    def to_json: (?untyped options) -> String
+  end
+end
