@@ -1,0 +1,50 @@
+module Twilio
+  VERSION: String
+
+  def self.configure: () { (Util::Configuration) -> void } -> void
+  def self.account_sid: () -> String?
+  def self.auth_token: () -> String?
+  def self.http_client: () -> Twilio::HTTP::Client?
+  def self.region: () -> String?
+  def self.edge: () -> String?
+  def self.logger: () -> Logger?
+
+  module Util
+    class Configuration
+      attr_accessor account_sid: String?
+      attr_accessor auth_token: String?
+      attr_accessor http_client: Twilio::HTTP::Client?
+      attr_accessor region: String?
+      attr_accessor edge: String?
+      attr_accessor logger: Logger?
+    end
+  end
+
+  module HTTP
+    class Client
+      attr_accessor adapter: Symbol
+      attr_reader timeout: Integer?
+
+      def initialize: (?String? proxy_prot, ?String? proxy_addr, ?Integer? proxy_port, ?String? proxy_user, ?String? proxy_pass, ?timeout: Integer?) -> void
+      def configure_connection: () { (untyped) -> void } -> nil
+    end
+  end
+
+  module Security
+    class RequestValidator
+      interface _ToUnsafeH
+        def to_unsafe_h: () -> Hash[untyped, untyped]
+      end
+
+      SIGNATURE_HEADER: String
+      SIGNATURE_SETTINGS_HEADER: String
+      HMAC_SHA1: String
+      HMAC_SHA256: String
+      DIGESTS: Hash[String, String]
+
+      def self.signature_algorithm: (String? signature_settings_header) -> String
+      def initialize: (?String? auth_token) -> void
+      def validate: (String url, Hash[untyped, untyped] | String | _ToUnsafeH params, String signature, ?String? algorithm) -> bool
+    end
+  end
+end
