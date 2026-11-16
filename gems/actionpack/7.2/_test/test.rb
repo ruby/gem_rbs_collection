@@ -128,3 +128,20 @@ mime.eql?(Mime::Type.new("text/html")) & true
 
 # helpers_path holds the configured helper directories
 ActionController::Base.helpers_path = ActionController::Base.helpers_path.map(&:upcase)
+
+# The calls need drawn routes, so this method is only type-checked
+class UrlHelpersChecker
+  def check(routes)
+    helpers = routes.url_helpers
+    # @type var path: String
+    path = helpers.polymorphic_path(:new_photo)
+    # @type var url: String
+    url = helpers.polymorphic_url([:admin, :photo], { only_path: true })
+    helpers.url_for(controller: "photos", action: "index").length
+    helpers.full_url_for(controller: "photos", action: "index").length
+    helpers.route_for(:photos).length
+    helpers.optimize_routes_generation? ? path : url
+    helpers._routes.named_routes
+    helpers.url_options.empty?
+  end
+end
