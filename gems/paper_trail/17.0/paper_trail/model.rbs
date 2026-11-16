@@ -1,0 +1,41 @@
+module PaperTrail
+  module Model
+    type event = :create | :update | :destroy | :touch
+
+    type condition = Proc | ^(untyped record) -> boolish
+
+    type attribute_name = Symbol | String
+
+    type attribute_list = attribute_name | Hash[attribute_name, Proc] | Array[attribute_name | Hash[attribute_name, Proc]]
+
+    module ClassMethods
+      def has_paper_trail: (
+        ?on: event | Array[event],
+        ?ignore: attribute_list,
+        ?only: attribute_list,
+        ?skip: attribute_list,
+        ?if: condition,
+        ?unless: condition,
+        ?meta: Hash[Symbol, untyped],
+        ?versions: Symbol | String | Hash[Symbol, untyped],
+        ?version: Symbol | String,
+        ?class_name: String,
+        ?synchronize_version_creation_timestamp: bool
+      ) -> void
+
+      def paper_trail: () -> ModelConfig
+
+      def paper_trail_options: () -> Hash[Symbol, untyped]
+    end
+
+    module InstanceMethods
+      def paper_trail: () -> RecordTrail
+    end
+  end
+end
+
+class ActiveRecord::Base
+  extend PaperTrail::Model::ClassMethods
+
+  include PaperTrail::Model::InstanceMethods
+end

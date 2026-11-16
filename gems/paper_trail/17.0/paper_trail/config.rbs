@@ -1,0 +1,29 @@
+module PaperTrail
+  class Config
+    include Singleton
+
+    def self.instance: () -> Config
+
+    interface _Serializer
+      def load: (String string) -> untyped
+
+      def dump: (untyped object) -> String
+    end
+
+    attr_accessor association_reify_error_behaviour: Symbol?
+
+    attr_accessor object_changes_adapter: untyped
+
+    attr_accessor serializer: _Serializer
+
+    attr_accessor version_limit: Integer?
+
+    attr_accessor has_paper_trail_defaults: Hash[Symbol, untyped]
+
+    attr_accessor version_error_behavior: :legacy | :log | :exception
+
+    def enabled: () -> bool
+
+    def enabled=: (boolish enable) -> void
+  end
+end

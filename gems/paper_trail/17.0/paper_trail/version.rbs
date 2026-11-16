@@ -1,0 +1,86 @@
+module PaperTrail
+  module VersionConcern
+    module ClassMethods
+      type timestamp = Time | Date | DateTime
+
+      def with_item_keys: (String item_type, Integer | String item_id) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def creates: () -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def updates: () -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def destroys: () -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def not_creates: () -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def between: (timestamp start_time, timestamp end_time) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def timestamp_sort_order: (?String | Symbol direction) -> Array[untyped]
+
+      def where_attribute_changes: (Symbol | String attribute) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def where_object: (?Hash[Symbol | String, untyped] args) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def where_object_changes: (?Hash[Symbol | String, untyped] args) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def where_object_changes_from: (?Hash[Symbol | String, untyped] args) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def where_object_changes_to: (?Hash[Symbol | String, untyped] args) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def preceding: (Version | timestamp obj, ?boolish timestamp_arg) -> ::PaperTrail::Version::ActiveRecord_Relation
+
+      def subsequent: (Version | timestamp obj, ?boolish timestamp_arg) -> ::PaperTrail::Version::ActiveRecord_Relation
+    end
+
+    def reify: (?Hash[Symbol, untyped] options) -> ActiveRecord::Base?
+
+    def changeset: () -> ActiveSupport::HashWithIndifferentAccess[String, [untyped, untyped]]?
+
+    def paper_trail_originator: () -> String?
+
+    def terminator: () -> String?
+
+    alias version_author terminator
+
+    def next: () -> Version?
+
+    def previous: () -> Version?
+
+    def index: () -> Integer
+  end
+
+  class Version < ActiveRecord::Base
+    include VersionConcern
+    extend VersionConcern::ClassMethods
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include VersionConcern::ClassMethods
+      include ::_ActiveRecord_Relation[Version, Integer]
+      include ::Enumerable[Version]
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include VersionConcern::ClassMethods
+      include ::_ActiveRecord_Relation[Version, Integer]
+      include ::Enumerable[Version]
+    end
+
+    extend ::_ActiveRecord_Relation_ClassMethods[Version, ActiveRecord_Relation, Integer]
+
+    attr_accessor item_type: String
+
+    attr_accessor item_id: Integer | String
+
+    attr_accessor event: String
+
+    attr_accessor whodunnit: String?
+
+    attr_accessor object: untyped
+
+    attr_accessor object_changes: untyped
+
+    attr_accessor created_at: ActiveSupport::TimeWithZone
+
+    def item: () -> ActiveRecord::Base?
+  end
+end

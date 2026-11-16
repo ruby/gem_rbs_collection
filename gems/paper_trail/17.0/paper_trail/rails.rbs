@@ -1,0 +1,23 @@
+module PaperTrail
+  module Rails
+    module Controller
+      def user_for_paper_trail: () -> untyped
+
+      def info_for_paper_trail: () -> Hash[Symbol, untyped]
+
+      def paper_trail_enabled_for_controller: () -> bool
+
+      private
+
+      def set_paper_trail_whodunnit: () -> void
+    end
+  end
+end
+
+class ActionController::Base
+  include PaperTrail::Rails::Controller
+end
+
+class ActionController::API
+  include PaperTrail::Rails::Controller
+end
