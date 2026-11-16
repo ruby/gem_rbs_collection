@@ -1,0 +1,67 @@
+module ReverseMarkdown
+  VERSION: String
+
+  type unknown_tags = :pass_through | :drop | :bypass | :raise | String
+
+  type options = {
+    ?unknown_tags: unknown_tags,
+    ?github_flavored: bool,
+    ?tag_border: String,
+    ?force_encoding: bool
+  }
+
+  def self.convert: (_ToS input, ?options | Hash[Symbol, untyped] options) -> String
+
+  def self.config: () ?{ (Config config) -> void } -> Config
+
+  def self.cleaner: () -> Cleaner
+
+  class Error < StandardError
+  end
+
+  class UnknownTagError < Error
+  end
+
+  class InvalidConfigurationError < Error
+  end
+
+  class Config
+    attr_writer unknown_tags: unknown_tags
+    attr_writer github_flavored: bool
+    attr_writer tag_border: String
+    attr_writer force_encoding: bool
+
+    def with: [T] (?options | Hash[Symbol, untyped] options) { () -> T } -> T
+
+    def unknown_tags: () -> unknown_tags
+    def github_flavored: () -> bool
+    def tag_border: () -> String
+    def force_encoding: () -> bool
+  end
+
+  class Cleaner
+    def tidy: (String string) -> String
+  end
+
+  module Converters
+    type state = Hash[Symbol, untyped]
+
+    def self.register: (Symbol | String tag_name, Base converter) -> Base
+
+    def self.unregister: (Symbol | String tag_name) -> Base?
+
+    def self.lookup: (Symbol | String tag_name) -> Base
+
+    class Base
+      def convert: (Nokogiri::XML::Node node, ?state state) -> String
+
+      def treat_children: (Nokogiri::XML::Node node, state state) -> String
+
+      def treat: (Nokogiri::XML::Node node, state state) -> String
+
+      def escape_keychars: (String string) -> String
+
+      def extract_title: (Nokogiri::XML::Node node) -> String
+    end
+  end
+end
