@@ -1,0 +1,173 @@
+module PgSearch
+  VERSION: String
+
+  type column = Symbol | String
+
+  type weight = String | Symbol
+
+  type against = column | Array[column | [column, weight]] | Hash[column, weight]
+
+  type feature = :tsearch | :trigram | :dmetaphone
+
+  type tsearch_options = {
+    ?dictionary: column,
+    ?prefix: boolish,
+    ?negation: boolish,
+    ?any_word: boolish,
+    ?normalization: Integer,
+    ?tsvector_column: column | Array[column],
+    ?highlight: Hash[column, String | Integer | bool]
+  }
+
+  type trigram_options = {
+    ?threshold: Numeric,
+    ?word_similarity: boolish,
+    ?only: column | Array[column],
+    ?sort_only: column | Array[column]
+  }
+
+  type dmetaphone_options = {
+    ?tsvector_column: column | Array[column],
+    ?only: column | Array[column],
+    ?sort_only: column | Array[column]
+  }
+
+  type features = {
+    ?tsearch: tsearch_options,
+    ?trigram: trigram_options,
+    ?dmetaphone: dmetaphone_options
+  }
+
+  # Options for `pg_search_scope` and `PgSearch.multisearch_options`.
+  type search_options = {
+    ?query: String,
+    ?against: against,
+    ?associated_against: Hash[Symbol, against],
+    ?using: feature | Array[feature] | features,
+    ?ranked_by: String,
+    ?ignoring: :accents | Array[:accents],
+    ?order_within_rank: String?
+  }
+
+  # Conditions for `multisearchable`. A Symbol is called on the record, and a
+  # Proc receives the record.
+  type condition = Symbol | Proc | ^(untyped) -> boolish
+
+  type multisearchable_options = {
+    ?against: column | Array[column],
+    ?if: condition | Array[condition],
+    ?unless: condition | Array[condition],
+    ?update_if: condition | Array[condition],
+    ?additional_attributes: Symbol | Proc | ^(untyped) -> Hash[Symbol, untyped]
+  }
+
+  type search_options_arg = search_options | Hash[Symbol, untyped]
+
+  type multisearchable_options_arg = multisearchable_options | Hash[Symbol, untyped]
+
+  def self.multisearch_options: () -> (search_options | Hash[Symbol, untyped] | Proc)
+
+  def self.multisearch_options=: (search_options_arg | Proc value) -> (search_options_arg | Proc)
+
+  def self.unaccent_function: () -> String
+
+  def self.unaccent_function=: (String value) -> String
+
+  def self.multisearch: (String query, *untyped) -> Document::ActiveRecord_Relation
+
+  def self.disable_multisearch: [T] () { () -> T } -> T
+
+  def self.multisearch_enabled?: () -> bool
+
+  class PgSearchRankNotSelected < StandardError
+    def message: () -> String
+  end
+
+  class PgSearchHighlightNotSelected < StandardError
+    def message: () -> String
+  end
+
+  # A model that includes `PgSearch::Model` declares the class-side API in its
+  # own signature:
+  #
+  #   class Post < ApplicationRecord
+  #     class ActiveRecord_Relation < ::ActiveRecord::Relation
+  #       include ::_ActiveRecord_Relation[::Post, ::Integer]
+  #       include ::Enumerable[::Post]
+  #       include PgSearch::ScopeOptions::WithPgSearchRank
+  #       include PgSearch::ScopeOptions::WithPgSearchHighlight
+  #     end
+  #
+  #     include PgSearch::Model
+  #     extend PgSearch::Model::ClassMethods
+  #
+  #     # The scope defined by `pg_search_scope :search_by_title` is not
+  #     # visible to RBS, so declare it by hand.
+  #     def self.search_by_title: (String query) -> ActiveRecord_Relation
+  #   end
+  module Model
+    module ClassMethods
+      def pg_search_scope: (Symbol name, search_options_arg | Proc | ^(String) -> search_options_arg options) -> void
+
+      def multisearchable: (?multisearchable_options_arg options) -> void
+    end
+
+    def pg_search_rank: () -> Float
+
+    def pg_search_highlight: () -> String
+  end
+
+  # Mixed into a model by `multisearchable`. A model that calls it declares
+  # `include PgSearch::Multisearchable` in its own signature.
+  module Multisearchable
+    def pg_search_document: () -> Document?
+
+    def update_pg_search_document: () -> void
+  end
+
+  # The relation returned by a `pg_search_scope` scope is extended with these
+  # modules at runtime. They are not included anywhere statically, so a model
+  # includes them in its own ActiveRecord_Relation signature.
+  class ScopeOptions
+    module WithPgSearchRank
+      def with_pg_search_rank: () -> self
+    end
+
+    module WithPgSearchHighlight
+      def with_pg_search_highlight: () -> self
+    end
+  end
+
+  module Multisearch
+    def self.rebuild: (singleton(::ActiveRecord::Base) model, ?clean_up: bool, ?transactional: bool) -> void
+
+    class ModelNotMultisearchable < StandardError
+      def message: () -> String
+    end
+  end
+
+  class Document < ::ActiveRecord::Base
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[Document, Integer]
+      include ::Enumerable[Document]
+      include ScopeOptions::WithPgSearchRank
+      include ScopeOptions::WithPgSearchHighlight
+    end
+
+    include Model
+    extend Model::ClassMethods
+    extend ::_ActiveRecord_Relation_ClassMethods[Document, ActiveRecord_Relation, Integer]
+
+    def self.search: (String query, *untyped) -> ActiveRecord_Relation
+
+    def content: () -> String
+
+    def searchable_type: () -> String
+
+    def searchable_id: () -> Integer
+
+    def searchable: () -> ::ActiveRecord::Base
+
+    def searchable=: (::ActiveRecord::Base value) -> ::ActiveRecord::Base
+  end
+end
