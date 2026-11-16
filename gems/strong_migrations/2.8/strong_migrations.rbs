@@ -1,0 +1,73 @@
+module StrongMigrations
+  class Error < StandardError
+  end
+
+  class UnsafeMigration < Error
+  end
+
+  class UnsupportedVersion < Error
+  end
+
+  VERSION: String
+
+  type target_version = Integer | Float | String | Hash[Symbol, Integer | Float | String]
+
+  type timeout = Integer | Float | ActiveSupport::Duration
+
+  type check_block = ^(Symbol method, Array[untyped] args) [self: ActiveRecord::Migration] -> void
+
+  def self.auto_analyze: () -> bool
+  def self.auto_analyze=: (boolish) -> void
+  def self.start_after: () -> Integer
+  def self.start_after=: (Integer) -> void
+  def self.error_messages: () -> Hash[Symbol, String]
+  def self.error_messages=: (Hash[Symbol, String]) -> void
+
+  def self.target_version: () -> target_version?
+  def self.target_version=: (target_version?) -> void
+  def self.target_postgresql_version: () -> target_version?
+  def self.target_postgresql_version=: (target_version?) -> void
+  def self.target_mysql_version: () -> target_version?
+  def self.target_mysql_version=: (target_version?) -> void
+  def self.target_mariadb_version: () -> target_version?
+  def self.target_mariadb_version=: (target_version?) -> void
+  def self.target_sql_mode: () -> String?
+  def self.target_sql_mode=: (String?) -> void
+
+  def self.lock_timeout: () -> timeout?
+  def self.lock_timeout=: (timeout?) -> void
+  def self.statement_timeout: () -> timeout?
+  def self.statement_timeout=: (timeout?) -> void
+  def self.transaction_timeout: () -> timeout?
+  def self.transaction_timeout=: (timeout?) -> void
+  def self.lock_timeout_limit: () -> (Numeric | false)
+  def self.lock_timeout_limit=: (Numeric | false) -> void
+  def self.lock_timeout_retries: () -> Integer
+  def self.lock_timeout_retries=: (Integer) -> void
+  def self.lock_timeout_retry_delay: () -> timeout
+  def self.lock_timeout_retry_delay=: (timeout) -> void
+
+  def self.check_down: () -> bool
+  def self.check_down=: (boolish) -> void
+  def self.safe_by_default: () -> bool
+  def self.safe_by_default=: (boolish) -> void
+  def self.alphabetize_schema: () -> bool
+  def self.alphabetize_schema=: (boolish) -> void
+  def self.remove_invalid_indexes: () -> bool
+  def self.remove_invalid_indexes=: (boolish) -> void
+  def self.skipped_databases: () -> Array[Symbol | String]
+  def self.skipped_databases=: (Array[Symbol | String]) -> void
+
+  def self.add_check: () { (Symbol method, Array[untyped] args) [self: ActiveRecord::Migration] -> void } -> Array[check_block]
+  def self.enable_check: (Symbol check, ?start_after: Integer?) -> void
+  def self.disable_check: (Symbol check) -> void
+  def self.skip_database: (Symbol | String database) -> Array[Symbol | String]
+end
+
+module ActiveRecord
+  class Migration
+    def safety_assured: [T] () { () -> T } -> T
+
+    def stop!: (String message, ?header: String) -> bot
+  end
+end
