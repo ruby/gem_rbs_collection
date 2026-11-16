@@ -1,0 +1,23 @@
+class User < ActiveRecord::Base
+  include Devise::Models::Invitable
+  extend Devise::Models::Invitable::ClassMethods
+end
+
+class Admin < ActiveRecord::Base
+  include Devise::Models::Invitable
+  extend Devise::Models::Invitable::ClassMethods
+end
+
+class InvitationsController < Devise::InvitationsController
+end
+
+class Invitation
+  def run: (User inviter) -> Array[User]
+end
+
+# NOTE: devise's RBS does not declare these DeviseController methods yet.
+class DeviseController
+  attr_accessor resource: untyped
+  def resource_class: () -> singleton(User)
+  def resource_name: () -> Symbol
+end

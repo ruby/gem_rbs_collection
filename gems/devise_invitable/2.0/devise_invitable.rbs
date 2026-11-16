@@ -1,0 +1,176 @@
+module DeviseInvitable
+  module Controllers
+    module Helpers
+      def after_invite_path_for: (untyped inviter, ?untyped invitee) -> String
+
+      def after_accept_path_for: (untyped resource) -> String
+
+      def invalid_token_path_for: (Symbol | String resource_name) -> String
+
+      private
+
+      def authenticate_inviter!: () -> untyped
+    end
+  end
+
+  module Inviter
+    def invitation_limit: () -> Integer?
+
+    def invitation_limit=: (Integer? limit) -> Integer?
+  end
+end
+
+module Devise
+  def self.invite_for: () -> (Integer | ActiveSupport::Duration)?
+  def self.invite_for=: ((Integer | ActiveSupport::Duration)? value) -> (Integer | ActiveSupport::Duration)?
+
+  def self.validate_on_invite: () -> bool
+  def self.validate_on_invite=: (bool value) -> bool
+
+  def self.invitation_limit: () -> Integer?
+  def self.invitation_limit=: (Integer? value) -> Integer?
+
+  def self.invite_key: () -> Hash[Symbol, untyped]
+  def self.invite_key=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
+
+  def self.resend_invitation: () -> bool
+  def self.resend_invitation=: (bool value) -> bool
+
+  def self.invited_by_class_name: () -> String?
+  def self.invited_by_class_name=: (String? value) -> String?
+
+  def self.invited_by_foreign_key: () -> (Symbol | String)?
+  def self.invited_by_foreign_key=: ((Symbol | String)? value) -> (Symbol | String)?
+
+  def self.invited_by_counter_cache: () -> (Symbol | String)?
+  def self.invited_by_counter_cache=: ((Symbol | String)? value) -> (Symbol | String)?
+
+  def self.allow_insecure_sign_in_after_accept: () -> bool
+  def self.allow_insecure_sign_in_after_accept=: (bool value) -> bool
+
+  def self.require_password_on_accepting: () -> bool
+  def self.require_password_on_accepting=: (bool value) -> bool
+
+  module Models
+    module Invitable
+      include DeviseInvitable::Inviter
+
+      module ClassMethods
+        def invite_for: () -> (Integer | ActiveSupport::Duration)?
+
+        def validate_on_invite: () -> bool
+
+        def invitation_limit: () -> Integer?
+
+        def invite_key: () -> Hash[Symbol, untyped]
+
+        def resend_invitation: () -> bool
+
+        def invited_by_class_name: () -> String?
+
+        def invited_by_foreign_key: () -> (Symbol | String)?
+
+        def invited_by_counter_cache: () -> (Symbol | String)?
+
+        def allow_insecure_sign_in_after_accept: () -> bool
+
+        def require_password_on_accepting: () -> bool
+
+        def invite_key_fields: () -> Array[Symbol]
+
+        def invite!: (?Hash[Symbol | String, untyped] attributes, ?ActiveRecord::Base? invited_by, ?Hash[Symbol, untyped] options) ?{ (instance) -> void } -> instance
+
+        def invite_mail!: (?Hash[Symbol | String, untyped] attributes, ?ActiveRecord::Base? invited_by, ?Hash[Symbol, untyped] options) ?{ (instance) -> void } -> untyped
+
+        def accept_invitation!: (?Hash[Symbol | String, untyped] attributes) -> instance
+
+        def find_by_invitation_token: (String? original_token, false only_valid) -> instance
+                                    | (String? original_token, bool only_valid) -> instance?
+
+        def no_active_invitation: () -> ActiveRecord::Relation
+
+        def created_by_invite: () -> ActiveRecord::Relation
+
+        def invitation_not_accepted: () -> ActiveRecord::Relation
+
+        def invitation_accepted: () -> ActiveRecord::Relation
+
+        def before_invitation_created: (*untyped args) ?{ (untyped) -> untyped } -> void
+
+        def after_invitation_created: (*untyped args) ?{ (untyped) -> untyped } -> void
+
+        def before_invitation_accepted: (*untyped args) ?{ (untyped) -> untyped } -> void
+
+        def after_invitation_accepted: (*untyped args) ?{ (untyped) -> untyped } -> void
+      end
+
+      attr_accessor skip_invitation: bool?
+
+      attr_reader raw_invitation_token: String?
+
+      def accept_invitation: () -> void
+
+      def accept_invitation!: () -> bool?
+
+      def created_by_invite?: () -> bool
+
+      def invited_to_sign_up?: () -> bool
+
+      def accepting_invitation?: () -> bool
+
+      def invitation_accepted?: () -> bool
+
+      def accepted_or_not_invited?: () -> bool
+
+      def valid_invitation?: () -> bool
+
+      def invite!: (?ActiveRecord::Base? invited_by, ?Hash[Symbol, untyped] options) ?{ (self) -> void } -> untyped
+
+      def deliver_invitation: (?Hash[Symbol, untyped] options) -> untyped
+
+      def encrypted_invitation_token: () -> String?
+
+      def invitation_due_at: () -> ActiveSupport::TimeWithZone?
+    end
+  end
+end
+
+module Devise
+  class InvitationsController < ::DeviseController
+    include DeviseInvitable::Controllers::Helpers
+
+    def new: () -> void
+
+    def create: () ?{ (untyped) -> void } -> void
+
+    def edit: () -> void
+
+    def update: () ?{ (untyped) -> void } -> void
+
+    def destroy: () -> void
+
+    private
+
+    def invite_resource: () ?{ (untyped) -> void } -> untyped
+
+    def accept_resource: () -> untyped
+
+    def current_inviter: () -> untyped
+
+    def resource_from_invitation_token: () -> void
+
+    def invite_params: () -> ActiveSupport::HashWithIndifferentAccess[String, untyped]
+
+    def update_resource_params: () -> ActiveSupport::HashWithIndifferentAccess[String, untyped]
+  end
+end
+
+module ActionController
+  class Base
+    include DeviseInvitable::Controllers::Helpers
+  end
+
+  class API
+    include DeviseInvitable::Controllers::Helpers
+  end
+end
