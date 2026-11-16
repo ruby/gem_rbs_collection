@@ -1,0 +1,25 @@
+module LetterOpenerWeb
+  VERSION: String
+
+  class Config
+    attr_accessor letters_location: Pathname
+  end
+
+  class Engine < Rails::Engine
+  end
+
+  class DeliveryMethod < LetterOpener::DeliveryMethod
+  end
+
+  class ApplicationController < ActionController::Base
+  end
+
+  class LettersController < ApplicationController
+  end
+
+  def self.config: () -> Config
+
+  def self.configure: () ?{ (Config config) -> void } -> void
+
+  def self.reset!: () -> void
+end
