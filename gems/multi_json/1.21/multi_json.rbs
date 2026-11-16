@@ -1,0 +1,92 @@
+module MultiJSON
+  VERSION: String
+
+  type options = Hash[Symbol, untyped]
+
+  type adapter_spec = Symbol | String | Module | nil
+
+  interface _Facade
+    def adapter: () -> Module
+    def use: (adapter_spec new_adapter) -> Module
+    def adapter=: (adapter_spec new_adapter) -> adapter_spec
+    def current_adapter: (?options? options) -> Module
+    def parse: ((String | ::_Reader)? string, ?options options) -> untyped
+    def generate: (untyped object, ?options options) -> String
+    def load: ((String | ::_Reader)? string, ?options options) -> untyped
+    def dump: (untyped object, ?options options) -> String
+    def decode: ((String | ::_Reader)? string, ?options options) -> untyped
+    def encode: (untyped object, ?options options) -> String
+    def with_adapter: [T] (adapter_spec new_adapter) { () -> T } -> T
+  end
+
+  extend _Facade
+  extend Options
+  extend AdapterSelector
+
+  module Options
+    def parse_options: (*untyped args) -> options
+    def parse_options=: (options | Proc options) -> (options | Proc)
+    def generate_options: (*untyped args) -> options
+    def generate_options=: (options | Proc options) -> (options | Proc)
+    def load_options: (*untyped args) -> options
+    def load_options=: (options | Proc options) -> (options | Proc)
+    def dump_options: (*untyped args) -> options
+    def dump_options=: (options | Proc options) -> (options | Proc)
+  end
+
+  module AdapterSelector
+    def default_adapter: () -> Symbol
+  end
+
+  class ParseError < StandardError
+    attr_reader data: untyped
+    attr_reader line: Integer?
+    attr_reader column: Integer?
+
+    def initialize: (?String? message, ?data: untyped, ?cause: Exception?) -> void
+  end
+
+  class DecodeError = ParseError
+  class LoadError = ParseError
+
+  class AdapterError < ArgumentError
+    def initialize: (?String? message, ?cause: Exception?) -> void
+  end
+
+  class Adapter
+    extend Options
+
+    def self.defaults: (:load | :dump action, options value) -> options
+    def self.load: ((String | ::_Reader)? string, ?options options) -> untyped
+    def self.dump: (untyped object, ?options options) -> String
+  end
+
+  module Adapters
+    class JsonGem < Adapter
+      class ParseError = ::JSON::ParserError
+    end
+
+    class Oj < Adapter
+      class ParseError < ::SyntaxError
+      end
+    end
+
+    class Yajl < Adapter
+    end
+
+    class FastJsonparser < Adapter
+    end
+  end
+end
+
+# Deprecated constant kept by multi_json 1.x. Forwards to MultiJSON.
+module MultiJson
+  extend MultiJSON::_Facade
+  extend MultiJSON::Options
+  extend MultiJSON::AdapterSelector
+
+  class ParseError = MultiJSON::ParseError
+  class DecodeError = MultiJSON::ParseError
+  class LoadError = MultiJSON::ParseError
+  class AdapterError = MultiJSON::AdapterError
+end
