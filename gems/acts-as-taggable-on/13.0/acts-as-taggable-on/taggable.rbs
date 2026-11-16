@@ -1,0 +1,135 @@
+module ActsAsTaggableOn
+  module Taggable
+    type tagged_with_options = {
+      ?any: boolish,
+      ?exclude: boolish,
+      ?match_all: boolish,
+      ?wild: bool | :prefix | :suffix,
+      ?on: context,
+      ?owned_by: ::ActiveRecord::Base,
+      ?start_at: Time,
+      ?end_at: Time,
+      ?order_by_matching_tag_count: boolish,
+      ?order: String
+    } | Hash[Symbol, untyped]
+
+    type tag_counts_options = {
+      ?start_at: Time,
+      ?end_at: Time,
+      ?conditions: String | Array[untyped],
+      ?at_least: Integer,
+      ?at_most: Integer,
+      ?order: String,
+      ?limit: Integer,
+      ?on: context
+    } | Hash[Symbol, untyped]
+
+    type tags_options = {
+      ?start_at: Time,
+      ?end_at: Time,
+      ?conditions: String | Array[untyped],
+      ?order: String,
+      ?limit: Integer,
+      ?on: context
+    } | Hash[Symbol, untyped]
+
+    type related_options = { ?ignore: String | Array[String] } | Hash[Symbol, untyped]
+
+    def taggable?: () -> bool
+
+    def acts_as_taggable: () -> void
+
+    def acts_as_ordered_taggable: () -> void
+
+    def acts_as_taggable_on: (*context | Array[context] tag_types) -> void
+
+    def acts_as_ordered_taggable_on: (*context | Array[context] tag_types) -> void
+
+    def acts_as_taggable_tenant: (context tenant) -> void
+
+    module TaggedWithQuery
+      def self.build: (untyped taggable_model, singleton(Tag) tag_model, singleton(Tagging) tagging_model, tag_input tag_list, tagged_with_options options) -> ::ActiveRecord::Relation
+    end
+
+    # Methods available on both the model class and its relations.
+    module QueryMethods[Relation]
+      def tagged_with: (tag_input tags, ?tagged_with_options options) -> Relation
+
+      def tag_counts_on: (context context, ?tag_counts_options options) -> Tag::ActiveRecord_Relation
+
+      def tags_on: (context context, ?tags_options options) -> Tag::ActiveRecord_Relation
+
+      def all_tags: (?tags_options options) -> Tag::ActiveRecord_Relation
+
+      def all_tag_counts: (?tag_counts_options options) -> Tag::ActiveRecord_Relation
+    end
+
+    module ClassMethods[Model, Relation]
+      include QueryMethods[Relation]
+
+      def tag_types: () -> Array[Symbol]
+
+      def preserve_tag_order?: () -> bool
+
+      def tenant_column: () -> Symbol?
+    end
+
+    module InstanceMethods
+      def taggings: () -> Tagging::ActiveRecord_Associations_CollectionProxy
+
+      def base_tags: () -> Tag::ActiveRecord_Associations_CollectionProxy
+
+      def tag_list_on: (context context) -> TagList
+
+      def set_tag_list_on: (context context, tag_input new_list) -> TagList
+
+      def all_tags_list_on: (context context) -> TagList
+
+      def all_tags_on: (context context) -> Array[Tag]
+
+      def tags_on: (context context) -> Tag::ActiveRecord_Relation
+
+      def tag_counts_on: (context context, ?tag_counts_options options) -> Tag::ActiveRecord_Relation
+
+      def owner_tags: (::ActiveRecord::Base? owner) -> Tag::ActiveRecord_Relation
+
+      def owner_tags_on: (::ActiveRecord::Base? owner, context context) -> Tag::ActiveRecord_Relation
+
+      def owner_tag_list_on: (::ActiveRecord::Base? owner, context context) -> TagList
+
+      def set_owner_tag_list_on: (::ActiveRecord::Base? owner, context context, tag_input new_list) -> TagList
+    end
+
+    # Instance methods generated for the default `tags` context.
+    module TagsContext
+      def tag_list: () -> TagList
+
+      def tag_list=: (tag_input new_tags) -> tag_input
+
+      def all_tags_list: () -> TagList
+
+      def tags: () -> Tag::ActiveRecord_Associations_CollectionProxy
+
+      def tag_taggings: () -> Tagging::ActiveRecord_Associations_CollectionProxy
+
+      def tag_counts: (?tag_counts_options options) -> Tag::ActiveRecord_Relation
+
+      def top_tags: (?Integer limit) -> Tag::ActiveRecord_Relation
+
+      def tags_from: (::ActiveRecord::Base? owner) -> TagList
+
+      def find_related_tags: (?related_options options) -> ::ActiveRecord::Relation
+
+      def find_related_on_tags: (?related_options options) -> ::ActiveRecord::Relation
+
+      def find_related_tags_for: (singleton(::ActiveRecord::Base) klass, ?related_options options) -> ::ActiveRecord::Relation
+
+      # Class and relation methods generated for the default `tags` context.
+      module QueryMethods
+        def tag_counts: (?tag_counts_options options) -> Tag::ActiveRecord_Relation
+
+        def top_tags: (?Integer limit) -> Tag::ActiveRecord_Relation
+      end
+    end
+  end
+end

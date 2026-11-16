@@ -1,0 +1,54 @@
+module ActsAsTaggableOn
+  class Tagging < ::ActiveRecord::Base
+    DEFAULT_CONTEXT: String
+
+    module QueryMethods
+      def owned_by: (::ActiveRecord::Base owner) -> Tagging::ActiveRecord_Relation
+
+      def not_owned: () -> Tagging::ActiveRecord_Relation
+
+      def by_contexts: (Array[context]? contexts) -> Tagging::ActiveRecord_Relation
+
+      def by_context: (?context context) -> Tagging::ActiveRecord_Relation
+
+      def by_tenant: (_ToS tenant) -> Tagging::ActiveRecord_Relation
+    end
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[Tagging, Integer]
+      include ::Enumerable[Tagging]
+      include QueryMethods
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::_ActiveRecord_Relation[Tagging, Integer]
+      include ::Enumerable[Tagging]
+      include QueryMethods
+    end
+
+    extend ::ActiveRecord::Base::ClassMethods[Tagging, ActiveRecord_Relation, Integer]
+    extend QueryMethods
+
+    def tag: () -> Tag
+
+    def tag=: (Tag tag) -> Tag
+
+    def tag_id: () -> Integer
+
+    def taggable: () -> ::ActiveRecord::Base
+
+    def taggable_id: () -> Integer
+
+    def taggable_type: () -> String
+
+    def tagger: () -> ::ActiveRecord::Base?
+
+    def tagger_id: () -> Integer?
+
+    def tagger_type: () -> String?
+
+    def context: () -> String
+
+    def tenant: () -> String?
+  end
+end

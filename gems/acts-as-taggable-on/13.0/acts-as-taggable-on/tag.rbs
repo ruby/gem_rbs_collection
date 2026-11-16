@@ -1,0 +1,54 @@
+module ActsAsTaggableOn
+  class Tag < ::ActiveRecord::Base
+    module QueryMethods
+      def most_used: (?Integer limit) -> Tag::ActiveRecord_Relation
+
+      def least_used: (?Integer limit) -> Tag::ActiveRecord_Relation
+
+      def named: (_ToS name) -> Tag::ActiveRecord_Relation
+
+      def named_any: (Array[_ToS] names) -> Tag::ActiveRecord_Relation
+
+      def named_like: (_ToS name) -> Tag::ActiveRecord_Relation
+
+      def named_like_any: (Array[_ToS] names) -> Tag::ActiveRecord_Relation
+
+      def for_context: (context context) -> Tag::ActiveRecord_Relation
+
+      def for_tenant: (_ToS tenant) -> Tag::ActiveRecord_Relation
+    end
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[Tag, Integer]
+      include ::Enumerable[Tag]
+      include QueryMethods
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::_ActiveRecord_Relation[Tag, Integer]
+      include ::Enumerable[Tag]
+      include QueryMethods
+    end
+
+    extend ::ActiveRecord::Base::ClassMethods[Tag, ActiveRecord_Relation, Integer]
+    extend QueryMethods
+
+    def self.find_or_create_with_like_by_name: (String name) -> Tag
+
+    def self.find_or_create_all_with_like_by_name: (*String | Array[String] names) -> Array[Tag]
+
+    def name: () -> String
+
+    def name=: (String name) -> String
+
+    def taggings_count: () -> Integer
+
+    def taggings: () -> Tagging::ActiveRecord_Associations_CollectionProxy
+
+    def ==: (untyped other) -> bool
+
+    def to_s: () -> String
+
+    def count: () -> Integer
+  end
+end
