@@ -1,0 +1,313 @@
+module OpenAI
+  VERSION: String
+
+  type response = Hash[String, untyped]
+
+  type parameters = Hash[Symbol, untyped]
+
+  interface _StreamHandler
+    def call: (*untyped) -> untyped
+  end
+
+  type client_options = {
+    ?access_token: String?,
+    ?admin_token: String?,
+    ?api_type: (Symbol | String)?,
+    ?api_version: String?,
+    ?extra_headers: Hash[String | Symbol, String]?,
+    ?log_errors: bool?,
+    ?organization_id: String?,
+    ?request_timeout: Numeric?,
+    ?uri_base: String?
+  }
+
+  # With a callable `stream:` the chunks go to it and the call returns the
+  # empty body as a String instead of a parsed Hash.
+  type chat_stream_parameters = {
+    stream: Proc | _StreamHandler,
+    ?model: String,
+    ?messages: Array[Hash[Symbol, untyped]],
+    ?temperature: Numeric,
+    ?max_tokens: Integer,
+    ?max_completion_tokens: Integer,
+    ?top_p: Numeric,
+    ?n: Integer,
+    ?stop: String | Array[String],
+    ?tools: Array[Hash[Symbol, untyped]],
+    ?tool_choice: String | Hash[Symbol, untyped],
+    ?response_format: Hash[Symbol, untyped],
+    ?stream_options: Hash[Symbol, untyped],
+    ?user: String
+  }
+
+  type completions_stream_parameters = {
+    stream: Proc | _StreamHandler,
+    ?model: String,
+    ?prompt: String | Array[String],
+    ?max_tokens: Integer,
+    ?temperature: Numeric,
+    ?top_p: Numeric,
+    ?n: Integer,
+    ?stop: String | Array[String],
+    ?stream_options: Hash[Symbol, untyped],
+    ?user: String
+  }
+
+  type responses_stream_parameters = {
+    stream: Proc | _StreamHandler,
+    ?model: String,
+    ?input: String | Array[Hash[Symbol, untyped]],
+    ?instructions: String,
+    ?temperature: Numeric,
+    ?max_output_tokens: Integer,
+    ?tools: Array[Hash[Symbol, untyped]],
+    ?tool_choice: String | Hash[Symbol, untyped],
+    ?previous_response_id: String,
+    ?store: bool,
+    ?user: String
+  }
+
+  # With a text response_format the body is not JSON and comes back as a
+  # String.
+  type audio_text_parameters = {
+    response_format: "text" | "srt" | "vtt",
+    ?model: String,
+    ?file: untyped,
+    ?language: String,
+    ?prompt: String,
+    ?temperature: Numeric
+  }
+
+  class Error < StandardError
+  end
+
+  class ConfigurationError < Error
+  end
+
+  class AuthenticationError < Error
+  end
+
+  class Configuration
+    attr_accessor access_token: String?
+    attr_accessor admin_token: String?
+    attr_accessor api_type: (Symbol | String)?
+    attr_accessor api_version: String
+    attr_accessor log_errors: bool
+    attr_accessor organization_id: String?
+    attr_accessor uri_base: String
+    attr_accessor request_timeout: Numeric
+    attr_accessor extra_headers: Hash[String | Symbol, String]
+
+    DEFAULT_API_VERSION: String
+    DEFAULT_URI_BASE: String
+    DEFAULT_REQUEST_TIMEOUT: Integer
+    DEFAULT_LOG_ERRORS: bool
+
+    def initialize: () -> void
+  end
+
+  attr_writer self.configuration: Configuration
+
+  def self.configuration: () -> Configuration
+
+  def self.configure: () { (Configuration) -> void } -> void
+
+  def self.rough_token_count: (?String content) -> Integer
+
+  module HTTPHeaders
+    def add_headers: (Hash[String | Symbol, String] headers) -> Hash[String | Symbol, String]
+  end
+
+  module HTTP
+    include HTTPHeaders
+  end
+
+  class Client
+    include HTTP
+
+    attr_reader access_token: String?
+    attr_reader admin_token: String?
+    attr_reader api_type: (Symbol | String)?
+    attr_reader api_version: String
+    attr_reader extra_headers: Hash[String | Symbol, String]
+    attr_reader log_errors: bool
+    attr_reader organization_id: String?
+    attr_reader request_timeout: Numeric
+    attr_reader uri_base: String
+    attr_reader faraday_middleware: (^(Faraday::Connection) -> void)?
+    attr_writer access_token: String?
+
+    def initialize: (?client_options | Hash[Symbol, untyped] config) ?{ (Faraday::Connection) -> void } -> void
+
+    def chat: (parameters: chat_stream_parameters) -> String
+            | (?parameters: parameters) -> response
+    def embeddings: (?parameters: parameters) -> response
+    def completions: (parameters: completions_stream_parameters) -> String
+                   | (?parameters: parameters) -> response
+    def moderations: (?parameters: parameters) -> response
+
+    def audio: () -> Audio
+    def files: () -> Files
+    def finetunes: () -> Finetunes
+    def images: () -> Images
+    def models: () -> Models
+    def responses: () -> Responses
+    def assistants: () -> Assistants
+    def threads: () -> Threads
+    def messages: () -> Messages
+    def runs: () -> Runs
+    def run_steps: () -> RunSteps
+    def vector_stores: () -> VectorStores
+    def vector_store_files: () -> VectorStoreFiles
+    def vector_store_file_batches: () -> VectorStoreFileBatches
+    def batches: () -> Batches
+    def realtime: () -> Realtime
+    def usage: () -> Usage
+    def conversations: () -> Conversations
+
+    def azure?: () -> bool
+
+    def admin: () -> Client
+
+    def beta: (Hash[String | Symbol, untyped] apis) -> Client
+  end
+
+  class Audio
+    def transcribe: (parameters: audio_text_parameters) -> String
+                  | (?parameters: parameters) -> response
+    def translate: (parameters: audio_text_parameters) -> String
+                 | (?parameters: parameters) -> response
+    def speech: (?parameters: parameters) -> String
+  end
+
+  class Files
+    def list: (?parameters: parameters) -> response
+    def upload: (?parameters: parameters) -> response
+    def retrieve: (id: String, ?parameters: parameters) -> response
+    def content: (id: String, ?parameters: parameters) -> untyped
+    def delete: (id: String) -> response
+  end
+
+  class Finetunes
+    def list: () -> response
+    def create: (?parameters: parameters) -> response
+    def retrieve: (id: String) -> response
+    def cancel: (id: String) -> response
+    def list_events: (id: String) -> response
+  end
+
+  class Images
+    def generate: (?parameters: parameters) -> response
+    def edit: (?parameters: parameters) -> response
+    def variations: (?parameters: parameters) -> response
+  end
+
+  class Models
+    def list: () -> response
+    def retrieve: (id: String) -> response
+    def delete: (id: String) -> response
+  end
+
+  class Responses
+    def create: (parameters: responses_stream_parameters) -> String
+              | (?parameters: parameters) -> response
+    def retrieve: (response_id: String) -> response
+    def delete: (response_id: String) -> response
+    def input_items: (response_id: String, ?parameters: parameters) -> response
+  end
+
+  class Assistants
+    def list: () -> response
+    def retrieve: (id: String) -> response
+    def create: (?parameters: parameters) -> response
+    def modify: (id: String, ?parameters: parameters) -> response
+    def delete: (id: String) -> response
+  end
+
+  class Threads
+    def retrieve: (id: String) -> response
+    def create: (?parameters: parameters) -> response
+    def modify: (id: String, ?parameters: parameters) -> response
+    def delete: (id: String) -> response
+  end
+
+  class Messages
+    def list: (thread_id: String, ?parameters: parameters) -> response
+    def retrieve: (thread_id: String, id: String) -> response
+    def create: (thread_id: String, ?parameters: parameters) -> response
+    def modify: (thread_id: String, id: String, ?parameters: parameters) -> response
+    def delete: (thread_id: String, id: String) -> response
+  end
+
+  class Runs
+    def list: (thread_id: String, ?parameters: parameters) -> response
+    def retrieve: (thread_id: String, id: String) -> response
+    def create: (thread_id: String, ?parameters: parameters, ?query_parameters: Hash[Symbol, untyped]) -> response
+    def modify: (id: String, thread_id: String, ?parameters: parameters) -> response
+    def cancel: (id: String, thread_id: String) -> response
+    def create_thread_and_run: (?parameters: parameters) -> response
+    def submit_tool_outputs: (thread_id: String, run_id: String, ?parameters: parameters) -> response
+  end
+
+  class RunSteps
+    def list: (thread_id: String, run_id: String, ?parameters: parameters) -> response
+    def retrieve: (thread_id: String, run_id: String, id: String, ?parameters: parameters) -> response
+  end
+
+  class VectorStores
+    def list: (?parameters: parameters) -> response
+    def retrieve: (id: String) -> response
+    def create: (?parameters: parameters) -> response
+    def modify: (id: String, ?parameters: parameters) -> response
+    def delete: (id: String) -> response
+    def search: (id: String, ?parameters: parameters) -> response
+  end
+
+  class VectorStoreFiles
+    def list: (vector_store_id: String, ?parameters: parameters) -> response
+    def retrieve: (vector_store_id: String, id: String) -> response
+    def create: (vector_store_id: String, ?parameters: parameters) -> response
+    def delete: (vector_store_id: String, id: String) -> response
+  end
+
+  class VectorStoreFileBatches
+    def list: (vector_store_id: String, id: String, ?parameters: parameters) -> response
+    def retrieve: (vector_store_id: String, id: String) -> response
+    def create: (vector_store_id: String, ?parameters: parameters) -> response
+    def cancel: (vector_store_id: String, id: String) -> response
+  end
+
+  class Batches
+    def list: (?parameters: parameters) -> response
+    def retrieve: (id: String) -> response
+    def create: (?parameters: parameters) -> response
+    def cancel: (id: String) -> response
+  end
+
+  class Realtime
+    def create: (?parameters: parameters) -> response
+  end
+
+  class Usage
+    def completions: (?parameters: parameters) -> response
+    def embeddings: (?parameters: parameters) -> response
+    def moderations: (?parameters: parameters) -> response
+    def images: (?parameters: parameters) -> response
+    def audio_speeches: (?parameters: parameters) -> response
+    def audio_transcriptions: (?parameters: parameters) -> response
+    def vector_stores: (?parameters: parameters) -> response
+    def code_interpreter_sessions: (?parameters: parameters) -> response
+    def costs: (?parameters: parameters) -> response
+  end
+
+  class Conversations
+    def retrieve: (id: String) -> response
+    def create: (?parameters: parameters) -> response
+    def modify: (id: String, ?parameters: parameters) -> response
+    def delete: (id: String) -> response
+    def create_items: (conversation_id: String, ?parameters: parameters) -> response
+    def list_items: (conversation_id: String, ?parameters: parameters) -> response
+    def get_item: (conversation_id: String, item_id: String) -> response
+    def delete_item: (conversation_id: String, item_id: String) -> response
+  end
+end
