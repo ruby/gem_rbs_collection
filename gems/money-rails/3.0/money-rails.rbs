@@ -1,0 +1,141 @@
+module MoneyRails
+  VERSION: String
+
+  interface _CurrencyResolver
+    def call: (untyped record) -> (::Symbol | ::String | ::Money::Currency)
+  end
+
+  type currency_source = ::Symbol | ::String | ::Money::Currency
+  type currency_resolver = currency_source | ::Proc | ^(untyped) -> currency_source | _CurrencyResolver
+
+  class Error < ::StandardError
+  end
+
+  module Configuration
+    def configure: () { (singleton(::MoneyRails) config) -> void } -> void
+
+    def default_currency: () -> ::Money::Currency?
+
+    def default_currency=: (currency_source | ::Proc | ^() -> currency_source currency_name) -> void
+
+    def register_currency=: (::Hash[::Symbol, untyped] currency_options) -> void
+
+    def rounding_mode=: (Integer mode) -> void
+
+    def default_bank: () -> ::Money::Bank::Base
+
+    def default_bank=: (::Money::Bank::Base | ^() -> ::Money::Bank::Base bank) -> void
+
+    def locale_backend: () -> ::Money::LocaleBackend::Base?
+
+    def locale_backend=: (::Symbol? backend) -> void
+
+    def add_rate: ((::Money::Currency | ::String | ::Symbol) from_currency, (::Money::Currency | ::String | ::Symbol) to_currency, ::Numeric rate) -> ::Numeric
+
+    attr_accessor include_validations: bool
+
+    attr_accessor amount_column: ::Hash[::Symbol, untyped]
+
+    attr_accessor currency_column: ::Hash[::Symbol, untyped]
+
+    attr_accessor no_cents_if_whole: bool?
+
+    attr_accessor symbol: (bool | ::String)?
+
+    attr_accessor sign_before_symbol: bool?
+
+    attr_accessor default_format: ::Hash[::Symbol, untyped]?
+
+    attr_accessor raise_error_on_money_parsing: bool
+
+    attr_accessor preserve_user_input: bool
+  end
+
+  extend Configuration
+
+  module ActionViewExtension
+    type money_value = ::Money | ::Numeric | ::String | nil
+
+    def currency_symbol: (?(::Symbol | ::String | ::Money::Currency) currency) -> ::String
+
+    def humanized_money: (money_value value, ?::Hash[::Symbol, untyped] options) -> ::String
+
+    def humanized_money_with_symbol: (money_value value, ?::Hash[::Symbol, untyped] options) -> ::String
+
+    def money_without_cents: (money_value value, ?::Hash[::Symbol, untyped] options) -> ::String
+
+    def money_without_cents_and_with_symbol: (money_value value) -> ::String
+
+    def money_only_cents: (money_value value) -> ::String
+  end
+
+  module ActiveRecord
+    module Monetizable
+      class ReadOnlyCurrencyException < ::MoneyRails::Error
+      end
+
+      module ClassMethods
+        def monetize: (
+          *(::Symbol | ::String) fields,
+          ?as: (::Symbol | ::String)?,
+          ?with_currency: ::MoneyRails::currency_resolver?,
+          ?with_model_currency: (::Symbol | ::String)?,
+          ?allow_nil: bool?,
+          ?disable_validation: bool?,
+          ?numericality: bool | ::Hash[::Symbol, untyped],
+          ?subunit_numericality: bool | ::Hash[::Symbol, untyped]
+        ) -> void
+
+        def monetized_attributes: () -> ::ActiveSupport::HashWithIndifferentAccess[::String, ::String]
+
+        def register_currency: (::Symbol | ::String | ::Money::Currency currency_name) -> void
+      end
+    end
+
+    module MigrationExtensions
+      module SchemaStatements
+        def add_monetize: ((::Symbol | ::String) table_name, (::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+
+        def remove_monetize: ((::Symbol | ::String) table_name, (::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+
+        def add_money: ((::Symbol | ::String) table_name, (::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+
+        def remove_money: ((::Symbol | ::String) table_name, (::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+      end
+
+      module Table
+        def monetize: ((::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+
+        def remove_monetize: ((::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+
+        def money: ((::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+
+        def remove_money: ((::Symbol | ::String) accessor, ?::Hash[::Symbol, untyped] options) -> void
+      end
+    end
+  end
+end
+
+class Money
+  def to_hash: () -> { cents: Integer, currency_iso: String }
+end
+
+module ActiveRecord
+  class Base
+    extend MoneyRails::ActiveRecord::Monetizable::ClassMethods
+  end
+
+  class Migration
+    include MoneyRails::ActiveRecord::MigrationExtensions::SchemaStatements
+  end
+
+  module ConnectionAdapters
+    class TableDefinition
+      include MoneyRails::ActiveRecord::MigrationExtensions::Table
+    end
+
+    class Table
+      include MoneyRails::ActiveRecord::MigrationExtensions::Table
+    end
+  end
+end
