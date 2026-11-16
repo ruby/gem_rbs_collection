@@ -1,0 +1,20 @@
+module Rswag
+  module Api
+    def self.configure: () { (Configuration) -> void } -> void
+
+    def self.config: () -> Configuration
+
+    def self.deprecator: () -> ActiveSupport::Deprecation
+
+    class Configuration
+      attr_accessor openapi_root: String?
+
+      attr_accessor swagger_filter: (^(Hash[String, untyped], Hash[String, untyped]) -> untyped | Proc)?
+
+      attr_accessor swagger_headers: Hash[String, String]?
+    end
+
+    class Engine < ::Rails::Engine
+    end
+  end
+end
