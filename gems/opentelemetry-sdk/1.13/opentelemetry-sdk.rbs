@@ -1,0 +1,236 @@
+module OpenTelemetry
+  module SDK
+    VERSION: String
+
+    class ConfigurationError < Error
+    end
+
+    def self?.configure: () ?{ (Configurator configurator) -> void } -> void
+
+    class Configurator
+      interface _IdGenerator
+        def generate_trace_id: () -> String
+        def generate_span_id: () -> String
+      end
+
+      interface _ErrorHandler
+        def call: (?exception: Exception?, ?message: String?) -> void
+      end
+
+      attr_writer propagators: Array[Context::Propagation::_TextMapPropagator]
+      attr_writer id_generator: _IdGenerator
+
+      def logger=: (Logger new_logger) -> Logger
+      def error_handler=: (_ErrorHandler | ^(?exception: Exception?, ?message: String?) -> void error_handler) -> void
+      def resource=: (Resources::Resource new_resource) -> Resources::Resource
+      def service_name=: (String service_name) -> Resources::Resource
+      def service_version=: (String service_version) -> Resources::Resource
+      def use: (String instrumentation_name, ?Hash[Symbol, untyped]? config) -> void
+      def use_all: (?Hash[String, Hash[Symbol, untyped]] instrumentation_config_map) -> void
+      def add_span_processor: (Trace::_SpanProcessor span_processor) -> void
+    end
+
+    module Resources
+      class Resource
+        def self.create: (?Hash[String, OpenTelemetry::Trace::attribute_value] attributes) -> Resource
+        def self.default: () -> Resource
+        def self.telemetry_sdk: () -> Resource
+        def self.process: () -> Resource
+
+        def attribute_enumerator: () -> Enumerator[[String, OpenTelemetry::Trace::attribute_value], void]
+        def merge: (Resource other) -> Resource
+      end
+    end
+
+    class InstrumentationScope < Struct[untyped]
+      def self.new: (String name, ?String? version, ?OpenTelemetry::Trace::attributes? attributes) -> InstrumentationScope
+
+      attr_accessor name: String
+      attr_accessor version: String?
+      attr_accessor attributes: OpenTelemetry::Trace::attributes?
+    end
+
+    module Trace
+      interface _SpanProcessor
+        def on_start: (Span span, Context parent_context) -> void
+        def on_finish: (Span span) -> void
+        def force_flush: (?timeout: Numeric?) -> Integer
+        def shutdown: (?timeout: Numeric?) -> Integer
+      end
+
+      class SpanProcessor
+        include _SpanProcessor
+
+        def on_finishing: (Span span) -> void
+      end
+
+      class TracerProvider < OpenTelemetry::Trace::TracerProvider
+        attr_accessor span_limits: SpanLimits
+        attr_accessor id_generator: Configurator::_IdGenerator
+        attr_accessor sampler: Samplers::_Sampler
+        attr_reader resource: Resources::Resource
+
+        def initialize: (?sampler: Samplers::_Sampler, ?resource: Resources::Resource, ?id_generator: Configurator::_IdGenerator, ?span_limits: SpanLimits) -> void
+        def shutdown: (?timeout: Numeric?) -> Integer
+        def force_flush: (?timeout: Numeric?) -> Integer
+        def add_span_processor: (_SpanProcessor span_processor) -> void
+      end
+
+      class SpanLimits
+        DEFAULT: SpanLimits
+
+        attr_reader attribute_count_limit: Integer
+        attr_reader attribute_length_limit: Integer?
+        attr_reader event_count_limit: Integer
+        attr_reader link_count_limit: Integer
+        attr_reader event_attribute_count_limit: Integer
+        attr_reader event_attribute_length_limit: Integer?
+        attr_reader link_attribute_count_limit: Integer
+
+        def initialize: (?attribute_count_limit: Integer, ?attribute_length_limit: Integer?, ?event_count_limit: Integer, ?link_count_limit: Integer, ?event_attribute_count_limit: Integer, ?event_attribute_length_limit: Integer?, ?link_attribute_count_limit: Integer) -> void
+      end
+
+      class Event < Struct[untyped]
+        attr_accessor name: String
+        attr_accessor attributes: OpenTelemetry::Trace::attributes?
+        attr_accessor timestamp: Integer
+      end
+
+      class Span < OpenTelemetry::Trace::Span
+        attr_reader name: String
+        attr_reader status: OpenTelemetry::Trace::Status
+        attr_reader kind: OpenTelemetry::Trace::SpanKind::kind
+        attr_reader parent_span_id: String
+        attr_reader start_timestamp: Integer
+        attr_reader end_timestamp: Integer?
+        attr_reader links: Array[OpenTelemetry::Trace::Link]?
+        attr_reader resource: Resources::Resource
+        attr_reader instrumentation_scope: InstrumentationScope
+
+        def attributes: () -> OpenTelemetry::Trace::attributes?
+        def events: () -> Array[Event]?
+        def to_span_data: () -> SpanData
+      end
+
+      class SpanData < Struct[untyped]
+        attr_accessor name: String
+        attr_accessor kind: OpenTelemetry::Trace::SpanKind::kind?
+        attr_accessor status: OpenTelemetry::Trace::Status?
+        attr_accessor parent_span_id: String
+        attr_accessor total_recorded_attributes: Integer
+        attr_accessor total_recorded_events: Integer
+        attr_accessor total_recorded_links: Integer
+        attr_accessor start_timestamp: Integer
+        attr_accessor end_timestamp: Integer?
+        attr_accessor attributes: OpenTelemetry::Trace::attributes?
+        attr_accessor links: Array[OpenTelemetry::Trace::Link]?
+        attr_accessor events: Array[Event]?
+        attr_accessor resource: Resources::Resource
+        attr_accessor instrumentation_scope: InstrumentationScope
+        attr_accessor span_id: String
+        attr_accessor trace_id: String
+        attr_accessor trace_flags: OpenTelemetry::Trace::TraceFlags
+        attr_accessor tracestate: OpenTelemetry::Trace::Tracestate
+        attr_accessor parent_span_is_remote: bool
+
+        def hex_span_id: () -> String
+        def hex_trace_id: () -> String
+        def hex_parent_span_id: () -> String
+      end
+
+      module Samplers
+        interface _Sampler
+          def should_sample?: (trace_id: String, parent_context: Context, links: Array[OpenTelemetry::Trace::Link]?, name: String, kind: OpenTelemetry::Trace::SpanKind::kind?, attributes: OpenTelemetry::Trace::attributes?) -> Result
+          def description: () -> String
+        end
+
+        ALWAYS_ON: ConstantSampler
+        ALWAYS_OFF: ConstantSampler
+
+        def self.parent_based: (root: _Sampler, ?remote_parent_sampled: _Sampler, ?remote_parent_not_sampled: _Sampler, ?local_parent_sampled: _Sampler, ?local_parent_not_sampled: _Sampler) -> ParentBased
+        def self.trace_id_ratio_based: (Numeric ratio) -> TraceIdRatioBased
+
+        module Decision
+          type decision = :__drop__ | :__record_only__ | :__record_and_sample__
+
+          DROP: :__drop__
+          RECORD_ONLY: :__record_only__
+          RECORD_AND_SAMPLE: :__record_and_sample__
+        end
+
+        class Result
+          attr_reader attributes: OpenTelemetry::Trace::attributes
+          attr_reader tracestate: OpenTelemetry::Trace::Tracestate
+
+          def initialize: (decision: Decision::decision, tracestate: OpenTelemetry::Trace::Tracestate, ?attributes: OpenTelemetry::Trace::attributes?) -> void
+          def sampled?: () -> bool
+          def recording?: () -> bool
+        end
+
+        class ConstantSampler
+          include _Sampler
+        end
+
+        class ParentBased
+          include _Sampler
+        end
+
+        class TraceIdRatioBased
+          include _Sampler
+        end
+      end
+
+      module Export
+        interface _SpanExporter
+          def export: (Enumerable[SpanData] span_data, ?timeout: Numeric?) -> Integer
+          def force_flush: (?timeout: Numeric?) -> Integer
+          def shutdown: (?timeout: Numeric?) -> Integer
+        end
+
+        SUCCESS: Integer
+        FAILURE: Integer
+        TIMEOUT: Integer
+
+        class ExportError < Error
+          attr_reader spans: Array[Span]
+
+          def initialize: (Array[Span] spans) -> void
+        end
+
+        class SpanExporter
+          include _SpanExporter
+
+          def initialize: () -> void
+        end
+
+        class ConsoleSpanExporter
+          include _SpanExporter
+
+          def initialize: () -> void
+        end
+
+        class InMemorySpanExporter
+          include _SpanExporter
+
+          attr_accessor recording: bool
+
+          def initialize: (?recording: bool) -> void
+          def finished_spans: () -> Array[SpanData]
+          def reset: () -> void
+        end
+
+        class SimpleSpanProcessor
+          include _SpanProcessor
+
+          def initialize: (_SpanExporter span_exporter) -> void
+        end
+
+        class BatchSpanProcessor
+          include _SpanProcessor
+
+          def initialize: (_SpanExporter exporter, ?exporter_timeout: Numeric, ?schedule_delay: Numeric, ?max_queue_size: Integer, ?max_export_batch_size: Integer, ?start_thread_on_boot: bool, ?metrics_reporter: untyped) -> void
+        end
+      end
+    end
+  end
+end

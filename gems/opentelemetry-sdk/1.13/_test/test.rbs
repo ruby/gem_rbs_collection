@@ -1,0 +1,18 @@
+class InternalDropSampler
+  include OpenTelemetry::SDK::Trace::Samplers::_Sampler
+
+  @fallback: OpenTelemetry::SDK::Trace::Samplers::TraceIdRatioBased
+
+  def initialize: () -> void
+end
+
+class CountingProcessor < OpenTelemetry::SDK::Trace::SpanProcessor
+  @started: Integer
+
+  def started: () -> Integer
+
+  def initialize: () -> void
+end
+
+class NullExporter < OpenTelemetry::SDK::Trace::Export::SpanExporter
+end
