@@ -1,0 +1,31 @@
+class RackLikeRequest
+  @env: Hash[String, untyped]
+
+  def env: () -> Hash[String, untyped]
+
+  def scheme: () -> String
+end
+
+class NilSchemeRequest
+  @env: Hash[String, untyped]
+
+  def env: () -> Hash[String, untyped]
+
+  def scheme: () -> nil
+end
+
+class SecureController < ActionController::Base
+  def index: () -> (SecureHeaders::NoOpHeaderConfig | SecureHeaders::ContentSecurityPolicyConfig)
+end
+
+class SecureView < ActionView::Base
+  def render_tags: () -> String
+end
+
+class ConfigExamples
+  def opt_outs: () -> void
+
+  def mutate_default: () -> void
+
+  def disable: () -> void
+end
