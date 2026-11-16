@@ -1,0 +1,39 @@
+class Product < ActiveRecord::Base
+end
+
+class ProductsController
+  include Pagy::Method
+
+  def request: () -> untyped
+
+  def index: () -> Array[untyped]
+
+  def countless: () -> Integer?
+
+  def countish: () -> Integer
+
+  def other_paginator: () -> Integer
+
+  def calendar_paginator: () -> Integer
+
+  def default_paginator: () -> Array[Integer?]
+
+  def range_error: () -> Integer
+
+  def option_error: () -> Array[untyped]
+end
+
+class ProductsRenderer
+  include Pagy::Method
+
+  def pagination: () -> Pagy::Offset
+end
+
+class Pagy
+  def page_series: (**untyped options) -> Array[Integer | String | :gap]
+
+  def page_anchor: (**untyped options) -> ^(Integer | String page, ?String? text, ?classes: String?, ?aria_label: String?) -> String
+end
+
+module PagyRequestQueryParamsOnly
+end
