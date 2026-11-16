@@ -1,0 +1,22 @@
+class Article < ActiveRecord::Base
+  def self.ransackable_attributes: (?untyped auth_object) -> Array[String]
+  def self.ransackable_associations: (?untyped auth_object) -> Array[String]
+  def self.ransackable_scopes: (?untyped auth_object) -> Array[Symbol]
+
+  extend ActiveRecord::Base::ClassMethods[Article, ActiveRecord_Relation, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::ActiveRecord::Relation::Methods[Article, Integer]
+  end
+end
+
+class Comment < ActiveRecord::Base
+  def self.ransackable_attributes: (?untyped auth_object) -> Array[String]
+end
+
+class ArticlesView < ActionView::Base
+  include Ransack::Helpers::FormHelper
+
+  def render_search: (Ransack::Search search) -> String
+  def render_table: (Ransack::Search search) -> Array[ActiveSupport::SafeBuffer]
+end
