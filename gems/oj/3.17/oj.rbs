@@ -1,0 +1,112 @@
+module Oj
+  VERSION: String
+
+  type options = Hash[Symbol, untyped]
+
+  class Error < StandardError
+  end
+
+  class ParseError < Error
+  end
+
+  class DepthError < Error
+  end
+
+  class LoadError < Error
+  end
+
+  class MimicError < Error
+  end
+
+  def self.default_options: () -> options
+  def self.default_options=: (options options) -> options
+
+  def self.load: (String | IO | StringIO json, ?options options) ?{ (untyped obj, Integer start, Integer len) -> void } -> untyped
+  def self.load_file: (String path, ?options options) ?{ (untyped obj, Integer start, Integer len) -> void } -> untyped
+  def self.safe_load: (String | IO | StringIO json) -> untyped
+  def self.strict_load: (String | IO | StringIO json, ?options? options) ?{ (untyped obj, Integer start, Integer len) -> void } -> untyped
+  def self.compat_load: (String | IO | StringIO json, ?options? options) ?{ (untyped obj, Integer start, Integer len) -> void } -> untyped
+  def self.object_load: (String | IO | StringIO json, ?options? options) ?{ (untyped obj, Integer start, Integer len) -> void } -> untyped
+  def self.wab_load: (String | IO | StringIO json, ?options? options) ?{ (untyped obj, Integer start, Integer len) -> void } -> untyped
+
+  def self.dump: (untyped obj, ?options options) -> String
+  def self.to_json: (untyped obj, ?options options) -> String
+  def self.to_file: (String path, untyped obj, ?options options) -> nil
+  def self.to_stream: (IO | StringIO io, untyped obj, ?options options) -> nil
+  def self.generate: (untyped obj, ?options? options) -> String
+  def self.fast_generate: (untyped obj, ?options? options) -> String
+
+  def self.mimic_JSON: (*untyped args) -> Module
+  def self.optimize_rails: () -> nil
+  def self.add_to_json: (*Class classes) -> untyped
+  def self.remove_to_json: (*Class classes) -> untyped
+
+  module Rails
+    def self.encode: (untyped obj, ?options? options) -> String
+    def self.optimize: (*Class classes) -> nil
+    def self.deoptimize: (*Class classes) -> nil
+    def self.optimized?: (Class klass) -> bool
+    def self.mimic_JSON: () -> nil
+    def self.set_encoder: () -> nil
+    def self.set_decoder: () -> nil
+
+    class Encoder
+      def self.new: (?options? options) -> instance
+      def encode: (untyped obj) -> String
+      def optimize: (*Class classes) -> nil
+      def deoptimize: (*Class classes) -> nil
+      def optimized?: (Class klass) -> bool
+    end
+  end
+
+  class StringWriter
+    def self.new: (?options? options) -> instance
+    def push_key: (String key) -> nil
+    def push_object: (?String? key) -> nil
+    def push_array: (?String? key) -> nil
+    def push_value: (untyped value, ?String? key) -> nil
+    def push_json: (String json, ?String? key) -> nil
+    def pop: () -> nil
+    def pop_all: () -> nil
+    def reset: () -> nil
+    def to_s: () -> String
+    def raw_json: () -> String
+    def as_json: (*untyped) -> untyped
+  end
+
+  class StreamWriter
+    def self.new: (IO | StringIO io, ?options? options) -> instance
+    def push_key: (String key) -> nil
+    def push_object: (?String? key) -> nil
+    def push_array: (?String? key) -> nil
+    def push_value: (untyped value, ?String? key) -> nil
+    def push_json: (String json, ?String? key) -> nil
+    def pop: () -> nil
+    def pop_all: () -> nil
+    def flush: () -> nil
+  end
+
+  class Doc
+    def self.open: [T] (String json) { (Doc doc) -> T } -> T
+                 | (String json) -> Doc
+    def self.open_file: [T] (String path) { (Doc doc) -> T } -> T
+                      | (String path) -> Doc
+    def self.parse: [T] (String json) { (Doc doc) -> T } -> T
+                  | (String json) -> Doc
+    def where?: () -> String
+    def where: () -> String
+    def path: () -> String
+    def local_key: () -> (String | Integer | nil)
+    def home: () -> String
+    def type: (?String? path) -> Class?
+    def fetch: (?String? path, ?untyped default) -> untyped
+    def exists?: (String path) -> bool
+    def each_leaf: (?String? path) { (Doc doc) -> void } -> nil
+    def each_child: (?String? path) { (Doc doc) -> void } -> nil
+    def each_value: (?String? path) { (untyped value) -> void } -> nil
+    def move: (String path) -> nil
+    def dump: (?String? path, ?String filename) -> String?
+    def size: () -> Integer
+    def close: () -> nil
+  end
+end
