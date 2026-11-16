@@ -1,0 +1,117 @@
+module OpenSearch
+  module API
+    def self.settings: () -> Hash[Symbol, untyped]
+
+    module Actions
+      def search: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def index: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def create: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def get: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def exists: (Hash[Symbol, untyped] arguments) -> bool
+
+      alias exists? exists
+
+      def update: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def delete: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def bulk: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def count: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def mget: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def msearch: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def scroll: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def clear_scroll: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def update_by_query: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def delete_by_query: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def reindex: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def info: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+      def ping: (?Hash[Symbol, untyped] arguments) -> bool
+    end
+
+    module Cluster
+      module Actions
+        def health: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def state: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def stats: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def get_settings: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def put_settings: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+      end
+
+      class ClusterClient
+        include Actions
+      end
+
+      def cluster: () -> ClusterClient
+    end
+
+    module Indices
+      module Actions
+        def create: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def delete: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def exists: (Hash[Symbol, untyped] arguments) -> bool
+
+        alias exists? exists
+
+        def get: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def open: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def close: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def refresh: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def flush: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def analyze: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def stats: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def put_mapping: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def get_mapping: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def put_settings: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def get_settings: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def put_alias: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def get_alias: (?Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def delete_alias: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+
+        def exists_alias: (Hash[Symbol, untyped] arguments) -> bool
+
+        alias exists_alias? exists_alias
+
+        def update_aliases: (Hash[Symbol, untyped] arguments) -> Hash[String, untyped]
+      end
+
+      class IndicesClient
+        include Actions
+      end
+
+      def indices: () -> IndicesClient
+    end
+  end
+end

@@ -1,0 +1,147 @@
+module JSONSchemer
+  VERSION: String
+
+  class UnsupportedOpenAPIVersion < StandardError
+  end
+
+  class UnknownRef < StandardError
+  end
+
+  class UnknownFormat < StandardError
+  end
+
+  class UnknownVocabulary < StandardError
+  end
+
+  class UnknownContentEncoding < StandardError
+  end
+
+  class UnknownContentMediaType < StandardError
+  end
+
+  class UnknownOutputFormat < StandardError
+  end
+
+  class InvalidRefResolution < StandardError
+  end
+
+  class InvalidRefPointer < StandardError
+  end
+
+  class InvalidRegexpResolution < StandardError
+  end
+
+  class InvalidFileURI < StandardError
+  end
+
+  class InvalidEcmaRegexp < StandardError
+  end
+
+  type schema_source = Hash[untyped, untyped] | String | Pathname
+
+  type error = Hash[String, untyped]
+
+  type output_format = "classic" | "flag" | "basic" | "detailed" | "verbose"
+
+  type access_mode = "read" | "write"
+
+  interface _Resolver[T]
+    def call: (T) -> untyped
+  end
+
+  type ref_resolver = "net/http" | ^(URI::Generic) -> untyped | _Resolver[URI::Generic]
+
+  type regexp_resolver = "ruby" | "ecma" | ^(String) -> untyped | _Resolver[String]
+
+  type property_callback = ^(untyped, untyped, untyped, untyped) -> void | Proc
+
+  type format_checker = ^(untyped, String) -> boolish | Proc | false
+
+  type content_handler = ^(String) -> [bool, untyped] | Proc
+
+  def self.schema: (schema_source schema, ?meta_schema: String | Schema, ?format: bool, ?formats: Hash[String, format_checker], ?content_encodings: Hash[String, content_handler], ?content_media_types: Hash[String, content_handler], ?insert_property_defaults: bool | :symbol, ?before_property_validation: property_callback | Array[property_callback], ?after_property_validation: property_callback | Array[property_callback], ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, ?output_format: output_format, ?resolve_enumerators: bool, ?access_mode: access_mode?) -> Schema
+
+  def self.valid_schema?: (schema_source schema, ?meta_schema: String | Schema, ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, ?output_format: output_format, ?resolve_enumerators: bool, ?access_mode: access_mode?) -> bool
+
+  def self.validate_schema: (schema_source schema, ?meta_schema: String | Schema, ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, ?output_format: "classic", ?resolve_enumerators: false, ?access_mode: access_mode?) -> Enumerator[error, void]
+                          | (schema_source schema, ?meta_schema: String | Schema, ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, ?output_format: "classic", resolve_enumerators: true, ?access_mode: access_mode?) -> Array[error]
+                          | (schema_source schema, ?meta_schema: String | Schema, ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, output_format: "flag" | "basic" | "detailed" | "verbose", ?resolve_enumerators: bool, ?access_mode: access_mode?) -> Hash[String, untyped]
+
+  def self.draft202012: () -> Schema
+
+  def self.draft201909: () -> Schema
+
+  def self.draft7: () -> Schema
+
+  def self.draft6: () -> Schema
+
+  def self.draft4: () -> Schema
+
+  def self.openapi31: () -> Schema
+
+  def self.openapi30: () -> Schema
+
+  def self.openapi: (Hash[untyped, untyped] document, ?meta_schema: String | Schema, ?format: bool, ?formats: Hash[String, format_checker], ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, ?output_format: output_format, ?access_mode: access_mode?) -> OpenAPI
+
+  def self.configuration: () -> Configuration
+
+  def self.configure: () { (Configuration) -> void } -> void
+
+  class Schema
+    attr_reader value: untyped
+
+    attr_reader parent: Schema?
+
+    attr_reader root: Schema
+
+    def valid?: (untyped instance, ?resolve_enumerators: bool, ?access_mode: access_mode?) -> bool
+
+    def validate: (untyped instance, ?output_format: "classic", ?resolve_enumerators: false, ?access_mode: access_mode?) -> Enumerator[error, void]
+                | (untyped instance, ?output_format: "classic", resolve_enumerators: true, ?access_mode: access_mode?) -> Array[error]
+                | (untyped instance, output_format: "flag" | "basic" | "detailed" | "verbose", ?resolve_enumerators: bool, ?access_mode: access_mode?) -> Hash[String, untyped]
+
+    def valid_schema?: (?output_format: output_format, ?resolve_enumerators: bool, ?access_mode: access_mode?) -> bool
+
+    def validate_schema: (?output_format: "classic", ?resolve_enumerators: false, ?access_mode: access_mode?) -> Enumerator[error, void]
+                       | (?output_format: "classic", resolve_enumerators: true, ?access_mode: access_mode?) -> Array[error]
+                       | (output_format: "flag" | "basic" | "detailed" | "verbose", ?resolve_enumerators: bool, ?access_mode: access_mode?) -> Hash[String, untyped]
+
+    def ref: (String value) -> Schema
+
+    def bundle: () -> untyped
+  end
+
+  class OpenAPI
+    def valid?: () -> bool
+
+    def validate: (?output_format: "classic", ?resolve_enumerators: false, ?access_mode: access_mode?) -> Enumerator[error, void]
+                | (?output_format: "classic", resolve_enumerators: true, ?access_mode: access_mode?) -> Array[error]
+                | (output_format: "flag" | "basic" | "detailed" | "verbose", ?resolve_enumerators: bool, ?access_mode: access_mode?) -> Hash[String, untyped]
+
+    def ref: (String value) -> Schema
+
+    def schema: (String name) -> Schema
+  end
+
+  class Configuration < Struct[untyped]
+    def self.new: (?meta_schema: String | Schema, ?format: bool, ?formats: Hash[String, format_checker], ?content_encodings: Hash[String, content_handler], ?content_media_types: Hash[String, content_handler], ?insert_property_defaults: bool | :symbol, ?before_property_validation: property_callback | Array[property_callback], ?after_property_validation: property_callback | Array[property_callback], ?ref_resolver: ref_resolver, ?regexp_resolver: regexp_resolver, ?output_format: output_format, ?resolve_enumerators: bool, ?access_mode: access_mode?) -> instance
+
+    attr_accessor meta_schema: String | Schema
+    attr_accessor format: bool
+    attr_accessor formats: Hash[String, format_checker]
+    attr_accessor content_encodings: Hash[String, content_handler]
+    attr_accessor content_media_types: Hash[String, content_handler]
+    attr_accessor insert_property_defaults: bool | :symbol
+    attr_accessor before_property_validation: property_callback | Array[property_callback]
+    attr_accessor after_property_validation: property_callback | Array[property_callback]
+    attr_accessor ref_resolver: ref_resolver
+    attr_accessor regexp_resolver: regexp_resolver
+    attr_accessor output_format: output_format
+    attr_accessor resolve_enumerators: bool
+    attr_accessor access_mode: access_mode?
+  end
+
+  module Errors
+    def self.pretty: (error error) -> String
+  end
+end

@@ -1,0 +1,147 @@
+module Twitter
+  module REST
+    type options = Hash[Symbol, untyped]
+    type tweet_reference = Integer | String | ::URI::Generic | Twitter::Tweet
+    type user_reference = Integer | String | ::URI::Generic | Twitter::User
+
+    module Tweets
+      def retweets: (tweet_reference tweet, ?options options) -> Array[Twitter::Tweet]
+      def status: (tweet_reference tweet, ?options options) -> Twitter::Tweet
+      def statuses: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                  | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                  | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def destroy_status: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                        | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                        | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def destroy_tweet: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                       | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                       | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def update: (String status, ?options options) -> Twitter::Tweet
+      def update!: (String status, ?options options) -> Twitter::Tweet
+      def retweet: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                 | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                 | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def retweet!: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                  | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                  | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def unretweet: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                   | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                   | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def update_with_media: (String status, File | Array[File] media, ?options options) -> Twitter::Tweet
+      def retweeters_ids: (?options options) -> Twitter::Cursor[Integer]
+                        | (Integer id, ?options options) -> Twitter::Cursor[Integer]
+    end
+
+    module Timelines
+      def mentions_timeline: (?options options) -> Array[Twitter::Tweet]
+      def mentions: (?options options) -> Array[Twitter::Tweet]
+      def user_timeline: (?options options) -> Array[Twitter::Tweet]
+                       | (user_reference user, ?options options) -> Array[Twitter::Tweet]
+      def retweeted_by_user: (user_reference user, ?options options) -> Array[Twitter::Tweet]
+      def retweeted_by: (user_reference user, ?options options) -> Array[Twitter::Tweet]
+      def retweeted_by_me: (?options options) -> Array[Twitter::Tweet]
+      def home_timeline: (?options options) -> Array[Twitter::Tweet]
+      def retweeted_to_me: (?options options) -> Array[Twitter::Tweet]
+      def retweets_of_me: (?options options) -> Array[Twitter::Tweet]
+    end
+
+    module Users
+      def verify_credentials: (?options options) -> Twitter::User
+      def user: (?options options) -> Twitter::User
+              | (user_reference user, ?options options) -> Twitter::User
+      def users: (*user_reference users) -> Array[Twitter::User]
+               | (*user_reference users, options options) -> Array[Twitter::User]
+               | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def user?: (user_reference user, ?options options) -> bool
+      def user_search: (String query, ?options options) -> Array[Twitter::User]
+      def blocked: (?options options) -> Array[Twitter::User]
+      def blocked_ids: (?options options) -> Twitter::Cursor[Integer]
+                     | (user_reference user, ?options options) -> Twitter::Cursor[Integer]
+      def block?: (user_reference user, ?options options) -> bool
+      def block: (*user_reference users) -> Array[Twitter::User]
+               | (*user_reference users, options options) -> Array[Twitter::User]
+               | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def unblock: (*user_reference users) -> Array[Twitter::User]
+                 | (*user_reference users, options options) -> Array[Twitter::User]
+                 | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def mute: (*user_reference users) -> Array[Twitter::User]
+              | (*user_reference users, options options) -> Array[Twitter::User]
+              | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def unmute: (*user_reference users) -> Array[Twitter::User]
+                | (*user_reference users, options options) -> Array[Twitter::User]
+                | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def muted: (?options options) -> Array[Twitter::User]
+      def muted_ids: (?options options) -> Twitter::Cursor[Integer]
+                   | (user_reference user, ?options options) -> Twitter::Cursor[Integer]
+      def update_profile: (?options options) -> Twitter::User
+      def update_profile_image: (File image, ?options options) -> Twitter::User
+    end
+
+    module Search
+      def search: (String query, ?options options) -> Twitter::SearchResults
+    end
+
+    module Favorites
+      def favorites: (?options options) -> Array[Twitter::Tweet]
+                   | (user_reference user, ?options options) -> Array[Twitter::Tweet]
+      def favorite: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                  | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                  | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def favorite!: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                   | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                   | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def fav: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+             | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+             | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def unfavorite: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                    | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                    | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+      def unfavorite!: (*tweet_reference tweets) -> Array[Twitter::Tweet]
+                     | (*tweet_reference tweets, options options) -> Array[Twitter::Tweet]
+                     | (*tweet_reference tweets, **untyped options) -> Array[Twitter::Tweet]
+    end
+
+    module FriendsAndFollowers
+      def friend_ids: (?options options) -> Twitter::Cursor[Integer]
+                    | (user_reference user, ?options options) -> Twitter::Cursor[Integer]
+      def follower_ids: (?options options) -> Twitter::Cursor[Integer]
+                      | (user_reference user, ?options options) -> Twitter::Cursor[Integer]
+      def friendships_incoming: (?options options) -> Twitter::Cursor[Integer]
+      def friendships_outgoing: (?options options) -> Twitter::Cursor[Integer]
+      def follow: (*user_reference users) -> Array[Twitter::User]
+                | (*user_reference users, options options) -> Array[Twitter::User]
+                | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def follow!: (*user_reference users) -> Array[Twitter::User]
+                 | (*user_reference users, options options) -> Array[Twitter::User]
+                 | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def unfollow: (*user_reference users) -> Array[Twitter::User]
+                  | (*user_reference users, options options) -> Array[Twitter::User]
+                  | (*user_reference users, **untyped options) -> Array[Twitter::User]
+      def friendship?: (user_reference source, user_reference target, ?options options) -> bool
+      def followers: (?options options) -> Twitter::Cursor[Twitter::User]
+                   | (user_reference user, ?options options) -> Twitter::Cursor[Twitter::User]
+      def friends: (?options options) -> Twitter::Cursor[Twitter::User]
+                 | (user_reference user, ?options options) -> Twitter::Cursor[Twitter::User]
+      def following: (?options options) -> Twitter::Cursor[Twitter::User]
+                   | (user_reference user, ?options options) -> Twitter::Cursor[Twitter::User]
+      def no_retweet_ids: (?options options) -> Array[Integer]
+    end
+
+    module API
+      include Twitter::REST::Favorites
+      include Twitter::REST::FriendsAndFollowers
+      include Twitter::REST::Search
+      include Twitter::REST::Timelines
+      include Twitter::REST::Tweets
+      include Twitter::REST::Users
+    end
+
+    class Client < Twitter::Client
+      include Twitter::REST::API
+
+      attr_accessor bearer_token: String?
+
+      def bearer_token?: () -> bool
+    end
+  end
+end

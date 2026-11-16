@@ -1,0 +1,286 @@
+module Countries
+  VERSION: String
+end
+
+module ISO3166
+  def self.configuration: () -> Configuration
+
+  def self.configuration=: (Configuration) -> Configuration
+
+  def self.configure: () { (Configuration) -> void } -> void
+
+  def self.reset: () -> void
+
+  class Configuration
+    def locales: () -> Array[Symbol]
+
+    def locales=: (Array[Symbol | String]) -> Array[Symbol | String]
+  end
+
+  class Data
+    def self.register: (Hash[Symbol | String, untyped] data) -> Hash[String, Hash[String, untyped]]
+
+    def self.unregister: (String | Symbol alpha2) -> Hash[String, untyped]?
+
+    def self.cache: () -> Hash[String, Hash[String, untyped]]
+
+    def self.codes: () -> Array[String]
+
+    def self.reset: () -> void
+  end
+
+  # Hash with locale fallback: looking up `:"pt-br"` falls back to `:pt`, and String keys are accepted.
+  class Translations < Hash[Symbol, String]
+    def []: (String | Symbol locale) -> String?
+  end
+
+  class Subdivision
+    attr_reader name: String
+
+    attr_reader code: String?
+
+    attr_reader unofficial_names: Array[String]?
+
+    attr_reader geo: Hash[String, untyped]?
+
+    attr_reader translations: Hash[Symbol, String]
+
+    attr_reader comments: String?
+
+    attr_reader type: String?
+
+    def []: (String | Symbol attr_name) -> untyped
+
+    def code_with_translations: () -> Hash[String?, Hash[Symbol, String]]
+
+    def match?: (String subdivision_str) -> bool
+  end
+
+  module Emoji
+    def emoji_flag: () -> String
+  end
+
+  module CountrySubdivisionMethods
+    def find_subdivision_by_name: (String subdivision_str) -> Subdivision?
+
+    def subdivision_for_string?: (String subdivision_str) -> bool
+
+    def subdivisions?: () -> bool
+
+    def subdivisions: () -> Hash[String, Subdivision]
+
+    def subdivisions_of_types: (Array[String] types) -> Hash[String, Subdivision]
+
+    def subdivision_types: () -> Array[String]
+
+    def humanized_subdivision_types: () -> Array[String]
+
+    def subdivision_names_with_codes: (?String | Symbol locale) -> Array[[String, String]]
+
+    def subdivision_names: (?String | Symbol locale) -> Array[String]
+  end
+
+  module ConversionMethods
+    def from_alpha2_to_alpha3: (String alpha2) -> String?
+
+    def from_alpha3_to_alpha2: (String alpha3) -> String?
+  end
+
+  module CountryClassMethods
+    def codes: () -> Array[String]
+
+    def all: () -> Array[Country]
+           | [T] () { ([String, Hash[String, untyped]]) -> T } -> Array[T]
+
+    def all_names_with_codes: (?String | Symbol locale) -> Array[[String, String]]
+
+    def pluck: (*String | Symbol attributes) -> Array[Array[untyped]]
+
+    def all_translated: (?String | Symbol locale) -> Array[String]
+
+    def translations: (?String | Symbol locale) -> Hash[String, String]
+
+    def collect_countries_with: (String query_val, ?Symbol query_method, ?Symbol result_method) -> Array[untyped]?
+
+    def collect_likely_countries_by_subdivision_name: (String subdivision_str, ?Symbol result_method) -> Array[untyped]?
+  end
+
+  module CountryFinderMethods
+    def search: (String | Symbol query) -> Country?
+
+    def []: (String | Symbol query) -> Country?
+
+    def find_all_by: (String | Symbol attribute, untyped val) -> Hash[String, Hash[String, untyped]]
+
+    def find_country_by_alpha2: (String | Regexp value) -> Country?
+
+    def find_country_by_alpha3: (String | Regexp value) -> Country?
+
+    def find_country_by_number: (String | Regexp value) -> Country?
+
+    def find_country_by_iso_short_name: (String | Regexp value) -> Country?
+
+    def find_country_by_iso_long_name: (String | Regexp value) -> Country?
+
+    def find_country_by_any_name: (String | Regexp value) -> Country?
+
+    def find_country_by_country_code: (String | Regexp value) -> Country?
+
+    def find_country_by_currency_code: (String | Regexp value) -> Country?
+
+    def find_all_countries_by_alpha2: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_alpha3: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_number: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_iso_short_name: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_iso_long_name: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_any_name: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_country_code: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_currency_code: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_region: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_subregion: (String | Regexp value) -> Array[Country]
+
+    def find_all_countries_by_continent: (String | Regexp value) -> Array[Country]
+  end
+
+  class Country
+    include Emoji
+    include CountrySubdivisionMethods
+    extend CountryClassMethods
+    extend ConversionMethods
+    extend CountryFinderMethods
+
+    # Returns nil when `country_data` is a String or Symbol that is not a known alpha2 code.
+    def self.new: (String | Symbol | Hash[String, untyped] country_data) -> Country?
+
+    attr_reader data: Hash[String, untyped]
+
+    def address_format: () -> String?
+
+    def alpha2: () -> String
+
+    def alpha3: () -> String
+
+    def continent: () -> String?
+
+    def country_code: () -> String?
+
+    def currency_code: () -> String?
+
+    def distance_unit: () -> String?
+
+    def gec: () -> String?
+
+    def geo: () -> Hash[String, untyped]
+
+    def international_prefix: () -> String?
+
+    def ioc: () -> String?
+
+    def iso_long_name: () -> String?
+
+    def iso_short_name: () -> String
+
+    def national_destination_code_lengths: () -> Array[Integer]
+
+    def national_number_lengths: () -> Array[Integer]
+
+    def national_prefix: () -> String?
+
+    def nanp_prefix: () -> String?
+
+    def nationality: () -> String?
+
+    def number: () -> String
+
+    def languages_official: () -> Array[String]
+
+    def languages_spoken: () -> Array[String]
+
+    def translations: () -> Translations
+
+    def postal_code: () -> bool?
+
+    def postal_code_format: () -> String?
+
+    def region: () -> String?
+
+    def unofficial_names: () -> Array[String]?
+
+    def start_of_week: () -> String
+
+    def subregion: () -> String?
+
+    def un_locode: () -> String?
+
+    def vat_rates: () -> Hash[String, untyped]?
+
+    def vehicle_registration_code: () -> String?
+
+    def world_region: () -> String?
+
+    def latitude: () -> Float?
+
+    def longitude: () -> Float?
+
+    def max_latitude: () -> Float?
+
+    def max_longitude: () -> Float?
+
+    def min_latitude: () -> Float?
+
+    def min_longitude: () -> Float?
+
+    def bounds: () -> Hash[String, Hash[String, Float]]?
+
+    def valid?: () -> bool
+
+    def ==: (untyped other) -> bool
+
+    def eql?: (untyped other) -> bool
+
+    def hash: () -> Integer
+
+    def <=>: (untyped other) -> Integer
+
+    def []: (String | Symbol key) -> untyped
+
+    def in_eu?: () -> bool
+
+    def in_g7?: () -> bool
+
+    def in_g20?: () -> bool
+
+    def gdpr_compliant?: () -> bool
+
+    def in_eea?: () -> bool
+
+    def in_esm?: () -> bool
+
+    def in_eu_vat?: () -> bool
+
+    def in_un?: () -> bool
+
+    def iso_short_name_lower_case: () -> String
+
+    def to_s: () -> String
+
+    def translated_names: () -> Array[String]
+
+    def translation: (?String | Symbol locale) -> String?
+
+    def common_name: () -> String?
+
+    def local_names: () -> Array[String?]
+
+    def local_name: () -> String?
+  end
+end

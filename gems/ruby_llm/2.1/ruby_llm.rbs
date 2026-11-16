@@ -1,0 +1,106 @@
+module RubyLLM
+  VERSION: String
+
+  def self.configure: () { (Configuration config) -> void } -> void
+
+  def self.config: () -> Configuration
+
+  def self.context: () ?{ (Configuration config) -> void } -> Context
+
+  def self.chat: (?model: String?, ?provider: (Symbol | String)?, ?protocol: Symbol?, ?assume_model_exists: bool, ?context: Context?) -> Chat
+
+  def self.embed: (String | Array[String] text, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?context: Context?, ?dimensions: Integer?, ?task_type: (Symbol | String)?, ?title: String?, ?with: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Embedding
+
+  def self.moderate: (?String? input, ?model: String?, ?with: untyped, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?context: Context?, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Moderation
+
+  def self.paint: (String prompt, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?size: String?, ?count: nil, ?context: Context?, ?with: untyped, ?mask: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Image
+                | (String prompt, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?size: String?, count: Integer, ?context: Context?, ?with: untyped, ?mask: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> (Image | Array[Image])
+
+  def self.transcribe: (String | Pathname | IO audio_file, ?model: String?, ?language: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?context: Context?, ?prompt: String?, ?temperature: Numeric?, ?format: (Symbol | String)?, ?timestamps: (Symbol | String)?, ?speaker_names: Array[String]?, ?speaker_references: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) ?{ (TranscriptionChunk chunk) -> void } -> Transcription
+
+  def self.mcp: (?url: String?, ?command: (String | Array[String])?, ?transport: untyped, ?name: String?, ?bearer_token: String?, ?headers: Hash[String, String], ?env: Hash[String, String], ?directory: String?, ?timeout: Numeric?, ?prefix: String?, ?input_requests: untyped, ?log_level: untyped, ?extensions: untyped, ?oauth: (bool | Hash[Symbol, untyped])?) -> MCP
+
+  def self.count_tokens: (String text, ?model: String?, ?provider: (Symbol | String)?) -> Integer
+
+  def self.workflow: [T] (String name, ?id: String?, ?metadata: Hash[Symbol | String, untyped]?) { (Workflow workflow) -> T } -> T
+
+  def self.with_usage_owner: [T] (Object owner) { () -> T } -> T
+
+  def self.models: () -> Models
+
+  def self.providers: () -> Array[singleton(Provider)]
+
+  class Error < StandardError
+    attr_reader response: Faraday::Response?
+
+    def initialize: (?String? message, ?response: Faraday::Response?) -> void
+  end
+
+  class BadRequestError < Error
+  end
+
+  class ContentFilterError < Error
+  end
+
+  class ContextLengthExceededError < Error
+  end
+
+  class ForbiddenError < Error
+  end
+
+  class OverloadedError < Error
+  end
+
+  class PaymentRequiredError < Error
+  end
+
+  class RateLimitError < Error
+  end
+
+  class ServerError < Error
+  end
+
+  class ServiceUnavailableError < Error
+  end
+
+  class ToolCallParseError < Error
+    attr_reader finish_reason: String?
+  end
+
+  class UnauthorizedError < Error
+  end
+
+  class UnsupportedAttachmentError < Error
+  end
+
+  class UnsupportedServerToolError < Error
+  end
+
+  class CancelledError < StandardError
+    def initialize: (?String message) -> void
+  end
+
+  class ConfigurationError < StandardError
+  end
+
+  class DeprecationError < StandardError
+  end
+
+  class InvalidRoleError < StandardError
+  end
+
+  class InvalidToolChoiceError < StandardError
+  end
+
+  class ModelNotFoundError < StandardError
+  end
+
+  class ModelRegistryError < StandardError
+  end
+
+  class PendingToolCallsError < StandardError
+  end
+
+  class PromptNotFoundError < StandardError
+  end
+end

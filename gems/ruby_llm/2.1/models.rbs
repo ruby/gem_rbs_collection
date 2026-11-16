@@ -1,0 +1,134 @@
+module RubyLLM
+  class Models
+    include Enumerable[Model]
+
+    def all: () -> Array[Model]
+
+    alias listed all
+
+    def unlisted: () -> Array[Model]
+
+    def each: () { (Model model) -> void } -> void
+            | () -> Enumerator[Model, void]
+
+    def find: (String model_id, ?provider: (Symbol | String)?, ?config: Configuration?) -> Model
+
+    def chat_models: () -> Models
+
+    def embedding_models: () -> Models
+
+    def audio_models: () -> Models
+
+    def image_models: () -> Models
+
+    def by_family: (Symbol | String family) -> Models
+
+    def by_provider: (Symbol | String provider) -> Models
+
+    def refresh: (?remote_only: bool) -> self
+
+    def load_from_json: (?String file) -> self
+
+    def save_to_json: (?String file) -> self
+  end
+
+  class Model
+    class Modalities
+      attr_reader input: Array[String]
+      attr_reader output: Array[String]
+
+      def to_h: () -> Hash[Symbol, Array[String]]
+    end
+
+    attr_reader id: String
+    attr_reader name: String
+    attr_reader provider: String
+    attr_reader family: String?
+    attr_reader created_at: Time?
+    attr_reader context_window: Integer?
+    attr_reader max_output_tokens: Integer?
+    attr_reader modalities: Modalities
+    attr_reader capabilities: Array[String]
+    attr_reader metadata: Hash[Symbol, untyped]
+    attr_reader unlisted_at: Time?
+
+    def supports?: (Symbol | String capability) -> bool
+
+    def unlisted?: () -> bool
+
+    def label: () -> String
+
+    def type: () -> Symbol
+
+    def reasoning_option_values: (Symbol | String `type`) -> Array[untyped]
+  end
+
+  class Provider
+    def self.slug: () -> String
+
+    def self.display_name: () -> String
+
+    def self.configured?: (Configuration config) -> bool
+
+    def slug: () -> String
+  end
+
+  module Providers
+    class Anthropic < Provider
+    end
+
+    class Azure < Provider
+    end
+
+    class Bedrock < Provider
+    end
+
+    class Cohere < Provider
+    end
+
+    class Deepgram < Provider
+    end
+
+    class DeepSeek < Provider
+    end
+
+    class ElevenLabs < Provider
+    end
+
+    class Gemini < Provider
+    end
+
+    class GPUStack < Provider
+    end
+
+    class Hetzner < Provider
+    end
+
+    class Mistral < Provider
+    end
+
+    class Ollama < Provider
+    end
+
+    class OllamaCloud < Provider
+    end
+
+    class OpenAI < Provider
+    end
+
+    class OpenRouter < Provider
+    end
+
+    class Perplexity < Provider
+    end
+
+    class TypeSafe < Provider
+    end
+
+    class VertexAI < Provider
+    end
+
+    class XAI < Provider
+    end
+  end
+end

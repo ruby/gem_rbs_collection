@@ -1,0 +1,88 @@
+module MaxMindDB
+  VERSION: String
+
+  DEFAULT_FILE_READER: ^(String) -> String
+
+  LOW_MEMORY_FILE_READER: ^(String) -> LowMemoryReader
+
+  def self.new: (String path, ?^(String) -> (String | LowMemoryReader) file_reader) -> Client
+
+  class LowMemoryReader
+  end
+
+  class Client
+    attr_reader metadata: Hash[String, untyped]
+
+    attr_accessor local_ip_alias: String?
+
+    def lookup: (String | Integer ip_or_hostname) -> Result
+  end
+
+  class Result
+    def []: (String attr) -> untyped
+
+    def city: () -> NamedLocation
+
+    def continent: () -> NamedLocation
+
+    def country: () -> NamedLocation
+
+    def found?: () -> bool
+
+    def location: () -> Location
+
+    def postal: () -> Postal
+
+    def registered_country: () -> NamedLocation
+
+    def represented_country: () -> NamedLocation
+
+    def subdivisions: () -> Subdivisions
+
+    def traits: () -> Traits
+
+    def connection_type: () -> String?
+
+    def network: () -> String?
+
+    def to_hash: () -> Hash[String, untyped]
+
+    class Location
+      def latitude: () -> Float?
+
+      def longitude: () -> Float?
+
+      def metro_code: () -> Integer?
+
+      def time_zone: () -> String?
+
+      def accuracy_radius: () -> Integer?
+    end
+
+    class NamedLocation
+      def code: () -> String?
+
+      def geoname_id: () -> Integer?
+
+      def is_in_european_union: () -> bool?
+
+      def iso_code: () -> String?
+
+      def name: (?Symbol | String locale) -> String?
+    end
+
+    class Postal
+      def code: () -> String?
+    end
+
+    class Subdivisions < Array[NamedLocation]
+      def most_specific: () -> NamedLocation
+    end
+
+    class Traits
+      def is_anonymous_proxy: () -> bool?
+
+      def is_satellite_provider: () -> bool?
+    end
+  end
+end

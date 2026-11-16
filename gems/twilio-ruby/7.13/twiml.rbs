@@ -1,0 +1,40 @@
+module Twilio
+  module TwiML
+    class TwiMLError < StandardError
+    end
+
+    class TwiML
+      def to_s: (?bool xml_declaration) -> String
+      alias to_xml to_s
+      def append: (TwiML verb) -> self
+      def comment: (String body) -> self
+      def add_text: (String content) -> self
+    end
+
+    class VoiceResponse < TwiML
+      def initialize: (**untyped keyword_args) ?{ (VoiceResponse) -> void } -> void
+      def dial: (?number: String, ?action: String, ?method: String, ?timeout: Integer, ?caller_id: String, ?record: String, **untyped keyword_args) ?{ (Dial) -> void } -> self
+      def hangup: (**untyped keyword_args) -> self
+      def redirect: (String url, ?method: String, **untyped keyword_args) -> self
+      def reject: (?reason: String, **untyped keyword_args) -> self
+      def say: (?message: String, ?voice: String, ?loop: Integer, ?language: String, **untyped keyword_args) -> self
+
+      class Dial < TwiML
+        def client: (?identity: String, ?url: String, ?method: String, ?status_callback_event: String, ?status_callback: String, ?status_callback_method: String, **untyped keyword_args) -> self
+        def conference: (String name, ?muted: bool, ?beep: bool | String, ?start_conference_on_enter: bool, ?end_conference_on_exit: bool, ?wait_url: String, ?wait_method: String, ?max_participants: Integer, ?record: String, ?status_callback_event: String, ?status_callback: String, ?status_callback_method: String, ?recording_status_callback: String, ?recording_status_callback_method: String, ?recording_status_callback_event: String, ?participant_label: String, **untyped keyword_args) -> self
+        def number: (String phone_number, ?url: String, ?method: String, ?status_callback_event: String, ?status_callback: String, ?status_callback_method: String, **untyped keyword_args) -> self
+      end
+    end
+
+    class MessagingResponse < TwiML
+      def initialize: (**untyped keyword_args) ?{ (MessagingResponse) -> void } -> void
+      def message: (?body: String, ?to: String, ?from: String, ?action: String, ?method: String, ?status_callback: String, **untyped keyword_args) ?{ (Message) -> void } -> self
+      def redirect: (String url, ?method: String, **untyped keyword_args) -> self
+
+      class Message < TwiML
+        def body: (String message, **untyped keyword_args) -> self
+        def media: (String url, **untyped keyword_args) -> self
+      end
+    end
+  end
+end

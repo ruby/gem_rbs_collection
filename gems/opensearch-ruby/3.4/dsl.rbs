@@ -1,0 +1,137 @@
+module OpenSearch
+  module DSL
+    module Search
+      type hashable = Hash[Symbol, untyped] | _ToHash[Symbol, untyped]
+
+      def self.search: (*untyped args) ?{ (Search) [self: Search] -> void } -> Search
+
+      def search: (*untyped args) ?{ (Search) [self: Search] -> void } -> Search
+
+      module BaseComponent
+        def empty?: () -> bool
+
+        def to_hash: (?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+      end
+
+      class Search
+        def initialize: (*untyped args) ?{ (Search) [self: Search] -> void } -> void
+
+        def query: () -> hashable?
+                 | (hashable query) -> self
+                 | () { (Query) [self: Query] -> void } -> self
+
+        def query=: (hashable query) -> self
+
+        def filter: () -> hashable?
+                  | (hashable filter) -> self
+                  | () { (Filter) [self: Filter] -> void } -> self
+
+        def filter=: (hashable filter) -> self
+
+        def post_filter: () -> hashable?
+                       | (hashable filter) -> self
+                       | () { (Filter) [self: Filter] -> void } -> self
+
+        def post_filter=: (hashable filter) -> self
+
+        def aggregation: (Symbol | String name, untyped definition) -> self
+                       | (Symbol | String name, *untyped args) { (Aggregation) [self: Aggregation] -> void } -> self
+
+        def aggregations: () -> AggregationsCollection?
+
+        def aggregations=: (AggregationsCollection? value) -> AggregationsCollection?
+
+        def highlight: () -> Highlight?
+                     | (*untyped args) ?{ (Highlight) [self: Highlight] -> void } -> self
+
+        def sort: () -> Sort?
+                | (untyped value, *untyped args) ?{ (Sort) [self: Sort] -> void } -> self
+                | () { (Sort) [self: Sort] -> void } -> self
+
+        def sort=: (untyped value) -> untyped
+
+        def size: () -> Integer?
+                | (Integer value) -> self
+
+        def size=: (Integer value) -> self
+
+        def from: () -> Integer?
+                | (Integer value) -> self
+
+        def from=: (Integer value) -> self
+
+        def stored_fields: () -> untyped
+                         | (untyped value) -> self
+
+        def stored_fields=: (untyped value) -> self
+
+        def suggest: () -> Hash[untyped, Suggest]?
+                   | (untyped key, ?untyped options) ?{ () -> void } -> self
+
+        def suggest=: (Hash[untyped, Suggest]? value) -> Hash[untyped, Suggest]?
+
+        def source: (untyped value) -> self
+
+        def _source: (untyped value) -> self
+
+        def fields: (untyped value) -> self
+
+        def script_fields: (untyped value) -> self
+
+        def fielddata_fields: (untyped value) -> self
+
+        def rescore: (untyped value) -> self
+
+        def explain: (untyped value) -> self
+
+        def version: (untyped value) -> self
+
+        def indices_boost: (untyped value) -> self
+
+        def min_score: (untyped value) -> self
+
+        def track_scores: (untyped value) -> self
+
+        def track_total_hits: (untyped value) -> self
+
+        def to_hash: () -> Hash[Symbol, untyped]
+      end
+
+      class Highlight
+        include BaseComponent
+
+        def fields: (Hash[untyped, untyped] | Array[String | Symbol] value) -> self
+
+        def field: (String | Symbol name, ?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+
+        def pre_tags: (*untyped tags) -> Array[untyped]
+
+        def pre_tags=: (untyped tags) -> untyped
+
+        def post_tags: (*untyped tags) -> Array[untyped]
+
+        def post_tags=: (untyped tags) -> untyped
+
+        def encoder: (untyped value) -> untyped
+
+        def encoder=: (untyped value) -> untyped
+
+        def tags_schema: (untyped value) -> untyped
+
+        def tags_schema=: (untyped value) -> untyped
+      end
+
+      class Sort
+        include BaseComponent
+
+        def by: (untyped name, ?untyped direction) -> self
+
+        def to_hash: () -> Array[untyped]
+      end
+
+      class Suggest
+        include BaseComponent
+      end
+    end
+  end
+end

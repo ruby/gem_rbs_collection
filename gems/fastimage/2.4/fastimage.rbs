@@ -1,0 +1,54 @@
+class FastImage
+  VERSION: String
+
+  SUPPORTED_IMAGE_TYPES: Array[Symbol]
+
+  type source = String | Pathname | ::_Reader
+
+  type options = {
+    ?timeout: Numeric,
+    ?raise_on_failure: boolish,
+    ?proxy: String?,
+    ?http_header: Hash[String, String]
+  } | Hash[Symbol, untyped]
+
+  class FastImageException < StandardError
+  end
+
+  class UnknownImageType < FastImageException
+  end
+
+  class ImageFetchFailure < FastImageException
+  end
+
+  class SizeNotFound < FastImageException
+  end
+
+  class CannotParseImage < FastImageException
+  end
+
+  class BadImageURI < FastImageException
+  end
+
+  def self.size: (source uri, ?options options) -> [Integer, Integer]?
+
+  def self.type: (source uri, ?options options) -> Symbol?
+
+  def self.animated?: (source uri, ?options options) -> bool?
+
+  def initialize: (source uri, ?options options) -> void
+
+  def type: () -> Symbol?
+
+  def size: () -> [Integer, Integer]?
+
+  def width: () -> Integer?
+
+  def height: () -> Integer?
+
+  def orientation: () -> Integer?
+
+  def animated: () -> bool?
+
+  def content_length: () -> Integer?
+end

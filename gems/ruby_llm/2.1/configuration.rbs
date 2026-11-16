@@ -1,0 +1,162 @@
+module RubyLLM
+  class Configuration
+    interface _Logger
+      def debug: (?String? progname) ?{ () -> String } -> bool
+
+      def info: (?String? progname) ?{ () -> String } -> bool
+
+      def warn: (?String? progname) ?{ () -> String } -> bool
+
+      def error: (?String? progname) ?{ () -> String } -> bool
+    end
+
+    interface _Instrumenter
+      def instrument: (String name, Hash[Symbol, untyped] payload) { (Hash[Symbol, untyped] payload) -> untyped } -> untyped
+    end
+
+    interface _ModelRegistryStore
+      def read: () -> Array[untyped]?
+
+      def write: (untyped models) -> untyped
+    end
+
+    interface _CredentialStore
+      def read: (String key) -> Hash[String, untyped]?
+
+      def write: (String key, Hash[String, untyped] data, owner: untyped) -> untyped
+
+      def delete: (String key) -> untyped
+    end
+
+    def self.options: () -> Array[Symbol]
+
+    attr_accessor default_model: String?
+    attr_accessor default_embedding_model: String?
+    attr_accessor default_moderation_model: String?
+    attr_accessor default_image_model: String?
+    attr_accessor default_speech_model: String?
+    attr_accessor default_transcription_model: String?
+    attr_accessor default_video_model: String?
+    attr_accessor video_generation_timeout: Numeric?
+    attr_accessor video_generation_poll_interval: Numeric?
+    attr_accessor model_registry_file: String?
+    attr_accessor model_registry_store: _ModelRegistryStore?
+    attr_accessor mcp_credential_store: _CredentialStore?
+    attr_accessor mcp_client_name: String?
+    attr_accessor mcp_client_id: String?
+
+    attr_accessor request_timeout: Numeric?
+    attr_accessor max_retries: Integer?
+    attr_accessor retry_interval: Numeric?
+    attr_accessor retry_backoff_factor: Numeric?
+    attr_accessor retry_interval_randomness: Numeric?
+    attr_accessor retry_max_interval: Numeric?
+    attr_accessor http_proxy: String?
+    attr_accessor tool_concurrency: (bool | Symbol)?
+    attr_accessor auto_upload_large_files: bool?
+    attr_accessor faraday_adapter: (Symbol | Class)?
+
+    attr_accessor logger: _Logger?
+    attr_accessor instrumenter: _Instrumenter?
+    attr_accessor deprecation_behavior: Symbol?
+    attr_accessor log_file: (String | IO)?
+    attr_accessor log_level: Integer?
+    attr_accessor log_stream_debug: bool?
+    attr_accessor log_regexp_timeout: Numeric?
+
+    def use_new_acts_as=: (bool value) -> bool
+
+    # Provider credentials and endpoints
+    attr_accessor anthropic_api_key: String?
+    attr_accessor anthropic_api_base: String?
+    attr_accessor cohere_api_key: String?
+    attr_accessor cohere_api_base: String?
+    attr_accessor deepgram_api_key: String?
+    attr_accessor deepgram_api_base: String?
+    attr_accessor deepseek_api_key: String?
+    attr_accessor deepseek_api_base: String?
+    attr_accessor elevenlabs_api_key: String?
+    attr_accessor elevenlabs_api_base: String?
+    attr_accessor gemini_api_key: String?
+    attr_accessor gemini_api_base: String?
+    attr_accessor hetzner_api_key: String?
+    attr_accessor hetzner_api_base: String?
+    attr_accessor mistral_api_key: String?
+    attr_accessor mistral_api_base: String?
+    attr_accessor ollama_api_key: String?
+    attr_accessor ollama_api_base: String?
+    attr_accessor ollama_cloud_api_key: String?
+    attr_accessor ollama_cloud_api_base: String?
+    attr_accessor openai_api_key: String?
+    attr_accessor openai_api_base: String?
+    attr_accessor openrouter_api_key: String?
+    attr_accessor openrouter_api_base: String?
+    attr_accessor perplexity_api_key: String?
+    attr_accessor perplexity_api_base: String?
+    attr_accessor typesafe_api_key: String?
+    attr_accessor typesafe_api_base: String?
+    attr_accessor xai_api_key: String?
+    attr_accessor xai_api_base: String?
+    attr_accessor gpustack_api_key: String?
+    attr_accessor gpustack_api_base: String?
+    attr_accessor azure_api_key: String?
+    attr_accessor azure_api_base: String?
+    attr_accessor azure_ai_auth_token: String?
+    attr_accessor azure_deployments: Hash[String, String]?
+    attr_accessor bedrock_api_key: String?
+    attr_accessor bedrock_secret_key: String?
+    attr_accessor bedrock_region: String?
+    attr_accessor bedrock_session_token: String?
+    attr_accessor bedrock_api_base: String?
+    attr_accessor vertexai_project_id: String?
+    attr_accessor vertexai_location: String?
+    attr_accessor vertexai_service_account_key: String?
+    attr_accessor vertexai_api_base: String?
+    attr_accessor openai_organization_id: String?
+    attr_accessor openai_project_id: String?
+    attr_accessor openai_use_system_role: bool?
+    attr_accessor openrouter_app_url: String?
+    attr_accessor openrouter_app_name: String?
+
+    attr_accessor anthropic_protocol: Symbol?
+    attr_accessor cohere_protocol: Symbol?
+    attr_accessor deepgram_protocol: Symbol?
+    attr_accessor deepseek_protocol: Symbol?
+    attr_accessor elevenlabs_protocol: Symbol?
+    attr_accessor gemini_protocol: Symbol?
+    attr_accessor hetzner_protocol: Symbol?
+    attr_accessor mistral_protocol: Symbol?
+    attr_accessor ollama_protocol: Symbol?
+    attr_accessor ollama_cloud_protocol: Symbol?
+    attr_accessor openai_protocol: Symbol?
+    attr_accessor openrouter_protocol: Symbol?
+    attr_accessor perplexity_protocol: Symbol?
+    attr_accessor typesafe_protocol: Symbol?
+    attr_accessor xai_protocol: Symbol?
+    attr_accessor gpustack_protocol: Symbol?
+    attr_accessor azure_protocol: Symbol?
+    attr_accessor bedrock_protocol: Symbol?
+    attr_accessor vertexai_protocol: Symbol?
+  end
+
+  class Context
+    attr_reader config: Configuration
+
+    def chat: (?model: String?, ?provider: (Symbol | String)?, ?protocol: Symbol?, ?assume_model_exists: bool) -> Chat
+
+    def embed: (String | Array[String] text, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?dimensions: Integer?, ?task_type: (Symbol | String)?, ?title: String?, ?with: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Embedding
+
+    def moderate: (?String? input, ?model: String?, ?with: untyped, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Moderation
+
+    def paint: (String prompt, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?size: String?, ?count: nil, ?with: untyped, ?mask: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Image
+             | (String prompt, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?size: String?, count: Integer, ?with: untyped, ?mask: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> (Image | Array[Image])
+
+    def transcribe: (String | Pathname | IO audio_file, ?model: String?, ?language: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?prompt: String?, ?temperature: Numeric?, ?format: (Symbol | String)?, ?timestamps: (Symbol | String)?, ?speaker_names: Array[String]?, ?speaker_references: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) ?{ (TranscriptionChunk chunk) -> void } -> Transcription
+
+    def mcp: (?url: String?, ?command: (String | Array[String])?, ?transport: untyped, ?name: String?, ?bearer_token: String?, ?headers: Hash[String, String], ?env: Hash[String, String], ?directory: String?, ?timeout: Numeric?, ?prefix: String?, ?input_requests: untyped, ?log_level: untyped, ?extensions: untyped, ?oauth: (bool | Hash[Symbol, untyped])?) -> MCP
+
+    def count_tokens: (String text, ?model: String?, ?provider: (Symbol | String)?) -> Integer
+
+    def workflow: [T] (String name, ?id: String?, ?metadata: Hash[Symbol | String, untyped]?) { (Workflow workflow) -> T } -> T
+  end
+end

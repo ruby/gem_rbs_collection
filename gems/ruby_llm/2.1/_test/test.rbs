@@ -1,0 +1,59 @@
+class WeatherTool < RubyLLM::Tool
+  def execute: (latitude: String, ?longitude: String?) -> Hash[Symbol, String?]
+end
+
+class ProbeTool < RubyLLM::Tool
+  def execute: (status: String) -> String
+end
+
+class ReviewSchema
+  def to_json_schema: () -> Hash[Symbol, untyped]
+end
+
+class MemoryCredentialStore
+  @data: Hash[String, Hash[String, untyped]]
+
+  def initialize: () -> void
+  def read: (String key) -> Hash[String, untyped]?
+  def write: (String key, Hash[String, untyped] data, ?owner: untyped) -> void
+  def delete: (String key) -> void
+end
+
+class LoggingInstrumenter
+  def instrument: (String name, Hash[Symbol, untyped] payload) { (Hash[Symbol, untyped]) -> untyped } -> untyped
+end
+
+class JsonRegistryStore
+  def read: () -> Array[untyped]?
+  def write: (untyped models) -> void
+end
+
+module Kernel
+  def talk_to_model: (RubyLLM::Chat chat) -> void
+
+  def read_message: (RubyLLM::Message response) -> void
+
+  def count_chat_tokens: (RubyLLM::Chat chat) -> void
+
+  def read_thinking: (RubyLLM::Thinking? thinking) -> void
+
+  def embed_text: (RubyLLM::Context context, RubyLLM::Tool weather) -> void
+
+  def moderate_text: (RubyLLM::Context context, RubyLLM::Tool weather) -> void
+
+  def paint_image: (RubyLLM::Context context, RubyLLM::Tool weather) -> void
+
+  def transcribe_audio: (RubyLLM::Context context, RubyLLM::Tool weather) -> void
+
+  def refresh_models: (RubyLLM::Models models) -> void
+
+  def count_remote_tokens: (RubyLLM::Context context) -> void
+
+  def use_mcp: (RubyLLM::Context context, RubyLLM::Tool weather) -> void
+
+  def rescue_errors: (RubyLLM::Chat chat) -> void
+
+  def inspect_attachment: () -> void
+
+  def toggle_open_telemetry: () -> void
+end

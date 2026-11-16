@@ -1,0 +1,238 @@
+module Koala
+  VERSION: String
+
+  class KoalaError < StandardError
+  end
+
+  def self.configure: () { (Configuration config) -> void } -> void
+
+  def self.config: () -> Configuration
+
+  class Configuration
+    attr_accessor access_token: String?
+    attr_accessor app_secret: String?
+    attr_accessor app_id: (String | Integer)?
+    attr_accessor app_access_token: String?
+    attr_accessor api_version: String?
+    attr_accessor oauth_callback_url: String?
+    attr_accessor preserve_form_arguments: bool?
+    attr_accessor graph_server: String
+    attr_accessor dialog_host: String
+    attr_accessor mask_tokens: bool?
+    attr_accessor rate_limit_hook: ((^(Hash[String, untyped]) -> void) | Proc)?
+    attr_accessor host_path_matcher: Regexp
+    attr_accessor video_replace: String
+    attr_accessor beta_replace: String
+  end
+
+  module Utils
+    def self.logger: () -> Logger
+
+    def self.logger=: (Logger logger) -> Logger
+  end
+
+  module HTTPService
+    class Response
+      attr_reader status: Integer
+      attr_reader body: String
+      attr_reader headers: Hash[String, String]
+
+      def data: () -> untyped
+    end
+  end
+
+  module Facebook
+    class OAuthSignatureError < KoalaError
+    end
+
+    class AppSecretNotDefinedError < KoalaError
+    end
+
+    class APIError < KoalaError
+      attr_accessor http_status: Integer?
+      attr_accessor response_body: String
+      attr_accessor fb_error_type: String?
+      attr_accessor fb_error_code: Integer?
+      attr_accessor fb_error_subcode: Integer?
+      attr_accessor fb_error_message: String?
+      attr_accessor fb_error_user_msg: String?
+      attr_accessor fb_error_user_title: String?
+      attr_accessor fb_error_trace_id: String?
+      attr_accessor fb_error_debug_trace_id: String?
+      attr_accessor fb_error_debug: String?
+      attr_accessor fb_error_rev: String?
+      attr_accessor fb_buc_usage: untyped
+      attr_accessor fb_ada_usage: untyped
+      attr_accessor fb_app_usage: untyped
+
+      def initialize: (Integer? http_status, String? response_body, ?(Hash[String, untyped] | String)? error_info) -> void
+    end
+
+    class BadFacebookResponse < APIError
+    end
+
+    class OAuthTokenRequestError < APIError
+    end
+
+    class ServerError < APIError
+    end
+
+    class ClientError < APIError
+    end
+
+    class AuthenticationError < ClientError
+    end
+
+    module GraphAPIMethods
+      type id = String | Integer
+
+      type args = Hash[String | Symbol, untyped]
+
+      type options = Hash[Symbol, untyped]
+
+      def get_object: (id id, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def get_object_metadata: (id id) ?{ (untyped result) -> untyped } -> untyped
+
+      def get_objects: (Array[id] | String ids, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def put_object: (id parent_object, String connection_name, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def delete_object: (id id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def get_connection: (id id, String connection_name, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      alias get_connections get_connection
+
+      def put_connections: (id id, String connection_name, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def delete_connections: (id id, String connection_name, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def get_picture_data: (id object, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def put_picture: (untyped picture, ?args args, ?id target_id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+                     | (untyped picture, String content_type, ?args args, ?id target_id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def put_video: (untyped video, ?args args, ?id target_id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+                   | (untyped video, String content_type, ?args args, ?id target_id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def put_wall_post: (String message, ?args attachment, ?id target_id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def put_comment: (id id, String message, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def put_like: (id id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def delete_like: (id id, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def search: (String search_terms, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def get_page_access_token: (id id, ?args args, ?options options) ?{ (String? token) -> untyped } -> untyped
+
+      def debug_token: (String input_token) ?{ (untyped result) -> untyped } -> untyped
+
+      def set_app_restrictions: (id app_id, Hash[String | Symbol, untyped] restrictions_hash, ?args args, ?options options) ?{ (untyped result) -> untyped } -> untyped
+
+      def get_page: (Array[untyped] params) ?{ (untyped result) -> untyped } -> untyped
+
+      def batch: (?options http_options) { (GraphBatchAPI batch_client) -> void } -> Array[untyped]
+               | (?options http_options) -> GraphBatchAPI
+    end
+
+    class API
+      include GraphAPIMethods
+
+      attr_reader access_token: String?
+      attr_reader app_secret: String?
+      attr_reader rate_limit_hook: ((^(Hash[String, untyped]) -> void) | Proc)?
+
+      def initialize: (?String? access_token, ?String? app_secret, ?((^(Hash[String, untyped]) -> void) | Proc)? rate_limit_hook) -> void
+
+      def graph_call: (GraphAPIMethods::id path, ?GraphAPIMethods::args args, ?String verb, ?GraphAPIMethods::options options) ?{ (untyped result) -> untyped } -> untyped
+
+      class GraphCollection < Array[untyped]
+        attr_reader paging: Hash[String, String]?
+        attr_reader summary: Hash[String, untyped]?
+        attr_reader api: API
+        attr_reader raw_response: Hash[String, untyped]
+        attr_reader headers: Hash[String, String]
+
+        def next_page: (?Hash[String | Symbol, untyped] extra_params) -> GraphCollection?
+
+        def previous_page: (?Hash[String | Symbol, untyped] extra_params) -> GraphCollection?
+
+        def next_page_params: () -> [String, Hash[String | Symbol, String]]?
+
+        def previous_page_params: () -> [String, Hash[String | Symbol, String]]?
+
+        def self.parse_page_url: (String url) -> [String, Hash[String | Symbol, String]]
+      end
+    end
+
+    class GraphBatchAPI < API
+      include GraphAPIMethods
+
+      attr_reader original_api: API
+
+      def initialize: (API api) -> void
+
+      def graph_call: (GraphAPIMethods::id path, ?GraphAPIMethods::args args, ?String verb, ?GraphAPIMethods::options options) ?{ (untyped result) -> untyped } -> nil
+
+      def execute: (?GraphAPIMethods::options http_options) -> Array[untyped]
+    end
+
+    class OAuth
+      attr_reader app_id: String | Integer | nil
+      attr_reader app_secret: String?
+      attr_reader oauth_callback_url: String?
+
+      def initialize: (?(String | Integer)? app_id, ?String? app_secret, ?String? oauth_callback_url) -> void
+
+      def get_user_info_from_cookies: (Hash[String, String] cookie_hash) -> Hash[String, untyped]?
+
+      alias get_user_info_from_cookie get_user_info_from_cookies
+
+      def url_for_oauth_code: (?Hash[Symbol, untyped] options) -> String
+
+      def url_for_access_token: (String code, ?Hash[Symbol, untyped] options) -> String
+
+      def url_for_dialog: (String dialog_type, ?Hash[Symbol, untyped] options) -> String
+
+      def generate_client_code: (String access_token) -> String
+
+      def get_access_token_info: (String code, ?Hash[Symbol, untyped] options) -> Hash[String, untyped]
+
+      def get_access_token: (String code, ?Hash[Symbol, untyped] options) -> String?
+
+      def get_app_access_token_info: (?Hash[Symbol, untyped] options) -> Hash[String, untyped]
+
+      def get_app_access_token: (?Hash[Symbol, untyped] options) -> String?
+
+      def exchange_access_token_info: (String access_token, ?Hash[Symbol, untyped] options) -> Hash[String, untyped]
+
+      def exchange_access_token: (String access_token, ?Hash[Symbol, untyped] options) -> String?
+
+      def parse_signed_request: (String input) -> Hash[String, untyped]
+    end
+
+    class RealtimeUpdates
+      attr_reader app_id: String | Integer | nil
+      attr_reader secret: String?
+
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+
+      def app_access_token: () -> String
+
+      def api: () -> API
+
+      def subscribe: (String object, String | Array[String] fields, String callback_url, String? verify_token, ?Hash[Symbol, untyped] options) -> untyped
+
+      def unsubscribe: (?String? object, ?Hash[Symbol, untyped] options) -> untyped
+
+      def list_subscriptions: (?Hash[Symbol, untyped] options) -> untyped
+
+      def self.meet_challenge: (Hash[String, String] params, ?String? verify_token) ?{ (String? token) -> boolish } -> (String | false)
+
+      def validate_update: (String body, Hash[String, String] headers) -> bool?
+    end
+  end
+end

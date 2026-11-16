@@ -1,0 +1,145 @@
+module Twitter
+  module Version
+    def self.major: () -> Integer
+    def self.minor: () -> Integer
+    def self.patch: () -> Integer
+    def self.pre: () -> String?
+    def self.to_h: () -> Hash[Symbol, Integer | String | nil]
+    def self.to_a: () -> Array[Integer | String]
+    def self.to_s: () -> String
+  end
+
+  class Client
+    attr_accessor access_token: String?
+    attr_accessor access_token_secret: String?
+    attr_accessor consumer_key: String?
+    attr_accessor consumer_secret: String?
+    attr_accessor proxy: { host: String, port: Integer, ?username: String, ?password: String }?
+    attr_accessor timeouts: { connect: Numeric, read: Numeric, write: Numeric, ?upload: Numeric } | { upload: Numeric } | nil
+    attr_accessor dev_environment: String?
+    attr_writer user_agent: String
+
+    def initialize: (?Hash[Symbol, untyped] options) ?{ (self) -> void } -> void
+
+    def user_token?: () -> bool
+    def user_agent: () -> String
+    def credentials: () -> { consumer_key: String?, consumer_secret: String?, token: String?, token_secret: String? }
+    def credentials?: () -> bool
+  end
+
+  class Error < StandardError
+    class ClientError < Error
+    end
+
+    class BadRequest < ClientError
+    end
+
+    class Unauthorized < ClientError
+    end
+
+    class Forbidden < ClientError
+    end
+
+    class RequestEntityTooLarge < ClientError
+    end
+
+    class AlreadyFavorited < Forbidden
+    end
+
+    class AlreadyRetweeted < Forbidden
+    end
+
+    class DuplicateStatus < Forbidden
+    end
+
+    class NotFound < ClientError
+    end
+
+    class NotAcceptable < ClientError
+    end
+
+    class UnprocessableEntity < ClientError
+    end
+
+    class TooManyRequests < ClientError
+    end
+
+    class ServerError < Error
+    end
+
+    class InternalServerError < ServerError
+    end
+
+    class BadGateway < ServerError
+    end
+
+    class ServiceUnavailable < ServerError
+    end
+
+    class GatewayTimeout < ServerError
+    end
+
+    class MediaError < Error
+    end
+
+    class InvalidMedia < MediaError
+    end
+
+    class MediaInternalError < MediaError
+    end
+
+    class UnsupportedMedia < MediaError
+    end
+
+    class TimeoutError < Error
+    end
+
+    FORBIDDEN_MESSAGES: Proc
+
+    module Code
+      AUTHENTICATION_PROBLEM: Integer
+      RESOURCE_NOT_FOUND: Integer
+      SUSPENDED_ACCOUNT: Integer
+      DEPRECATED_CALL: Integer
+      RATE_LIMIT_EXCEEDED: Integer
+      INVALID_OR_EXPIRED_TOKEN: Integer
+      SSL_REQUIRED: Integer
+      UNABLE_TO_VERIFY_CREDENTIALS: Integer
+      OVER_CAPACITY: Integer
+      INTERNAL_ERROR: Integer
+      OAUTH_TIMESTAMP_OUT_OF_RANGE: Integer
+      ALREADY_FAVORITED: Integer
+      FOLLOW_ALREADY_REQUESTED: Integer
+      FOLLOW_LIMIT_EXCEEDED: Integer
+      PROTECTED_STATUS: Integer
+      OVER_UPDATE_LIMIT: Integer
+      DUPLICATE_STATUS: Integer
+      BAD_AUTHENTICATION_DATA: Integer
+      SPAM: Integer
+      LOGIN_VERIFICATION_NEEDED: Integer
+      ENDPOINT_RETIRED: Integer
+      CANNOT_WRITE: Integer
+      CANNOT_MUTE: Integer
+      CANNOT_UNMUTE: Integer
+    end
+
+    attr_reader code: Integer?
+    attr_reader rate_limit: RateLimit
+  end
+
+  class Base
+    attr_reader attrs: Hash[Symbol, untyped]
+
+    def initialize: (?Hash[Symbol, untyped]? attrs) -> void
+    def to_h: () -> Hash[Symbol, untyped]
+    def to_hash: () -> Hash[Symbol, untyped]
+  end
+
+  class RateLimit < Base
+    def limit: () -> Integer?
+    def remaining: () -> Integer?
+    def reset_at: () -> Time?
+    def reset_in: () -> Integer?
+    def retry_after: () -> Integer?
+  end
+end

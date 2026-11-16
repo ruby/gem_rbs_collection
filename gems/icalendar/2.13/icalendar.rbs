@@ -1,0 +1,319 @@
+module Icalendar
+  VERSION: String
+
+  type text_input = String | Value
+  type uri_input = String | URI::Generic | Value
+  type date_input = Value | ::Date | ::DateTime | ::Time | String
+
+  class DowncasedHash
+    def []: (String | Symbol key) -> (String | Array[String])?
+    def []=: (String | Symbol key, String | Array[String] value) -> (String | Array[String])
+    def has_key?: (String | Symbol key) -> bool
+    def empty?: () -> bool
+  end
+
+  class Value < SimpleDelegator
+    attr_accessor ical_params: Hash[String | Symbol, untyped] | DowncasedHash
+    attr_accessor context: Hash[String | Symbol, untyped] | DowncasedHash
+
+    def initialize: (untyped value, ?Hash[String | Symbol, untyped] params, ?Hash[String | Symbol, untyped] context) -> void
+    def value: () -> untyped
+    def is_a?: (Module klass) -> bool
+    def kind_of?: (Module klass) -> bool
+    def to_s: () -> String
+    def ical_param: (String | Symbol key, String | Array[String] value) -> (String | Array[String])
+  end
+
+  module Values
+    class Text < Value
+      def value: () -> String
+    end
+
+    class Uri < Value
+      def value: () -> (URI::Generic | String)
+    end
+
+    class CalAddress < Uri
+    end
+
+    class Date < Value
+      FORMAT: String
+
+      def initialize: (::Date | ::Time | ::DateTime | String value, ?Hash[String | Symbol, untyped] params, ?Hash[String | Symbol, untyped] context) -> void
+      def value: () -> ::Date
+      def <=>: (untyped other) -> ::Integer?
+      def <: (untyped other) -> bool
+      def <=: (untyped other) -> bool
+      def >: (untyped other) -> bool
+      def >=: (untyped other) -> bool
+      def between?: (untyped min, untyped max) -> bool
+
+      class FormatError < ArgumentError
+      end
+    end
+
+    class DateTime < Value
+      FORMAT: String
+
+      def initialize: (::Date | ::Time | ::DateTime | String value, ?Hash[String | Symbol, untyped] params, ?Hash[String | Symbol, untyped] context) -> void
+      def <=>: (untyped other) -> ::Integer?
+      def <: (untyped other) -> bool
+      def <=: (untyped other) -> bool
+      def >: (untyped other) -> bool
+      def >=: (untyped other) -> bool
+      def between?: (untyped min, untyped max) -> bool
+      def utc?: () -> bool
+
+      class FormatError < ArgumentError
+      end
+    end
+
+    class DateOrDateTime < Value
+      def initialize: (::Date | ::Time | ::DateTime | String value, ?Hash[String | Symbol, untyped] params, ?Hash[String | Symbol, untyped] context) -> void
+      def call: () -> (Date | DateTime)
+    end
+
+    class Duration < Value
+      def initialize: (String | Duration value, ?Hash[String | Symbol, untyped] params, ?Hash[String | Symbol, untyped] context) -> void
+      def past?: () -> bool
+    end
+
+    class Integer < Value
+      def value: () -> ::Integer
+    end
+
+    class Recur < Value
+      def valid?: () -> bool
+    end
+
+    class Period < Value
+    end
+
+    module Helpers
+      class Array < Value
+        def value: () -> ::Array[Value]
+      end
+    end
+
+    class UtcOffset < Value
+      def behind?: () -> bool
+    end
+  end
+
+  module HasProperties
+    def valid?: (?boolish strict) -> bool
+    def property: (String | Symbol property_name) -> (Value | Array[Value] | nil)
+    def custom_property: (String | Symbol property_name) -> Array[Value]
+    def append_custom_property: (String | Symbol property_name, text_input value) -> untyped
+  end
+
+  module HasComponents
+    def add_component: [T < Component] (T c) ?{ (T) -> void } -> T
+    def add_custom_component: [T < Component] (String | Symbol component_name, T c) ?{ (T) -> void } -> T
+    def custom_component: (String | Symbol component_name) -> Array[Component]
+  end
+
+  class Component
+    include HasProperties
+    include HasComponents
+
+    attr_reader name: String
+    attr_reader ical_name: String
+    attr_reader parent: Component?
+
+    def self.parse: (String | IO | StringIO source) -> Array[instance]
+    def new_uid: () -> String
+    def to_ical: () -> String
+  end
+
+  class Alarm < Component
+    def initialize: () -> void
+
+    def action: () -> Values::Text?
+    def action=: (text_input? value) -> untyped
+    def trigger: () -> Values::Duration?
+    def trigger=: ((String | Value)? value) -> untyped
+    def description: () -> Values::Text?
+    def description=: (text_input? value) -> untyped
+    def summary: () -> Values::Text?
+    def summary=: (text_input? value) -> untyped
+    def attendee: () -> Array[Values::CalAddress | Values::Helpers::Array]
+    def attendee=: (uri_input | Array[uri_input] | nil value) -> untyped
+    def append_attendee: (uri_input value) -> untyped
+    def duration: () -> Values::Duration?
+    def duration=: ((String | Value)? value) -> untyped
+    def repeat: () -> Values::Integer?
+    def repeat=: ((::Integer | Value)? value) -> untyped
+    def attach: () -> Array[Values::Uri | Values::Helpers::Array]
+    def attach=: (uri_input | Array[uri_input] | nil value) -> untyped
+    def append_attach: (uri_input value) -> untyped
+    def uid: () -> Values::Text?
+    def uid=: (text_input? value) -> untyped
+    def acknowledged: () -> Values::DateTime?
+    def acknowledged=: (date_input? value) -> untyped
+  end
+
+  class Event < Component
+    def initialize: () -> void
+
+    def dtstamp: () -> Values::DateTime?
+    def dtstamp=: (date_input? value) -> untyped
+    def uid: () -> Values::Text?
+    def uid=: (text_input? value) -> untyped
+    def dtstart: () -> (Values::DateTime | Values::Date)?
+    def dtstart=: (date_input? value) -> untyped
+    def dtend: () -> (Values::DateTime | Values::Date)?
+    def dtend=: (date_input? value) -> untyped
+    def duration: () -> Values::Duration?
+    def duration=: ((String | Value)? value) -> untyped
+    def ip_class: () -> Values::Text?
+    def ip_class=: (text_input? value) -> untyped
+    def created: () -> Values::DateTime?
+    def created=: (date_input? value) -> untyped
+    def description: () -> Values::Text?
+    def description=: (text_input? value) -> untyped
+    def last_modified: () -> Values::DateTime?
+    def last_modified=: (date_input? value) -> untyped
+    def location: () -> Values::Text?
+    def location=: (text_input? value) -> untyped
+    def organizer: () -> Values::CalAddress?
+    def organizer=: (uri_input? value) -> untyped
+    def priority: () -> Values::Integer?
+    def priority=: ((::Integer | String | Value)? value) -> untyped
+    def sequence: () -> Values::Integer?
+    def sequence=: ((::Integer | String | Value)? value) -> untyped
+    def status: () -> Values::Text?
+    def status=: (text_input? value) -> untyped
+    def summary: () -> Values::Text?
+    def summary=: (text_input? value) -> untyped
+    def transp: () -> Values::Text?
+    def transp=: (text_input? value) -> untyped
+    def url: () -> Values::Uri?
+    def url=: (uri_input? value) -> untyped
+    def recurrence_id: () -> (Values::DateTime | Values::Date)?
+    def recurrence_id=: (date_input? value) -> untyped
+
+    def rrule: () -> Array[Values::Recur]
+    def rrule=: (text_input | Array[text_input] | nil value) -> untyped
+    def append_rrule: (text_input value) -> untyped
+    def attach: () -> Array[Values::Uri | Values::Helpers::Array]
+    def attach=: (uri_input | Array[uri_input] | nil value) -> untyped
+    def append_attach: (uri_input value) -> untyped
+    def attendee: () -> Array[Values::CalAddress | Values::Helpers::Array]
+    def attendee=: (uri_input | Array[uri_input] | nil value) -> untyped
+    def append_attendee: (uri_input value) -> untyped
+    def categories: () -> Array[Values::Text | Values::Helpers::Array]
+    def categories=: (text_input | Array[text_input] | nil value) -> untyped
+    def append_categories: (text_input value) -> untyped
+    def comment: () -> Array[Values::Text | Values::Helpers::Array]
+    def comment=: (text_input | Array[text_input] | nil value) -> untyped
+    def append_comment: (text_input value) -> untyped
+    def exdate: () -> Array[Values::DateTime | Values::Date | Values::Helpers::Array]
+    def exdate=: (date_input | Array[date_input] | nil value) -> untyped
+    def append_exdate: (date_input value) -> untyped
+    def rdate: () -> Array[Values::DateTime | Values::Date | Values::Period | Values::Helpers::Array]
+    def rdate=: (date_input | Array[date_input] | nil value) -> untyped
+    def append_rdate: (date_input value) -> untyped
+
+    def alarm: (?Alarm c) ?{ (Alarm) -> void } -> Alarm
+    def add_alarm: (Alarm c) -> Alarm
+    def alarms: () -> Array[Alarm]
+    def has_alarm?: () -> bool
+  end
+
+  class Timezone < Component
+    module TzProperties
+      def dtstart: () -> Values::DateTime?
+      def dtstart=: (date_input? value) -> untyped
+      def tzoffsetfrom: () -> Values::UtcOffset?
+      def tzoffsetfrom=: ((String | Value)? value) -> untyped
+      def tzoffsetto: () -> Values::UtcOffset?
+      def tzoffsetto=: ((String | Value)? value) -> untyped
+      def tzname: () -> Array[Values::Text | Values::Helpers::Array]
+      def tzname=: (text_input | Array[text_input] | nil value) -> untyped
+      def rrule: () -> Array[Values::Recur]
+      def rrule=: (text_input | Array[text_input] | nil value) -> untyped
+    end
+
+    class Daylight < Component
+      include TzProperties
+
+      def initialize: () -> void
+    end
+
+    class Standard < Component
+      include TzProperties
+
+      def initialize: () -> void
+    end
+
+    def initialize: () -> void
+
+    def tzid: () -> Values::Text?
+    def tzid=: (text_input? value) -> untyped
+    def daylight: (?Daylight c) ?{ (Daylight) -> void } -> Daylight
+    def add_daylight: (Daylight c) -> Daylight
+    def daylights: () -> Array[Daylight]
+    def standard: (?Standard c) ?{ (Standard) -> void } -> Standard
+    def add_standard: (Standard c) -> Standard
+    def standards: () -> Array[Standard]
+  end
+
+  class Calendar < Component
+    def initialize: () -> void
+
+    def version: () -> Values::Text?
+    def version=: (text_input? value) -> untyped
+    def prodid: () -> Values::Text?
+    def prodid=: (text_input? value) -> untyped
+    def calscale: () -> Values::Text?
+    def calscale=: (text_input? value) -> untyped
+    def ip_method: () -> Values::Text?
+    def ip_method=: (text_input? value) -> untyped
+    def uid: () -> Values::Text?
+    def uid=: (text_input? value) -> untyped
+    def url: () -> Values::Uri?
+    def url=: (uri_input? value) -> untyped
+    def last_modified: () -> Values::DateTime?
+    def last_modified=: (date_input? value) -> untyped
+    def ip_name: () -> Array[Values::Text | Values::Helpers::Array]
+    def ip_name=: (text_input | Array[text_input] | nil value) -> untyped
+    def description: () -> Array[Values::Text | Values::Helpers::Array]
+    def description=: (text_input | Array[text_input] | nil value) -> untyped
+
+    def publish: () -> self
+    def request: () -> self
+    def reply: () -> self
+    def add: () -> self
+    def cancel: () -> self
+    def refresh: () -> self
+    def counter: () -> self
+    def decline_counter: () -> self
+
+    def event: (?Event c) ?{ (Event) -> void } -> Event
+    def add_event: (Event c) -> Event
+    def events: () -> Array[Event]
+    def find_event: (String id) -> Event?
+    def has_event?: () -> bool
+    def timezone: (?Timezone c) ?{ (Timezone) -> void } -> Timezone
+    def add_timezone: (Timezone c) -> Timezone
+    def timezones: () -> Array[Timezone]
+    def find_timezone: (String id) -> Timezone?
+    def has_timezone?: () -> bool
+  end
+
+  class Parser
+    attr_reader source: IO | StringIO
+    attr_reader strict: bool
+    attr_reader verbose: bool
+
+    def initialize: (String | IO | StringIO source, ?bool strict, ?bool verbose) -> void
+    def parse: () -> Array[Calendar]
+  end
+end
+
+module TZInfo
+  class Timezone
+    def ical_timezone: (::Time | ::DateTime date, ?bool? dst) -> Icalendar::Timezone
+  end
+end

@@ -1,0 +1,441 @@
+module Net
+  class IMAP < Net::Protocol
+    VERSION: String
+    PORT: Integer
+    SSL_PORT: Integer
+
+    type sequence_set_input = Integer | String | Symbol | Range[Integer] | Array[Integer | String | Range[Integer]] | Set[Integer] | SequenceSet
+
+    type fetch_attr = String | Array[String]
+
+    type flag_list = Array[Symbol | String]
+
+    type ssl_option = bool | Hash[Symbol, untyped]
+
+    type response_handler = ^(UntaggedResponse | TaggedResponse | ContinuationRequest) -> void
+
+    type bodystructure = BodyTypeBasic | BodyTypeText | BodyTypeMessage | BodyTypeMultipart
+
+    include MonitorMixin
+
+    def initialize: (
+      String host,
+      ?port: Integer?,
+      ?ssl: ssl_option?,
+      ?response_handlers: Array[response_handler]?,
+      ?config: Config,
+      ?open_timeout: Numeric,
+      ?idle_response_timeout: Numeric,
+      ?max_response_size: Numeric?,
+      ?debug: bool,
+      ?sasl_ir: bool | :when_capabilities_cached,
+      ?enforce_logindisabled: bool | :when_capabilities_cached
+    ) -> void
+
+    def self.SequenceSet: (?sequence_set_input? set) -> SequenceSet
+    def self.config: () -> Config
+    def self.debug: () -> bool
+    def self.debug=: (bool val) -> bool
+    def self.default_port: () -> Integer
+    def self.default_tls_port: () -> Integer
+    def self.default_imap_port: () -> Integer
+    def self.default_imaps_port: () -> Integer
+    def self.default_ssl_port: () -> Integer
+    def self.encode_utf7: (String s) -> String
+    def self.decode_utf7: (String s) -> String
+    def self.encode_date: (Date | Time date) -> String
+    def self.decode_date: (String string) -> Date
+    def self.encode_datetime: (Time | DateTime time) -> String
+    def self.decode_datetime: (String string) -> DateTime
+    def self.decode_time: (String string) -> Time
+
+    attr_reader greeting: UntaggedResponse?
+    attr_reader config: Config
+    attr_reader host: String
+    attr_reader port: Integer
+    attr_reader ssl_ctx: OpenSSL::SSL::SSLContext?
+
+    def open_timeout: () -> Numeric
+    def idle_response_timeout: () -> Numeric
+    def max_response_size: () -> Numeric?
+    def max_response_size=: (Numeric? val) -> Numeric?
+
+    def tls_verified?: () -> bool
+    def tls_connected?: () -> bool
+    def tls_socket?: () -> bool
+    def disconnect: (?timeout: Numeric?) -> void
+    def disconnected?: () -> bool
+
+    def capable?: (String | Symbol capability) -> bool
+    alias capability? capable?
+    def capabilities: () -> Array[String]
+    def auth_mechanisms: () -> Array[String]
+    def auth_capable?: (String | Symbol mechanism) -> bool
+    def capabilities_cached?: () -> bool
+    def clear_cached_capabilities: () -> void
+    def capability: () -> Array[String]
+    def noop: () -> TaggedResponse
+    def logout: () -> TaggedResponse
+    def logout!: () -> TaggedResponse?
+    def starttls: (**untyped options) -> TaggedResponse
+    def authenticate: (
+      String | Symbol mechanism,
+      *String args,
+      ?sasl_ir: bool | :when_capabilities_cached,
+      **untyped props
+    ) ?{ (String) -> String? } -> TaggedResponse
+    def login: (String user, String password) -> TaggedResponse
+
+    def select: (String mailbox, ?condstore: bool) -> TaggedResponse
+    def examine: (String mailbox, ?condstore: bool) -> TaggedResponse
+    def create: (String mailbox) -> TaggedResponse
+    def delete: (String mailbox) -> TaggedResponse
+    def rename: (String mailbox, String newname) -> TaggedResponse
+    def subscribe: (String mailbox) -> TaggedResponse
+    def unsubscribe: (String mailbox) -> TaggedResponse
+    def list: (String refname, String mailbox) -> Array[MailboxList]
+    def lsub: (String refname, String mailbox) -> Array[MailboxList]
+    def status: (String mailbox, Array[String] attr) -> Hash[String, Integer | String]?
+    def append: (String mailbox, String message, ?flag_list? flags, ?Time? date_time) -> TaggedResponse
+    def check: () -> TaggedResponse
+    def close: () -> TaggedResponse
+    def unselect: () -> TaggedResponse
+    def expunge: () -> (Array[Integer] | VanishedData)
+    def uid_expunge: (sequence_set_input uid_set) -> (Array[Integer] | VanishedData)
+
+    def search: (String | Array[untyped] criteria, ?String? charset) -> SearchResult
+              | (String | Array[untyped] criteria, ?charset: String?, return: Array[String | Symbol | Range[Integer]]) -> (ESearchResult | SearchResult)
+    def uid_search: (String | Array[untyped] criteria, ?String? charset) -> SearchResult
+                  | (String | Array[untyped] criteria, ?charset: String?, return: Array[String | Symbol | Range[Integer]]) -> (ESearchResult | SearchResult)
+    def fetch: (sequence_set_input set, fetch_attr attr, ?changedsince: Integer?) -> Array[FetchData]
+    def uid_fetch: (sequence_set_input set, fetch_attr attr, ?changedsince: Integer?, ?partial: Range[Integer]?) -> Array[FetchData]
+    def store: (sequence_set_input set, String attr, flag_list | Symbol | String flags, ?unchangedsince: Integer?) -> Array[FetchData]
+    def uid_store: (sequence_set_input set, String attr, flag_list | Symbol | String flags, ?unchangedsince: Integer?) -> Array[FetchData]
+    def copy: (sequence_set_input set, String mailbox) -> TaggedResponse
+    def uid_copy: (sequence_set_input set, String mailbox) -> TaggedResponse
+    def move: (sequence_set_input set, String mailbox) -> TaggedResponse
+    def uid_move: (sequence_set_input set, String mailbox) -> TaggedResponse
+    def sort: (Array[String] sort_keys, String | Array[untyped] search_keys, String charset) -> Array[Integer]
+    def uid_sort: (Array[String] sort_keys, String | Array[untyped] search_keys, String charset) -> Array[Integer]
+    def thread: (String algorithm, String | Array[untyped] search_keys, String charset) -> Array[ThreadMember]
+    def uid_thread: (String algorithm, String | Array[untyped] search_keys, String charset) -> Array[ThreadMember]
+
+    def enable: (*String | Symbol capabilities) -> TaggedResponse
+    def enabled?: (String | Symbol capability) -> bool
+    def idle: (?Numeric? timeout) { (UntaggedResponse | TaggedResponse | ContinuationRequest) -> void } -> TaggedResponse?
+    def idle_done: () -> void
+
+    def responses: () -> Hash[String, Array[untyped]]
+                 | (String | Symbol type) -> Array[untyped]
+                 | [T] (String | Symbol type) { (Array[untyped]) -> T } -> T
+                 | [T] () { (Hash[String, Array[untyped]]) -> T } -> T
+    def clear_responses: (?String | Symbol? type) -> untyped
+    def response_handlers: () -> Array[response_handler]
+    def add_response_handler: (?response_handler? handler) ?{ (UntaggedResponse | TaggedResponse | ContinuationRequest) -> void } -> Array[response_handler]
+    def remove_response_handler: (response_handler handler) -> response_handler?
+
+    class Config
+      def self.default: () -> Config
+      def self.global: () -> Config
+
+      attr_accessor debug: bool
+      alias debug? debug
+      attr_accessor open_timeout: Integer
+      attr_accessor idle_response_timeout: Integer
+      attr_accessor max_response_size: Integer?
+      attr_accessor sasl_ir: bool | :when_capabilities_cached
+      attr_accessor enforce_logindisabled: bool | :when_capabilities_cached
+
+      def initialize: (?Config parent, **untyped attrs) -> void
+      def update: (**untyped attrs) -> self
+      def with: (**untyped attrs) ?{ (Config) -> void } -> Config
+      def load_defaults: (Numeric | Symbol version) -> self
+      def to_h: () -> Hash[Symbol, untyped]
+    end
+
+    class SequenceSet
+      def self.[]: (sequence_set_input first, *sequence_set_input rest) -> SequenceSet
+      def self.try_convert: (untyped obj) -> SequenceSet?
+      def self.empty: () -> SequenceSet
+      def self.full: () -> SequenceSet
+
+      def initialize: (?sequence_set_input? input) -> void
+      def string: () -> String?
+      def to_s: () -> String
+      def empty?: () -> bool
+      def valid?: () -> bool
+      def include?: (Integer | Symbol | String element) -> bool
+      def |: (sequence_set_input other) -> SequenceSet
+      def -: (sequence_set_input other) -> SequenceSet
+      def &: (sequence_set_input other) -> SequenceSet
+      def add: (sequence_set_input element) -> self
+      def <<: (sequence_set_input element) -> self
+      def to_a: () -> Array[Integer | Range[Integer] | Symbol]
+      def numbers: () -> Array[Integer]
+      def ranges: () -> Array[Range[Integer]]
+      def each_number: () { (Integer) -> void } -> self
+                     | () -> Enumerator[Integer, self]
+      def count: () -> Integer
+      def min: () -> (Integer | Symbol)?
+      def max: () -> (Integer | Symbol)?
+      def freeze: () -> self
+    end
+
+    class TaggedResponse < Struct[untyped]
+      attr_reader tag: String
+      attr_reader name: String
+      attr_reader data: ResponseText
+      attr_reader raw_data: String
+    end
+
+    class UntaggedResponse < Struct[untyped]
+      attr_reader name: String
+      attr_reader data: untyped
+      attr_reader raw_data: String
+    end
+
+    class ContinuationRequest < Struct[untyped]
+      attr_reader data: ResponseText
+      attr_reader raw_data: String
+    end
+
+    class ResponseText < Struct[untyped]
+      attr_reader code: ResponseCode?
+      attr_reader text: String
+    end
+
+    class ResponseCode < Struct[untyped]
+      attr_reader name: String
+      attr_reader data: untyped
+    end
+
+    class MailboxList < Struct[untyped]
+      attr_reader attr: Array[Symbol]
+      attr_reader delim: String?
+      attr_reader name: String
+    end
+
+    class ThreadMember < Struct[untyped]
+      attr_reader seqno: Integer?
+      attr_reader children: Array[ThreadMember]
+      def to_sequence_set: () -> SequenceSet
+      def all_seqnos: (?ThreadMember node) -> Array[Integer]
+    end
+
+    class Address < Struct[untyped]
+      attr_reader name: String?
+      attr_reader route: String?
+      attr_reader mailbox: String?
+      attr_reader host: String?
+    end
+
+    class Envelope < Struct[untyped]
+      attr_reader date: String?
+      attr_reader subject: String?
+      attr_reader from: Array[Address]?
+      attr_reader sender: Array[Address]?
+      attr_reader reply_to: Array[Address]?
+      attr_reader to: Array[Address]?
+      attr_reader cc: Array[Address]?
+      attr_reader bcc: Array[Address]?
+      attr_reader in_reply_to: String?
+      attr_reader message_id: String?
+    end
+
+    class ContentDisposition < Struct[untyped]
+      attr_reader dsp_type: String
+      attr_reader param: Hash[String, String]?
+    end
+
+    module BodyStructure
+      def multipart?: () -> bool
+    end
+
+    class BodyTypeBasic < Struct[untyped]
+      include BodyStructure
+
+      attr_reader media_type: String
+      attr_reader subtype: String?
+      attr_reader param: Hash[String, String]?
+      attr_reader content_id: String?
+      attr_reader description: String?
+      attr_reader encoding: String?
+      attr_reader size: Integer
+      attr_reader md5: String?
+      attr_reader disposition: ContentDisposition?
+      attr_reader language: Array[String]?
+      attr_reader location: String?
+      attr_reader extension: Array[untyped]?
+    end
+
+    class BodyTypeText < Struct[untyped]
+      include BodyStructure
+
+      attr_reader media_type: String
+      attr_reader subtype: String?
+      attr_reader param: Hash[String, String]?
+      attr_reader content_id: String?
+      attr_reader description: String?
+      attr_reader encoding: String?
+      attr_reader size: Integer
+      attr_reader lines: Integer
+      attr_reader md5: String?
+      attr_reader disposition: ContentDisposition?
+      attr_reader language: Array[String]?
+      attr_reader location: String?
+      attr_reader extension: Array[untyped]?
+    end
+
+    class BodyTypeMessage < Struct[untyped]
+      include BodyStructure
+
+      attr_reader media_type: String
+      attr_reader subtype: String?
+      attr_reader param: Hash[String, String]?
+      attr_reader content_id: String?
+      attr_reader description: String?
+      attr_reader encoding: String?
+      attr_reader size: Integer
+      attr_reader envelope: Envelope
+      attr_reader body: bodystructure
+      attr_reader lines: Integer
+      attr_reader md5: String?
+      attr_reader disposition: ContentDisposition?
+      attr_reader language: Array[String]?
+      attr_reader location: String?
+      attr_reader extension: Array[untyped]?
+    end
+
+    class BodyTypeMultipart < Struct[untyped]
+      include BodyStructure
+
+      attr_reader media_type: String
+      attr_reader subtype: String?
+      attr_reader parts: Array[bodystructure]
+      attr_reader param: Hash[String, String]?
+      attr_reader disposition: ContentDisposition?
+      attr_reader language: Array[String]?
+      attr_reader location: String?
+      attr_reader extension: Array[untyped]?
+    end
+
+    class FetchStruct < Struct[untyped]
+      attr_reader attr: Hash[String, untyped]
+
+      def attr_upcase: () -> Hash[String, untyped]
+      def body: () -> untyped
+      def message: (?offset: Integer?) -> String?
+      def part: (Integer index, *Integer subparts, ?offset: Integer?) -> String?
+      def header: (*Integer part_nums, ?fields: Array[String]?, ?except: Array[String]?, ?offset: Integer?) -> String?
+      def text: (*Integer part, ?offset: Integer?) -> String?
+      def bodystructure: () -> bodystructure?
+      alias body_structure bodystructure
+      def envelope: () -> Envelope?
+      def flags: () -> Array[Symbol]?
+      def internaldate: () -> Time?
+      alias internal_date internaldate
+      def rfc822: () -> String?
+      def rfc822_size: () -> Integer?
+      def size: () -> Integer?
+      def rfc822_header: () -> String?
+      def rfc822_text: () -> String?
+      def uid: () -> Integer?
+      def modseq: () -> Integer?
+    end
+
+    class FetchData < FetchStruct
+      attr_reader seqno: Integer
+
+      def self.new: (Integer seqno, Hash[String, untyped] attr) -> instance
+    end
+
+    class UIDFetchData < FetchStruct
+      attr_reader uid: Integer
+
+      def self.new: (Integer uid, Hash[String, untyped] attr) -> instance
+    end
+
+    class SearchResult < Array[Integer]
+      attr_reader modseq: Integer?
+
+      def to_sequence_set: () -> SequenceSet
+    end
+
+    class ESearchResult < Data
+      attr_reader tag: String?
+      attr_reader uid: bool
+      attr_reader data: Array[untyped]
+
+      def to_a: () -> Array[Integer]
+      def to_sequence_set: () -> SequenceSet
+      def each: () { (Integer) -> void } -> self
+              | () -> Enumerator[Integer, self]
+      def uid?: () -> bool
+      def min: () -> Integer?
+      def max: () -> Integer?
+      def all: () -> SequenceSet?
+      def count: () -> Integer?
+      def modseq: () -> Integer?
+    end
+
+    class VanishedData < Data
+      attr_reader uids: SequenceSet
+      attr_reader earlier: bool
+
+      def to_a: () -> Array[Integer]
+      def each: () { (Integer) -> void } -> self
+              | () -> Enumerator[Integer, self]
+    end
+
+    class Error < StandardError
+    end
+
+    class LoginDisabledError < Error
+    end
+
+    class DataFormatError < Error
+    end
+
+    class ResponseReadError < Error
+    end
+
+    class ResponseTooLargeError < ResponseReadError
+      attr_reader bytes_read: Integer?
+      attr_reader literal_size: Integer?
+      attr_reader max_response_size: Integer?
+    end
+
+    class ResponseParseError < Error
+      attr_reader parser_class: Class
+      attr_reader string: String?
+      attr_reader pos: Integer?
+      attr_reader lex_state: Symbol?
+      attr_reader token: untyped
+    end
+
+    class ResponseError < Error
+      attr_reader response: TaggedResponse | UntaggedResponse
+    end
+
+    class NoResponseError < ResponseError
+    end
+
+    class BadResponseError < ResponseError
+    end
+
+    class ByeResponseError < ResponseError
+    end
+
+    class UnknownResponseError < ResponseError
+    end
+
+    class InvalidResponseError < Error
+    end
+
+    class InvalidTaggedResponseError < InvalidResponseError
+      attr_reader state: Symbol
+      attr_reader command: untyped
+      attr_reader response: TaggedResponse
+    end
+  end
+end

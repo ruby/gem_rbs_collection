@@ -1,0 +1,133 @@
+module GObject
+  class GObject
+  end
+end
+
+module Vips
+  LIBRARY_VERSION: String
+
+  class Error < RuntimeError
+    def initialize: (?String? msg) -> void
+    def to_s: () -> String
+  end
+
+  class Object < GObject::GObject
+  end
+
+  class Image < Object
+    # Constructors
+    def self.new_from_file: (String name, **untyped opts) -> Image
+    def self.new_from_buffer: (String data, String option_string, **untyped opts) -> Image
+    def self.new_from_memory: (String data, Integer width, Integer height, Integer bands, Symbol format) -> Image
+    def self.new_from_memory_copy: (String data, Integer width, Integer height, Integer bands, Symbol format) -> Image
+    def self.new_from_array: (Array[untyped] array, ?Numeric scale, ?Numeric offset) -> Image
+    def self.matrix_from_array: (Integer width, Integer height, Array[Numeric] array) -> Image
+    def new_from_image: (Numeric | Array[Numeric] value) -> Image
+
+    # Loaders and generators
+    def self.thumbnail: (String filename, Integer width, **untyped opts) -> Image
+    def self.thumbnail_buffer: (String buffer, Integer width, **untyped opts) -> Image
+    def self.pngload_buffer: (String buffer, **untyped opts) -> Image
+    def self.jpegload_buffer: (String buffer, **untyped opts) -> Image
+    def self.black: (Integer width, Integer height, **untyped opts) -> Image
+    def self.text: (String text, **untyped opts) -> Image
+
+    # Savers
+    def write_to_file: (String name, **untyped opts) -> void
+    def write_to_buffer: (String format_string, **untyped opts) -> String
+    def write_to_memory: () -> String
+
+    # Properties and metadata
+    def width: () -> Integer
+    def height: () -> Integer
+    def bands: () -> Integer
+    def format: () -> Symbol
+    def interpretation: () -> Symbol
+    def coding: () -> Symbol
+    def filename: () -> String
+    def xres: () -> Float
+    def yres: () -> Float
+    def size: () -> [Integer, Integer]
+    def has_alpha?: () -> bool
+    def get_fields: () -> Array[String]
+    def get_typeof: (String name) -> Integer
+    def get: (String name) -> untyped
+    def mutate: () { (MutableImage) -> void } -> Image
+    def copy_memory: () -> Image
+    def add_alpha: () -> Image
+    def to_a: () -> Array[Array[Array[Numeric]]]
+    def []: (Numeric | Range[Integer] index) -> Image
+
+    # Arithmetic and relational operators
+    def +: (Image | Numeric | Array[Numeric] other) -> Image
+    def -: (Image | Numeric | Array[Numeric] other) -> Image
+    def *: (Image | Numeric | Array[Numeric] other) -> Image
+    def /: (Image | Numeric | Array[Numeric] other) -> Image
+    def %: (Image | Numeric | Array[Numeric] other) -> Image
+    def **: (Image | Numeric | Array[Numeric] other) -> Image
+    def |: (Image | Numeric | Array[Numeric] other) -> Image
+    def &: (Image | Numeric | Array[Numeric] other) -> Image
+    def <: (Image | Numeric | Array[Numeric] other) -> Image
+    def <=: (Image | Numeric | Array[Numeric] other) -> Image
+    def >: (Image | Numeric | Array[Numeric] other) -> Image
+    def >=: (Image | Numeric | Array[Numeric] other) -> Image
+
+    # Operations
+    def thumbnail_image: (Integer width, **untyped opts) -> Image
+    def resize: (Numeric scale, **untyped opts) -> Image
+    def copy: (**untyped opts) -> Image
+    def flatten: (**untyped opts) -> Image
+    def autorot: (**untyped opts) -> Image
+    def insert: (Image sub, Integer x, Integer y, **untyped opts) -> Image
+    def crop: (Integer left, Integer top, Integer width, Integer height) -> Image
+    def extract_area: (Integer left, Integer top, Integer width, Integer height) -> Image
+    def extract_band: (Integer band, **untyped opts) -> Image
+    def embed: (Numeric x, Numeric y, Numeric width, Numeric height, **untyped opts) -> Image
+    def bandfold: (**untyped opts) -> Image
+    def affine: (Array[Numeric] matrix, **untyped opts) -> Image
+    def bandjoin: (Image | Numeric | Array[Image | Numeric] other) -> Image
+    def composite: (Image | Array[Image] overlay, String | Symbol | Array[String | Symbol] mode, **untyped opts) -> Image
+    def colourspace: (Symbol | String space, **untyped opts) -> Image
+    def cast: (Symbol | String format, **untyped opts) -> Image
+    def flip: (Symbol | String direction) -> Image
+    def rot: (Symbol | String angle) -> Image
+    def ifthenelse: (Image | Numeric | Array[Numeric] then_image, Image | Numeric | Array[Numeric] else_image, **untyped opts) -> Image
+    def draw_rect: (Numeric | Array[Numeric] ink, Integer left, Integer top, Integer width, Integer height, **untyped opts) -> Image
+    def stats: () -> Image
+    def getpoint: (Integer x, Integer y, **untyped opts) -> Array[Float]
+    def find_trim: (**untyped opts) -> [Integer, Integer, Integer, Integer]
+    def avg: () -> Float
+    def min: (**untyped opts) -> Float
+    def max: (**untyped opts) -> Float
+  end
+
+  class MutableImage < Object
+    def width: () -> Integer
+    def height: () -> Integer
+    def bands: () -> Integer
+    def get_fields: () -> Array[String]
+    def get: (String name) -> untyped
+    def set!: (String name, untyped value) -> void
+    def remove!: (String name) -> void
+    def draw_point!: (Numeric | Array[Numeric] ink, Integer left, Integer top, **untyped opts) -> void
+    def draw_rect!: (Numeric | Array[Numeric] ink, Integer left, Integer top, Integer width, Integer height, **untyped opts) -> void
+  end
+
+  # Library configuration
+  def self.version: (Integer flag) -> Integer
+  def self.version_string: () -> String
+  def self.at_least_libvips?: (Integer x, Integer y) -> bool
+  def self.block_untrusted: (boolish state) -> void
+  def self.block: (String operation_name, boolish state) -> void
+  def self.cache_max: () -> Integer
+  def self.cache_set_max: (Integer size) -> void
+  def self.cache_max_mem: () -> Integer
+  def self.cache_set_max_mem: (Integer size) -> void
+  def self.cache_max_files: () -> Integer
+  def self.cache_set_max_files: (Integer size) -> void
+  def self.concurrency: () -> Integer
+  def self.concurrency_set: (Integer n) -> void
+  def self.vector?: () -> bool
+  def self.vector_set: (boolish enabled) -> void
+  def self.get_suffixes: () -> Array[String]
+end

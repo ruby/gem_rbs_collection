@@ -1,0 +1,380 @@
+module Twilio
+  module REST
+    class TwilioError < StandardError
+    end
+
+    class RestError < TwilioError
+      attr_reader message: String
+      attr_reader response: untyped
+      attr_reader code: Integer
+      attr_reader status_code: Integer
+      attr_reader details: Hash[String, untyped]?
+      attr_reader more_info: String?
+      attr_reader error_message: String?
+    end
+
+    class InstanceResource
+    end
+
+    class InstanceContext
+    end
+
+    class ListResource
+    end
+
+    class Version
+    end
+
+    class Domain
+      attr_reader client: Client
+    end
+
+    class ClientBase
+      attr_accessor http_client: Twilio::HTTP::Client
+      attr_accessor username: String?
+      attr_accessor password: String?
+      attr_accessor account_sid: String?
+      attr_accessor auth_token: String?
+      attr_accessor region: String?
+      attr_accessor edge: String?
+      attr_accessor logger: Logger?
+      attr_accessor user_agent_extensions: Array[String]
+
+      def initialize: (?String? username, ?String? password, ?String? account_sid, ?String? region, ?Twilio::HTTP::Client? http_client, ?Logger? logger, ?Array[String]? user_agent_extensions) -> void
+    end
+
+    class Client < ClientBase
+      def api: () -> Api
+      def content: () -> Content
+      def messaging: () -> Messaging
+      def accounts: () -> untyped
+      def bulkexports: () -> untyped
+      def chat: () -> untyped
+      def conversations: () -> untyped
+      def events: () -> untyped
+      def flex_api: () -> untyped
+      def frontline_api: () -> untyped
+      def preview_iam: () -> untyped
+      def iam: () -> untyped
+      def insights: () -> untyped
+      def intelligence: () -> untyped
+      def ip_messaging: () -> untyped
+      def knowledge: () -> untyped
+      def lookups: () -> untyped
+      def marketplace: () -> untyped
+      def memory: () -> untyped
+      def monitor: () -> untyped
+      def notify: () -> untyped
+      def numbers: () -> untyped
+      def oauth: () -> untyped
+      def preview: () -> untyped
+      def pricing: () -> untyped
+      def proxy: () -> untyped
+      def routes: () -> untyped
+      def serverless: () -> untyped
+      def studio: () -> untyped
+      def supersim: () -> untyped
+      def sync: () -> untyped
+      def taskrouter: () -> untyped
+      def trunking: () -> untyped
+      def trusthub: () -> untyped
+      def verify: () -> untyped
+      def video: () -> untyped
+      def voice: () -> untyped
+      def webhooks: () -> untyped
+      def wireless: () -> untyped
+
+      def applications: () -> Api::V2010::AccountContext::ApplicationList
+                      | (String sid) -> Api::V2010::AccountContext::ApplicationContext
+      def calls: () -> Api::V2010::AccountContext::CallList
+               | (String sid) -> Api::V2010::AccountContext::CallContext
+      def conferences: () -> Api::V2010::AccountContext::ConferenceList
+                     | (String sid) -> Api::V2010::AccountContext::ConferenceContext
+      def incoming_phone_numbers: () -> Api::V2010::AccountContext::IncomingPhoneNumberList
+                                | (String sid) -> Api::V2010::AccountContext::IncomingPhoneNumberContext
+      def messages: () -> Api::V2010::AccountContext::MessageList
+                  | (String sid) -> Api::V2010::AccountContext::MessageContext
+      def addresses: (*untyped) -> untyped
+      def authorized_connect_apps: (*untyped) -> untyped
+      def available_phone_numbers: (*untyped) -> untyped
+      def connect_apps: (*untyped) -> untyped
+      def keys: (*untyped) -> untyped
+      def notifications: (*untyped) -> untyped
+      def outgoing_caller_ids: (*untyped) -> untyped
+      def queues: (*untyped) -> untyped
+      def recordings: (*untyped) -> untyped
+      def short_codes: (*untyped) -> untyped
+      def signing_keys: (*untyped) -> untyped
+      def transcriptions: (*untyped) -> untyped
+    end
+
+    class ApiBase < Domain
+    end
+
+    class Api < ApiBase
+      def v2010: () -> V2010
+      def account: () -> V2010::AccountContext
+      def accounts: (String sid) -> V2010::AccountContext
+
+      class V2010 < Version
+        def account: () -> AccountContext
+        def accounts: (String sid) -> AccountContext
+        def applications: () -> AccountContext::ApplicationList
+                        | (String sid) -> AccountContext::ApplicationContext
+        def calls: () -> AccountContext::CallList
+                 | (String sid) -> AccountContext::CallContext
+        def conferences: () -> AccountContext::ConferenceList
+                       | (String sid) -> AccountContext::ConferenceContext
+        def incoming_phone_numbers: () -> AccountContext::IncomingPhoneNumberList
+                                  | (String sid) -> AccountContext::IncomingPhoneNumberContext
+        def messages: () -> AccountContext::MessageList
+                    | (String sid) -> AccountContext::MessageContext
+
+        class AccountInstance < InstanceResource
+          def sid: () -> String
+          def friendly_name: () -> String?
+          def status: () -> String?
+          def type: () -> String?
+        end
+
+        class AccountContext < InstanceContext
+          def fetch: () -> AccountInstance
+          def applications: () -> ApplicationList
+                          | (String sid) -> ApplicationContext
+          def calls: () -> CallList
+                   | (String sid) -> CallContext
+          def conferences: () -> ConferenceList
+                         | (String sid) -> ConferenceContext
+          def incoming_phone_numbers: () -> IncomingPhoneNumberList
+                                    | (String sid) -> IncomingPhoneNumberContext
+          def messages: () -> MessageList
+                      | (String sid) -> MessageContext
+
+          class MessageList < ListResource
+            def create: (?to: String, ?status_callback: String, ?application_sid: String, ?max_price: Float, ?provide_feedback: bool, ?attempt: String | Integer, ?validity_period: String | Integer, ?force_delivery: bool, ?content_retention: String, ?address_retention: String, ?smart_encoded: bool, ?persistent_action: Array[String], ?traffic_type: String, ?shorten_urls: bool, ?schedule_type: String, ?send_at: Time | Date | String, ?send_as_mms: bool, ?content_variables: String, ?message_intent: String, ?risk_check: String, ?from: String, ?fallback_from: String, ?messaging_service_sid: String, ?body: String, ?media_url: Array[String], ?content_sid: String) -> MessageInstance
+            def list: (?to: String, ?from: String, ?date_sent: Time | Date | String, ?date_sent_before: Time | Date | String, ?date_sent_after: Time | Date | String, ?limit: Integer?, ?page_size: Integer?) -> Array[MessageInstance]
+          end
+
+          class MessageContext < InstanceContext
+            def fetch: () -> MessageInstance
+          end
+
+          class MessageInstance < InstanceResource
+            def body: () -> String?
+            def num_segments: () -> String?
+            def direction: () -> String?
+            def from: () -> String?
+            def to: () -> String?
+            def date_updated: () -> Time?
+            def price: () -> String?
+            def error_message: () -> String?
+            def uri: () -> String?
+            def account_sid: () -> String
+            def num_media: () -> String?
+            def status: () -> String?
+            def messaging_service_sid: () -> String?
+            def sid: () -> String
+            def date_sent: () -> Time?
+            def date_created: () -> Time?
+            def error_code: () -> Integer?
+            def price_unit: () -> String?
+            def api_version: () -> String?
+            def subresource_uris: () -> Hash[String, untyped]?
+            def fetch: () -> MessageInstance
+          end
+
+          class CallList < ListResource
+            def create: (?to: String, ?from: String, ?method: String, ?fallback_url: String, ?fallback_method: String, ?status_callback: String, ?status_callback_event: Array[String], ?status_callback_method: String, ?send_digits: String, ?timeout: String | Integer, ?record: bool, ?recording_channels: String, ?recording_status_callback: String, ?recording_status_callback_method: String, ?recording_configuration_id: String, ?sip_auth_username: String, ?sip_auth_password: String, ?machine_detection: String, ?machine_detection_timeout: String | Integer, ?recording_status_callback_event: Array[String], ?trim: String, ?caller_id: String, ?machine_detection_speech_threshold: String | Integer, ?machine_detection_speech_end_threshold: String | Integer, ?machine_detection_silence_timeout: String | Integer, ?async_amd: String, ?async_amd_status_callback: String, ?async_amd_status_callback_method: String, ?passports: String, ?byoc: String, ?call_reason: String, ?call_token: String, ?recording_track: String, ?time_limit: String | Integer, ?client_notification_url: String, ?url: String, ?twiml: String, ?application_sid: String) -> CallInstance
+            def list: (?to: String, ?from: String, ?parent_call_sid: String, ?status: String, ?start_time: Time | Date | String, ?start_time_before: Time | Date | String, ?start_time_after: Time | Date | String, ?end_time: Time | Date | String, ?end_time_before: Time | Date | String, ?end_time_after: Time | Date | String, ?limit: Integer?, ?page_size: Integer?) -> Array[CallInstance]
+          end
+
+          class CallContext < InstanceContext
+            def fetch: () -> CallInstance
+            def update: (?url: String, ?method: String, ?status: String, ?fallback_url: String, ?fallback_method: String, ?status_callback: String, ?status_callback_method: String, ?twiml: String, ?time_limit: String | Integer) -> CallInstance
+          end
+
+          class CallInstance < InstanceResource
+            def sid: () -> String
+            def date_created: () -> Time?
+            def date_updated: () -> Time?
+            def parent_call_sid: () -> String?
+            def account_sid: () -> String
+            def to: () -> String?
+            def to_formatted: () -> String?
+            def from: () -> String?
+            def from_formatted: () -> String?
+            def phone_number_sid: () -> String?
+            def status: () -> String?
+            def start_time: () -> Time?
+            def end_time: () -> Time?
+            def duration: () -> String?
+            def price: () -> String?
+            def price_unit: () -> String?
+            def direction: () -> String?
+            def answered_by: () -> String?
+            def api_version: () -> String?
+            def forwarded_from: () -> String?
+            def group_sid: () -> String?
+            def caller_name: () -> String?
+            def queue_time: () -> String?
+            def stir_verstat: () -> String?
+            def trunk_sid: () -> String?
+            def uri: () -> String?
+            def subresource_uris: () -> Hash[String, untyped]?
+            def fetch: () -> CallInstance
+            def update: (?url: String, ?method: String, ?status: String, ?fallback_url: String, ?fallback_method: String, ?status_callback: String, ?status_callback_method: String, ?twiml: String, ?time_limit: String | Integer) -> CallInstance
+          end
+
+          class ConferenceList < ListResource
+            def list: (?date_created: Date | Time | String, ?date_created_before: Date | Time | String, ?date_created_after: Date | Time | String, ?date_updated: Date | Time | String, ?date_updated_before: Date | Time | String, ?date_updated_after: Date | Time | String, ?friendly_name: String, ?status: String, ?limit: Integer?, ?page_size: Integer?) -> Array[ConferenceInstance]
+          end
+
+          class ConferenceContext < InstanceContext
+            def update: (?status: String, ?announce_url: String, ?announce_method: String) -> ConferenceInstance
+            def participants: () -> ParticipantList
+                            | (String call_sid) -> ParticipantContext
+
+            class ParticipantList < ListResource
+              def list: (?muted: bool, ?hold: bool, ?coaching: bool, ?limit: Integer?, ?page_size: Integer?) -> Array[ParticipantInstance]
+            end
+
+            class ParticipantContext < InstanceContext
+              def update: (?muted: bool, ?hold: bool, ?hold_url: String, ?hold_method: String, ?announce_url: String, ?announce_method: String, ?wait_url: String, ?wait_method: String, ?beep_on_exit: bool, ?end_conference_on_exit: bool, ?coaching: bool, ?call_sid_to_coach: String) -> ParticipantInstance
+            end
+
+            class ParticipantInstance < InstanceResource
+              def call_sid: () -> String?
+              def label: () -> String?
+              def conference_sid: () -> String?
+              def status: () -> String?
+              def muted: () -> bool?
+              def hold: () -> bool?
+            end
+          end
+
+          class ConferenceInstance < InstanceResource
+            def sid: () -> String
+            def friendly_name: () -> String?
+            def status: () -> String?
+          end
+
+          class IncomingPhoneNumberList < ListResource
+            def list: (?beta: bool, ?friendly_name: String, ?phone_number: String, ?origin: String, ?limit: Integer?, ?page_size: Integer?) -> Array[IncomingPhoneNumberInstance]
+          end
+
+          class IncomingPhoneNumberContext < InstanceContext
+            def update: (?account_sid: String, ?api_version: String, ?friendly_name: String, ?sms_application_sid: String, ?sms_fallback_method: String, ?sms_fallback_url: String, ?sms_method: String, ?sms_url: String, ?status_callback: String, ?status_callback_method: String, ?voice_application_sid: String, ?voice_caller_id_lookup: bool, ?voice_fallback_method: String, ?voice_fallback_url: String, ?voice_method: String, ?voice_url: String, ?emergency_status: String, ?emergency_address_sid: String, ?trunk_sid: String, ?voice_receive_mode: String, ?identity_sid: String, ?address_sid: String, ?bundle_sid: String) -> IncomingPhoneNumberInstance
+          end
+
+          class IncomingPhoneNumberInstance < InstanceResource
+            def sid: () -> String
+            def phone_number: () -> String?
+            def friendly_name: () -> String?
+            def capabilities: () -> Hash[String, untyped]?
+            def sms_url: () -> String?
+            def sms_method: () -> String?
+            def sms_application_sid: () -> String?
+            def voice_url: () -> String?
+            def voice_method: () -> String?
+            def voice_application_sid: () -> String?
+            def trunk_sid: () -> String?
+            def status_callback: () -> String?
+            def status_callback_method: () -> String?
+          end
+
+          class ApplicationList < ListResource
+            def create: (?api_version: String, ?voice_url: String, ?voice_method: String, ?voice_fallback_url: String, ?voice_fallback_method: String, ?status_callback: String, ?status_callback_method: String, ?voice_caller_id_lookup: bool, ?sms_url: String, ?sms_method: String, ?sms_fallback_url: String, ?sms_fallback_method: String, ?sms_status_callback: String, ?message_status_callback: String, ?friendly_name: String, ?public_application_connect_enabled: bool) -> ApplicationInstance
+          end
+
+          class ApplicationContext < InstanceContext
+            def fetch: () -> ApplicationInstance
+            def update: (?friendly_name: String, ?api_version: String, ?voice_url: String, ?voice_method: String, ?voice_fallback_url: String, ?voice_fallback_method: String, ?status_callback: String, ?status_callback_method: String, ?voice_caller_id_lookup: bool, ?sms_url: String, ?sms_method: String, ?sms_fallback_url: String, ?sms_fallback_method: String, ?sms_status_callback: String, ?message_status_callback: String, ?public_application_connect_enabled: bool) -> ApplicationInstance
+            def delete: () -> bool
+          end
+
+          class ApplicationInstance < InstanceResource
+            def sid: () -> String
+            def friendly_name: () -> String?
+            def voice_url: () -> String?
+            def voice_method: () -> String?
+          end
+        end
+      end
+    end
+
+    class MessagingBase < Domain
+    end
+
+    class Messaging < MessagingBase
+      def v1: () -> V1
+      def v2: () -> V2
+      def services: (String sid) -> V1::ServiceContext
+
+      class V1 < Version
+        def services: (String sid) -> ServiceContext
+
+        class ServiceContext < InstanceContext
+          def fetch: () -> ServiceInstance
+          def update: (?friendly_name: String, ?inbound_request_url: String, ?inbound_method: String, ?fallback_url: String, ?fallback_method: String, ?status_callback: String, ?sticky_sender: bool, ?mms_converter: bool, ?smart_encoding: bool, ?scan_message_content: String, ?fallback_to_long_code: bool, ?area_code_geomatch: bool, ?validity_period: String | Integer, ?synchronous_validation: bool, ?usecase: String, ?use_inbound_webhook_on_number: bool) -> ServiceInstance
+        end
+
+        class ServiceInstance < InstanceResource
+          def sid: () -> String
+          def friendly_name: () -> String?
+          def inbound_request_url: () -> String?
+          def inbound_method: () -> String?
+          def use_inbound_webhook_on_number: () -> bool?
+        end
+      end
+
+      class V2 < Version
+        def channels_senders: () -> ChannelsSenderList
+                            | (String sid) -> ChannelsSenderContext
+
+        class ChannelsSenderList < ListResource
+          def list: (?channel: String, ?limit: Integer?, ?page_size: Integer?) -> Array[ChannelsSenderInstance]
+          def stream: (?channel: String, ?limit: Integer?, ?page_size: Integer?) -> Enumerable[ChannelsSenderInstance]
+        end
+
+        class ChannelsSenderContext < InstanceContext
+          def update: (?messaging_v2_channels_sender_requests_update: Hash[Symbol, untyped]) -> ChannelsSenderInstance
+        end
+
+        class ChannelsSenderInstance < InstanceResource
+          def sid: () -> String
+          def sender_id: () -> String?
+          def status: () -> String?
+          def profile: () -> Hash[String, untyped]?
+          def properties: () -> Hash[String, untyped]?
+          def webhook: () -> Hash[String, untyped]?
+        end
+      end
+    end
+
+    class ContentBase < Domain
+    end
+
+    class Content < ContentBase
+      def v1: () -> V1
+
+      class V1 < Version
+        def content_and_approvals: () -> ContentAndApprovalsList
+
+        class ContentAndApprovalsList < ListResource
+          def list: (?limit: Integer?, ?page_size: Integer?) -> Array[ContentAndApprovalsInstance]
+        end
+
+        class ContentAndApprovalsInstance < InstanceResource
+          def sid: () -> String
+          def friendly_name: () -> String?
+          def language: () -> String?
+          def variables: () -> Hash[String, untyped]?
+          def types: () -> Hash[String, untyped]?
+          def approval_requests: () -> Hash[String, untyped]?
+          def date_created: () -> Time?
+          def date_updated: () -> Time?
+        end
+      end
+    end
+  end
+end

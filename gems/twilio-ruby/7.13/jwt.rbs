@@ -1,0 +1,63 @@
+module Twilio
+  module JWT
+    class BaseJWT
+      def headers: () -> Hash[String | Symbol, untyped]
+      def payload: () -> Hash[Symbol, untyped]
+      def to_jwt: () -> String
+      alias to_s to_jwt
+    end
+
+    module AccessTokenGrant
+    end
+
+    module Scope
+    end
+
+    class AccessToken < BaseJWT
+      attr_accessor account_sid: String
+      attr_accessor signing_key_id: String?
+      attr_accessor secret: String
+      attr_accessor identity: String?
+      attr_accessor grants: Array[AccessTokenGrant]
+      attr_accessor nbf: Integer?
+      attr_accessor ttl: Integer
+      attr_accessor valid_until: Integer?
+      attr_accessor region: String?
+
+      def initialize: (String account_sid, String signing_key_sid, String secret, ?Array[AccessTokenGrant] grants, ?identity: String?, ?nbf: Integer?, ?ttl: Integer, ?valid_until: Integer?, ?region: String?) -> void
+      def add_grant: (AccessTokenGrant grant) -> Array[AccessTokenGrant]
+
+      class VoiceGrant
+        include AccessTokenGrant
+
+        attr_accessor incoming_allow: bool?
+        attr_accessor outgoing_application_sid: String?
+        attr_accessor outgoing_application_params: Hash[String | Symbol, untyped]?
+        attr_accessor push_credential_sid: String?
+        attr_accessor endpoint_id: String?
+      end
+    end
+
+    class ClientCapability < BaseJWT
+      attr_accessor account_sid: String
+      attr_accessor auth_token: String
+      attr_accessor client_name: String?
+      attr_accessor scopes: Array[Scope]
+
+      def initialize: (String account_sid, String auth_token, ?scopes: Array[Scope], ?nbf: Integer?, ?ttl: Integer, ?valid_until: Integer?) -> void
+      def add_scope: (Scope scope) -> Array[Scope]
+
+      class IncomingClientScope
+        include Scope
+
+        def initialize: (String client_name) -> void
+      end
+
+      class OutgoingClientScope
+        include Scope
+
+        def initialize: (String application_sid, ?String? client_name, ?Hash[String | Symbol, untyped] params) -> void
+      end
+    end
+  end
+end
