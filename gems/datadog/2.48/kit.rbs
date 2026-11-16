@@ -1,0 +1,62 @@
+module Datadog
+  module Kit
+    module Identity
+      def self.set_user: (
+        ?::Datadog::Tracing::TraceOperation? trace,
+        ?::Datadog::Tracing::SpanOperation? span,
+        id: String,
+        ?email: String?,
+        ?name: String?,
+        ?session_id: String?,
+        ?role: String?,
+        ?scope: String?,
+        **String? others
+      ) -> void
+    end
+
+    module AppSec
+      module Events
+        LOGIN_SUCCESS_EVENT: String
+        LOGIN_FAILURE_EVENT: String
+        SIGNUP_EVENT: String
+
+        def self.track_login_success: (
+          ?::Datadog::Tracing::TraceOperation? trace,
+          ?::Datadog::Tracing::SpanOperation? span,
+          user: Hash[Symbol, String],
+          **untyped others
+        ) -> void
+
+        def self.track_login_failure: (
+          ?::Datadog::Tracing::TraceOperation? trace,
+          ?::Datadog::Tracing::SpanOperation? span,
+          user_exists: bool,
+          ?user_id: String?,
+          **untyped others
+        ) -> void
+
+        def self.track_signup: (
+          ?::Datadog::Tracing::TraceOperation? trace,
+          ?::Datadog::Tracing::SpanOperation? span,
+          user: Hash[Symbol, String],
+          **untyped others
+        ) -> void
+
+        def self.track: (
+          String event,
+          ?::Datadog::Tracing::TraceOperation? trace,
+          ?::Datadog::Tracing::SpanOperation? span,
+          **untyped others
+        ) -> void
+
+        module V2
+          def self.track_user_login_success: (String login, ?(String | Hash[Symbol, String])? user_or_id, ?Hash[Symbol | String, untyped] metadata) -> void
+
+          def self.track_user_login_failure: (String login, ?bool user_exists, ?Hash[Symbol | String, untyped] metadata) -> void
+
+          def self.track_user_signup: (String login, ?(String | Hash[Symbol, String])? user_or_id, ?Hash[Symbol | String, untyped] metadata) -> void
+        end
+      end
+    end
+  end
+end
