@@ -1,0 +1,670 @@
+module OpenSearch
+  module DSL
+    module Search
+      # Builds one query. Each method below creates the query of the same name
+      class Query
+        def bool: (*untyped args) ?{ (Queries::Bool) [self: Queries::Bool] -> void } -> Queries::Bool
+
+        def boosting: (*untyped args) ?{ (Queries::Boosting) [self: Queries::Boosting] -> void } -> Queries::Boosting
+
+        def common: (*untyped args) ?{ (Queries::Common) [self: Queries::Common] -> void } -> Queries::Common
+
+        def constant_score: (*untyped args) ?{ (Queries::ConstantScore) [self: Queries::ConstantScore] -> void } -> Queries::ConstantScore
+
+        def dis_max: (*untyped args) ?{ (Queries::DisMax) [self: Queries::DisMax] -> void } -> Queries::DisMax
+
+        def exists: (*untyped args) ?{ (Queries::Exists) [self: Queries::Exists] -> void } -> Queries::Exists
+
+        def filtered: (*untyped args) ?{ (Queries::Filtered) [self: Queries::Filtered] -> void } -> Queries::Filtered
+
+        def function_score: (*untyped args) ?{ (Queries::FunctionScore) [self: Queries::FunctionScore] -> void } -> Queries::FunctionScore
+
+        def fuzzy: (*untyped args) ?{ (Queries::Fuzzy) [self: Queries::Fuzzy] -> void } -> Queries::Fuzzy
+
+        def fuzzy_like_this: (*untyped args) ?{ (Queries::FuzzyLikeThis) [self: Queries::FuzzyLikeThis] -> void } -> Queries::FuzzyLikeThis
+
+        def fuzzy_like_this_field: (*untyped args) ?{ (Queries::FuzzyLikeThisField) [self: Queries::FuzzyLikeThisField] -> void } -> Queries::FuzzyLikeThisField
+
+        def geo_shape: (*untyped args) ?{ (Queries::GeoShape) [self: Queries::GeoShape] -> void } -> Queries::GeoShape
+
+        def has_child: (*untyped args) ?{ (Queries::HasChild) [self: Queries::HasChild] -> void } -> Queries::HasChild
+
+        def has_parent: (*untyped args) ?{ (Queries::HasParent) [self: Queries::HasParent] -> void } -> Queries::HasParent
+
+        def ids: (*untyped args) ?{ (Queries::Ids) [self: Queries::Ids] -> void } -> Queries::Ids
+
+        def indices: (*untyped args) ?{ (Queries::Indices) [self: Queries::Indices] -> void } -> Queries::Indices
+
+        def match: (*untyped args) ?{ (Queries::Match) [self: Queries::Match] -> void } -> Queries::Match
+
+        def match_all: (*untyped args) ?{ (Queries::MatchAll) [self: Queries::MatchAll] -> void } -> Queries::MatchAll
+
+        def match_phrase: (*untyped args) ?{ (Queries::MatchPhrase) [self: Queries::MatchPhrase] -> void } -> Queries::MatchPhrase
+
+        def match_phrase_prefix: (*untyped args) ?{ (Queries::MatchPhrasePrefix) [self: Queries::MatchPhrasePrefix] -> void } -> Queries::MatchPhrasePrefix
+
+        def more_like_this: (*untyped args) ?{ (Queries::MoreLikeThis) [self: Queries::MoreLikeThis] -> void } -> Queries::MoreLikeThis
+
+        def multi_match: (*untyped args) ?{ (Queries::MultiMatch) [self: Queries::MultiMatch] -> void } -> Queries::MultiMatch
+
+        def nested: (*untyped args) ?{ (Queries::Nested) [self: Queries::Nested] -> void } -> Queries::Nested
+
+        def prefix: (*untyped args) ?{ (Queries::Prefix) [self: Queries::Prefix] -> void } -> Queries::Prefix
+
+        def query_string: (*untyped args) ?{ (Queries::QueryString) [self: Queries::QueryString] -> void } -> Queries::QueryString
+
+        def range: (*untyped args) ?{ (Queries::Range) [self: Queries::Range] -> void } -> Queries::Range
+
+        def regexp: (*untyped args) ?{ (Queries::Regexp) [self: Queries::Regexp] -> void } -> Queries::Regexp
+
+        def script_score: (*untyped args) ?{ (Queries::ScriptScore) [self: Queries::ScriptScore] -> void } -> Queries::ScriptScore
+
+        def simple_query_string: (*untyped args) ?{ (Queries::SimpleQueryString) [self: Queries::SimpleQueryString] -> void } -> Queries::SimpleQueryString
+
+        def span_first: (*untyped args) ?{ (Queries::SpanFirst) [self: Queries::SpanFirst] -> void } -> Queries::SpanFirst
+
+        def span_multi: (*untyped args) ?{ (Queries::SpanMulti) [self: Queries::SpanMulti] -> void } -> Queries::SpanMulti
+
+        def span_near: (*untyped args) ?{ (Queries::SpanNear) [self: Queries::SpanNear] -> void } -> Queries::SpanNear
+
+        def span_not: (*untyped args) ?{ (Queries::SpanNot) [self: Queries::SpanNot] -> void } -> Queries::SpanNot
+
+        def span_or: (*untyped args) ?{ (Queries::SpanOr) [self: Queries::SpanOr] -> void } -> Queries::SpanOr
+
+        def span_term: (*untyped args) ?{ (Queries::SpanTerm) [self: Queries::SpanTerm] -> void } -> Queries::SpanTerm
+
+        def template: (*untyped args) ?{ (Queries::Template) [self: Queries::Template] -> void } -> Queries::Template
+
+        def term: (*untyped args) ?{ (Queries::Term) [self: Queries::Term] -> void } -> Queries::Term
+
+        def terms: (*untyped args) ?{ (Queries::Terms) [self: Queries::Terms] -> void } -> Queries::Terms
+
+        def top_children: (*untyped args) ?{ (Queries::TopChildren) [self: Queries::TopChildren] -> void } -> Queries::TopChildren
+
+        def wildcard: (*untyped args) ?{ (Queries::Wildcard) [self: Queries::Wildcard] -> void } -> Queries::Wildcard
+
+        def to_hash: (?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+      end
+
+      module Queries
+        class Bool
+          include BaseComponent
+
+          def minimum_should_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def must: (hashable query) -> self
+                  | () { (Query) [self: Query] -> void } -> self
+
+          def must_not: (hashable query) -> self
+                      | () { (Query) [self: Query] -> void } -> self
+
+          def should: (hashable query) -> self
+                    | () { (Query) [self: Query] -> void } -> self
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class Boosting
+          include BaseComponent
+
+          def positive: (untyped value) -> Hash[Symbol, untyped]
+
+          def negative: (untyped value) -> Hash[Symbol, untyped]
+
+          def negative_boost: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Common
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def cutoff_frequency: (untyped value) -> Hash[Symbol, untyped]
+
+          def low_freq_operator: (untyped value) -> Hash[Symbol, untyped]
+
+          def minimum_should_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def disable_coord: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class ConstantScore
+          include BaseComponent
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class DisMax
+          include BaseComponent
+
+          def queries: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def tie_breaker: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Exists
+          include BaseComponent
+
+          def field: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Filtered
+          include BaseComponent
+
+          def strategy: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class FunctionScore
+          include BaseComponent
+
+          def script_score: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def score_mode: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost_mode: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+
+          def functions: () -> Array[untyped]
+                       | (Array[untyped] value) -> Array[untyped]
+
+          def functions=: (Array[untyped] value) -> Array[untyped]
+        end
+
+        class Fuzzy
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzziness: (untyped value) -> Hash[Symbol, untyped]
+
+          def prefix_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_expansions: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class FuzzyLikeThis
+          include BaseComponent
+
+          def fields: (untyped value) -> Hash[Symbol, untyped]
+
+          def like_text: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzziness: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_query_terms: (untyped value) -> Hash[Symbol, untyped]
+
+          def prefix_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def ignore_tf: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class FuzzyLikeThisField
+          include BaseComponent
+
+          def like_text: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzziness: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_query_terms: (untyped value) -> Hash[Symbol, untyped]
+
+          def prefix_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def ignore_tf: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeoShape
+          include BaseComponent
+
+          def shape: (untyped value) -> Hash[Symbol, untyped]
+
+          def indexed_shape: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class HasChild
+          include BaseComponent
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def score_mode: (untyped value) -> Hash[Symbol, untyped]
+
+          def min_children: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_children: (untyped value) -> Hash[Symbol, untyped]
+
+          def inner_hits: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+        end
+
+        class HasParent
+          include BaseComponent
+
+          def parent_type: (untyped value) -> Hash[Symbol, untyped]
+
+          def score_mode: (untyped value) -> Hash[Symbol, untyped]
+
+          def inner_hits: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+        end
+
+        class Ids
+          include BaseComponent
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def values: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Indices
+          include BaseComponent
+
+          def indices: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def no_match_query: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Match
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def operator: (untyped value) -> Hash[Symbol, untyped]
+
+          def minimum_should_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzziness: (untyped value) -> Hash[Symbol, untyped]
+
+          def prefix_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_expansions: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzzy_rewrite: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def lenient: (untyped value) -> Hash[Symbol, untyped]
+
+          def zero_terms_query: (untyped value) -> Hash[Symbol, untyped]
+
+          def cutoff_frequency: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class MatchAll
+          include BaseComponent
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class MatchPhrase
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def slop: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class MatchPhrasePrefix
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_expansions: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class MoreLikeThis
+          include BaseComponent
+
+          def like: (untyped value) -> Hash[Symbol, untyped]
+
+          def unlike: (untyped value) -> Hash[Symbol, untyped]
+
+          def like_text: (untyped value) -> Hash[Symbol, untyped]
+
+          def docs: (untyped value) -> Hash[Symbol, untyped]
+
+          def ids: (untyped value) -> Hash[Symbol, untyped]
+
+          def fields: (untyped value) -> Hash[Symbol, untyped]
+
+          def min_term_freq: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_query_terms: (untyped value) -> Hash[Symbol, untyped]
+
+          def include: (untyped value) -> Hash[Symbol, untyped]
+
+          def exclude: (untyped value) -> Hash[Symbol, untyped]
+
+          def percent_terms_to_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def stop_words: (untyped value) -> Hash[Symbol, untyped]
+
+          def min_doc_freq: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_doc_freq: (untyped value) -> Hash[Symbol, untyped]
+
+          def min_word_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_word_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost_terms: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class MultiMatch
+          include BaseComponent
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def cutoff_frequency: (untyped value) -> Hash[Symbol, untyped]
+
+          def fields: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzziness: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_expansions: (untyped value) -> Hash[Symbol, untyped]
+
+          def minimum_should_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def operator: (untyped value) -> Hash[Symbol, untyped]
+
+          def prefix_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def rewrite: (untyped value) -> Hash[Symbol, untyped]
+
+          def slop: (untyped value) -> Hash[Symbol, untyped]
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def use_dis_max: (untyped value) -> Hash[Symbol, untyped]
+
+          def zero_terms_query: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Nested
+          include BaseComponent
+
+          def path: (untyped value) -> Hash[Symbol, untyped]
+
+          def score_mode: (untyped value) -> Hash[Symbol, untyped]
+
+          def inner_hits: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+        end
+
+        class Prefix
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class QueryString
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def fields: (untyped value) -> Hash[Symbol, untyped]
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def default_field: (untyped value) -> Hash[Symbol, untyped]
+
+          def default_operator: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def allow_leading_wildcard: (untyped value) -> Hash[Symbol, untyped]
+
+          def lowercase_expanded_terms: (untyped value) -> Hash[Symbol, untyped]
+
+          def enable_position_increments: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzzy_max_expansions: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzziness: (untyped value) -> Hash[Symbol, untyped]
+
+          def fuzzy_prefix_length: (untyped value) -> Hash[Symbol, untyped]
+
+          def phrase_slop: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyze_wildcard: (untyped value) -> Hash[Symbol, untyped]
+
+          def auto_generate_phrase_queries: (untyped value) -> Hash[Symbol, untyped]
+
+          def minimum_should_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def lenient: (untyped value) -> Hash[Symbol, untyped]
+
+          def locale: (untyped value) -> Hash[Symbol, untyped]
+
+          def use_dis_max: (untyped value) -> Hash[Symbol, untyped]
+
+          def tie_breaker: (untyped value) -> Hash[Symbol, untyped]
+
+          def time_zone: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Range
+          include BaseComponent
+
+          def gte: (untyped value) -> Hash[Symbol, untyped]
+
+          def gt: (untyped value) -> Hash[Symbol, untyped]
+
+          def lte: (untyped value) -> Hash[Symbol, untyped]
+
+          def lt: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def time_zone: (untyped value) -> Hash[Symbol, untyped]
+
+          def format: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Regexp
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def flags: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class ScriptScore
+          include BaseComponent
+
+          def script: (untyped value) -> Hash[Symbol, untyped]
+
+          def min_score: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+        end
+
+        class SimpleQueryString
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def fields: (untyped value) -> Hash[Symbol, untyped]
+
+          def default_operator: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyzer: (untyped value) -> Hash[Symbol, untyped]
+
+          def flags: (untyped value) -> Hash[Symbol, untyped]
+
+          def analyze_wildcard: (untyped value) -> Hash[Symbol, untyped]
+
+          def lenient: (untyped value) -> Hash[Symbol, untyped]
+
+          def minimum_should_match: (untyped value) -> Hash[Symbol, untyped]
+
+          def quote_field_suffix: (untyped value) -> Hash[Symbol, untyped]
+
+          def all_fields: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class SpanFirst
+          include BaseComponent
+
+          def match: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class SpanMulti
+          include BaseComponent
+
+          def match: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class SpanNear
+          include BaseComponent
+
+          def span_near: (untyped value) -> Hash[Symbol, untyped]
+
+          def slop: (untyped value) -> Hash[Symbol, untyped]
+
+          def in_order: (untyped value) -> Hash[Symbol, untyped]
+
+          def collect_payloads: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class SpanNot
+          include BaseComponent
+
+          def include: (untyped value) -> Hash[Symbol, untyped]
+
+          def exclude: (untyped value) -> Hash[Symbol, untyped]
+
+          def pre: (untyped value) -> Hash[Symbol, untyped]
+
+          def post: (untyped value) -> Hash[Symbol, untyped]
+
+          def dist: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class SpanOr
+          include BaseComponent
+
+          def clauses: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class SpanTerm
+          include BaseComponent
+        end
+
+        class Template
+          include BaseComponent
+
+          def query: (untyped value) -> Hash[Symbol, untyped]
+
+          def params: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Term
+          include BaseComponent
+        end
+
+        class Terms
+          include BaseComponent
+        end
+
+        class TopChildren
+          include BaseComponent
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def score: (untyped value) -> Hash[Symbol, untyped]
+
+          def factor: (untyped value) -> Hash[Symbol, untyped]
+
+          def incremental_factor: (untyped value) -> Hash[Symbol, untyped]
+
+          def _scope: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (Query) [self: Query] -> void } -> self
+        end
+
+        class Wildcard
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+        end
+      end
+    end
+  end
+end

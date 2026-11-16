@@ -1,0 +1,430 @@
+module OpenSearch
+  module DSL
+    module Search
+      class Filter
+        def and: (*untyped args) ?{ (Filters::And) [self: Filters::And] -> void } -> Filters::And
+
+        def bool: (*untyped args) ?{ (Filters::Bool) [self: Filters::Bool] -> void } -> Filters::Bool
+
+        def exists: (*untyped args) ?{ (Filters::Exists) [self: Filters::Exists] -> void } -> Filters::Exists
+
+        def geo_bounding_box: (*untyped args) ?{ (Filters::GeoBoundingBox) [self: Filters::GeoBoundingBox] -> void } -> Filters::GeoBoundingBox
+
+        def geo_distance: (*untyped args) ?{ (Filters::GeoDistance) [self: Filters::GeoDistance] -> void } -> Filters::GeoDistance
+
+        def geo_distance_range: (*untyped args) ?{ (Filters::GeoDistanceRange) [self: Filters::GeoDistanceRange] -> void } -> Filters::GeoDistanceRange
+
+        def geo_polygon: (*untyped args) ?{ (Filters::GeoPolygon) [self: Filters::GeoPolygon] -> void } -> Filters::GeoPolygon
+
+        def geo_shape: (*untyped args) ?{ (Filters::GeoShape) [self: Filters::GeoShape] -> void } -> Filters::GeoShape
+
+        def geohash_cell: (*untyped args) ?{ (Filters::GeohashCell) [self: Filters::GeohashCell] -> void } -> Filters::GeohashCell
+
+        def has_child: (*untyped args) ?{ (Filters::HasChild) [self: Filters::HasChild] -> void } -> Filters::HasChild
+
+        def has_parent: (*untyped args) ?{ (Filters::HasParent) [self: Filters::HasParent] -> void } -> Filters::HasParent
+
+        def ids: (*untyped args) ?{ (Filters::Ids) [self: Filters::Ids] -> void } -> Filters::Ids
+
+        def indices: (*untyped args) ?{ (Filters::Indices) [self: Filters::Indices] -> void } -> Filters::Indices
+
+        def limit: (*untyped args) ?{ (Filters::Limit) [self: Filters::Limit] -> void } -> Filters::Limit
+
+        def match_all: (*untyped args) ?{ (Filters::MatchAll) [self: Filters::MatchAll] -> void } -> Filters::MatchAll
+
+        def missing: (*untyped args) ?{ (Filters::Missing) [self: Filters::Missing] -> void } -> Filters::Missing
+
+        def nested: (*untyped args) ?{ (Filters::Nested) [self: Filters::Nested] -> void } -> Filters::Nested
+
+        def not: (*untyped args) ?{ (Filters::Not) [self: Filters::Not] -> void } -> Filters::Not
+
+        def or: (*untyped args) ?{ (Filters::Or) [self: Filters::Or] -> void } -> Filters::Or
+
+        def prefix: (*untyped args) ?{ (Filters::Prefix) [self: Filters::Prefix] -> void } -> Filters::Prefix
+
+        def query: (*untyped args) ?{ (::OpenSearch::DSL::Search::Query) [self: ::OpenSearch::DSL::Search::Query] -> void } -> Filters::Query
+
+        def range: (*untyped args) ?{ (Filters::Range) [self: Filters::Range] -> void } -> Filters::Range
+
+        def regexp: (*untyped args) ?{ (Filters::Regexp) [self: Filters::Regexp] -> void } -> Filters::Regexp
+
+        def script: (*untyped args) ?{ (Filters::Script) [self: Filters::Script] -> void } -> Filters::Script
+
+        def term: (*untyped args) ?{ (Filters::Term) [self: Filters::Term] -> void } -> Filters::Term
+
+        def terms: (*untyped args) ?{ (Filters::Terms) [self: Filters::Terms] -> void } -> Filters::Terms
+
+        def type: (*untyped args) ?{ (Filters::Type) [self: Filters::Type] -> void } -> Filters::Type
+
+        def to_hash: (?Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+      end
+
+      module BaseCompoundFilterComponent
+        include Enumerable[untyped]
+
+        def and: (*untyped args) ?{ (Filters::And) [self: Filters::And] -> void } -> Array[untyped]
+
+        def bool: (*untyped args) ?{ (Filters::Bool) [self: Filters::Bool] -> void } -> Array[untyped]
+
+        def exists: (*untyped args) ?{ (Filters::Exists) [self: Filters::Exists] -> void } -> Array[untyped]
+
+        def geo_bounding_box: (*untyped args) ?{ (Filters::GeoBoundingBox) [self: Filters::GeoBoundingBox] -> void } -> Array[untyped]
+
+        def geo_distance: (*untyped args) ?{ (Filters::GeoDistance) [self: Filters::GeoDistance] -> void } -> Array[untyped]
+
+        def geo_distance_range: (*untyped args) ?{ (Filters::GeoDistanceRange) [self: Filters::GeoDistanceRange] -> void } -> Array[untyped]
+
+        def geo_polygon: (*untyped args) ?{ (Filters::GeoPolygon) [self: Filters::GeoPolygon] -> void } -> Array[untyped]
+
+        def geo_shape: (*untyped args) ?{ (Filters::GeoShape) [self: Filters::GeoShape] -> void } -> Array[untyped]
+
+        def geohash_cell: (*untyped args) ?{ (Filters::GeohashCell) [self: Filters::GeohashCell] -> void } -> Array[untyped]
+
+        def has_child: (*untyped args) ?{ (Filters::HasChild) [self: Filters::HasChild] -> void } -> Array[untyped]
+
+        def has_parent: (*untyped args) ?{ (Filters::HasParent) [self: Filters::HasParent] -> void } -> Array[untyped]
+
+        def ids: (*untyped args) ?{ (Filters::Ids) [self: Filters::Ids] -> void } -> Array[untyped]
+
+        def indices: (*untyped args) ?{ (Filters::Indices) [self: Filters::Indices] -> void } -> Array[untyped]
+
+        def limit: (*untyped args) ?{ (Filters::Limit) [self: Filters::Limit] -> void } -> Array[untyped]
+
+        def match_all: (*untyped args) ?{ (Filters::MatchAll) [self: Filters::MatchAll] -> void } -> Array[untyped]
+
+        def missing: (*untyped args) ?{ (Filters::Missing) [self: Filters::Missing] -> void } -> Array[untyped]
+
+        def nested: (*untyped args) ?{ (Filters::Nested) [self: Filters::Nested] -> void } -> Array[untyped]
+
+        def not: (*untyped args) ?{ (Filters::Not) [self: Filters::Not] -> void } -> Array[untyped]
+
+        def or: (*untyped args) ?{ (Filters::Or) [self: Filters::Or] -> void } -> Array[untyped]
+
+        def prefix: (*untyped args) ?{ (Filters::Prefix) [self: Filters::Prefix] -> void } -> Array[untyped]
+
+        def query: (*untyped args) ?{ (::OpenSearch::DSL::Search::Query) [self: ::OpenSearch::DSL::Search::Query] -> void } -> Array[untyped]
+
+        def range: (*untyped args) ?{ (Filters::Range) [self: Filters::Range] -> void } -> Array[untyped]
+
+        def regexp: (*untyped args) ?{ (Filters::Regexp) [self: Filters::Regexp] -> void } -> Array[untyped]
+
+        def script: (*untyped args) ?{ (Filters::Script) [self: Filters::Script] -> void } -> Array[untyped]
+
+        def term: (*untyped args) ?{ (Filters::Term) [self: Filters::Term] -> void } -> Array[untyped]
+
+        def terms: (*untyped args) ?{ (Filters::Terms) [self: Filters::Terms] -> void } -> Array[untyped]
+
+        def type: (*untyped args) ?{ (Filters::Type) [self: Filters::Type] -> void } -> Array[untyped]
+
+        def each: () { (untyped) -> void } -> untyped
+
+        def slice: (*untyped args) -> untyped
+
+        alias [] slice
+
+        def size: () -> Integer
+
+        def <<: (untyped value) -> Array[untyped]
+
+        def empty?: () -> bool
+      end
+
+      module Filters
+        class And
+          include BaseComponent
+          include BaseCompoundFilterComponent
+        end
+
+        class Bool
+          include BaseComponent
+
+          def must: (hashable filter) -> self
+                  | () { (Filter) [self: Filter] -> void } -> self
+
+          def must_not: (hashable filter) -> self
+                      | () { (Filter) [self: Filter] -> void } -> self
+
+          def should: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class Exists
+          include BaseComponent
+
+          def field: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeoBoundingBox
+          include BaseComponent
+
+          def top_left: (untyped value) -> Hash[Symbol, untyped]
+
+          def bottom_right: (untyped value) -> Hash[Symbol, untyped]
+
+          def top_right: (untyped value) -> Hash[Symbol, untyped]
+
+          def bottom_left: (untyped value) -> Hash[Symbol, untyped]
+
+          def top: (untyped value) -> Hash[Symbol, untyped]
+
+          def left: (untyped value) -> Hash[Symbol, untyped]
+
+          def bottom: (untyped value) -> Hash[Symbol, untyped]
+
+          def right: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeoDistance
+          include BaseComponent
+
+          def distance: (untyped value) -> Hash[Symbol, untyped]
+
+          def distance_type: (untyped value) -> Hash[Symbol, untyped]
+
+          def lat: (untyped value) -> Hash[Symbol, untyped]
+
+          def lon: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeoDistanceRange
+          include BaseComponent
+
+          def lat: (untyped value) -> Hash[Symbol, untyped]
+
+          def lon: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeoPolygon
+          include BaseComponent
+
+          def points: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeoShape
+          include BaseComponent
+
+          def shape: (untyped value) -> Hash[Symbol, untyped]
+
+          def indexed_shape: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class GeohashCell
+          include BaseComponent
+
+          def precision: (untyped value) -> Hash[Symbol, untyped]
+
+          def lat: (untyped value) -> Hash[Symbol, untyped]
+
+          def lon: (untyped value) -> Hash[Symbol, untyped]
+
+          def neighbors: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class HasChild
+          include BaseComponent
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def min_children: (untyped value) -> Hash[Symbol, untyped]
+
+          def max_children: (untyped value) -> Hash[Symbol, untyped]
+
+          def inner_hits: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (::OpenSearch::DSL::Search::Query) [self: ::OpenSearch::DSL::Search::Query] -> void } -> self
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class HasParent
+          include BaseComponent
+
+          def parent_type: (untyped value) -> Hash[Symbol, untyped]
+
+          def score_mode: (untyped value) -> Hash[Symbol, untyped]
+
+          def inner_hits: (untyped value) -> Hash[Symbol, untyped]
+
+          def query: (hashable query) -> self
+                   | () { (::OpenSearch::DSL::Search::Query) [self: ::OpenSearch::DSL::Search::Query] -> void } -> self
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class Ids
+          include BaseComponent
+
+          def type: (untyped value) -> Hash[Symbol, untyped]
+
+          def values: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Indices
+          include BaseComponent
+
+          def indices: (untyped value) -> Hash[Symbol, untyped]
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+
+          def no_match_filter: (hashable filter) -> self
+                             | () { (Filter) [self: Filter] -> void } -> self
+        end
+
+        class Limit
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class MatchAll
+          include BaseComponent
+        end
+
+        class Missing
+          include BaseComponent
+
+          def field: (untyped value) -> Hash[Symbol, untyped]
+
+          def existence: (untyped value) -> Hash[Symbol, untyped]
+
+          def null_value: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Nested
+          include BaseComponent
+
+          def path: (untyped value) -> Hash[Symbol, untyped]
+
+          def filter: (hashable filter) -> self
+                    | () { (Filter) [self: Filter] -> void } -> self
+
+          def query: (hashable query) -> self
+                   | () { (::OpenSearch::DSL::Search::Query) [self: ::OpenSearch::DSL::Search::Query] -> void } -> self
+        end
+
+        class Not
+          include BaseComponent
+
+          def and: (*untyped args) ?{ (Filters::And) [self: Filters::And] -> void } -> Filters::And
+
+          def bool: (*untyped args) ?{ (Filters::Bool) [self: Filters::Bool] -> void } -> Filters::Bool
+
+          def exists: (*untyped args) ?{ (Filters::Exists) [self: Filters::Exists] -> void } -> Filters::Exists
+
+          def geo_bounding_box: (*untyped args) ?{ (Filters::GeoBoundingBox) [self: Filters::GeoBoundingBox] -> void } -> Filters::GeoBoundingBox
+
+          def geo_distance: (*untyped args) ?{ (Filters::GeoDistance) [self: Filters::GeoDistance] -> void } -> Filters::GeoDistance
+
+          def geo_distance_range: (*untyped args) ?{ (Filters::GeoDistanceRange) [self: Filters::GeoDistanceRange] -> void } -> Filters::GeoDistanceRange
+
+          def geo_polygon: (*untyped args) ?{ (Filters::GeoPolygon) [self: Filters::GeoPolygon] -> void } -> Filters::GeoPolygon
+
+          def geo_shape: (*untyped args) ?{ (Filters::GeoShape) [self: Filters::GeoShape] -> void } -> Filters::GeoShape
+
+          def geohash_cell: (*untyped args) ?{ (Filters::GeohashCell) [self: Filters::GeohashCell] -> void } -> Filters::GeohashCell
+
+          def has_child: (*untyped args) ?{ (Filters::HasChild) [self: Filters::HasChild] -> void } -> Filters::HasChild
+
+          def has_parent: (*untyped args) ?{ (Filters::HasParent) [self: Filters::HasParent] -> void } -> Filters::HasParent
+
+          def ids: (*untyped args) ?{ (Filters::Ids) [self: Filters::Ids] -> void } -> Filters::Ids
+
+          def indices: (*untyped args) ?{ (Filters::Indices) [self: Filters::Indices] -> void } -> Filters::Indices
+
+          def limit: (*untyped args) ?{ (Filters::Limit) [self: Filters::Limit] -> void } -> Filters::Limit
+
+          def match_all: (*untyped args) ?{ (Filters::MatchAll) [self: Filters::MatchAll] -> void } -> Filters::MatchAll
+
+          def missing: (*untyped args) ?{ (Filters::Missing) [self: Filters::Missing] -> void } -> Filters::Missing
+
+          def nested: (*untyped args) ?{ (Filters::Nested) [self: Filters::Nested] -> void } -> Filters::Nested
+
+          def not: (*untyped args) ?{ (Filters::Not) [self: Filters::Not] -> void } -> Filters::Not
+
+          def or: (*untyped args) ?{ (Filters::Or) [self: Filters::Or] -> void } -> Filters::Or
+
+          def prefix: (*untyped args) ?{ (Filters::Prefix) [self: Filters::Prefix] -> void } -> Filters::Prefix
+
+          def query: (*untyped args) ?{ (::OpenSearch::DSL::Search::Query) [self: ::OpenSearch::DSL::Search::Query] -> void } -> Filters::Query
+
+          def range: (*untyped args) ?{ (Filters::Range) [self: Filters::Range] -> void } -> Filters::Range
+
+          def regexp: (*untyped args) ?{ (Filters::Regexp) [self: Filters::Regexp] -> void } -> Filters::Regexp
+
+          def script: (*untyped args) ?{ (Filters::Script) [self: Filters::Script] -> void } -> Filters::Script
+
+          def term: (*untyped args) ?{ (Filters::Term) [self: Filters::Term] -> void } -> Filters::Term
+
+          def terms: (*untyped args) ?{ (Filters::Terms) [self: Filters::Terms] -> void } -> Filters::Terms
+
+          def type: (*untyped args) ?{ (Filters::Type) [self: Filters::Type] -> void } -> Filters::Type
+        end
+
+        class Or
+          include BaseComponent
+          include BaseCompoundFilterComponent
+        end
+
+        class Prefix
+          include BaseComponent
+        end
+
+        class Query
+          include BaseComponent
+        end
+
+        class Range
+          include BaseComponent
+
+          def gte: (untyped value) -> Hash[Symbol, untyped]
+
+          def gt: (untyped value) -> Hash[Symbol, untyped]
+
+          def lte: (untyped value) -> Hash[Symbol, untyped]
+
+          def lt: (untyped value) -> Hash[Symbol, untyped]
+
+          def boost: (untyped value) -> Hash[Symbol, untyped]
+
+          def time_zone: (untyped value) -> Hash[Symbol, untyped]
+
+          def format: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Regexp
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+
+          def flags: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Script
+          include BaseComponent
+
+          def script: (untyped value) -> Hash[Symbol, untyped]
+
+          def params: (untyped value) -> Hash[Symbol, untyped]
+        end
+
+        class Term
+          include BaseComponent
+        end
+
+        class Terms
+          include BaseComponent
+        end
+
+        class Type
+          include BaseComponent
+
+          def value: (untyped value) -> Hash[Symbol, untyped]
+        end
+      end
+    end
+  end
+end
