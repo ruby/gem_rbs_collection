@@ -1,0 +1,70 @@
+module FriendlyId
+  module Slugged
+    def normalize_friendly_id: (String value) -> String
+
+    def should_generate_new_friendly_id?: () -> boolish
+
+    def resolve_friendly_id_conflict: (Candidates candidates) -> String?
+
+    module Configuration
+      attr_writer slug_column: Symbol | String
+
+      attr_writer slug_limit: Integer?
+
+      attr_writer sequence_separator: String
+
+      attr_accessor slug_generator_class: Class?
+
+      attr_accessor treat_numeric_as_conflict: bool?
+
+      def slug_column: () -> (Symbol | String)
+
+      def slug_limit: () -> Integer?
+
+      def sequence_separator: () -> String
+    end
+  end
+
+  class Candidates
+    include Enumerable[String]
+
+    def each: () { (String) -> void } -> void
+            | () -> Array[String]
+  end
+
+  class SlugGenerator
+    def available?: (String? slug) -> bool
+
+    def generate: (Candidates candidates) -> String?
+  end
+
+  module SequentiallySlugged
+    include Slugged
+  end
+
+  module Reserved
+    module Configuration
+      attr_accessor reserved_words: Array[String]?
+
+      attr_accessor treat_reserved_as_conflict: bool?
+    end
+  end
+
+  module Scoped
+    include Slugged
+
+    module Configuration
+      attr_accessor scope: Symbol | String | Array[Symbol | String]?
+
+      def scope_columns: () -> Array[String]
+    end
+  end
+
+  module SimpleI18n
+    include Slugged
+
+    module Model
+      def set_friendly_id: (String text, ?Symbol? locale) -> void
+    end
+  end
+end
