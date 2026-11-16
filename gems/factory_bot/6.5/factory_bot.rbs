@@ -1,0 +1,179 @@
+module FactoryBot
+  VERSION: String
+
+  class AssociationDefinitionError < RuntimeError
+  end
+
+  class TraitDefinitionError < RuntimeError
+  end
+
+  class InvalidCallbackNameError < RuntimeError
+  end
+
+  class DuplicateDefinitionError < RuntimeError
+  end
+
+  class SequenceAbuseError < RuntimeError
+  end
+
+  class AttributeDefinitionError < RuntimeError
+  end
+
+  class MethodDefinitionError < RuntimeError
+  end
+
+  class InvalidFactoryError < RuntimeError
+  end
+
+  class Factory
+    attr_reader name: Symbol
+  end
+
+  class Registry
+    include Enumerable[Factory]
+
+    attr_reader name: String
+
+    def clear: () -> void
+
+    def find: (Symbol | String name) -> Factory
+
+    alias [] find
+
+    def registered?: (Symbol | String name) -> bool
+
+    def each: () { (Factory) -> void } -> void
+            | () -> Enumerator[Factory, void]
+  end
+
+  class SyntaxRunner
+    include Syntax::Methods
+  end
+
+  class DefinitionProxy
+    def add_attribute: (Symbol name) { () -> untyped } -> void
+
+    def transient: () { () [self: DefinitionProxy] -> void } -> void
+
+    def sequence: (Symbol name, ?untyped initial, ?aliases: Array[Symbol]) ?{ (untyped) -> untyped } -> void
+
+    def association: (Symbol name, *Symbol | Hash[Symbol, untyped] options) -> void
+
+    def to_create: () { (untyped) -> untyped } -> void
+
+    def skip_create: () -> void
+
+    def factory: (Symbol | String name, ?Hash[Symbol, untyped] options) ?{ () [self: DefinitionProxy] -> void } -> void
+
+    def trait: (Symbol name) { () [self: DefinitionProxy] -> void } -> void
+
+    def traits_for_enum: (Symbol attribute_name, ?(Array[untyped] | Hash[untyped, untyped])? values) -> void
+
+    def initialize_with: () { () -> untyped } -> void
+
+    def before: (*Symbol names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+    def after: (*Symbol names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+    def callback: (*Symbol names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+  end
+
+  module Syntax
+    module Methods
+      def create: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> untyped
+
+      def build: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> untyped
+
+      def build_stubbed: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> untyped
+
+      def attributes_for: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (Hash[Symbol, untyped] attributes) -> void } -> Hash[Symbol, untyped]
+
+      def create_list: (Symbol | String name, Integer amount, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance, ?Integer index) -> void } -> Array[untyped]
+
+      def build_list: (Symbol | String name, Integer amount, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance, ?Integer index) -> void } -> Array[untyped]
+
+      def build_stubbed_list: (Symbol | String name, Integer amount, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance, ?Integer index) -> void } -> Array[untyped]
+
+      def attributes_for_list: (Symbol | String name, Integer amount, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (Hash[Symbol, untyped] attributes, ?Integer index) -> void } -> Array[Hash[Symbol, untyped]]
+
+      def create_pair: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> Array[untyped]
+
+      def build_pair: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> Array[untyped]
+
+      def build_stubbed_pair: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> Array[untyped]
+
+      def attributes_for_pair: (Symbol | String name, *Symbol | Hash[Symbol, untyped] traits_and_overrides) ?{ (Hash[Symbol, untyped] attributes) -> void } -> Array[Hash[Symbol, untyped]]
+
+      def generate: (*Symbol | String uri_parts, ?scope: untyped) -> untyped
+
+      def generate_list: (*Symbol | String | Integer uri_parts_and_count, ?scope: untyped) -> Array[untyped]
+    end
+
+    module Default
+      include Methods
+
+      def define: () { () [self: DSL] -> void } -> void
+
+      def modify: () { () [self: ModifyDSL] -> void } -> void
+
+      class DSL
+        def factory: (Symbol | String name, ?Hash[Symbol, untyped] options) ?{ () [self: DefinitionProxy] -> void } -> void
+
+        def sequence: (Symbol name, ?untyped initial, ?aliases: Array[Symbol]) ?{ (untyped) -> untyped } -> void
+
+        def trait: (Symbol name) { () [self: DefinitionProxy] -> void } -> void
+
+        def before: (*Symbol names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+        def after: (*Symbol names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+        def callback: (*Symbol names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+        def initialize_with: () { () -> untyped } -> void
+
+        def skip_create: () -> void
+
+        def to_create: () { (untyped) -> untyped } -> void
+      end
+
+      class ModifyDSL
+        def factory: (Symbol | String name, ?Hash[Symbol, untyped] _options) { () [self: DefinitionProxy] -> void } -> void
+      end
+    end
+  end
+
+  extend Syntax::Default
+
+  def self.use_parent_strategy: () -> bool
+
+  def self.use_parent_strategy=: (bool value) -> bool
+
+  def self.automatically_define_enum_traits: () -> bool
+
+  def self.automatically_define_enum_traits=: (bool value) -> bool
+
+  def self.sequence_setting_timeout: () -> Integer
+
+  def self.sequence_setting_timeout=: (Integer value) -> Integer
+
+  def self.definition_file_paths: () -> Array[String]
+
+  def self.definition_file_paths=: (Array[String] paths) -> Array[String]
+
+  def self.build_stubbed_starting_id=: (Integer starting_id) -> Integer
+
+  def self.factories: () -> Registry
+
+  def self.find_definitions: () -> void
+
+  def self.reload: () -> void
+
+  def self.lint: (?Enumerable[Factory] factories, ?strategy: Symbol, ?traits: bool, ?verbose: bool) -> void
+               | (Enumerable[Factory] factories, Hash[Symbol, untyped] options) -> void
+
+  def self.rewind_sequences: () -> void
+
+  def self.rewind_sequence: (*Symbol | String uri_parts) -> void
+
+  def self.set_sequence: (*untyped uri_parts_and_value) -> void
+end
