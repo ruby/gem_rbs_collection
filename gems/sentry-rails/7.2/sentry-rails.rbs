@@ -1,0 +1,103 @@
+module Sentry
+  class Configuration
+    attr_reader rails: Sentry::Rails::Configuration
+  end
+
+  module Rails
+    VERSION: String
+
+    class Configuration
+      attr_accessor register_error_subscriber: bool
+      attr_accessor report_rescued_exceptions: bool
+      attr_accessor skippable_job_adapters: Array[String]
+      attr_accessor tracing_subscribers: Set[Class]
+      attr_accessor enable_db_query_source: bool
+      attr_accessor db_query_source_threshold_ms: Numeric
+      attr_accessor assets_regexp: Regexp?
+      attr_accessor active_support_logger_subscription_items: Hash[String, Array[Symbol]]
+      attr_accessor active_job_report_on_retry_error: bool
+      attr_accessor active_job_propagate_traces: bool
+      attr_accessor solid_queue_exclude_recurring_tasks: Array[String | Regexp]
+      attr_reader structured_logging: StructuredLoggingConfiguration
+    end
+
+    class StructuredLoggingConfiguration
+      attr_accessor enabled: bool
+      attr_accessor subscribers: Hash[Symbol, Class]
+
+      def enabled?: () -> bool
+    end
+
+    module ControllerMethods
+      def capture_message: (String message, ?Hash[Symbol, untyped] options) -> untyped
+      def capture_exception: (Exception exception, ?Hash[Symbol, untyped] options) -> untyped
+    end
+
+    class ErrorSubscriber
+      def report: (Exception error, handled: bool, severity: Symbol, context: Hash[Symbol, untyped], ?source: String?) -> void
+    end
+
+    module ActionCableExtensions
+      module Connection
+      end
+    end
+
+    class LogSubscriber < ActiveSupport::LogSubscriber
+    end
+
+    module LogSubscribers
+      class ActionControllerSubscriber < LogSubscriber
+      end
+
+      class ActionMailerSubscriber < LogSubscriber
+      end
+
+      class ActiveJobSubscriber < LogSubscriber
+      end
+
+      class ActiveRecordSubscriber < LogSubscriber
+      end
+    end
+
+    module Tracing
+      START_TIMESTAMP_NAME: Symbol
+
+      def self.get_current_transaction: () -> untyped
+
+      class AbstractSubscriber
+        def self.subscribe!: () -> void
+        def self.unsubscribe!: () -> void
+        def self.subscribe_to_event: (Array[String] event_names) { (String event_name, Float duration, Hash[Symbol, untyped] payload) -> void } -> void
+        def self.record_on_current_span: (duration: Numeric, **untyped options) ?{ (untyped span) -> void } -> untyped
+      end
+
+      class ActionViewSubscriber < AbstractSubscriber
+        EVENT_NAMES: Array[String]
+        SPAN_PREFIX: String
+        SPAN_ORIGIN: String
+      end
+
+      class ActiveRecordSubscriber < AbstractSubscriber
+        EVENT_NAMES: Array[String]
+        SPAN_PREFIX: String
+        SPAN_ORIGIN: String
+      end
+
+      class ActiveStorageSubscriber < AbstractSubscriber
+        EVENT_NAMES: Array[String]
+        SPAN_ORIGIN: String
+      end
+
+      class ActiveSupportSubscriber < AbstractSubscriber
+        READ_EVENT_NAMES: Array[String]
+        WRITE_EVENT_NAMES: Array[String]
+        REMOVE_EVENT_NAMES: Array[String]
+        FLUSH_EVENT_NAMES: Array[String]
+        EVENT_NAMES: Array[String]
+        SPAN_ORIGIN: String
+
+        def self.operation_name: (String event_name) -> String
+      end
+    end
+  end
+end
