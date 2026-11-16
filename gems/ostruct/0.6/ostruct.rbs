@@ -1,0 +1,29 @@
+class OpenStruct
+  VERSION: String
+
+  def initialize: (?(Hash[String | Symbol, untyped] | OpenStruct | Struct[untyped])? hash) -> void
+                | (**untyped attributes) -> void
+
+  def []: (String | Symbol name) -> untyped
+
+  def []=: [T] (String | Symbol name, T value) -> T
+
+  def dig: (String | Symbol name, *untyped names) -> untyped
+
+  def delete_field: (String | Symbol name) -> untyped
+                  | [T] (String | Symbol name) { () -> T } -> (untyped | T)
+
+  def each_pair: () { ([Symbol, untyped]) -> void } -> self
+               | () -> Enumerator[[Symbol, untyped], self]
+
+  def to_h: () -> Hash[Symbol, untyped]
+          | [K, V] () { (Symbol name, untyped value) -> [K, V] } -> Hash[K, V]
+
+  def inspect: () -> String
+
+  def to_s: () -> String
+
+  def ==: (untyped other) -> bool
+
+  def eql?: (untyped other) -> bool
+end
