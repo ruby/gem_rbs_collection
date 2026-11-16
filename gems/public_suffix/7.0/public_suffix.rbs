@@ -1,0 +1,77 @@
+module PublicSuffix
+  VERSION: String
+
+  DOT: String
+  BANG: String
+  STAR: String
+
+  def self.parse: (_ToS name, ?list: List, ?default_rule: Rule::Base?, ?ignore_private: bool) -> Domain
+
+  def self.valid?: (_ToS name, ?list: List, ?default_rule: Rule::Base?, ?ignore_private: bool) -> bool
+
+  def self.domain: (_ToS name, ?list: List, ?default_rule: Rule::Base?, ?ignore_private: bool) -> String?
+
+  class Error < StandardError
+  end
+
+  class DomainInvalid < Error
+  end
+
+  class DomainNotAllowed < DomainInvalid
+  end
+
+  class Domain
+    attr_reader tld: String?
+    attr_reader sld: String?
+    attr_reader trd: String?
+
+    def to_s: () -> String
+    def to_a: () -> [String?, String?, String?]
+    def name: () -> String
+    def domain: () -> String?
+    def subdomain: () -> String?
+    def domain?: () -> bool
+    def subdomain?: () -> bool
+  end
+
+  class List
+    DEFAULT_LIST_PATH: String
+
+    def self.default: (?private_domains: bool) -> List
+    def self.default=: (List? value) -> List?
+    def self.parse: (String input, ?private_domains: bool) -> List
+
+    def initialize: () ?{ (List) -> void } -> void
+    def ==: (untyped other) -> bool
+    def eql?: (untyped other) -> bool
+    def add: (Rule::Base rule) -> self
+    def <<: (Rule::Base rule) -> self
+    def size: () -> Integer
+    def empty?: () -> bool
+    def default_rule: () -> Rule::Base
+  end
+
+  module Rule
+    def self.factory: (String content, ?private: bool) -> Base
+    def self.default: () -> Wildcard
+
+    class Base
+      attr_reader value: String
+      attr_reader length: Integer
+      attr_reader private: bool
+
+      def ==: (untyped other) -> bool
+      def eql?: (untyped other) -> bool
+      def rule: () -> String
+    end
+
+    class Normal < Base
+    end
+
+    class Wildcard < Base
+    end
+
+    class Exception < Base
+    end
+  end
+end
