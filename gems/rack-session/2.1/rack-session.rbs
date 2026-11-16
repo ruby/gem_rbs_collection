@@ -1,0 +1,365 @@
+module Rack
+  module Session
+    VERSION: String
+
+    RACK_SESSION: String
+
+    RACK_SESSION_OPTIONS: String
+
+    RACK_SESSION_UNPACKED_COOKIE_DATA: String
+
+    # A session ID whose private_id, the hash of the public ID, is used as
+    # the key of the stored session
+    class SessionId
+      ID_VERSION: Integer
+
+      attr_reader public_id: String
+
+      def initialize: (String public_id) -> void
+
+      def private_id: () -> String
+
+      alias cookie_value public_id
+
+      alias to_s public_id
+
+      def empty?: () -> false
+
+      def inspect: () -> String
+
+      private
+
+      def hash_sid: (String sid) -> String
+    end
+
+    module Abstract
+      # SessionHash is responsible to lazily load the session from store.
+      class SessionHash
+        include Enumerable[[String, untyped]]
+
+        Unspecified: Object
+
+        attr_writer id: untyped
+
+        def self.find: (Request req) -> untyped
+
+        def self.set: (Request req, untyped session) -> void
+
+        def self.set_options: (Request req, Hash[Symbol, untyped] options) -> void
+
+        def initialize: (Persisted store, Request req) -> void
+
+        def id: () -> untyped
+
+        def options: () -> Hash[Symbol, untyped]
+
+        def each: () { ([String, untyped]) -> void } -> Hash[String, untyped]
+
+        def []: (String | Symbol key) -> untyped
+
+        def dig: (String | Symbol key, *untyped keys) -> untyped
+
+        def fetch: (String | Symbol key, ?untyped default) ?{ (String) -> untyped } -> untyped
+
+        def has_key?: (String | Symbol key) -> bool
+
+        alias key? has_key?
+
+        alias include? has_key?
+
+        def []=: (String | Symbol key, untyped value) -> untyped
+
+        alias store []=
+
+        def clear: () -> Hash[String, untyped]
+
+        def destroy: () -> untyped
+
+        def to_hash: () -> Hash[String, untyped]
+
+        def update: (_ToHash[untyped, untyped] hash) -> Hash[String, untyped]
+
+        alias merge! update
+
+        def replace: (_ToHash[untyped, untyped] hash) -> Hash[String, untyped]
+
+        def delete: (String | Symbol key) -> untyped
+
+        def inspect: () -> String
+
+        def exists?: () -> bool
+
+        def loaded?: () -> bool
+
+        def empty?: () -> bool
+
+        def keys: () -> Array[String]
+
+        def values: () -> Array[untyped]
+
+        private
+
+        def load_for_read!: () -> void
+
+        def load_for_write!: () -> void
+
+        def load!: () -> void
+
+        def stringify_keys: (_ToHash[untyped, untyped] other) -> Hash[String, untyped]
+      end
+
+      # The base class of session stores. Subclasses implement find_session,
+      # write_session, and delete_session.
+      class Persisted
+        DEFAULT_OPTIONS: Hash[Symbol, untyped]
+
+        attr_reader key: String
+
+        attr_reader default_options: Hash[Symbol, untyped]
+
+        attr_reader sid_secure: untyped
+
+        attr_reader same_site: untyped
+
+        def initialize: (_Application app, ?Hash[Symbol, untyped] options) -> void
+
+        def call: (env env) -> response
+
+        def context: (env env, ?_Application app) -> response
+
+        # Sets the session cookie to the response if the session needs to be saved
+        def commit_session: (Request req, Response::Raw res) -> void
+
+        private
+
+        def make_request: (env env) -> Request
+
+        def initialize_sid: () -> void
+
+        def generate_sid: (?untyped secure) -> untyped
+
+        def prepare_session: (Request req) -> void
+
+        def load_session: (Request req) -> [untyped, untyped]
+
+        def extract_session_id: (Request request) -> untyped
+
+        def current_session_id: (Request req) -> untyped
+
+        def session_exists?: (Request req) -> boolish
+
+        def commit_session?: (Request req, untyped session, Hash[Symbol, untyped] options) -> boolish
+
+        def loaded_session?: (untyped session) -> bool
+
+        def forced_session_update?: (untyped session, Hash[Symbol, untyped] options) -> boolish
+
+        def force_options?: (Hash[Symbol, untyped] options) -> bool
+
+        def security_matches?: (Request request, Hash[Symbol, untyped] options) -> bool
+
+        def cookie_value: (untyped data) -> untyped
+
+        def set_cookie: (Request request, Response::Raw response, Hash[Symbol, untyped] cookie) -> void
+
+        def session_class: () -> singleton(SessionHash)
+
+        def find_session: (Request req, untyped sid) -> [untyped, untyped]
+
+        def write_session: (Request req, untyped sid, Hash[String, untyped] session, Hash[Symbol, untyped] options) -> untyped
+
+        def delete_session: (Request req, untyped sid, Hash[Symbol, untyped] options) -> untyped
+      end
+
+      # A session store whose session IDs are SessionId, so the stored sessions
+      # are keyed by their private IDs
+      class PersistedSecure < Persisted
+        class SecureSessionHash < SessionHash
+        end
+
+        def generate_sid: (*untyped) -> SessionId
+
+        def extract_session_id: (*untyped) -> SessionId?
+
+        private
+
+        def session_class: () -> singleton(SecureSessionHash)
+      end
+
+      # Deprecated. Inherit from Persisted instead.
+      class ID < Persisted
+        def find_session: (Request req, untyped sid) -> untyped
+
+        def write_session: (Request req, untyped sid, Hash[String, untyped] session, Hash[Symbol, untyped] options) -> untyped
+
+        def delete_session: (Request req, untyped sid, Hash[Symbol, untyped] options) -> untyped
+      end
+    end
+
+    # Stores the sessions in a Hash in memory
+    class Pool < Abstract::PersistedSecure
+      DEFAULT_OPTIONS: Hash[Symbol, untyped]
+
+      attr_reader mutex: Thread::Mutex
+
+      attr_reader pool: Hash[String, Hash[String, untyped]]
+
+      def initialize: (_Application app, ?Hash[Symbol, untyped] options) -> void
+
+      def generate_sid: (*untyped args, ?use_mutex: boolish) -> SessionId
+
+      def find_session: (Request req, SessionId? sid) -> [SessionId, Hash[String, untyped]]
+
+      def write_session: (Request req, SessionId session_id, Hash[String, untyped] new_session, Hash[Symbol, untyped] options) -> (SessionId | false)
+
+      def delete_session: (Request req, SessionId session_id, Hash[Symbol, untyped] options) -> SessionId?
+
+      private
+
+      def get_session_with_fallback: (SessionId sid) -> Hash[String, untyped]?
+    end
+
+    # Stores the sessions in the cookie, encrypted with the :secrets option
+    class Cookie < Abstract::PersistedSecure
+      # The :coder option, which serializes the session when no :secrets are given
+      interface _Coder
+        def encode: (untyped data) -> untyped
+
+        def decode: (untyped data) -> untyped
+      end
+
+      class Base64
+        def encode: (String str) -> String
+
+        def decode: (String str) -> String
+
+        class Marshal < Base64
+          def encode: (untyped str) -> String
+
+          def decode: (String? str) -> untyped
+        end
+
+        class JSON < Base64
+          def encode: (untyped obj) -> String
+
+          def decode: (String? str) -> untyped
+        end
+
+        class ZipJSON < Base64
+          def encode: (untyped obj) -> String
+
+          def decode: (String? str) -> untyped
+        end
+      end
+
+      class Identity
+        def encode: [T] (T str) -> T
+
+        def decode: [T] (T str) -> T
+      end
+
+      class Marshal
+        def encode: (untyped str) -> String
+
+        def decode: (String? str) -> untyped
+      end
+
+      attr_reader coder: _Coder
+
+      attr_reader encryptors: Array[Encryptor]
+
+      def initialize: (_Application app, ?Hash[Symbol, untyped] options) -> void
+
+      private
+
+      def find_session: (Request req, untyped sid) -> [untyped, Hash[String, untyped]]
+
+      def extract_session_id: (Request request) -> untyped
+
+      def unpacked_cookie_data: (Request request) -> Hash[String, untyped]
+
+      def persistent_session_id!: (Hash[String, untyped]? data, ?untyped sid) -> Hash[String, untyped]
+
+      def write_session: (Request req, untyped session_id, Hash[String, untyped] session, Hash[Symbol, untyped] options) -> SessionId?
+
+      def delete_session: (Request req, untyped session_id, Hash[Symbol, untyped] options) -> Session::SessionId?
+
+      def legacy_digest_match?: (String? data, String? digest) -> bool
+
+      def legacy_generate_hmac: (String data) -> String
+
+      def encode_session_data: (Hash[String, untyped] session) -> untyped
+
+      def secure?: (Hash[Symbol, untyped] options) -> boolish
+
+      # A Session::SessionId with the encoded session data
+      class SessionId
+        attr_reader cookie_value: untyped
+
+        def initialize: (Session::SessionId session_id, untyped cookie_value) -> void
+
+        def public_id: () -> String
+
+        def private_id: () -> String
+
+        def empty?: () -> false
+      end
+    end
+
+    # Encrypts and decrypts the session data of Rack::Session::Cookie
+    class Encryptor
+      class Error < StandardError
+      end
+
+      class InvalidSignature < Error
+      end
+
+      class InvalidMessage < Error
+      end
+
+      module Serializable
+        private
+
+        def serialize_payload: (untyped message) -> String
+
+        def deserialized_message: (String data) -> untyped
+
+        def serializer: () -> untyped
+      end
+
+      class V1
+        include Serializable
+
+        def initialize: (String secret, ?Hash[Symbol, untyped] opts) -> void
+
+        def decrypt: (String base64_data) -> untyped
+
+        def encrypt: (untyped message) -> String
+      end
+
+      class V2
+        include Serializable
+
+        def initialize: (String secret, ?Hash[Symbol, untyped] opts) -> void
+
+        def decrypt: (String base64_data) -> untyped
+
+        def encrypt: (untyped message) -> String
+      end
+
+      def initialize: (String secret, ?Hash[Symbol, untyped] opts) -> void
+
+      def decrypt: (String base64_data) -> untyped
+
+      def encrypt: (untyped message) -> String
+
+      private
+
+      attr_reader v1: V1
+
+      attr_reader v2: V2
+
+      def guess_decryptor: (String? base64_data) -> (V1 | V2)
+    end
+  end
+end
