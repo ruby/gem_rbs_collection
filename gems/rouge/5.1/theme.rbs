@@ -1,0 +1,79 @@
+module Rouge
+  class Theme
+    def self.find: (String | Symbol name) -> singleton(Theme)?
+    def self.registry: () -> Hash[String, singleton(Theme)]
+
+    def self.palette: (Hash[Symbol | String, String] colors) -> Hash[Symbol | String, String]
+                    | (String | Symbol name) -> String
+
+    def self.render: (?{ ?scope: String } opts) -> String
+                   | (?{ ?scope: String } opts) { (String) -> void } -> void
+  end
+
+  module HasModes
+    def mode: () -> Symbol?
+            | (Symbol mode) -> singleton(Theme)
+
+    def mode!: (Symbol mode) -> void
+  end
+
+  class CSSTheme < Theme
+    def initialize: (?{ ?scope: String } opts) -> void
+
+    def render: () -> String
+              | () { (String) -> void } -> void
+  end
+
+  module Themes
+    class Base16 < CSSTheme
+      extend HasModes
+
+      def self.light!: () -> void
+      def self.dark!: () -> void
+    end
+
+    class BlackWhiteTheme < CSSTheme
+    end
+
+    class Colorful < CSSTheme
+    end
+
+    class Github < CSSTheme
+      extend HasModes
+
+      def self.light!: () -> void
+      def self.dark!: () -> void
+    end
+
+    class Gruvbox < CSSTheme
+      extend HasModes
+
+      def self.light!: () -> void
+      def self.dark!: () -> void
+    end
+
+    class IgorPro < CSSTheme
+    end
+
+    class Magritte < CSSTheme
+    end
+
+    class Molokai < CSSTheme
+    end
+
+    class Monokai < CSSTheme
+    end
+
+    class MonokaiSublime < CSSTheme
+    end
+
+    class Pastie < CSSTheme
+    end
+
+    class ThankfulEyes < CSSTheme
+    end
+
+    class Tulip < CSSTheme
+    end
+  end
+end

@@ -1,0 +1,67 @@
+module Phlex
+  class SGML
+    include Helpers
+
+    type renderable = SGML | singleton(SGML) | Enumerable[renderable] | Proc | Method | String
+
+    module SafeObject
+      def to_s: () -> String
+    end
+
+    class SafeValue
+      include SafeObject
+
+      attr_reader to_s: String
+    end
+
+    module Elements
+      def register_element: (Symbol method_name, ?tag: String) -> Symbol
+    end
+
+    def self.call: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> String
+
+    def view_template: () ?{ (*untyped) -> untyped } -> untyped
+
+    def to_proc: () -> ^(SGML) -> nil
+
+    def call: (?String buffer, ?context: Hash[untyped, untyped], ?fragments: Enumerable[String | Symbol]?) ?{ (*untyped) -> untyped } -> String
+
+    def context: () -> Hash[untyped, untyped]
+
+    def rendering?: () -> bool
+
+    def plain: (String | Symbol | Integer | Float | nil content) -> nil
+
+    def whitespace: () ?{ (self) -> untyped } -> nil
+
+    def comment: () ?{ (self) -> untyped } -> nil
+
+    def raw: (SafeObject? content) -> nil
+
+    def capture: (*untyped args) ?{ (*untyped) -> untyped } -> String
+
+    def fragment: (String | Symbol name) { () -> untyped } -> nil
+
+    def safe: (String value) -> SafeValue
+
+    def flush: () -> nil
+
+    def render: (?renderable? renderable) ?{ (*untyped) -> untyped } -> nil
+
+    def cache: (*untyped cache_key, **untyped options) { () -> untyped } -> nil
+
+    def low_level_cache: (untyped cache_key, **untyped options) { () -> untyped } -> nil
+
+    private
+
+    def vanish: (*untyped) ?{ (*untyped) -> untyped } -> nil
+
+    def render?: () -> bool
+
+    def around_template: () { () -> untyped } -> nil
+
+    def before_template: () ?{ (*untyped) -> untyped } -> nil
+
+    def after_template: () ?{ (*untyped) -> untyped } -> nil
+  end
+end

@@ -1,0 +1,100 @@
+module InlineSvg
+  VERSION: String
+
+  interface _AssetFile
+    def named: (String asset_name) -> String
+  end
+
+  interface _Randomness
+    def call: () -> String
+  end
+
+  type transform_params = Hash[Symbol, untyped]
+
+  type custom_transformation = {
+    ?attribute: Symbol,
+    transform: singleton(TransformPipeline::Transformations::Transformation),
+    ?priority: Integer,
+    ?default_value: untyped
+  }
+
+  class Configuration
+    class Invalid < ArgumentError
+    end
+
+    attr_reader asset_file: _AssetFile
+
+    attr_reader custom_transformations: Hash[Symbol, custom_transformation]
+
+    attr_reader svg_not_found_css_class: String?
+
+    def asset_file=: (_AssetFile custom_asset_file) -> void
+
+    def svg_not_found_css_class=: (String? css_class) -> void
+
+    def add_custom_transformation: (custom_transformation options) -> Hash[Symbol, custom_transformation]
+
+    def raise_on_file_not_found=: (boolish value) -> void
+
+    def raise_on_file_not_found?: () -> bool
+  end
+
+  def self.configuration: () -> Configuration
+
+  def self.configure: () { (Configuration config) -> void } -> void
+
+  class AssetFile
+    class FileNotFound < IOError
+    end
+
+    def self.named: (String filename) -> String
+  end
+
+  class CachedAssetFile
+    def initialize: (?paths: Array[String | Pathname] | String | Pathname?, ?filters: Array[String | Regexp] | String | Regexp) -> void
+
+    def named: (String asset_name) -> String
+  end
+
+  class IdGenerator
+    class Randomness
+      def self.call: () -> String
+    end
+
+    def self.generate: (String base, _ToS salt, ?randomness: _Randomness) -> String
+  end
+
+  module TransformPipeline
+    module Transformations
+      class Transformation
+        def self.create_with_value: (untyped value) -> instance
+
+        attr_reader value: untyped
+
+        def initialize: (untyped value) -> void
+
+        def transform: (Nokogiri::XML::Document doc) -> Nokogiri::XML::Document
+
+        def with_svg: (Nokogiri::XML::Document doc) ?{ (Nokogiri::XML::Node svg) -> void } -> Nokogiri::XML::Document
+      end
+
+      class NullTransformation < Transformation
+      end
+    end
+  end
+
+  class CustomTransformation < TransformPipeline::Transformations::Transformation
+  end
+
+  module ActionView
+    module Helpers
+      def inline_svg_tag: (String | IO | StringIO filename, ?transform_params transform_params) -> ActiveSupport::SafeBuffer
+
+      def inline_svg_pack_tag: (String | IO | StringIO filename, ?transform_params transform_params) -> ActiveSupport::SafeBuffer
+    end
+  end
+end
+
+class ActionView::Base
+  include InlineSvg::ActionView::Helpers
+end

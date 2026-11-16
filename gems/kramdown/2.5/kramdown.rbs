@@ -1,0 +1,42 @@
+module Kramdown
+  VERSION: String
+
+  class Error < RuntimeError
+  end
+
+  class Document
+    attr_accessor root: Element
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    attr_reader warnings: Array[String]
+
+    def initialize: (String source, ?Hash[Symbol, untyped] options) -> void
+
+    def to_html: () -> String
+
+    def to_kramdown: () -> String
+
+    def to_latex: () -> String
+  end
+
+  class Element
+    attr_accessor type: Symbol
+
+    attr_accessor value: untyped
+
+    attr_accessor children: Array[Element]
+
+    def initialize: (Symbol `type`, ?untyped value, ?Hash[String, String]? attr, ?Hash[Symbol, untyped]? options) -> void
+
+    def attr: () -> Hash[String, String]
+
+    def options: () -> Hash[Symbol, untyped]
+
+    def self.category: (Element el) -> (:block | :span | nil)
+
+    def block?: () -> bool
+
+    def span?: () -> bool
+  end
+end

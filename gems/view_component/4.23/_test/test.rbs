@@ -1,0 +1,56 @@
+class ApplicationComponent < ViewComponent::Base
+end
+
+class ParentComponent < ApplicationComponent
+  def call: () -> String
+end
+
+module AlertComponentSlots
+  def title: () -> ViewComponent::Slot
+  def title?: () -> bool
+  def with_title: () ?{ () -> String } -> self
+  def with_title_content: (String content) -> self
+  def actions: () -> Array[ViewComponent::Slot]
+  def with_action: () ?{ () -> String } -> ViewComponent::Slot
+end
+
+class AlertComponent < ParentComponent
+  include AlertComponentSlots
+
+  @message: String
+
+  def initialize: (message: String) -> void
+  def call: () -> String
+end
+
+class IconComponent < ViewComponent::Base
+  def call: () -> String
+end
+
+class CardComponent < ViewComponent::Base
+  @card: String
+  @counter: Integer
+  def initialize: (card: String, ?card_counter: Integer) -> void
+  def call: () -> String
+end
+
+class CardPreview < ViewComponent::Preview
+  def default: () -> Hash[Symbol, untyped]
+  def with_block: () -> Hash[Symbol, untyped]
+  def templated: () -> Hash[Symbol, untyped]
+end
+
+class ActionComponent < ViewComponent::Base
+  def call: () -> String
+end
+
+class SmallBadgeComponent < ViewComponent::Base
+  def call: () -> String
+end
+
+class LargeBadgeComponent < ViewComponent::Base
+  def call: () -> String
+end
+
+class InlineComponent < ViewComponent::Base
+end

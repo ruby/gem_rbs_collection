@@ -1,0 +1,26 @@
+module I18n
+  module JS
+    VERSION: String
+
+    DEFAULT_CONFIG_PATH: String
+    DEFAULT_EXPORT_DIR_PATH: String
+
+    def self.config_file_path: () -> String
+    def self.config_file_path=: (String new_path) -> String
+
+    def self.export_i18n_js_dir_path: () -> (String | :none)
+    def self.export_i18n_js_dir_path=: (String | false | nil new_path) -> (String | false | nil)
+
+    def self.sort_translation_keys?: () -> bool
+    def self.sort_translation_keys=: (boolish value) -> bool
+
+    def self.backend: () -> untyped
+    def self.backend=: (untyped alternative_backend) -> untyped
+
+    def self.export: () -> void
+    def self.translations: () -> Hash[Symbol, untyped]
+
+    class Middleware
+    end
+  end
+end

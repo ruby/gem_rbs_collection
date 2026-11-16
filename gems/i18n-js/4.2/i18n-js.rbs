@@ -1,0 +1,44 @@
+module I18nJS
+  VERSION: String
+
+  type config = Hash[Symbol | String, untyped]
+
+  class MissingConfigError < StandardError
+  end
+
+  def self.call: (config_file: String | Pathname) -> Array[String]
+               | (config: config) -> Array[String]
+  def self.translations: () -> Hash[Symbol, untyped]
+  def self.listen: (
+    ?config_file: String | Pathname,
+    ?locales_dir: String | Pathname | Array[String | Pathname],
+    ?run_on_start: boolish,
+    ?options: Hash[Symbol, untyped]
+  ) -> Array[String]?
+  def self.register_plugin: (singleton(Plugin) plugin) -> void
+
+  class Plugin
+    attr_reader main_config: Hash[Symbol, untyped]
+    attr_reader schema: Schema
+
+    def config_key: () -> Symbol
+    def config: () -> Hash[Symbol, untyped]
+    def enabled?: () -> bool?
+    def transform: (translations: Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+    def validate_schema: () -> void
+    def setup: () -> void
+    def after_export: (files: Array[String]) -> void
+  end
+
+  class Schema
+    class InvalidError < StandardError
+    end
+
+    def self.root_keys: () -> Set[Symbol]
+    def expect_type: (path: Array[Symbol | Integer] | String | Symbol | nil, types: Class | Array[Class]) -> void
+    def expect_array_with_items: (path: Array[Symbol | Integer] | String | Symbol | nil) -> void
+    def expect_required_keys: (keys: Enumerable[Symbol], path: Array[Symbol | Integer] | String | Symbol | nil) -> void
+    def reject_extraneous_keys: (keys: Enumerable[Symbol], path: Array[Symbol | Integer] | String | Symbol | nil) -> void
+    def reject: (String error_message, ?untyped node) -> bot
+  end
+end

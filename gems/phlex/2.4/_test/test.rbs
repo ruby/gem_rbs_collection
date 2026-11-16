@@ -1,0 +1,76 @@
+class Greeting < Phlex::HTML
+  @name: String
+
+  def initialize: (name: String) -> void
+
+  def view_template: () -> void
+end
+
+class Card < Phlex::HTML
+  @title: String
+
+  def initialize: (?String title) -> void
+
+  def view_template: () ?{ (*untyped) -> untyped } -> void
+end
+
+class Page < Phlex::HTML
+  @items: Array[String]
+
+  def initialize: (Array[String] items) -> void
+
+  def view_template: () -> void
+
+  private
+
+  def around_template: () { () -> untyped } -> nil
+
+  def before_template: () ?{ (*untyped) -> untyped } -> nil
+
+  def after_template: () ?{ (*untyped) -> untyped } -> nil
+
+  def render?: () -> bool
+end
+
+class Merged < Phlex::HTML
+  @attributes: Hash[Symbol, untyped]
+
+  def initialize: (**untyped attributes) -> void
+
+  def view_template: () ?{ (*untyped) -> untyped } -> void
+end
+
+class Cached < Phlex::HTML
+  def view_template: () -> void
+end
+
+class CustomElement < Phlex::HTML
+end
+
+class Embedded < Phlex::HTML
+  def view_template: () -> void
+
+  private
+
+  def register_element_result: () -> Symbol
+end
+
+class Sparkline < Phlex::SVG
+  @points: String
+
+  def initialize: (points: String) -> void
+
+  def view_template: () -> void
+end
+
+module Components
+  extend Phlex::Kit
+end
+
+class HTMLElements < Phlex::HTML
+  def view_template: () -> void
+end
+
+class SVGElements < Phlex::SVG
+  def view_template: () -> void
+end

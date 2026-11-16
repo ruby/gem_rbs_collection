@@ -1,0 +1,260 @@
+module Loofah
+  VERSION: String
+
+  type scrubber_name = Symbol | Scrubber
+
+  def self.html5_support?: () -> bool
+
+  def self.html4_document: (String | IO string_or_io, ?String? url, ?String? encoding, ?Integer options) ?{ (Nokogiri::XML::ParseOptions) -> void } -> HTML4::Document
+
+  def self.html4_fragment: (String? tags, ?String? encoding) -> HTML4::DocumentFragment
+
+  def self.scrub_html4_document: (String | IO string_or_io, scrubber_name method) -> HTML4::Document
+
+  def self.scrub_html4_fragment: (String? tags, scrubber_name method) -> HTML4::DocumentFragment
+
+  def self.html5_document: (String | IO string_or_io, ?String? url, ?String? encoding) ?{ (Hash[Symbol, untyped] options) -> void } -> HTML5::Document
+
+  def self.html5_fragment: (String | IO | nil tags, ?String? encoding) -> HTML5::DocumentFragment
+
+  def self.scrub_html5_document: (String | IO string_or_io, scrubber_name method) -> HTML5::Document
+
+  def self.scrub_html5_fragment: (String | IO | nil tags, scrubber_name method) -> HTML5::DocumentFragment
+
+  def self.document: (String | IO string_or_io, ?String? url, ?String? encoding, ?Integer options) ?{ (Nokogiri::XML::ParseOptions) -> void } -> HTML4::Document
+
+  def self.fragment: (String? tags, ?String? encoding) -> HTML4::DocumentFragment
+
+  def self.scrub_document: (String | IO string_or_io, scrubber_name method) -> HTML4::Document
+
+  def self.scrub_fragment: (String? tags, scrubber_name method) -> HTML4::DocumentFragment
+
+  def self.xml_document: (String | IO string_or_io, ?String? url, ?String? encoding, ?Integer options) ?{ (Nokogiri::XML::ParseOptions) -> void } -> XML::Document
+
+  def self.xml_fragment: (String? tags) -> XML::DocumentFragment
+
+  def self.scrub_xml_document: (String | IO string_or_io, scrubber_name method) -> XML::Document
+
+  def self.scrub_xml_fragment: (String? tags, scrubber_name method) -> XML::DocumentFragment
+
+  def self.remove_extraneous_whitespace: (String string) -> String
+
+  class ScrubberNotFound < RuntimeError
+  end
+
+  class Scrubber
+    CONTINUE: Object
+
+    STOP: Object
+
+    attr_reader direction: :top_down | :bottom_up
+
+    attr_reader block: (^(Nokogiri::XML::Node) -> top)?
+
+    def initialize: (?{ ?direction: :top_down | :bottom_up } options) ?{ (Nokogiri::XML::Node) -> top } -> void
+
+    def scrub: (Nokogiri::XML::Node node) -> top
+
+    def append_attribute: (Nokogiri::XML::Node node, String attribute, String value) -> String
+  end
+
+  module Scrubbers
+    class Strip < Scrubber
+      def initialize: () -> void
+    end
+
+    class Prune < Scrubber
+      def initialize: () -> void
+    end
+
+    class Escape < Scrubber
+      def initialize: () -> void
+    end
+
+    class Whitewash < Scrubber
+      def initialize: () -> void
+    end
+
+    class NoFollow < Scrubber
+      def initialize: () -> void
+    end
+
+    class TargetBlank < Scrubber
+      def initialize: () -> void
+    end
+
+    class NoOpener < Scrubber
+      def initialize: () -> void
+    end
+
+    class NoReferrer < Scrubber
+      def initialize: () -> void
+    end
+
+    class Unprintable < Scrubber
+      def initialize: () -> void
+    end
+
+    class DoubleBreakpoint < Scrubber
+      def initialize: () -> void
+    end
+
+    MAP: Hash[Symbol, singleton(Scrubber)]
+
+    def self.scrubber_symbols: () -> Array[Symbol]
+  end
+
+  module ScrubBehavior
+    module Node
+      def scrub!: (scrubber_name scrubber) -> self
+    end
+  end
+
+  module TextBehavior
+    def text: (?Hash[Symbol, bool] options) -> String
+
+    alias inner_text text
+
+    alias to_str text
+
+    def to_text: (?Hash[Symbol, bool] options) -> String
+  end
+
+  module Helpers
+    def self.strip_tags: (String? string_or_io) -> String
+
+    def self.sanitize: (String? string_or_io) -> String
+  end
+
+  module HTML4
+    class Document < Nokogiri::HTML::Document
+      include ScrubBehavior::Node
+      include TextBehavior
+
+      def self.parse: (String | IO string_or_io, ?String? url, ?String? encoding, ?Integer options) ?{ (Nokogiri::XML::ParseOptions) -> void } -> instance
+
+      def to_s: () -> String
+    end
+
+    class DocumentFragment < Nokogiri::HTML::DocumentFragment
+      include ScrubBehavior::Node
+      include TextBehavior
+
+      def self.parse: (String? tags, ?String? encoding) -> instance
+
+      def to_s: () -> String
+
+      alias serialize to_s
+    end
+  end
+
+  module HTML = HTML4
+
+  module HTML5
+    class Document < Nokogiri::HTML::Document
+      include ScrubBehavior::Node
+      include TextBehavior
+
+      def self.parse: (String | IO string_or_io, ?String? url, ?String? encoding) ?{ (Hash[Symbol, untyped] options) -> void } -> instance
+
+      def to_s: () -> String
+    end
+
+    class DocumentFragment < Nokogiri::HTML::DocumentFragment
+      include ScrubBehavior::Node
+      include TextBehavior
+
+      def self.parse: (String | IO | nil tags, ?String? encoding) -> instance
+
+      def to_s: () -> String
+
+      alias serialize to_s
+    end
+
+    module Scrub
+      CONTROL_CHARACTERS: Regexp
+
+      def self.allowed_element?: (String element_name) -> bool
+
+      def self.scrub_attributes: (Nokogiri::XML::Node node) -> void
+
+      def self.scrub_css: (String style) -> String
+
+      def self.allowed_uri?: (String uri_string) -> bool
+
+      def self.scrub_uri_attribute: (Nokogiri::XML::Attr attr_node) -> bool
+
+      def self.cdata_needs_escaping?: (Nokogiri::XML::Node node) -> bool
+
+      def self.cdata_escape: (Nokogiri::XML::Node node) -> Nokogiri::XML::Node
+    end
+
+    module SafeList
+      ACCEPTABLE_ELEMENTS: Set[String]
+
+      MATHML_ELEMENTS: Set[String]
+
+      SVG_ELEMENTS: Set[String]
+
+      ACCEPTABLE_ATTRIBUTES: Set[String]
+
+      MATHML_ATTRIBUTES: Set[String]
+
+      SVG_ATTRIBUTES: Set[String]
+
+      ARIA_ATTRIBUTES: Set[String]
+
+      ACCEPTABLE_CSS_PROPERTIES: Set[String]
+
+      ACCEPTABLE_CSS_KEYWORDS: Set[String]
+
+      ACCEPTABLE_CSS_COLORS: Set[String]
+
+      ACCEPTABLE_CSS_EXTENDED_COLORS: Set[String]
+
+      ACCEPTABLE_CSS_FUNCTIONS: Set[String]
+
+      ACCEPTABLE_SVG_PROPERTIES: Set[String]
+
+      ACCEPTABLE_PROTOCOLS: Set[String]
+
+      ACCEPTABLE_URI_DATA_MEDIATYPES: Set[String]
+
+      ALLOWED_ELEMENTS: Set[String]
+
+      ALLOWED_ELEMENTS_WITH_LIBXML2: Set[String]
+
+      ALLOWED_ATTRIBUTES: Set[String]
+
+      ALLOWED_CSS_PROPERTIES: Set[String]
+
+      ALLOWED_CSS_KEYWORDS: Set[String]
+
+      ALLOWED_CSS_FUNCTIONS: Set[String]
+
+      ALLOWED_SVG_PROPERTIES: Set[String]
+
+      ALLOWED_PROTOCOLS: Set[String]
+
+      ALLOWED_URI_DATA_MEDIATYPES: Set[String]
+    end
+  end
+
+  module XML
+    class Document < Nokogiri::XML::Document
+      include ScrubBehavior::Node
+
+      def self.parse: (String | IO string_or_io, ?String? url, ?String? encoding, ?Integer options) ?{ (Nokogiri::XML::ParseOptions) -> void } -> instance
+
+      def to_s: () -> String
+    end
+
+    class DocumentFragment < Nokogiri::XML::DocumentFragment
+      include ScrubBehavior::Node
+
+      def self.parse: (String? tags) -> instance
+
+      def to_s: () -> String
+    end
+  end
+end

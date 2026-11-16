@@ -1,0 +1,150 @@
+module ViewComponent
+  class Base
+    include ActionView::Helpers
+    include ERB::Escape
+    include ViewComponent::InlineTemplate
+    include ViewComponent::Slotable
+    include ViewComponent::Translatable
+    include ViewComponent::WithContentHelper
+
+    extend ViewComponent::InlineTemplate::ClassMethods
+    extend ViewComponent::Slotable::ClassMethods
+    extend ViewComponent::Translatable::ClassMethods
+
+    def self.config: () -> ViewComponent::Config::Options
+
+    def self.cache_digest: (?finder: ActionView::LookupContext?, ?format: Symbol) -> String
+
+    def self.with_collection: (_ToAry[untyped] collection, ?spacer_component: ViewComponent::Base?, **untyped args) -> ViewComponent::Collection
+
+    def self.with_collection_parameter: (Symbol? parameter) -> void
+
+    def self.strip_trailing_whitespace: (?bool value) -> void
+
+    def self.strip_trailing_whitespace?: () -> bool
+
+    def self.sidecar_files: (Array[String | Symbol] extensions) -> Array[String]
+
+    def initialize: () -> void
+
+    def render_in: (ActionView::Base view_context, **untyped) ?{ (self) -> untyped } -> String
+
+    def render_parent: () -> nil
+
+    def render_parent_to_string: () -> String
+
+    def output_preamble: () -> String
+
+    def output_postamble: () -> String
+
+    def before_render: () -> void
+
+    def around_render: () { () -> untyped } -> untyped
+
+    def render?: () -> bool
+
+    def controller: () -> ActionController::Base
+
+    def helpers: () -> untyped
+
+    def request: () -> ActionDispatch::Request?
+
+    def current_template: () -> ViewComponent::Template?
+
+    def content: () -> String?
+
+    def content?: () -> bool
+  end
+
+  class Collection
+    include Enumerable[ViewComponent::Base]
+
+    def render_in: (ActionView::Base view_context, **untyped) ?{ (ViewComponent::Base) -> untyped } -> String
+
+    def each: () { (ViewComponent::Base) -> untyped } -> void
+            | () -> Enumerator[ViewComponent::Base, void]
+
+    def size: () -> Integer
+  end
+
+  class Template
+  end
+
+  class Slot
+    include ViewComponent::WithContentHelper
+
+    def content?: () -> bool
+
+    def to_s: () -> String
+  end
+
+  module Slotable
+    module ClassMethods
+      def renders_one: (Symbol slot_name, ?(Symbol | String | Class | Proc | { types: Hash[Symbol, untyped] } | Hash[Symbol, untyped])? callable) -> void
+
+      def renders_many: (Symbol slot_name, ?(Symbol | String | Class | Proc | { types: Hash[Symbol, untyped] } | Hash[Symbol, untyped])? callable) -> void
+
+      def slot_type: (Symbol slot_name) -> (:single | :collection | :collection_item)?
+    end
+  end
+
+  module WithContentHelper
+    def with_content: (untyped value) -> self
+  end
+
+  module Translatable
+    module ClassMethods
+      def translate: (?(String | Symbol | Array[String | Symbol])? key, **untyped options) -> untyped
+
+      alias t translate
+    end
+
+    def translate: (?(String | Symbol | Array[String | Symbol])? key, **untyped options) -> untyped
+
+    alias t translate
+  end
+
+  module InlineTemplate
+    module ClassMethods
+      def erb_template: (String template) -> void
+    end
+  end
+
+  class Config
+    class Options < ActiveSupport::OrderedOptions
+      def generate: () -> ViewComponent::Config::Options
+
+      def previews: () -> ViewComponent::Config::Options
+
+      def instrumentation_enabled: () -> bool
+
+      def instrumentation_enabled=: (bool value) -> bool
+    end
+
+    def self.current: () -> ViewComponent::Config::Options
+
+    def self.defaults: () -> ViewComponent::Config::Options
+  end
+
+  class Preview
+    include ActionView::Helpers::TagHelper
+    include ActionView::Helpers::AssetTagHelper
+    extend ActiveSupport::DescendantsTracker
+
+    def self.all: () -> Array[singleton(ViewComponent::Preview)]
+
+    def self.examples: () -> Array[String]
+
+    def self.exists?: (String preview) -> bool
+
+    def self.find: (String preview) -> singleton(ViewComponent::Preview)?
+
+    def self.preview_name: () -> String
+
+    def self.layout: (String | Symbol | false | nil layout_name) -> void
+
+    def render: (ViewComponent::Base component, **untyped args) ?{ (*untyped) -> untyped } -> Hash[Symbol, untyped]
+
+    def render_with_template: (?template: String?, ?locals: Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+  end
+end

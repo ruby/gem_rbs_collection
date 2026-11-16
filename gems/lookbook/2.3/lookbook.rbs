@@ -1,0 +1,422 @@
+module Lookbook
+  VERSION: String
+
+  def self.version: () -> String
+
+  def self.config: () -> ConfigStore
+
+  def self.configure: () { (ConfigStore config) -> void } -> void
+
+  def self.previews: () -> Array[PreviewEntity]
+
+  def self.pages: () -> Array[PageEntity]
+
+  def self.data: () -> Store
+
+  def self.data=: (Hash[Symbol, untyped] new_data) -> Hash[Symbol, untyped]
+
+  def self.add_input_type: (Symbol name, String partial_path, ?Hash[Symbol, untyped] opts) -> void
+
+  def self.add_panel: (Symbol | String name, String partial_path, ?Hash[Symbol, untyped] opts) -> void
+
+  def self.update_panel: (Symbol | String name, Hash[Symbol, untyped] opts) -> void
+
+  def self.remove_panel: (Symbol | String name) -> void
+
+  def self.add_tag: (Symbol | String name, ?Array[Symbol]? args) ?{ (CustomTag tag) -> void } -> void
+
+  def self.after_initialize: () { (singleton(Lookbook) app) -> void } -> void
+
+  def self.before_exit: () { (singleton(Lookbook) app) -> void } -> void
+
+  def self.after_change: () { (singleton(Lookbook) app, Hash[Symbol, Array[String]] changes) -> void } -> void
+
+  class Error < StandardError
+    attr_reader scope: String?
+    attr_reader original: Exception?
+    attr_reader status: Integer?
+    attr_reader detail: String?
+    attr_reader source: String?
+
+    def message: () -> String?
+
+    def type: () -> String
+
+    def file_path: () -> String?
+
+    def relative_file_path: () -> String?
+
+    def line_number: () -> Integer?
+
+    def backtrace_lines: () -> Array[String]
+  end
+
+  class ConfigError < Error
+  end
+
+  class Engine < Rails::Engine
+    def self.mount_path: () -> String
+
+    def self.mounted?: () -> bool
+
+    def self.previews: () -> PreviewCollection
+
+    def self.pages: () -> PageCollection
+  end
+
+  class Store < ActiveSupport::OrderedOptions
+    def fetch: (Symbol | String name, *untyped args) ?{ (Symbol) -> untyped } -> untyped
+
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  class ConfigStore
+    def project_name: () -> (String | false | nil)
+
+    def project_name=: (String | false | nil name) -> (String | false | nil)
+
+    def project_logo: () -> String?
+
+    def project_logo=: (String? svg) -> String?
+
+    def preview_collection_label: () -> String
+
+    def preview_collection_label=: (String label) -> String
+
+    def preview_nav_filter: () -> bool
+
+    def preview_nav_filter=: (bool value) -> bool
+
+    def preview_paths: () -> Array[String | Pathname]
+
+    def preview_paths=: (Array[String | Pathname] paths) -> Array[String | Pathname]
+
+    def preview_display_options: () -> Hash[Symbol, untyped]
+
+    def preview_display_options=: (Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+
+    def preview_controller: () -> String
+
+    def preview_controller=: (String name) -> String
+
+    def preview_template: () -> String
+
+    def preview_template=: (String path) -> String
+
+    def preview_layout: () -> (String | false)?
+
+    def preview_layout=: ((String | false)? layout) -> (String | false)?
+
+    def preview_inspector: () -> Store
+
+    def preview_embeds: () -> Store
+
+    def preview_disable_error_handling: () -> bool
+
+    def preview_disable_error_handling=: (bool value) -> bool
+
+    def preview_single_pass_rendering: () -> bool
+
+    def preview_single_pass_rendering=: (bool value) -> bool
+
+    def preview_sort_scenarios: () -> bool
+
+    def preview_sort_scenarios=: (bool value) -> bool
+
+    def page_collection_label: () -> String
+
+    def page_collection_label=: (String label) -> String
+
+    def page_nav_filter: () -> bool
+
+    def page_nav_filter=: (bool value) -> bool
+
+    def page_paths: () -> Array[String | Pathname]
+
+    def page_paths=: (Array[String | Pathname] paths) -> Array[String | Pathname]
+
+    def page_extensions: () -> Array[String]
+
+    def page_extensions=: (Array[String]? extensions) -> Array[String]?
+
+    def page_route: () -> String
+
+    def page_route=: (String route) -> String
+
+    def page_options: () -> Hash[Symbol, untyped]
+
+    def page_options=: (Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+
+    def component_paths: () -> Array[String | Pathname]
+
+    def component_paths=: (Array[String | Pathname] paths) -> Array[String | Pathname]
+
+    def markdown_options: () -> Hash[Symbol, untyped]
+
+    def markdown_options=: (Hash[Symbol, untyped]? options) -> Hash[Symbol, untyped]?
+
+    def highlighter_options: () -> Hash[Symbol, untyped]
+
+    def highlighter_options=: (Hash[Symbol, untyped]? options) -> Hash[Symbol, untyped]?
+
+    def reload_on_change: () -> bool?
+
+    def reload_on_change=: (bool? value) -> bool?
+
+    def lazy_load_previews_and_pages: () -> bool
+
+    def lazy_load_previews_and_pages=: (bool value) -> bool
+
+    def live_updates: () -> bool
+
+    def live_updates=: (bool value) -> bool
+
+    def listen_paths: () -> Array[String | Pathname]
+
+    def listen_paths=: (Array[String | Pathname] paths) -> Array[String | Pathname]
+
+    def listen_extensions: () -> Array[String]
+
+    def listen_extensions=: (Array[String]? extensions) -> Array[String]?
+
+    def autoload_previews: () -> bool
+
+    def autoload_previews=: (bool value) -> bool
+
+    def ui_theme: () -> String
+
+    def ui_theme=: (Symbol | String name) -> String
+
+    def ui_theme_overrides: () -> Store
+                          | () { (Store overrides) -> void } -> void
+
+    def ui_theme_overrides=: (Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
+
+    def ui_favicon: () -> (String | Hash[Symbol, String] | bool)
+
+    def ui_favicon=: (String | Hash[Symbol, String] | bool favicon) -> (String | Hash[Symbol, String] | bool)
+
+    def log_level: () -> Integer
+
+    def log_level=: (Integer level) -> Integer
+
+    def log_use_rails_logger: () -> bool
+
+    def log_use_rails_logger=: (bool value) -> bool
+
+    def debug_menu: () -> bool
+
+    def debug_menu=: (bool value) -> bool
+
+    def using_view_component: () -> bool
+
+    def using_view_component=: (bool value) -> bool
+  end
+
+  class Preview
+    include ActionView::Helpers::TagHelper
+    include ActionView::Helpers::AssetTagHelper
+
+    def self.layout: (String | false layout_name) -> void
+
+    def render: (?(String | ViewComponent::Base)? component, **untyped args) ?{ (*untyped) -> untyped } -> Hash[Symbol, untyped]
+
+    def render_component: (?(String | ViewComponent::Base)? component, **untyped args) ?{ (*untyped) -> untyped } -> Hash[Symbol, untyped]
+
+    def render_with_template: (?template: String?, ?locals: Hash[Symbol, untyped]?) -> Hash[Symbol, untyped]
+  end
+
+  class PreviewController < Rails::ApplicationController
+  end
+
+  module PreviewHelper
+    def lookbook_display: (Symbol | String key, ?untyped fallback) -> untyped
+
+    def lookbook_data: (Symbol | String key, ?untyped fallback) -> untyped
+  end
+
+  class YardTag < ::YARD::Tags::Tag
+    def text: () -> String?
+
+    def options: () -> Hash[Symbol, untyped]
+  end
+
+  class CustomTag < YardTag
+    attr_reader arg_names: Array[Symbol]
+    attr_reader tag_args: Hash[Symbol, String?]
+
+    def tag_body: () -> String?
+
+    def opts: () -> Hash[Symbol, untyped]
+  end
+
+  class Entity
+    def id: () -> String
+
+    def name: () -> String
+
+    def label: () -> String
+
+    def type: () -> Symbol
+
+    def lookup_path: () -> String
+  end
+
+  module NavigableEntity
+    def hidden?: () -> bool
+
+    def visible?: () -> bool
+  end
+
+  module LocatableEntity
+    def file_path: () -> Pathname
+
+    def file_name: (?bool strip_ext) -> String
+
+    def file_extension: () -> String
+
+    def directory_path: () -> Pathname
+
+    def relative_file_path: () -> Pathname
+
+    def relative_directory_path: () -> Pathname
+
+    def last_modified: () -> Time
+  end
+
+  module AnnotatableEntity
+    def notes: () -> String
+
+    def has_tag?: (Symbol | String name) -> bool
+  end
+
+  class PreviewEntity < Entity
+    include AnnotatableEntity
+    include LocatableEntity
+    include NavigableEntity
+
+    def preview_class: () -> singleton(Lookbook::Preview)
+
+    def preview_class_name: () -> String
+
+    def scenarios: () -> ScenarioCollection
+
+    def scenario: (Symbol | String scenario_name) -> ScenarioEntity?
+
+    def visible_scenarios: () -> ScenarioCollection
+
+    def hidden_scenarios: () -> ScenarioCollection
+
+    def default_scenario: () -> ScenarioEntity?
+
+    def render_targets: () -> RenderTargetCollection
+
+    def inspect_path: () -> String
+
+    def preview_path: () -> String
+
+    def url_path: () -> String
+  end
+
+  class ScenarioEntity < Entity
+    include AnnotatableEntity
+    include NavigableEntity
+
+    attr_reader preview: PreviewEntity
+
+    def parent: () -> PreviewEntity
+
+    def source: () -> String
+
+    def display_options: () -> Hash[Symbol, untyped]
+
+    def inspect_path: () -> String
+
+    def preview_path: () -> String
+
+    def url_path: () -> String
+  end
+
+  class ScenarioGroupEntity < Entity
+    include NavigableEntity
+
+    attr_reader scenarios: ScenarioCollection
+
+    attr_reader preview: PreviewEntity
+
+    def display_options: () -> Hash[Symbol, untyped]
+
+    def render_targets: () -> RenderTargetCollection
+
+    def inspect_path: () -> String
+
+    def preview_path: () -> String
+
+    def url_path: () -> String
+  end
+
+  class RenderableEntity < Entity
+    include LocatableEntity
+
+    def component_class: () -> Class?
+
+    def inline?: () -> bool
+
+    def component?: () -> bool
+
+    def template?: () -> bool
+
+    def template_file_path: () -> String?
+  end
+
+  class PageEntity < Entity
+    include LocatableEntity
+    include NavigableEntity
+
+    def title: () -> String
+
+    def data: () -> untyped
+
+    def landing?: () -> bool
+
+    def markdown?: () -> bool
+
+    def header?: () -> bool
+
+    def footer?: () -> bool
+
+    def docs_path: () -> String
+
+    def url_path: () -> String
+  end
+
+  class EntityCollection[T < Entity]
+    include Enumerable[T]
+
+    def find_by_id: (Symbol | String id) -> T?
+
+    def find_by_path: (Symbol | String path) -> T?
+
+    def next: (T entity) -> T?
+
+    def previous: (T entity) -> T?
+
+    def each: () { (T entity) -> void } -> void
+            | () -> Enumerator[T, void]
+  end
+
+  class PreviewCollection < EntityCollection[PreviewEntity]
+    def find_by_preview_class: (Class | String klass) -> PreviewEntity?
+
+    def find_scenario_by_path: (Symbol | String lookup_path) -> ScenarioEntity?
+  end
+
+  class PageCollection < EntityCollection[PageEntity]
+  end
+
+  class ScenarioCollection < EntityCollection[ScenarioEntity | ScenarioGroupEntity]
+  end
+
+  class RenderTargetCollection < EntityCollection[RenderableEntity]
+  end
+end

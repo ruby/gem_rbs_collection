@@ -1,0 +1,37 @@
+module Phlex
+  VERSION: String
+
+  def self.html: () { (untyped) [self: HTML] -> untyped } -> String
+
+  def self.svg: () { (untyped) [self: SVG] -> untyped } -> String
+
+  module Error
+  end
+
+  class ArgumentError < ::ArgumentError
+    include Error
+  end
+
+  class DoubleRenderError < ::RuntimeError
+    include Error
+  end
+
+  class RuntimeError < ::RuntimeError
+    include Error
+  end
+
+  class NameError < ::NameError[untyped]
+    include Error
+  end
+
+  module Helpers
+    private
+
+    def mix: (*Hash[untyped, untyped] args) -> Hash[Symbol, untyped]
+
+    def grab: (**untyped bindings) -> untyped
+  end
+
+  module Kit
+  end
+end

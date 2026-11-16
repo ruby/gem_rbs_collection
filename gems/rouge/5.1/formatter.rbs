@@ -1,0 +1,65 @@
+module Rouge
+  class Formatter
+    def self.tag: () -> String?
+    def self.find: (String tag) -> singleton(Formatter)?
+    def self.format: (Enumerable[Token::pair] tokens, *untyped args, **untyped kwargs) -> String
+
+    def initialize: (?Hash[Symbol, untyped] opts) -> void
+
+    def format: (Enumerable[Token::pair] tokens) -> String
+              | (Enumerable[Token::pair] tokens) { (String) -> void } -> void
+  end
+
+  module Formatters
+    class HTML < Formatter
+      def span: (singleton(Token) tok, String val) -> String
+      def safe_span: (singleton(Token) tok, String safe_val) -> String
+    end
+
+    class HTMLDebug < HTML
+    end
+
+    class HTMLInline < HTML
+      def initialize: (singleton(Theme) | Theme | String theme) -> void
+    end
+
+    class HTMLLegacy < Formatter
+      type options = {
+        ?css_class: String,
+        ?line_numbers: bool,
+        ?inline_theme: singleton(Theme) | Theme | String,
+        ?wrap: bool
+      }
+
+      def initialize: (?options opts) -> void
+    end
+
+    class HTMLLineTable < Formatter
+      type options = {
+        ?start_line: Integer,
+        ?table_class: String,
+        ?line_id: String,
+        ?line_class: String,
+        ?gutter_class: String,
+        ?code_class: String
+      }
+
+      def initialize: (HTML formatter, ?options opts) -> void
+    end
+
+    class HTMLTable < Formatter
+      type options = {
+        ?start_line: Integer,
+        ?line_format: String,
+        ?table_class: String,
+        ?gutter_class: String,
+        ?code_class: String
+      }
+
+      def initialize: (HTML inner, ?options opts) -> void
+    end
+
+    class Null < Formatter
+    end
+  end
+end

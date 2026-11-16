@@ -1,0 +1,19 @@
+class HTMLEntities
+  type flavor = String | Symbol
+
+  type instruction = :basic | :named | :decimal | :hexadecimal
+
+  FLAVORS: Array[String]
+
+  class UnknownFlavor < RuntimeError
+  end
+
+  class InstructionError < RuntimeError
+  end
+
+  def initialize: (?flavor flavor) -> void
+
+  def decode: (_ToS source) -> String
+
+  def encode: (_ToS source, *instruction instructions) -> String
+end
