@@ -1,0 +1,129 @@
+module Rack
+  class MiniProfiler
+    VERSION: String
+
+    class Context
+    end
+
+    class Config
+      # Behavior
+      def authorization_mode: () -> (:allow_all | :allow_authorized)
+      def authorization_mode=: (:allow_all | :allow_authorized | :whitelist mode) -> (:allow_all | :allow_authorized | :whitelist)
+      attr_accessor auto_inject: boolish
+      attr_accessor enabled: boolish
+      attr_accessor disable_caching: boolish
+      def pre_authorize_cb: () -> Proc
+      def pre_authorize_cb=: (((^(Rack::env) -> boolish) | Proc) callback) -> (((^(Rack::env) -> boolish) | Proc))
+      def user_provider: () -> Proc
+      def user_provider=: (((^(Rack::env) -> untyped) | Proc) callback) -> (((^(Rack::env) -> untyped) | Proc))
+      attr_accessor skip_paths: Array[String | Regexp]?
+      attr_accessor skip_schema_queries: boolish
+      attr_accessor profile_parameter: String
+      attr_accessor suppress_encoding: boolish
+      attr_accessor enable_advanced_debugging_tools: boolish
+      attr_accessor enable_hotwire_turbo_drive_support: boolish
+      attr_accessor content_security_policy_nonce: (String | (^(Rack::env, untyped) -> String?) | Proc)?
+      attr_accessor assets_url: ((^(String, String, Rack::env) -> String?) | Proc)?
+      attr_accessor base_url_path: String
+      attr_accessor cookie_path: String
+      attr_accessor logger: ::Logger?
+
+      # Storage
+      attr_accessor storage: singleton(AbstractStore)
+      attr_accessor storage_instance: AbstractStore?
+      attr_accessor storage_options: Hash[Symbol, untyped]?
+      def storage_failure: () -> Proc
+      def storage_failure=: (((^(Exception) -> untyped) | Proc) callback) -> (((^(Exception) -> untyped) | Proc))
+
+      # Backtraces and SQL
+      attr_accessor backtrace_ignores: Array[Regexp]?
+      attr_accessor backtrace_includes: Array[Regexp]?
+      attr_accessor backtrace_remove: (String | Regexp)?
+      attr_accessor backtrace_threshold_ms: Numeric
+      attr_accessor max_sql_param_length: Integer
+      attr_accessor skip_sql_param_names: Regexp?
+
+      # Flamegraphs
+      attr_accessor flamegraph_sample_rate: Numeric
+      attr_accessor flamegraph_mode: Symbol
+      attr_accessor flamegraph_ignore_gc: boolish
+
+      # UI
+      attr_accessor collapse_results: boolish
+      attr_accessor html_container: String
+      attr_accessor max_traces_to_show: Integer
+      attr_accessor position: String
+      attr_accessor show_children: boolish
+      attr_accessor show_controls: boolish
+      attr_accessor show_total_sql_count: boolish
+      attr_accessor show_trivial: boolish
+      attr_accessor start_hidden: boolish
+      attr_accessor toggle_shortcut: String
+
+      # Snapshots
+      attr_accessor snapshot_every_n_requests: Integer
+      attr_accessor max_snapshot_groups: Integer
+      attr_accessor max_snapshots_per_group: Integer
+      attr_accessor snapshot_hidden_custom_fields: Array[String]
+      attr_accessor snapshots_transport_destination_url: String?
+      attr_accessor snapshots_transport_auth_key: String?
+      attr_accessor snapshots_redact_sql_queries: boolish
+      attr_accessor snapshots_transport_gzip_requests: boolish
+    end
+
+    class AbstractStore
+    end
+
+    class MemoryStore < AbstractStore
+      def initialize: (?Hash[Symbol, untyped]? args) -> void
+    end
+
+    class RedisStore < AbstractStore
+      def initialize: (?Hash[Symbol, untyped]? args) -> void
+    end
+
+    class FileStore < AbstractStore
+      def initialize: (Hash[Symbol, untyped] args) -> void
+    end
+
+    class MemcacheStore < AbstractStore
+      def initialize: (?Hash[Symbol, untyped]? args) -> void
+    end
+
+    def self.config: () -> Config
+    def self.reset_config: () -> Config
+    def self.current: () -> Context?
+    def self.authorize_request: () -> true
+    def self.deauthorize_request: () -> nil
+    def self.request_authorized?: () -> bool?
+    def self.discard_results: () -> bool?
+    def self.snapshots_transporter?: () -> bool
+    def self.add_snapshot_custom_field: [T] (String key, T value) -> T
+
+    def self.step: [T] (String name, ?untyped opts) { () -> T } -> T
+                 | (String name, ?untyped opts) -> nil
+    def self.counter: [T] (String type, ?Numeric? duration_ms) { () -> T } -> T
+                    | (String type, ?Numeric? duration_ms) -> nil
+    def self.profile_method: (Module klass, Symbol | String method, ?(:profile | :counter) type) ?{ (*untyped) -> String } -> void
+    def self.unprofile_method: (Module klass, Symbol | String method) -> void
+    def self.counter_method: (Module klass, Symbol | String method) ?{ (*untyped) -> String } -> void
+    def self.uncounter_method: (Module klass, Symbol | String method) -> void
+    def self.profile_singleton_method: (Module klass, Symbol | String method, ?(:profile | :counter) type) ?{ (*untyped) -> String } -> void
+    def self.unprofile_singleton_method: (Module klass, Symbol | String method) -> void
+
+    def initialize: (Rack::_Application app, ?(Config | Hash[Symbol, untyped])? config) -> void
+    def call: (Rack::env env) -> Rack::response
+  end
+
+  module MiniProfilerRailsMethods
+    def render_notification_handler: (String name, Numeric finish, Numeric start, ?name_as_description: boolish) -> void
+  end
+
+  module MiniProfilerRails
+    extend MiniProfilerRailsMethods
+
+    def self.initialize!: (untyped app) -> void
+    def self.subscribe: (String event) { (String name, Float start, Float finish, String id, Hash[Symbol, untyped] payload) -> void } -> void
+    def self.shorten_identifier: (String identifier) -> String
+  end
+end
