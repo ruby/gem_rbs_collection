@@ -77,6 +77,16 @@ module ActionDispatch
         include ActiveSupport::Concern
         include UrlFor
         # https://github.com/rails/rails/blob/v7.2.2.2/actionpack/lib/action_dispatch/routing/route_set.rb#L518
+
+        # The generated module delegates these to a proxy object in its `class << self`.
+        def self.url_for: (untyped options) -> String
+        def self.full_url_for: (untyped options) -> String
+        def self.route_for: (untyped name, *untyped args) -> String
+        def self.optimize_routes_generation?: () -> bool
+        def self.polymorphic_url: (untyped record_or_hash_or_array, ?::Hash[untyped, untyped] options) -> String
+        def self.polymorphic_path: (untyped record_or_hash_or_array, ?::Hash[untyped, untyped] options) -> String
+        def self._routes: () -> RouteSet
+        def self.url_options: () -> ::Hash[untyped, untyped]
       end
     end
 
