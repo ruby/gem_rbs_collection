@@ -1,0 +1,133 @@
+module Rack
+  class Attack
+    VERSION: String
+
+    class Error < StandardError
+    end
+
+    class MisconfiguredStoreError < Error
+    end
+
+    class MissingStoreError < Error
+    end
+
+    class IncompatibleStoreError < Error
+    end
+
+    interface _Notifier
+      def instrument: (String name, ?Hash[Symbol, untyped] payload) -> untyped
+    end
+
+    type name = String | Symbol
+
+    type duration = Integer | ::_ToI
+
+    type period = duration | Proc | ^(Request request) -> Integer
+
+    type limit = Integer | Proc | ^(Request request) -> Integer
+
+    type responder = ^(Request request) -> ::Rack::response
+
+    attr_accessor self.enabled: bool
+    attr_accessor self.notifier: _Notifier?
+    attr_accessor self.throttle_discriminator_normalizer: (^(untyped discriminator) -> untyped)?
+    attr_reader self.configuration: Configuration
+
+    def self.cache: () -> Cache
+    def self.reset!: () -> void
+
+    def self.safelist: (?name? name) { (Request request) -> boolish } -> void
+    def self.blocklist: (?name? name) { (Request request) -> boolish } -> void
+    def self.safelist_ip: (String ip_address) -> void
+    def self.blocklist_ip: (String ip_address) -> void
+    def self.throttle: (name name, limit: limit, period: period, ?type: Symbol) { (Request request) -> untyped } -> Throttle
+    def self.track: (name name, ?limit: limit, ?period: period) { (Request request) -> untyped } -> Track
+    def self.throttled_responder: () -> responder
+    def self.throttled_responder=: (responder responder) -> responder
+    def self.blocklisted_responder: () -> responder
+    def self.blocklisted_responder=: (responder responder) -> responder
+    def self.throttled_response_retry_after_header: () -> bool
+    def self.throttled_response_retry_after_header=: (boolish value) -> boolish
+    def self.clear_configuration: () -> void
+    def self.safelists: () -> Hash[name, Safelist]
+    def self.blocklists: () -> Hash[name, Blocklist]
+    def self.throttles: () -> Hash[name, Throttle]
+    def self.tracks: () -> Hash[name, Track]
+
+    class Configuration
+      attr_reader safelists: Hash[name, Safelist]
+      attr_reader blocklists: Hash[name, Blocklist]
+      attr_reader throttles: Hash[name, Throttle]
+      attr_reader tracks: Hash[name, Track]
+      attr_accessor blocklisted_responder: responder
+      attr_accessor throttled_responder: responder
+      attr_reader throttled_response_retry_after_header: bool
+      def throttled_response_retry_after_header=: (boolish value) -> boolish
+
+      def safelist: (?name? name) { (Request request) -> boolish } -> void
+      def blocklist: (?name? name) { (Request request) -> boolish } -> void
+      def safelist_ip: (String ip_address) -> void
+      def blocklist_ip: (String ip_address) -> void
+      def throttle: (name name, limit: limit, period: period, ?type: Symbol) { (Request request) -> untyped } -> Throttle
+      def track: (name name, ?limit: limit, ?period: period) { (Request request) -> untyped } -> Track
+      def clear_configuration: () -> void
+    end
+
+    class Request < ::Rack::Request
+    end
+
+    class Cache
+      attr_accessor prefix: String
+      attr_accessor store: untyped
+
+      def count: (String unprefixed_key, duration period) -> Integer
+      def read: (String unprefixed_key) -> untyped
+      def write: (String unprefixed_key, untyped value, duration expires_in) -> untyped
+      def reset_count: (String unprefixed_key, duration period) -> untyped
+      def delete: (String unprefixed_key) -> untyped
+      def reset!: () -> untyped
+    end
+
+    class Check
+      attr_reader name: name?
+      attr_reader type: Symbol?
+    end
+
+    class Safelist < Check
+    end
+
+    class Blocklist < Check
+    end
+
+    class Throttle
+      attr_reader name: name
+      attr_reader limit: limit
+      attr_reader period: Integer | Proc | ^(Request request) -> Integer
+      attr_reader type: Symbol
+    end
+
+    class Track
+      attr_reader filter: Check | Throttle
+    end
+
+    class Fail2Ban
+      def self.filter: (untyped discriminator, bantime: duration, findtime: duration, maxretry: Integer) { () -> boolish } -> bool?
+      def self.reset: (untyped discriminator, findtime: duration, **untyped) -> untyped
+      def self.banned?: (untyped discriminator) -> bool
+    end
+
+    class Allow2Ban < Fail2Ban
+    end
+
+    class BaseProxy < SimpleDelegator
+    end
+
+    module StoreProxy
+      class RedisProxy < BaseProxy
+      end
+
+      class RedisCacheStoreProxy < BaseProxy
+      end
+    end
+  end
+end
