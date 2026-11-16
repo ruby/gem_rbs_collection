@@ -194,5 +194,14 @@ class BodyRenderer
   end
 end
 
+params = ActionController::Parameters.new({ name: "Francesco" })
+(params == ActionController::Parameters.new) & true
+params.eql?(ActionController::Parameters.new) & true
+params.hash + 1
+mime = Mime::Type.new("text/plain")
+(mime == "text/plain") & true
+mime.eql?(Mime::Type.new("text/html")) & true
+(mime === [mime]) & true
+
 # helpers_path holds the configured helper directories
 ActionController::Base.helpers_path = ActionController::Base.helpers_path.map(&:upcase)

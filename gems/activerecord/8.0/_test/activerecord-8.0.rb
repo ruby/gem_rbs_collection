@@ -106,6 +106,10 @@ module Test
   built.reload.articles
   built.slice(:name, 'id').keys
   (built <=> User.new)&.positive?
+  # @type var comparison: -1 | 0 | 1 | nil
+  comparison = built <=> User.new
+  (built == User.new) & true
+  built.hash + 1
   built.validate & built.valid?
   built.signed_id(purpose: :login).length
   User.find_signed(built.signed_id)
