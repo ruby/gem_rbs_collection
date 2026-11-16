@@ -1,0 +1,43 @@
+module HttpAcceptLanguage
+  class Parser
+    attr_accessor header: String?
+
+    def initialize: (String? header) -> void
+
+    def user_preferred_languages: () -> Array[String]
+
+    def user_preferred_languages=: (Array[String] languages) -> Array[String]
+
+    def preferred_language_from: (Enumerable[_ToS] available_languages) -> String?
+
+    def compatible_language_from: [T < _ToS] (Enumerable[T] available_languages) -> T?
+
+    def sanitize_available_locales: (Enumerable[_ToS] available_languages) -> Array[String]
+
+    def language_region_compatible_from: (Enumerable[_ToS] available_languages) -> String?
+  end
+
+  class Middleware
+    def initialize: (Rack::_Application app) -> void
+
+    def call: (Rack::env env) -> Rack::response
+  end
+
+  module AutoLocale
+    extend ActiveSupport::Concern
+  end
+
+  module EasyAccess
+    def http_accept_language: () -> Parser
+  end
+end
+
+module ActionController
+  class Base
+    include HttpAcceptLanguage::EasyAccess
+  end
+
+  class API
+    include HttpAcceptLanguage::EasyAccess
+  end
+end

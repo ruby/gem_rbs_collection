@@ -1,0 +1,71 @@
+module Rack
+  class Timeout
+    module ExceptionWithEnv
+      attr_reader env: Rack::env
+    end
+
+    class Error < RuntimeError
+      include ExceptionWithEnv
+    end
+
+    class RequestExpiryError < Error
+    end
+
+    class RequestTimeoutError < Error
+    end
+
+    class RequestTimeoutException < Exception
+      include ExceptionWithEnv
+    end
+
+    class RequestDetails < Struct[untyped]
+      attr_accessor id: String?
+      attr_accessor wait: Float?
+      attr_accessor service: Float?
+      attr_accessor timeout: Numeric?
+      attr_accessor state: Symbol?
+      attr_accessor term: Integer?
+
+      def ms: (Symbol key) -> String?
+    end
+
+    VALID_STATES: Array[Symbol]
+    ENV_INFO_KEY: String
+
+    attr_reader service_timeout: Numeric | false
+    attr_reader wait_timeout: Numeric | false
+    attr_reader wait_overtime: Numeric | false
+    attr_reader service_past_wait: bool
+    attr_reader term_on_timeout: Numeric | false
+
+    def initialize: (
+      Rack::_Application app,
+      ?service_timeout: Numeric | false | nil,
+      ?wait_timeout: Numeric | false | nil,
+      ?wait_overtime: Numeric | false | nil,
+      ?service_past_wait: bool,
+      ?term_on_timeout: Numeric | false | nil
+    ) -> void
+
+    def call: (Rack::env env) -> Rack::response
+
+    def self.register_state_change_observer: (untyped id) { (Rack::env env) -> void } -> Proc
+
+    def self.unregister_state_change_observer: (untyped id) -> Proc?
+
+    module Logger
+      attr_reader self.device: (IO | String)?
+      attr_reader self.level: (Integer | String | Symbol)?
+      attr_reader self.logger: ::Logger?
+
+      def self.device=: ((IO | String)? new_device) -> void
+      def self.level=: (Integer | String | Symbol? new_level) -> void
+      def self.logger=: (::Logger new_logger) -> void
+      def self.disable: () -> void
+    end
+
+    class StateChangeLoggingObserver
+      STATE_LOG_LEVEL: Hash[Symbol, Symbol]
+    end
+  end
+end

@@ -1,0 +1,39 @@
+module BetterErrors
+  VERSION: String
+
+  type editor_proc = Proc | ^(String file, Integer line) -> String
+
+  def self.application_root: () -> String?
+  def self.application_root=: (String? root) -> String?
+  def self.logger: () -> ::Logger?
+  def self.logger=: (::Logger? logger) -> ::Logger?
+  def self.ignored_instance_variables: () -> Array[Symbol | String]
+  def self.ignored_instance_variables=: (Array[Symbol | String] names) -> Array[Symbol | String]
+  def self.maximum_variable_inspect_size: () -> Integer
+  def self.maximum_variable_inspect_size=: (Integer size) -> Integer
+  def self.ignored_classes: () -> Array[String]
+  def self.ignored_classes=: (Array[String] names) -> Array[String]
+
+  def self.editor: () -> Editor
+  def self.editor=: (Symbol | String | editor_proc editor) -> void
+  def self.default_editor: () -> Editor
+  def self.use_pry!: () -> void
+
+  class Editor
+    def url: (String raw_path, Integer line) -> String
+    def scheme: () -> String
+  end
+
+  class ErrorPage
+    def initialize: (Exception exception, Hash[String, untyped] env) -> void
+  end
+
+  class Middleware
+    ALLOWED_IPS: Set[IPAddr]
+
+    def self.allow_ip!: (String | IPAddr addr) -> Set[IPAddr]
+
+    def initialize: (Rack::_Application app, ?singleton(ErrorPage) handler) -> void
+    def call: (Rack::env env) -> Rack::response
+  end
+end

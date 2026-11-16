@@ -1,0 +1,49 @@
+class Premailer
+  module Rails
+    VERSION: String
+
+    interface _CSSCache
+      def []: (String url) -> String?
+
+      def []=: (String url, String css) -> untyped
+    end
+
+    def self.config: () -> Hash[Symbol, untyped]
+
+    def self.config=: (Hash[Symbol, untyped] config) -> Hash[Symbol, untyped]
+
+    def self.register_interceptors: () -> void
+
+    class Hook
+      def self.perform: (Mail::Message message) -> Mail::Message
+
+      alias self.delivering_email self.perform
+
+      alias self.previewing_email self.perform
+    end
+
+    class CustomizedPremailer < ::Premailer
+      def initialize: (String html) -> void
+    end
+
+    module CSSHelper
+      extend CSSHelper
+
+      attr_accessor cache: _CSSCache
+    end
+
+    module CSSLoaders
+      module FileSystemLoader
+        extend FileSystemLoader
+
+        def file_name: (String url) -> String
+      end
+
+      module NetworkLoader
+        extend NetworkLoader
+
+        def uri_for_url: (String url) -> URI::Generic?
+      end
+    end
+  end
+end

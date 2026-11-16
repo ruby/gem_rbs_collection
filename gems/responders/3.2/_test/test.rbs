@@ -1,0 +1,27 @@
+class ApplicationResponder < ActionController::Responder
+  include Responders::FlashResponder
+  include Responders::HttpCacheResponder
+  include Responders::CollectionResponder
+end
+
+class TurboResponder < ActionController::Responder
+  def to_html: () -> untyped
+  def to_js: () -> untyped
+  def to_format: () -> untyped
+  def custom_behavior: () -> untyped
+
+  private
+
+  def navigation_behavior: (Exception error) -> untyped
+  def api_behavior: () -> untyped
+end
+
+class PostsController < ActionController::Base
+  def index: () -> untyped
+  def show: () -> untyped
+  def create: () -> untyped
+end
+
+class ResponderUser
+  def run: (ActionController::Base controller, String post) -> untyped
+end
