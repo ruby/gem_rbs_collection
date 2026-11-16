@@ -1,0 +1,100 @@
+module Responders
+  module ControllerMethod
+    def responders: (*(Symbol | String | Module) responders) -> singleton(ActionController::Responder)
+  end
+
+  module FlashResponder : ActionController::Responder
+    def self.flash_keys: () -> Array[Symbol]
+    def self.flash_keys=: (Array[Symbol]) -> Array[Symbol]
+    def self.namespace_lookup: () -> bool
+    def self.namespace_lookup=: (bool) -> bool
+
+    def to_html: () -> untyped
+    def to_js: () -> untyped
+  end
+
+  module HttpCacheResponder : ActionController::Responder
+    def to_format: () -> untyped
+  end
+
+  module CollectionResponder
+  end
+end
+
+module ActionController
+  class Responder
+    DEFAULT_ACTIONS_FOR_VERBS: Hash[Symbol, Symbol]
+
+    def self.call: ((ActionController::Base | ActionController::API) controller, Array[untyped] resources, ?Hash[Symbol, untyped] options) -> untyped
+    def self.error_status: () -> (Symbol | Integer)
+    def self.error_status=: (Symbol | Integer) -> (Symbol | Integer)
+    def self.redirect_status: () -> (Symbol | Integer)
+    def self.redirect_status=: (Symbol | Integer) -> (Symbol | Integer)
+
+    attr_reader controller: ActionController::Base | ActionController::API
+    attr_reader request: ActionDispatch::Request
+    attr_reader format: Symbol
+    attr_reader resource: untyped
+    attr_reader resources: Array[untyped]
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: ((ActionController::Base | ActionController::API) controller, Array[untyped] resources, ?Hash[Symbol, untyped] options) -> void
+    def respond: () -> untyped
+    def to_html: () -> untyped
+    def to_js: () -> untyped
+    def to_format: () -> untyped
+
+    def head: (*untyped args, **untyped options) -> untyped
+    def render: (*untyped args, **untyped options) -> untyped
+    def redirect_to: (*untyped args, **untyped options) -> untyped
+
+    def get?: () -> bool
+    def post?: () -> bool
+    def patch?: () -> bool
+    def put?: () -> bool
+    def delete?: () -> bool
+
+    private
+
+    def navigation_behavior: (Exception error) -> untyped
+    def api_behavior: () -> untyped
+    def resource_location: () -> untyped
+    def navigation_location: () -> untyped
+    def api_location: () -> untyped
+    def default_render: () -> untyped
+    def display: (untyped resource, ?Hash[Symbol, untyped] given_options) -> untyped
+    def display_errors: () -> untyped
+    def has_errors?: () -> bool
+    def has_renderer?: () -> bool
+    def has_view_rendering?: () -> bool
+    def default_action: () -> Symbol?
+    def resource_errors: () -> untyped
+    def response_overridden?: () -> bool
+    def error_rendering_options: () -> Hash[Symbol, untyped]
+    def redirect_options: () -> Hash[Symbol, untyped]
+  end
+
+  module RespondWith
+    module ClassMethods
+      def respond_to: (*Symbol mimes, ?only: Symbol | Array[Symbol], ?except: Symbol | Array[Symbol]) -> Hash[Symbol, Hash[Symbol, Array[Symbol]]]
+      def clear_respond_to: () -> Hash[Symbol, Hash[Symbol, Array[Symbol]]]
+      def responder: () -> singleton(ActionController::Responder)
+      def responder=: (singleton(ActionController::Responder)) -> singleton(ActionController::Responder)
+      def mimes_for_respond_to: () -> Hash[Symbol, Hash[Symbol, Array[Symbol]]]
+      def mimes_for_respond_to=: (Hash[Symbol, Hash[Symbol, Array[Symbol]]]) -> Hash[Symbol, Hash[Symbol, Array[Symbol]]]
+    end
+
+    def respond_with: (*untyped resources) ?{ (ActionController::MimeResponds::Collector) -> void } -> untyped
+  end
+
+  class Base
+    include RespondWith
+    extend RespondWith::ClassMethods
+    extend Responders::ControllerMethod
+  end
+
+  class API
+    include RespondWith
+    extend RespondWith::ClassMethods
+  end
+end
