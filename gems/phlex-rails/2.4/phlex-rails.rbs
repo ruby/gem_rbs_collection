@@ -1,0 +1,146 @@
+module Phlex
+  module Rails
+    class HelpersCalledBeforeRenderError < ::StandardError
+    end
+
+    interface _RenderIn
+      def render_in: (untyped view_context) ?{ (*untyped) -> untyped } -> String?
+    end
+
+    interface _ToPartialPath
+      def to_partial_path: () -> String
+    end
+
+    # Returned by `partial`. Pass it to `render`.
+    class Partial
+      include _RenderIn
+    end
+
+    # The object yielded by form helpers such as `form_with`. Calls are forwarded to the Rails form builder, and the HTML it returns is written to the output buffer.
+    class Builder < ::BasicObject
+      def unwrap: () -> untyped
+
+      def send: (Symbol | String name, *untyped args, **untyped kwargs) ?{ (*untyped) -> untyped } -> untyped
+
+      def public_send: (Symbol | String name, *untyped args, **untyped kwargs) ?{ (*untyped) -> untyped } -> untyped
+
+      def object: () -> untyped
+
+      def object_name: () -> (String | Symbol)
+
+      def label: (untyped method, ?untyped? text, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> nil
+               | (?::Hash[untyped, untyped] label_html_options) ?{ () -> untyped } -> nil
+
+      def text: () -> untyped
+
+      def value: () -> untyped
+
+      def text_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def text_area: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def hidden_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def password_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def email_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def number_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def search_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def url_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def telephone_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def file_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def date_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def time_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def datetime_local_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def color_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def range_field: (untyped method, ?::Hash[untyped, untyped] options) -> nil
+
+      def check_box: (untyped method, ?::Hash[untyped, untyped] options, ?untyped checked_value, ?untyped unchecked_value) -> nil
+                   | (?::Hash[untyped, untyped] extra_html_options) -> nil
+
+      def radio_button: (untyped method, untyped tag_value, ?::Hash[untyped, untyped] options) -> nil
+                      | (?::Hash[untyped, untyped] extra_html_options) -> nil
+
+      def select: (untyped method, ?untyped? choices, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ () -> untyped } -> nil
+
+      def collection_select: (untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) -> nil
+
+      def collection_check_boxes: (untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (Builder) -> untyped } -> nil
+
+      def collection_radio_buttons: (untyped method, untyped collection, untyped value_method, untyped text_method, ?::Hash[untyped, untyped] options, ?::Hash[untyped, untyped] html_options) ?{ (Builder) -> untyped } -> nil
+
+      def fields_for: (untyped record_name, ?untyped? record_object, ?::Hash[untyped, untyped] fields_options) { (Builder) -> untyped } -> nil
+
+      def submit: (?untyped? value, ?::Hash[untyped, untyped] options) -> nil
+
+      def button: (?untyped? value, ?::Hash[untyped, untyped] options) ?{ () -> untyped } -> nil
+    end
+
+    # The value returned by `options_for_select` and `options_from_collection_for_select`. Using it as an argument to another helper raises Phlex::ArgumentError.
+    class Never < ::BasicObject
+    end
+
+    module HelperMacros
+      def register_output_helper: (Symbol method_name, ?mark_safe: bool) -> Symbol
+
+      def register_value_helper: (Symbol method_name) -> Symbol
+
+      def register_builder_yielding_helper: (Symbol method_name) -> Symbol
+    end
+
+    module SGML
+      def partial: (String path, *untyped args, **untyped kwargs) ?{ (*untyped) -> untyped } -> Partial
+
+      def view_context: () -> ::ActionView::Base
+
+      def render: (?::Phlex::SGML::renderable? renderable) ?{ (*untyped) -> untyped } -> nil
+                | (_RenderIn | _ToPartialPath renderable) ?{ (*untyped) -> untyped } -> nil
+    end
+
+    module Layout
+      include Helpers::CSPMetaTag
+      include Helpers::CSRFMetaTags
+      include Helpers::FaviconLinkTag
+      include Helpers::PreloadLinkTag
+      include Helpers::StyleSheetLinkTag
+      include Helpers::ActionCableMetaTag
+      include Helpers::AutoDiscoveryLinkTag
+      include Helpers::JavaScriptIncludeTag
+      include Helpers::JavaScriptImportmapModulePreloadTags
+      include Helpers::JavaScriptImportmapTags
+      include Helpers::JavaScriptImportModuleTag
+      include Helpers::JavaScriptInlineImportmapTag
+      include Helpers::TurboRefreshMethodTag
+      include Helpers::TurboRefreshScrollTag
+      include Helpers::TurboRefreshesWith
+
+      def render: (?untyped view_context, *untyped args, **untyped kwargs) ?{ (*untyped) -> untyped } -> untyped
+    end
+  end
+
+  class HTML < SGML
+    extend Rails::HelperMacros
+    include Rails::SGML
+  end
+
+  class SVG < SGML
+    extend Rails::HelperMacros
+    include Rails::SGML
+  end
+end
+
+module ActiveSupport
+  class SafeBuffer
+    include Phlex::SGML::SafeObject
+  end
+end
