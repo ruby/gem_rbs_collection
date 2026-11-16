@@ -1,0 +1,32 @@
+module OpenTelemetry
+  module Baggage
+    def self?.build: (?context: Context) { (Builder builder) -> void } -> Context
+    def self?.clear: (?context: Context) -> Context
+    def self?.value: (String key, ?context: Context) -> String?
+    def self?.values: (?context: Context) -> Hash[String, String]
+    def self?.raw_entries: (?context: Context) -> Hash[String, Entry]
+    def self?.set_value: (String key, String value, ?metadata: String?, ?context: Context) -> Context
+    def self?.remove_value: (String key, ?context: Context) -> Context
+
+    class Builder
+      attr_reader entries: Hash[String, Entry]
+
+      def set_value: (String key, String value, ?metadata: String?) -> Entry
+      def remove_value: (String key) -> Entry?
+      def clear: () -> Hash[String, Entry]
+    end
+
+    class Entry
+      attr_reader value: String
+      attr_reader metadata: String?
+    end
+
+    module Propagation
+      def self?.text_map_propagator: () -> TextMapPropagator
+
+      class TextMapPropagator
+        include Context::Propagation::_TextMapPropagator
+      end
+    end
+  end
+end

@@ -1,0 +1,73 @@
+module OpenTelemetry
+  class Context
+    class DetachError < Error
+    end
+
+    ROOT: Context
+
+    def self.create_key: (String name) -> Key
+    def self.current: () -> Context
+    def self.attach: (Context context) -> Integer
+    def self.detach: (Integer token) -> bool
+    def self.with_current: [T] (Context context) { (Context context) -> T } -> T
+    def self.with_value: [T, V] (Key key, V value) { (Context context, V value) -> T } -> T
+    def self.with_values: [T] (Hash[Key, untyped] values) { (Context context, Hash[Key, untyped] values) -> T } -> T
+    def self.value: (Key key) -> untyped
+    def self.clear: () -> Array[Context]
+    def self.empty: () -> Context
+
+    def value: (Key key) -> untyped
+    alias [] value
+    def set_value: (Key key, untyped value) -> Context
+    def set_values: (Hash[Key, untyped] values) -> Context
+
+    class Key
+      attr_reader name: String
+
+      def get: (?Context context) -> untyped
+    end
+
+    module Propagation
+      interface _TextMapGetter
+        def get: (untyped carrier, String key) -> String?
+        def keys: (untyped carrier) -> Array[String]
+      end
+
+      interface _TextMapSetter
+        def set: (untyped carrier, String key, String value) -> void
+      end
+
+      interface _TextMapPropagator
+        def inject: (untyped carrier, ?context: Context, ?setter: _TextMapSetter) -> void
+        def extract: (untyped carrier, ?context: Context, ?getter: _TextMapGetter) -> Context
+        def fields: () -> Array[String]
+      end
+
+      def self?.text_map_getter: () -> TextMapGetter
+      def self?.text_map_setter: () -> TextMapSetter
+
+      class TextMapGetter
+        include _TextMapGetter
+      end
+
+      class TextMapSetter
+        include _TextMapSetter
+      end
+
+      class RackEnvGetter
+        include _TextMapGetter
+      end
+
+      class NoopTextMapPropagator
+        include _TextMapPropagator
+      end
+
+      class CompositeTextMapPropagator
+        include _TextMapPropagator
+
+        def self.compose: (injectors: Array[_TextMapPropagator], extractors: Array[_TextMapPropagator]) -> CompositeTextMapPropagator
+        def self.compose_propagators: (Array[_TextMapPropagator] propagators) -> _TextMapPropagator
+      end
+    end
+  end
+end
