@@ -41,6 +41,8 @@ module ActiveRecord
     extend SecurePassword::ClassMethods
     include TokenFor
     extend TokenFor::ClassMethods
+    include SignedId
+    extend SignedId::ClassMethods
 
     module ClassMethods[Model, Relation, PrimaryKey]
       def and: (::ActiveRecord::Relation) -> Relation
@@ -177,6 +179,11 @@ module ActiveRecord
       def upsert: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
 
       def upsert_all: (untyped attributes, ?unique_by: untyped?, ?returning: untyped?, ?record_timestamps: bool?) -> untyped
+
+      # Builds an object (or multiple objects) and returns either the built object or a list of built
+      # objects.
+      def build: (Array[untyped] attributes) ?{ (instance) -> void } -> Array[instance]
+               | (?untyped? attributes) ?{ (instance) -> void } -> instance
     end
 
     def previously_persisted?: () -> bool
@@ -261,6 +268,28 @@ module ActiveRecord
     module ClassMethods[Model, Relation, PrimaryKey]
       def with: (*untyped args) -> Relation
     end
+  end
+end
+
+module ActiveRecord
+  module SignedId
+    extend ActiveSupport::Concern
+
+    def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
+
+    module ClassMethods
+      def signed_id_verifier_secret: () -> untyped
+
+      def signed_id_verifier_secret=: (untyped value) -> untyped
+    end
+  end
+end
+
+module ActiveRecord
+  module Calculations
+    def pluck: (Symbol | String | Arel::Nodes::t column) -> Array[untyped]
+             | (*Symbol | String | Arel::Nodes::t columns) -> Array[Array[untyped]]
+             | ...
   end
 end
 
