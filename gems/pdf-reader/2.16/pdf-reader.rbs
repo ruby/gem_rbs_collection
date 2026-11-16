@@ -1,0 +1,46 @@
+module PDF
+  class Reader
+    class MalformedPDFError < RuntimeError
+    end
+
+    class InvalidPageError < ArgumentError
+    end
+
+    class InvalidObjectError < MalformedPDFError
+    end
+
+    class UnsupportedFeatureError < RuntimeError
+    end
+
+    class EncryptedPDFError < UnsupportedFeatureError
+    end
+
+    class Page
+      def number: () -> Integer
+
+      def fonts: () -> Hash[Symbol, untyped]
+
+      def raw_content: () -> String
+
+      def text: (?Hash[Symbol, untyped] opts) -> String
+
+      alias to_s text
+    end
+
+    def self.open: [T] (String | IO | StringIO input, ?Hash[Symbol, untyped] opts) { (Reader) -> T } -> T
+
+    def initialize: (String | IO | StringIO input, ?Hash[Symbol, untyped] opts) -> void
+
+    def info: () -> Hash[Symbol, untyped]
+
+    def metadata: () -> String?
+
+    def page_count: () -> Integer
+
+    def pdf_version: () -> Float
+
+    def pages: () -> Array[Page]
+
+    def page: (Integer num) -> Page
+  end
+end
