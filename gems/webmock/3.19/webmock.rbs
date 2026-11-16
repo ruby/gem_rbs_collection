@@ -1,4 +1,6 @@
 module WebMock
+  extend API
+
   VERSION: String
 
   def self.version: () -> String
@@ -6,4 +8,58 @@ module WebMock
   def self.disable!: (?Hash[Symbol, untyped] options) -> void
 
   def self.enable!: (?Hash[Symbol, untyped] options) -> void
+
+  module API
+    type uri_pattern = String | Regexp | Addressable::URI | Addressable::Template | ^(Addressable::URI) -> boolish
+
+    def stub_request: (Symbol method, uri_pattern uri) -> RequestStub
+    alias stub_http_request stub_request
+
+    def a_request: (Symbol method, uri_pattern uri) -> RequestPattern
+
+    def assert_requested: (Symbol method, uri_pattern uri, ?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> void
+                        | (RequestStub stub, ?Hash[Symbol, untyped] options) -> void
+
+    def assert_not_requested: (Symbol method, uri_pattern uri, ?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> void
+                            | (RequestStub stub, ?Hash[Symbol, untyped] options) -> void
+    alias refute_requested assert_not_requested
+
+    def remove_request_stub: (RequestStub stub) -> void
+
+    def reset_executed_requests!: () -> void
+  end
+
+  class RequestSignature
+    attr_accessor method: Symbol
+    attr_accessor uri: Addressable::URI
+    attr_accessor body: String?
+    attr_reader headers: Hash[String, String]?
+  end
+
+  class RequestPattern
+    def with: (?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> self
+  end
+
+  class RequestStub
+    attr_accessor request_pattern: RequestPattern
+
+    def with: (?Hash[Symbol, untyped] params) ?{ (RequestSignature) -> boolish } -> self
+
+    def to_return: (*Hash[Symbol, untyped] | Array[Hash[Symbol, untyped]] response_hashes) -> self
+                 | () { (RequestSignature) -> Hash[Symbol, untyped] } -> self
+    alias and_return to_return
+
+    def to_return_json: (*Hash[Symbol, untyped] | Array[Hash[Symbol, untyped]] response_hashes) -> self
+    alias and_return_json to_return_json
+
+    def to_raise: (*Class | Exception | String | Array[Class | Exception | String] exceptions) -> self
+    alias and_raise to_raise
+
+    def to_timeout: () -> self
+    alias and_timeout to_timeout
+
+    def then: () -> self
+
+    def times: (Integer number) -> self
+  end
 end
