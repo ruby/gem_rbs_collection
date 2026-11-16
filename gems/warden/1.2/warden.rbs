@@ -1,0 +1,194 @@
+module Warden
+  VERSION: String
+
+  class NotAuthenticated < StandardError
+  end
+
+  class UserNotSet < RuntimeError
+  end
+
+  class Manager
+    extend Hooks
+
+    attr_accessor config: Config
+
+    def initialize: (::Rack::_Application app, ?Hash[Symbol, untyped] options) ?{ (Config) -> void } -> void
+
+    def call: (::Rack::env env) -> untyped
+
+    def self.serialize_into_session: (?Symbol? scope) { (untyped user) -> untyped } -> untyped
+
+    def self.serialize_from_session: (?Symbol? scope) { (untyped key) -> untyped } -> untyped
+  end
+
+  module Hooks
+    def after_set_user: (?Hash[Symbol, untyped] options, ?Symbol method) { (untyped user, Proxy auth, Hash[Symbol, untyped] opts) -> void } -> untyped
+
+    def after_authentication: (?Hash[Symbol, untyped] options, ?Symbol method) { (untyped user, Proxy auth, Hash[Symbol, untyped] opts) -> void } -> untyped
+
+    def after_fetch: (?Hash[Symbol, untyped] options, ?Symbol method) { (untyped user, Proxy auth, Hash[Symbol, untyped] opts) -> void } -> untyped
+
+    def before_failure: (?Hash[Symbol, untyped] options, ?Symbol method) { (::Rack::env env, Hash[Symbol, untyped] opts) -> void } -> untyped
+
+    def after_failed_fetch: (?Hash[Symbol, untyped] options, ?Symbol method) { (untyped user, Proxy auth, Hash[Symbol, untyped] opts) -> void } -> untyped
+
+    def before_logout: (?Hash[Symbol, untyped] options, ?Symbol method) { (untyped user, Proxy auth, Hash[Symbol, untyped] opts) -> void } -> untyped
+
+    def on_request: (?Hash[Symbol, untyped] options, ?Symbol method) { (Proxy proxy) -> void } -> untyped
+  end
+
+  class Config < Hash[Symbol, untyped]
+    def failure_app: () -> untyped
+
+    def failure_app=: (untyped value) -> untyped
+
+    def default_scope: () -> Symbol
+
+    def default_scope=: (Symbol value) -> Symbol
+
+    def intercept_401: () -> bool
+
+    def intercept_401=: (bool value) -> bool
+
+    def silence_missing_strategies!: () -> true
+
+    def default_strategies: (*Symbol | Array[Symbol] | Hash[Symbol, untyped] strategies) -> Array[Symbol]
+
+    def scope_defaults: (Symbol scope, ?Hash[Symbol, untyped] opts) -> Hash[Symbol, untyped]
+
+    def strategies: () -> singleton(Strategies)
+
+    def serialize_into_session: (?Symbol? scope) { (untyped user) -> untyped } -> untyped
+
+    def serialize_from_session: (?Symbol? scope) { (untyped key) -> untyped } -> untyped
+  end
+
+  class Proxy
+    include Mixins::Common
+
+    attr_reader env: ::Rack::env
+
+    attr_reader manager: Manager
+
+    attr_reader config: Config
+
+    def default_strategies: (*Symbol | Array[Symbol] | Hash[Symbol, untyped] strategies) -> Array[Symbol]
+
+    def errors: () -> Errors
+
+    def clear_strategies_cache!: (*Symbol | Hash[Symbol, untyped] args) -> void
+
+    def lock!: () -> true
+
+    def authenticate: (*Symbol | Hash[Symbol, untyped] args) -> untyped
+
+    def authenticate?: (*Symbol | Hash[Symbol, untyped] args) ?{ () -> void } -> bool
+
+    def authenticate!: (*Symbol | Hash[Symbol, untyped] args) -> untyped
+
+    def authenticated?: (?Symbol scope) ?{ () -> void } -> bool
+
+    def unauthenticated?: (?Symbol scope) ?{ () -> void } -> bool
+
+    def set_user: (untyped user, ?Hash[Symbol, untyped] opts) -> untyped
+
+    def user: (?Symbol | Hash[Symbol, untyped] argument) -> untyped
+
+    def session: (?Symbol scope) -> Hash[String, untyped]
+
+    def logout: (*Symbol scopes) -> void
+
+    def message: () -> (String | Symbol)?
+
+    def custom_failure!: () -> true
+
+    def custom_failure?: () -> bool
+
+    class Errors
+      include Enumerable[Array[String]]
+
+      def clear!: () -> void
+
+      def add: (Symbol | String field_name, String message) -> Array[String]
+
+      def full_messages: () -> Array[String]
+
+      def on: (Symbol | String field_name) -> Array[String]?
+
+      def each: () { (Array[String]) -> void } -> untyped
+              | () -> Enumerator[Array[String], untyped]
+
+      def empty?: () -> bool
+    end
+  end
+
+  module Mixins
+    module Common
+      def session: () -> untyped
+
+      def raw_session: () -> untyped
+
+      def request: () -> ::Rack::Request
+
+      def params: () -> Hash[String, untyped]
+
+      def reset_session!: () -> untyped
+    end
+  end
+
+  module Strategies
+    def self.add: (Symbol label, ?singleton(Base)? strategy) ?{ () [self: singleton(Base)] -> void } -> singleton(Base)
+
+    def self.update: (Symbol label) { () [self: singleton(Base)] -> void } -> singleton(Base)
+
+    def self.[]: (Symbol label) -> singleton(Base)?
+
+    def self.clear!: () -> void
+
+    class Base
+      include Mixins::Common
+
+      attr_accessor user: untyped
+
+      attr_accessor message: (String | Symbol)?
+
+      attr_accessor result: Symbol?
+
+      attr_accessor custom_response: untyped
+
+      attr_reader env: ::Rack::env
+
+      attr_reader scope: Symbol?
+
+      attr_reader status: Integer?
+
+      def clear!: () -> void
+
+      def valid?: () -> bool
+
+      def headers: (?Hash[String, String] header) -> Hash[String, String]
+
+      def errors: () -> Proxy::Errors
+
+      def halt!: () -> true
+
+      def halted?: () -> bool
+
+      def store?: () -> bool
+
+      def pass: () -> nil
+
+      def successful?: () -> bool
+
+      def success!: (untyped user, ?String? message) -> Symbol
+
+      def fail!: (?String | Symbol message) -> Symbol
+
+      def fail: (?String | Symbol message) -> Symbol
+
+      def redirect!: (String url, ?Hash[String | Symbol, untyped] params, ?Hash[Symbol, untyped] opts) -> String
+
+      def custom!: (untyped response) -> Symbol
+    end
+  end
+end
