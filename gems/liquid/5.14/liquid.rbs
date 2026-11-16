@@ -1,0 +1,205 @@
+module Liquid
+  VERSION: String
+
+  type error_mode = :lax | :warn | :strict | :strict2
+
+  FilterSeparator: Regexp
+  TagStart: Regexp
+  TagEnd: Regexp
+  TagName: Regexp
+  VariableStart: Regexp
+  VariableEnd: Regexp
+  QuotedString: Regexp
+  QuotedFragment: Regexp
+  TagAttributes: Regexp
+
+  class Error < ::StandardError
+    attr_accessor line_number: Integer?
+    attr_accessor template_name: String?
+    attr_accessor markup_context: String?
+
+    def to_s: (?bool with_prefix) -> String
+  end
+
+  class ArgumentError < Error
+  end
+
+  class ContextError < Error
+  end
+
+  class FileSystemError < Error
+  end
+
+  class StandardError < Error
+  end
+
+  class SyntaxError < Error
+  end
+
+  class StackLevelError < Error
+  end
+
+  class MemoryError < Error
+  end
+
+  class ZeroDivisionError < Error
+  end
+
+  class FloatDomainError < Error
+  end
+
+  class UndefinedVariable < Error
+  end
+
+  class UndefinedDropMethod < Error
+  end
+
+  class UndefinedFilter < Error
+  end
+
+  class MethodOverrideError < Error
+  end
+
+  class DisabledError < Error
+  end
+
+  class InternalError < Error
+  end
+
+  class TemplateEncodingError < Error
+  end
+
+  class Environment
+    attr_accessor error_mode: error_mode
+    attr_accessor tags: Hash[String, singleton(Tag)]
+
+    def self.build: (?tags: Hash[String, singleton(Tag)]?, ?error_mode: error_mode?) ?{ (Environment) -> void } -> Environment
+    def self.default: () -> Environment
+
+    def register_tag: (String name, singleton(Tag) klass) -> singleton(Tag)
+    def register_filter: (Module filter) -> void
+  end
+
+  class Template
+    type parse_options = Hash[Symbol, untyped]
+
+    type render_options = Hash[Symbol, untyped]
+
+    attr_accessor root: Document
+
+    def self.parse: (String source, ?parse_options options) -> Template
+    def self.tags: () -> Hash[String, untyped]
+    def self.register_tag: (String name, singleton(Tag) klass) -> singleton(Tag)
+    def self.register_filter: (Module mod) -> void
+
+    def registers: () -> Hash[untyped, untyped]
+    def assigns: () -> Hash[String, untyped]
+    def errors: () -> Array[Error]
+    def render: (?(Hash[String, untyped] | Context | Drop)? assigns, ?(render_options | Module | Array[Module]) options) -> String
+    def render!: (?(Hash[String, untyped] | Context | Drop)? assigns, ?(render_options | Module | Array[Module]) options) -> String
+  end
+
+  class ParseContext
+    attr_accessor line_number: Integer?
+    attr_accessor depth: Integer
+    attr_reader partial: bool
+    attr_reader error_mode: error_mode
+    attr_reader environment: Environment
+
+    def []: (Symbol option_key) -> untyped
+    def partial_options: () -> Hash[Symbol, untyped]
+  end
+
+  class Tokenizer
+    attr_reader line_number: Integer?
+
+    def shift: () -> String?
+  end
+
+  class BlockBody
+    def initialize: () -> void
+    def nodelist: () -> Array[untyped]
+    def render: (Context context) -> String
+    def blank?: () -> bool
+  end
+
+  class Document
+    def nodelist: () -> Array[untyped]
+  end
+
+  class Tag
+    @tag_name: String
+    @markup: String
+    @parse_context: ParseContext
+    @line_number: Integer?
+
+    attr_reader nodelist: Array[untyped]
+    attr_reader tag_name: String
+    attr_reader line_number: Integer?
+    attr_reader parse_context: ParseContext
+
+    def initialize: (String tag_name, String markup, ParseContext parse_context) -> void
+    def parse: (Tokenizer tokens) -> void
+    def raw: () -> String
+    def render: (Context context) -> String?
+  end
+
+  class Block < Tag
+    @body: BlockBody
+
+    def render: (Context context) -> String
+    def nodelist: () -> Array[untyped]
+    def unknown_tag: (String tag_name, String markup, Tokenizer tokenizer) -> void
+
+    private
+
+    def parse_body: (BlockBody body, Tokenizer tokens) -> bool
+  end
+
+  class Drop
+    @context: Context?
+
+    attr_writer context: Context?
+
+    def initialize: () -> void
+    def liquid_method_missing: (untyped method) -> untyped
+    def []: (String | Symbol method_or_key) -> untyped
+    def key?: (untyped name) -> bool
+    def to_liquid: () -> self
+    def to_s: () -> String
+  end
+
+  class Registers
+    attr_reader static: Hash[untyped, untyped]
+
+    def initialize: (?Hash[untyped, untyped] | Registers registers) -> void
+    def []=: (untyped key, untyped value) -> untyped
+    def []: (untyped key) -> untyped
+    def delete: (untyped key) -> untyped
+    def key?: (untyped key) -> bool
+  end
+
+  class Context
+    type environment_scope = Hash[String, untyped] | Drop
+
+    @environments: Array[environment_scope]
+    @scopes: Array[Hash[String, untyped]]
+    @registers: Registers
+
+    attr_reader scopes: Array[Hash[String, untyped]]
+    attr_reader errors: Array[Error]
+    attr_reader registers: Registers
+    attr_reader environments: Array[environment_scope]
+    attr_accessor template_name: String?
+    attr_accessor strict_variables: bool
+    attr_accessor strict_filters: bool
+
+    def initialize: (?(environment_scope | Array[environment_scope]) environments, ?Hash[String, untyped]? outer_scope, ?(Hash[untyped, untyped] | Registers) registers, ?bool rethrow_errors) -> void
+    def push: (?Hash[String, untyped] new_scope) -> void
+    def pop: () -> Hash[String, untyped]
+    def stack: [T] (?Hash[String, untyped] new_scope) { () -> T } -> T
+    def []=: (String key, untyped value) -> untyped
+    def []: (String expression) -> untyped
+    def key?: (String key) -> bool
+  end
+end

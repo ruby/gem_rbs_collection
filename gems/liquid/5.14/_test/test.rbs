@@ -1,0 +1,29 @@
+module ShoutFilter
+  def shout: (String input) -> String
+end
+
+class HelloTag < Liquid::Tag
+  @name: String
+  @source: untyped
+end
+
+class BoxTag < Liquid::Block
+  @inline: bool
+end
+
+class SplitTag < Liquid::Block
+  @in_block: Liquid::BlockBody
+end
+
+class UserDrop < Liquid::Drop
+  @user: String
+
+  def initialize: (String user) -> void
+  def name: () -> String
+  def liquid_method_missing: (String method) -> String
+end
+
+class LiquidContext < Liquid::Context
+  def initialize: (String owner) -> void
+  def same?: (Liquid::Context other) -> bool
+end
