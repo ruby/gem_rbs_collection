@@ -1,0 +1,93 @@
+class Jbuilder < BasicObject
+  VERSION: String
+
+  type key_format = Symbol | Proc
+
+  def self.encode: (?key_formatter: KeyFormatter?, ?ignore_nil: boolish, ?deep_format_keys: boolish) ?{ (Jbuilder) -> void } -> String
+
+  def self.key_format: (*key_format formats, **untyped formats_with_options) -> KeyFormatter
+
+  def self.ignore_nil: (?boolish value) -> boolish
+
+  def self.deep_format_keys: (?boolish value) -> boolish
+
+  def initialize: (?key_formatter: KeyFormatter?, ?ignore_nil: boolish, ?deep_format_keys: boolish) ?{ (Jbuilder) -> void } -> void
+
+  def set!: (String | Symbol key) { (Jbuilder) -> void } -> void
+          | [T] (String | Symbol key, Enumerable[T] collection, *untyped attributes) ?{ (T) -> void } -> void
+          | (String | Symbol key, untyped value, *untyped attributes) -> void
+
+  def key_format!: (*key_format formats, **untyped formats_with_options) -> KeyFormatter
+
+  def ignore_nil!: (?boolish value) -> boolish
+
+  def deep_format_keys!: (?boolish value) -> boolish
+
+  def child!: () { (Jbuilder) -> void } -> void
+
+  def array!: [T] (?Enumerable[T]? collection, *untyped attributes) ?{ (T) -> void } -> void
+
+  def extract!: (untyped object, *(String | Symbol) attributes) -> void
+
+  def call: [T] (Enumerable[T] collection) { (T) -> void } -> void
+          | (untyped object, *(String | Symbol) attributes) -> void
+
+  def nil!: () -> nil
+
+  alias null! nil!
+
+  def attributes!: () -> (Hash[String, untyped] | Array[untyped] | Blank | nil)
+
+  def merge!: (Hash[untyped, untyped] | Array[untyped] | Jbuilder object) -> (Hash[untyped, untyped] | Array[untyped] | Blank | nil)
+
+  def target!: () -> String
+
+  class Blank
+    def empty?: () -> true
+  end
+
+  class KeyFormatter
+    def initialize: (*key_format formats, **untyped formats_with_options) -> void
+
+    def format: (String | Symbol key) -> String
+  end
+
+  class NullError < ::NoMethodError[untyped]
+  end
+
+  class ArrayError < ::StandardError
+  end
+
+  class MergeError < ::StandardError
+  end
+
+  class DependencyTracker
+    def self.call: (String name, untyped template, ?untyped view_paths) -> Array[String]
+  end
+end
+
+class JbuilderTemplate < Jbuilder
+  def self.template_lookup_options: () -> Hash[Symbol, untyped]
+
+  def self.template_lookup_options=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
+
+  def partial!: (String partial, **untyped locals) -> void
+              | (**untyped options) -> void
+              | (untyped model, **untyped options) -> void
+
+  def cache!: (?untyped key, ?Hash[Symbol, untyped] options) { () -> void } -> void
+
+  def cache_root!: (?untyped key, ?Hash[Symbol, untyped] options) { () -> void } -> void
+
+  def cache_if!: (boolish condition, ?untyped key, ?Hash[Symbol, untyped] options) { () -> void } -> void
+
+  def target!: () -> String
+
+  def array!: (untyped collection, partial: String, ?as: Symbol, **untyped locals) -> void
+            | [T] (?Enumerable[T]? collection, *untyped attributes) ?{ (T) -> void } -> void
+
+  def set!: (String | Symbol key, untyped collection, partial: String, ?as: Symbol, **untyped locals) -> void
+          | (String | Symbol key) { (JbuilderTemplate) -> void } -> void
+          | [T] (String | Symbol key, Enumerable[T] collection, *untyped attributes) ?{ (T) -> void } -> void
+          | (String | Symbol key, untyped value, *untyped attributes) -> void
+end
