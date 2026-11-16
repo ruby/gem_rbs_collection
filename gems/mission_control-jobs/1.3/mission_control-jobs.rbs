@@ -1,0 +1,81 @@
+module MissionControl
+  module Jobs
+    VERSION: String
+
+    class Engine < ::Rails::Engine
+    end
+
+    class Application
+      attr_reader name: String
+
+      def id: () -> String
+
+      def to_param: () -> String
+
+      def to_s: () -> String
+    end
+
+    class IdentifiedElements
+    end
+
+    class Applications < IdentifiedElements
+      def add: (String | Symbol name, ?Hash[String | Symbol, Object] queue_adapters_by_name) -> Application
+    end
+
+    def self.adapters: () -> (Set[Symbol] | Array[Symbol])
+
+    def self.adapters=: (Set[Symbol] | Array[Symbol] value) -> (Set[Symbol] | Array[Symbol])
+
+    def self.applications: () -> Applications
+
+    def self.applications=: (Applications value) -> Applications
+
+    def self.base_controller_class: () -> String
+
+    def self.base_controller_class=: (String value) -> String
+
+    def self.internal_query_count_limit: () -> Integer
+
+    def self.internal_query_count_limit=: (Integer value) -> Integer
+
+    def self.delay_between_bulk_operation_batches: () -> (Numeric | ::ActiveSupport::Duration)
+
+    def self.delay_between_bulk_operation_batches=: (Numeric | ::ActiveSupport::Duration value) -> (Numeric | ::ActiveSupport::Duration)
+
+    def self.scheduled_job_delay_threshold: () -> (Numeric | ::ActiveSupport::Duration)
+
+    def self.scheduled_job_delay_threshold=: (Numeric | ::ActiveSupport::Duration value) -> (Numeric | ::ActiveSupport::Duration)
+
+    def self.logger: () -> ::Logger
+
+    def self.logger=: (::Logger value) -> ::Logger
+
+    def self.show_console_help: () -> bool
+
+    def self.show_console_help=: (bool value) -> bool
+
+    def self.backtrace_cleaner: () -> ::ActiveSupport::BacktraceCleaner?
+
+    def self.backtrace_cleaner=: (::ActiveSupport::BacktraceCleaner? value) -> ::ActiveSupport::BacktraceCleaner?
+
+    def self.back_to_main_app_path: () -> String?
+
+    def self.back_to_main_app_path=: (String? value) -> String?
+
+    def self.http_basic_auth_user: () -> String?
+
+    def self.http_basic_auth_user=: (String? value) -> String?
+
+    def self.http_basic_auth_password: () -> String?
+
+    def self.http_basic_auth_password=: (String? value) -> String?
+
+    def self.http_basic_auth_enabled: () -> bool
+
+    def self.http_basic_auth_enabled=: (bool value) -> bool
+
+    def self.filter_arguments: () -> Array[String]
+
+    def self.filter_arguments=: (Array[String] value) -> Array[String]
+  end
+end
