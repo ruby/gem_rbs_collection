@@ -1,0 +1,37 @@
+module WillPaginate
+  module ActiveRecord
+    module Pagination
+      def paginate: (Hash[Symbol, untyped] options) -> ::ActiveRecord::Relation
+      def page: (?Integer | String | nil num) -> ::ActiveRecord::Relation
+    end
+
+    module RelationMethods
+      include CollectionMethods
+
+      def current_page: () -> PageNumber
+      def total_entries: () -> Integer
+      def per_page: () -> Integer?
+                  | (Integer value) -> self
+    end
+  end
+end
+
+module ActiveRecord
+  class Base
+    extend WillPaginate::PerPage
+    extend WillPaginate::ActiveRecord::Pagination
+
+    module ClassMethods[Model, Relation, PrimaryKey]
+      def paginate: (Hash[Symbol, untyped] options) -> Relation
+    end
+  end
+
+  class Relation
+    include WillPaginate::ActiveRecord::Pagination
+    include WillPaginate::ActiveRecord::RelationMethods
+
+    module Methods[Model, PrimaryKey]
+      def paginate: (Hash[Symbol, untyped] options) -> self
+    end
+  end
+end

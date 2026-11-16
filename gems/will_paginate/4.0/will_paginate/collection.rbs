@@ -1,0 +1,24 @@
+module WillPaginate
+  module CollectionMethods
+    def total_pages: () -> Integer
+    def previous_page: () -> Integer?
+    def next_page: () -> Integer?
+    def out_of_bounds?: () -> bool
+  end
+
+  class Collection[Elem] < Array[Elem]
+    include CollectionMethods
+
+    attr_reader current_page: PageNumber
+    attr_reader per_page: Integer
+    attr_reader total_entries: Integer?
+
+    def initialize: (Integer | String | PageNumber page, ?_ToI per_page, ?_ToI? total) -> void
+
+    def self.create: (Integer | String | PageNumber page, _ToI per_page, ?_ToI? total) { (Collection[untyped]) -> void } -> Collection[untyped]
+
+    def offset: () -> Integer
+    def total_entries=: (_ToI number) -> Integer
+    def replace: (_ToAry[Elem] array) -> self
+  end
+end

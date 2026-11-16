@@ -1,0 +1,40 @@
+module WillPaginate
+  module ViewHelpers
+    interface _Pageable
+      def total_pages: () -> Integer
+      def total_entries: () -> Integer?
+      def current_page: () -> PageNumber
+    end
+
+    def self.pagination_options: () -> Hash[Symbol, untyped]
+    def self.pagination_options=: (Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+
+    def will_paginate: (_Pageable collection, ?Hash[Symbol, untyped] options) -> String?
+    def page_entries_info: (_Pageable collection, ?Hash[Symbol, untyped] options) -> String
+
+    class LinkRendererBase
+    end
+
+    class LinkRenderer < LinkRendererBase
+      def to_html: () -> String
+      def container_attributes: () -> Hash[Symbol, untyped]
+    end
+  end
+
+  module ActionView
+    include ViewHelpers
+
+    def will_paginate: (?(ViewHelpers::_Pageable | Hash[Symbol, untyped])? collection, ?Hash[Symbol, untyped] options) -> String?
+    def page_entries_info: (?(ViewHelpers::_Pageable | Hash[Symbol, untyped])? collection, ?Hash[Symbol, untyped] options) -> String
+    def paginated_section: (*untyped args) { () -> String } -> String
+
+    class LinkRenderer < ViewHelpers::LinkRenderer
+    end
+  end
+end
+
+module ActionView
+  class Base
+    include WillPaginate::ActionView
+  end
+end
