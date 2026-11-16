@@ -1,0 +1,90 @@
+class SsrfFilter
+  VERSION: String
+
+  IPV4_BLACKLIST: Array[IPAddr]
+  IPV6_BLACKLIST: Array[IPAddr]
+  NAT64_LOCAL_PREFIX: IPAddr
+
+  DEFAULT_SCHEME_WHITELIST: Array[String]
+  DEFAULT_RESOLVER: ^(String) -> Array[IPAddr]
+  DEFAULT_ALLOW_UNFOLLOWED_REDIRECTS: bool
+  DEFAULT_MAX_REDIRECTS: Integer
+  DEFAULT_SENSITIVE_HEADERS: Array[String]
+  DEFAULT_ON_CROSS_ORIGIN_REDIRECT: :strip
+
+  VERB_MAP: Hash[Symbol, singleton(Net::HTTPRequest)]
+
+  type resolver = (^(String) -> Array[IPAddr] | Proc | Method)
+
+  type request_proc = (^(Net::HTTPGenericRequest) -> untyped | Proc | Method)
+
+  # The keys are the options of `Net::HTTP.start`.
+  type http_options = {
+    ?open_timeout: Numeric,
+    ?read_timeout: Numeric,
+    ?write_timeout: Numeric,
+    ?ssl_timeout: Numeric,
+    ?continue_timeout: Numeric,
+    ?keep_alive_timeout: Numeric,
+    ?max_retries: Integer,
+    ?ignore_eof: bool,
+    ?verify_mode: Integer,
+    ?ca_file: String,
+    ?ca_path: String,
+    ?cert: untyped,
+    ?key: untyped,
+    ?ssl_version: untyped,
+    ?min_version: untyped,
+    ?max_version: untyped,
+    ?verify_hostname: bool,
+    ?local_host: String,
+    ?local_port: Integer
+  }
+
+  type options = {
+    ?scheme_whitelist: Array[String],
+    ?resolver: resolver,
+    ?max_redirects: Integer,
+    ?allow_unfollowed_redirects: bool,
+    ?sensitive_headers: Array[String],
+    ?on_cross_origin_redirect: :strip | :raise,
+    ?params: Hash[String | Symbol, untyped],
+    ?headers: Hash[String | Symbol, String],
+    ?body: String,
+    ?request_proc: request_proc,
+    ?http_options: http_options
+  }
+
+  def self.get: (String | URI::Generic url, ?(options | Hash[Symbol, untyped]) options) ?{ (Net::HTTPResponse) -> void } -> Net::HTTPResponse
+
+  def self.put: (String | URI::Generic url, ?(options | Hash[Symbol, untyped]) options) ?{ (Net::HTTPResponse) -> void } -> Net::HTTPResponse
+
+  def self.post: (String | URI::Generic url, ?(options | Hash[Symbol, untyped]) options) ?{ (Net::HTTPResponse) -> void } -> Net::HTTPResponse
+
+  def self.delete: (String | URI::Generic url, ?(options | Hash[Symbol, untyped]) options) ?{ (Net::HTTPResponse) -> void } -> Net::HTTPResponse
+
+  def self.head: (String | URI::Generic url, ?(options | Hash[Symbol, untyped]) options) ?{ (Net::HTTPResponse) -> void } -> Net::HTTPResponse
+
+  def self.patch: (String | URI::Generic url, ?(options | Hash[Symbol, untyped]) options) ?{ (Net::HTTPResponse) -> void } -> Net::HTTPResponse
+
+  class Error < StandardError
+  end
+
+  class InvalidUriScheme < Error
+  end
+
+  class PrivateIPAddress < Error
+  end
+
+  class UnresolvedHostname < Error
+  end
+
+  class TooManyRedirects < Error
+  end
+
+  class CRLFInjection < Error
+  end
+
+  class CredentialLeakage < Error
+  end
+end
