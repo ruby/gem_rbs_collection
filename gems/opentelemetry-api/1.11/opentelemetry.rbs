@@ -1,0 +1,19 @@
+module OpenTelemetry
+  VERSION: String
+
+  class Error < StandardError
+  end
+
+  def self?.logger: () -> Logger
+  def self?.logger=: (Logger logger) -> Logger
+
+  def self?.error_handler: () -> ^(?exception: Exception?, ?message: String?) -> void
+  def self?.error_handler=: (^(?exception: Exception?, ?message: String?) -> void error_handler) -> void
+  def self?.handle_error: (?exception: Exception?, ?message: String?) -> void
+
+  def self?.tracer_provider: () -> Trace::TracerProvider
+  def self?.tracer_provider=: (Trace::TracerProvider provider) -> Trace::TracerProvider
+
+  def self?.propagation: () -> Context::Propagation::_TextMapPropagator
+  def self?.propagation=: (Context::Propagation::_TextMapPropagator propagation) -> Context::Propagation::_TextMapPropagator
+end

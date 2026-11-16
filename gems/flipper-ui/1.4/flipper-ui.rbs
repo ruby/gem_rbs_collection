@@ -1,0 +1,37 @@
+module Flipper
+  module UI
+    type options = { ?env_key: String, ?rack_protection: Hash[Symbol, untyped] }
+
+    type names_source = (^(Array[String]) -> Hash[String, String]) | Proc
+
+    def self.app: (?(Flipper::DSL | singleton(Flipper))? flipper, ?options options) ?{ (Rack::Builder) -> void } -> Rack::_Application
+
+    def self.configure: () { (Configuration) -> void } -> void
+
+    def self.configuration: () -> Configuration
+
+    class Configuration
+      attr_accessor banner_text: String?
+      attr_reader banner_class: String
+      def banner_class=: (String value) -> String
+      attr_accessor read_only: boolish
+      attr_accessor application_href: String?
+      alias application_breadcrumb_href application_href
+      alias application_breadcrumb_href= application_href=
+      attr_accessor nav_items: Array[Hash[Symbol, String]]
+      attr_accessor feature_creation_enabled: boolish
+      attr_accessor feature_removal_enabled: boolish
+      attr_accessor fun: boolish
+      attr_accessor cloud_recommendation: boolish
+      attr_accessor version_check_enabled: boolish
+      attr_accessor add_actor_placeholder: String
+      attr_accessor descriptions_source: names_source
+      attr_accessor actor_names_source: names_source
+      attr_accessor show_feature_description_in_list: boolish
+      attr_accessor actors_separator: String
+      attr_accessor confirm_fully_enable: boolish
+      attr_accessor confirm_disable: boolish
+      attr_accessor disable_fully_enable: (bool | String)?
+    end
+  end
+end

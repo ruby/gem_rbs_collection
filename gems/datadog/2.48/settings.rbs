@@ -1,0 +1,156 @@
+module Datadog
+  module Core
+    module Configuration
+      class Settings
+        interface _AgentSettings
+          def host: () -> String?
+          def host=: (String? value) -> String?
+          def port: () -> (String | Integer)?
+          def port=: ((String | Integer)? value) -> (String | Integer)?
+          def use_ssl: () -> bool?
+          def use_ssl=: (bool? value) -> bool?
+          def timeout_seconds: () -> Numeric?
+          def timeout_seconds=: (Numeric? value) -> Numeric?
+          def uds_path: () -> String?
+          def uds_path=: (String? value) -> String?
+        end
+
+        interface _StartupLogsSettings
+          def enabled: () -> bool?
+          def enabled=: (bool? value) -> bool?
+        end
+
+        interface _DiagnosticsSettings
+          def debug: () -> bool
+          def debug=: (bool value) -> bool
+          def startup_logs: () -> _StartupLogsSettings
+        end
+
+        interface _LoggerSettings
+          def instance: () -> untyped
+          def instance=: (untyped logger) -> untyped
+          def level: () -> Integer
+          def level=: (Integer level) -> Integer
+        end
+
+        interface _ProfilingSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+        end
+
+        interface _RuntimeMetricsSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+          def opts: () -> Hash[Symbol, untyped]
+          def opts=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
+          def statsd: () -> untyped
+          def statsd=: (untyped client) -> untyped
+        end
+
+        interface _HealthMetricsSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+          def statsd: () -> untyped
+          def statsd=: (untyped client) -> untyped
+        end
+
+        interface _TelemetrySettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+        end
+
+        interface _RemoteSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+        end
+
+        interface _PartialFlushSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+          def min_spans_threshold: () -> Integer
+          def min_spans_threshold=: (Integer value) -> Integer
+        end
+
+        interface _SamplingSettings
+          def default_rate: () -> (Float | Integer | Rational)?
+          def default_rate=: ((Float | Integer | Rational)? rate) -> (Float | Integer | Rational)?
+          def rate_limit: () -> Integer?
+          def rate_limit=: (Integer? limit) -> Integer?
+          def rules: () -> String?
+          def rules=: (String? json) -> String?
+          def span_rules: () -> String?
+          def span_rules=: (String? json) -> String?
+        end
+
+        interface _TestModeSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+          def async: () -> bool
+          def async=: (bool value) -> bool
+          def writer_options: () -> Hash[Symbol, untyped]
+          def writer_options=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
+        end
+
+        interface _TracingSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+          def log_injection: () -> bool
+          def log_injection=: (bool value) -> bool
+          def report_hostname: () -> bool
+          def report_hostname=: (bool value) -> bool
+          def trace_id_128_bit_generation_enabled: () -> bool
+          def trace_id_128_bit_generation_enabled=: (bool value) -> bool
+          def trace_id_128_bit_logging_enabled: () -> bool
+          def trace_id_128_bit_logging_enabled=: (bool value) -> bool
+          def propagation_style: () -> Array[String]
+          def propagation_style=: (Array[String] styles) -> Array[String]
+          def propagation_style_extract: () -> Array[String]
+          def propagation_style_extract=: (Array[String] styles) -> Array[String]
+          def propagation_style_inject: () -> Array[String]
+          def propagation_style_inject=: (Array[String] styles) -> Array[String]
+          def partial_flush: () -> _PartialFlushSettings
+          def sampling: () -> _SamplingSettings
+          def test_mode: () -> _TestModeSettings
+          def writer_options: () -> Hash[Symbol, untyped]
+          def writer_options=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
+
+          def instrument: (Symbol integration_name, ?Hash[Symbol, untyped] options) ?{ (::Datadog::Tracing::Contrib::Configuration::Settings) -> void } -> ::Datadog::Tracing::Contrib::Integration
+
+          def []: (Symbol integration_name, ?untyped key) -> ::Datadog::Tracing::Contrib::Configuration::Settings?
+        end
+
+        interface _AppSecSettings
+          def enabled: () -> bool
+          def enabled=: (bool value) -> bool
+          def instrument: (Symbol integration_name) -> void
+        end
+
+        def service: () -> String?
+        def service=: (String? name) -> String?
+        def env: () -> String?
+        def env=: (String? name) -> String?
+        def version: () -> String?
+        def version=: (String? version) -> String?
+        def hostname: () -> String?
+        def hostname=: (String? name) -> String?
+        def site: () -> String?
+        def site=: (String? site) -> String?
+        def api_key: () -> String?
+        def api_key=: (String? key) -> String?
+        def tags: () -> Hash[String, untyped]
+        def tags=: (Hash[String | Symbol, untyped]? tags) -> Hash[String | Symbol, untyped]?
+
+        def agent: () -> _AgentSettings
+        def diagnostics: () -> _DiagnosticsSettings
+        def logger: () -> _LoggerSettings
+        def profiling: () -> _ProfilingSettings
+        def runtime_metrics: () -> _RuntimeMetricsSettings
+        def health_metrics: () -> _HealthMetricsSettings
+        def telemetry: () -> _TelemetrySettings
+        def remote: () -> _RemoteSettings
+        def tracing: () -> _TracingSettings
+        def appsec: () -> _AppSecSettings
+      end
+    end
+  end
+end

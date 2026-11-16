@@ -1,0 +1,171 @@
+module Bugsnag
+  VERSION: String
+
+  interface _OnErrorCallback
+    def call: (Report report) -> untyped
+  end
+
+  interface _OnBreadcrumbCallback
+    def call: (Breadcrumbs::Breadcrumb breadcrumb) -> untyped
+  end
+
+  type metadata_key = String | Symbol
+
+  type sections = Hash[metadata_key, Hash[metadata_key, untyped]]
+
+  type breadcrumb_metadata = Hash[metadata_key, String | Numeric | bool]
+
+  extend Utility::FeatureDataStore
+
+  def self.configure: () ?{ (Configuration configuration) -> void } -> void
+  def self.configuration: () -> Configuration
+  def self.notify: (Exception | String | nil exception, ?bool auto_notify) ?{ (Report report) -> void } -> void
+
+  def self.on_error: () { (Report report) -> untyped } -> void
+  def self.add_on_error: (^(Report) -> untyped | ::Proc | _OnErrorCallback callback) -> void
+  def self.remove_on_error: (^(Report) -> untyped | ::Proc | _OnErrorCallback callback) -> void
+
+  def self.leave_breadcrumb: (String name, ?breadcrumb_metadata meta_data, ?String type, ?(:auto | :manual) auto) -> void
+  def self.add_on_breadcrumb: (^(Breadcrumbs::Breadcrumb) -> untyped | ::Proc | _OnBreadcrumbCallback callback) -> void
+  def self.remove_on_breadcrumb: (^(Breadcrumbs::Breadcrumb) -> untyped | ::Proc | _OnBreadcrumbCallback callback) -> void
+
+  def self.start_session: () -> void
+  def self.pause_session: () -> void
+  def self.resume_session: () -> bool
+
+  def self.metadata: () -> Hash[metadata_key, untyped]
+  def self.add_metadata: (metadata_key section, Hash[metadata_key, untyped] data) -> void
+                       | (metadata_key section, metadata_key key, untyped value) -> void
+  def self.clear_metadata: (metadata_key section, ?metadata_key key) -> void
+
+  module Utility
+    module FeatureDataStore
+      def add_feature_flag: (String name, ?String? variant) -> void
+      def add_feature_flags: (Array[FeatureFlag] feature_flags) -> void
+      def clear_feature_flag: (String name) -> void
+      def clear_feature_flags: () -> void
+    end
+  end
+
+  class FeatureFlag
+    attr_reader name: String
+    attr_reader variant: String?
+
+    def initialize: (String name, ?String? variant) -> void
+    def to_h: () -> Hash[String, String]
+  end
+
+  module BreadcrumbType
+    ERROR: String
+    LOG: String
+    MANUAL: String
+    NAVIGATION: String
+    PROCESS: String
+    REQUEST: String
+    STATE: String
+    USER: String
+  end
+
+  module Breadcrumbs
+    class Breadcrumb
+      attr_accessor type: String
+      attr_reader auto: bool
+      attr_reader timestamp: Time
+
+      def message: () -> String
+      def message=: (String message) -> void
+      def metadata: () -> Hash[metadata_key, untyped]?
+      def metadata=: (Hash[metadata_key, untyped]? metadata) -> void
+      def ignore!: () -> void
+      def ignore?: () -> bool
+      def to_h: () -> Hash[Symbol, untyped]
+    end
+  end
+
+  class EndpointConfiguration
+    attr_reader notify: String?
+    attr_reader sessions: String?
+
+    def initialize: (String? notify, String? sessions) -> void
+  end
+
+  class Configuration
+    attr_accessor api_key: String?
+    attr_accessor release_stage: String?
+    attr_accessor app_version: String?
+    attr_accessor app_type: String?
+    attr_accessor auto_notify: bool
+    attr_accessor send_environment: bool
+    attr_accessor send_code: bool
+    attr_accessor project_root: (String | Pathname)?
+    attr_accessor context: String?
+    attr_accessor hostname: String
+    attr_accessor timeout: Integer
+    attr_accessor logger: Logger
+    attr_accessor delivery_method: Symbol
+    attr_accessor proxy_host: String?
+    attr_accessor proxy_port: Integer?
+    attr_accessor proxy_user: String?
+    attr_accessor proxy_password: String?
+    attr_accessor vendor_paths: Array[String]
+    attr_accessor redacted_keys: Set[String | Regexp]
+    attr_accessor discard_classes: Set[String | Regexp]
+    attr_accessor enabled_release_stages: Array[String]?
+    attr_accessor enabled_breadcrumb_types: Array[String]
+    attr_accessor auto_track_sessions: bool
+    attr_accessor endpoints: EndpointConfiguration
+    attr_accessor max_breadcrumbs: Integer
+    attr_reader metadata: Hash[metadata_key, untyped]
+
+    attr_accessor ignore_classes: Set[Class | ^(Exception) -> bool | ::Proc]
+    attr_accessor meta_data_filters: Set[String | Regexp]
+    attr_accessor notify_release_stages: Array[String]?
+    attr_accessor auto_capture_sessions: bool
+
+    def on_error: () { (Report report) -> untyped } -> void
+    def add_on_error: (^(Report) -> untyped | ::Proc | _OnErrorCallback callback) -> void
+    def remove_on_error: (^(Report) -> untyped | ::Proc | _OnErrorCallback callback) -> void
+    def add_on_breadcrumb: (^(Breadcrumbs::Breadcrumb) -> untyped | ::Proc | _OnBreadcrumbCallback callback) -> void
+    def remove_on_breadcrumb: (^(Breadcrumbs::Breadcrumb) -> untyped | ::Proc | _OnBreadcrumbCallback callback) -> void
+
+    def add_metadata: (metadata_key section, Hash[metadata_key, untyped] data) -> void
+                    | (metadata_key section, metadata_key key, untyped value) -> void
+    def clear_metadata: (metadata_key section, ?metadata_key key) -> void
+  end
+
+  class Report
+    include Utility::FeatureDataStore
+
+    attr_reader unhandled: bool
+    attr_reader errors: Array[untyped]
+    attr_reader original_error: Exception | String
+    attr_accessor api_key: String?
+    attr_accessor app_type: String?
+    attr_accessor app_version: String?
+    attr_accessor breadcrumbs: Array[Breadcrumbs::Breadcrumb]
+    attr_accessor delivery_method: Symbol
+    attr_accessor grouping_hash: String?
+    attr_accessor hostname: String
+    attr_accessor release_stage: String?
+    attr_accessor severity: String
+    attr_accessor user: Hash[Symbol, untyped]
+    attr_writer unhandled: bool
+    attr_writer context: String?
+
+    def context: () -> String?
+    def metadata: () -> sections
+    def metadata=: (sections metadata) -> void
+    def add_metadata: (metadata_key section, Hash[metadata_key, untyped] data) -> void
+                    | (metadata_key section, metadata_key key, untyped value) -> void
+    def clear_metadata: (metadata_key section, ?metadata_key key) -> void
+    def set_user: (?(String | Integer)? id, ?String? email, ?String? name) -> void
+    def feature_flags: () -> Array[FeatureFlag]
+    def ignore!: () -> void
+    def ignore?: () -> bool
+
+    def add_tab: (metadata_key name, untyped value) -> void
+    def remove_tab: (metadata_key name) -> void
+  end
+
+  class Event = Report
+end

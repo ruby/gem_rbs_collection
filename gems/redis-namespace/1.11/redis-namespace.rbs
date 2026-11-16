@@ -1,0 +1,124 @@
+class Redis
+  # Only the commands shown in the README and the commonly used ones are declared.
+  # The other commands are defined dynamically from `COMMANDS` and
+  # `method_missing`, which Steep cannot see.
+  class Namespace
+    VERSION: String
+
+    type namespace = String | Symbol
+
+    type dynamic_namespace = namespace | Proc | ^() -> namespace
+
+    type arg = Redis::arg
+
+    def initialize: (dynamic_namespace namespace, ?redis: untyped, ?warning: boolish, ?deprecations: boolish) -> void
+                  | (dynamic_namespace namespace, Hash[Symbol, untyped] options) -> void
+
+    attr_reader redis: untyped
+
+    attr_accessor warning: bool
+
+    def namespace: () -> namespace
+                 | [T] (namespace desired) { (Namespace) -> T } -> namespace
+
+    def namespace=: (dynamic_namespace) -> void
+
+    def full_namespace: () -> String
+
+    def connection: () -> Hash[Symbol, untyped]
+
+    def multi: () { (self) -> void } -> Array[untyped]
+
+    def exec: () -> Array[untyped]?
+
+    def pipelined: () { (self) -> void } -> Array[untyped]
+
+    def get: (arg key) -> String?
+
+    def set: (arg key, top value, ?ex: Integer?, ?px: Integer?, ?nx: boolish, ?xx: boolish, ?keepttl: boolish) -> (String | bool)
+
+    def setex: (arg key, Integer ttl, top value) -> String
+
+    def del: (*(arg | Array[arg]) keys) -> Integer
+
+    def exists: (*arg keys) -> Integer
+
+    def keys: (?String? query) -> Array[String]
+
+    def expire: (arg key, Integer seconds) -> bool
+
+    def ttl: (arg key) -> Integer
+
+    def mget: (*arg keys) -> Array[String?]
+
+    def mset: (*top args) -> String
+
+    def incr: (arg key) -> Integer
+
+    def incrby: (arg key, Integer increment) -> Integer
+
+    def decr: (arg key) -> Integer
+
+    def decrby: (arg key, Integer decrement) -> Integer
+
+    def eval: (String script, ?Array[arg] keys, ?Array[top] argv, ?keys: Array[arg], ?argv: Array[top]) -> untyped
+
+    def evalsha: (String sha, ?Array[arg] keys, ?Array[top] argv, ?keys: Array[arg], ?argv: Array[top]) -> untyped
+
+    def hget: (arg key, arg field) -> String?
+
+    def hset: (arg key, arg field, top value) -> Integer
+            | (arg key, Hash[arg, top] fields) -> Integer
+
+    def hdel: (arg key, *arg fields) -> Integer
+
+    def hexists: (arg key, arg field) -> bool
+
+    def hgetall: (arg key) -> Hash[String, String]
+
+    def hkeys: (arg key) -> Array[String]
+
+    def hvals: (arg key) -> Array[String]
+
+    def hlen: (arg key) -> Integer
+
+    def hincrby: (arg key, arg field, Integer increment) -> Integer
+
+    def lpush: (arg key, Array[top] values) -> Integer
+             | (arg key, top value) -> Integer
+
+    def rpush: (arg key, Array[top] values) -> Integer
+             | (arg key, top value) -> Integer
+
+    def lpop: (arg key) -> String?
+
+    def rpop: (arg key) -> String?
+
+    def llen: (arg key) -> Integer
+
+    def lrange: (arg key, Integer start, Integer stop) -> Array[String]
+
+    def sadd: (arg key, Array[top] members) -> Integer
+            | (arg key, top member) -> (Integer | bool)
+
+    def srem: (arg key, Array[top] members) -> Integer
+            | (arg key, top member) -> (Integer | bool)
+
+    def sismember: (arg key, top member) -> bool
+
+    def smembers: (arg key) -> Array[String]
+
+    def scard: (arg key) -> Integer
+
+    def zadd: (arg key, *untyped args, ?nx: bool, ?xx: bool, ?ch: bool, ?incr: bool) -> (bool | Integer | Float)
+
+    def zcard: (arg key) -> Integer
+
+    def zscore: (arg key, top member) -> Float?
+
+    def zrem: (arg key, Array[top] members) -> Integer
+            | (arg key, top member) -> bool
+
+    def zrange: (arg key, Integer start, Integer stop, ?with_scores: boolish, ?withscores: boolish) -> Array[untyped]
+  end
+end

@@ -1,0 +1,296 @@
+module Honeybadger
+  VERSION: String
+
+  interface _ToHoneybadgerContext
+    def to_honeybadger_context: () -> Hash[Symbol | String, untyped]
+  end
+
+  interface _Api
+    def notify: (?(Exception | String | Hash[Symbol, untyped])? exception_or_opts,
+                 ?exception: Exception,
+                 ?error_class: String,
+                 ?error_message: String,
+                 ?backtrace: Array[String],
+                 ?cause: Exception?,
+                 ?context: Hash[Symbol | String, untyped],
+                 ?params: Hash[Symbol | String, untyped],
+                 ?parameters: Hash[Symbol | String, untyped],
+                 ?session: Hash[Symbol | String, untyped],
+                 ?cgi_data: Hash[Symbol | String, untyped],
+                 ?details: Hash[Symbol | String, untyped],
+                 ?tags: String | Array[String],
+                 ?fingerprint: String,
+                 ?component: String,
+                 ?controller: String,
+                 ?action: String,
+                 ?url: String,
+                 ?api_key: String,
+                 ?force: bool,
+                 ?sync: bool) -> (String | false)
+
+    def context: () -> Agent
+               | (Hash[Symbol | String, untyped] | _ToHoneybadgerContext context) -> Agent
+               | [T] (Hash[Symbol | String, untyped] | _ToHoneybadgerContext context) { () -> T } -> T
+
+    def get_context: () -> Hash[Symbol | String, untyped]?
+
+    def event_context: () -> Agent
+                     | (Hash[Symbol | String, untyped] context) -> Agent
+                     | [T] (Hash[Symbol | String, untyped] context) { () -> T } -> T
+
+    def get_event_context: () -> Hash[Symbol | String, untyped]?
+
+    def clear!: () -> void
+
+    def add_breadcrumb: (String message, ?metadata: Hash[Symbol | String, untyped], ?category: String) -> Agent
+
+    def event: (String event_type, ?Hash[Symbol, untyped] payload) -> void
+             | (Hash[Symbol, untyped] payload) -> void
+
+    def check_in: (String id) -> bool
+
+    def track_deployment: (?environment: String?, ?revision: String?, ?local_username: String?, ?repository: String?) -> bool
+
+    def flush: () -> true
+             | [T] () { () -> T } -> T
+
+    def stop: (?bool force) -> true
+
+    def configure: () { (Config::Ruby config) -> void } -> Config
+
+    def config: () -> Config
+  end
+
+  extend _Api
+
+  class Agent
+    include _Api
+
+    def initialize: (?(Config | Hash[Symbol, untyped]) opts) -> void
+  end
+
+  class Config
+    interface _LoggerLike
+      def debug: (?String? message) ?{ () -> String } -> untyped
+      def info: (?String? message) ?{ () -> String } -> untyped
+      def warn: (?String? message) ?{ () -> String } -> untyped
+      def error: (?String? message) ?{ () -> String } -> untyped
+    end
+
+    DEFAULTS: Hash[Symbol, untyped]
+
+    def get: (Symbol key) -> untyped
+    alias [] get
+
+    def set: (Symbol key, untyped value) -> untyped
+    alias []= set
+
+    def to_hash: (?bool defaults) -> Hash[Symbol, untyped]
+    alias to_h to_hash
+
+    class Mash
+      def to_hash: () -> Hash[Symbol, untyped]
+      alias to_h to_hash
+    end
+
+    class Ruby < Mash
+      interface _Exceptions
+        def enabled: () -> bool
+        def enabled=: (bool value) -> bool
+        def ignore: () -> Array[String | Class]
+        def ignore=: (Array[String | Class] value) -> Array[String | Class]
+        def ignore_only: () -> Array[String | Class]?
+        def ignore_only=: (Array[String | Class]? value) -> Array[String | Class]?
+        def ignored_user_agents: () -> Array[String | Regexp]
+        def ignored_user_agents=: (Array[String | Regexp] value) -> Array[String | Regexp]
+        def rescue_rake: () -> bool
+        def rescue_rake=: (bool value) -> bool
+        def notify_at_exit: () -> bool
+        def notify_at_exit=: (bool value) -> bool
+        def source_radius: () -> Integer
+        def source_radius=: (Integer value) -> Integer
+        def backtrace_limit: () -> Integer
+        def backtrace_limit=: (Integer value) -> Integer
+        def local_variables: () -> bool
+        def local_variables=: (bool value) -> bool
+        def unwrap: () -> bool
+        def unwrap=: (bool value) -> bool
+      end
+
+      interface _Request
+        def filter_keys: () -> Array[String | Symbol | Regexp | ^(untyped key, untyped value) -> void | Proc]
+        def filter_keys=: (Array[String | Symbol | Regexp | ^(untyped key, untyped value) -> void | Proc] value) -> Array[String | Symbol | Regexp | ^(untyped key, untyped value) -> void | Proc]
+        def disable_session: () -> bool
+        def disable_session=: (bool value) -> bool
+        def disable_params: () -> bool
+        def disable_params=: (bool value) -> bool
+        def disable_environment: () -> bool
+        def disable_environment=: (bool value) -> bool
+        def disable_url: () -> bool
+        def disable_url=: (bool value) -> bool
+      end
+
+      interface _Breadcrumbs
+        def enabled: () -> bool
+        def enabled=: (bool value) -> bool
+        def active_support_notifications: () -> Hash[String, untyped]
+        def active_support_notifications=: (Hash[String, untyped] value) -> Hash[String, untyped]
+      end
+
+      interface _Insights
+        def enabled: () -> bool
+        def enabled=: (bool value) -> bool
+      end
+
+      interface _JobRetries
+        def attempt_threshold: () -> Integer
+        def attempt_threshold=: (Integer value) -> Integer
+      end
+
+      interface _Events
+        def ignore: () -> Array[String | Regexp | Hash[Symbol, untyped]]
+        def ignore=: (Array[String | Regexp | Hash[Symbol, untyped]] value) -> Array[String | Regexp | Hash[Symbol, untyped]]
+        def sample_rate: () -> Integer
+        def sample_rate=: (Integer value) -> Integer
+        def batch_size: () -> Integer
+        def batch_size=: (Integer value) -> Integer
+      end
+
+      interface _Logging
+        def path: () -> String?
+        def path=: (String? value) -> String?
+        def level: () -> String
+        def level=: (String value) -> String
+      end
+
+      interface _Connection
+        def host: () -> String
+        def host=: (String value) -> String
+        def port: () -> Integer?
+        def port=: (Integer? value) -> Integer?
+        def secure: () -> bool
+        def secure=: (bool value) -> bool
+        def http_open_timeout: () -> Integer
+        def http_open_timeout=: (Integer value) -> Integer
+        def http_read_timeout: () -> Integer
+        def http_read_timeout=: (Integer value) -> Integer
+      end
+
+      def api_key: () -> String?
+      def api_key=: (String? value) -> String?
+      def env: () -> String?
+      def env=: (String? value) -> String?
+      def revision: () -> String?
+      def revision=: (String? value) -> String?
+      def root: () -> String
+      def root=: (String value) -> String
+      def hostname: () -> String
+      def hostname=: (String value) -> String
+      def report_data: () -> bool?
+      def report_data=: (bool? value) -> bool?
+      def debug: () -> bool
+      def debug=: (bool value) -> bool
+      def sync: () -> bool
+      def sync=: (bool value) -> bool
+      def send_data_at_exit: () -> bool
+      def send_data_at_exit=: (bool value) -> bool
+      def development_environments: () -> Array[String]
+      def development_environments=: (Array[String] value) -> Array[String]
+      def plugins: () -> Array[String | Symbol]?
+      def plugins=: (Array[String | Symbol]? value) -> Array[String | Symbol]?
+      def skipped_plugins: () -> Array[String | Symbol]?
+      def skipped_plugins=: (Array[String | Symbol]? value) -> Array[String | Symbol]?
+
+      def exceptions: () -> _Exceptions
+      def request: () -> _Request
+      def breadcrumbs: () -> _Breadcrumbs
+      def insights: () -> _Insights
+      def events: () -> _Events
+      def logging: () -> _Logging
+      def connection: () -> _Connection
+      def active_job: () -> _JobRetries
+      def delayed_job: () -> _JobRetries
+      def sidekiq: () -> _JobRetries
+      def shoryuken: () -> _JobRetries
+      def faktory: () -> _JobRetries
+
+      def logger: () -> Config::_LoggerLike
+      def logger=: (Config::_LoggerLike logger) -> Config::_LoggerLike
+
+      def before_notify: (?(^(Notice) -> untyped | Proc) action) ?{ (Notice notice) -> untyped } -> Array[^(Notice) -> untyped | Proc]
+
+      def after_notify: (?(^(Notice, Backend::Response) -> untyped | Proc) action) ?{ (Notice notice, Backend::Response response) -> untyped } -> Array[^(Notice, Backend::Response) -> untyped | Proc]
+
+      def before_event: (?(^(Event) -> untyped | Proc) action) ?{ (Event event) -> untyped } -> Array[^(Event) -> untyped | Proc]
+    end
+  end
+
+  class Notice
+    attr_reader id: String
+    attr_reader exception: Exception?
+    attr_reader cause: Exception?
+    attr_reader tags: Array[String]
+    attr_accessor backtrace: Array[String]
+    attr_accessor fingerprint: String?
+    attr_accessor error_class: String
+    attr_accessor error_message: String
+    attr_accessor context: Hash[Symbol, untyped]
+    attr_accessor cgi_data: Hash[untyped, untyped]
+    attr_accessor params: Hash[untyped, untyped]
+    attr_accessor component: String?
+    attr_accessor action: String?
+    attr_accessor session: Hash[untyped, untyped]
+    attr_accessor url: String?
+    attr_accessor api_key: String?
+    attr_accessor details: Hash[untyped, untyped]
+    attr_accessor request_id: String?
+
+    def tags=: (String | Array[String] tags) -> void
+
+    def halt!: () -> true
+  end
+
+  class Event
+    attr_reader ts: String
+    attr_reader event_type: String?
+    attr_reader payload: Hash[untyped, untyped]
+
+    def []: (untyped key) -> untyped
+    def []=: (untyped key, untyped value) -> untyped
+    def dig: (untyped key, *untyped keys) -> untyped
+    def delete: (untyped key) -> untyped
+    def halt!: () -> true
+  end
+
+  module Backend
+    class Response
+      attr_reader code: Integer | Symbol
+      attr_reader body: String?
+      attr_reader message: String?
+      attr_reader error: String?
+
+      def success?: () -> bool
+      def error_message: () -> String?
+    end
+  end
+
+  class Plugin
+    def self.register: (?String | Symbol name) { () [self: Plugin] -> void } -> Plugin
+
+    def requirement: () { () [self: Execution] -> untyped } -> void
+    def execution: () { () [self: Execution] -> untyped } -> void
+    def collect: (?interval: Integer) { () [self: CollectorExecution] -> untyped } -> void
+
+    class Execution
+      private
+
+      def config: () -> Config
+      def logger: () -> Config::_LoggerLike
+    end
+
+    class CollectorExecution < Execution
+      def gauge: (String name) { () -> Numeric } -> untyped
+               | (String name, ^() -> Numeric callable) -> untyped
+    end
+  end
+end

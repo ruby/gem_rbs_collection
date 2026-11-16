@@ -1,0 +1,42 @@
+module SidekiqScheduler
+  module Schedule
+    def schedule=: (Hash[String | Symbol, Hash[String | Symbol, untyped]] schedule_hash) -> Hash[String, Hash[String, untyped]]
+
+    def schedule: () -> Hash[String, Hash[String, untyped]]?
+
+    def reload_schedule!: () -> Hash[String, Hash[String, untyped]]
+
+    alias schedule! reload_schedule!
+
+    def get_schedule: () -> Hash[String, Hash[String, untyped]]
+                    | (String name) -> Hash[String, untyped]?
+
+    def get_all_schedules: () -> Hash[String, Hash[String, untyped]]
+
+    def set_schedule: (String name, Hash[String | Symbol, untyped] config) -> Hash[String | Symbol, untyped]
+
+    def remove_schedule: (String name) -> void
+  end
+
+  class Scheduler
+    attr_accessor enabled: bool?
+
+    def self.instance: () -> Scheduler
+
+    def self.reload_schedule!: () -> void
+
+    def reload_schedule!: () -> void
+  end
+
+  module RedisManager
+    def self.key_prefix: () -> String?
+
+    def self.key_prefix=: (String? value) -> String?
+  end
+end
+
+module Sidekiq
+  extend SidekiqScheduler::Schedule
+
+  class Scheduler = SidekiqScheduler::Scheduler
+end

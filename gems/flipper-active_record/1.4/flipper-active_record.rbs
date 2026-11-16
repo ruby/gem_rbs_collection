@@ -1,0 +1,38 @@
+module Flipper
+  module Adapters
+    class ActiveRecord
+      include ::Flipper::Adapter
+
+      type options = {
+        ?name: Symbol,
+        ?feature_class: singleton(Feature),
+        ?gate_class: singleton(Gate)
+      }
+
+      attr_reader name: Symbol
+
+      def initialize: (?options | Hash[Symbol, untyped] options) -> void
+
+      class Model < ::ActiveRecord::Base
+      end
+
+      class Feature < Model
+        extend ::_ActiveRecord_Relation_ClassMethods[Feature, ActiveRecord_Relation, Integer]
+
+        class ActiveRecord_Relation < ::ActiveRecord::Relation
+          include ::_ActiveRecord_Relation[Feature, Integer]
+          include Enumerable[Feature]
+        end
+      end
+
+      class Gate < Model
+        extend ::_ActiveRecord_Relation_ClassMethods[Gate, ActiveRecord_Relation, Integer]
+
+        class ActiveRecord_Relation < ::ActiveRecord::Relation
+          include ::_ActiveRecord_Relation[Gate, Integer]
+          include Enumerable[Gate]
+        end
+      end
+    end
+  end
+end

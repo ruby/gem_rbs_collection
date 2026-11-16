@@ -1,0 +1,267 @@
+module PrometheusExporter
+  VERSION: String
+
+  DEFAULT_PORT: Integer
+
+  DEFAULT_BIND_ADDRESS: String
+
+  DEFAULT_PREFIX: String
+
+  DEFAULT_LABEL: Hash[Symbol, untyped]
+
+  DEFAULT_TIMEOUT: Integer
+
+  DEFAULT_REALM: String
+
+  def self.hostname: () -> String
+
+  class Client
+    class RemoteMetric
+      attr_reader name: String
+
+      attr_reader type: Symbol | String
+
+      attr_reader help: String
+
+      def observe: (?untyped value, ?Hash[Symbol | String, untyped]? keys) -> void
+
+      def increment: (?Hash[Symbol | String, untyped]? keys, ?Numeric value) -> void
+
+      def decrement: (?Hash[Symbol | String, untyped]? keys, ?Numeric value) -> void
+    end
+
+    MAX_SOCKET_AGE: Integer
+
+    MAX_QUEUE_SIZE: Integer
+
+    attr_reader logger: Logger
+
+    def self.default: () -> Client
+
+    def self.default=: (Client client) -> Client
+
+    def initialize: (
+      ?host: String,
+      ?port: Integer | String,
+      ?max_queue_size: Integer?,
+      ?thread_sleep: Numeric,
+      ?connect_timeout: Numeric?,
+      ?json_serializer: Symbol?,
+      ?custom_labels: Hash[Symbol, untyped]?,
+      ?logger: Logger,
+      ?log_level: Integer,
+      ?process_queue_once_and_stop: bool,
+      ?tls_ca_file: String?,
+      ?tls_cert_file: String?,
+      ?tls_key_file: String?
+    ) -> void
+
+    def custom_labels=: (Hash[Symbol, untyped]? custom_labels) -> Hash[Symbol, untyped]?
+
+    def register: (Symbol | String `type`, String name, String help, ?Hash[Symbol, untyped]? opts) -> RemoteMetric
+
+    def find_registered_metric: (String name, ?type: Symbol | String | nil, ?help: String?) -> RemoteMetric?
+
+    def send_json: (Hash[Symbol, untyped] obj) -> void
+
+    def stop: (?wait_timeout_seconds: Numeric) -> void
+  end
+
+  class LocalClient < Client
+    attr_reader collector: Server::CollectorBase
+
+    def initialize: (collector: Server::CollectorBase, ?json_serializer: Symbol?, ?custom_labels: Hash[Symbol, untyped]?) -> void
+  end
+
+  module Metric
+    type labels = Hash[Symbol | String, untyped]
+
+    class Base
+      def self.default_prefix: () -> String
+
+      def self.default_prefix=: (String? name) -> String?
+
+      def self.default_labels: () -> Hash[Symbol, untyped]
+
+      def self.default_labels=: (Hash[Symbol, untyped]? labels) -> Hash[Symbol, untyped]?
+
+      def self.default_aggregation: () -> (singleton(Summary) | singleton(Histogram))
+
+      def self.default_aggregation=: (singleton(Summary) | singleton(Histogram) aggregation) -> (singleton(Summary) | singleton(Histogram))
+
+      attr_accessor name: String
+
+      attr_accessor help: String
+
+      def initialize: (String name, String help) -> void
+
+      def `type`: () -> String
+
+      def metric_text: () -> String
+
+      def reset!: () -> void
+
+      def to_h: () -> Hash[untyped, untyped]
+
+      def to_prometheus_text: () -> String
+    end
+
+    class Counter < Base
+      attr_reader data: Hash[labels, Numeric]
+
+      def to_h: () -> Hash[labels, Numeric]
+
+      def remove: (labels labels) -> Numeric?
+
+      def observe: (?Numeric increment, ?labels labels) -> Numeric
+
+      def increment: (?labels labels, ?Numeric value) -> Numeric
+
+      def decrement: (?labels labels, ?Numeric value) -> Numeric
+
+      def reset: (?labels labels, ?Numeric value) -> Numeric
+    end
+
+    class Gauge < Base
+      attr_reader data: Hash[labels, Numeric]
+
+      def to_h: () -> Hash[labels, Numeric]
+
+      def remove: (labels labels) -> Numeric?
+
+      def observe: (Numeric? value, ?labels labels) -> void
+
+      def set: (Numeric? value, ?labels labels) -> void
+
+      def increment: (?labels labels, ?Numeric value) -> Numeric
+
+      def decrement: (?labels labels, ?Numeric value) -> Numeric
+    end
+
+    class Histogram < Base
+      DEFAULT_BUCKETS: Array[Numeric]
+
+      def self.default_buckets: () -> Array[Numeric]
+
+      def self.default_buckets=: (Array[Numeric]? buckets) -> Array[Numeric]?
+
+      attr_reader buckets: Array[Numeric]
+
+      def initialize: (String name, String help, ?{ ?buckets: Array[Numeric]? } opts) -> void
+
+      def remove: (labels labels) -> void
+
+      def observe: (Numeric value, ?labels? labels) -> void
+    end
+
+    class Summary < Base
+      DEFAULT_QUANTILES: Array[Float]
+
+      ROTATE_AGE: Integer
+
+      def initialize: (String name, String help, ?{ ?quantiles: Array[Float]? } opts) -> void
+
+      def remove: (labels labels) -> void
+
+      def observe: (Numeric value, ?labels? labels) -> void
+    end
+  end
+
+  class Middleware
+    interface _App
+      def call: (Hash[String, untyped] env) -> untyped
+    end
+
+    @app: _App
+
+    @client: Client
+
+    def initialize: (_App app, ?{ ?instrument: Symbol | bool | nil, ?client: Client? } config) -> void
+
+    def call: (Hash[String, untyped] env) -> untyped
+
+    def custom_labels: (Hash[String, untyped] env) -> Hash[Symbol, untyped]?
+
+    private
+
+    def measure_queue_time: (Hash[String, untyped] env) -> Float?
+  end
+
+  module Server
+    class TypeCollector
+      def `type`: () -> String
+
+      def collect: (Hash[String, untyped] obj) -> void
+
+      def metrics: () -> Array[Metric::Base]
+    end
+
+    class CollectorBase
+      def process: (String str) -> void
+
+      def prometheus_metrics_text: (?String str) -> String?
+    end
+
+    class Collector < CollectorBase
+      attr_reader logger: Logger
+
+      def initialize: (?json_serializer: Symbol?, ?logger: Logger) -> void
+
+      def register_collector: (TypeCollector collector) -> void
+
+      def process_hash: (Hash[String, untyped] obj) -> void
+
+      def prometheus_metrics_text: () -> String
+    end
+
+    class WebServer
+      attr_reader collector: CollectorBase
+
+      def initialize: (
+        { ?port: Integer?, ?bind: String?, ?timeout: Numeric?, ?verbose: bool?, ?auth: String?, ?realm: String?, ?collector: CollectorBase?, ?log_target: untyped, ?tls_cert_file: String?, ?tls_key_file: String? } opts
+      ) -> void
+
+      def start: () -> Thread
+
+      def stop: () -> void
+    end
+  end
+
+  module Instrumentation
+    class PeriodicStats
+      def self.started?: () -> bool
+
+      def self.stop: () -> void
+    end
+
+    class Process < PeriodicStats
+      def self.start: (?client: Client?, ?type: String?, ?frequency: Numeric, ?labels: Hash[Symbol, untyped]?) -> Thread
+    end
+
+    class Puma < PeriodicStats
+      def self.start: (?client: Client?, ?frequency: Numeric, ?labels: Hash[Symbol, untyped]) -> Thread
+    end
+
+    class ActiveRecord < PeriodicStats
+      ALLOWED_CONFIG_LABELS: Array[Symbol]
+
+      def self.start: (?client: Client?, ?frequency: Numeric, ?custom_labels: Hash[Symbol, untyped], ?config_labels: Array[Symbol | String]) -> Thread?
+    end
+
+    class SidekiqProcess < PeriodicStats
+      def self.start: (?client: Client?, ?frequency: Numeric) -> Thread
+    end
+
+    class SidekiqQueue < PeriodicStats
+      def self.start: (?client: Client?, ?frequency: Numeric, ?all_queues: bool) -> Thread
+    end
+
+    class SidekiqStats < PeriodicStats
+      def self.start: (?client: Client?, ?frequency: Numeric) -> Thread
+    end
+
+    class Sidekiq
+      def self.death_handler: () -> ^(Hash[String, untyped] job, Exception ex) -> void
+    end
+  end
+end

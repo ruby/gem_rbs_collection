@@ -1,0 +1,84 @@
+module Bullet
+  VERSION: String
+
+  type safelist_type = :n_plus_one_query | :unused_eager_loading | :counter_cache
+
+  type stacktrace_filter = String | Regexp | [String | Regexp, String | Integer | Range[Integer]]
+
+  type notifier_config = bool | Hash[Symbol, untyped]
+
+  type safelist_options = { type: safelist_type, class_name: String, association: Symbol | String }
+
+  def self.alert=: (notifier_config) -> void
+  def self.console=: (notifier_config) -> void
+  def self.rails_logger=: (boolish) -> void
+  def self.honeybadger=: (notifier_config) -> void
+  def self.airbrake=: (notifier_config) -> void
+  def self.rollbar=: (notifier_config) -> void
+  def self.bugsnag=: (notifier_config | ^(untyped report) -> void) -> void
+  def self.sentry=: (notifier_config) -> void
+  def self.appsignal=: (notifier_config) -> void
+  def self.terminal_notifier=: (boolish) -> void
+  def self.opentelemetry=: (boolish) -> void
+  def self.slack=: (Hash[Symbol, untyped]) -> void
+  def self.xmpp=: (Hash[Symbol, untyped]) -> void
+  def self.customized_logger=: (String | IO) -> void
+  def self.raise=: (boolish) -> void
+  def self.bullet_logger=: (boolish) -> void
+
+  def self.enable=: (boolish) -> void
+  def self.enabled=: (boolish) -> void
+  def self.enable?: () -> bool
+  def self.enabled?: () -> bool
+
+  def self.n_plus_one_query_enable=: (boolish) -> void
+  def self.n_plus_one_query_enable?: () -> bool
+  def self.unused_eager_loading_enable=: (boolish) -> void
+  def self.unused_eager_loading_enable?: () -> bool
+  def self.counter_cache_enable=: (boolish) -> void
+  def self.counter_cache_enable?: () -> bool
+
+  def self.add_footer: () -> bool?
+  def self.add_footer=: (bool?) -> void
+  def self.footer_position: () -> String
+  def self.footer_position=: (String) -> void
+  def self.skip_html_injection=: (boolish) -> void
+  def self.skip_http_headers: () -> bool?
+  def self.skip_http_headers=: (bool?) -> void
+  def self.always_append_html_body: () -> bool?
+  def self.always_append_html_body=: (bool?) -> void
+  def self.skip_user_in_notification: () -> bool?
+  def self.skip_user_in_notification=: (bool?) -> void
+
+  def self.stacktrace_includes: () -> Array[stacktrace_filter]
+  def self.stacktrace_includes=: (Array[stacktrace_filter]) -> void
+  def self.stacktrace_excludes: () -> Array[stacktrace_filter]
+  def self.stacktrace_excludes=: (Array[stacktrace_filter]) -> void
+
+  def self.safelist: () -> Hash[safelist_type, Hash[String, Array[Symbol]]]?
+  def self.add_safelist: (safelist_options options) -> Array[Symbol]
+  def self.delete_safelist: (safelist_options options) -> void
+  def self.clear_safelist: () -> nil
+
+  def self.notification?: () -> bool?
+  def self.perform_out_of_channel_notifications: (?Hash[String, untyped] env) -> void
+
+  def self.start_request: () -> void
+  def self.end_request: () -> void
+  def self.pause: () -> void
+  def self.resume: () -> void
+  def self.paused?: () -> bool
+  def self.skip: [T] () { () -> T } -> T
+  def self.profile: [T] () { () -> T } -> T
+
+  module ActiveJob
+  end
+
+  class Rack
+  end
+
+  module Notification
+    class UnoptimizedQueryError < StandardError
+    end
+  end
+end

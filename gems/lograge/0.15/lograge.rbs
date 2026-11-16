@@ -1,0 +1,140 @@
+module Lograge
+  VERSION: String
+
+  interface _Formatter
+    def call: (Hash[Symbol, untyped] data) -> untyped
+  end
+
+  type custom_options = ^(ActiveSupport::Notifications::Event event) -> Hash[Symbol, untyped]?
+
+  type before_format = ^(Hash[Symbol, untyped] data, Hash[Symbol, untyped] payload) -> Hash[Symbol, untyped]?
+
+  type ignore_test = ^(ActiveSupport::Notifications::Event event) -> boolish
+
+  type custom_payload = ^(untyped controller) -> Hash[Symbol, untyped]?
+
+  type formatter = _Formatter | ^(Hash[Symbol, untyped] data) -> untyped
+
+  def self.logger: () -> ::Logger?
+
+  def self.logger=: (::Logger? logger) -> ::Logger?
+
+  def self.log_level: () -> Symbol
+
+  def self.log_level=: (Symbol level) -> Symbol
+
+  def self.formatter: () -> formatter?
+
+  def self.formatter=: (formatter? formatter) -> formatter?
+
+  def self.custom_options=: (custom_options | Hash[Symbol, untyped] | nil options) -> (custom_options | Hash[Symbol, untyped] | nil)
+
+  def self.before_format=: (before_format? callable) -> before_format?
+
+  def self.ignore: (ignore_test? test) -> Array[ignore_test]?
+
+  class OrderedOptions < ActiveSupport::OrderedOptions
+    def custom_payload: () { (untyped controller) -> Hash[Symbol, untyped]? } -> void
+
+    def enabled: () -> bool?
+
+    def enabled=: (bool value) -> bool
+
+    def formatter: () -> Lograge::formatter?
+
+    def formatter=: (Lograge::formatter? value) -> Lograge::formatter?
+
+    def custom_options: () -> (custom_options | Hash[Symbol, untyped] | nil)
+
+    def custom_options=: (custom_options | Hash[Symbol, untyped] | nil value) -> (custom_options | Hash[Symbol, untyped] | nil)
+
+    def custom_payload_method: () -> custom_payload?
+
+    def custom_payload_method=: (custom_payload? value) -> custom_payload?
+
+    def before_format: () -> before_format?
+
+    def before_format=: (before_format? value) -> before_format?
+
+    def ignore_actions: () -> (String | Array[String])?
+
+    def ignore_actions=: ((String | Array[String])? value) -> (String | Array[String])?
+
+    def ignore_custom: () -> ignore_test?
+
+    def ignore_custom=: (ignore_test? value) -> ignore_test?
+
+    def base_controller_class: () -> (String | Array[String])?
+
+    def base_controller_class=: ((String | Array[String])? value) -> (String | Array[String])?
+
+    def logger: () -> ::Logger?
+
+    def logger=: (::Logger? value) -> ::Logger?
+
+    def log_level: () -> Symbol?
+
+    def log_level=: (Symbol? value) -> Symbol?
+
+    def keep_original_rails_log: () -> bool?
+
+    def keep_original_rails_log=: (bool value) -> bool
+  end
+
+  module Formatters
+    class KeyValue
+      def call: (Hash[Symbol, untyped] data) -> String
+    end
+
+    class KeyValueDeep < KeyValue
+    end
+
+    class L2met < KeyValue
+    end
+
+    class Json
+      def call: (Hash[Symbol, untyped] data) -> String
+    end
+
+    class Cee
+      def call: (Hash[Symbol, untyped] data) -> String
+    end
+
+    class Graylog2
+      def call: (Hash[Symbol, untyped] data) -> Hash[Symbol, untyped]
+    end
+
+    class Lines
+      def call: (Hash[Symbol, untyped] data) -> String
+    end
+
+    class Logstash
+      def call: (Hash[Symbol, untyped] data) -> String
+    end
+
+    class LTSV
+      def call: (Hash[Symbol, untyped] data) -> String
+    end
+
+    class Raw
+      def call: (Hash[Symbol, untyped] data) -> Hash[Symbol, untyped]
+    end
+  end
+
+  module LogSubscribers
+    class Base < ActiveSupport::LogSubscriber
+    end
+
+    class ActionController < Base
+      def process_action: (ActiveSupport::Notifications::Event event) -> void
+    end
+  end
+end
+
+module Rails
+  class Application
+    class Configuration
+      def lograge: () -> Lograge::OrderedOptions
+    end
+  end
+end

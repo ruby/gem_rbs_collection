@@ -1,0 +1,173 @@
+module Datadog
+  module Tracing
+    def self.trace: [T] (
+      String name,
+      ?continue_from: TraceDigest?,
+      ?on_error: (^(SpanOperation, Exception) -> void | Proc)?,
+      ?resource: String?,
+      ?service: String?,
+      ?start_time: Time?,
+      ?tags: Hash[String, untyped]?,
+      ?type: String?,
+      ?id: Integer?
+    ) { (SpanOperation, TraceOperation) -> T } -> T
+                  | (
+      String name,
+      ?continue_from: TraceDigest?,
+      ?on_error: (^(SpanOperation, Exception) -> void | Proc)?,
+      ?resource: String?,
+      ?service: String?,
+      ?start_time: Time?,
+      ?tags: Hash[String, untyped]?,
+      ?type: String?,
+      ?id: Integer?
+    ) -> SpanOperation
+
+    def self.continue_trace!: [T] (TraceDigest? digest) { () -> T } -> T
+                            | (TraceDigest? digest) -> TraceOperation
+
+    def self.logger: () -> ::Logger
+    def self.active_trace: () -> TraceOperation?
+    def self.active_span: () -> SpanOperation?
+    def self.keep!: () -> void
+    def self.reject!: () -> void
+    def self.correlation: () -> Correlation::Identifier
+    def self.log_correlation: () -> String
+    def self.shutdown!: () -> void
+    def self.before_flush: (*Pipeline::SpanProcessor processors) ?{ (TraceSegment) -> TraceSegment } -> void
+    def self.enabled?: () -> bool
+
+    module Metadata
+      module Tagging
+        def get_tag: (String key) -> (String | Float)?
+        def set_tag: (String key, ?untyped value) -> void
+        def set_tags: (Hash[String, untyped] tags) -> void
+        def has_tag?: (String key) -> bool
+        def clear_tag: (String key) -> void
+        def get_metric: (String key) -> (String | Float)?
+        def set_metric: (String key, Numeric value) -> void
+        def clear_metric: (String key) -> void
+        def tags: () -> Hash[String, String | Float]
+        def []: (String key) -> (String | Float)?
+        def []=: (String key, untyped value) -> void
+      end
+    end
+
+    class TraceDigest
+    end
+
+    class SpanOperation
+      include Metadata::Tagging
+
+      attr_reader id: Integer
+      attr_reader trace_id: Integer
+      attr_reader parent_id: Integer
+      attr_reader name: String
+      attr_reader resource: String
+      attr_reader service: String?
+      attr_reader type: String?
+      attr_reader start_time: Time?
+      attr_reader end_time: Time?
+
+      def name=: (String name) -> String
+      def resource=: (String resource) -> String
+      def service=: (String? service) -> String?
+      def type=: (String? type) -> String?
+
+      def set_error: (Exception error) -> void
+      def record_exception: (Exception exception, ?attributes: Hash[String, untyped]) -> void
+      def root?: () -> bool
+      def finish: (?Time? end_time) -> Span
+      def finished?: () -> bool
+      def duration: () -> Float?
+    end
+
+    class Span
+      include Metadata::Tagging
+
+      attr_accessor id: Integer
+      attr_accessor trace_id: Integer
+      attr_accessor parent_id: Integer
+      attr_accessor name: String
+      attr_accessor resource: String
+      attr_accessor service: String?
+      attr_accessor type: String?
+      attr_accessor status: Integer
+      attr_accessor start_time: Time?
+      attr_accessor end_time: Time?
+
+      def started?: () -> bool
+      def stopped?: () -> bool
+      def finished?: () -> bool
+      def duration: () -> Float?
+      def set_error: (Exception error) -> void
+    end
+
+    class TraceOperation
+      include Metadata::Tagging
+
+      attr_reader id: Integer
+      attr_reader active_span: SpanOperation?
+      attr_accessor sampling_priority: Integer?
+      attr_writer name: String?
+      attr_writer service: String?
+
+      def name: () -> String?
+      def service: () -> String?
+      def resource: () -> String?
+      def resource=: (String? resource) -> String?
+      def keep!: () -> void
+      def reject!: () -> void
+      def sampled?: () -> bool
+      def finished?: () -> bool
+      def to_digest: () -> TraceDigest
+    end
+
+    class TraceSegment
+      include Metadata::Tagging
+
+      attr_reader id: Integer
+      attr_reader spans: Array[Span]
+      attr_reader name: String?
+      attr_reader resource: String?
+      attr_reader service: String?
+      attr_reader sampling_priority: Integer?
+    end
+
+    module Correlation
+      class Identifier
+        attr_reader env: String?
+        attr_reader service: String
+        attr_reader span_id: String
+        attr_reader version: String?
+
+        def trace_id: () -> String
+        def to_h: () -> Hash[Symbol, untyped]
+        def to_log_format: () -> String
+      end
+    end
+
+    module Pipeline
+      class SpanProcessor
+        def initialize: (?(^(Span) -> void | Proc)? operation) ?{ (Span) -> void } -> void
+        def call: (TraceSegment trace) -> TraceSegment
+      end
+
+      class SpanFilter < SpanProcessor
+        def initialize: (?(^(Span) -> boolish | Proc)? operation) ?{ (Span) -> boolish } -> void
+      end
+    end
+
+    module Contrib
+      module Integration
+      end
+
+      module Configuration
+        class Settings
+          def []: (Symbol name) -> untyped
+          def []=: (Symbol name, untyped value) -> void
+        end
+      end
+    end
+  end
+end

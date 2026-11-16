@@ -1,0 +1,301 @@
+class RedisClient
+  VERSION: String
+
+  type command_scalar = String | Symbol | Integer | Float
+
+  type command_arg = command_scalar | Array[command_scalar] | Hash[command_scalar, command_scalar]
+
+  type command_option = command_scalar | bool | nil
+
+  def self.config: (?url: String?, ?host: String?, ?port: Integer | String | nil, ?path: String?, ?username: String?, ?password: String | ^(String) -> String? | Proc | nil, ?db: Integer | String | nil, ?id: String?, ?timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?, ?connect_timeout: Numeric?, ?idle_timeout: Numeric?, ?ssl: bool?, ?custom: untyped, ?ssl_params: Hash[Symbol, untyped]?, ?driver: Symbol | String | Class | nil, ?protocol: 2 | 3, ?client_implementation: Class, ?command_builder: Module, ?inherit_socket: bool, ?reconnect_attempts: Integer | Array[Numeric] | false | nil, ?middlewares: Array[Module] | false | nil, ?circuit_breaker: CircuitBreaker | Hash[Symbol, untyped] | nil, ?driver_info: String | Array[String] | nil) -> Config
+
+  def self.sentinel: (
+    sentinels: Array[String | Hash[Symbol, untyped]],
+    ?sentinel_username: String?,
+    ?sentinel_password: String | ^(String) -> String? | Proc | nil,
+    ?role: :master | :replica | :slave | String,
+    ?name: String?,
+    ?url: String?,
+    ?username: String?, ?password: String | ^(String) -> String? | Proc | nil, ?db: Integer | String | nil, ?id: String?, ?timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?, ?connect_timeout: Numeric?, ?idle_timeout: Numeric?, ?ssl: bool?, ?custom: untyped, ?ssl_params: Hash[Symbol, untyped]?, ?driver: Symbol | String | Class | nil, ?protocol: 2 | 3, ?client_implementation: Class, ?command_builder: Module, ?inherit_socket: bool, ?reconnect_attempts: Integer | Array[Numeric] | false | nil, ?middlewares: Array[Module] | false | nil, ?circuit_breaker: CircuitBreaker | Hash[Symbol, untyped] | nil, ?driver_info: String | Array[String] | nil
+  ) -> SentinelConfig
+
+  def self.ring: (*(RedisClient | Pooled | Array[RedisClient | Pooled]) clients, ?replicas: Integer) -> HashRing
+
+  def self.new: (Config::Common config, ?id: String?, ?connect_timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?) -> instance
+              | (?Hash[Symbol, untyped]? arg, ?url: String?, ?host: String?, ?port: Integer | String | nil, ?path: String?, ?username: String?, ?password: String | ^(String) -> String? | Proc | nil, ?db: Integer | String | nil, ?id: String?, ?timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?, ?connect_timeout: Numeric?, ?idle_timeout: Numeric?, ?ssl: bool?, ?custom: untyped, ?ssl_params: Hash[Symbol, untyped]?, ?driver: Symbol | String | Class | nil, ?protocol: 2 | 3, ?client_implementation: Class, ?command_builder: Module, ?inherit_socket: bool, ?reconnect_attempts: Integer | Array[Numeric] | false | nil, ?middlewares: Array[Module] | false | nil, ?circuit_breaker: CircuitBreaker | Hash[Symbol, untyped] | nil, ?driver_info: String | Array[String] | nil) -> instance
+
+  def self.register: (Module middleware) -> void
+
+  def self.default_driver: () -> Class?
+
+  def self.default_driver=: (Symbol | String | Class name) -> Class?
+
+  module Common
+    attr_reader config: Config::Common
+    attr_reader id: String?
+    attr_reader nodes: Array[self]
+    attr_accessor connect_timeout: Numeric?
+    attr_accessor read_timeout: Numeric?
+    attr_accessor write_timeout: Numeric?
+
+    def timeout=: (Numeric? timeout) -> Numeric?
+    def node_for: (untyped key) -> self
+    def nodes_for: (*String | Array[String] keys) -> Hash[self, Array[String]]
+  end
+
+  module HasConfig
+    attr_reader config: Config::Common?
+  end
+
+  module Retriable
+    def retry_attempt: () -> Integer
+    def retriable?: () -> bool
+    def final?: () -> bool
+  end
+
+  module Final
+    def retry_attempt: () -> Integer
+    def retriable?: () -> bool
+    def final?: () -> bool
+  end
+
+  module HasCommand
+    attr_reader command: Array[String]?
+  end
+
+  module HasCode
+    attr_reader code: String?
+  end
+
+  class Error < StandardError
+    include HasConfig
+    include Retriable
+
+    attr_reader next_error: Error?
+  end
+
+  class ProtocolError < Error
+  end
+
+  class UnsupportedServer < Error
+  end
+
+  class ConnectionError < Error
+  end
+
+  class CannotConnectError < ConnectionError
+  end
+
+  class FailoverError < ConnectionError
+  end
+
+  class TimeoutError < ConnectionError
+  end
+
+  class ReadTimeoutError < TimeoutError
+  end
+
+  class WriteTimeoutError < TimeoutError
+  end
+
+  class CheckoutTimeoutError < TimeoutError
+  end
+
+  class CommandError < Error
+    include HasCommand
+    include HasCode
+    include Final
+  end
+
+  class AuthenticationError < CommandError
+  end
+
+  class PermissionError < CommandError
+  end
+
+  class WrongTypeError < CommandError
+  end
+
+  class OutOfMemoryError < CommandError
+  end
+
+  class NoScriptError < CommandError
+  end
+
+  class ReadOnlyError < ConnectionError
+    include HasCommand
+    include HasCode
+  end
+
+  class MasterDownError < ConnectionError
+    include HasCommand
+    include HasCode
+  end
+
+  class Config
+    module Common
+      attr_reader db: Integer
+      attr_reader id: String?
+      attr_reader ssl: bool
+      attr_reader ssl_params: Hash[Symbol, untyped]?
+      attr_reader command_builder: Module
+      attr_reader inherit_socket: bool
+      attr_reader connect_timeout: Numeric?
+      attr_reader read_timeout: Numeric?
+      attr_reader write_timeout: Numeric?
+      attr_reader idle_timeout: Numeric?
+      attr_reader driver: Class
+      attr_reader protocol: 2 | 3
+      attr_reader custom: untyped
+      attr_reader circuit_breaker: CircuitBreaker?
+      attr_reader driver_info: String | Array[String] | nil
+
+      def ssl?: () -> bool
+      def username: () -> String
+      def password: () -> String?
+      def server_url: () -> String
+      def new_client: (?id: String?, ?connect_timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?) -> RedisClient
+      def new_pool: (?size: Integer, ?timeout: Numeric, ?auto_reload_after_fork: bool, ?id: String?, ?connect_timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?) -> Pooled
+    end
+
+    include Common
+
+    attr_reader host: String?
+    attr_reader port: Integer?
+    attr_reader path: String?
+    attr_reader server_key: [String?, String?, Integer?]
+  end
+
+  class SentinelConfig
+    include Config::Common
+
+    attr_reader name: String
+
+    def sentinels: () -> Array[Config]
+    def reset: () -> void
+    def host: () -> String?
+    def port: () -> Integer?
+    def path: () -> nil
+    def server_key: () -> [String?, String?, Integer?]
+  end
+
+  class CircuitBreaker
+    class OpenCircuitError < CannotConnectError
+    end
+
+    attr_reader error_timeout: Float
+    attr_reader error_threshold: Integer
+    attr_reader error_threshold_timeout: Float
+    attr_reader success_threshold: Integer
+
+    def initialize: (error_threshold: Integer, error_timeout: Numeric, ?error_threshold_timeout: Numeric, ?success_threshold: Integer) -> void
+  end
+
+  class HashRing
+    type node = RedisClient | Pooled
+
+    attr_reader nodes: Array[node]
+
+    def initialize: (?Array[node] nodes, ?replicas: Integer) -> void
+    def node_for: (String key) -> node
+    def nodes_for: (*String | Array[String] keys) -> Hash[node, Array[String]]
+  end
+
+  class RubyConnection
+  end
+
+  class PubSub
+    def call: (*command_arg command, **command_option kwargs) -> nil
+    def call_v: (Array[command_arg] command) -> nil
+    def close: () -> self
+    def next_event: (?Numeric? timeout) -> untyped
+  end
+
+  class Multi
+    def call: (*command_arg command, **command_option kwargs) ?{ (untyped result) -> untyped } -> nil
+    def call_v: (Array[command_arg] command) ?{ (untyped result) -> untyped } -> nil
+    def call_once: (*command_arg command, **command_option kwargs) ?{ (untyped result) -> untyped } -> nil
+    def call_once_v: (Array[command_arg] command) ?{ (untyped result) -> untyped } -> nil
+  end
+
+  class Pipeline < Multi
+    def blocking_call: (Numeric | false | nil timeout, *command_arg command, **command_option kwargs) ?{ (untyped result) -> untyped } -> nil
+    def blocking_call_v: (Numeric | false | nil timeout, Array[command_arg] command) ?{ (untyped result) -> untyped } -> nil
+  end
+
+  class Pooled
+    include Common
+
+    def with: [T] (?timeout: Numeric) { (RedisClient client) -> T } -> T
+    alias then with
+    def close: () -> nil
+    def size: () -> Integer
+    def call: (*command_arg command, **command_option kwargs) -> untyped
+            | [T] (*command_arg command, **command_option kwargs) { (untyped result) -> T } -> T
+    def call_v: (Array[command_arg] command) -> untyped
+              | [T] (Array[command_arg] command) { (untyped result) -> T } -> T
+    def call_once: (*command_arg command, **command_option kwargs) -> untyped
+                 | [T] (*command_arg command, **command_option kwargs) { (untyped result) -> T } -> T
+    def call_once_v: (Array[command_arg] command) -> untyped
+                   | [T] (Array[command_arg] command) { (untyped result) -> T } -> T
+    def blocking_call: (Numeric | false | nil timeout, *command_arg command, **command_option kwargs) -> untyped
+                     | [T] (Numeric | false | nil timeout, *command_arg command, **command_option kwargs) { (untyped result) -> T } -> T
+    def blocking_call_v: (Numeric | false | nil timeout, Array[command_arg] command) -> untyped
+                       | [T] (Numeric | false | nil timeout, Array[command_arg] command) { (untyped result) -> T } -> T
+    def scan: (*command_arg args, **command_option kwargs) { (String key) -> void } -> nil
+            | (*command_arg args, **command_option kwargs) -> Enumerator[String, nil]
+    def sscan: (command_arg key, *command_arg args, **command_option kwargs) { (String member) -> void } -> nil
+             | (command_arg key, *command_arg args, **command_option kwargs) -> Enumerator[String, nil]
+    def hscan: (command_arg key, *command_arg args, **command_option kwargs) { (String field, String value) -> void } -> nil
+             | (command_arg key, *command_arg args, **command_option kwargs) -> Enumerator[[String, String], nil]
+    def zscan: (command_arg key, *command_arg args, **command_option kwargs) { (String member, String score) -> void } -> nil
+             | (command_arg key, *command_arg args, **command_option kwargs) -> Enumerator[[String, String], nil]
+    def pipelined: (?exception: bool) { (Pipeline pipeline) -> void } -> Array[untyped]
+    def multi: (?watch: nil) { (Multi transaction) -> void } -> Array[untyped]
+             | (watch: String | Array[String]) { (Multi transaction) -> void } -> Array[untyped]?
+    def pubsub: () -> PubSub
+  end
+
+  include Common
+
+  def inspect: () -> String
+  def server_url: () -> String
+  def timeout: () -> Numeric?
+  def idle_timeout: () -> Numeric?
+  def db: () -> Integer
+  def host: () -> String?
+  def port: () -> Integer?
+  def path: () -> String?
+  def username: () -> String
+  def password: () -> String?
+  def size: () -> Integer
+  def with: [T] (?untyped options) { (self client) -> T } -> T
+  alias then with
+  def measure_round_trip_delay: () -> Float
+  def connected?: () -> bool?
+  def close: () -> self
+  def call: (*command_arg command, **command_option kwargs) -> untyped
+          | [T] (*command_arg command, **command_option kwargs) { (untyped result) -> T } -> T
+  def call_v: (Array[command_arg] command) -> untyped
+            | [T] (Array[command_arg] command) { (untyped result) -> T } -> T
+  def call_once: (*command_arg command, **command_option kwargs) -> untyped
+               | [T] (*command_arg command, **command_option kwargs) { (untyped result) -> T } -> T
+  def call_once_v: (Array[command_arg] command) -> untyped
+                 | [T] (Array[command_arg] command) { (untyped result) -> T } -> T
+  def blocking_call: (Numeric | false | nil timeout, *command_arg command, **command_option kwargs) -> untyped
+                   | [T] (Numeric | false | nil timeout, *command_arg command, **command_option kwargs) { (untyped result) -> T } -> T
+  def blocking_call_v: (Numeric | false | nil timeout, Array[command_arg] command) -> untyped
+                     | [T] (Numeric | false | nil timeout, Array[command_arg] command) { (untyped result) -> T } -> T
+  def scan: (*command_arg args, **command_option kwargs) { (String key) -> void } -> nil
+          | (*command_arg args, **command_option kwargs) -> Enumerator[String, nil]
+  def sscan: (command_arg key, *command_arg args, **command_option kwargs) { (String member) -> void } -> nil
+           | (command_arg key, *command_arg args, **command_option kwargs) -> Enumerator[String, nil]
+  def hscan: (command_arg key, *command_arg args, **command_option kwargs) { (String field, String value) -> void } -> nil
+           | (command_arg key, *command_arg args, **command_option kwargs) -> Enumerator[[String, String], nil]
+  def zscan: (command_arg key, *command_arg args, **command_option kwargs) { (String member, String score) -> void } -> nil
+           | (command_arg key, *command_arg args, **command_option kwargs) -> Enumerator[[String, String], nil]
+  def pipelined: (?exception: bool) { (Pipeline pipeline) -> void } -> Array[untyped]
+  def multi: (?watch: nil) { (Multi transaction) -> void } -> Array[untyped]
+           | (watch: String | Array[String]) { (Multi transaction) -> void } -> Array[untyped]?
+  def pubsub: () -> PubSub
+end

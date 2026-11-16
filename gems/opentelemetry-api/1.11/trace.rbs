@@ -1,0 +1,129 @@
+module OpenTelemetry
+  module Trace
+    type attribute_value = String | Integer | Float | bool
+                         | Array[String] | Array[Integer] | Array[Float] | Array[bool]
+
+    type attributes = Hash[String, attribute_value]
+
+    INVALID_TRACE_ID: String
+    INVALID_SPAN_ID: String
+
+    def self?.generate_trace_id: () -> String
+    def self?.generate_span_id: () -> String
+    def self?.current_span: (?Context? context) -> Span
+    def self?.context_with_span: (Span span, ?parent_context: Context) -> Context
+    def self?.with_span: [T] (Span span) { (Span span, Context context) -> T } -> T
+    def self?.non_recording_span: (SpanContext span_context) -> Span
+
+    class Tracer
+      def in_span: [T] (String name, ?attributes: attributes?, ?links: Array[Link]?, ?start_timestamp: (Time | Integer)?, ?kind: SpanKind::kind?, ?record_exception: bool) { (Span span, Context context) -> T } -> T
+      def start_root_span: (String name, ?attributes: attributes?, ?links: Array[Link]?, ?start_timestamp: (Time | Integer)?, ?kind: SpanKind::kind?) -> Span
+      def start_span: (String name, ?with_parent: Context?, ?attributes: attributes?, ?links: Array[Link]?, ?start_timestamp: (Time | Integer)?, ?kind: SpanKind::kind?) -> Span
+    end
+
+    class TracerProvider
+      def tracer: (?String? deprecated_name, ?String? deprecated_version, ?name: String?, ?version: String?, ?attributes: attributes?) -> Tracer
+    end
+
+    class Span
+      INVALID: Span
+
+      attr_reader context: SpanContext
+
+      def recording?: () -> bool
+      def set_attribute: (String key, attribute_value value) -> self
+      def []=: (String key, attribute_value value) -> self
+      def add_attributes: (attributes attributes) -> self
+      def add_link: (Link link) -> self
+      def add_event: (String name, ?attributes: attributes?, ?timestamp: (Time | Integer)?) -> self
+      def record_exception: (Exception exception, ?attributes: attributes?) -> void
+      def status=: (Status status) -> void
+      def name=: (String new_name) -> void
+      def finish: (?end_timestamp: (Time | Integer)?) -> self
+    end
+
+    class SpanContext
+      INVALID: SpanContext
+
+      attr_reader trace_flags: TraceFlags
+      attr_reader tracestate: Tracestate
+      attr_reader trace_id: String
+      attr_reader span_id: String
+
+      def initialize: (?trace_id: String, ?span_id: String, ?trace_flags: TraceFlags, ?tracestate: Tracestate, ?remote: bool) -> void
+      def hex_trace_id: () -> String
+      def hex_span_id: () -> String
+      def valid?: () -> bool
+      def remote?: () -> bool
+    end
+
+    module SpanKind
+      type kind = :internal | :server | :client | :producer | :consumer
+
+      INTERNAL: :internal
+      SERVER: :server
+      CLIENT: :client
+      PRODUCER: :producer
+      CONSUMER: :consumer
+    end
+
+    class Status
+      OK: Integer
+      UNSET: Integer
+      ERROR: Integer
+
+      def self.unset: (?String description) -> Status
+      def self.ok: (?String description) -> Status
+      def self.error: (?String description) -> Status
+
+      attr_reader code: Integer
+      attr_reader description: String
+
+      def ok?: () -> bool
+    end
+
+    class Link
+      attr_reader span_context: SpanContext
+      attr_reader attributes: attributes
+
+      def initialize: (SpanContext span_context, ?attributes? attributes) -> void
+      def ==: (untyped other) -> bool
+    end
+
+    class TraceFlags
+      DEFAULT: TraceFlags
+      SAMPLED: TraceFlags
+
+      def self.from_byte: (Integer flags) -> TraceFlags
+
+      def sampled?: () -> bool
+    end
+
+    class Tracestate
+      DEFAULT: Tracestate
+
+      def self.from_string: (String? header) -> Tracestate
+      def self.from_hash: (Hash[String, String] hash) -> Tracestate
+      def self.create: (Hash[String, String] hash) -> Tracestate
+
+      def value: (String key) -> String?
+      alias [] value
+      def set_value: (String key, String value) -> Tracestate
+      def delete: (String key) -> Tracestate
+      def to_s: () -> String
+      def to_h: () -> Hash[String, String]
+      def empty?: () -> bool
+      def ==: (untyped other) -> bool
+    end
+
+    module Propagation
+      module TraceContext
+        def self?.text_map_propagator: () -> TextMapPropagator
+
+        class TextMapPropagator
+          include Context::Propagation::_TextMapPropagator
+        end
+      end
+    end
+  end
+end
