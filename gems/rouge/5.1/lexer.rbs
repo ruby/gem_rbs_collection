@@ -1,0 +1,167 @@
+module Rouge
+  class Lexer
+    type options = Hash[Symbol | String, untyped]
+
+    type guess_info = {
+      ?mimetype: String?,
+      ?filename: String?,
+      ?source: String?
+    }
+
+    def self.lex: (String stream, ?options opts) -> Enumerator[Token::pair, void]
+                | (String stream, ?options opts) { (singleton(Token), String) -> void } -> void
+
+    def self.find: (String | Symbol name) -> singleton(Lexer)?
+
+    def self.find_fancy: (String? str, ?String? code, ?options default_options) -> Lexer?
+
+    def self.lookup_fancy: (String? str, ?String? code, ?options default_options) -> [singleton(Lexer)?, options]
+
+    def self.all: () -> Array[singleton(Lexer)]
+
+    def self.guesses: (?guess_info info) -> Array[singleton(Lexer)]
+
+    def self.guess: (?guess_info info) -> singleton(Lexer)
+                  | (?guess_info info) { (Array[singleton(Lexer)]) -> singleton(Lexer) } -> singleton(Lexer)
+
+    def self.guess_by_mimetype: (String mimetype) -> singleton(Lexer)
+    def self.guess_by_filename: (String filename) -> singleton(Lexer)
+    def self.guess_by_source: (String source) -> singleton(Lexer)
+
+    def self.title: () -> String
+    def self.desc: () -> String?
+    def self.tag: () -> String
+    def self.aliases: (*String | Symbol names) -> Array[String]
+    def self.filenames: (*String globs) -> Array[String]
+    def self.mimetypes: (*String mimetypes) -> Array[String]
+
+    attr_reader options: Hash[String, untyped]
+
+    def initialize: (?options opts) -> void
+
+    def lex: (String string) -> Enumerator[Token::pair, void]
+           | (String string) { (singleton(Token), String) -> void } -> void
+
+    def continue_lex: (String string) -> Enumerator[Token::pair, void]
+                    | (String string) { (singleton(Token), String) -> void } -> void
+
+    def tag: () -> String
+  end
+
+  class RegexLexer < Lexer
+  end
+
+  class TemplateLexer < RegexLexer
+  end
+
+  class Guesser
+    class Ambiguous < StandardError
+      attr_reader alternatives: Array[singleton(Lexer)]
+    end
+  end
+
+  module Lexers
+    class PlainText < Lexer
+      attr_reader token: singleton(Token)
+    end
+
+    class ArmAsm < RegexLexer
+    end
+
+    class C < RegexLexer
+    end
+
+    class Cpp < C
+    end
+
+    class CSharp < RegexLexer
+    end
+
+    class CSS < RegexLexer
+    end
+
+    class Diff < RegexLexer
+    end
+
+    class Go < RegexLexer
+    end
+
+    class GraphQL < RegexLexer
+    end
+
+    class HTML < RegexLexer
+    end
+
+    class INI < RegexLexer
+    end
+
+    class Java < RegexLexer
+    end
+
+    class Javascript < RegexLexer
+    end
+
+    class JSON < RegexLexer
+    end
+
+    class Kotlin < RegexLexer
+    end
+
+    class Lua < RegexLexer
+    end
+
+    class Make < RegexLexer
+    end
+
+    class Markdown < RegexLexer
+    end
+
+    class ObjectiveC < C
+    end
+
+    class Perl < RegexLexer
+    end
+
+    class PHP < TemplateLexer
+    end
+
+    class Python < RegexLexer
+    end
+
+    class R < RegexLexer
+    end
+
+    class Ruby < RegexLexer
+    end
+
+    class Rust < RegexLexer
+    end
+
+    class SassCommon < RegexLexer
+    end
+
+    class Scss < SassCommon
+    end
+
+    class Shell < RegexLexer
+    end
+
+    class SQL < RegexLexer
+    end
+
+    class Swift < RegexLexer
+    end
+
+    class Typescript < Javascript
+    end
+
+    class VisualBasic < RegexLexer
+    end
+
+    class XML < RegexLexer
+    end
+
+    class YAML < RegexLexer
+    end
+  end
+end
