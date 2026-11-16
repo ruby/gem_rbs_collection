@@ -1,0 +1,85 @@
+module Redcarpet
+  VERSION: String
+
+  # Render options (escape_html and so on) are not extensions. Pass them to the
+  # renderer's new; the C renderer does not read them from Markdown.new.
+  type markdown_options = {
+    ?no_intra_emphasis: bool,
+    ?tables: bool,
+    ?fenced_code_blocks: bool,
+    ?disable_indented_code_blocks: bool,
+    ?autolink: bool,
+    ?strikethrough: bool,
+    ?underline: bool,
+    ?highlight: bool,
+    ?quote: bool,
+    ?lax_spacing: bool,
+    ?space_after_headers: bool,
+    ?superscript: bool,
+    ?footnotes: bool
+  } | Hash[Symbol, untyped]
+
+  class Markdown
+    def self.new: (Render::Base | singleton(Render::Base) renderer, ?markdown_options options) -> Markdown
+
+    def render: (String text) -> String
+
+    attr_reader renderer: Render::Base
+  end
+
+  module Render
+    type html_options = {
+      ?filter_html: bool,
+      ?no_images: bool,
+      ?no_links: bool,
+      ?no_styles: bool,
+      ?escape_html: bool,
+      ?safe_links_only: bool,
+      ?with_toc_data: bool,
+      ?hard_wrap: bool,
+      ?xhtml: bool,
+      ?prettify: bool,
+      ?link_attributes: Hash[Symbol | String, String]
+    } | Hash[Symbol, untyped]
+
+    type toc_options = {
+      ?escape_html: bool,
+      ?nesting_level: Integer | Range[Integer]
+    } | Hash[Symbol, untyped]
+
+    class Base
+      def initialize: () -> void
+    end
+
+    class HTML < Base
+      def initialize: (?html_options options) -> void
+    end
+
+    class HTML_TOC < Base
+      def initialize: (?toc_options options) -> void
+    end
+
+    class XHTML < HTML
+      def initialize: (?html_options options) -> void
+    end
+
+    class SmartyHTML < HTML
+      include SmartyPants
+    end
+
+    class Safe < HTML
+      def initialize: (?html_options options) -> void
+    end
+
+    module SmartyPants
+      def self.render: (String text) -> String
+
+      def self.postprocess: (String text) -> String
+
+      def postprocess: (String text) -> String
+    end
+
+    class StripDown < Base
+    end
+  end
+end
