@@ -1,0 +1,478 @@
+module Prawn
+  VERSION: String
+
+  module Errors
+    class NotOnPage < StandardError
+    end
+
+    class UnknownFont < StandardError
+    end
+
+    class CannotFit < StandardError
+    end
+
+    class IncompatibleStringEncoding < StandardError
+    end
+
+    class UnknownOption < StandardError
+    end
+
+    class UnsupportedImageType < StandardError
+    end
+
+    class NameTaken < StandardError
+    end
+
+    class InvalidName < StandardError
+    end
+
+    class UndefinedObjectName < StandardError
+    end
+
+    class RequiredOption < StandardError
+    end
+
+    class BlockRequired < StandardError
+    end
+
+    class InvalidGraphicsPath < StandardError
+    end
+
+    class InvalidJoinStyle < StandardError
+    end
+  end
+
+  class Font
+    attr_reader name: String
+
+    attr_reader family: String?
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def ascender: () -> Numeric
+
+    def descender: () -> Numeric
+
+    def line_gap: () -> Numeric
+
+    def height: () -> Numeric
+
+    def height_at: (Numeric size) -> Numeric
+  end
+
+  module Images
+    class Image
+      attr_reader width: Integer
+
+      attr_reader height: Integer
+
+      attr_accessor scaled_width: Numeric?
+
+      attr_accessor scaled_height: Numeric?
+    end
+
+    type image_options = {
+      ?at: Prawn::Graphics::point,
+      ?position: :left | :center | :right | Numeric,
+      ?vposition: :top | :center | :bottom | Numeric,
+      ?height: Numeric,
+      ?width: Numeric,
+      ?scale: Numeric,
+      ?fit: [Numeric, Numeric]
+    }
+
+    def image: (String | Pathname | IO | StringIO file, ?(image_options | Hash[Symbol, untyped]) options) -> Image
+  end
+
+  module Graphics
+    type point = [Numeric, Numeric]
+
+    type fill_rule_options = { ?fill_rule: :even_odd | :nonzero }
+
+    module Color
+      type color = String | Array[Numeric]
+
+      def fill_color: () -> color
+                    | (String color) -> void
+                    | (Array[Numeric] color) -> void
+                    | (Numeric c, Numeric m, Numeric y, Numeric k) -> void
+
+      def stroke_color: () -> color
+                      | (String color) -> void
+                      | (Array[Numeric] color) -> void
+                      | (Numeric c, Numeric m, Numeric y, Numeric k) -> void
+    end
+
+    module Dash
+      type dash_options = { ?space: Numeric, ?phase: Numeric }
+
+      def dash: (Numeric | Array[Numeric] length, ?(dash_options | Hash[Symbol, untyped]) options) -> void
+
+      def undash: () -> void
+
+      def dashed?: () -> bool
+    end
+
+    module Transparency
+      def transparent: (Numeric opacity, ?Numeric stroke_opacity) { () -> void } -> void
+    end
+
+    include Color
+    include Dash
+    include Transparency
+
+    def move_to: (point point) -> void
+               | (Numeric x, Numeric y) -> void
+
+    def line_to: (point point) -> void
+               | (Numeric x, Numeric y) -> void
+
+    def rectangle: (point point, Numeric width, Numeric height) -> void
+
+    def line_width: () -> Numeric
+                  | (Numeric width) -> void
+
+    def line_width=: (Numeric width) -> void
+
+    def line: (point point1, point point2) -> void
+            | (Numeric x1, Numeric y1, Numeric x2, Numeric y2) -> void
+
+    def horizontal_line: (Numeric x1, Numeric x2, ?{ at: Numeric } options) -> void
+
+    def horizontal_rule: () -> void
+
+    def vertical_line: (Numeric y1, Numeric y2, { at: Numeric } params) -> void
+
+    def circle: (point center, Numeric radius) -> void
+
+    def polygon: (*point points) -> void
+
+    def stroke: () ?{ () -> void } -> void
+
+    def close_and_stroke: () ?{ () -> void } -> void
+
+    def stroke_bounds: () -> void
+
+    def fill: (?(fill_rule_options | Hash[Symbol, untyped]) options) ?{ () -> void } -> void
+
+    def fill_and_stroke: (?(fill_rule_options | Hash[Symbol, untyped]) options) ?{ () -> void } -> void
+
+    def close_path: () -> void
+
+    def stroke_rectangle: (point point, Numeric width, Numeric height) -> void
+
+    def fill_rectangle: (point point, Numeric width, Numeric height) -> void
+
+    def stroke_circle: (point center, Numeric radius) -> void
+
+    def fill_circle: (point center, Numeric radius) -> void
+
+    def stroke_line: (point point1, point point2) -> void
+                   | (Numeric x1, Numeric y1, Numeric x2, Numeric y2) -> void
+
+    def stroke_horizontal_line: (Numeric x1, Numeric x2, ?{ at: Numeric } options) -> void
+
+    def stroke_horizontal_rule: () -> void
+
+    def stroke_vertical_line: (Numeric y1, Numeric y2, { at: Numeric } params) -> void
+
+    def stroke_polygon: (*point points) -> void
+
+    def fill_polygon: (*point points) -> void
+  end
+
+  module Text
+    type fragment = {
+      text: String,
+      ?styles: Array[Symbol],
+      ?size: Numeric,
+      ?character_spacing: Numeric,
+      ?color: Graphics::Color::color,
+      ?font: String,
+      ?link: String,
+      ?anchor: String
+    }
+
+    type text_options = {
+      ?inline_format: bool | Array[untyped],
+      ?kerning: bool,
+      ?size: Numeric,
+      ?style: Symbol,
+      ?color: Graphics::Color::color,
+      ?character_spacing: Numeric,
+      ?indent_paragraphs: Numeric,
+      ?direction: :ltr | :rtl,
+      ?fallback_fonts: Array[String],
+      ?align: :left | :center | :right | :justify,
+      ?valign: :top | :center | :bottom,
+      ?leading: Numeric,
+      ?final_gap: bool,
+      ?mode: Symbol,
+      ?width: Numeric,
+      ?height: Numeric,
+      ?overflow: :truncate | :shrink_to_fit | :expand,
+      ?min_font_size: Numeric,
+      ?single_line: bool
+    }
+
+    type plain_text_box_options = {
+      ?kerning: bool,
+      ?size: Numeric,
+      ?style: Symbol,
+      ?color: Graphics::Color::color,
+      ?character_spacing: Numeric,
+      ?direction: :ltr | :rtl,
+      ?fallback_fonts: Array[String],
+      ?align: :left | :center | :right | :justify,
+      ?valign: :top | :center | :bottom,
+      ?leading: Numeric,
+      ?mode: Symbol,
+      ?at: Graphics::point,
+      ?width: Numeric,
+      ?height: Numeric,
+      ?overflow: :truncate | :shrink_to_fit | :expand,
+      ?min_font_size: Numeric,
+      ?single_line: bool,
+      ?rotate: Numeric,
+      ?rotate_around: :center | :upper_left | :upper_right | :lower_right | :lower_left
+    }
+
+    type inline_text_box_options = {
+      inline_format: bool | Array[untyped],
+      ?kerning: bool,
+      ?size: Numeric,
+      ?style: Symbol,
+      ?color: Graphics::Color::color,
+      ?character_spacing: Numeric,
+      ?direction: :ltr | :rtl,
+      ?fallback_fonts: Array[String],
+      ?align: :left | :center | :right | :justify,
+      ?valign: :top | :center | :bottom,
+      ?leading: Numeric,
+      ?mode: Symbol,
+      ?at: Graphics::point,
+      ?width: Numeric,
+      ?height: Numeric,
+      ?overflow: :truncate | :shrink_to_fit | :expand,
+      ?min_font_size: Numeric,
+      ?single_line: bool,
+      ?rotate: Numeric,
+      ?rotate_around: :center | :upper_left | :upper_right | :lower_right | :lower_left
+    }
+
+    type draw_text_options = {
+      at: Graphics::point,
+      ?kerning: bool,
+      ?size: Numeric,
+      ?style: Symbol,
+      ?rotate: Numeric
+    }
+
+    type width_options = {
+      ?inline_format: bool | Array[untyped],
+      ?kerning: bool,
+      ?size: Numeric,
+      ?style: Symbol
+    }
+
+    def text: (String? string, ?(text_options | Hash[Symbol, untyped]) options) -> void
+
+    def formatted_text: (Array[fragment] array, ?(text_options | Hash[Symbol, untyped]) options) -> void
+
+    def draw_text: (String text, draw_text_options | Hash[Symbol, untyped] options) -> void
+
+    def text_box: (String string, ?plain_text_box_options options) -> String
+                | (String string, inline_text_box_options options) -> Array[fragment]
+                | (String string, Hash[Symbol, untyped] options) -> (String | Array[fragment])
+
+    def height_of: (String string, ?(text_options | Hash[Symbol, untyped]) options) -> Numeric
+
+    def height_of_formatted: (Array[fragment] array, ?(text_options | Hash[Symbol, untyped]) options) -> Numeric
+  end
+
+  # The methods that Prawn::Document defines. Prawn::View forwards them to its
+  # document with method_missing, so both include this interface.
+  interface _DocumentMethods
+    def margin_box: () -> Document::BoundingBox
+
+    def margin_box=: (Document::BoundingBox box) -> Document::BoundingBox
+
+    def y: () -> Numeric
+
+    def y=: (Numeric new_y) -> Numeric
+
+    def page_number: () -> Integer
+
+    def page_number=: (Integer number) -> Integer
+
+    def start_new_page: (?(Document::page_options | Hash[Symbol, untyped]) options) -> void
+
+    def delete_page: (Integer index) -> bool
+
+    def page_count: () -> Integer
+
+    def go_to_page: (Integer page_number) -> void
+
+    def cursor: () -> Numeric
+
+    def move_cursor_to: (Numeric new_y) -> void
+
+    def float: () { () -> void } -> void
+
+    def render: (?(IO | StringIO) output) -> String
+
+    def render_file: (String | Pathname filename) -> void
+
+    def bounds: () -> Document::BoundingBox
+
+    def bounds=: (Document::BoundingBox bounding_box) -> Document::BoundingBox
+
+    def move_up: (Numeric amount) -> void
+
+    def move_down: (Numeric amount) -> void
+
+    def pad_top: (Numeric y) { () -> void } -> void
+
+    def pad_bottom: (Numeric y) { () -> void } -> void
+
+    def pad: (Numeric y) { () -> void } -> void
+
+    def indent: (Numeric left, ?Numeric right) { () -> void } -> void
+
+    def number_pages: (String string, ?(Document::number_pages_options | Hash[Symbol, untyped]) options) -> void
+
+    def bounding_box: (Graphics::point point, ?({ width: Numeric, ?height: Numeric } | Hash[Symbol, untyped]) options) { () -> void } -> Document::BoundingBox
+
+    def canvas: () { () -> void } -> Document::BoundingBox
+
+    def repeat: (Document::page_filter page_filter, ?({ ?dynamic: bool } | Hash[Symbol, untyped]) options) { () -> void } -> void
+
+    def font: () -> Font
+            | (String | Pathname name, ?(Document::font_options | Hash[Symbol, untyped]) options) -> Font
+            | (String | Pathname name, ?(Document::font_options | Hash[Symbol, untyped]) options) { () -> void } -> Font
+
+    def font_size: () -> Numeric
+                 | (Numeric points) -> void
+                 | (Numeric points) { () -> void } -> void
+
+    def font_size=: (Numeric size) -> Numeric
+
+    def width_of: (String string, ?(Text::width_options | Hash[Symbol, untyped]) options) -> Numeric
+
+    def font_families: () -> Hash[String, Hash[Symbol, Document::font_definition]]
+  end
+
+  class Document
+    include Text
+    include Graphics
+    include Images
+    include _DocumentMethods
+
+    class BoundingBox
+      attr_reader width: Numeric
+
+      def height: () -> Numeric
+
+      def left: () -> Numeric
+
+      def right: () -> Numeric
+
+      def top: () -> Numeric
+
+      def bottom: () -> Numeric
+
+      def top_left: () -> Graphics::point
+
+      def top_right: () -> Graphics::point
+
+      def bottom_left: () -> Graphics::point
+
+      def bottom_right: () -> Graphics::point
+
+      def absolute_left: () -> Numeric
+
+      def absolute_right: () -> Numeric
+
+      def absolute_top: () -> Numeric
+
+      def absolute_bottom: () -> Numeric
+
+      def indent: (Numeric left_padding, ?Numeric right_padding) { () -> void } -> void
+    end
+
+    type document_options = {
+      ?page_size: String | [Numeric, Numeric],
+      ?page_layout: :portrait | :landscape,
+      ?margin: Numeric | Array[Numeric],
+      ?left_margin: Numeric,
+      ?right_margin: Numeric,
+      ?top_margin: Numeric,
+      ?bottom_margin: Numeric,
+      ?skip_page_creation: bool,
+      ?compress: bool,
+      ?background: String?,
+      ?background_scale: Numeric?,
+      ?info: Hash[Symbol, untyped]?,
+      ?text_formatter: untyped,
+      ?print_scaling: :none | :aspect
+    }
+
+    type page_options = {
+      ?size: String | [Numeric, Numeric],
+      ?layout: :portrait | :landscape,
+      ?margin: Numeric | Array[Numeric],
+      ?left_margin: Numeric,
+      ?right_margin: Numeric,
+      ?top_margin: Numeric,
+      ?bottom_margin: Numeric
+    }
+
+    type number_pages_options = {
+      ?page_filter: page_filter,
+      ?start_count_at: Integer | String,
+      ?total_pages: Integer,
+      ?color: Graphics::Color::color,
+      ?at: Graphics::point,
+      ?width: Numeric,
+      ?height: Numeric,
+      ?align: :left | :center | :right | :justify,
+      ?valign: :top | :center | :bottom,
+      ?size: Numeric,
+      ?style: Symbol,
+      ?kerning: bool,
+      ?character_spacing: Numeric,
+      ?direction: :ltr | :rtl,
+      ?fallback_fonts: Array[String],
+      ?leading: Numeric,
+      ?mode: Symbol,
+      ?overflow: :truncate | :shrink_to_fit | :expand,
+      ?min_font_size: Numeric,
+      ?single_line: bool,
+      ?rotate: Numeric,
+      ?rotate_around: :center | :upper_left | :upper_right | :lower_right | :lower_left
+    }
+
+    type font_definition = String | Pathname | { file: String | Pathname, ?subset: bool }
+
+    type font_options = { ?style: Symbol, ?size: Numeric }
+
+    type page_filter = :all | :odd | :even | Array[Integer] | Range[Integer] | ^(Integer) -> bool
+
+    def self.generate: (String | Pathname filename, ?(document_options | Hash[Symbol, untyped]) options) ?{ (Document pdf) [self: Document] -> void } -> void
+
+    def initialize: (?(document_options | Hash[Symbol, untyped]) options) ?{ (Document pdf) [self: Document] -> void } -> void
+  end
+
+  module View
+    include Text
+    include Graphics
+    include Images
+    include _DocumentMethods
+
+    def document: () -> Document
+
+    def update: () { () -> void } -> void
+
+    def save_as: (String | Pathname filename) -> void
+  end
+end
