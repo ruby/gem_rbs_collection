@@ -1,0 +1,249 @@
+module RubyLLM
+  class Chat
+    include Enumerable[Message]
+
+    interface _SchemaSource
+      def to_json_schema: () -> Hash[Symbol | String, untyped]
+    end
+
+    attr_reader model: Model
+    attr_reader provider: Provider
+    attr_reader messages: Array[Message]
+    attr_reader provider_options: Hash[Symbol, untyped]
+    attr_reader headers: Hash[String | Symbol, String]
+    attr_reader temperature: Numeric?
+    attr_reader max_output_tokens: Integer?
+    attr_reader schema: Hash[Symbol | String, untyped]?
+    attr_reader concurrency: Symbol?
+    attr_reader context: Context?
+
+    def initialize: (?model: String?, ?provider: (Symbol | String)?, ?protocol: Symbol?, ?assume_model_exists: bool, ?context: Context?) -> void
+
+    def messages=: (Array[Message | Hash[Symbol, untyped]] new_messages) -> Array[Message]
+
+    def ask: (?String? message, ?with: untyped) ?{ (Chunk chunk) -> void } -> Message
+
+    alias say ask
+
+    def ask_later: (?String? message, ?with: untyped) -> self
+
+    def generate: () ?{ (Chunk chunk) -> void } -> Message
+
+    def run_tools: () -> self
+
+    def step: () ?{ (Chunk chunk) -> void } -> Message?
+
+    def complete: () ?{ (Chunk chunk) -> void } -> Message?
+
+    def complete?: () -> bool
+
+    def waiting?: () -> bool
+
+    def cancel: () -> self
+
+    def cancelled?: () -> bool
+
+    def add_message: (Message | Hash[Symbol, untyped] message_or_attributes) -> Message
+
+    def with_instructions: (String? instructions, ?append: bool, ?cache_until_here: (bool | Hash[Symbol, untyped])) -> self
+
+    def with_tools: (*(Tool | singleton(Tool) | Array[Tool | singleton(Tool)] | nil) tools, ?defer: bool?) -> self
+
+    def tools: () -> Hash[Symbol, Tool]
+
+    def with_tool_options: (?choice: (Symbol | String)?, ?calls: (Symbol | Integer)?, ?concurrency: (bool | Symbol)?) -> self
+
+    def tool_options: () -> { choice: (Symbol | String)?, calls: (Symbol | Integer)?, concurrency: Symbol? }
+
+    def with_model: (String? model_id, ?provider: (Symbol | String)?, ?protocol: Symbol?, ?assume_model_exists: bool) -> self
+
+    def with_temperature: (Numeric? temperature) -> self
+
+    def with_max_output_tokens: (Integer? max_output_tokens) -> self
+
+    def with_thinking: (?bool enabled, ?effort: (Symbol | String)?, ?budget: Integer?, ?display: (Symbol | String)?) -> self
+                     | (Hash[Symbol | String, untyped] options) -> self
+
+    def thinking: () -> Hash[Symbol, untyped]?
+
+    def with_provider_options: (Hash[Symbol, untyped] provider_options) -> self
+
+    def with_headers: (Hash[String | Symbol, String] headers) -> self
+
+    def with_schema: (Class | _SchemaSource | Hash[Symbol | String, untyped] | nil schema) -> self
+
+    def before_message: () { () -> void } -> self
+
+    def after_message: () { (Message message) -> void } -> self
+
+    def before_tool_call: () { (ToolCall tool_call) -> void } -> self
+
+    def after_tool_result: () { (untyped result) -> void } -> self
+
+    def each: () { (Message message) -> void } -> void
+            | () -> Enumerator[Message, void]
+
+    def tokens: () -> Tokens
+
+    def cost: () -> Cost
+
+    def count_tokens: (?String? message) -> Integer
+  end
+
+  class Chunk < Message
+  end
+
+  class Message
+    ROLES: Array[Symbol]
+
+    attr_reader role: Symbol
+    attr_reader content: String?
+    attr_reader attachments: Array[Attachment]
+    attr_reader model: String?
+    attr_reader tool_calls: Hash[String, ToolCall]?
+    attr_reader tool_call_id: String?
+    attr_reader raw: untyped
+    attr_reader thinking: Thinking?
+    attr_reader finish_reason: Symbol?
+
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    def parsed: () -> untyped
+
+    def tool_call?: () -> bool
+
+    def tool_result?: () -> bool
+
+    def tool_results: () -> Array[Message]
+
+    def stopped?: () -> bool
+
+    def max_tokens?: () -> bool
+
+    def tool_call_stop?: () -> bool
+
+    def content_filtered?: () -> bool
+
+    def tokens: () -> Tokens
+
+    def cost: (?model: (Model | String)?) -> Cost
+
+    def model_info: () -> Model?
+
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  class ToolCall
+    attr_reader id: String
+    attr_reader name: String
+    attr_reader arguments: Hash[String | Symbol, untyped]
+    attr_accessor thought_signature: String?
+
+    def remote?: () -> bool
+
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  class Thinking
+    attr_reader text: String?
+    attr_reader signature: String?
+  end
+
+  class Attachment
+    attr_reader source: untyped
+    attr_reader filename: String
+    attr_reader mime_type: String
+    attr_reader resolution: Symbol?
+
+    def initialize: (untyped source, ?filename: String?, ?resolution: Symbol?) -> void
+
+    def content: () -> String
+
+    def type: () -> Symbol
+
+    def image?: () -> bool
+
+    def video?: () -> bool
+
+    def audio?: () -> bool
+
+    def pdf?: () -> bool
+
+    def text?: () -> bool
+
+    def document?: () -> bool
+  end
+
+  class Tokens
+    attr_reader input: Integer?
+    attr_reader output: Integer?
+    attr_reader cache_read: Integer?
+    attr_reader cache_write: Integer?
+    attr_reader cache_write_by_ttl: Hash[String, Integer]?
+    attr_reader thinking: Integer?
+    attr_reader server_tool_use: Hash[String, Integer]?
+    attr_reader reported_cost: Numeric?
+
+    def initialize: (?input: Integer?, ?output: Integer?, ?cache_read: Integer?, ?cache_write: Integer?, ?thinking: Integer?, ?cache_write_by_ttl: Hash[String, Integer]?, ?server_tool_use: Hash[String, Integer]?, ?reported_cost: Numeric?) -> void
+
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  class Cost
+    def input: () -> Numeric?
+
+    def output: () -> Numeric?
+
+    def cache_read: () -> Numeric?
+
+    def cache_write: () -> Numeric?
+
+    def thinking: () -> Numeric?
+
+    def total: () -> Numeric?
+
+    def to_h: () -> Hash[Symbol, Numeric]
+  end
+
+  class Tool
+    class Parameter
+      attr_reader name: Symbol | String
+      attr_reader type: Symbol | String
+      attr_reader description: String?
+      attr_reader required: bool
+    end
+
+    def self.tool_name: () -> String
+
+    def self.description: (String text) -> String
+                        | () -> String?
+
+    def self.parameter: (Symbol | String name, ?type: Symbol | String, ?description: String?, ?required: bool) -> Parameter
+
+    def self.parameters: (Hash[Symbol | String, untyped] schema) -> self
+                       | () { () [self: untyped] -> void } -> self
+
+    def self.requires_approval: () ?{ (ToolCall tool_call) -> bool? } -> void
+
+    def self.provider_options: () -> Hash[Symbol, untyped]
+                             | (Hash[Symbol, untyped] options) -> self
+
+    def self.defer: () -> bool
+
+    def name: () -> String
+
+    def description: () -> String?
+
+    def requires_approval?: () -> bool
+
+    def provider_options: () -> Hash[Symbol, untyped]
+
+    def parameters_schema: () -> Hash[Symbol | String, untyped]?
+
+    def call: (?tool_call: ToolCall?, **untyped arguments) -> untyped
+
+    def execute: (**untyped arguments) -> untyped
+
+    def progress: (?String? message, ?value: Numeric?, ?total: Numeric?) -> nil
+  end
+end

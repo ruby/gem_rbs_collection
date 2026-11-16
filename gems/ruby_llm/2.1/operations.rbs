@@ -1,0 +1,131 @@
+module RubyLLM
+  class Embedding
+    attr_reader vectors: Array[Float] | Array[Array[Float]]
+    attr_reader model: String
+
+    def tokens: () -> Tokens
+
+    def cost: () -> Cost
+
+    def self.embed: (String | Array[String] text, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?context: Context?, ?dimensions: Integer?, ?task_type: (Symbol | String)?, ?title: String?, ?with: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Embedding
+  end
+
+  class Moderation
+    class Result
+      attr_reader categories: Array[String]
+      attr_reader category_scores: Hash[String, Float]
+
+      def flagged?: () -> bool
+    end
+
+    attr_reader id: String
+    attr_reader model: String?
+    attr_reader results: Array[Result]
+    attr_reader raw: untyped
+
+    def flagged?: () -> bool
+
+    def flagged_categories: () -> Array[String]
+
+    def category_scores: () -> Hash[String, Float]
+
+    def tokens: () -> Tokens
+
+    def cost: () -> Cost
+
+    def self.moderate: (?String? input, ?model: String?, ?with: untyped, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?context: Context?, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Moderation
+  end
+
+  class Image
+    attr_reader url: String?
+    attr_reader data: String?
+    attr_reader mime_type: String?
+    attr_reader revised_prompt: String?
+    attr_reader model: String?
+
+    def base64?: () -> bool
+
+    def to_blob: () -> String
+
+    def save: (String path) -> String
+
+    def tokens: () -> Tokens
+
+    def cost: () -> Cost
+
+    def self.paint: (String prompt, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?size: String?, ?count: nil, ?context: Context?, ?with: untyped, ?mask: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> Image
+                  | (String prompt, ?model: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?size: String?, count: Integer, ?context: Context?, ?with: untyped, ?mask: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) -> (Image | Array[Image])
+  end
+
+  class Transcription
+    attr_reader text: String
+    attr_reader model: String?
+    attr_reader language: String?
+    attr_reader duration: Numeric?
+    attr_reader segments: Array[Hash[Symbol | String, untyped]]?
+    attr_reader words: Array[Hash[Symbol | String, untyped]]?
+
+    def tokens: () -> Tokens
+
+    def cost: () -> Cost
+
+    def self.transcribe: (String | Pathname | IO audio_file, ?model: String?, ?language: String?, ?provider: (Symbol | String)?, ?assume_model_exists: bool, ?context: Context?, ?prompt: String?, ?temperature: Numeric?, ?format: (Symbol | String)?, ?timestamps: (Symbol | String)?, ?speaker_names: Array[String]?, ?speaker_references: untyped, ?provider_options: Hash[Symbol, untyped], ?metadata: Hash[Symbol, untyped]?, ?owner: Object?) ?{ (TranscriptionChunk chunk) -> void } -> Transcription
+  end
+
+  class TranscriptionChunk
+    attr_reader type: String
+    attr_reader delta: String?
+    attr_reader text: String?
+    attr_reader segment: Hash[Symbol | String, untyped]?
+    attr_reader raw: untyped
+
+    def delta?: () -> bool
+
+    def partial?: () -> bool
+
+    def segment?: () -> bool
+
+    def done?: () -> bool
+  end
+
+  class Workflow
+    attr_reader id: String
+    attr_reader name: String
+
+    def step: [T] (String name, ?id: String?) { () -> T } -> T
+  end
+
+  class OpenTelemetry
+    def self.enable: () -> nil
+
+    def self.disable: () -> nil
+  end
+
+  class MCP
+    class Result
+    end
+
+    class Tool < RubyLLM::Tool
+      attr_reader server_name: String
+      attr_reader visibility: Array[Symbol]
+
+      def read_only?: () -> bool
+
+      def destructive?: () -> bool
+
+      def idempotent?: () -> bool
+
+      def open_world?: () -> bool
+    end
+
+    def name: () -> String
+
+    def tools: () -> Array[Tool]
+
+    def call: (Symbol | String name, **untyped arguments) -> Result
+
+    def authorization_url: (redirect_uri: String) -> String
+
+    def authorize: (Hash[String | Symbol, untyped] params) -> self
+  end
+end
