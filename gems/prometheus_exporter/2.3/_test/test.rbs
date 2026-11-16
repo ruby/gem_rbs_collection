@@ -1,0 +1,25 @@
+class MyCollector < PrometheusExporter::Server::TypeCollector
+  @gauge: PrometheusExporter::Metric::Gauge
+
+  def initialize: () -> void
+
+  def collect: (Hash[String, untyped] obj) -> void
+
+  def metrics: () -> Array[PrometheusExporter::Metric::Gauge]
+end
+
+class MyBaseCollector < PrometheusExporter::Server::CollectorBase
+  def `type`: () -> String
+
+  def metrics: () -> Array[PrometheusExporter::Metric::Gauge]
+end
+
+class RackApp
+  def call: (Hash[String, untyped] env) -> [Integer, Hash[String, String], Array[String]]
+end
+
+class MyMiddleware < PrometheusExporter::Middleware
+end
+
+class Job
+end
