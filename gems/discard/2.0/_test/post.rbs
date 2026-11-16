@@ -1,0 +1,28 @@
+class Post < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Post, ::Integer]
+    include ::Enumerable[::Post]
+    include Discard::Model::QueryMethods[::Post, ::Post::ActiveRecord_Relation]
+  end
+
+  include Discard::Model
+  extend Discard::Model::ClassMethods[::Post, ::Post::ActiveRecord_Relation]
+
+  def check_discardable: () -> nil
+  def check_restorable: () -> nil
+  def wrap_discard: () -> nil
+  def wrap_undiscard: () -> nil
+  def notify_discarded: () -> nil
+  def restorable?: () -> bool
+end
+
+class Comment < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Comment, ::Integer]
+    include ::Enumerable[::Comment]
+    include Discard::Model::QueryMethods[::Comment, ::Comment::ActiveRecord_Relation]
+  end
+
+  include Discard::Model
+  extend Discard::Model::ClassMethods[::Comment, ::Comment::ActiveRecord_Relation]
+end

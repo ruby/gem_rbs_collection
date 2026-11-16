@@ -1,0 +1,25 @@
+module FriendlyId
+  module History
+    include Slugged
+
+    def slugs: () -> ::ActiveRecord::Associations::CollectionProxy
+
+    module Configuration
+      def dependent_value: () -> (Symbol | false)
+    end
+  end
+
+  class Slug < ::ActiveRecord::Base
+    attr_accessor slug: String
+
+    attr_accessor scope: String?
+
+    attr_accessor sluggable_type: String
+
+    attr_accessor sluggable_id: Integer | String
+
+    def sluggable: () -> ::ActiveRecord::Base?
+
+    def to_param: () -> String
+  end
+end

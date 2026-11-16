@@ -1,0 +1,17 @@
+module ActiveRecordUnion
+  VERSION: String
+end
+
+module ActiveRecord
+  class Relation
+    module Union
+      def union: (::ActiveRecord::Relation relation) -> self
+               | (Hash[Symbol | String, untyped] | String | Array[untyped] condition, *untyped binds) -> self
+
+      def union_all: (::ActiveRecord::Relation relation) -> self
+                   | (Hash[Symbol | String, untyped] | String | Array[untyped] condition, *untyped binds) -> self
+    end
+
+    include Union
+  end
+end

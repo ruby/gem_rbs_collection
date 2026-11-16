@@ -1,0 +1,11 @@
+class Post < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::ActiveRecord::Relation::Methods[Post, Integer]
+  end
+
+  extend ::ActiveRecord::Base::ClassMethods[Post, ActiveRecord_Relation, Integer]
+end
+
+class UnionExamples
+  def combine: (Post::ActiveRecord_Relation recent, Post::ActiveRecord_Relation featured, Post::ActiveRecord_Relation pinned) -> Array[Post::ActiveRecord_Relation?]
+end

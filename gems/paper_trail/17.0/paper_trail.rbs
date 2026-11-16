@@ -1,0 +1,40 @@
+module PaperTrail
+  module VERSION
+    MAJOR: Integer
+    MINOR: Integer
+    TINY: Integer
+    PRE: String?
+    STRING: String
+
+    def self.to_s: () -> String
+  end
+
+  type whodunnit = _ToS | ^() -> _ToS
+
+  type request_options = {
+    ?enabled: bool,
+    ?whodunnit: whodunnit?,
+    ?controller_info: Hash[Symbol, untyped]?
+  }
+
+  extend Cleaner
+
+  def self.enabled=: (boolish value) -> void
+
+  def self.enabled?: () -> bool
+
+  def self.gem_version: () -> Gem::Version
+
+  def self.version: () -> String
+
+  def self.request: () -> singleton(Request)
+                  | [R] (request_options options) { () -> R } -> R
+
+  def self.serializer: () -> Config::_Serializer
+
+  def self.serializer=: (Config::_Serializer value) -> void
+
+  def self.config: () ?{ (Config config) -> void } -> Config
+
+  alias self.configure self.config
+end

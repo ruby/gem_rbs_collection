@@ -1,0 +1,116 @@
+class Pagy
+  VERSION: String
+
+  ROOT: Pathname
+
+  DEFAULT: Hash[Symbol, untyped]
+
+  OPTIONS: Hash[Symbol, untyped]
+
+  attr_reader page: Integer
+
+  attr_reader next: Integer?
+
+  attr_reader in: Integer
+
+  attr_reader limit: Integer
+
+  attr_reader options: Hash[Symbol, untyped]
+
+  def self.translate_with_the_slower_i18n_gem!: () -> void
+
+  def page_url: (Integer | :first | :current | :page | :previous | :next | :last page, **untyped options) -> String?
+
+  private
+
+  # protected in pagy; RBS has no protected, so they are declared private, which still lets a reopened Pagy call them
+  def series: (?slots: Integer, ?compact: bool?, **untyped) -> Array[Integer | String | :gap]
+
+  def a_lambda: (?anchor_string: String?, **untyped) -> ^(Integer | String page, ?String? text, ?classes: String?, ?aria_label: String?) -> String
+
+  public
+
+  class OptionError < ArgumentError
+    attr_reader pagy: Pagy
+
+    attr_reader option: Symbol
+
+    attr_reader value: untyped
+  end
+
+  class RangeError < OptionError
+  end
+
+  module NumericHelpers
+    def series_nav: (?(Symbol | String)? style, **untyped options) -> String
+
+    def series_nav_js: (?(Symbol | String)? style, **untyped options) -> String
+
+    def input_nav_js: (?(Symbol | String)? style, **untyped options) -> String
+
+    def info_tag: (?id: String?, ?item_name: String?) -> String
+
+    def limit_tag_js: (?id: String?, ?item_name: String?, **untyped options) -> String
+  end
+
+  # Offset pagination. `Pagy::Method#pagy` returns an instance of it, or of one of its subclasses
+  class Offset < Pagy
+    include NumericHelpers
+
+    attr_reader offset: Integer
+
+    attr_reader count: Integer
+
+    attr_reader from: Integer
+
+    attr_reader to: Integer
+
+    attr_reader previous: Integer?
+
+    attr_reader last: Integer
+
+    alias pages last
+
+    def initialize: (?count: Integer?, ?page: Integer | String | nil, ?limit: Integer | String | nil, **untyped options) -> void
+
+    def records: (untyped collection) -> untyped
+
+    # Offset pagination without any COUNT query
+    class Countless < Offset
+      def count: () -> Integer?
+
+      def last: () -> Integer?
+
+      def pages: () -> Integer?
+    end
+
+    # Offset pagination that memoizes the count in the page param
+    class Countish < Offset
+    end
+  end
+
+  # Declared only as a constant: openfoodnetwork calls `Pagy::Request.prepend`
+  class Request
+  end
+
+  module I18n
+    def self.pathnames: () -> Array[Pathname]
+
+    def self.locale: () -> String
+
+    def self.locale=: (String? value) -> String?
+
+    def self.translate: (String key, **untyped options) -> String
+  end
+
+  module Method
+    private
+
+    def pagy: (:offset paginator, untyped collection, **untyped options) -> [Pagy::Offset, untyped]
+            | (:countless paginator, untyped collection, **untyped options) -> [Pagy::Offset::Countless, untyped]
+            | (:countish paginator, untyped collection, **untyped options) -> [Pagy::Offset::Countish, untyped]
+            | (:calendar paginator, untyped collection, **untyped options) -> [untyped, Pagy::Offset, untyped]
+            | (Symbol paginator, untyped collection, **untyped options) -> [Pagy, untyped]
+            | (untyped collection, **untyped options) -> [Pagy::Offset, untyped]
+  end
+end

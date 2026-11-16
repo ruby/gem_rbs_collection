@@ -1,0 +1,76 @@
+class Pagy
+  VERSION: String
+
+  DEFAULT: Hash[Symbol, untyped]
+
+  attr_reader count: Integer
+
+  attr_reader from: Integer
+
+  attr_reader in: Integer
+
+  attr_reader last: Integer
+
+  attr_reader next: Integer?
+
+  attr_reader offset: Integer
+
+  attr_reader prev: Integer?
+
+  attr_reader to: Integer
+
+  attr_reader page: Integer
+
+  attr_reader limit: Integer
+
+  attr_reader vars: Hash[Symbol, untyped]
+
+  alias pages last
+
+  def initialize: (?count: Integer, ?page: Integer | String | nil, ?limit: Integer | String | nil, **untyped vars) -> void
+
+  def series: (?size: Integer | Array[Integer], **untyped) -> Array[Integer | String | :gap]
+
+  # Added by the `pagy/extras/overflow` extra
+  def overflow?: () -> bool
+
+  class VariableError < ArgumentError
+    attr_reader pagy: Pagy
+
+    attr_reader variable: Symbol
+
+    attr_reader value: untyped
+  end
+
+  class OverflowError < VariableError
+  end
+
+  # Returned by `Pagy::Backend#pagy_countless` (the `pagy/extras/countless` extra)
+  class Countless < Pagy
+    def count: () -> nil
+  end
+
+  module Backend
+    private
+
+    def pagy: (untyped collection, **untyped vars) -> [Pagy, untyped]
+
+    # Added by the `pagy/extras/countless` extra
+    def pagy_countless: (untyped collection, **untyped vars) -> [Pagy::Countless, untyped]
+
+    # Added by the `pagy/extras/array` extra
+    def pagy_array: [T] (Array[T] array, **untyped vars) -> [Pagy, Array[T]]
+
+    # Added by the `pagy/extras/arel` extra
+    def pagy_arel: (untyped collection, **untyped vars) -> [Pagy, untyped]
+  end
+
+  module Frontend
+    def pagy_nav: (Pagy pagy, ?id: String?, ?aria_label: String?, **untyped vars) -> String
+
+    def pagy_info: (Pagy pagy, ?id: String?, ?item_name: String?) -> String
+
+    # Added by the `pagy/extras/bootstrap` extra
+    def pagy_bootstrap_nav: (Pagy pagy, ?id: String?, ?classes: String, ?aria_label: String?, **untyped vars) -> String
+  end
+end

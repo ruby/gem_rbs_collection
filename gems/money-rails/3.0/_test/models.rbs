@@ -1,0 +1,27 @@
+class DeliveryFee
+  def call: (untyped product) -> Symbol
+end
+
+module OptionalPrice
+  def self.call: (untyped product) -> String
+end
+
+class Product < ActiveRecord::Base
+end
+
+class Order < ActiveRecord::Base
+end
+
+class AddPriceToProducts < ActiveRecord::Migration::Current
+  def change: () -> void
+
+  def define_order_columns: (ActiveRecord::ConnectionAdapters::TableDefinition table) -> void
+
+  def change_order_columns: (ActiveRecord::ConnectionAdapters::Table table) -> void
+end
+
+module PriceHelper
+  include MoneyRails::ActionViewExtension
+
+  def format_price: (Money money, Integer number) -> String
+end

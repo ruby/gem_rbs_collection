@@ -1,0 +1,14 @@
+module FriendlyId
+  VERSION: String
+
+  # `extend FriendlyId` in a model's signature gives the class methods of `Base`.
+  # Declare `extend FriendlyId::Base[Model, Relation]` instead to get precise types.
+  include Base[untyped, untyped]
+
+  def self.defaults: () -> (^(Configuration) -> void)
+                   | () { (Configuration) -> void } -> (^(Configuration) -> void)
+
+  def self.table_name_prefix: () -> String
+
+  type module_name = Symbol | String | Module
+end

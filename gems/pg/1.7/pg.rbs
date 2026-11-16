@@ -1,0 +1,613 @@
+module PG
+  VERSION: String
+
+  def self.library_version: () -> Integer
+  def self.version_string: (?untyped include_buildnum) -> String
+  def self.isthreadsafe: () -> bool
+  def self.connect: (?String | Hash[Symbol | String, untyped] conninfo) -> PG::Connection
+                  | (**untyped) -> PG::Connection
+                  | [T] (?String | Hash[Symbol | String, untyped] conninfo) { (PG::Connection) -> T } -> T
+                  | [T] (**untyped) { (PG::Connection) -> T } -> T
+
+  module Constants
+    CONNECTION_OK: Integer
+    CONNECTION_BAD: Integer
+
+    PQTRANS_IDLE: Integer
+    PQTRANS_ACTIVE: Integer
+    PQTRANS_INTRANS: Integer
+    PQTRANS_INERROR: Integer
+    PQTRANS_UNKNOWN: Integer
+
+    PGRES_EMPTY_QUERY: Integer
+    PGRES_COMMAND_OK: Integer
+    PGRES_TUPLES_OK: Integer
+    PGRES_COPY_OUT: Integer
+    PGRES_COPY_IN: Integer
+    PGRES_BAD_RESPONSE: Integer
+    PGRES_NONFATAL_ERROR: Integer
+    PGRES_FATAL_ERROR: Integer
+    PGRES_COPY_BOTH: Integer
+    PGRES_SINGLE_TUPLE: Integer
+
+    PG_DIAG_SEVERITY: Integer
+    PG_DIAG_SEVERITY_NONLOCALIZED: Integer
+    PG_DIAG_SQLSTATE: Integer
+    PG_DIAG_MESSAGE_PRIMARY: Integer
+    PG_DIAG_MESSAGE_DETAIL: Integer
+    PG_DIAG_MESSAGE_HINT: Integer
+    PG_DIAG_STATEMENT_POSITION: Integer
+    PG_DIAG_CONTEXT: Integer
+    PG_DIAG_SCHEMA_NAME: Integer
+    PG_DIAG_TABLE_NAME: Integer
+    PG_DIAG_COLUMN_NAME: Integer
+    PG_DIAG_DATATYPE_NAME: Integer
+    PG_DIAG_CONSTRAINT_NAME: Integer
+  end
+
+  include PG::Constants
+
+  class Error < StandardError
+    def initialize: (?String? msg, ?connection: PG::Connection?, ?result: PG::Result?) -> void
+    def connection: () -> PG::Connection?
+    def result: () -> PG::Result?
+    def error: () -> String
+  end
+
+  class NotAllCopyDataRetrieved < PG::Error
+  end
+
+  class LostCopyState < PG::Error
+  end
+
+  class NotInBlockingMode < PG::Error
+  end
+
+  class UnableToSend < PG::Error
+  end
+
+  class ConnectionBad < PG::Error
+  end
+
+  class InvalidResultStatus < PG::Error
+  end
+
+  class NoResultError < PG::Error
+  end
+
+  class InvalidChangeOfResultFields < PG::Error
+  end
+
+  # Raising this inside Connection#transaction rolls back without re-raising.
+  class RollbackTransaction < StandardError
+  end
+
+  # Errors reported by the server. The classes below are generated from the
+  # SQLSTATE class codes, and only the commonly rescued ones are declared.
+  class ServerError < PG::Error
+  end
+
+  class DataException < PG::ServerError
+  end
+
+  class DatetimeFieldOverflow < PG::DataException
+  end
+
+  class DivisionByZero < PG::DataException
+  end
+
+  class InvalidDatetimeFormat < PG::DataException
+  end
+
+  class InvalidParameterValue < PG::DataException
+  end
+
+  class InvalidRegularExpression < PG::DataException
+  end
+
+  class InvalidTextRepresentation < PG::DataException
+  end
+
+  class NumericValueOutOfRange < PG::DataException
+  end
+
+  class StringDataRightTruncation < PG::DataException
+  end
+
+  class IntegrityConstraintViolation < PG::ServerError
+  end
+
+  class RestrictViolation < PG::IntegrityConstraintViolation
+  end
+
+  class NotNullViolation < PG::IntegrityConstraintViolation
+  end
+
+  class ForeignKeyViolation < PG::IntegrityConstraintViolation
+  end
+
+  class UniqueViolation < PG::IntegrityConstraintViolation
+  end
+
+  class CheckViolation < PG::IntegrityConstraintViolation
+  end
+
+  class ExclusionViolation < PG::IntegrityConstraintViolation
+  end
+
+  class InvalidTransactionState < PG::ServerError
+  end
+
+  class ReadOnlySqlTransaction < PG::InvalidTransactionState
+  end
+
+  class InFailedSqlTransaction < PG::InvalidTransactionState
+  end
+
+  class TransactionRollback < PG::ServerError
+  end
+
+  class TRSerializationFailure < PG::TransactionRollback
+  end
+
+  class TRDeadlockDetected < PG::TransactionRollback
+  end
+
+  class SyntaxErrorOrAccessRuleViolation < PG::ServerError
+  end
+
+  class SyntaxError < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class InsufficientPrivilege < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class UndefinedColumn < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class UndefinedFunction < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class UndefinedTable < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class UndefinedObject < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class DuplicateColumn < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class DuplicateTable < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class DuplicateObject < PG::SyntaxErrorOrAccessRuleViolation
+  end
+
+  class InsufficientResources < PG::ServerError
+  end
+
+  class DiskFull < PG::InsufficientResources
+  end
+
+  class OutOfMemory < PG::InsufficientResources
+  end
+
+  class TooManyConnections < PG::InsufficientResources
+  end
+
+  class ObjectNotInPrerequisiteState < PG::ServerError
+  end
+
+  class LockNotAvailable < PG::ObjectNotInPrerequisiteState
+  end
+
+  class OperatorIntervention < PG::ServerError
+  end
+
+  class QueryCanceled < PG::OperatorIntervention
+  end
+
+  class AdminShutdown < PG::OperatorIntervention
+  end
+
+  class CrashShutdown < PG::OperatorIntervention
+  end
+
+  class CannotConnectNow < PG::OperatorIntervention
+  end
+
+  class ConnectionException < PG::ServerError
+  end
+
+  class ConnectionFailure < PG::ConnectionException
+  end
+
+  class Connection
+    include PG::Constants
+
+    type connect_args = String | Hash[Symbol | String, untyped]
+    type param = untyped
+
+    def self.new: (?connect_args conninfo) -> instance
+                | (**untyped) -> instance
+                | [T] (?connect_args conninfo) { (instance) -> T } -> T
+                | [T] (**untyped) { (instance) -> T } -> T
+    alias self.connect self.new
+    alias self.open self.new
+
+    def self.ping: (?connect_args conninfo) -> Integer
+                 | (**untyped) -> Integer
+    def self.escape_string: (String string) -> String
+    def self.escape_bytea: (String string) -> String
+    def self.unescape_bytea: (String string) -> String
+    def self.quote_ident: (String | Array[String] identifier) -> String
+    def self.conndefaults: () -> Array[Hash[Symbol, String?]]
+    def self.conndefaults_hash: () -> Hash[Symbol, String?]
+    def self.conninfo_parse: (String conninfo) -> Array[Hash[Symbol, String?]]
+
+    def exec: (String sql) -> PG::Result
+            | [T] (String sql) { (PG::Result) -> T } -> T
+    alias query exec
+    def exec_params: (String sql, ?Array[param]? params, ?Integer result_format, ?PG::TypeMap? type_map) -> PG::Result
+                   | [T] (String sql, ?Array[param]? params, ?Integer result_format, ?PG::TypeMap? type_map) { (PG::Result) -> T } -> T
+    def prepare: (String name, String sql, ?Array[Integer]? param_types) -> PG::Result
+    def exec_prepared: (String name, ?Array[param]? params, ?Integer result_format, ?PG::TypeMap? type_map) -> PG::Result
+                     | [T] (String name, ?Array[param]? params, ?Integer result_format, ?PG::TypeMap? type_map) { (PG::Result) -> T } -> T
+    def describe_prepared: (String name) -> PG::Result
+    def send_query: (String sql) -> nil
+    def send_query_params: (String sql, Array[param]? params, ?Integer result_format, ?PG::TypeMap? type_map) -> nil
+    def get_result: () -> PG::Result?
+                  | [T] () { (PG::Result) -> T } -> T?
+    def get_last_result: () -> PG::Result?
+    def discard_results: () -> nil
+
+    def escape_string: (String string) -> String
+    alias escape escape_string
+    def escape_literal: (String string) -> String
+    def escape_identifier: (String string) -> String
+    def escape_bytea: (String string) -> String
+    def unescape_bytea: (String string) -> String
+    def quote_ident: (String | Array[String] identifier) -> String
+    def encrypt_password: (String password, String username, ?String? algorithm) -> String
+
+    def transaction: [T] () { (self) -> T } -> T?
+    def copy_data: [T] (String sql, ?PG::Coder? coder) { (PG::Result) -> T } -> PG::Result
+    def put_copy_data: (String | Array[untyped] buffer, ?PG::Coder? encoder) -> bool
+    def put_copy_end: (?String? error_message) -> bool
+    def get_copy_data: (?bool async, ?PG::Coder? decoder) -> (String | Array[untyped])?
+
+    def notifies: () -> Hash[Symbol, untyped]?
+    def wait_for_notify: (?Float | Integer | nil timeout) -> String?
+                       | [T] (?Float | Integer | nil timeout) { (String event, Integer pid, String? payload) -> T } -> String?
+    def cancel: () -> String?
+    def finish: () -> nil
+    alias close finish
+    def finished?: () -> bool
+    def reset: () -> self
+
+    def status: () -> Integer
+    def transaction_status: () -> Integer
+    def server_version: () -> Integer
+    def backend_pid: () -> Integer
+    def error_message: () -> String
+    def parameter_status: (String parameter) -> String?
+    def socket_io: () -> IO
+    def db: () -> String?
+    def user: () -> String?
+    def host: () -> String?
+    def port: () -> Integer
+    def options: () -> String?
+    def conninfo_hash: () -> Hash[Symbol, String?]
+    def conndefaults: () -> Array[Hash[Symbol, String?]]
+    def conndefaults_hash: () -> Hash[Symbol, String?]
+    def ssl_in_use?: () -> bool
+
+    def set_client_encoding: (String encoding) -> void
+    def client_encoding=: (String encoding) -> String
+    def get_client_encoding: () -> String
+    def internal_encoding: () -> Encoding?
+    def internal_encoding=: (String | Encoding | nil encoding) -> (String | Encoding)?
+    def external_encoding: () -> Encoding
+
+    def type_map_for_queries: () -> PG::TypeMap
+    def type_map_for_queries=: (PG::TypeMap type_map) -> PG::TypeMap
+    def type_map_for_results: () -> PG::TypeMap
+    def type_map_for_results=: (PG::TypeMap type_map) -> PG::TypeMap
+    def encoder_for_put_copy_data: () -> PG::Coder?
+    def encoder_for_put_copy_data=: (PG::Coder? encoder) -> PG::Coder?
+    def decoder_for_get_copy_data: () -> PG::Coder?
+    def decoder_for_get_copy_data=: (PG::Coder? decoder) -> PG::Coder?
+    def field_name_type: () -> Symbol
+    def field_name_type=: (Symbol type) -> Symbol
+  end
+
+  class Result
+    include PG::Constants
+    include Enumerable[Hash[String | Symbol, untyped]]
+
+    def self.res_status: (Integer status) -> String
+
+    def result_status: () -> Integer
+    def res_status: (?Integer status) -> String
+    def error_message: () -> String
+    def verbose_error_message: (Integer verbosity, Integer show_context) -> String?
+    def error_field: (Integer field_code) -> String?
+    def check: () -> self
+    def clear: () -> nil
+    def cleared?: () -> bool
+    def autoclear?: () -> bool
+
+    def ntuples: () -> Integer
+    alias num_tuples ntuples
+    def nfields: () -> Integer
+    alias num_fields nfields
+    def cmd_status: () -> String
+    def cmd_tuples: () -> Integer
+    def oid_value: () -> Integer?
+    def fields: () -> Array[String | Symbol]
+    def fname: (Integer field_index) -> (String | Symbol)
+    def fnumber: (String | Symbol field_name) -> Integer
+    def ftype: (Integer field_index) -> Integer
+
+    def getvalue: (Integer tuple_index, Integer field_index) -> untyped
+    def getisnull: (Integer tuple_index, Integer field_index) -> bool
+    def values: () -> Array[Array[untyped]]
+    def column_values: (Integer column_index) -> Array[untyped]
+    def field_values: (String | Symbol field_name) -> Array[untyped]
+    def tuple_values: (Integer tuple_index) -> Array[untyped]
+    def tuple: (Integer tuple_index) -> PG::Tuple
+    def []: (Integer tuple_index) -> Hash[String | Symbol, untyped]
+
+    def each: () { (Hash[String | Symbol, untyped]) -> void } -> self
+            | () -> Enumerator[Hash[String | Symbol, untyped], self]
+    def each_row: () { (Array[untyped]) -> void } -> self
+                | () -> Enumerator[Array[untyped], self]
+    def each_tuple: () { (PG::Tuple) -> void } -> self
+                  | () -> Enumerator[PG::Tuple, self]
+
+    def type_map: () -> PG::TypeMap
+    def type_map=: (PG::TypeMap type_map) -> PG::TypeMap
+    def map_types!: (PG::TypeMap type_map) -> self
+    def field_name_type: () -> Symbol
+    def field_name_type=: (Symbol type) -> Symbol
+    def field_names_as: (Symbol type) -> self
+  end
+
+  class Tuple
+    include Enumerable[[String | Symbol, untyped]]
+
+    def []: (Integer | String | Symbol key) -> untyped
+    def fetch: (Integer | String | Symbol key) -> untyped
+             | [T] (Integer | String | Symbol key, T default) -> (untyped | T)
+             | [T] (Integer | String | Symbol key) { (Integer | String | Symbol) -> T } -> (untyped | T)
+    def values: () -> Array[untyped]
+    def length: () -> Integer
+    def keys: () -> Array[String | Symbol]
+    def has_key?: (Integer | String | Symbol key) -> bool
+    def each: () { ([String | Symbol, untyped]) -> void } -> self
+            | () -> Enumerator[[String | Symbol, untyped], self]
+    def each_value: () { (untyped) -> void } -> self
+                  | () -> Enumerator[untyped, self]
+    def each_key: () { (String | Symbol) -> void } -> self
+                | () -> Enumerator[String | Symbol, self]
+  end
+
+  class TypeMap
+    module DefaultTypeMappable
+      def default_type_map: () -> PG::TypeMap?
+      def default_type_map=: (PG::TypeMap? type_map) -> PG::TypeMap?
+    end
+  end
+
+  class TypeMapAllStrings < PG::TypeMap
+  end
+
+  class TypeMapByColumn < PG::TypeMap
+    include PG::TypeMap::DefaultTypeMappable
+
+    def initialize: (Array[PG::Coder?] coders) -> void
+    def coders: () -> Array[PG::Coder?]
+    def oids: () -> Array[Integer?]
+  end
+
+  class TypeMapByOid < PG::TypeMap
+    include PG::TypeMap::DefaultTypeMappable
+
+    def add_coder: (PG::Coder coder) -> PG::Coder
+    def rm_coder: (Integer format, Integer oid) -> PG::Coder?
+    def coders: () -> Array[PG::Coder]
+    def build_column_map: (PG::Result result) -> PG::TypeMapByColumn
+  end
+
+  class BasicTypeMapForResults < PG::TypeMapByOid
+    def initialize: (PG::Connection connection, ?registry: untyped) -> void
+  end
+
+  class BasicTypeMapForQueries < PG::TypeMapByClass
+    def initialize: (PG::Connection connection, ?registry: untyped, ?if_undefined: untyped) -> void
+  end
+
+  class TypeMapByClass < PG::TypeMap
+    include PG::TypeMap::DefaultTypeMappable
+
+    def []: (Class klass) -> PG::Coder?
+    def []=: (Class klass, PG::Coder? coder) -> PG::Coder?
+    def coders: () -> Hash[Class, PG::Coder]
+  end
+
+  class Coder
+    def initialize: (?oid: Integer, ?format: Integer, ?flags: Integer, ?name: String?) -> void
+    def oid: () -> Integer
+    def oid=: (Integer oid) -> Integer
+    def format: () -> Integer
+    def format=: (Integer format) -> Integer
+    def flags: () -> Integer
+    def flags=: (Integer flags) -> Integer
+    def name: () -> String?
+    def name=: (String? name) -> String?
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  class SimpleCoder < PG::Coder
+  end
+
+  class SimpleEncoder < PG::SimpleCoder
+  end
+
+  class SimpleDecoder < PG::SimpleCoder
+  end
+
+  class CompositeCoder < PG::Coder
+    def initialize: (?oid: Integer, ?format: Integer, ?flags: Integer, ?name: String?, ?elements_type: PG::Coder?, ?needs_quotation: bool, ?delimiter: String, ?dimensions: Integer?) -> void
+    def elements_type: () -> PG::Coder?
+    def elements_type=: (PG::Coder? coder) -> PG::Coder?
+    def needs_quotation?: () -> bool
+    def needs_quotation=: (bool flag) -> bool
+    def delimiter: () -> String
+    def delimiter=: (String delimiter) -> String
+    def dimensions: () -> Integer?
+    def dimensions=: (Integer? dimensions) -> Integer?
+  end
+
+  class CompositeEncoder < PG::CompositeCoder
+  end
+
+  class CompositeDecoder < PG::CompositeCoder
+  end
+
+  class CopyCoder < PG::Coder
+    def initialize: (?oid: Integer, ?format: Integer, ?flags: Integer, ?name: String?, ?type_map: PG::TypeMap?, ?delimiter: String, ?null_string: String) -> void
+    def type_map: () -> PG::TypeMap?
+    def type_map=: (PG::TypeMap? type_map) -> PG::TypeMap?
+    def delimiter: () -> String
+    def delimiter=: (String delimiter) -> String
+    def null_string: () -> String
+    def null_string=: (String null_string) -> String
+  end
+
+  class CopyEncoder < PG::CopyCoder
+  end
+
+  class CopyDecoder < PG::CopyCoder
+  end
+
+  module TextEncoder
+    class Boolean < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Integer < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Float < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class String < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Bytea < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Identifier < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Numeric < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Date < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Inet < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class JSON < PG::SimpleEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class Array < PG::CompositeEncoder
+      def encode: (::Array[untyped] value) -> ::String?
+    end
+
+    class QuotedLiteral < PG::CompositeEncoder
+      def encode: (untyped value) -> ::String?
+    end
+
+    class CopyRow < PG::CopyEncoder
+      def encode: (::Array[untyped] value) -> ::String?
+    end
+  end
+
+  module TextDecoder
+    class Boolean < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> bool?
+    end
+
+    class Integer < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::Integer?
+    end
+
+    class Float < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::Float?
+    end
+
+    class String < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::String?
+    end
+
+    class Bytea < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::String?
+    end
+
+    class Identifier < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::Array[::String]?
+    end
+
+    class Numeric < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> untyped
+    end
+
+    class Date < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> untyped
+    end
+
+    class Inet < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> untyped
+    end
+
+    class JSON < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> untyped
+    end
+
+    class Timestamp < PG::SimpleDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> Time?
+    end
+
+    class TimestampUtc < Timestamp
+    end
+
+    class TimestampUtcToLocal < Timestamp
+    end
+
+    class TimestampLocal < Timestamp
+    end
+
+    class TimestampWithTimeZone = Timestamp
+    class TimestampWithoutTimeZone = TimestampLocal
+
+    class Array < PG::CompositeDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::Array[untyped]?
+    end
+
+    class CopyRow < PG::CopyDecoder
+      def decode: (::String value, ?::Integer? tuple, ?::Integer? field) -> ::Array[untyped]?
+    end
+  end
+end

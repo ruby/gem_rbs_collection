@@ -1,0 +1,58 @@
+module PostColumns
+  def skill_list: () -> ActsAsTaggableOn::TagList
+
+  def title: () -> String
+end
+
+module PhotoColumns
+  def location_list: () -> ActsAsTaggableOn::TagList
+end
+
+class Post < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Post, ::Integer]
+    include ::Enumerable[::Post]
+    include ActsAsTaggableOn::Taggable::QueryMethods[::Post::ActiveRecord_Relation]
+    include ActsAsTaggableOn::Taggable::TagsContext::QueryMethods
+  end
+
+  extend ::ActiveRecord::Base::ClassMethods[::Post, ::Post::ActiveRecord_Relation, ::Integer]
+  extend ActsAsTaggableOn::Taggable::ClassMethods[::Post, ::Post::ActiveRecord_Relation]
+  extend ActsAsTaggableOn::Taggable::TagsContext::QueryMethods
+  include ActsAsTaggableOn::Taggable::InstanceMethods
+  include ActsAsTaggableOn::Taggable::TagsContext
+
+  include PostColumns
+end
+
+class Photo < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Photo, ::Integer]
+    include ::Enumerable[::Photo]
+    include ActsAsTaggableOn::Taggable::QueryMethods[::Photo::ActiveRecord_Relation]
+    include ActsAsTaggableOn::Taggable::TagsContext::QueryMethods
+  end
+
+  extend ::ActiveRecord::Base::ClassMethods[::Photo, ::Photo::ActiveRecord_Relation, ::Integer]
+  extend ActsAsTaggableOn::Taggable::ClassMethods[::Photo, ::Photo::ActiveRecord_Relation]
+  extend ActsAsTaggableOn::Taggable::TagsContext::QueryMethods
+  include ActsAsTaggableOn::Taggable::InstanceMethods
+  include ActsAsTaggableOn::Taggable::TagsContext
+
+  include PhotoColumns
+end
+
+class Member < ActiveRecord::Base
+  include ActsAsTaggableOn::Tagger::InstanceMethods
+end
+
+class Member2 < ActiveRecord::Base
+  include ActsAsTaggableOn::Tagger::InstanceMethods
+end
+
+class TagCloudHelper
+  include ActsAsTaggableOn::TagsHelper
+end
+
+class WordParser < ActsAsTaggableOn::DefaultParser
+end

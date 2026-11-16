@@ -1,0 +1,62 @@
+class Article < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Article, ::Integer]
+    include ::Enumerable[::Article]
+  end
+
+  extend FriendlyId::Base[::Article, ActiveRecord_Relation]
+  extend FriendlyId::FinderMethods[::Article]
+  include FriendlyId::Model
+  include FriendlyId::Slugged
+
+  def title: () -> String
+  def title_changed?: () -> bool
+  def resolve_friendly_id_conflict: (FriendlyId::Candidates candidates) -> String?
+end
+
+class Post < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Post, ::Integer]
+    include ::Enumerable[::Post]
+  end
+
+  extend FriendlyId::Base[::Post, ActiveRecord_Relation]
+  include FriendlyId::Model
+  include FriendlyId::Slugged
+  include FriendlyId::History
+
+  def slug: () -> String
+  def slug_candidates: () -> Array[Symbol | Array[Symbol]]
+end
+
+class Page < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Page, ::Integer]
+    include ::Enumerable[::Page]
+  end
+
+  extend FriendlyId::Base[::Page, ActiveRecord_Relation]
+  include FriendlyId::Model
+  include FriendlyId::SimpleI18n
+  include FriendlyId::SimpleI18n::Model
+end
+
+FRIENDLY_OPTIONS: Hash[Symbol, untyped]
+
+class Product < ActiveRecord::Base
+  extend FriendlyId
+end
+
+class Account < ActiveRecord::Base
+  extend FriendlyId
+end
+
+module Lookup
+  def self.generator: (FriendlyId::SlugGenerator generator, FriendlyId::Candidates candidates) -> Array[untyped]
+  def self.article: (String param) -> Article
+  def self.post: (String param) -> String
+  def self.config_of: () -> Array[untyped]
+  def self.record: (Post post) -> Array[untyped]
+  def self.generate: (Article article) -> Array[untyped]
+  def self.i18n: (Page page) -> void
+end

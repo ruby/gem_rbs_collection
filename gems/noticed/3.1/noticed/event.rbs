@@ -1,0 +1,131 @@
+module Noticed
+  class Event < ApplicationRecord
+    extend ::_ActiveRecord_Relation_ClassMethods[Event, ActiveRecord_Relation, Integer]
+    extend Deliverable::ClassMethods
+    extend NotificationMethods::ClassMethods
+
+    include Deliverable
+    include Translation
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[Event, Integer]
+      include Enumerable[Event]
+
+      def newest_first: () -> ActiveRecord_Relation
+    end
+
+    def self.newest_first: () -> ActiveRecord_Relation
+
+    def id: () -> Integer
+
+    def type: () -> String
+
+    def params: () -> Hash[Symbol, untyped]
+
+    def notifications_count: () -> Integer
+
+    def record_type: () -> String?
+
+    def record_id: () -> Integer?
+
+    def record: () -> untyped
+
+    def record=: (untyped value) -> untyped
+
+    def notifications: () -> Notification::ActiveRecord_Associations_CollectionProxy
+
+    def created_at: () -> Time
+
+    def updated_at: () -> Time
+  end
+
+  module NotificationMethods
+    module ClassMethods
+      def notification_methods: () { () [self: singleton(Notification)] -> void } -> void
+    end
+  end
+
+  module Readable
+    module ClassMethods
+      def mark_as_read: (**untyped attributes) -> Integer
+
+      def mark_as_unread: (**untyped attributes) -> Integer
+    end
+
+    def mark_as_read: () -> bool
+
+    def mark_as_read!: () -> true
+
+    def mark_as_unread: () -> bool
+
+    def mark_as_unread!: () -> true
+
+    def read?: () -> bool
+
+    def unread?: () -> bool
+  end
+
+  class Notification < ApplicationRecord
+    extend ::_ActiveRecord_Relation_ClassMethods[Notification, ActiveRecord_Relation, Integer]
+    extend Readable::ClassMethods
+
+    include Readable
+    include Translation
+
+    class ActiveRecord_Relation < ::ActiveRecord::Relation
+      include ::_ActiveRecord_Relation[Notification, Integer]
+      include Enumerable[Notification]
+      include Readable::ClassMethods
+
+      def newest_first: () -> ActiveRecord_Relation
+
+      def read: () -> ActiveRecord_Relation
+
+      def unread: () -> ActiveRecord_Relation
+    end
+
+    class ActiveRecord_Associations_CollectionProxy < ::ActiveRecord::Associations::CollectionProxy
+      include ::_ActiveRecord_Relation[Notification, Integer]
+      include Enumerable[Notification]
+      include Readable::ClassMethods
+
+      def newest_first: () -> ActiveRecord_Relation
+
+      def read: () -> ActiveRecord_Relation
+
+      def unread: () -> ActiveRecord_Relation
+    end
+
+    def self.newest_first: () -> ActiveRecord_Relation
+
+    def self.read: () -> ActiveRecord_Relation
+
+    def self.unread: () -> ActiveRecord_Relation
+
+    def id: () -> Integer
+
+    def type: () -> String
+
+    def event: () -> Event
+
+    def event_id: () -> Integer
+
+    def recipient: () -> untyped
+
+    def recipient_type: () -> String
+
+    def recipient_id: () -> Integer
+
+    def read_at: () -> Time?
+
+    def seen_at: () -> Time?
+
+    def created_at: () -> Time
+
+    def updated_at: () -> Time
+
+    def params: () -> Hash[Symbol, untyped]
+
+    def record: () -> untyped
+  end
+end

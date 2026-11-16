@@ -1,0 +1,78 @@
+module ActiveRecord
+  module Acts
+    module List
+      VERSION: String
+
+      type scope = Symbol | String | Array[Symbol | String | Hash[Symbol, untyped]]
+
+      module ClassMethods
+        def acts_as_list: (
+          ?column: Symbol | String,
+          ?scope: scope,
+          ?top_of_list: Integer,
+          ?add_new_at: :top | :bottom | nil,
+          ?sequential_updates: bool,
+          ?touch_on_update: bool
+        ) -> void
+                        | (Hash[Symbol, untyped] options) -> void
+      end
+
+      module InstanceMethods
+        def current_position: () -> Integer?
+
+        def insert_at: (?Integer position) -> bool?
+
+        def insert_at!: (?Integer position) -> bool?
+
+        def move_lower: () -> void
+
+        def move_higher: () -> void
+
+        def move_to_bottom: () -> void
+
+        def move_to_top: () -> void
+
+        def remove_from_list: () -> void
+
+        def increment_position: () -> bool?
+
+        def decrement_position: () -> bool?
+
+        def first?: () -> bool
+
+        def last?: () -> bool
+
+        def higher_item: () -> self?
+
+        def higher_items: (?Integer? limit) -> ActiveRecord::Relation
+
+        def lower_item: () -> self?
+
+        def lower_items: (?Integer? limit) -> ActiveRecord::Relation
+
+        def in_list?: () -> bool
+
+        def not_in_list?: () -> bool
+
+        def default_position: () -> Integer?
+
+        def default_position?: () -> bool
+
+        def set_list_position: (Integer? new_position, ?bool raise_exception_if_save_fails) -> bool
+      end
+
+      module NoUpdate
+        module ClassMethods
+          def acts_as_list_no_update: [R] (?Array[singleton(ActiveRecord::Base)] extra_classes) { () -> R } -> R
+        end
+      end
+    end
+  end
+end
+
+class ActiveRecord::Base
+  extend ActiveRecord::Acts::List::ClassMethods
+  extend ActiveRecord::Acts::List::NoUpdate::ClassMethods
+
+  include ActiveRecord::Acts::List::InstanceMethods
+end

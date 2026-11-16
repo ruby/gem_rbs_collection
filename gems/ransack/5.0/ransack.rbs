@@ -1,0 +1,340 @@
+module Ransack
+  VERSION: String
+
+  interface _ToUnsafeH
+    def to_unsafe_h: () -> Hash[untyped, untyped]
+  end
+
+  type search_params = Hash[untyped, untyped] | _ToUnsafeH | nil
+
+  type search_options = {
+    ?search_key: Symbol | String,
+    ?ignore_unknown_conditions: boolish,
+    ?auth_object: untyped,
+    ?strip_whitespace: boolish
+  } | Hash[Symbol, untyped]
+
+  type sort_params = {
+    ?name: Symbol | String,
+    ?dir: String,
+    ?ransacker_args: Array[untyped]
+  } | Hash[Symbol, untyped]
+
+  type ransacker_options = {
+    ?type: Symbol,
+    ?args: Array[Symbol],
+    ?formatter: Proc | ^(untyped) -> untyped,
+    ?callable: Proc | ^(::ActiveRecord::Associations::JoinDependency::JoinPart parent, *untyped) -> ::Arel::Nodes::t
+  } | Hash[Symbol, untyped]
+
+  type predicate_options = {
+    ?arel_predicate: String | Symbol | Proc,
+    ?formatter: Proc | ^(untyped) -> untyped,
+    ?validator: Proc | ^(untyped) -> boolish,
+    ?type: Symbol,
+    ?wants_array: boolish,
+    ?compounds: boolish,
+    ?case_insensitive: boolish
+  } | Hash[Symbol, untyped]
+
+  type condition_options = {
+    ?attributes: Integer,
+    ?values: Integer
+  } | Hash[Symbol, untyped]
+
+  type fields_sort_option = :nulls_first | :nulls_last | :nulls_always_first | :nulls_always_last | nil
+
+  class UntraversableAssociationError < StandardError
+  end
+
+  class InvalidSearchError < ArgumentError
+  end
+
+  module Configuration
+    def configure: () { (Configuration config) -> void } -> void
+
+    def add_predicate: (String | Symbol name, ?predicate_options opts) -> void
+
+    def search_key=: (Symbol | String name) -> void
+
+    def ignore_unknown_conditions=: (boolish boolean) -> void
+
+    def default_predicate=: (String | Symbol name) -> void
+
+    def custom_arrows=: ({ ?up_arrow: String, ?down_arrow: String, ?default_arrow: String } opts) -> void
+
+    def sanitize_custom_scope_booleans=: (boolish boolean) -> void
+
+    def fields_sort_option=: (fields_sort_option setting) -> void
+
+    def postgres_fields_sort_option=: (fields_sort_option setting) -> void
+
+    def hide_sort_order_indicators=: (boolish boolean) -> void
+
+    def strip_whitespace=: (boolish boolean) -> void
+
+    def ignore_blank_values=: (boolish boolean) -> void
+  end
+
+  extend Configuration
+
+  class Predicate
+    attr_reader name: String
+
+    attr_reader arel_predicate: String | Symbol | Proc
+
+    attr_reader type: Symbol?
+
+    attr_reader formatter: Proc?
+
+    attr_reader validator: Proc
+
+    attr_reader compound: bool?
+
+    attr_reader wants_array: bool
+
+    attr_reader case_insensitive: bool?
+  end
+
+  class Ransacker
+  end
+
+  class Context
+    attr_reader klass: singleton(::ActiveRecord::Base)
+
+    attr_reader object: ::ActiveRecord::Relation
+
+    attr_accessor auth_object: untyped
+
+    attr_accessor search_key: Symbol | String
+
+    attr_accessor ignore_unknown_conditions: boolish
+  end
+
+  module Adapters
+    module ActiveRecord
+      class Context < ::Ransack::Context
+      end
+
+      module Base
+        def ransack: (?search_params params, ?search_options options) -> Search
+
+        def ransack!: (?search_params params, ?search_options options) -> Search
+
+        def ransacker: (String | Symbol name, ?ransacker_options opts) ?{ (::ActiveRecord::Associations::JoinDependency::JoinPart parent, *untyped args) -> ::Arel::Nodes::t } -> Hash[String, Ransacker]
+
+        def ransack_alias: (String | Symbol new_name, String | Symbol old_name) -> Hash[String, String]
+
+        def ransackable_attributes: (?untyped auth_object) -> Array[String]
+
+        def ransackable_associations: (?untyped auth_object) -> Array[String]
+
+        def ransortable_attributes: (?untyped auth_object) -> Array[String]
+
+        def ransackable_scopes: (?untyped auth_object) -> Array[Symbol | String]
+
+        def ransackable_scopes_skip_sanitize_args: () -> Array[Symbol | String]
+
+        def authorizable_ransackable_attributes: () -> Array[String]
+
+        def authorizable_ransackable_associations: () -> Array[String]
+
+        def _ransackers: () -> Hash[String, Ransacker]
+
+        def _ransack_aliases: () -> Hash[String, String]
+      end
+    end
+  end
+
+  module Nodes
+    class Node
+      attr_reader context: Context
+    end
+
+    class Attribute < Node
+      attr_reader name: String?
+
+      attr_reader ransacker_args: Array[untyped]
+
+      def name=: (String? name) -> void
+    end
+
+    class Value < Node
+      attr_accessor value: untyped
+    end
+
+    class Condition < Node
+      attr_accessor predicate: Predicate?
+
+      def attributes: () -> Array[Attribute]
+
+      alias a attributes
+
+      def values: () -> Array[Value]
+
+      alias v values
+
+      def predicate_name: () -> String?
+
+      def predicate_name=: (String name) -> void
+
+      def combinator: () -> String?
+
+      alias m combinator
+
+      def combinator=: (String | Symbol | nil val) -> void
+
+      alias m= combinator=
+
+      def build_attribute: (?String? name, ?Array[untyped] ransacker_args) -> Attribute
+
+      def build_value: (?untyped val) -> Value
+
+      def value: () -> untyped
+    end
+
+    class Sort < Node
+      attr_reader name: String?
+
+      attr_reader dir: String?
+
+      attr_reader ransacker_args: Array[untyped]?
+
+      def name=: (String | Symbol name) -> void
+
+      def dir=: (String? dir) -> void
+
+      def valid?: () -> bool
+    end
+
+    class Grouping < Node
+      attr_reader combinator: String?
+
+      alias m combinator
+
+      def combinator=: (String | Symbol | nil val) -> void
+
+      alias m= combinator=
+
+      def conditions: () -> Array[Condition]
+
+      alias c conditions
+
+      def groupings: () -> Array[Grouping]
+
+      alias g groupings
+
+      def values: () -> Array[Condition | Grouping]
+
+      def []: (String | Symbol key) -> Condition?
+
+      def build_condition: (?condition_options opts) -> Condition
+
+      def new_condition: (?condition_options opts) -> Condition
+
+      def build_grouping: (?search_params params) -> Grouping
+
+      def new_grouping: (?search_params params) -> Grouping
+    end
+  end
+
+  class Search
+    attr_reader base: Nodes::Grouping
+
+    attr_reader context: Context
+
+    def initialize: (::ActiveRecord::Relation | singleton(::ActiveRecord::Base) object, ?search_params params, ?search_options options) -> void
+
+    def klass: () -> singleton(::ActiveRecord::Base)
+
+    def object: () -> ::ActiveRecord::Relation
+
+    def result: (?distinct: boolish) -> ::ActiveRecord::Relation
+
+    def sorts: () -> Array[Nodes::Sort]
+
+    alias s sorts
+
+    def sorts=: (String | Array[String | Hash[untyped, untyped]] | Hash[untyped, Hash[untyped, untyped]] args) -> void
+
+    alias s= sorts=
+
+    def build_sort: (?sort_params opts) -> Nodes::Sort
+
+    def new_sort: (?sort_params opts) -> Nodes::Sort
+
+    def conditions: () -> Array[Nodes::Condition]
+
+    def groupings: () -> Array[Nodes::Grouping]
+
+    def combinator: () -> String?
+
+    def build_condition: (?condition_options opts) -> Nodes::Condition
+
+    def new_condition: (?condition_options opts) -> Nodes::Condition
+
+    def build_grouping: (?search_params params) -> Nodes::Grouping
+
+    def new_grouping: (?search_params params) -> Nodes::Grouping
+
+    def translate: (String | Symbol key, ?Hash[Symbol, untyped] options) -> String?
+  end
+
+  module Helpers
+    class FormBuilder < ::ActionView::Helpers::FormBuilder
+      def attribute_select: (?Hash[Symbol, untyped]? options, ?Hash[Symbol, untyped]? html_options, ?String? action) -> ::ActiveSupport::SafeBuffer
+
+      def sort_direction_select: (?Hash[Symbol, untyped] options, ?Hash[Symbol, untyped] html_options) -> ::ActiveSupport::SafeBuffer
+
+      def sort_select: (?Hash[Symbol, untyped] options, ?Hash[Symbol, untyped] html_options) -> ::ActiveSupport::SafeBuffer
+
+      def predicate_select: (?Hash[Symbol, untyped] options, ?Hash[Symbol, untyped] html_options) -> ::ActiveSupport::SafeBuffer
+
+      def combinator_select: (?Hash[Symbol, untyped] options, ?Hash[Symbol, untyped] html_options) -> ::ActiveSupport::SafeBuffer
+
+      def sort_fields: (?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+                     | (Nodes::Sort | Array[Nodes::Sort] objects, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def condition_fields: (?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+                          | (Nodes::Condition | Array[Nodes::Condition] objects, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def grouping_fields: (?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+                         | (Nodes::Grouping | Array[Nodes::Grouping] objects, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def attribute_fields: (?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+                          | (Nodes::Attribute | Array[Nodes::Attribute] objects, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def predicate_fields: (?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def value_fields: (?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+                      | (Nodes::Value | Array[Nodes::Value] objects, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def sort_link: (Symbol | String attribute, *String | Array[String | Symbol] | Hash[Symbol, untyped] args) -> ::ActiveSupport::SafeBuffer
+
+      def sort_url: (Symbol | String attribute, *String | Array[String | Symbol] | Hash[Symbol, untyped] args) -> String
+    end
+
+    module FormHelper
+      def search_form_for: (Search | Array[untyped] record, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> String
+
+      def search_form_with: (?Hash[Symbol, untyped] record_or_options, ?Hash[Symbol, untyped] options) ?{ (FormBuilder builder) -> untyped } -> String
+                          | (Search record, ?Hash[Symbol, untyped] options) ?{ (FormBuilder builder) -> untyped } -> String
+
+      def turbo_search_form_for: (Search | Array[untyped] record, ?Hash[Symbol, untyped] options) { (FormBuilder builder) -> untyped } -> String
+
+      def sort_link: (Search | [Symbol, Search] search_object, Symbol | String attribute, *String | Array[String | Symbol] | Hash[Symbol, untyped] args) ?{ () -> untyped } -> ::ActiveSupport::SafeBuffer
+
+      def sort_url: (Search | [Symbol, Search] search_object, Symbol | String attribute, *String | Array[String | Symbol] | Hash[Symbol, untyped] args) -> String
+    end
+  end
+end
+
+class ActiveRecord::Base
+  extend Ransack::Adapters::ActiveRecord::Base
+end
+
+class ActiveRecord::Relation
+  def ransack: (?Ransack::search_params params, ?Ransack::search_options options) -> Ransack::Search
+
+  def ransack!: (?Ransack::search_params params, ?Ransack::search_options options) -> Ransack::Search
+end

@@ -1,0 +1,47 @@
+module FriendlyId
+  module Base[Model, Relation]
+    def friendly_id: (
+      ?(Symbol | String)? base,
+      ?use: module_name | Array[module_name]?,
+      ?dependent: Symbol | false | nil,
+      ?routes: Symbol | bool,
+      ?finder_methods: Module,
+      ?scope: Symbol | String | Array[Symbol | String],
+      ?slug_column: Symbol | String,
+      ?slug_limit: Integer?,
+      ?sequence_separator: String,
+      ?slug_generator_class: Class,
+      ?treat_numeric_as_conflict: bool,
+      ?reserved_words: Array[String]?,
+      ?treat_reserved_as_conflict: bool
+    ) ?{ (Configuration) -> void } -> void
+                   | (?(Symbol | String)? base, ?Hash[Symbol, untyped] options) ?{ (Configuration) -> void } -> void
+
+    def friendly: () -> (Relation & FinderMethods[Model])
+
+    def friendly_id_config: () -> Configuration
+  end
+
+  module Model
+    def friendly_id_config: () -> Configuration
+
+    def friendly_id: () -> String?
+
+    def to_param: () -> String?
+  end
+
+  module FinderMethods[Model]
+    def find: (String | Integer | ::ActiveRecord::Base id, ?allow_nil: false) -> Model
+            | (String | Integer | ::ActiveRecord::Base id, allow_nil: true) -> Model?
+            | (Array[String | Integer | ::ActiveRecord::Base] ids) -> Array[Model]
+
+    def exists?: (?untyped conditions) -> bool
+
+    def find_by_friendly_id: (untyped id) -> Model
+
+    def exists_by_friendly_id?: (untyped id) -> bool
+  end
+
+  module Finders
+  end
+end

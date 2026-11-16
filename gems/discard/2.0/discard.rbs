@@ -1,0 +1,87 @@
+# A model that includes `Discard::Model` needs its class-side API declared
+# in the model's own signature:
+#
+#   class Post < ApplicationRecord
+#     class ActiveRecord_Relation < ::ActiveRecord::Relation
+#       include ::_ActiveRecord_Relation[::Post, ::Integer]
+#       include ::Enumerable[::Post]
+#       include Discard::Model::QueryMethods[::Post, ::Post::ActiveRecord_Relation]
+#     end
+#
+#     include Discard::Model
+#     extend Discard::Model::ClassMethods[::Post, ::Post::ActiveRecord_Relation]
+#   end
+#
+module Discard
+  VERSION: String
+
+  type discard_callback[T] = Symbol | ^(T) [self: T] -> void
+  type discard_condition[T] = Symbol | ^(T) [self: T] -> boolish
+
+  class DiscardError < StandardError
+  end
+
+  class RecordNotDiscarded < DiscardError
+    attr_reader record: ::ActiveRecord::Base?
+  end
+
+  class RecordNotUndiscarded < DiscardError
+    attr_reader record: ::ActiveRecord::Base?
+  end
+
+  module Model
+    # Scopes and bulk operations. Mix this into the model's `ActiveRecord_Relation`
+    # to call them on relations such as `Post.where(...).kept`.
+    module QueryMethods[Model, Relation]
+      def kept: () -> Relation
+
+      def undiscarded: () -> Relation
+
+      def discarded: () -> Relation
+
+      def with_discarded: () -> Relation
+
+      def discard_all: () -> Array[Model]
+
+      def discard_all!: () -> Array[Model]
+
+      def undiscard_all: () -> Array[Model]
+
+      def undiscard_all!: () -> Array[Model]
+    end
+
+    module ClassMethods[Model, Relation]
+      include QueryMethods[Model, Relation]
+
+      def discard_column: () -> (Symbol | String)
+
+      def discard_column=: ((Symbol | String) column) -> (Symbol | String)
+
+      def before_discard: (*discard_callback[instance], ?if: discard_condition[instance], ?unless: discard_condition[instance]) ?{ () [self: instance] -> void } -> void
+
+      def around_discard: (*discard_callback[instance], ?if: discard_condition[instance], ?unless: discard_condition[instance]) ?{ (instance, ^() -> void) [self: instance] -> void } -> void
+
+      def after_discard: (*discard_callback[instance], ?if: discard_condition[instance], ?unless: discard_condition[instance]) ?{ () [self: instance] -> void } -> void
+
+      def before_undiscard: (*discard_callback[instance], ?if: discard_condition[instance], ?unless: discard_condition[instance]) ?{ () [self: instance] -> void } -> void
+
+      def around_undiscard: (*discard_callback[instance], ?if: discard_condition[instance], ?unless: discard_condition[instance]) ?{ (instance, ^() -> void) [self: instance] -> void } -> void
+
+      def after_undiscard: (*discard_callback[instance], ?if: discard_condition[instance], ?unless: discard_condition[instance]) ?{ () [self: instance] -> void } -> void
+    end
+
+    def discarded?: () -> bool
+
+    def undiscarded?: () -> bool
+
+    alias kept? undiscarded?
+
+    def discard: () -> bool
+
+    def discard!: () -> true
+
+    def undiscard: () -> bool
+
+    def undiscard!: () -> true
+  end
+end

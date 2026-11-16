@@ -1,0 +1,15 @@
+module ActsAsTaggableOn
+  module Tagger
+    module ClassMethods
+      def acts_as_tagger: (?Hash[Symbol, untyped] options) -> void
+    end
+
+    module InstanceMethods
+      def tag: (::ActiveRecord::Base taggable, on: context, with: tag_input, ?force: bool, ?skip_save: bool) -> bool?
+
+      def owned_taggings: () -> Tagging::ActiveRecord_Associations_CollectionProxy
+
+      def owned_tags: () -> Tag::ActiveRecord_Associations_CollectionProxy
+    end
+  end
+end

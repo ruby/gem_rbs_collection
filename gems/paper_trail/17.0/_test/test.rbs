@@ -1,0 +1,47 @@
+# Methods that has_paper_trail defines on each model (has_many and attr_accessor)
+module ArticleGeneratedMethods
+  def versions: () -> PaperTrail::Version::ActiveRecord_Associations_CollectionProxy
+
+  attr_accessor paper_trail_event: String?
+end
+
+module PageGeneratedMethods
+  def page_versions: () -> PaperTrail::Version::ActiveRecord_Associations_CollectionProxy
+end
+
+module NoteGeneratedMethods
+  def note_versions: () -> PaperTrail::Version::ActiveRecord_Associations_CollectionProxy
+end
+
+class Article < ActiveRecord::Base
+  include ArticleGeneratedMethods
+end
+
+class Page < ActiveRecord::Base
+  include PageGeneratedMethods
+
+  def title: () -> String
+end
+
+class Note < ActiveRecord::Base
+  include NoteGeneratedMethods
+end
+
+class Memo < ActiveRecord::Base
+end
+
+class ArticleVersion < PaperTrail::Version
+end
+
+class ApiController < ActionController::API
+end
+
+class ApplicationController < ActionController::Base
+  def current_user_id: () -> Integer
+
+  def prepare_request: () -> void
+end
+
+module PageTitle
+  def self.of: (untyped page) -> String
+end

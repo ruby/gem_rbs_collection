@@ -1,0 +1,287 @@
+module AASM
+  VERSION: String
+
+  type callback = Symbol | String | Proc | Class
+
+  type callbacks = callback | Array[callback]
+
+  type state_machine_name = Symbol | String
+
+  # Extend the including class with this module in the class's own RBS.
+  module ClassMethods
+    def aasm: (
+      ?state_machine_name name,
+      ?column: Symbol | String,
+      ?whiny_transitions: boolish,
+      ?create_scopes: boolish,
+      ?skip_validation_on_save: boolish,
+      ?whiny_persistence: boolish,
+      ?use_transactions: boolish,
+      ?requires_new_transaction: boolish,
+      ?requires_lock: boolish | String,
+      ?timestamps: boolish,
+      ?no_direct_assignment: boolish,
+      ?with_klass: singleton(AASM::Base),
+      ?enum: boolish | Symbol | String,
+      ?namespace: boolish | Symbol | String,
+      ?logger: ::Logger
+    ) ?{ () [self: AASM::Base] -> void } -> AASM::Base
+  end
+
+  def aasm: (?state_machine_name name) -> AASM::InstanceBase
+
+  class UnknownStateMachineError < RuntimeError
+  end
+
+  class InvalidTransition < RuntimeError
+    attr_reader object: untyped
+    attr_reader event_name: Symbol
+    attr_reader originating_state: Symbol?
+    attr_reader failures: Array[Symbol | String | Method]
+    attr_reader state_machine_name: Symbol
+
+    def reasoning: () -> String?
+  end
+
+  class UndefinedState < RuntimeError
+  end
+
+  class UndefinedEvent < UndefinedState
+  end
+
+  class NoDirectAssignmentError < RuntimeError
+  end
+
+  class Configuration
+    def self.hide_warnings: () -> bool?
+
+    def self.hide_warnings=: (boolish value) -> boolish
+
+    attr_accessor column: Symbol?
+    attr_accessor whiny_transitions: bool?
+    attr_accessor create_scopes: bool?
+    attr_accessor whiny_persistence: bool?
+    attr_accessor skip_validation_on_save: bool?
+    attr_accessor use_transactions: bool?
+    attr_accessor requires_new_transaction: bool?
+    attr_accessor requires_lock: (bool | String)?
+    attr_accessor timestamps: bool?
+    attr_accessor no_direct_assignment: bool?
+    attr_accessor with_klass: singleton(AASM::Base)?
+    attr_accessor enum: (bool | Symbol | String)?
+    attr_accessor namespace: (bool | Symbol | String)?
+    attr_accessor logger: ::Logger?
+  end
+
+  class StateMachine
+    attr_reader name: Symbol
+    attr_reader states: Array[Core::State]
+    attr_reader events: Hash[Symbol, Core::Event]
+    attr_reader initial_state: (Symbol | String | Proc)?
+    attr_reader config: Configuration
+  end
+
+  class Base
+    type initial_state = Symbol | String | Proc
+
+    attr_reader klass: Class
+    attr_reader state_machine: StateMachine
+
+    def attribute_name: () -> Symbol
+                      | (Symbol | String column_name) -> Symbol
+
+    def initial_state: () -> initial_state?
+                     | (initial_state new_initial_state) -> initial_state
+
+    def state: (
+      *Symbol names,
+      ?initial: boolish,
+      ?display: String,
+      ?before_enter: callbacks,
+      ?enter: callbacks,
+      ?after_enter: callbacks,
+      ?before_exit: callbacks,
+      ?exit: callbacks,
+      ?after_exit: callbacks
+    ) -> void
+
+    def event: (
+      Symbol name,
+      ?guard: callbacks,
+      ?guards: callbacks,
+      ?if: callbacks,
+      ?unless: callbacks,
+      ?after: callbacks,
+      ?after_commit: callbacks,
+      ?after_transaction: callbacks,
+      ?before: callbacks,
+      ?before_transaction: callbacks,
+      ?ensure: callbacks,
+      ?error: callbacks,
+      ?before_success: callbacks,
+      ?success: callbacks,
+      ?binding_event: Symbol
+    ) ?{ () [self: AASM::Core::_EventDSL] -> void } -> void
+
+    def after_all_transitions: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def after_all_transactions: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def before_all_transactions: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def before_all_events: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def after_all_events: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def error_on_all_events: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def ensure_on_all_events: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+    def states: () -> Array[Core::State]
+
+    def events: () -> Array[Core::Event]
+
+    def human_event_name: (Symbol | String event) -> String
+
+    def states_for_select: () -> Array[[String, String]]
+
+    def from_states_for_state: (Symbol state, ?transition: Symbol) -> Array[Symbol?]
+  end
+
+  class InstanceBase
+    attr_accessor from_state: Symbol?
+    attr_accessor to_state: Symbol?
+    attr_accessor current_event: Symbol?
+
+    def current_state: () -> Symbol?
+
+    def current_state=: (Symbol | String state) -> (Symbol | String)
+
+    def human_state: () -> String
+
+    def states: () -> Array[Core::State]
+              | (?permitted: boolish) -> Array[Core::State]?
+              | ({ ?permitted: boolish } options, *untyped args) -> Array[Core::State]?
+
+    def events: (?state: Symbol, ?reject: Symbol | Array[Symbol], ?permitted: boolish) -> Array[Core::Event]
+              | ({ ?state: Symbol, ?reject: Symbol | Array[Symbol], ?permitted: boolish } options, *untyped args) -> Array[Core::Event]
+
+    def permitted_transitions: () -> Array[{ event: Symbol, state: Symbol }]
+
+    def may_fire_event?: (Symbol name, *untyped args) -> bool
+
+    def fire: (Symbol | String event_name, *untyped args) ?{ () -> void } -> bool
+
+    def fire!: (Symbol | String event_name, *untyped args) ?{ () -> void } -> bool
+  end
+
+  module Core
+    interface _EventDSL
+      def before: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def after: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def success: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def error: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def ensure: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def before_success: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def before_transaction: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def after_commit: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def after_transaction: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def transitions: (
+        ?from: Symbol | Array[Symbol],
+        ?to: Symbol,
+        ?guard: callbacks,
+        ?guards: callbacks,
+        ?if: callbacks,
+        ?unless: callbacks,
+        ?after: callbacks,
+        ?success: callbacks
+      ) ?{ () [self: _TransitionDSL] -> void } -> Array[Transition]
+    end
+
+    interface _TransitionDSL
+      def guard: (*callback callbacks) ?{ (*untyped) [self: untyped] -> boolish } -> void
+
+      def after: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+
+      def success: (*callback callbacks) ?{ (*untyped) [self: untyped] -> untyped } -> void
+    end
+
+    class State
+      attr_reader name: Symbol
+      attr_reader state_machine: StateMachine
+      attr_reader options: Hash[Symbol, untyped]
+      attr_reader default_display_name: String
+
+      def ==: (untyped state) -> bool
+
+      def <=>: (untyped state) -> Integer?
+
+      def to_s: () -> String
+
+      def display_name: () -> String
+
+      def localized_name: () -> String
+
+      alias human_name localized_name
+
+      def for_select: () -> [String, String]
+    end
+
+    class Event
+      attr_reader name: Symbol
+      attr_reader state_machine: StateMachine
+      attr_reader options: Hash[Symbol, untyped]
+      attr_reader default_display_name: String
+
+      def transitions: (
+        ?from: Symbol | Array[Symbol],
+        ?to: Symbol,
+        ?guard: callbacks,
+        ?guards: callbacks,
+        ?if: callbacks,
+        ?unless: callbacks,
+        ?after: callbacks,
+        ?success: callbacks
+      ) ?{ () [self: _TransitionDSL] -> void } -> Array[Transition]
+
+      def transitions_from_state?: (Symbol state) -> bool
+
+      def transitions_from_state: (Symbol state) -> Array[Transition]
+
+      def transitions_to_state?: (Symbol state) -> bool
+
+      def transitions_to_state: (Symbol state) -> Array[Transition]
+
+      def failed_callbacks: () -> Array[Symbol | String | Method]
+
+      def ==: (untyped event) -> bool
+
+      def to_s: () -> String
+    end
+
+    class Transition
+      attr_reader from: Symbol?
+      attr_reader to: Symbol
+      attr_reader event: Event
+      attr_reader opts: Hash[Symbol, untyped]
+      attr_reader failures: Array[Symbol | String | Method]
+
+      def options: () -> Hash[Symbol, untyped]
+
+      def allowed?: (untyped record, *untyped args) -> bool
+
+      def from?: (untyped value) -> bool
+
+      def ==: (untyped transition) -> bool
+    end
+  end
+end

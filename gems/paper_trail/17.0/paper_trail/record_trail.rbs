@@ -1,0 +1,21 @@
+module PaperTrail
+  class RecordTrail
+    def live?: () -> bool
+
+    def next_version: () -> ActiveRecord::Base?
+
+    def originator: () -> String?
+
+    def previous_version: () -> ActiveRecord::Base?
+
+    def save_with_version: (?in_after_callback: bool, **untyped options) -> bool
+
+    def update_column: (Symbol | String name, untyped value) -> void
+
+    def update_columns: (Hash[Symbol | String, untyped] attributes) -> void
+
+    def version_at: (Time | Date | DateTime timestamp, ?Hash[Symbol, untyped] reify_options) -> ActiveRecord::Base?
+
+    def versions_between: (Time | Date | DateTime start_time, Time | Date | DateTime end_time) -> Array[ActiveRecord::Base?]
+  end
+end

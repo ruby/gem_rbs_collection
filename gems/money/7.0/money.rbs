@@ -1,0 +1,311 @@
+class Money
+  include Comparable
+
+  type currency_like = Money::Currency | String | Symbol
+
+  class UndefinedSmallestDenomination < StandardError
+  end
+
+  class Currency
+    include Comparable
+
+    extend Enumerable[Money::Currency]
+
+    class UnknownCurrency < ArgumentError
+    end
+
+    class NoCurrency < ArgumentError
+    end
+
+    def self.find: ((String | Symbol) id) -> Money::Currency?
+
+    def self.find_by_iso_numeric: ((String | Numeric) num) -> Money::Currency?
+
+    def self.wrap: (Money::Currency? object) -> Money::Currency?
+                 | (String | Symbol object) -> Money::Currency
+
+    def self.all: () -> Array[Money::Currency]
+
+    def self.each: () { (Money::Currency) -> untyped } -> untyped
+
+    def self.register: (Hash[Symbol, untyped] curr) -> void
+
+    def self.inherit: (String | Symbol parent_iso_code, Hash[Symbol, untyped] curr) -> void
+
+    def self.unregister: (Hash[Symbol, untyped] | String | Symbol curr) -> bool
+
+    attr_reader id: Symbol
+
+    attr_reader priority: Integer?
+
+    attr_reader iso_code: String
+
+    attr_reader iso_numeric: String?
+
+    attr_reader name: String
+
+    attr_reader symbol: String?
+
+    attr_reader disambiguate_symbol: String?
+
+    attr_reader html_entity: String?
+
+    attr_reader subunit: String?
+
+    attr_reader subunit_to_unit: Integer
+
+    attr_reader decimal_mark: String
+
+    attr_reader thousands_separator: String
+
+    attr_reader symbol_first: bool
+
+    attr_reader smallest_denomination: Integer?
+
+    def initialize: ((String | Symbol) id) -> void
+
+    def <=>: (untyped other_currency) -> Integer?
+
+    def ==: (untyped other_currency) -> bool
+
+    def eql?: (untyped other_currency) -> bool
+
+    def hash: () -> Integer
+
+    def inspect: () -> String
+
+    def to_s: () -> String
+
+    def to_str: () -> String
+
+    def to_sym: () -> Symbol
+
+    def to_currency: () -> Money::Currency
+
+    def code: () -> String
+
+    def symbol_first?: () -> bool
+
+    def iso?: () -> boolish
+
+    def cents_based?: () -> bool
+
+    def exponent: () -> Integer
+
+    def decimal_places: () -> Integer
+
+    def separator: () -> String
+
+    def delimiter: () -> String
+  end
+
+  module Bank
+    class Error < StandardError
+    end
+
+    class UnknownRate < Error
+    end
+
+    class UnknownRateFormat < StandardError
+    end
+
+    class DifferentCurrencyError < Error
+    end
+
+    class Base
+      def self.instance: () -> instance
+
+      attr_reader rounding_method: (^(Numeric) -> Numeric)?
+
+      def initialize: () ?{ (Numeric) -> Numeric } -> void
+
+      def exchange_with: (Money from, Money::currency_like to_currency) ?{ (Numeric) -> Numeric } -> Money
+
+      def same_currency?: (Money::currency_like currency1, Money::currency_like currency2) -> bool
+    end
+
+    class VariableExchange < Base
+      def initialize: (?untyped store) ?{ (Numeric) -> Numeric } -> void
+
+      def store: () -> untyped
+
+      def add_rate: (Money::currency_like from, Money::currency_like to, Numeric rate) -> Numeric
+
+      def set_rate: (Money::currency_like from, Money::currency_like to, Numeric rate, ?Hash[Symbol, untyped] opts) -> Numeric
+
+      def get_rate: (Money::currency_like from, Money::currency_like to, ?Hash[Symbol, untyped] opts) -> Numeric?
+
+      def rates: () -> Hash[String, Numeric]
+    end
+
+    class SingleCurrency < Base
+    end
+  end
+
+  module LocaleBackend
+    class Base
+    end
+
+    class NotSupported < StandardError
+    end
+
+    class Unknown < ArgumentError
+    end
+  end
+
+  def self.from_cents: (Numeric | String | Money obj, ?Money::currency_like? currency, ?Hash[Symbol, untyped] options) -> Money
+
+  def self.from_amount: (Numeric amount, ?Money::currency_like? currency, ?Hash[Symbol, untyped] options) -> Money
+
+  %a{deprecated: Use Money.from_amount instead (deprecated since money 7.0)}
+  def self.from_dollars: (Numeric amount, ?Money::currency_like? currency, ?Hash[Symbol, untyped] options) -> Money
+
+  def self.empty: (?Money::currency_like currency) -> Money
+
+  def self.zero: (?Money::currency_like currency) -> Money
+
+  def self.us_dollar: (Numeric cents) -> Money
+
+  def self.ca_dollar: (Numeric cents) -> Money
+
+  def self.euro: (Numeric cents) -> Money
+
+  def self.pound_sterling: (Numeric pence) -> Money
+
+  def self.default_currency: () -> Money::Currency?
+
+  def self.default_currency=: (Money::currency_like? | ^() -> Money::currency_like currency) -> void
+
+  def self.default_bank: () -> Money::Bank::Base
+
+  def self.default_bank=: (Money::Bank::Base | ^() -> Money::Bank::Base bank) -> void
+
+  def self.with_bank: [T] (Money::Bank::Base bank) { () -> T } -> T
+
+  def self.rounding_mode: () -> (Integer | Symbol)
+
+  def self.rounding_mode=: (Integer | Symbol new_rounding_mode) -> void
+
+  def self.with_rounding_mode: [T] (Integer | Symbol mode) { () -> T } -> T
+
+  def self.locale_backend: () -> Money::LocaleBackend::Base?
+
+  def self.locale_backend=: (Symbol? value) -> void
+
+  def self.default_infinite_precision: () -> bool
+
+  def self.default_infinite_precision=: (boolish value) -> void
+
+  def self.conversion_precision: () -> Integer
+
+  def self.conversion_precision=: (Integer value) -> void
+
+  def self.strict_eql_compare: () -> bool
+
+  def self.strict_eql_compare=: (boolish value) -> void
+
+  def self.default_formatting_rules: () -> Hash[Symbol, untyped]?
+
+  def self.default_formatting_rules=: (Hash[Symbol, untyped]? value) -> void
+
+  def self.add_rate: (Money::currency_like from_currency, Money::currency_like to_currency, Numeric rate) -> Numeric
+
+  def self.disallow_currency_conversion!: () -> void
+
+  attr_reader currency: Money::Currency
+
+  attr_reader bank: Money::Bank::Base
+
+  def initialize: (Numeric | String | Money obj, ?Money::currency_like? currency, ?Hash[Symbol, untyped] options) -> void
+
+  def cents: () -> (Integer | BigDecimal)
+
+  def fractional: () -> (Integer | BigDecimal)
+
+  %a{deprecated: Use Money#amount instead (deprecated since money 7.0)}
+  def dollars: () -> BigDecimal
+
+  def amount: () -> BigDecimal
+
+  def hash: () -> Integer
+
+  def symbol: () -> String
+
+  def inspect: () -> String
+
+  def to_s: () -> String
+
+  def to_d: () -> BigDecimal
+
+  def to_i: () -> Integer
+
+  def to_f: () -> Float
+
+  def to_money: (?Money::currency_like? given_currency) -> Money
+
+  def with_currency: (Money::currency_like new_currency) -> Money
+
+  def exchange_to: (Money::currency_like other_currency) ?{ (Numeric) -> Numeric } -> Money
+
+  def as_us_dollar: () -> Money
+
+  def as_ca_dollar: () -> Money
+
+  def as_euro: () -> Money
+
+  def allocate: (Numeric | Array[Numeric] parts) -> Array[Money]
+
+  def split: (Numeric | Array[Numeric] parts) -> Array[Money]
+
+  def round: (?(Integer | Symbol) rounding_mode, ?Integer rounding_precision) -> Money
+
+  %a{deprecated: Use Money#to_nearest_cash_value.fractional instead (deprecated since money 7.0)}
+  def round_to_nearest_cash_value: () -> (Integer | BigDecimal)
+
+  def to_nearest_cash_value: () -> Money
+
+  def format: (*Hash[Symbol, untyped] rules) -> String
+
+  def thousands_separator: () -> String
+
+  def decimal_mark: () -> String
+
+  def -@: () -> Money
+
+  def +: (Money | Numeric other) -> Money
+
+  def -: (Money | Numeric other) -> Money
+
+  def *: (Numeric value) -> Money
+
+  def /: (Money value) -> Float
+       | (Numeric value) -> Money
+
+  def div: (Money value) -> Float
+         | (Numeric value) -> Money
+
+  def divmod: (Money val) -> [Integer, Money]
+            | (Numeric val) -> [Money, Money]
+
+  def modulo: (Money | Numeric val) -> Money
+
+  def %: (Money | Numeric val) -> Money
+
+  def remainder: (Money | Numeric val) -> Money
+
+  def abs: () -> Money
+
+  def zero?: () -> bool
+
+  def nonzero?: () -> Money?
+
+  def positive?: () -> bool
+
+  def negative?: () -> bool
+
+  def <=>: (untyped other) -> Integer?
+
+  def ==: (untyped other) -> bool
+
+  def eql?: (untyped other_money) -> bool
+end

@@ -1,0 +1,47 @@
+module PostScopes
+  def search_by_title: (String query) -> Post::ActiveRecord_Relation
+  def search_by_content: (String query) -> Post::ActiveRecord_Relation
+end
+
+module PostColumns
+  def title: () -> String
+  def author_id: () -> Integer
+end
+
+class Post < ActiveRecord::Base
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::_ActiveRecord_Relation[::Post, ::Integer]
+    include ::Enumerable[::Post]
+    include PgSearch::ScopeOptions::WithPgSearchRank
+    include PgSearch::ScopeOptions::WithPgSearchHighlight
+  end
+
+  include PgSearch::Model
+  extend PgSearch::Model::ClassMethods
+  extend PostScopes
+  include PgSearch::Multisearchable
+  include PostColumns
+
+  def self.rank_of_first: () -> Float?
+
+  def published?: () -> bool
+end
+
+module CommentColumns
+  def body: () -> String
+end
+
+class Tag < ActiveRecord::Base
+  include PgSearch::Model
+  extend PgSearch::Model::ClassMethods
+end
+
+class Comment < ActiveRecord::Base
+  include PgSearch::Model
+  extend PgSearch::Model::ClassMethods
+  include PgSearch::Multisearchable
+  include CommentColumns
+
+  def attrs_for_document: () -> Hash[Symbol, untyped]
+  def visible?: () -> bool
+end

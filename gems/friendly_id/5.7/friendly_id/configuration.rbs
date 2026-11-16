@@ -1,0 +1,34 @@
+module FriendlyId
+  class Configuration
+    include Slugged::Configuration
+
+    include Reserved::Configuration
+
+    include Scoped::Configuration
+
+    include History::Configuration
+
+    attr_writer base: Symbol | String
+
+    attr_reader defaults: Hash[Symbol, untyped]
+
+    attr_reader modules: Array[Module]
+
+    attr_accessor model_class: Class
+
+    attr_accessor finder_methods: Module
+
+    attr_accessor dependent: Symbol | false | nil
+
+    attr_accessor routes: Symbol | bool
+
+    def use: (*module_name | Array[module_name] modules) -> Array[Class?]
+
+    def uses?: (module_name mod) -> bool?
+
+    def query_field: () -> (String | Symbol)
+
+    def base: () -> (Symbol | String)?
+            | (Symbol | String value) -> (Symbol | String)
+  end
+end

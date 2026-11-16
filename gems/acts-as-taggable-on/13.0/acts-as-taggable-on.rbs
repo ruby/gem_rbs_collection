@@ -1,0 +1,109 @@
+# A model that calls `acts_as_taggable` or `acts_as_taggable_on` needs the
+# following in its own signature (`tag_list`, `tags`, `tag_counts` and
+# `top_tags` exist only for the default `tags` context, so `TagsContext` and
+# `TagsContext::QueryMethods` are optional):
+#
+#   class Post < ApplicationRecord
+#     class ActiveRecord_Relation < ::ActiveRecord::Relation
+#       include ::_ActiveRecord_Relation[::Post, ::Integer]
+#       include ::Enumerable[::Post]
+#       include ActsAsTaggableOn::Taggable::QueryMethods[::Post::ActiveRecord_Relation]
+#       include ActsAsTaggableOn::Taggable::TagsContext::QueryMethods
+#     end
+#
+#     extend ActsAsTaggableOn::Taggable::ClassMethods[::Post, ::Post::ActiveRecord_Relation]
+#     extend ActsAsTaggableOn::Taggable::TagsContext::QueryMethods
+#     include ActsAsTaggableOn::Taggable::InstanceMethods
+#     include ActsAsTaggableOn::Taggable::TagsContext
+#   end
+#
+# A model that calls `acts_as_tagger` additionally needs
+# `include ActsAsTaggableOn::Tagger::InstanceMethods`.
+module ActsAsTaggableOn
+  VERSION: String
+
+  type context = Symbol | String
+
+  type tag_input = String | Array[String]
+
+  class DuplicateTagError < StandardError
+  end
+
+  class Configuration
+    attr_accessor force_lowercase: bool
+
+    attr_accessor force_parameterize: bool
+
+    attr_accessor remove_unused_tags: bool
+
+    attr_accessor default_parser: singleton(GenericParser)
+
+    attr_accessor tags_counter: bool
+
+    attr_accessor tags_table: context
+
+    attr_accessor taggings_table: context
+
+    attr_reader delimiter: String | Array[String]
+
+    attr_reader strict_case_match: bool
+
+    attr_reader base_class: String
+
+    def strict_case_match=: (bool strict_case_match) -> void
+
+    def force_binary_collation=: (bool force_binary_collation) -> void
+
+    def base_class=: (String base_class) -> void
+  end
+
+  def self.setup: () ?{ (Configuration) -> void } -> void
+
+  def self.glue: () -> String
+
+  def self.force_lowercase: () -> bool
+
+  def self.force_lowercase=: (bool value) -> void
+
+  def self.force_parameterize: () -> bool
+
+  def self.force_parameterize=: (bool value) -> void
+
+  def self.remove_unused_tags: () -> bool
+
+  def self.remove_unused_tags=: (bool value) -> void
+
+  def self.default_parser: () -> singleton(GenericParser)
+
+  def self.default_parser=: (singleton(GenericParser) parser) -> void
+
+  def self.tags_counter: () -> bool
+
+  def self.tags_counter=: (bool value) -> void
+
+  def self.tags_table: () -> context
+
+  def self.tags_table=: (context value) -> void
+
+  def self.taggings_table: () -> context
+
+  def self.taggings_table=: (context value) -> void
+
+  def self.delimiter: () -> (String | Array[String])
+
+  def self.strict_case_match: () -> bool
+
+  def self.strict_case_match=: (bool value) -> void
+
+  def self.force_binary_collation=: (bool value) -> void
+
+  def self.base_class: () -> String
+
+  def self.base_class=: (String value) -> void
+end
+
+class ActiveRecord::Base
+  extend ActsAsTaggableOn::Taggable
+
+  extend ActsAsTaggableOn::Tagger::ClassMethods
+end

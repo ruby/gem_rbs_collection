@@ -1,0 +1,30 @@
+module ActsAsTaggableOn
+  class GenericParser
+    def initialize: (tag_input tag_list) -> void
+
+    def parse: () -> TagList
+  end
+
+  class DefaultParser < GenericParser
+  end
+
+  class TagList < Array[String]
+    attr_accessor owner: untyped
+
+    attr_accessor parser: singleton(GenericParser)
+
+    def initialize: (*tag_input names, ?parse: bool, ?parser: singleton(GenericParser)) -> void
+
+    def add: (*tag_input names, ?parse: bool, ?parser: singleton(GenericParser)) -> self
+
+    def remove: (*tag_input names, ?parse: bool, ?parser: singleton(GenericParser)) -> self
+
+    def <<: (tag_input name) -> self
+
+    def +: (Array[String] other) -> TagList
+
+    def concat: (Array[String] other) -> self
+
+    def to_s: () -> String
+  end
+end

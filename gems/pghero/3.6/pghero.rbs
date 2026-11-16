@@ -1,0 +1,264 @@
+module PgHero
+  VERSION: String
+
+  class Error < StandardError
+  end
+
+  class NotEnabled < Error
+  end
+
+  class Engine < ::Rails::Engine
+  end
+
+  class HomeController < ::ActionController::Base
+  end
+
+  def self.long_running_query_sec: () -> Integer
+  def self.long_running_query_sec=: (Integer value) -> Integer
+  def self.slow_query_ms: () -> Integer
+  def self.slow_query_ms=: (Integer value) -> Integer
+  def self.slow_query_calls: () -> Integer
+  def self.slow_query_calls=: (Integer value) -> Integer
+  def self.explain_timeout_sec: () -> Float
+  def self.explain_timeout_sec=: (Numeric value) -> Numeric
+  def self.total_connections_threshold: () -> Integer
+  def self.total_connections_threshold=: (Integer value) -> Integer
+  def self.cache_hit_rate_threshold: () -> Integer
+  def self.cache_hit_rate_threshold=: (Integer value) -> Integer
+  def self.env: () -> String
+  def self.env=: (String value) -> String
+  def self.show_migrations: () -> bool
+  def self.show_migrations=: (bool value) -> bool
+  def self.config_path: () -> String
+  def self.config_path=: (String value) -> String
+  def self.filter_data: () -> bool
+  def self.filter_data=: (bool value) -> bool
+
+  def self.time_zone: () -> ActiveSupport::TimeZone?
+  def self.time_zone=: (ActiveSupport::TimeZone | String | Symbol time_zone) -> void
+  def self.username: () -> String?
+  def self.password: () -> String?
+  def self.stats_database_url: () -> String?
+  def self.visualize_url: () -> String
+  def self.config: () -> Hash[String, untyped]
+  def self.databases: () -> Hash[Symbol, Database]
+  def self.capture_query_stats: (?verbose: bool) -> true
+  def self.capture_space_stats: (?verbose: bool) -> true
+  def self.analyze_all: (?verbose: bool, ?min_size: Integer?, ?tables: String | Array[String] | nil) -> true
+  def self.autoindex_all: (?create: bool, ?verbose: bool) -> true
+  def self.pretty_size: (Numeric value) -> String
+  def self.clean_query_stats: (?before: Time?) -> true
+  def self.clean_space_stats: (?before: Time?) -> true
+
+  def self.query_stats_enabled?: () -> bool
+  def self.query_stats: (
+      ?historical: bool,
+      ?start_at: Time?,
+      ?end_at: Time?,
+      ?min_average_time: Numeric?,
+      ?min_calls: Integer?,
+      ?sort: ("total_minutes" | "average_time" | "calls")?,
+      ?query_hash: Integer | String | nil
+    ) -> Array[Hash[Symbol, untyped]]
+  def self.slow_queries: (
+      ?query_stats: Array[Hash[Symbol, untyped]]?,
+      ?historical: bool,
+      ?start_at: Time?,
+      ?end_at: Time?,
+      ?min_average_time: Numeric?,
+      ?min_calls: Integer?,
+      ?sort: ("total_minutes" | "average_time" | "calls")?,
+      ?query_hash: Integer | String | nil
+    ) -> Array[Hash[Symbol, untyped]]
+  def self.historical_query_stats_enabled?: () -> bool
+  def self.database_size: () -> String
+  def self.total_connections: () -> Integer
+  def self.running_queries: (?min_duration: Integer?, ?all: bool) -> Array[Hash[Symbol, untyped]]
+  def self.long_running_queries: () -> Array[Hash[Symbol, untyped]]
+  def self.blocked_queries: () -> Array[Hash[Symbol, untyped]]
+  def self.index_hit_rate: () -> Numeric?
+  def self.table_hit_rate: () -> Numeric?
+  def self.index_usage: () -> Array[Hash[Symbol, untyped]]
+  def self.unused_indexes: (?max_scans: Integer, ?across: Array[String]) -> Array[Hash[Symbol, untyped]]
+  def self.unused_tables: () -> Array[Hash[Symbol, untyped]]
+  def self.invalid_indexes: (?indexes: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+  def self.duplicate_indexes: (?indexes: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+  def self.sequence_danger: (?threshold: Numeric, ?sequences: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+  def self.transaction_id_danger: (?threshold: Integer, ?max_value: Integer) -> Array[Hash[Symbol, untyped]]
+  def self.autovacuum_danger: () -> Array[Hash[Symbol, untyped]]
+  def self.relation_sizes: () -> Array[Hash[Symbol, untyped]]
+  def self.maintenance_info: () -> Array[Hash[Symbol, untyped]]
+  def self.replica?: () -> bool
+  def self.replication_lag: () -> Numeric?
+  def self.last_stats_reset_time: () -> Time?
+  def self.settings: () -> Hash[Symbol, untyped]
+
+  class Database
+    include Methods::Basic
+    include Methods::Connections
+    include Methods::Constraints
+    include Methods::Explain
+    include Methods::Indexes
+    include Methods::Kill
+    include Methods::Maintenance
+    include Methods::Queries
+    include Methods::QueryStats
+    include Methods::Replication
+    include Methods::Sequences
+    include Methods::Settings
+    include Methods::Space
+    include Methods::Tables
+
+    attr_reader id: String
+    attr_reader config: Hash[String, untyped]
+
+    def name: () -> String
+    def capture_query_stats?: () -> bool
+    def cache_hit_rate_threshold: () -> Integer
+    def total_connections_threshold: () -> Integer
+    def slow_query_ms: () -> Integer
+    def slow_query_calls: () -> Integer
+    def explain_timeout_sec: () -> Float
+    def long_running_query_sec: () -> Integer
+    def index_bloat_bytes: () -> Integer
+  end
+
+  class Stats < ActiveRecord::Base
+  end
+
+  class QueryStats < Stats
+  end
+
+  class SpaceStats < Stats
+  end
+
+  module Methods
+    module Basic
+      def ssl_used?: () -> bool
+      def database_name: () -> String
+      def current_user: () -> String
+      def server_version: () -> String
+      def server_version_num: () -> Integer
+      def quote_ident: (String value) -> String
+    end
+
+    module Connections
+      def connections: () -> Array[Hash[Symbol, untyped]]
+      def total_connections: () -> Integer
+      def connection_states: () -> Hash[String, Integer]
+      def connection_sources: () -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Constraints
+      def invalid_constraints: () -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Explain
+      def explain: (String sql) -> String
+      def explain_v2: (String sql, ?analyze: bool?, ?verbose: bool?, ?costs: bool?, ?settings: bool?, ?generic_plan: bool?, ?buffers: bool?, ?wal: bool?, ?timing: bool?, ?summary: bool?, ?format: ("text" | "xml" | "json" | "yaml")) -> String
+    end
+
+    module Indexes
+      def index_hit_rate: () -> Numeric?
+      def index_caching: () -> Array[Hash[Symbol, untyped]]
+      def index_usage: () -> Array[Hash[Symbol, untyped]]
+      def missing_indexes: () -> Array[Hash[Symbol, untyped]]
+      def unused_indexes: (?max_scans: Integer, ?across: Array[String]) -> Array[Hash[Symbol, untyped]]
+      def reset_stats: () -> true
+      def last_stats_reset_time: () -> Time?
+      def invalid_indexes: (?indexes: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+      def indexes: () -> Array[Hash[Symbol, untyped]]
+      def duplicate_indexes: (?indexes: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+      def index_bloat: (?min_size: Integer?) -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Kill
+      def kill: (Integer pid) -> bool
+      def kill_long_running_queries: (?min_duration: Integer?) -> true
+      def kill_all: () -> true
+    end
+
+    module Maintenance
+      def transaction_id_danger: (?threshold: Integer, ?max_value: Integer) -> Array[Hash[Symbol, untyped]]
+      def autovacuum_danger: () -> Array[Hash[Symbol, untyped]]
+      def vacuum_progress: () -> Array[Hash[Symbol, untyped]]
+      def maintenance_info: () -> Array[Hash[Symbol, untyped]]
+      def analyze: (String table, ?verbose: bool) -> true
+      def analyze_tables: (?verbose: bool, ?min_size: Integer?, ?tables: String | Array[String] | nil) -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Queries
+      def running_queries: (?min_duration: Integer?, ?all: bool) -> Array[Hash[Symbol, untyped]]
+      def long_running_queries: () -> Array[Hash[Symbol, untyped]]
+      def blocked_queries: () -> Array[Hash[Symbol, untyped]]
+    end
+
+    module QueryStats
+      def query_stats: (
+        ?historical: bool,
+        ?start_at: Time?,
+        ?end_at: Time?,
+        ?min_average_time: Numeric?,
+        ?min_calls: Integer?,
+        ?sort: ("total_minutes" | "average_time" | "calls")?,
+        ?query_hash: Integer | String | nil
+      ) -> Array[Hash[Symbol, untyped]]
+      def query_stats_available?: () -> bool
+      def query_stats_enabled?: () -> bool
+      def query_stats_extension_enabled?: () -> bool
+      def query_stats_readable?: () -> bool
+      def enable_query_stats: () -> true
+      def disable_query_stats: () -> true
+      def reset_query_stats: (?user: String?, ?query_hash: Integer | String | nil, ?raise_errors: bool) -> bool
+      def historical_query_stats_enabled?: () -> bool
+      def capture_query_stats: (?raise_errors: bool) -> void
+      def clean_query_stats: (?before: Time?) -> Integer
+      def slow_queries: (
+        ?query_stats: Array[Hash[Symbol, untyped]]?,
+        ?historical: bool,
+        ?start_at: Time?,
+        ?end_at: Time?,
+        ?min_average_time: Numeric?,
+        ?min_calls: Integer?,
+        ?sort: ("total_minutes" | "average_time" | "calls")?,
+        ?query_hash: Integer | String | nil
+      ) -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Replication
+      def replica?: () -> bool
+      def replication_lag: () -> Numeric?
+      def replication_slots: () -> Array[Hash[Symbol, untyped]]
+      def replicating?: () -> bool
+    end
+
+    module Sequences
+      def sequences: () -> Array[Hash[Symbol, untyped]]
+      def sequence_danger: (?threshold: Numeric, ?sequences: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Settings
+      def settings: () -> Hash[Symbol, untyped]
+      def autovacuum_settings: () -> Hash[Symbol, untyped]
+      def vacuum_settings: () -> Hash[Symbol, untyped]
+    end
+
+    module Space
+      def database_size: () -> String
+      def relation_sizes: () -> Array[Hash[Symbol, untyped]]
+      def table_sizes: () -> Array[Hash[Symbol, untyped]]
+      def space_growth: (?days: Integer, ?relation_sizes: Array[Hash[Symbol, untyped]]?) -> Array[Hash[Symbol, untyped]]
+      def relation_space_stats: (String relation, ?schema: String) -> Array[Hash[Symbol, untyped]]
+      def capture_space_stats: () -> void
+      def clean_space_stats: (?before: Time?) -> Integer
+      def space_stats_enabled?: () -> bool
+    end
+
+    module Tables
+      def table_hit_rate: () -> Numeric?
+      def table_caching: () -> Array[Hash[Symbol, untyped]]
+      def unused_tables: () -> Array[Hash[Symbol, untyped]]
+      def table_stats: (?schema: String?, ?table: String | Array[String] | nil) -> Array[Hash[Symbol, untyped]]
+    end
+  end
+end

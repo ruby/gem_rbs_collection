@@ -1,0 +1,27 @@
+class Article < ActiveRecord::Base
+  extend ActiveRecord::Base::ClassMethods[Article, ActiveRecord_Relation, Integer]
+
+  class ActiveRecord_Relation < ::ActiveRecord::Relation
+    include ::ActiveRecord::Relation::Methods[Article, ::Integer]
+  end
+end
+
+class Comment < ActiveRecord::Base
+end
+
+class CustomRenderer < WillPaginate::ActionView::LinkRenderer
+  def to_html: () -> String
+end
+
+class PostsHelper
+  include WillPaginate::ViewHelpers
+
+  def render_links: (WillPaginate::Collection[String] posts) -> String
+end
+
+class PaginatedView
+  include WillPaginate::ActionView
+
+  def render_links: () -> String
+  def items: () -> WillPaginate::Collection[String]
+end
