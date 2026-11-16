@@ -1,0 +1,178 @@
+module SidekiqUniqueJobs
+  VERSION: String
+
+  class ThreadSafeConfig
+  end
+
+  class Config < ThreadSafeConfig
+    type reaper = :ruby | :lua | :none
+
+    attr_accessor lock_timeout: Integer?
+
+    attr_accessor lock_ttl: Integer?
+
+    attr_accessor enabled: bool
+
+    attr_accessor lock_prefix: String
+
+    attr_accessor logger: Logger
+
+    attr_accessor logger_enabled: bool
+
+    attr_accessor locks: Hash[Symbol, singleton(Lock::BaseLock)]
+
+    attr_accessor strategies: Hash[Symbol, singleton(OnConflict::Strategy)]
+
+    attr_accessor debug_lua: bool
+
+    attr_accessor max_history: Integer
+
+    attr_accessor reaper: reaper | false | nil
+
+    attr_accessor reaper_count: Integer
+
+    attr_accessor reaper_interval: Integer
+
+    attr_accessor reaper_timeout: Integer
+
+    attr_accessor reaper_resurrector_interval: Integer
+
+    attr_accessor reaper_resurrector_enabled: bool
+
+    attr_accessor lock_info: bool
+
+    attr_accessor raise_on_config_error: bool
+
+    attr_accessor digest_algorithm: :modern | :legacy
+
+    attr_accessor locksmith_executor: untyped
+
+    attr_accessor on_conflict: Symbol | Hash[Symbol, Symbol] | nil
+
+    def add_lock: (Symbol | String name, singleton(Lock::BaseLock) klass) -> Hash[Symbol, singleton(Lock::BaseLock)]
+
+    def add_strategy: (Symbol | String name, singleton(OnConflict::Strategy) klass) -> Hash[Symbol, singleton(OnConflict::Strategy)]
+  end
+
+  class Reflections
+    def after_unlock_callback_failed: () { (Hash[String, untyped] job, ?Exception error) -> void } -> void
+
+    def execution_failed: () { (Hash[String, untyped] job, ?Exception error) -> void } -> void
+
+    def lock_failed: () { (Hash[String, untyped] job) -> void } -> void
+
+    def locked: () { (Hash[String, untyped] job) -> void } -> void
+
+    def reschedule_failed: () { (Hash[String, untyped] job) -> void } -> void
+
+    def rescheduled: () { (Hash[String, untyped] job) -> void } -> void
+
+    def timeout: () { (Hash[String, untyped] job) -> void } -> void
+
+    def unknown_sidekiq_worker: () { (Hash[String, untyped] job) -> void } -> void
+
+    def unlock_failed: () { (Hash[String, untyped] job) -> void } -> void
+
+    def unlocked: () { (Hash[String, untyped] job) -> void } -> void
+  end
+
+  class UniqueJobsError < ::RuntimeError
+  end
+
+  class DuplicateLock < UniqueJobsError
+  end
+
+  class DuplicateStrategy < UniqueJobsError
+  end
+
+  class InvalidWorker < UniqueJobsError
+  end
+
+  class Lock
+    class BaseLock
+    end
+  end
+
+  module OnConflict
+    class Strategy
+      attr_reader item: Hash[String, untyped]
+    end
+  end
+
+  module Middleware
+    class Client
+    end
+
+    class Server
+    end
+  end
+
+  class Server
+    def self.configure: (untyped config) -> void
+  end
+
+  module Redis
+    class Entity
+      def exist?: () -> bool
+
+      def pttl: () -> Integer
+
+      def ttl: () -> Integer
+
+      def expires?: () -> bool
+
+      def count: () -> Integer
+    end
+
+    class SortedSet < Entity
+    end
+  end
+
+  class Digests < Redis::SortedSet
+    def initialize: (?String digests_key) -> void
+
+    def delete_by_pattern: (String pattern, ?count: Integer) -> Integer?
+
+    def delete_by_digest: (String digest, ?queuetime: bool, ?runtime: bool) -> Integer
+
+    def entries: (?pattern: String, ?count: Integer) -> Hash[String, Float]
+  end
+
+  class ExpiringDigests < Digests
+    def initialize: () -> void
+  end
+
+  module Unlockable
+    def self.unlock: (Hash[String, untyped] item) -> (String | false)
+
+    def self.unlock!: (Hash[String, untyped] item) -> (String | false)
+
+    def self.delete: (Hash[String, untyped] item) -> bool?
+
+    def self.delete!: (Hash[String, untyped] item) -> bool
+  end
+
+  def self.config: () -> Config
+
+  def self.configure: (?Hash[Symbol, untyped] options) ?{ (Config config) -> void } -> void
+
+  def self.use_config: [T] (?Hash[Symbol, untyped] tmp_config) { () -> T } -> T
+
+  def self.reset!: () -> Config
+
+  def self.logger: () -> Logger
+
+  def self.logger=: (Logger other) -> Logger
+
+  def self.enabled?: () -> bool
+
+  def self.disabled?: () -> bool
+
+  def self.enable!: () ?{ () -> void } -> bool
+
+  def self.disable!: () ?{ () -> void } -> bool
+
+  def self.reflect: () { (Reflections on) -> void } -> void
+
+  def self.validate_worker!: (Hash[String, untyped] options) -> void
+end

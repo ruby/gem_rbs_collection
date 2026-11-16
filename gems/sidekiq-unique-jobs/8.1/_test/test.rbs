@@ -1,0 +1,19 @@
+class ReportWorker
+  include Sidekiq::Job
+  extend Sidekiq::Job::ClassMethods
+  extend Sidekiq::Job::Options::ClassMethods
+
+  def perform: (*untyped args) -> void
+end
+
+class MarkForLaterRun < SidekiqUniqueJobs::OnConflict::Strategy
+  def call: () -> bool
+end
+
+module Locks
+  class LogOnlyLock < SidekiqUniqueJobs::Lock::BaseLock
+    def lock: () -> String
+
+    def execute: () { () -> untyped } -> untyped
+  end
+end
