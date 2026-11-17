@@ -4,7 +4,10 @@ module Marcel
     attr_reader mediatype: String
     attr_reader subtype: String
 
-    def self.by_magic: (IO | StringIO) -> instance
+    def self.by_extension: (_ToS ext) -> instance?
+    def self.by_path: (String | Pathname path) -> instance?
+    def self.by_magic: (IO | StringIO | Tempfile io) -> instance?
+    def self.all_by_magic: (IO | StringIO | Tempfile io) -> Array[instance]
   end
 
   class MimeType
