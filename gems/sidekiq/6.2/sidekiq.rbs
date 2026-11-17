@@ -723,11 +723,11 @@ module Sidekiq
 
       def set: (untyped options) -> self
 
-      def perform_async: (*untyped args) -> String
+      def perform_async: (*untyped args) -> String?
 
       # +interval+ must be a timestamp, numeric or something that acts
       #   numeric (like an activesupport time interval).
-      def perform_in: ((Time | untyped) interval, *untyped args) -> String
+      def perform_in: ((Time | untyped) interval, *untyped args) -> String?
 
       alias perform_at perform_in
     end
@@ -735,11 +735,11 @@ module Sidekiq
     module ClassMethods
       def set: (Hash[Symbol, untyped] options) -> Sidekiq::Worker::Setter
 
-      def perform_async: (*untyped args) -> String
+      def perform_async: (*untyped args) -> String?
 
       # +interval+ must be a timestamp, numeric or something that acts
       #   numeric (like an activesupport time interval).
-      def perform_in: ((Time | untyped) interval, *untyped args) -> String
+      def perform_in: ((Time | untyped) interval, *untyped args) -> String?
 
       alias perform_at perform_in
 
@@ -758,7 +758,7 @@ module Sidekiq
       # options for a specific job.
       def sidekiq_options: (?Hash[Symbol | String, untyped] opts) -> Hash[String, untyped]
 
-      def client_push: (Hash[(Symbol | String), untyped] item) -> String
+      def client_push: (Hash[(Symbol | String), untyped] item) -> String?
     end
   end
 
