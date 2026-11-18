@@ -278,9 +278,11 @@ module ActiveRecord
     def signed_id: (?expires_in: ActiveSupport::Duration?, ?expires_at: Time | ActiveSupport::TimeWithZone | nil, ?purpose: untyped) -> String
 
     module ClassMethods
-      def signed_id_verifier_secret: () -> untyped
+      def signed_id_verifier_secret: () -> (String | ^() -> String)?
 
-      def signed_id_verifier_secret=: (untyped value) -> untyped
+      # Set the secret used for the signed id verifier instance when using Active Record outside of \Rails.
+      # Within \Rails, this is automatically set using the \Rails application key generator.
+      def signed_id_verifier_secret=: ((String | ^() -> String)? value) -> (String | ^() -> String)?
     end
   end
 end
