@@ -391,14 +391,30 @@ class DateTime
   # Layers additional behavior on DateTime#<=> so that Time and
   # ActiveSupport::TimeWithZone instances can be compared with a DateTime.
   def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
+
+  # DateTime acts like a Time, so any Duration keeps it a DateTime;
+  # without these it would inherit the Date overloads above.
+  def +: (ActiveSupport::Duration other) -> self
+       | ...
+
+  def -: (ActiveSupport::Duration other) -> self
+       | ...
 end
 
 # active_support/core_ext/date/calculations.rb
 class Date
-  def +: (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+  # Keep these overloads split by kind: a Duration with only calendar
+  # parts advances the Date and returns a Date, while any clock part
+  # goes through Date#since and returns a Time or TimeWithZone. One
+  # signature for all Durations would be wrong for one of the two.
+  def +: (ActiveSupport::Duration[:calendar] other) -> self
+       | (ActiveSupport::Duration[:clock] other) -> (Time | ActiveSupport::TimeWithZone)
+       | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
        | ...
 
-  def -: (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+  def -: (ActiveSupport::Duration[:calendar] other) -> self
+       | (ActiveSupport::Duration[:clock] other) -> (Time | ActiveSupport::TimeWithZone)
+       | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
        | ...
 
   # Allow Date to be compared with Time by converting to DateTime and relying on the <=> from there.
@@ -469,7 +485,7 @@ end
 
 # active_support/duration.rb
 module ActiveSupport
-  class Duration
+  class Duration[out K = top]
     class Scalar
       def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
     end
