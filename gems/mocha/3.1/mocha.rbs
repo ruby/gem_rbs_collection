@@ -1,0 +1,237 @@
+module Mocha
+  module API
+    include ParameterMatchers::Methods
+
+    def mock: (?Hash[Symbol, untyped] expected_methods_vs_return_values) -> Mock
+            | (String | Symbol name, ?Hash[Symbol, untyped] expected_methods_vs_return_values) -> Mock
+
+    def stub: (?Hash[Symbol, untyped] stubbed_methods_vs_return_values) -> Mock
+            | (String | Symbol name, ?Hash[Symbol, untyped] stubbed_methods_vs_return_values) -> Mock
+
+    def stub_everything: (?Hash[Symbol, untyped] stubbed_methods_vs_return_values) -> Mock
+                       | (String | Symbol name, ?Hash[Symbol, untyped] stubbed_methods_vs_return_values) -> Mock
+
+    def sequence: (String | Symbol name) ?{ () -> void } -> Sequence
+
+    def states: (String name) -> StateMachine
+  end
+
+  module ObjectMethods : BasicObject
+    def expects: (Symbol | String | Hash[Symbol, untyped] expected_methods_vs_return_values) -> Expectation
+
+    def stubs: (Symbol | String | Hash[Symbol, untyped] stubbed_methods_vs_return_values) -> Expectation
+
+    def unstub: (*Symbol method_names) -> void
+  end
+
+  class Mock
+    interface _New[T]
+      def new: (?) -> T
+    end
+
+    def expects: (Symbol | String | Hash[Symbol, untyped] method_name_or_hash, ?untyped backtrace) -> Expectation
+
+    def stubs: (Symbol | String | Hash[Symbol, untyped] method_name_or_hash, ?untyped backtrace) -> Expectation
+
+    def unstub: (*Symbol method_names) -> void
+
+    def responds_like: [T] (T responder) -> (Mock & T)
+    alias quacks_like responds_like
+
+    def responds_like_instance_of: [T] (_New[T] responder_class) -> (Mock & T)
+    alias quacks_like_instance_of responds_like_instance_of
+  end
+
+  class Expectation
+    def times: (Integer | Range[Integer] range_or_number) -> self
+
+    def thrice: () -> self
+
+    def twice: () -> self
+
+    def once: () -> self
+
+    def never: () -> self
+
+    def at_least: (Integer minimum_number_of_times) -> self
+
+    def at_least_once: () -> self
+
+    def at_most: (Integer maximum_number_of_times) -> self
+
+    def at_most_once: () -> self
+
+    def with: (*untyped expected_parameters_or_matchers) ?{ (*untyped) -> boolish } -> self
+
+    def with_block_given: () -> self
+
+    def with_no_block_given: () -> self
+
+    def yields: (*untyped parameters) -> self
+
+    def multiple_yields: (*untyped parameter_groups) -> self
+
+    def returns: (*untyped values) -> self
+
+    def raises: (?Class | Exception | String exception, ?String? message) -> self
+
+    def throws: (Symbol | String tag, ?untyped object) -> self
+
+    def then: (?StateMachine::State state) -> self
+
+    def when: (StateMachine::StatePredicate state_predicate) -> self
+
+    def in_sequence: (Sequence sequence, *Sequence sequences) -> self
+  end
+
+  class Sequence
+  end
+
+  class StateMachine
+    class StatePredicate
+    end
+
+    class State < StatePredicate
+    end
+
+    def starts_as: (String initial_state_name) -> self
+
+    def become: (String next_state_name) -> String
+
+    def is: (String state_name) -> State
+
+    def is_not: (String unexpected_state_name) -> StatePredicate
+  end
+
+  module ParameterMatchers
+    module BaseMethods
+      def &: (BaseMethods other) -> AllOf
+
+      def |: (BaseMethods other) -> AnyOf
+    end
+
+    module Methods
+      def all_of: (*untyped matchers) -> AllOf
+
+      def any_of: (*untyped matchers) -> AnyOf
+
+      def any_parameters: () -> AnyParameters
+
+      def anything: () -> Anything
+
+      def equals: (untyped value) -> Equals
+
+      def equivalent_uri: (String uri) -> EquivalentUri
+
+      def has_entries: (Hash[untyped, untyped] entries) -> HasEntries
+
+      def has_entry: (Hash[untyped, untyped] entry) -> HasEntry
+                   | (untyped key, untyped value) -> HasEntry
+
+      def has_key: (untyped key) -> HasKey
+
+      def has_keys: (*untyped keys) -> HasKeys
+
+      def has_value: (untyped value) -> HasValue
+
+      def includes: (*untyped items) -> Includes
+
+      def instance_of: (Class klass) -> InstanceOf
+
+      def is_a: (Module klass) -> IsA
+
+      def kind_of: (Module klass) -> KindOf
+
+      def Not: (untyped matcher) -> Not
+
+      def optionally: (*untyped matchers) -> Optionally
+
+      def regexp_matches: (Regexp regexp) -> RegexpMatches
+
+      def responds_with: (Hash[Symbol, untyped] messages_vs_results) -> AllOf
+                       | (Symbol message, untyped result) -> RespondsWith
+
+      def yaml_equivalent: (untyped object) -> YamlEquivalent
+    end
+
+    class AllOf
+      include BaseMethods
+    end
+
+    class AnyOf
+      include BaseMethods
+    end
+
+    class AnyParameters
+      include BaseMethods
+    end
+
+    class Anything
+      include BaseMethods
+    end
+
+    class Equals
+      include BaseMethods
+    end
+
+    class EquivalentUri
+      include BaseMethods
+    end
+
+    class HasEntries
+      include BaseMethods
+    end
+
+    class HasEntry
+      include BaseMethods
+    end
+
+    class HasKey
+      include BaseMethods
+    end
+
+    class HasKeys
+      include BaseMethods
+    end
+
+    class HasValue
+      include BaseMethods
+    end
+
+    class Includes
+      include BaseMethods
+    end
+
+    class InstanceOf
+      include BaseMethods
+    end
+
+    class IsA
+      include BaseMethods
+    end
+
+    class KindOf
+      include BaseMethods
+    end
+
+    class Not
+      include BaseMethods
+    end
+
+    class Optionally
+      include BaseMethods
+    end
+
+    class RegexpMatches
+      include BaseMethods
+    end
+
+    class RespondsWith
+      include BaseMethods
+    end
+
+    class YamlEquivalent
+      include BaseMethods
+    end
+  end
+end
