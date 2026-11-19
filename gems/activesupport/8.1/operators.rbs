@@ -1,6 +1,10 @@
 # active_support/duration.rb
 module ActiveSupport
-  class Duration
+  # K records which parts a Duration can hold: :calendar for days, weeks,
+  # months and years, :clock for seconds, minutes and hours, a union of
+  # both when mixed, and top when unknown. Date#+ uses it to tell a Date
+  # result from a Time one.
+  class Duration[out K = top]
     class Scalar
       def coerce: (untyped other) -> [Scalar, self]
                 | ...
@@ -26,20 +30,25 @@ module ActiveSupport
            | ...
     end
 
+    def self.new: (Numeric value, Hash[Symbol, Numeric] parts, ?bool? variable) -> Duration
+
     def coerce: (untyped other) -> [Scalar, self]
               | ...
 
-    def +: (Duration | Numeric other) -> Duration
+    # A Numeric operand is added as seconds.
+    def +: [K2] (Duration[K2] other) -> Duration[K | K2]
+         | (Numeric other) -> Duration[K | :clock]
          | ...
 
-    def -: (Duration | Numeric other) -> Duration
+    def -: [K2] (Duration[K2] other) -> Duration[K | K2]
+         | (Numeric other) -> Duration[K | :clock]
          | ...
 
-    def *: (Duration | Numeric other) -> Duration
+    def *: (Duration | Numeric other) -> Duration[K]
          | ...
 
     def /: (Duration other) -> Numeric
-         | (Numeric other) -> Duration
+         | (Numeric other) -> Duration[K]
          | ...
 
     def %: (Duration | Numeric other) -> Duration
