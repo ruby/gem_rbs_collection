@@ -157,3 +157,11 @@ ActiveRecord::Base.time_zone_aware_types.map(&:to_proc)
 ActiveRecord::Base.record_timestamps = !ActiveRecord::Base.lock_optimistically
 ActiveRecord::Base.enumerate_columns_in_select_statements = !ActiveRecord::Base.cache_versioning
 ActiveRecord::Base.new.record_timestamps = !ActiveRecord::Base.new.pluralize_table_names
+
+# signed_id_verifier_secret holds a String or a lambda returning one
+ActiveRecord::Base.signed_id_verifier_secret = "secret"
+ActiveRecord::Base.signed_id_verifier_secret = -> { "secret" }
+secret = ActiveRecord::Base.signed_id_verifier_secret
+secret.is_a?(String) ? secret.upcase : secret&.call&.upcase
+instance_secret = ActiveRecord::Base.new.signed_id_verifier_secret
+instance_secret.is_a?(String) ? instance_secret.upcase : instance_secret&.call&.upcase
