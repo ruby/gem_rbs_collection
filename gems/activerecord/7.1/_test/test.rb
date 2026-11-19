@@ -24,6 +24,8 @@ ActiveRecord::Base.signed_id_verifier_secret = -> { "secret" }
 ActiveRecord::Base.signed_id_verifier_secret = "secret"
 secret = ActiveRecord::Base.signed_id_verifier_secret
 secret.is_a?(String) ? secret.upcase : secret&.call&.upcase
+instance_secret = ActiveRecord::Base.new.signed_id_verifier_secret
+instance_secret.is_a?(String) ? instance_secret.upcase : instance_secret&.call&.upcase
 ActiveRecord::Base.new.signed_id(expires_at: Time.now + 3600, purpose: :login).length
 
 # Article::ActiveRecord_Relation has no Relation::Methods, so this is Calculations#pluck
