@@ -58,5 +58,5 @@ module Test
   found_rindex = users.rindex(users.first)
 
   # @type var article: Article?
-  article = User.take.articles[0]
+  article = User.take!.articles[0]
 end
