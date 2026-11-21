@@ -605,11 +605,11 @@ module ActiveRecord
       def sum: (?untyped? column_name) -> untyped
              | [T] (?T initial_value) { (Model) -> T } -> T
       def destroy_all: () -> untyped
-      def delete_all: () -> untyped
-      def update_all: (*untyped) -> untyped
-      def touch_all: (*untyped, ?time: untyped) -> untyped
-      def destroy_by: (*untyped) -> untyped
-      def delete_by: (*untyped) -> untyped
+      def delete_all: () -> Integer
+      def update_all: (*untyped) -> Integer
+      def touch_all: (*untyped, ?time: untyped) -> Integer
+      def destroy_by: (*untyped) -> Array[Model]
+      def delete_by: (*untyped) -> Integer
       def each: () { (Model) -> void } -> self
       def select: (*Symbol | String | Arel::Nodes::t) -> self
                 | () { (Model) -> boolish } -> Array[Model]
@@ -701,12 +701,12 @@ module ActiveRecord
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
       def sum: (?untyped? column_name) -> untyped
              | [T] (?T initial_value) { (Model) -> T } -> T
-      def destroy_all: () -> untyped
-      def delete_all: () -> untyped
-      def update_all: (*untyped) -> untyped
-      def touch_all: (*untyped, ?time: untyped) -> untyped
-      def destroy_by: (*untyped) -> untyped
-      def delete_by: (*untyped) -> untyped
+      def destroy_all: () -> Array[Model]
+      def delete_all: () -> Integer
+      def update_all: (*untyped) -> Integer
+      def touch_all: (*untyped, ?time: untyped) -> Integer
+      def destroy_by: (*untyped) -> Array[Model]
+      def delete_by: (*untyped) -> Integer
       def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
