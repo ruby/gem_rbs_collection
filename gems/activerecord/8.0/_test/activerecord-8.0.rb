@@ -54,6 +54,10 @@ module Test
   User.sole.id
   User.all.sole.id
   User.take!.articles.sole.id
+  User.find_sole_by(name: 'name').id
+  User.all.find_sole_by(name: 'name').id
+  User.find_sole_by(['name = ?', 'name']).id
+  User.take!.articles.find_sole_by(id: 1).id
   User.from('users AS users')
   User.from(User.where(:active), :u)
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')

@@ -28,6 +28,7 @@ module ActiveRecord
       def and: (::ActiveRecord::Relation) -> Relation
       def strict_loading: (?bool value) -> Relation
       def sole: () -> Model
+      def find_sole_by: (untyped arg, *untyped args) -> Model
       def from: (untyped value, ?untyped? subquery_name) -> untyped
     end
   end
@@ -396,6 +397,7 @@ module ActiveRecord
       def reorder: (*untyped args) -> self
       def unscope: (*untyped args) -> self
       def sole: () -> Model
+      def find_sole_by: (untyped arg, *untyped args) -> Model
     end
   end
 
@@ -495,6 +497,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
            | () { (Model) -> boolish } -> ::Integer
            | (Symbol | String column_name) -> ::Integer
   def sole: () -> Model
+  def find_sole_by: (untyped arg, *untyped args) -> Model
 
   def order_values: () -> Array[String | Symbol]?
   def joins_values: () -> Array[String | Symbol]?
@@ -594,6 +597,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
            | (Symbol | String column_name) -> ::Integer
   def create_with: (nil | Hash[untyped, untyped]) -> Relation
   def sole: () -> Model
+  def find_sole_by: (untyped arg, *untyped args) -> Model
 end
 
 module ActiveRecord
