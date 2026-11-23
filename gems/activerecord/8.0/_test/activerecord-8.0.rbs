@@ -22,4 +22,12 @@ module Test
       include ::ActiveRecord::Relation::Methods[Article, Integer]
     end
   end
+
+  class Comment < ActiveRecord::Base
+    class ActiveRecord_Relation < ActiveRecord::Relation
+      include _ActiveRecord_Relation[Comment, Integer]
+    end
+
+    extend _ActiveRecord_Relation_ClassMethods[Comment, ActiveRecord_Relation, Integer]
+  end
 end

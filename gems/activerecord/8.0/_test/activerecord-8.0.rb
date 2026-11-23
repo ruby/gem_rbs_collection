@@ -156,3 +156,36 @@ ActiveRecord::Base.time_zone_aware_types.map(&:to_proc)
 ActiveRecord::Base.record_timestamps = !ActiveRecord::Base.lock_optimistically
 ActiveRecord::Base.enumerate_columns_in_select_statements = !ActiveRecord::Base.cache_versioning
 ActiveRecord::Base.new.record_timestamps = !ActiveRecord::Base.new.pluralize_table_names
+
+# Bulk relation methods return the destroyed records or the affected row count
+Test::User.destroy_all.first&.new_record?
+Test::User.destroy_by(id: 1).first&.new_record?
+Test::User.where(id: 1).destroy_by(name: "x").first&.new_record?
+Test::User.delete_all.zero?
+Test::User.delete_by(id: 1).zero?
+Test::User.update_all(name: "x").zero?
+Test::User.touch_all(time: Time.now).zero?
+Test::User.where(id: 1).delete_all.zero?
+Test::User.where(id: 1).delete_by(name: "x").zero?
+Test::User.where(id: 1).update_all(name: "x").zero?
+Test::User.where(id: 1).touch_all.zero?
+
+# The same through a has_many association (CollectionProxy)
+Test::User.new.articles.delete_all.zero?
+Test::User.new.articles.delete_by(id: 1).zero?
+Test::User.new.articles.update_all(title: "x").zero?
+Test::User.new.articles.touch_all.zero?
+Test::User.new.articles.destroy_by(id: 1).first&.new_record?
+
+# The same through the _ActiveRecord_Relation interfaces
+Test::Comment.destroy_all.first&.new_record?
+Test::Comment.destroy_by(id: 1).first&.new_record?
+Test::Comment.where(id: 1).destroy_by(title: "x").first&.new_record?
+Test::Comment.delete_all.zero?
+Test::Comment.delete_by(id: 1).zero?
+Test::Comment.update_all(title: "x").zero?
+Test::Comment.touch_all(time: Time.now).zero?
+Test::Comment.where(id: 1).delete_all.zero?
+Test::Comment.where(id: 1).delete_by(title: "x").zero?
+Test::Comment.where(id: 1).update_all(title: "x").zero?
+Test::Comment.where(id: 1).touch_all.zero?

@@ -1,0 +1,15 @@
+class Post < ActiveRecord::Base
+  class ActiveRecord_Relation < ActiveRecord::Relation
+    include ActiveRecord::Relation::Methods[Post, Integer]
+  end
+
+  extend ActiveRecord::Base::ClassMethods[Post, ActiveRecord_Relation, Integer]
+end
+
+class Comment < ActiveRecord::Base
+  class ActiveRecord_Relation < ActiveRecord::Relation
+    include _ActiveRecord_Relation[Comment, Integer]
+  end
+
+  extend _ActiveRecord_Relation_ClassMethods[Comment, ActiveRecord_Relation, Integer]
+end
