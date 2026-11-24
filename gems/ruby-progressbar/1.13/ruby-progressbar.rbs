@@ -1,0 +1,214 @@
+class ProgressBar
+  VERSION: String
+
+  # The stream the progress bar is written to, such as `$stdout`, `$stderr` or a `StringIO`.
+  interface _Stream
+    def print: (*untyped) -> untyped
+
+    def puts: (*untyped) -> untyped
+
+    def flush: () -> untyped
+
+    def tty?: () -> bool
+  end
+
+  # Options of `ProgressBar.create`.
+  type options = {
+    ?total: Integer?,
+    ?starting_at: Integer?,
+    ?title: String?,
+    ?format: String,
+    ?length: Integer?,
+    ?output: _Stream | singleton(Output),
+    ?throttle_rate: Numeric,
+    ?progress_mark: String,
+    ?remainder_mark: String,
+    ?unknown_progress_animation_steps: Array[String],
+    ?projector: { ?type: String, ?strength: Numeric },
+    ?rate_scale: ^(Float rate) -> Numeric,
+    ?autostart: bool,
+    ?autofinish: bool,
+    # Deprecated: use `projector: { type: "smoothing", strength: }`.
+    ?smoothing: Numeric,
+    # Deprecated: use `projector: { type: "smoothing", strength: }`.
+    ?running_average_rate: Numeric
+  }
+
+  def self.create: (?options options) -> Base
+
+  class Base
+    def initialize: (?options options) -> void
+
+    def start: (?{ ?at: Integer } options) -> void
+
+    def finish: () -> void
+
+    def pause: () -> void
+
+    def stop: () -> void
+
+    def resume: () -> void
+
+    def reset: () -> void
+
+    # Returns the time the bar was started at, or nil if it has not been started.
+    def started?: () -> ::Time?
+
+    # Returns the time the timer was stopped at, or whether the bar is finished.
+    def stopped?: () -> (::Time | bool)
+
+    alias paused? stopped?
+
+    def finished?: () -> bool
+
+    def increment: () -> void
+
+    def decrement: () -> void
+
+    def progress: () -> Integer
+
+    def progress=: (Integer new_progress) -> void
+
+    def total: () -> Integer?
+
+    def total=: (Integer? new_total) -> void
+
+    def progress_mark=: (String mark) -> void
+
+    def remainder_mark=: (String mark) -> void
+
+    def title: () -> String?
+
+    def title=: (String? title) -> void
+
+    def format=: (String? other) -> void
+
+    alias format format=
+
+    def log: (untyped string) -> void
+
+    def clear: () -> void
+
+    def refresh: (?{ ?force: bool } options) -> void
+
+    def to_s: (?String? new_format) -> String
+
+    def to_h: () -> {
+      "output_stream" => _Stream | singleton(Output),
+      "length" => Integer,
+      "title" => String?,
+      "progress_mark" => String,
+      "remainder_mark" => String,
+      "progress" => Integer,
+      "total" => Integer?,
+      "percentage" => Float,
+      "elapsed_time_in_seconds" => Float | Integer,
+      "estimated_time_remaining_in_seconds" => Integer?,
+      "base_rate_of_change" => Float,
+      "scaled_rate_of_change" => Numeric,
+      "unknown_progress_animation_steps" => Array[String],
+      "throttle_rate" => Numeric,
+      "started?" => ::Time?,
+      "stopped?" => ::Time | bool,
+      "finished?" => bool
+    }
+
+    def inspect: () -> String
+  end
+
+  class InvalidProgressError < RuntimeError
+  end
+
+  # Base class of the output strategies. A subclass can be passed as the `output` option.
+  #
+  # A subclass defines `clear`, `bar_update_string`, `default_format`,
+  # `resolve_format`, `eol` and `refresh_with_format_change`, like the classes
+  # in `ProgressBar::Outputs`.
+  class Output
+    DEFAULT_OUTPUT_STREAM: IO
+
+    # The `output` option: a stream, or the Output subclass itself when a
+    # subclass was given.
+    attr_accessor stream: _Stream | singleton(Output)
+
+    def self.detect: (?Hash[Symbol, untyped] options) -> Output
+
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    def log: (String string) -> void
+
+    def clear_string: () -> String
+
+    def length: () -> Integer
+
+    def with_refresh: () { () -> void } -> void
+
+    def refresh: (?{ ?force: bool } options) -> void
+  end
+
+  module Outputs
+    class Tty < Output
+      DEFAULT_FORMAT_STRING: String
+
+      def clear: () -> void
+
+      def bar_update_string: () -> String
+
+      def default_format: () -> String
+
+      def resolve_format: (String? other_format) -> String
+
+      def eol: () -> String
+
+      alias refresh_with_format_change with_refresh
+    end
+
+    class NonTty < Output
+      DEFAULT_FORMAT_STRING: String
+
+      def clear: () -> void
+
+      def last_update_length: () -> Integer
+
+      def bar_update_string: () -> String
+
+      def default_format: () -> String
+
+      def resolve_format: (*untyped) -> String
+
+      def refresh_with_format_change: (*untyped) ?{ () -> void } -> nil
+
+      def eol: () -> String
+    end
+
+    # Pass as the `output` option to disable output. Requires `require "ruby-progressbar/outputs/null"`.
+    class Null < Output
+      def clear: () -> nil
+
+      def log: (String _string) -> nil
+
+      def refresh: (*untyped) -> nil
+
+      def clear_string: () -> String
+
+      def bar_update_string: () -> String
+
+      def default_format: () -> String
+
+      def resolve_format: (String? _format) -> String
+
+      def eol: () -> String
+
+      alias refresh_with_format_change with_refresh
+    end
+  end
+
+  module Refinements
+    # `using ProgressBar::Refinements::Enumerator` adds
+    # `Enumerator#with_progressbar(options = {}) { |item, progress_bar| ... }`.
+    # RBS cannot declare refinements, so that method is not declared here.
+    module Enumerator
+      ARITY_ERROR_MESSAGE: String
+    end
+  end
+end
