@@ -1,0 +1,66 @@
+module JMESPath
+  VERSION: String
+
+  # Evaluates a JMESPath expression against `data` and returns the matched
+  # value, or `nil` when the expression does not resolve inside `data`.
+  #
+  # `data` is usually a Hash or Array (or a Struct). A Pathname is read as a
+  # JSON file, and an IO or StringIO is read and parsed as JSON.
+  #
+  # Raises JMESPath::Errors::SyntaxError for an invalid expression.
+  def self.search: (String expression, untyped data, ?Hash[Symbol, untyped] runtime_options) -> untyped
+
+  # Reads and parses the JSON file at `path`.
+  def self.load_json: (path path) -> untyped
+
+  class Runtime
+    # Options:
+    # - `cache_expressions` (bool, default true): when false, a non-caching
+    #   Parser is used.
+    # - `disable_visit_errors` (bool, default false): when true, unexpected
+    #   data during evaluation returns nil instead of raising.
+    # - `parser` (Parser or CachingParser): the parser to use.
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    attr_reader parser: Parser | CachingParser
+
+    def search: (String expression, untyped data) -> untyped
+  end
+
+  class Parser
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    # Returns the parsed expression tree.
+    def parse: (String expression) -> untyped
+  end
+
+  class CachingParser
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    # Returns the parsed expression tree, cached by expression.
+    def parse: (String expression) -> untyped
+  end
+
+  module Errors
+    class Error < StandardError
+    end
+
+    class RuntimeError < Error
+    end
+
+    class SyntaxError < Error
+    end
+
+    class InvalidTypeError < Error
+    end
+
+    class InvalidValueError < Error
+    end
+
+    class InvalidArityError < Error
+    end
+
+    class UnknownFunctionError < Error
+    end
+  end
+end
