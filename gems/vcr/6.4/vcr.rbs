@@ -1,0 +1,534 @@
+module VCR
+  type record_mode = :all | :none | :new_episodes | :once
+
+  # A callable that tells whether two requests match.
+  interface _RequestMatcher
+    def call: (Request request_1, Request request_2) -> boolish
+  end
+
+  type request_matcher = Symbol | ^(Request request_1, Request request_2) -> boolish | _RequestMatcher
+
+  # Filter given to `before_http_request`, `after_http_request` and `around_http_request`:
+  # a predicate method name of `VCR::Request::Typed` (e.g. `:real?`) or a callable.
+  type request_filter = Symbol | ^(Request::Typed request) -> boolish
+
+  type cassette_options = {
+    ?record: record_mode,
+    ?record_on_error: bool,
+    ?erb: bool | Hash[Symbol, untyped],
+    ?match_requests_on: Array[request_matcher],
+    ?re_record_interval: Integer,
+    ?tag: Symbol,
+    ?tags: Array[Symbol],
+    ?update_content_length_header: bool,
+    ?allow_playback_repeats: bool,
+    ?allow_unused_http_interactions: bool,
+    ?exclusive: bool,
+    ?serialize_with: Symbol,
+    ?preserve_exact_body_bytes: bool,
+    ?decode_compressed_response: bool,
+    ?recompress_response: bool,
+    ?persist_with: Symbol,
+    ?persister_options: Hash[Symbol, untyped],
+    ?clean_outdated_http_interactions: bool,
+    ?drop_unused_requests: bool
+  }
+
+  def self.current_cassette: () -> Cassette?
+
+  # The cassettes in use, including those linked from another fiber's context.
+  def self.cassettes: () -> Enumerable[Cassette]
+
+  # Returns nil when VCR is turned off with `ignore_cassettes: true`.
+  def self.insert_cassette: (String name, ?cassette_options options) -> Cassette?
+
+  def self.eject_cassette: (?{ ?skip_no_unused_interactions_assertion: bool } options) -> Cassette?
+
+  # The cassette is nil when VCR is turned off with `ignore_cassettes: true`.
+  def self.use_cassette: [T] (String name, ?cassette_options options) { (Cassette? cassette) -> T } -> T
+
+  def self.use_cassettes: [T] (Array[{ name: String, ?options: cassette_options }] cassettes) { () -> T } -> T
+
+  def self.configure: () { (Configuration config) -> void } -> void
+
+  def self.configuration: () -> Configuration
+
+  def self.cucumber_tags: () { (CucumberTags tags) -> void } -> void
+
+  def self.turned_off: [T] (?{ ?ignore_cassettes: bool } options) { () -> T } -> T
+
+  def self.turn_off!: (?{ ?ignore_cassettes: bool } options) -> void
+
+  def self.turned_on: [T] (?{ ?ignore_cassettes: bool } options) { () -> T } -> T
+
+  def self.turn_on!: () -> void
+
+  def self.turned_on?: () -> bool
+
+  def self.http_interactions: () -> (Cassette::HTTPInteractionList | singleton(Cassette::HTTPInteractionList::NullList))
+
+  def self.real_http_connections_allowed?: () -> bool
+
+  def self.request_matchers: () -> RequestMatcherRegistry
+
+  def self.cassette_serializers: () -> Cassette::Serializers
+
+  def self.cassette_persisters: () -> Cassette::Persisters
+
+  def self.version: () -> String
+
+  class Configuration
+    def cassette_library_dir: () -> String?
+
+    def cassette_library_dir=: (String? dir) -> String?
+
+    def default_cassette_options: () -> Hash[Symbol, untyped]
+
+    def default_cassette_options=: (cassette_options overrides) -> cassette_options
+
+    def hook_into: (*Symbol hooks) -> void
+
+    def ignore_hosts: (*String hosts) -> void
+
+    alias ignore_host ignore_hosts
+
+    def unignore_hosts: (*String hosts) -> void
+
+    alias unignore_host unignore_hosts
+
+    def ignore_localhost=: (bool value) -> bool
+
+    def ignore_request: () { (Request request) -> boolish } -> void
+
+    def allow_http_connections_when_no_cassette=: (bool) -> bool
+
+    def allow_http_connections_when_no_cassette?: () -> bool
+
+    attr_accessor query_parser: ^(String query) -> untyped | _QueryParser
+
+    attr_accessor uri_parser: _URIParser
+
+    def register_request_matcher: (Symbol name) { (Request request_1, Request request_2) -> boolish } -> void
+
+    def define_cassette_placeholder: (String placeholder, ?Symbol? tag) { (HTTPInteraction::HookAware interaction) -> _ToS } -> void
+
+    alias filter_sensitive_data define_cassette_placeholder
+
+    def cassette_serializers: () -> Cassette::Serializers
+
+    def cassette_persisters: () -> Cassette::Persisters
+
+    def before_record: (?Symbol? tag) { (HTTPInteraction::HookAware interaction, Cassette cassette) -> void } -> void
+
+    def before_playback: (?Symbol? tag) { (HTTPInteraction::HookAware interaction, Cassette cassette) -> void } -> void
+
+    def before_http_request: (*request_filter filters) { (Request::Typed request) -> void } -> void
+
+    def after_http_request: (*request_filter filters) { (Request::Typed request, Response? response) -> void } -> void
+
+    def around_http_request: (*request_filter filters) { (Request::FiberAware request) -> void } -> void
+
+    def configure_rspec_metadata!: () -> void
+
+    attr_reader debug_logger: _DebugLogger?
+
+    def debug_logger=: (_DebugLogger? value) -> void
+
+    def preserve_exact_body_bytes: () { (Request | Response http_message, Cassette? cassette) -> boolish } -> void
+
+    def preserve_exact_body_bytes_for?: (Request | Response http_message) -> bool
+
+    interface _QueryParser
+      def call: (String query) -> untyped
+    end
+
+    interface _URIParser
+      def parse: (String uri) -> untyped
+    end
+
+    interface _DebugLogger
+      def puts: (String message) -> untyped
+    end
+  end
+
+  class Cassette
+    VALID_RECORD_MODES: Array[record_mode]
+
+    attr_reader name: String
+
+    attr_reader record_mode: record_mode
+
+    attr_reader record_on_error: bool
+
+    attr_reader match_requests_on: Array[request_matcher]
+
+    attr_reader erb: (bool | Hash[Symbol, untyped])?
+
+    attr_reader re_record_interval: Integer?
+
+    attr_reader clean_outdated_http_interactions: bool?
+
+    attr_reader drop_unused_requests: bool?
+
+    attr_reader tags: Array[Symbol]
+
+    def initialize: (String name, ?cassette_options options) -> void
+
+    def eject: (?{ ?skip_no_unused_interactions_assertion: bool } options) -> void
+
+    def run_failed!: () -> void
+
+    def run_failed?: () -> bool
+
+    def http_interactions: () -> HTTPInteractionList
+
+    def new_recorded_interactions: () -> Array[HTTPInteraction]
+
+    # nil when `cassette_library_dir` is not set.
+    def file: () -> String?
+
+    def recording?: () -> bool
+
+    def serializable_hash: () -> Hash[String, untyped]
+
+    def originally_recorded_at: () -> Time?
+
+    def linked?: () -> bool
+
+    class HTTPInteractionList
+      module NullList
+        def self.response_for: (*untyped) -> nil
+
+        def self.has_interaction_matching?: (*untyped) -> false
+
+        def self.has_used_interaction_matching?: (*untyped) -> false
+
+        def self.remaining_unused_interaction_count: (*untyped) -> 0
+      end
+
+      attr_reader interactions: Array[HTTPInteraction]
+
+      attr_reader request_matchers: Array[request_matcher]
+
+      attr_reader allow_playback_repeats: bool
+
+      def response_for: (Request request) -> Response?
+
+      def has_interaction_matching?: (Request request) -> bool
+
+      def has_used_interaction_matching?: (Request request) -> bool
+
+      def remaining_unused_interaction_count: () -> Integer
+
+      def assert_no_unused_interactions!: () -> void
+    end
+
+    # A serializer registered with `VCR.configuration.cassette_serializers`.
+    interface _Serializer
+      def file_extension: () -> String
+
+      def serialize: (Hash[String, untyped] hash) -> String
+
+      def deserialize: (String string) -> Hash[String, untyped]
+    end
+
+    # A persister registered with `VCR.configuration.cassette_persisters`.
+    interface _Persister
+      def []: (String file_name) -> String?
+
+      def []=: (String file_name, String content) -> void
+    end
+
+    class Serializers
+      def []: (Symbol name) -> _Serializer
+
+      def []=: (Symbol name, _Serializer value) -> _Serializer
+    end
+
+    class Persisters
+      def []: (Symbol name) -> _Persister
+
+      def []=: (Symbol name, _Persister value) -> _Persister
+
+      module FileSystem
+        def self.storage_location: () -> String?
+
+        def self.storage_location=: (String? dir) -> String?
+
+        def self.[]: (String file_name) -> String?
+
+        def self.[]=: (String file_name, String content) -> void
+
+        def self.absolute_path_to_file: (String file_name) -> String?
+      end
+    end
+  end
+
+  class Request < ::Struct[untyped]
+    # A trailing :skip_port_stripping keeps the default port in the URI.
+    def initialize: (?(Symbol | String)? method, ?String? uri, ?String? body, ?Hash[String, String | Array[String]]? headers) -> void
+                  | ((Symbol | String)? method, String? uri, String? body, Hash[String, String | Array[String]]? headers, :skip_port_stripping) -> void
+
+    def self.new: (?(Symbol | String)? method, ?String? uri, ?String? body, ?Hash[String, String | Array[String]]? headers) -> instance
+                | ((Symbol | String)? method, String? uri, String? body, Hash[String, String | Array[String]]? headers, :skip_port_stripping) -> instance
+
+    def method: () -> Symbol?
+              | (interned name) -> Method
+
+    def method=: (Symbol? method) -> Symbol?
+
+    attr_accessor uri: String
+
+    attr_accessor body: String
+
+    attr_accessor headers: Hash[String, Array[String]]
+
+    def to_hash: () -> Hash[String, untyped]
+
+    def self.from_hash: (Hash[String, untyped] hash) -> Request
+
+    def parsed_uri: () -> untyped
+
+    # A request with how VCR handles it. It delegates the other methods to the request.
+    class Typed
+      # `:unknown` is used only when VCR works around a WebMock after_request bug.
+      type request_type = :ignored | :stubbed_by_vcr | :externally_stubbed | :recordable | :unhandled | :unknown
+
+      def method: () -> Symbol?
+                | (interned name) -> Method
+
+      attr_reader type: request_type
+
+      def initialize: (Request request, request_type type) -> void
+
+      def ignored?: () -> bool
+
+      def stubbed_by_vcr?: () -> bool
+
+      def externally_stubbed?: () -> bool
+
+      def recordable?: () -> bool
+
+      def unhandled?: () -> bool
+
+      def real?: () -> bool
+
+      def stubbed?: () -> bool
+
+      def uri: () -> String
+
+      def body: () -> String
+
+      def headers: () -> Hash[String, Array[String]]
+
+      def parsed_uri: () -> untyped
+
+      def to_hash: () -> Hash[String, untyped]
+    end
+
+    # The request yielded to `around_http_request`. It delegates the other methods to `Typed`.
+    class FiberAware
+      def method: () -> Symbol?
+                | (interned name) -> Method
+
+      def proceed: () -> untyped
+
+      def to_proc: () -> Proc
+
+      def type: () -> Typed::request_type
+
+      def ignored?: () -> bool
+
+      def stubbed_by_vcr?: () -> bool
+
+      def externally_stubbed?: () -> bool
+
+      def recordable?: () -> bool
+
+      def unhandled?: () -> bool
+
+      def real?: () -> bool
+
+      def stubbed?: () -> bool
+
+      def uri: () -> String
+
+      def body: () -> String
+
+      def headers: () -> Hash[String, Array[String]]
+
+      def parsed_uri: () -> untyped
+
+      def to_hash: () -> Hash[String, untyped]
+    end
+  end
+
+  class Response < ::Struct[untyped]
+    def initialize: (?ResponseStatus? status, ?Hash[String, String | Array[String]]? headers, ?String? body, ?String? http_version, ?Hash[String, untyped]? adapter_metadata) -> void
+
+    def self.new: (?ResponseStatus? status, ?Hash[String, String | Array[String]]? headers, ?String? body, ?String? http_version, ?Hash[String, untyped]? adapter_metadata) -> instance
+
+    attr_accessor status: ResponseStatus
+
+    attr_accessor headers: Hash[String, Array[String]]
+
+    attr_accessor body: String
+
+    attr_accessor http_version: String?
+
+    attr_accessor adapter_metadata: Hash[String, untyped]
+
+    def to_hash: () -> Hash[String, untyped]
+
+    def self.from_hash: (Hash[String, untyped] hash) -> Response
+
+    def update_content_length_header: () -> void
+
+    def content_encoding: () -> String?
+
+    def compressed?: () -> bool
+
+    def vcr_decompressed?: () -> String?
+
+    def decompress: () -> self
+
+    def recompress: () -> void
+
+    def self.decompress: (String body, String? type) { (String new_body) -> void } -> void
+  end
+
+  class ResponseStatus < ::Struct[untyped]
+    def initialize: (?Integer? code, ?String? message) -> void
+
+    def self.new: (?Integer? code, ?String? message) -> instance
+
+    attr_accessor code: Integer
+
+    attr_accessor message: String?
+
+    def to_hash: () -> Hash[String, untyped]
+
+    def self.from_hash: (Hash[String, untyped] hash) -> ResponseStatus
+  end
+
+  class HTTPInteraction < ::Struct[untyped]
+    def initialize: (?Request? request, ?Response? response, ?Time? recorded_at) -> void
+
+    def self.new: (?Request? request, ?Response? response, ?Time? recorded_at) -> instance
+
+    attr_accessor request: Request
+
+    attr_accessor response: Response
+
+    attr_accessor recorded_at: Time
+
+    def to_hash: () -> Hash[String, untyped]
+
+    def self.from_hash: (Hash[String, untyped] hash) -> HTTPInteraction
+
+    def hook_aware: () -> HookAware
+
+    # The interaction yielded to `before_record` and `before_playback` hooks.
+    # It delegates the other methods to the interaction.
+    class HookAware
+      def initialize: (HTTPInteraction http_interaction) -> void
+
+      def ignore!: () -> void
+
+      def ignored?: () -> bool
+
+      def filter!: (_ToS text, _ToS replacement_text) -> void
+
+      def request: () -> Request
+
+      def response: () -> Response
+
+      def recorded_at: () -> Time
+
+      def to_hash: () -> Hash[String, untyped]
+    end
+  end
+
+  class RequestMatcherRegistry
+    DEFAULT_MATCHERS: Array[Symbol]
+
+    class Matcher < ::Struct[untyped]
+      attr_accessor callable: ^(Request request_1, Request request_2) -> boolish | _RequestMatcher
+
+      def matches?: (Request request_1, Request request_2) -> boolish
+    end
+
+    class URIWithoutParamsMatcher < ::Struct[untyped]
+      attr_accessor params_to_ignore: Array[String]
+
+      def call: (Request request_1, Request request_2) -> bool
+
+      def to_proc: () -> ^(Request request_1, Request request_2) -> bool
+    end
+
+    def register: (Symbol name) { (Request request_1, Request request_2) -> boolish } -> void
+
+    def []: (request_matcher matcher) -> Matcher
+
+    def uri_without_params: (*Symbol | String ignores) -> URIWithoutParamsMatcher
+
+    alias uri_without_param uri_without_params
+  end
+
+  class CucumberTags
+    def self.tags: () -> Array[String]
+
+    def self.add_tag: (String tag) -> void
+
+    def initialize: (untyped main_object) -> void
+
+    # The last argument can be cassette options, with `use_scenario_name: true` to name the cassette after the scenario.
+    def tags: (*String | Hash[Symbol, untyped] tag_names) -> void
+
+    alias tag tags
+  end
+
+  module Errors
+    class Error < StandardError
+    end
+
+    class CassetteInUseError < Error
+    end
+
+    class TurnedOffError < Error
+    end
+
+    class MissingERBVariableError < Error
+    end
+
+    class LibraryVersionTooLowError < Error
+    end
+
+    class UnregisteredMatcherError < Error
+    end
+
+    class InvalidCassetteFormatError < Error
+    end
+
+    class AroundHTTPRequestHookError < Error
+    end
+
+    class NotSupportedError < Error
+    end
+
+    class UnknownContentEncodingError < Error
+    end
+
+    class UnusedHTTPInteractionError < Error
+    end
+
+    class EjectLinkedCassetteError < Error
+    end
+
+    class UnhandledHTTPRequestError < Error
+      attr_reader request: Request
+
+      def initialize: (Request request) -> void
+    end
+  end
+end
