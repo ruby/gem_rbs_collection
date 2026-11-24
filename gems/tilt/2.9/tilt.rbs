@@ -1,0 +1,323 @@
+# Tilt is a thin interface over a bunch of different Ruby template engines.
+module Tilt
+  type template_file = String | _ToStr | _ToPath | _Path
+  type template_options = Hash[Symbol | String, untyped]
+  type locals = Hash[untyped, untyped]
+
+  interface _Path
+    def path: () -> String
+  end
+
+  VERSION: String
+
+  # Replace the default mapping with a finalized version of the default
+  # mapping. Once this is called, all attempts to modify the default mapping
+  # fail, and Tilt itself is frozen.
+  def self.finalize!: () -> singleton(Tilt)
+
+  def self.register: (singleton(Template) template_class, *String | Symbol extensions) -> void
+                   | (String extension, singleton(Template) template_class) -> void
+
+  # Alias of register for Tilt 1.x compatibility.
+  def self.prefer: (singleton(Template) template_class, *String | Symbol extensions) -> void
+                 | (String extension, singleton(Template) template_class) -> void
+
+  def self.register_lazy: (Symbol | String class_name, String file, *String extensions) -> void
+
+  def self.register_pipeline: (String ext, ?template_options options) -> singleton(Pipeline)
+
+  def self.registered?: (String ext) -> bool
+
+  def self.new: (String | _ToPath file, ?Integer? line, ?template_options? options) ?{ (Template) -> (String | Proc) } -> Template
+
+  def self.[]: (String | _ToPath file) -> singleton(Template)?
+
+  def self.template_for: (String | _ToPath file) -> singleton(Template)?
+
+  def self.templates_for: (String | _ToPath file) -> Array[singleton(Template)]
+
+  def self.default_mapping: () -> (Mapping | FinalizedMapping)
+
+  # Whether to extract fixed locals from templates by scanning the template
+  # content.
+  def self.extract_fixed_locals: () -> bool?
+
+  def self.extract_fixed_locals=: (bool? value) -> bool?
+
+  # The common lookup methods of Mapping and FinalizedMapping.
+  # This class is a private constant.
+  class BaseMapping
+    # Instantiates a new template class based on the file.
+    def new: (String | _ToPath file, ?Integer? line, ?template_options? options) ?{ (Template) -> (String | Proc) } -> Template
+
+    # Looks up a template class based on the file name and/or extension.
+    def []: (String | _ToPath file) -> singleton(Template)?
+
+    alias template_for []
+
+    # Looks up a list of template classes based on the file name.
+    def templates_for: (String | _ToPath file) -> Array[singleton(Template)]
+
+    def registered?: (String ext) -> bool
+
+    def extensions_for: (singleton(Template) template_class) -> Array[String]
+  end
+
+  # Tilt::Mapping associates file extensions with template implementations.
+  class Mapping < BaseMapping
+    attr_reader lazy_map: Hash[String, Array[[ String, String ]]]
+
+    attr_reader template_map: Hash[String, singleton(Template)]
+
+    def initialize: () -> void
+
+    # Return a finalized mapping. A finalized mapping only includes support
+    # for template libraries already loaded, and does not allow registering
+    # new template libraries or lazy loading template libraries not yet
+    # loaded.
+    def finalized: () -> FinalizedMapping
+
+    # Registers a lazy template implementation by file extension.
+    def register_lazy: (Symbol | String class_name, String file, *String extensions) -> void
+
+    # Registers a template implementation by file extension.
+    def register: (singleton(Template) template_class, *String | Symbol extensions) -> void
+                | (String extension, singleton(Template) template_class) -> void
+
+    # Register a new template class using the given extension that
+    # represents a pipeline of multiple existing template, where each
+    # template class processes the output of the previous template class.
+    def register_pipeline: (String ext, ?template_options options) -> singleton(Pipeline)
+
+    # Unregisters an extension.
+    def unregister: (*String | Symbol extensions) -> nil
+  end
+
+  # A Mapping that does not support lazy loading or registering new template
+  # classes. This class is a private constant.
+  class FinalizedMapping < BaseMapping
+    def initialize: (Hash[String, singleton(Template)] template_map) -> void
+
+    def dup: () -> self
+
+    def clone: (?freeze: bool) -> self
+  end
+
+  # Base class for template implementations.
+  class Template
+    def self.metadata: () -> Hash[Symbol, untyped]
+
+    def self.default_mime_type: () -> String?
+
+    def self.default_mime_type=: (String? value) -> String?
+
+    # Template source; loaded from a file or given directly.
+    attr_reader data: String | Proc
+
+    # The name of the file where the template data was loaded from.
+    attr_reader file: String?
+
+    # The line number in file where template data was loaded from.
+    attr_reader line: Integer
+
+    # A Hash of template engine specific options.
+    attr_reader options: Hash[Symbol | String, untyped]
+
+    # A path ending in .rb that the template code will be written to.
+    attr_reader compiled_path: String?
+
+    # Create a new template with the file, line, and options specified. The
+    # arguments can be given in any order. When a block is given, it should
+    # return the template data. Otherwise, the data is read from the file.
+    def initialize: (?template_file? file, ?Integer? line, ?template_options? options) ?{ (Template) -> (String | Proc) } -> void
+                  | (template_file? file, template_options options) ?{ (Template) -> (String | Proc) } -> void
+                  | (Integer line, ?template_options? options) { (Template) -> (String | Proc) } -> void
+                  | (template_options options) { (Template) -> (String | Proc) } -> void
+
+    # Render the template in the given scope with the locals specified. If a
+    # block is given, it is typically available within the template via
+    # +yield+.
+    def render: (?untyped scope, ?locals? locals) ?{ (*untyped) -> untyped } -> String
+
+    # The basename of the template file.
+    def basename: (?String suffix) -> String?
+
+    # The template file's basename with all extensions chomped off.
+    def name: () -> String?
+
+    # The filename used in backtraces to describe the template.
+    def eval_file: () -> String
+
+    # Whether the template uses fixed locals.
+    def fixed_locals?: () -> bool
+
+    # An empty Hash that the template engine can populate with various
+    # metadata.
+    def metadata: () -> Hash[Symbol, untyped]
+
+    # Set the prefix to use for compiled paths, similar to using the
+    # :compiled_path template option.
+    def compiled_path=: (String? path) -> String?
+
+    # The compiled method for the locals keys and scope_class provided.
+    def compiled_method: (Array[untyped] locals_keys, ?Module? scope_class) -> UnboundMethod
+
+    private
+
+    # Do whatever preparation is necessary to setup the underlying template
+    # engine. Called immediately after template data is loaded.
+    def prepare: () -> void
+
+    # Execute the compiled template and return the result string.
+    def evaluate: (untyped scope, locals locals) ?{ (*untyped) -> untyped } -> String
+
+    # A string containing the (Ruby) source code for the template.
+    def precompiled_template: (Array[untyped] local_keys) -> String
+
+    def precompiled_preamble: (Array[untyped] local_keys) -> String
+
+    def precompiled_postamble: (Array[untyped] local_keys) -> String
+
+    # The full Ruby source of the compiled template and the line offset of the
+    # template code within it. Overriding precompiled_template is usually
+    # easier.
+    def precompiled: (Array[untyped] local_keys) -> [String, Integer]
+
+    # Whether the compiled template code gets a frozen_string_literal magic
+    # comment.
+    def freeze_string_literals?: () -> bool
+
+    # The encoding forced on the template data, from the :default_encoding
+    # option.
+    def default_encoding: () -> (String | Encoding)?
+
+    def skip_compiled_encoding_detection?: () -> bool?
+  end
+
+  # Static templates are templates that return the same output for every
+  # render.
+  class StaticTemplate < Template
+    # Returns a new subclass whose output is the result of the block, which is
+    # evaluated in the template instance once, when the template is prepared.
+    def self.subclass: (?mime_type: String) { () [self: StaticTemplate] -> String } -> singleton(StaticTemplate)
+
+    # The scope, locals and block are ignored.
+    def render: (?untyped scope, ?locals? locals) ?{ (*untyped) -> untyped } -> String
+
+    def allows_script?: () -> false
+
+    # Static templates are not compiled, so this always raises
+    # NotImplementedError.
+    def compiled_method: (Array[untyped] locals_keys, ?Module? scope_class) -> bot
+  end
+
+  # The tilt command line utility. Loaded by `require "tilt/cli"`.
+  module CLI
+    # Runs the command and returns the exit code.
+    def self.run: (?argv: Array[String], ?stdout: IO | StringIO, ?stdin: IO | StringIO, ?stderr: IO | StringIO, ?script_name: String) -> Integer
+  end
+
+  # Template class registered with register_pipeline.
+  class Pipeline < Template
+  end
+
+  # Template implementations shipped with Tilt. Each one is loaded on first
+  # use and requires its template engine library.
+
+  class AsciidoctorTemplate < StaticTemplate
+  end
+
+  class BabelTemplate < StaticTemplate
+  end
+
+  class BuilderTemplate < Template
+  end
+
+  class CSVTemplate < Template
+  end
+
+  class CoffeeScriptTemplate < StaticTemplate
+    def self.default_bare: () -> bool
+
+    def self.default_bare=: (bool value) -> bool
+
+    def self.literate?: () -> bool
+  end
+
+  class CoffeeScriptLiterateTemplate < CoffeeScriptTemplate
+  end
+
+  class CommonMarkerTemplate < StaticTemplate
+  end
+
+  class ERBTemplate < Template
+  end
+
+  class ErubiTemplate < Template
+  end
+
+  class EtanniTemplate < Template
+  end
+
+  class HerbTemplate < Template
+  end
+
+  class KramdownTemplate < StaticTemplate
+  end
+
+  class LiquidTemplate < Template
+    def allows_script?: () -> false
+  end
+
+  class LiveScriptTemplate < StaticTemplate
+  end
+
+  class MarkabyTemplate < Template
+  end
+
+  class NokogiriTemplate < Template
+  end
+
+  class PandocTemplate < StaticTemplate
+  end
+
+  class PlainTemplate < StaticTemplate
+  end
+
+  class PrawnTemplate < Template
+  end
+
+  class RDiscountTemplate < StaticTemplate
+  end
+
+  class RDocTemplate < StaticTemplate
+  end
+
+  class RadiusTemplate < Template
+    def allows_script?: () -> false
+  end
+
+  class RedClothTemplate < StaticTemplate
+  end
+
+  class RedcarpetTemplate < StaticTemplate
+  end
+
+  class RstPandocTemplate < StaticTemplate
+  end
+
+  class SassTemplate < StaticTemplate
+  end
+
+  class ScssTemplate < SassTemplate
+  end
+
+  class StringTemplate < Template
+  end
+
+  class TypeScriptTemplate < StaticTemplate
+  end
+
+  class YajlTemplate < Template
+  end
+end
