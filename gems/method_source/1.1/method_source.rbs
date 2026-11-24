@@ -1,0 +1,87 @@
+module MethodSource
+  extend CodeHelpers
+
+  VERSION: String
+
+  # Raised when the source or comment of a method cannot be found or parsed.
+  class SourceNotFoundError < StandardError
+  end
+
+  # Returns the source of the expression starting at `source_location`
+  # (as returned by `Method#source_location`).
+  # Raises SourceNotFoundError if the file cannot be read or parsed.
+  def self.source_helper: ([String, Integer] source_location, ?untyped name) -> String
+
+  # Returns the comment above the expression at `source_location`.
+  def self.comment_helper: ([String, Integer] source_location, ?untyped name) -> String
+
+  # Returns the lines of `file_name`, memoized.
+  # Raises SourceNotFoundError if the file does not exist.
+  def self.lines_for: (String file_name, ?untyped name) -> Array[String]
+
+  def self.clear_cache: () -> void
+
+  # @deprecated Use MethodSource::CodeHelpers#complete_expression?
+  def self.valid_expression?: (String str) -> bool
+
+  # @deprecated Use MethodSource::CodeHelpers#expression_at
+  def self.extract_code: ([String, Integer] source_location) -> String
+
+  module CodeHelpers
+    type file = Array[String] | String | IO
+
+    type expression_options = { ?strict: bool, ?consume: Integer }
+
+    # Returns the first complete expression starting on `line_number` (1-based).
+    # Raises SyntaxError if no complete expression can be found.
+    def expression_at: (file file, Integer line_number, ?expression_options options) -> String
+
+    # Returns the comment right above `line_number` (1-based).
+    def comment_describing: (file file, Integer line_number) -> String
+
+    # Raises SyntaxError if the code is invalid in a way more input cannot fix.
+    def complete_expression?: (String str) -> bool
+  end
+
+  # Included into Method, UnboundMethod and Proc.
+  module MethodExtensions
+    # Raises SourceNotFoundError if the source cannot be found.
+    def source: () -> String
+
+    # Raises SourceNotFoundError if the source cannot be found.
+    def comment: () -> String
+
+    # Returns the comment of the class or module the method belongs to.
+    def class_comment: () -> String
+
+    alias module_comment class_comment
+  end
+
+  # Fallback implementations of `source_location` for old Ruby
+  # implementations. Core `source_location` takes precedence on current Rubies.
+  module SourceLocation
+    module MethodExtensions
+    end
+
+    module ProcExtensions
+    end
+
+    module UnboundMethodExtensions
+    end
+  end
+end
+
+class Method
+  include MethodSource::SourceLocation::MethodExtensions
+  include MethodSource::MethodExtensions
+end
+
+class UnboundMethod
+  include MethodSource::SourceLocation::UnboundMethodExtensions
+  include MethodSource::MethodExtensions
+end
+
+class Proc
+  include MethodSource::SourceLocation::ProcExtensions
+  include MethodSource::MethodExtensions
+end
