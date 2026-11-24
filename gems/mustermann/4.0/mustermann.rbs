@@ -1,0 +1,337 @@
+# Namespace and main entry point for the Mustermann library.
+module Mustermann
+  VERSION: String
+
+  # Objects that can be turned into a pattern by Mustermann.new.
+  interface _ToPattern
+    def to_pattern: (**untyped options) -> Pattern
+  end
+
+  # Anything Mustermann.new accepts as a pattern.
+  type input = String | Symbol | Regexp | Pattern | _ToPattern | Array[input]
+
+  # Values used to expand a pattern, keyed by capture name.
+  type values = Hash[Symbol | String, untyped]
+
+  # How to treat values that are not used by any pattern when expanding.
+  type additional_values = :raise | :ignore | :append
+
+  # Creates a new pattern based on input.
+  #
+  # A Regexp creates a Mustermann::Regular pattern. Strings use the pattern
+  # type given by `type` (Mustermann::Sinatra by default). Multiple inputs or
+  # an Array are combined with `operator` into a Mustermann::Composite.
+  def self.new: (Regexp input, ?type: Symbol | String | nil, **untyped options) -> Regular
+              | (*input input, ?type: Symbol | String | nil, ?operator: Symbol, **untyped options) -> Pattern
+
+  # Maps a type name (such as `:sinatra` or `:rails`) to its pattern class.
+  def self.[]: (Symbol | String name) -> singleton(Pattern)
+
+  class Error < StandardError
+  end
+
+  class CompileError < Error
+  end
+
+  class ParseError < Error
+  end
+
+  class ExpandError < Error
+  end
+
+  class TrieError < CompileError
+  end
+
+  # Superclass for all pattern implementations.
+  class Pattern
+    include Mustermann
+
+    def self.supported_options: (*Symbol list) -> Array[Symbol]
+
+    def self.supported?: (Symbol option, **untyped options) -> bool
+
+    # Registers the pattern class under the given type names.
+    def self.register: (*Symbol names) -> Array[Symbol]
+
+    # Subclasses accept a String; Regular also takes a Regexp and Composite an
+    # Array of patterns, both through this method.
+    def self.new: (String | Regexp | Array[input] string, ?ignore_unknown_options: bool, **untyped options) -> instance
+
+    attr_reader uri_decode: bool
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (String | Regexp | Array[input] string, ?uri_decode: bool, **untyped options) ?{ () -> Hash[Symbol, untyped] } -> void
+
+    def to_s: () -> String
+
+    def inspect: () -> String
+
+    def match: (String string) -> Match?
+
+    def names: () -> Array[String]
+
+    def =~: (String string) -> Integer?
+
+    def ===: (String string) -> bool
+
+    def hash: () -> Integer
+
+    def ==: (untyped other) -> bool
+
+    def eql?: (untyped other) -> bool
+
+    def peek_size: (String string) -> Integer?
+
+    def peek: (String string) -> String?
+
+    def peek_match: (String string) -> Match?
+
+    def peek_params: (String string) -> [ Hash[String, untyped], Integer ]?
+
+    def params: (?String? string) -> Hash[String, untyped]?
+
+    def expand: (?additional_values? behavior, ?values values) -> String
+              | (values values) -> String
+
+    def to_templates: () -> Array[String]
+
+    def |: (input other) -> Pattern
+
+    alias & |
+
+    alias ^ |
+
+    def +: (input other) -> Pattern
+
+    def to_proc: () -> ^(String) -> bool
+  end
+
+  # Superclass for patterns that internally compile to a regular expression.
+  class RegexpBased < Pattern
+    attr_reader regexp: Regexp
+
+    alias to_regexp regexp
+  end
+
+  # Matches a string exactly, taking URI decoding into account.
+  class Identity < Pattern
+    def self.new: (String string, ?ignore_unknown_options: bool, **untyped options) -> instance
+  end
+
+  # Pattern type for plain regular expressions.
+  class Regular < RegexpBased
+    def self.new: (String | Regexp string, ?check_anchors: bool, ?ignore_unknown_options: bool, **untyped options) -> instance
+
+    def initialize: (String | Regexp string, ?check_anchors: bool, **untyped options) ?{ () -> Hash[Symbol, untyped] } -> void
+  end
+
+  module AST
+    # Superclass for patterns built from a parsed syntax tree.
+    class Pattern < RegexpBased
+      def self.new: (String string, ?ignore_unknown_options: bool, **untyped options) -> instance
+    end
+  end
+
+  # Sinatra 2.0 style pattern (the default type).
+  class Sinatra < AST::Pattern
+    # Escapes characters with a special meaning in Sinatra patterns.
+    def self.escape: (_ToS string) -> String
+
+    # Converts a string or a compatible pattern into a Sinatra pattern, or returns nil.
+    def self.try_convert: (untyped input, **untyped options) -> instance?
+
+    def safe_string: () -> String
+  end
+
+  # Sinatra style pattern where groups do not need to be followed by `?` to be optional.
+  class Hybrid < Sinatra
+  end
+
+  # Rails style pattern.
+  class Rails < AST::Pattern
+    def self.new: (String string, ?version: String?, ?ignore_unknown_options: bool, **untyped options) -> instance
+  end
+
+  # Combines several patterns with an operator (`|`, `&` or `^`).
+  class Composite < Pattern
+    def self.new: (*input patterns, ?operator: Symbol, ?type: Symbol | String, **untyped options) -> Pattern
+
+    attr_reader patterns: Array[Pattern]
+
+    attr_reader operator: Symbol
+
+    def params: (String string) -> Hash[String, untyped]?
+  end
+
+  # Patterns that match one after another.
+  class Concat < Composite
+  end
+
+  # Expands one or more patterns into strings.
+  class Expander
+    ADDITIONAL_VALUES: Array[additional_values]
+
+    attr_reader patterns: Array[Pattern]
+
+    attr_reader additional_values: additional_values
+
+    def initialize: (*input | Expander patterns, ?additional_values: additional_values, **untyped options) ?{ (Pattern) -> untyped } -> void
+
+    # Another Expander adds its patterns.
+    def add: (*input | Expander patterns) ?{ (Pattern) -> untyped } -> self
+
+    alias << add
+
+    def cast: (*untyped types) ?{ (?) -> untyped } -> self
+
+    # The values can also be given as the first argument; patterns pass them on
+    # that way.
+    def expand: (?(additional_values | values)? behavior, ?values values) -> String
+
+    def expandable?: (values? values) -> bool
+
+    def inspect: () -> String
+
+    def ==: (untyped other) -> bool
+
+    def eql?: (untyped other) -> bool
+
+    def hash: () -> Integer
+  end
+
+  # A match of a Mustermann::Pattern against a string.
+  class Match
+    attr_reader pattern: Pattern
+
+    attr_reader string: String
+
+    attr_reader params: Hash[String, untyped]
+
+    attr_reader captures: Array[untyped]
+
+    attr_reader named_captures: Hash[String, untyped]
+
+    attr_reader post_match: String
+
+    attr_reader pre_match: String
+
+    attr_reader regexp: Regexp?
+
+    def initialize: (Pattern | Match | MatchData pattern_or_match, ?(String | Match | MatchData)? string_or_match, ?matched: String?, ?params: Hash[String, untyped]?, ?post_match: String?, ?pre_match: String?, ?captures: Array[untyped]?, ?named_captures: Hash[String, untyped]?, ?regexp: Regexp?) -> void
+
+    def names: () -> Array[String]
+
+    def []: (String | Symbol key) -> untyped
+          | (Integer index) -> untyped
+          | (Integer start, Integer length) -> Array[untyped]?
+          | (Range[Integer?] range) -> Array[untyped]?
+
+    def deconstruct_keys: (Array[String | Symbol] keys) -> Hash[String | Symbol, untyped]
+
+    def values_at: (*String | Symbol | Integer keys) -> Array[untyped]
+
+    def hash: () -> Integer
+
+    def eql?: (untyped other) -> bool
+
+    alias == eql?
+
+    def to_s: () -> String
+
+    alias to_h params
+
+    def inspect: () -> String
+  end
+
+  # Maps patterns to values and finds the values matching a string.
+  class Set
+    type mapping = Set | Hash[input, untyped] | String | Pattern | Array[mapping]
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (*mapping mapping, ?additional_values: additional_values, ?use_trie: bool | Integer, ?use_cache: bool, ?strict_order: bool, **untyped options) ?{ (Set) -> void } -> void
+                  | (*mapping mapping, ?additional_values: additional_values, ?use_trie: bool | Integer, ?use_cache: bool, ?strict_order: bool, **untyped options) { () -> mapping } -> void
+
+    def strict_order?: () -> bool
+
+    def use_cache?: () -> bool
+
+    def use_trie?: () -> bool
+
+    def add: (input pattern, *untyped values) -> self
+
+    alias []= add
+
+    def []: (String | Pattern pattern_or_string) -> untyped
+
+    def match: (String string) -> Match?
+
+    def peek_match: (String string) -> Match?
+
+    def match_all: (String string) -> Array[Match]?
+
+    def peek_match_all: (String string) -> Array[Match]?
+
+    def merge: (mapping mapping) -> Set
+
+    def update: (mapping mapping) -> self
+
+    alias merge! update
+
+    def patterns: () -> Array[Pattern]
+
+    def expander: (?untyped value) -> Expander
+
+    def expand: (?untyped value, ?untyped behavior, ?values? values) -> String
+
+    def has_value?: (untyped value) -> bool?
+
+    # Runs the trie optimizations now instead of at match time.
+    def optimize!: () -> void
+
+    # A match returned by Mustermann::Set, with the value the pattern maps to.
+    class Match < Mustermann::Match
+      attr_reader value: untyped
+
+      def initialize: (*untyped args, ?value: untyped, **untyped options) -> void
+    end
+  end
+
+  # A minimal Rack router built on Mustermann::Set.
+  class Router
+    type env = Hash[String, untyped]
+
+    type app = ^(env env) -> untyped | _Call
+
+    interface _Call
+      def call: (env env) -> untyped
+    end
+
+    def initialize: (?app? fallback, ?key: String, **untyped options) ?{ () [self: self] -> void } -> void
+
+    def call: (env env) -> untyped
+
+    def fallback: (?app? fallback) ?{ (env env) -> untyped } -> app
+
+    def route: (String verb, input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def path_for: (untyped app, ?untyped behavior, ?values params) -> String
+
+    def get: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def post: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def put: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def patch: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def delete: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def options: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def link: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+
+    def unlink: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+  end
+end
