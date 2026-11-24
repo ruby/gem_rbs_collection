@@ -1,0 +1,26 @@
+class Matrix[T]
+  # The elements of the factors are computed with `quo`, so an Integer matrix
+  # gives Rational elements. The element type is not tracked.
+  class LUPDecomposition
+    def initialize: (Matrix[untyped] a) -> void
+
+    def l: () -> Matrix[untyped]
+
+    def u: () -> Matrix[untyped]
+
+    def p: () -> Matrix[Integer]
+
+    def to_ary: () -> [Matrix[untyped], Matrix[untyped], Matrix[Integer]]
+    alias to_a to_ary
+
+    attr_reader pivots: Array[Integer]
+
+    def singular?: () -> bool
+
+    def det: () -> untyped
+    alias determinant det
+
+    def solve: (Matrix[untyped] b) -> Matrix[untyped]
+             | (Array[untyped] | Vector[untyped] b) -> Vector[untyped]
+  end
+end

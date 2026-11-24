@@ -1,0 +1,124 @@
+# See matrix.rbs for how the element type `T` is tracked.
+class Vector[T]
+  include ExceptionForMatrix
+  include Enumerable[T]
+
+  def self.[]: [E] (*E array) -> Vector[E]
+
+  def self.elements: [E] (Array[E] | Vector[E] array, ?boolish copy) -> Vector[E]
+
+  def self.basis: (size: Integer, index: Integer) -> Vector[Integer]
+
+  def self.zero: (Integer size) -> Vector[Integer]
+
+  def self.independent?: (*Vector[untyped] vs) -> bool
+
+  private def initialize: (Array[T] array) -> void
+
+  def []: %a{implicitly-returns-nil} (int i) -> T
+        | (Range[Integer?] range) -> Array[T]?
+  alias element []
+  alias component []
+
+  def []=: (int i, T v) -> void
+         | (Range[Integer?] range, Vector[T] | Matrix[T] | T v) -> void
+
+  def round: (?int ndigits) -> Vector[untyped]
+
+  def size: () -> Integer
+
+  def each: () { (T e) -> void } -> self
+          | () -> Enumerator[T, self]
+
+  def each2: [U] (Vector[U] | Array[U] v) { (T e1, U e2) -> void } -> self
+           | [U] (Vector[U] | Array[U] v) -> Enumerator[[T, U], self]
+
+  def collect2: [U, R] (Vector[U] | Array[U] v) { (T e1, U e2) -> R } -> Array[R]
+              | [U] (Vector[U] | Array[U] v) -> Enumerator[[T, U], Array[untyped]]
+
+  def independent?: (*Vector[untyped] vs) -> bool
+
+  def zero?: () -> bool
+
+  def freeze: () -> self
+
+  def ==: (untyped other) -> bool
+
+  def eql?: (untyped other) -> bool
+
+  def hash: () -> Integer
+
+  def *: (Matrix[T] x) -> Matrix[T]
+       | (Matrix[untyped] x) -> Matrix[untyped]
+       | (T x) -> Vector[T]
+       | (Numeric x) -> Vector[untyped]
+
+  def +: (Vector[T] v) -> Vector[T]
+       | (Vector[untyped] v) -> Vector[untyped]
+       | (Matrix[T] v) -> Matrix[T]
+       | (Matrix[untyped] v) -> Matrix[untyped]
+
+  def -: (Vector[T] v) -> Vector[T]
+       | (Vector[untyped] v) -> Vector[untyped]
+       | (Matrix[T] v) -> Matrix[T]
+       | (Matrix[untyped] v) -> Matrix[untyped]
+
+  def /: (T x) -> Vector[T]
+       | (Numeric x) -> Vector[untyped]
+
+  def +@: () -> Vector[T]
+
+  def -@: () -> Vector[T]
+
+  def inner_product: (Vector[T] v) -> T
+                   | (Vector[untyped] v) -> untyped
+  alias dot inner_product
+
+  def cross_product: (*Vector[T] vs) -> Vector[T]
+                   | (*Vector[untyped] vs) -> Vector[untyped]
+  alias cross cross_product
+
+  def collect: [U] () { (T e) -> U } -> Vector[U]
+             | () -> Enumerator[T, Vector[untyped]]
+  alias map collect
+
+  def collect!: () { (T e) -> T } -> self
+              | () -> Enumerator[T, self]
+  alias map! collect!
+
+  def magnitude: () -> Float
+  alias r magnitude
+  alias norm magnitude
+
+  def map2: [U, R] (Vector[U] | Array[U] v) { (T e1, U e2) -> R } -> Vector[R]
+          | [U] (Vector[U] | Array[U] v) -> Enumerator[[T, U], Vector[untyped]]
+
+  class ZeroVectorError < StandardError
+  end
+
+  def normalize: () -> Vector[untyped]
+
+  # Returns `0` (an Integer) when the vectors point in the same direction.
+  def angle_with: (Vector[untyped] v) -> (Float | Integer)
+
+  def covector: () -> Matrix[T]
+
+  def to_a: () -> Array[T]
+
+  def to_matrix: () -> Matrix[T]
+
+  %a{deprecated}
+  def elements_to_f: () -> Vector[Float]
+
+  %a{deprecated}
+  def elements_to_i: () -> Vector[Integer]
+
+  %a{deprecated}
+  def elements_to_r: () -> Vector[Rational]
+
+  def coerce: (Numeric other) -> [Matrix::Scalar, self]
+
+  def to_s: () -> String
+
+  def inspect: () -> String
+end
