@@ -1,0 +1,142 @@
+# Platform backends (ChildProcess::Unix and ChildProcess::Windows, each with
+# its own Process and IO subclass) are loaded depending on the platform and
+# are left out; ChildProcess.build returns one of them, typed here through
+# the common ChildProcess::AbstractProcess / ChildProcess::AbstractIO API.
+module ChildProcess
+  VERSION: String
+
+  interface _CloseOnExec
+    def close_on_exec=: (bool) -> untyped
+  end
+
+  type os = :linux | :macosx | :windows | :cygwin | :solaris | :bsd | :aix
+
+  # Every argument must be a String (raises ArgumentError otherwise).
+  # A single argument is run directly, never through a shell.
+  def self.new: (*String args) -> AbstractProcess
+  alias self.build self.new
+
+  def self.logger: () -> Logger
+
+  # nil resets to the default logger on $stderr.
+  def self.logger=: (Logger? logger) -> Logger?
+
+  def self.platform: () -> os
+
+  def self.platform_name: () -> String
+
+  def self.unix?: () -> bool
+
+  def self.linux?: () -> bool
+
+  def self.jruby?: () -> bool
+
+  def self.windows?: () -> bool
+
+  def self.posix_spawn_chosen_explicitly?: () -> bool
+
+  def self.posix_spawn?: () -> false
+
+  def self.posix_spawn=: (bool bool) -> bool
+
+  # Raises ChildProcess::Error for an unknown host OS.
+  def self.os: () -> os
+
+  def self.arch: () -> String
+
+  # Raises ChildProcess::Error if `file` does not respond to `close_on_exec=`.
+  def self.close_on_exec: (_CloseOnExec file) -> true
+
+  class Error < StandardError
+  end
+
+  class TimeoutError < Error
+  end
+
+  class SubclassResponsibility < Error
+  end
+
+  class InvalidEnvironmentVariable < Error
+  end
+
+  class LaunchError < Error
+  end
+
+  class AbstractIO
+    # What the child's stdout/stderr can be set to: an IO, Tempfile, File, ...
+    # (`to_io` is checked when it is set, `fileno` is used by #start).
+    interface _Stream
+      def to_io: () -> ::IO
+      def fileno: () -> Integer
+    end
+
+    attr_reader stderr: _Stream?
+
+    attr_reader stdout: _Stream?
+
+    # The write end of the child's stdin; set by #start when `duplex` is true.
+    attr_reader stdin: ::IO?
+
+    # Lets the child write to this process' STDOUT and STDERR.
+    def inherit!: () -> void
+
+    def stderr=: (_Stream io) -> _Stream
+
+    def stdout=: (_Stream io) -> _Stream
+  end
+
+  class AbstractProcess
+    POLL_INTERVAL: Float
+
+    # nil until the process has exited (and for detached processes).
+    attr_reader exit_code: Integer?
+
+    attr_accessor detach: bool
+
+    attr_accessor duplex: bool
+
+    # Keys and values are converted with `to_s`; a nil value unsets the
+    # variable in the child.
+    attr_reader environment: Hash[String | Symbol, _ToS?]
+
+    attr_accessor cwd: String?
+
+    attr_accessor leader: bool
+
+    def io: () -> AbstractIO
+
+    # nil until the process has started.
+    def pid: () -> Integer?
+
+    # Raises ChildProcess::LaunchError if the command cannot be run and
+    # ChildProcess::InvalidEnvironmentVariable for a bad environment entry.
+    def start: () -> self
+
+    # Returns the exit code when the process had to be killed, nil when it
+    # exited within `timeout` seconds, and true if it was already gone.
+    def stop: (?Numeric timeout) -> (Integer | true | nil)
+
+    # Returns the exit code, or nil for a detached process.
+    def wait: () -> Integer?
+
+    def exited?: () -> bool
+
+    def started?: () -> bool
+
+    def alive?: () -> bool
+
+    def crashed?: () -> bool
+
+    # Raises ChildProcess::TimeoutError if the process is still alive after
+    # `timeout` seconds.
+    def poll_for_exit: (Numeric timeout) -> nil
+  end
+
+  class ProcessSpawnProcess < AbstractProcess
+    attr_reader pid: Integer?
+
+    def exited?: () -> bool
+
+    def wait: () -> Integer?
+  end
+end
