@@ -1,0 +1,276 @@
+# WebSocket protocol implementation (handshakes and frames for drafts 75, 76
+# and 00-17 / RFC 6455).
+module WebSocket
+  DEFAULT_VERSION: Integer
+  ROOT: String
+  # Defined by `require "websocket/version"` (not loaded by `require "websocket"`).
+  VERSION: String
+
+  # Limit of frame payload size in bytes (default 20MB).
+  def self.max_frame_size: () -> Integer
+  def self.max_frame_size=: (Integer val) -> Integer
+
+  # If true, protocol errors raise WebSocket::Error instead of setting `error`.
+  def self.should_raise: () -> bool
+  def self.should_raise=: (bool val) -> bool
+
+  # Errors override `message` to return a Symbol, which is also what the
+  # `error` attribute of handshakes and frames is set to.
+  class Error < RuntimeError
+    class Frame < ::WebSocket::Error
+      class ControlFramePayloadTooLong < ::WebSocket::Error::Frame
+        def message: () -> :control_frame_payload_too_long
+      end
+
+      class DataFrameInsteadContinuation < ::WebSocket::Error::Frame
+        def message: () -> :data_frame_instead_continuation
+      end
+
+      class FragmentedControlFrame < ::WebSocket::Error::Frame
+        def message: () -> :fragmented_control_frame
+      end
+
+      class Invalid < ::WebSocket::Error::Frame
+        def message: () -> :invalid_frame
+      end
+
+      class InvalidPayloadEncoding < ::WebSocket::Error::Frame
+        def message: () -> :invalid_payload_encoding
+      end
+
+      class MaskTooShort < ::WebSocket::Error::Frame
+        def message: () -> :mask_is_too_short
+      end
+
+      class ReservedBitUsed < ::WebSocket::Error::Frame
+        def message: () -> :reserved_bit_used
+      end
+
+      class TooLong < ::WebSocket::Error::Frame
+        def message: () -> :frame_too_long
+      end
+
+      class UnexpectedContinuationFrame < ::WebSocket::Error::Frame
+        def message: () -> :unexpected_continuation_frame
+      end
+
+      class UnknownFrameType < ::WebSocket::Error::Frame
+        def message: () -> :unknown_frame_type
+      end
+
+      class UnknownOpcode < ::WebSocket::Error::Frame
+        def message: () -> :unknown_opcode
+      end
+
+      class UnknownCloseCode < ::WebSocket::Error::Frame
+        def message: () -> :unknown_close_code
+      end
+
+      class UnknownVersion < ::WebSocket::Error::Frame
+        def message: () -> :unknown_protocol_version
+      end
+    end
+
+    class Handshake < ::WebSocket::Error
+      class GetRequestRequired < ::WebSocket::Error::Handshake
+        def message: () -> :get_request_required
+      end
+
+      class InvalidAuthentication < ::WebSocket::Error::Handshake
+        def message: () -> :invalid_handshake_authentication
+      end
+
+      class InvalidHeader < ::WebSocket::Error::Handshake
+        def message: () -> :invalid_header
+      end
+
+      class UnsupportedProtocol < ::WebSocket::Error::Handshake
+        def message: () -> :unsupported_protocol
+      end
+
+      class InvalidStatusCode < ::WebSocket::Error::Handshake
+        def message: () -> :invalid_status_code
+      end
+
+      class NoHostProvided < ::WebSocket::Error::Handshake
+        def message: () -> :no_host_provided
+      end
+
+      class UnknownVersion < ::WebSocket::Error::Handshake
+        def message: () -> :unknown_protocol_version
+      end
+    end
+  end
+
+  module Handshake
+    # Abstract base of Client and Server.
+    class Base
+      # nil for a Client created without a host (its `error` is then set).
+      attr_reader host: String?
+
+      # nil for a Server before the request has been parsed.
+      attr_reader path: String?
+
+      attr_reader query: String?
+
+      attr_reader state: :new | :finished | :error
+
+      # nil for a Server before the request has been parsed.
+      attr_reader version: Integer?
+
+      attr_reader secure: bool?
+
+      attr_reader headers: Hash[String, String]
+
+      attr_reader protocols: Array[String]
+
+      # Set (instead of raising) when a protocol error occurs, unless
+      # WebSocket.should_raise is true.
+      attr_reader error: Symbol?
+
+      def <<: (String data) -> void
+
+      # Text of the request or response; an empty String when there is none
+      # yet or an error occurred.
+      def to_s: () -> String
+
+      def finished?: () -> bool
+
+      def valid?: () -> bool
+
+      # Data received after the handshake.
+      def leftovers: () -> String
+
+      def default_port: () -> Integer
+
+      def default_port?: () -> bool
+
+      def port: () -> Integer
+
+      def uri: () -> String
+    end
+
+    class Client < Base
+      # Raises WebSocket::Error::Handshake::NoHostProvided or UnknownVersion
+      # when WebSocket.should_raise is true; otherwise sets `error`.
+      def initialize: (?host: String, ?origin: String, ?path: String, ?port: Integer, ?query: String, ?secure: bool, ?url: String, ?uri: String, ?protocols: Array[String], ?version: Integer, ?headers: Hash[String, String]) -> void
+                    | (Hash[Symbol, untyped] args) -> void
+
+      attr_reader origin: String?
+
+      attr_reader headers: Hash[String, String]
+
+      def path: () -> String
+
+      def version: () -> Integer
+
+      # Parses the server response. Returns true when it is complete, false
+      # when more data is needed, nil when an error was set.
+      def <<: (String data) -> bool?
+
+      def should_respond?: () -> bool
+    end
+
+    class Server < Base
+      def initialize: (?secure: bool, ?protocols: Array[String]) -> void
+                    | (Hash[Symbol, untyped] args) -> void
+
+      def <<: (String data) -> void
+
+      # Raises WebSocket::Error::Handshake::UnknownVersion for an unknown version.
+      def from_rack: (Hash[untyped, untyped] env) -> :finished
+
+      # Raises WebSocket::Error::Handshake::UnknownVersion for an unknown version.
+      def from_hash: ({ ?headers: Hash[String, String]?, ?path: String?, ?query: String?, ?body: String? } hash) -> :finished
+
+      def should_respond?: () -> bool
+
+      def host: () -> String
+
+      def port: () -> Integer
+    end
+  end
+
+  module Frame
+    # Abstract base of Incoming and Outgoing.
+    class Base
+      attr_reader type: Symbol?
+
+      attr_reader version: Integer
+
+      # Set (instead of raising) when a protocol error occurs, unless
+      # WebSocket.should_raise is true.
+      attr_reader error: Symbol?
+
+      attr_accessor data: String
+
+      # Close code (drafts 07 and later).
+      attr_accessor code: Integer?
+
+      def error?: () -> bool
+
+      def support_type?: () -> bool
+    end
+
+    # Use Incoming::Client or Incoming::Server.
+    class Incoming < Base
+      # Sets `error` to :unknown_protocol_version for an unknown version
+      # (raises when WebSocket.should_raise is true). nil means the default.
+      def initialize: (?type: Symbol | String | nil, ?code: Integer?, ?data: String?, ?version: Integer?, ?decoded: bool?) -> void
+                    | (Hash[Symbol, untyped] args) -> void
+
+      def decoded?: () -> bool
+
+      # Adds raw data received from the peer.
+      def <<: (String data) -> String
+
+      # Next complete decoded frame, or nil when none is available or an
+      # error was set.
+      def next: () -> self?
+
+      def to_s: () -> String
+
+      class Client < Incoming
+        def incoming_masking?: () -> bool
+
+        def outgoing_masking?: () -> bool
+      end
+
+      class Server < Incoming
+        def incoming_masking?: () -> bool
+
+        def outgoing_masking?: () -> bool
+      end
+    end
+
+    # Use Outgoing::Client or Outgoing::Server.
+    class Outgoing < Base
+      # Sets `error` to :unknown_protocol_version for an unknown version
+      # (raises when WebSocket.should_raise is true). nil means the default;
+      # a nil close code means 1000.
+      def initialize: (?type: Symbol | String | nil, ?code: Integer?, ?data: String?, ?version: Integer?) -> void
+                    | (Hash[Symbol, untyped] args) -> void
+
+      def supported?: () -> bool
+
+      def require_sending?: () -> bool
+
+      # Encoded frame. nil when the frame type is not supported by the version
+      # or the close code is invalid (`error` is set, or an error is raised
+      # when WebSocket.should_raise is true).
+      def to_s: () -> String?
+
+      class Client < Outgoing
+        def incoming_masking?: () -> bool
+
+        def outgoing_masking?: () -> bool
+      end
+
+      class Server < Outgoing
+        def incoming_masking?: () -> bool
+
+        def outgoing_masking?: () -> bool
+      end
+    end
+  end
+end
