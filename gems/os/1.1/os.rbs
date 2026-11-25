@@ -1,0 +1,77 @@
+# Friendly predicates and helpers for determining the Ruby runtime platform.
+class OS
+  # Returns `RbConfig::CONFIG`.
+  def self.config: () -> Hash[String, String]
+
+  # True on Windows (`ENV['OS'] == 'Windows_NT'`), false on Cygwin and elsewhere.
+  def self.windows?: () -> bool
+
+  alias self.doze? self.windows?
+
+  # True for Linux, macOS and Cygwin.
+  def self.posix?: () -> bool
+
+  def self.linux?: () -> bool
+
+  def self.freebsd?: () -> bool
+
+  def self.iron_ruby?: () -> bool
+
+  # 32 or 64.
+  def self.bits: () -> Integer
+
+  def self.java?: () -> bool
+
+  alias self.jruby? self.java?
+
+  # Full path of the running Ruby executable.
+  def self.ruby_bin: () -> String
+
+  def self.mac?: () -> bool
+
+  def self.osx?: () -> bool
+
+  def self.x?: () -> bool
+
+  # Resident set size of the current process in bytes.
+  # Raises RuntimeError on platforms where it cannot be determined.
+  def self.rss_bytes: () -> Integer
+
+  def self.cygwin?: () -> bool
+
+  # "NUL" on Windows, "/dev/null" otherwise.
+  def self.dev_null: () -> String
+
+  # YAML dump of the relevant RbConfig entries and RUBY_PLATFORM.
+  def self.report: () -> String
+
+  # Raises RuntimeError on unknown platforms.
+  def self.cpu_count: () -> Integer
+
+  # "start", "open" or "xdg-open".
+  def self.open_file_command: () -> String
+
+  def self.app_config_path: (String name) -> String
+
+  # Parses /etc/os-release. A line without a value maps to nil.
+  # Raises RuntimeError when not on Linux or the file does not exist.
+  def self.parse_os_release: () -> Hash[Symbol, String?]
+
+  def self.host: () -> String
+
+  def self.host_cpu: () -> String
+
+  def self.host_os: () -> String
+
+  class Underlying
+    def self.bsd?: () -> bool
+
+    def self.windows?: () -> bool
+
+    def self.linux?: () -> bool
+
+    # nil when not on Linux; otherwise the result of `system('grep -q docker /proc/self/cgroup')`
+    # (true, false, or nil when the command cannot be run).
+    def self.docker?: () -> bool?
+  end
+end
