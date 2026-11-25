@@ -1,0 +1,127 @@
+module Multipart
+  module Post
+    VERSION: String
+
+    # Something `#read` can be called on, such as an IO, File, Tempfile or StringIO.
+    interface _Reader
+      def read: (?Integer? length) -> String?
+    end
+
+    # Wraps a file or IO for use as a value in the params of
+    # `Net::HTTP::Post::Multipart.new`.
+    # Other IO methods (`read`, `rewind`, `close`, ...) are delegated to `#io`
+    # with `method_missing` and are not declared here.
+    class UploadIO
+      # `filename_or_io` is a path to open or an object that responds to `#read`.
+      # `filename` defaults to the IO's `#path` (or "local.path") or to the given path.
+      def initialize: (String | _Reader filename_or_io, String content_type, ?String? filename, ?Hash[String, untyped] opts) -> void
+
+      attr_reader content_type: String
+
+      attr_reader original_filename: String
+
+      attr_reader local_path: String
+
+      # The given IO, or the File opened from the given path.
+      attr_reader io: untyped
+
+      # Extra headers for the file part, e.g. "Content-Transfer-Encoding".
+      attr_reader opts: Hash[String, untyped]
+    end
+
+    # Reads several IOs one after another as one stream.
+    class CompositeReadIO
+      # Each argument (or element of an Array argument) is an IO-like object
+      # that responds to `#read` and `#rewind`.
+      def initialize: (*untyped ios) -> void
+
+      def close: () -> void
+
+      def closed?: () -> bool
+
+      # Raises IOError when closed.
+      def read: (?nil length, ?String? outbuf) -> String
+              | (Integer length, ?String? outbuf) -> String?
+
+      def rewind: () -> Integer
+    end
+
+    module Parts
+      # A value that `Part.new` turns into a `FilePart`, such as an `UploadIO`.
+      # It must also respond to `#read` and to `#length` or `#local_path`.
+      interface _File
+        def content_type: () -> String
+
+        def original_filename: () -> String
+      end
+
+      module Part
+        # Returns a FilePart when `value` responds to `#content_type` and
+        # `#original_filename`, otherwise a ParamPart.
+        def self.new: (String boundary, String | Symbol name, untyped value, ?Hash[String, untyped]? headers) -> (FilePart | ParamPart)
+
+        def self.file?: (untyped value) -> bool
+
+        def length: () -> Integer
+
+        def to_io: () -> (StringIO | CompositeReadIO)
+      end
+
+      class ParamPart
+        include Part
+
+        # `headers` may set "Content-Type" and "Content-ID".
+        def initialize: (String boundary, String | Symbol name, untyped value, ?Hash[String, untyped] headers) -> void
+
+        def length: () -> Integer
+      end
+
+      class FilePart
+        include Part
+
+        def initialize: (String boundary, String | Symbol name, _File io, ?Hash[String, untyped] headers) -> void
+
+        attr_reader length: Integer
+      end
+
+      class EpiloguePart
+        include Part
+
+        def initialize: (String boundary) -> void
+      end
+    end
+
+    module Multipartable : Net::HTTPGenericRequest
+      def self.secure_boundary: () -> String
+
+      # `params` values are Strings (or anything with `#to_s`), UploadIOs, or
+      # Arrays of them. `headers[:parts]` maps a param name to headers for
+      # that part; the other entries are request headers.
+      def initialize: (String | URI::Generic path, Hash[String | Symbol, untyped] params, ?Hash[String | Symbol, untyped] headers, ?String boundary) -> void
+
+      attr_reader boundary: String
+    end
+  end
+end
+
+module Net
+  class HTTP
+    class Post
+      class Multipart < Post
+        include ::Multipart::Post::Multipartable
+      end
+    end
+
+    class Put
+      class Multipart < Put
+        include ::Multipart::Post::Multipartable
+      end
+    end
+  end
+end
+
+%a{deprecated: Use Multipart::Post::UploadIO instead}
+class UploadIO = Multipart::Post::UploadIO
+
+%a{deprecated: Use Multipart::Post::CompositeReadIO instead}
+class CompositeIO = Multipart::Post::CompositeReadIO
