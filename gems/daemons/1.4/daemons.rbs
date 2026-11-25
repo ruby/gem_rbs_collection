@@ -1,0 +1,298 @@
+# All functions and classes that Daemons provides reside in this module.
+module Daemons
+  VERSION: String
+
+  # Where pid files are written: relative to the script (`:script`), to the
+  # `:dir` option (`:normal`) or in /var/run (`:system`). Any other value makes
+  # `Daemons::Pid.dir` raise `Daemons::Error`.
+  type dir_mode = :script | :normal | :system
+
+  # Passes control to Daemons: parses `options[:ARGV]` (or `ARGV`) for a command
+  # such as "start" or "stop" and runs `script` as a daemon.
+  # Supported options are documented in the README (`:app_name`, `:ARGV`,
+  # `:dir_mode`, `:dir`, `:multiple`, `:ontop`, `:mode`, `:monitor`, ...).
+  def self?.run: (String script, ?Hash[Symbol, untyped] options) -> ApplicationGroup?
+
+  # Like `run`, but runs the block as the daemon instead of a script.
+  def self?.run_proc: (String app_name, ?Hash[Symbol, untyped] options) { () -> void } -> ApplicationGroup?
+
+  # Executes the block in a new daemon and returns its Application.
+  def self?.call: (?Hash[Symbol, untyped] options) { () -> void } -> Application
+
+  # Creates a new daemon Application for the block like `call`, without starting it.
+  def self?.new: (?Hash[Symbol, untyped] options) { () -> void } -> Application
+
+  # Daemonizes the current process.
+  def self?.daemonize: (?Hash[Symbol, untyped] options) -> void
+
+  # The internal ApplicationGroup instance.
+  def self?.group: () -> ApplicationGroup?
+
+  # The internal Controller instance.
+  def self?.controller: () -> Controller?
+
+  class Exception < ::RuntimeError
+  end
+
+  class RuntimeException < Daemons::Exception
+  end
+
+  class CmdException < Daemons::Exception
+  end
+
+  class Error < Daemons::Exception
+  end
+
+  class SystemError < Error
+    attr_reader system_error: untyped
+
+    def initialize: (String msg, untyped system_error) -> void
+  end
+
+  class TimeoutError < Error
+  end
+
+  class Application
+    interface _StatusCallback
+      def call: (Application) -> untyped
+    end
+
+    SIGNAL: String
+
+    attr_accessor app_argv: Array[String]?
+
+    attr_accessor controller_argv: Array[String]?
+
+    # The Pid instance belonging to this application.
+    attr_reader pid: Pid
+
+    # The ApplicationGroup the application belongs to.
+    attr_reader group: ApplicationGroup
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (ApplicationGroup group, ?Hash[Symbol, untyped] add_options, ?Pid? pid) -> void
+
+    # A Symbol or String names a method of the Application (raises NameError if
+    # there is none).
+    def show_status_callback=: (Symbol | String | _StatusCallback function) -> _StatusCallback
+
+    def change_privilege: () -> void
+
+    def script: () -> String?
+
+    def pidfile_dir: () -> String?
+
+    def logdir: () -> String?
+
+    def output_logfilename: () -> String
+
+    def output_logfile: () -> String?
+
+    def logfilename: () -> String
+
+    def logfile: () -> String?
+
+    def start_none: () -> void
+
+    # Replaces the current process with the script (Kernel.exec).
+    def start_exec: () -> bot
+
+    def start_load: () -> void
+
+    def start_proc: () -> void
+
+    def start: (?boolish restart) -> void
+
+    def started: () -> void
+
+    def reload: () -> void
+
+    def exception_log: () -> void
+
+    def stop: (?boolish no_wait) -> void
+
+    def wait_and_retry_kill_harder: (Integer pid, Array[{ sig: String, wait: Numeric }] remaining_signals, ?boolish no_wait) -> void
+
+    def zap: () -> void
+
+    def zap!: () -> void
+
+    def show_status: () -> void
+
+    def default_show_status: (?Application daemon) -> void
+
+    def running?: () -> bool
+  end
+
+  class ApplicationGroup
+    attr_reader app_name: String
+
+    attr_reader script: String?
+
+    attr_reader monitor: Monitor?
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    attr_reader applications: Array[Application]
+
+    attr_accessor controller_argv: Array[String]?
+
+    attr_accessor app_argv: Array[String]?
+
+    attr_accessor dir_mode: dir_mode
+
+    attr_accessor dir: String
+
+    # true if the application is supposed to run in multiple instances
+    attr_reader multiple: bool
+
+    def initialize: (String app_name, ?Hash[Symbol, untyped] options) -> void
+
+    # Finds the running instances of the application.
+    def setup: () -> Array[Application]
+
+    def pidfile_dir: () -> String?
+
+    def new_application: (?Hash[Symbol, untyped] add_options) -> Application
+
+    def create_monitor: (Application an_app) -> void
+
+    def start_all: () -> void
+
+    def stop_all: (?boolish no_wait) -> void
+
+    def reload_all: () -> void
+
+    def zap_all: () -> void
+
+    def show_status: () -> void
+
+    def running?: () -> bool
+  end
+
+  class Controller
+    COMMANDS: Array[String]
+
+    attr_reader app_name: String
+
+    attr_reader group: ApplicationGroup?
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (?Hash[Symbol, untyped] options, ?Array[String] argv) -> void
+
+    def setup_options: () -> void
+
+    def run: () -> void
+
+    # Splits argv into the command, the controller options and the application
+    # options (after "--").
+    def self.split_argv: (Array[String] argv) -> [ String?, Array[String], Array[String] ]
+
+    def print_usage: () -> void
+
+    # Returns nil when a Daemons::CmdException, Daemons::RuntimeException or
+    # OptionParser::ParseError was rescued and reported.
+    def catch_exceptions: [T] () { () -> T } -> T?
+  end
+
+  class Optparse
+    attr_reader usage: String
+
+    def initialize: (Controller controller) -> void
+
+    def parse: (Array[String] args) -> Hash[Symbol, true | String | Integer]
+  end
+
+  class Monitor
+    def self.find: (String dir, String app_name) -> Monitor?
+
+    def initialize: (Application an_app, ?Hash[Symbol, untyped] options) -> void
+
+    def start: (ApplicationGroup application_group) -> void
+
+    def stop: () -> void
+  end
+
+  class Pid
+    def self.running?: (Integer? pid) -> bool
+
+    # Returns nil when `dir_mode` is `:script` and `script` is nil.
+    def self.dir: (dir_mode dir_mode, String dir, String? script) -> String?
+
+    def initialize: () -> void
+
+    def pid: () -> Integer?
+
+    def pid=: (Integer p) -> void
+
+    def running?: () -> bool
+
+    def cleanup: () -> void
+
+    def zap: () -> void
+
+    def exist?: () -> bool
+  end
+
+  class PidFile < Pid
+    DEFAULT_PID_DELIMITER: String
+
+    attr_reader dir: String
+
+    attr_reader progname: String
+
+    attr_reader multiple: bool
+
+    attr_reader number: Integer?
+
+    attr_reader pid_delimiter: String
+
+    def self.find_files: (String dir, String progname, ?boolish delete, ?String? pid_delimiter) ?{ (Integer pid, String file) -> void } -> Array[String]
+
+    def self.existing: (String path) -> PidFile
+
+    def initialize: (String dir, String progname, ?bool multiple, ?String? pid_delimiter) -> void
+
+    def filename: () -> String
+
+    def exist?: () -> bool
+
+    def pid=: (Integer p) -> void
+
+    def cleanup: () -> void
+
+    def zap: () -> void
+
+    def pid: () -> Integer?
+  end
+
+  class PidMem < Pid
+    attr_accessor pid: Integer?
+
+    def self.existing: (Integer numeric_pid) -> PidMem
+  end
+end
+
+module Daemonize
+  # Forks, retrying every 5 seconds while the process limit is reached.
+  # Returns the child's pid in the parent and nil in the child.
+  def self?.safefork: () -> Integer?
+
+  # Simulates the daemonization process (:ontop mode).
+  def self?.simulate: (?String? logfile_name, ?String? app_name) -> void
+
+  # Calls the block in a new daemon process and returns its pid.
+  def self?.call_as_daemon: (^() -> void block, ?String? logfile_name, ?String? app_name) -> Integer
+
+  # Turns the current process into a daemon (the calling process exits) and
+  # returns the new session id in the daemon.
+  def self?.daemonize: (?String? logfile_name, ?String? app_name) -> Integer
+
+  def self?.close_io: () -> void
+
+  # Redirects $stdin to /dev/null and $stdout/$stderr to the given file,
+  # syslog ("SYSLOG") or /dev/null (nil).
+  def self?.redirect_io: (String? logfile_name) -> void
+end
