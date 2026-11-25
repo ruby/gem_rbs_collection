@@ -1,0 +1,69 @@
+module INotify
+  VERSION: String
+
+  # Raised by Notifier#read_events, #process and #run when the kernel reports
+  # that the inotify event queue has overflowed.
+  class QueueOverflowError < RuntimeError
+  end
+
+  class Notifier
+    # Flags accepted by #watch (see the documentation of Notifier#watch).
+    type flag = :access | :attrib | :close_write | :close_nowrite | :modify | :open
+              | :moved_from | :moved_to | :create | :delete | :delete_self | :move_self
+              | :close | :move | :all_events
+              | :onlydir | :dont_follow | :mask_add | :oneshot | :recursive
+
+    NON_RECURSIVE: String
+
+    # Raises SystemCallError if inotify cannot be initialized.
+    def initialize: () -> void
+
+    def fd: () -> Integer
+
+    def to_io: () -> IO
+
+    # Raises SystemCallError if the path cannot be watched. With :recursive the
+    # block is needed: without one, #process raises NoMethodError on the first event.
+    def watch: (String path, *flag flags) ?{ (Event event) -> void } -> Watcher
+
+    # Blocks until #stop is called.
+    def run: () -> void
+
+    def stop: () -> void
+
+    def process: () -> void
+
+    def close: () -> void
+
+    def read_events: () -> Array[Event]
+  end
+
+  class Watcher
+    attr_reader notifier: Notifier
+
+    attr_reader path: String
+
+    attr_reader flags: Array[Notifier::flag]
+
+    # Raises SystemCallError if the watch cannot be removed.
+    def close: () -> nil
+  end
+
+  class Event
+    attr_reader related: Array[Event]
+
+    attr_reader name: String
+
+    attr_reader notifier: Notifier
+
+    # nil when the watcher has already been closed (e.g. for the :ignored event
+    # that follows Watcher#close).
+    def watcher: () -> Watcher?
+
+    def absolute_name: () -> String
+
+    def flags: () -> Array[Symbol]
+
+    def size: () -> Integer
+  end
+end
