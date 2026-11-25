@@ -1,0 +1,276 @@
+module Slop
+  VERSION: String
+
+  # Builds a Slop::Options (yielding it to the block) and parses `items`.
+  # Raises Slop::Error subclasses unless `suppress_errors: true` is given.
+  def self.parse: (?Array[String] items, **untyped config) ?{ (Options options) -> void } -> Result
+
+  def self.option_defined?: (interned name) -> bool
+
+  def self.string_to_option: (String s) -> String
+
+  # Raises NameError when no such option class exists.
+  def self.string_to_option_class: (String s) -> singleton(Option)
+
+  class Error < StandardError
+  end
+
+  class NotImplementedError < Error
+  end
+
+  class MissingArgument < Error
+    attr_reader flags: Array[String]
+
+    def initialize: (String msg, Array[String] flags) -> void
+  end
+
+  class UnknownOption < Error
+    attr_reader flag: String
+
+    def initialize: (String msg, String flag) -> void
+  end
+
+  class MissingRequiredOption < Error
+  end
+
+  class InvalidOptionValue < Error
+    # Slop passes all flags of the option here.
+    attr_reader flag: Array[String]
+
+    def initialize: (String msg, Array[String] flag) -> void
+  end
+
+  class Option
+    DEFAULT_CONFIG: Hash[Symbol, bool]
+
+    attr_reader flags: Array[String]
+
+    attr_reader desc: String?
+
+    attr_reader config: Hash[Symbol, untyped]
+
+    attr_reader count: Integer
+
+    attr_reader block: Proc?
+
+    attr_writer value: untyped
+
+    def initialize: (Array[String] flags, String? desc, **untyped config) ?{ (untyped value) -> void } -> void
+
+    def reset: () -> Integer
+
+    # Called by the parser for every occurrence of the option. Increments
+    # #count, sets the value and calls the option's block.
+    # Raises Slop::MissingArgument or Slop::InvalidOptionValue unless errors
+    # are suppressed.
+    def ensure_call: (String | false | nil value) -> void
+
+    # Converts the argument to the option's value. Subclasses override it;
+    # on Slop::Option itself it raises Slop::NotImplementedError.
+    def call: (untyped value) -> untyped
+
+    def finish: (Result result) -> void
+
+    def expects_argument?: () -> bool
+
+    def null?: () -> bool
+
+    def value: () -> untyped
+
+    def default_value: () -> untyped
+
+    def suppress_errors?: () -> boolish
+
+    def required?: () -> boolish
+
+    def validate_type?: () -> boolish
+
+    def flag: () -> String
+
+    def key: () -> Symbol
+
+    def valid?: (untyped value) -> boolish
+
+    def underscore_flags?: () -> boolish
+
+    def help?: () -> boolish
+
+    def tail?: () -> boolish
+
+    def tail: () -> Integer
+
+    def to_s: (?offset: Integer) -> String
+  end
+
+  class StringOption < Option
+    def call: (String | false value) -> String
+  end
+
+  class SymbolOption < Option
+    def call: (String value) -> Symbol
+  end
+
+  class BoolOption < Option
+    FALSE_VALUES: Array[String | bool]
+
+    TRUE_VALUES: Array[String | bool]
+
+    VALID_VALUES: Array[String | bool]
+
+    attr_accessor explicit_value: String | bool | nil
+
+    def valid?: (String | bool | nil value) -> bool
+
+    def call: (String | bool | nil value) -> bool
+
+    def force_false?: () -> bool
+  end
+
+  class BooleanOption = BoolOption
+
+  class IntegerOption < Option
+    INT_STRING_REGEXP: Regexp
+
+    def valid?: (String value) -> Integer?
+
+    def call: (String value) -> Integer
+  end
+
+  class IntOption = IntegerOption
+
+  class FloatOption < Option
+    FLOAT_STRING_REGEXP: Regexp
+
+    def valid?: (String value) -> Integer?
+
+    def call: (String value) -> Float
+  end
+
+  class ArrayOption < Option
+    def call: (String value) -> Array[String]
+
+    def delimiter: () -> (String | Regexp | nil)
+
+    def limit: () -> Integer
+  end
+
+  class RegexpOption < Option
+    def call: (String value) -> Regexp
+  end
+
+  class NullOption < BoolOption
+  end
+
+  class Options
+    include Enumerable[Option]
+
+    DEFAULT_CONFIG: Hash[Symbol, String | bool]
+
+    attr_reader options: Array[Option]
+
+    # Indexed by option position; positions without a separator are nil.
+    attr_reader separators: Array[String?]
+
+    attr_reader parser: Parser
+
+    attr_reader config: Hash[Symbol, untyped]
+
+    # A String, or the value given as `banner:` (false or nil turns the banner off).
+    attr_accessor banner: String | bool | nil
+
+    attr_accessor validate_types: bool?
+
+    def initialize: (**untyped config) ?{ (Options options) -> void } -> void
+
+    # The last argument is the description unless it starts with "-".
+    # Raises ArgumentError for a flag that is already defined.
+    def on: (*String flags, **untyped config) ?{ (untyped value) -> void } -> Option
+
+    # Option types, dispatched through method_missing.
+    def string: (*String flags, **untyped config) ?{ (untyped value) -> void } -> StringOption
+
+    def symbol: (*String flags, **untyped config) ?{ (untyped value) -> void } -> SymbolOption
+
+    def bool: (*String flags, **untyped config) ?{ (untyped value) -> void } -> BoolOption
+
+    def boolean: (*String flags, **untyped config) ?{ (untyped value) -> void } -> BoolOption
+
+    def integer: (*String flags, **untyped config) ?{ (untyped value) -> void } -> IntegerOption
+
+    def int: (*String flags, **untyped config) ?{ (untyped value) -> void } -> IntegerOption
+
+    def float: (*String flags, **untyped config) ?{ (untyped value) -> void } -> FloatOption
+
+    def array: (*String flags, **untyped config) ?{ (untyped value) -> void } -> ArrayOption
+
+    def regexp: (*String flags, **untyped config) ?{ (untyped value) -> void } -> RegexpOption
+
+    def null: (*String flags, **untyped config) ?{ (untyped value) -> void } -> NullOption
+
+    def separator: (?String string) -> String
+
+    def parse: (Array[String] strings) -> Result
+
+    def each: () { (Option option) -> void } -> Array[Option]
+            | () -> Enumerator[Option, Array[Option]]
+
+    def to_a: () -> Array[Option]
+
+    def to_s: (?prefix: String) -> String
+  end
+
+  class Parser
+    attr_reader options: Options
+
+    attr_reader config: Hash[Symbol, untyped]
+
+    attr_reader arguments: Array[String]
+
+    def initialize: (Options options, **untyped config) -> void
+
+    def reset: () -> self
+
+    def parse: (Array[String] strings) -> Result
+
+    def used_options: () -> Array[Option]
+
+    def unused_options: () -> Array[Option]
+  end
+
+  class Result
+    attr_reader parser: Parser
+
+    attr_reader options: Options
+
+    def initialize: (Parser parser) -> void
+
+    # nil when no option matches the flag.
+    def []: (interned flag) -> untyped
+
+    alias get []
+
+    # Raises Slop::UnknownOption when no option matches the flag.
+    def fetch: (interned flag) -> untyped
+
+    # Raises ArgumentError when no option matches the flag.
+    def []=: [T] (interned flag, T value) -> T
+
+    alias set []=
+
+    def option: (interned flag) -> Option?
+
+    def used_options: () -> Array[Option]
+
+    def unused_options: () -> Array[Option]
+
+    def arguments: () -> Array[String]
+
+    alias args arguments
+
+    def to_hash: () -> Hash[Symbol, untyped]
+
+    alias to_h to_hash
+
+    def to_s: (?prefix: String) -> String
+  end
+end
