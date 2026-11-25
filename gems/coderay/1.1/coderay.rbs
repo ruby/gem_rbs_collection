@@ -1,0 +1,409 @@
+module CodeRay
+  type plugin_id = Symbol | String
+
+  type options = Hash[Symbol, untyped]
+
+  type filename = String | _ToPath
+
+  VERSION: String
+
+  CODERAY_PATH: String
+
+  def self.coderay_path: (*String path) -> String
+
+  # Scans `code` with the scanner for `lang`. The result encodes lazily:
+  # `CodeRay.scan(code, :ruby).html`, `.div`, `.tokens`, ...
+  def self.scan: (_ToS code, plugin_id lang, ?options options) -> TokensProxy
+
+  # `lang` defaults to `:auto` (detected with FileType, falling back to `:text`).
+  def self.scan_file: (filename filename, ?plugin_id lang, ?options options) -> TokensProxy
+
+  # The result depends on the encoder (a String for most, an Integer for
+  # :count and :lines_of_code, Tokens for :filter, ...).
+  def self.encode: (_ToS code, plugin_id lang, plugin_id format, ?options options) -> untyped
+
+  def self.encode_tokens: (Array[String | Symbol] | TokensProxy tokens, plugin_id format, ?options options) -> untyped
+
+  def self.encode_file: (filename filename, plugin_id format, ?options options) -> untyped
+
+  def self.highlight: (_ToS code, plugin_id lang, ?options options, ?plugin_id format) -> untyped
+
+  def self.highlight_file: (filename filename, ?options options, ?plugin_id format) -> untyped
+
+  # Raises PluginHost::PluginNotFound for an unknown format.
+  def self.encoder: (plugin_id format, ?options options) -> Encoders::Encoder
+
+  # Unknown languages fall back to the Text scanner.
+  def self.scanner: (plugin_id lang, ?options options) -> Scanners::Scanner
+
+  def self.get_scanner_options: (options options) -> options
+
+  # A Hash of all known token kinds and their CSS classes (false when unknown).
+  TokenKinds: Hash[Symbol, String | false]
+
+  class Duo
+    attr_accessor lang: plugin_id?
+
+    attr_accessor format: plugin_id?
+
+    attr_accessor options: options
+
+    # `Duo.new(ruby: :html)` is the same as `Duo.new(:ruby, :html)`.
+    def initialize: (Hash[plugin_id, plugin_id] lang_to_format, ?nil format, ?options options) -> void
+                  | (?plugin_id? lang, ?plugin_id? format, ?options options) -> void
+
+    def self.[]: (Hash[plugin_id, plugin_id] lang_to_format, ?nil format, ?options options) -> Duo
+               | (?plugin_id? lang, ?plugin_id? format, ?options options) -> Duo
+
+    def scanner: () -> Scanners::Scanner
+
+    def encoder: () -> Encoders::Encoder
+
+    def encode: (_ToS code, ?options options) -> untyped
+
+    alias highlight encode
+
+    alias call encode
+  end
+
+  class Tokens < Array[String | Symbol]
+    attr_accessor scanner: Scanners::Scanner?
+
+    def encode: (plugin_id | Encoders::Encoder encoder, ?options options) -> untyped
+
+    def to_s: () -> String
+
+    def split_into_parts: (*Integer sizes) -> Array[Tokens]
+
+    # The number of tokens (half the Array size).
+    def count: () -> Integer
+
+    def text_token: (String text, Symbol kind) -> self
+
+    def begin_group: (Symbol kind) -> self
+
+    def end_group: (Symbol kind) -> self
+
+    def begin_line: (Symbol kind) -> self
+
+    def end_line: (Symbol kind) -> self
+
+    def tokens: (*Array[String | Symbol] tokens) -> self
+  end
+
+  class TokensProxy
+    attr_accessor input: _ToS
+
+    attr_accessor lang: plugin_id
+
+    attr_accessor options: options
+
+    attr_accessor block: Proc?
+
+    def initialize: (_ToS input, plugin_id lang, ?options options, ?Proc? block) -> void
+
+    def encode: (plugin_id | Encoders::Encoder encoder, ?options options) -> untyped
+
+    # An Array of Tokens when the input is an Array of Strings (each part is
+    # scanned separately).
+    def tokens: () -> (Tokens | Array[Tokens])
+
+    def scanner: () -> Scanners::Scanner
+
+    # Yields the tokens; whole Tokens parts when the input was an Array of Strings.
+    def each: () ?{ (String | Symbol | Tokens item) -> void } -> self
+  end
+
+  module FileType
+    class UnknownFileType < Exception
+    end
+
+    TypeFromExt: Hash[String, Symbol]
+
+    TypeFromName: Hash[String, Symbol]
+
+    TypeFromShebang: Regexp
+
+    def self.[]: (filename filename, ?boolish read_shebang) -> Symbol?
+
+    # Raises UnknownFileType when the type is unknown and neither a default
+    # nor a block is given.
+    def self.fetch: (filename filename, ?nil default, ?boolish read_shebang) -> Symbol
+                  | [T] (filename filename, T default, ?boolish read_shebang) -> (Symbol | T)
+                  | [T] (filename filename, ?untyped default, ?boolish read_shebang) { () -> T } -> (Symbol | T)
+  end
+
+  module PluginHost
+    class PluginNotFound < LoadError
+    end
+
+    class HostNotFound < LoadError
+    end
+
+    PLUGIN_HOSTS: Array[PluginHost]
+
+    PLUGIN_HOSTS_BY_ID: Hash[untyped, untyped]
+
+    # load_all and all_plugins raise PluginNotFound on CodeRay's own hosts
+    # (their plugin directory holds the unregistered base class); they work
+    # for user-defined hosts.
+    def load_all: () -> void
+
+    # Raises PluginNotFound when there is no such plugin and no default.
+    def []: (plugin_id id) -> Class
+
+    alias load []
+
+    def plugin_path: (*String args) -> String
+
+    def map: (Hash[plugin_id, plugin_id] hash) -> void
+
+    def default: (?nil) -> Class
+               | (plugin_id id) -> String
+
+    def register: (Class plugin, plugin_id id) -> void
+
+    def plugin_hash: () -> Hash[String | Symbol, Class | String]
+
+    def list: () -> Array[Symbol]
+
+    def all_plugins: () -> Array[Class]
+
+    def load_plugin_map: () -> bool
+  end
+
+  module Plugin : Module
+    attr_reader plugin_id: Symbol?
+
+    def register_for: (Symbol id) -> void
+
+    def title: (?_ToS? title) -> String
+
+    def plugin_host: (?PluginHost host) -> PluginHost
+  end
+
+  module Encoders
+    extend PluginHost
+
+    def self.[]: (plugin_id id) -> singleton(Encoder)
+
+    def self.load: (plugin_id id) -> singleton(Encoder)
+
+    class Encoder
+      extend Plugin
+
+      DEFAULT_OPTIONS: options
+
+      def self.file_extension: () -> String
+
+      attr_accessor options: options
+
+      attr_accessor scanner: Scanners::Scanner?
+
+      def initialize: (?options options) -> void
+
+      def encode_tokens: (Array[String | Symbol] | TokensProxy tokens, ?options options) -> untyped
+
+      def encode: (_ToS code, plugin_id lang, ?options options) -> untyped
+
+      alias highlight encode
+
+      def file_extension: () -> String
+
+      # Deprecated: use #token.
+      def <<: ([String | Symbol, Symbol] token) -> void
+
+      def token: (String | Symbol content, Symbol kind) -> void
+
+      def text_token: (String text, Symbol kind) -> void
+
+      def begin_group: (Symbol kind) -> void
+
+      def end_group: (Symbol kind) -> void
+
+      def begin_line: (Symbol kind) -> void
+
+      def end_line: (Symbol kind) -> void
+    end
+
+    class HTML < Encoder
+      FILE_EXTENSION: String
+
+      DEFAULT_OPTIONS: options
+    end
+
+    class Div < HTML
+      FILE_EXTENSION: String
+
+      DEFAULT_OPTIONS: options
+    end
+
+    class Span < HTML
+      FILE_EXTENSION: String
+
+      DEFAULT_OPTIONS: options
+    end
+
+    class Page < HTML
+      FILE_EXTENSION: String
+
+      DEFAULT_OPTIONS: options
+    end
+
+    class Terminal < Encoder
+      TOKEN_COLORS: Hash[Symbol, String | Hash[Symbol, String] | nil]
+    end
+
+    class Text < Encoder
+      FILE_EXTENSION: String
+
+      DEFAULT_OPTIONS: options
+    end
+
+    class JSON < Encoder
+      FILE_EXTENSION: String
+    end
+
+    class XML < Encoder
+      FILE_EXTENSION: String
+
+      DEFAULT_OPTIONS: options
+    end
+
+    class YAML < Encoder
+      FILE_EXTENSION: String
+    end
+
+    class Debug < Encoder
+      FILE_EXTENSION: String
+    end
+
+    class DebugLint < Debug
+    end
+
+    class Lint < Debug
+      class InvalidTokenStream < StandardError
+      end
+
+      class EmptyToken < InvalidTokenStream
+      end
+
+      class UnknownTokenKind < InvalidTokenStream
+      end
+
+      class IncorrectTokenGroupNesting < InvalidTokenStream
+      end
+    end
+
+    class Null < Encoder
+    end
+
+    class Statistic < Encoder
+    end
+
+    class Count < Encoder
+      def encode_tokens: (Array[String | Symbol] | TokensProxy tokens, ?options options) -> Integer
+
+      def encode: (_ToS code, plugin_id lang, ?options options) -> Integer
+
+      alias highlight encode
+    end
+
+    class Filter < Encoder
+      def encode_tokens: (Array[String | Symbol] | TokensProxy tokens, ?options options) -> Tokens
+
+      def encode: (_ToS code, plugin_id lang, ?options options) -> Tokens
+
+      alias highlight encode
+    end
+
+    class TokenKindFilter < Filter
+      DEFAULT_OPTIONS: options
+    end
+
+    class CommentFilter < TokenKindFilter
+      DEFAULT_OPTIONS: options
+    end
+
+    class LinesOfCode < TokenKindFilter
+      NON_EMPTY_LINE: Regexp
+
+      def encode_tokens: (Array[String | Symbol] | TokensProxy tokens, ?options options) -> Integer
+
+      def encode: (_ToS code, plugin_id lang, ?options options) -> Integer
+
+      alias highlight encode
+    end
+  end
+
+  module Scanners
+    extend PluginHost
+
+    # Unknown languages fall back to the Text scanner.
+    def self.[]: (plugin_id id) -> singleton(Scanner)
+
+    def self.load: (plugin_id id) -> singleton(Scanner)
+
+    class Scanner < StringScanner
+      extend Plugin
+
+      include Enumerable[String | Symbol]
+
+      class ScanError < StandardError
+      end
+
+      DEFAULT_OPTIONS: options
+
+      KINDS_NOT_LOC: Array[Symbol]
+
+      def self.normalize: (_ToS code) -> String
+
+      def self.file_extension: (?_ToS extension) -> String
+
+      def self.encoding: (?String name) -> Encoding
+
+      def self.lang: () -> Symbol?
+
+      attr_accessor state: untyped
+
+      # Raises NotImplementedError on the Scanner base class itself.
+      def initialize: (?_ToS code, ?options options) -> void
+
+      def reset: () -> void
+
+      def string=: (_ToS code) -> void
+
+      def lang: () -> Symbol?
+
+      def file_extension: () -> String
+
+      # Returns the encoder instead of Tokens when one was passed as the
+      # :tokens option (as Encoder#encode does).
+      def tokenize: (Array[String] source, ?options options) -> Array[Tokens]
+                  | (?_ToS? source, ?options options) -> (Tokens | Encoders::Encoder)
+
+      def tokens: () -> (Tokens | Encoders::Encoder)
+
+      def each: () { (String | Symbol item) -> void } -> Tokens
+              | () -> Enumerator[String | Symbol, Tokens]
+
+      def line: (?Integer pos) -> Integer
+
+      def column: (?Integer pos) -> Integer
+
+      def binary_string: () -> String
+    end
+  end
+
+  module Styles
+    extend PluginHost
+
+    def self.[]: (plugin_id id) -> singleton(Style)
+
+    def self.load: (plugin_id id) -> singleton(Style)
+
+    class Style
+      extend Plugin
+    end
+  end
+end
