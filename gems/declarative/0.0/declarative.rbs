@@ -1,0 +1,153 @@
+# Type signatures for the declarative gem.
+#
+# Left out on purpose:
+#   * `declarative/testing` (Declarative.Inspect, Declarative::Inspect,
+#     Declarative::Inspect::Schema, Declarative::Definitions::Inspect): test
+#     helpers that are not loaded by `require "declarative"`.
+#   * Internal helpers: DeepDup.dup_items, Defaults#handle_array_and_deprecate,
+#     Schema::DSL::NestedBuilder and the private methods.
+module Declarative
+  VERSION: String
+
+  # Deep-copies nested arrays and hashes. Every other object is returned as is.
+  # Subclasses of Array and Hash are copied into plain arrays and hashes.
+  module DeepDup
+    def self.call: (::Hash[untyped, untyped] args) -> ::Hash[untyped, untyped]
+                 | (::Array[untyped] args) -> ::Array[untyped]
+                 | [T] (T args) -> T
+  end
+
+  # Mutable DSL object that collects default options for definitions.
+  class Defaults
+    def initialize: () -> void
+
+    # Sets static defaults and, with a block, the dynamic defaults computed
+    # for every definition from its name and options.
+    def merge!: (?::Hash[Symbol, untyped] hash) ?{ ((Symbol | String)? name, ::Hash[Symbol, untyped] given_options) -> ::Hash[Symbol, untyped] } -> self
+
+    # Evaluates the defaults and merges `given_options` into them.
+    def call: ((Symbol | String)? name, ::Hash[Symbol, untyped] given_options) -> ::Hash[Symbol, untyped]
+
+    # Wraps array values in Variables::Append.
+    def self.wrap_arrays: (::Hash[Symbol, untyped] variables) -> ::Hash[Symbol, Variables::Proc]
+  end
+
+  # Hash of definition name to definition.
+  #
+  # #each yields the definitions only, and so do the Enumerable methods that
+  # Hash does not define itself (map, find, first, ...); the common ones are
+  # declared below. Hash's own methods (select, reject, to_a, ...) work on
+  # pairs.
+  class Definitions < ::Hash[String, Definitions::Definition]
+    class Definition
+      def initialize: (Symbol | String name, ?::Hash[Symbol, untyped] options) -> void
+
+      def []: (Symbol name) -> untyped
+
+      def merge!: (::Hash[Symbol, untyped] hash) -> self
+
+      # Returns a deep copy of the options with `hash` merged in.
+      def merge: (::Hash[Symbol, untyped] hash) -> ::Hash[Symbol, untyped]
+    end
+
+    def initialize: (singleton(Definition) definition_class) -> void
+
+    def each: () { (Definition) -> void } -> ::Array[Definition]
+            | () -> ::Enumerator[Definition, ::Array[Definition]]
+
+    # The block is not called here: it is handed to the `:_nested_builder`
+    # option as `:_block`, so its arguments and self depend on that builder.
+    def add: (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) -> void } -> Definition
+
+    def get: (Symbol | String name) -> Definition?
+
+    def map: [U] () { (Definition) -> U } -> ::Array[U]
+           | () -> ::Enumerator[Definition, ::Array[untyped]]
+
+    alias collect map
+
+    def flat_map: [U] () { (Definition) -> (::Array[U] | U) } -> ::Array[U]
+                | () -> ::Enumerator[Definition, ::Array[untyped]]
+
+    def find: () { (Definition) -> boolish } -> Definition?
+            | () -> ::Enumerator[Definition, Definition?]
+
+    alias detect find
+
+    def find_all: () { (Definition) -> boolish } -> ::Array[Definition]
+                | () -> ::Enumerator[Definition, ::Array[Definition]]
+
+    def each_with_index: () { (Definition, Integer) -> void } -> self
+                       | () -> ::Enumerator[[ Definition, Integer ], self]
+
+    def first: () -> Definition?
+             | (int n) -> ::Array[Definition]
+
+    def sort_by: () { (Definition) -> untyped } -> ::Array[Definition]
+               | () -> ::Enumerator[Definition, ::Array[Definition]]
+
+    def group_by: [U] () { (Definition) -> U } -> ::Hash[U, ::Array[Definition]]
+                | () -> ::Enumerator[Definition, ::Hash[untyped, ::Array[Definition]]]
+  end
+
+  # Records DSL calls so they can be replayed on an inheriting class or module.
+  class Heritage < ::Array[::Hash[Symbol, untyped]]
+    def record: (Symbol method, *untyped args) ?{ (?) -> untyped } -> self
+
+    # Replays the recorded calls on `inheritor`. The block receives each
+    # recorded call (`{ method:, args:, block: }`) before it is replayed.
+    def call: (Object inheritor) ?{ (::Hash[Symbol, untyped] cfg) -> void } -> self
+
+    module DSL
+      def heritage: () -> Heritage
+    end
+
+    # Extend a class with this (and DSL) to replay the heritage on subclasses.
+    module Inherited
+      def inherited: (Class subclass) -> void
+    end
+
+    # Extend a module with this (and DSL) to replay the heritage on includers.
+    module Included
+      def included: (Module mod) -> void
+    end
+  end
+
+  # `extend Declarative::Schema` also extends the class with Schema::DSL,
+  # Schema::Feature, Heritage::DSL and Heritage::Inherited. Declare those
+  # `extend`s in your own signatures to use the DSL. The class must define
+  # `self.default_nested_class`.
+  module Schema
+    def self.extended: (Module extender) -> void
+
+    module DSL
+      # With the default nested builder, the block is evaluated with
+      # class_eval in a new subclass of `default_nested_class`, which is
+      # expected to be a schema class itself.
+      def property: (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) [self: Class & Schema::DSL & Schema::Feature & Heritage::DSL] -> void } -> Definitions::Definition
+
+      def defaults: (?::Hash[Symbol, untyped] options) ?{ ((Symbol | String)? name, ::Hash[Symbol, untyped] given_options) -> ::Hash[Symbol, untyped] } -> Defaults
+
+      def definitions: () -> Definitions
+
+      def definition_class: () -> singleton(Definitions::Definition)
+    end
+
+    module Feature
+      # Includes the modules and registers them so nested schemas include them too.
+      def feature: (*Module mods) -> ::Array[Module]
+    end
+  end
+
+  # Merges option hashes, honoring Variables::Merge and Variables::Append.
+  class Variables
+    class Proc < ::Proc
+    end
+
+    def self.merge: [K] (::Hash[K, untyped] defaults, ::Hash[K, untyped] overrides) -> ::Hash[K, untyped]
+
+    def self.Merge: (::Hash[untyped, untyped] merged_hash) -> Variables::Proc
+
+    def self.Append: (::Array[untyped] appended_array) -> Variables::Proc
+  end
+end
