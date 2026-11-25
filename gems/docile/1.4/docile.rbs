@@ -1,0 +1,23 @@
+# Docile turns any object into a DSL: the block runs with `self` set to a
+# proxy that sends method calls to `dsl` first and falls back to the block's
+# own context. The `[self: T]` block types describe the DSL side only.
+#
+# Only the singleton methods are declared. The private instance copies made by
+# `module_function` call `exec_in_proxy_context`, which only `Docile` itself
+# has (it extends `Docile::Execution`), so `include Docile` alone does not
+# give working methods.
+module Docile
+  VERSION: String
+
+  # Executes the block against `dsl` and returns `dsl`. For an imperative DSL
+  # whose methods modify the context object. `args` are passed to the block.
+  def self.dsl_eval: [T] (T dsl, *untyped args, **untyped kwargs) { (*untyped) [self: T] -> void } -> T
+
+  # Like `dsl_eval`, but returns the value of the block.
+  def self.dsl_eval_with_block_return: [T, R] (T dsl, *untyped args, **untyped kwargs) { (*untyped) [self: T] -> R } -> R
+
+  # Executes the block against an immutable `dsl`; each DSL call replaces the
+  # context with its return value. Returns the value of the block, which is
+  # the result of the final DSL call.
+  def self.dsl_eval_immutable: [T, R] (T dsl, *untyped args, **untyped kwargs) { (*untyped) [self: T] -> R } -> R
+end
