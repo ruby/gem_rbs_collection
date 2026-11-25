@@ -1,10 +1,14 @@
 # active_support/duration.rb
 module ActiveSupport
-  # K records which parts a Duration can hold: :calendar for days, weeks,
-  # months and years, :clock for seconds, minutes and hours, a union of
-  # both when mixed, and top when unknown. Date#+ uses it to tell a Date
-  # result from a Time one.
+  # K is the union of the keys a Duration can hold in @parts, or top
+  # when unknown. Date#+ uses it to tell a Date result from a Time one.
   class Duration[out K = top]
+    # Parts that Date#advance handles (Duration::VARIABLE_PARTS)
+    type date_parts = :years | :months | :weeks | :days
+
+    # Parts that go through Date#since
+    type time_parts = :hours | :minutes | :seconds
+
     class Scalar
       def coerce: (untyped other) -> [Scalar, self]
                 | ...
@@ -35,13 +39,13 @@ module ActiveSupport
     def coerce: (untyped other) -> [Scalar, self]
               | ...
 
-    # A Numeric operand is added as seconds.
+    # A Numeric operand is added to the :seconds part.
     def +: [K2] (Duration[K2] other) -> Duration[K | K2]
-         | (Numeric other) -> Duration[K | :clock]
+         | (Numeric other) -> Duration[K | :seconds]
          | ...
 
     def -: [K2] (Duration[K2] other) -> Duration[K | K2]
-         | (Numeric other) -> Duration[K | :clock]
+         | (Numeric other) -> Duration[K | :seconds]
          | ...
 
     def *: (Duration | Numeric other) -> Duration[K]
@@ -58,17 +62,17 @@ end
 
 # active_support/core_ext/date/calculations.rb
 class Date
-  # Keep these overloads split by kind: a Duration with only calendar
-  # parts advances the Date and returns a Date, while any clock part
-  # goes through Date#since and returns a Time or TimeWithZone. One
-  # signature for all Durations would be wrong for one of the two.
-  def +: (ActiveSupport::Duration[:calendar] other) -> self
-       | (ActiveSupport::Duration[:clock] other) -> (Time | ActiveSupport::TimeWithZone)
+  # Keep these overloads split by part: a Duration with only date parts
+  # advances the Date and returns a Date, while any time part goes
+  # through Date#since and returns a Time or TimeWithZone. One signature
+  # for all Durations would be wrong for one of the two.
+  def +: (ActiveSupport::Duration[ActiveSupport::Duration::date_parts] other) -> self
+       | (ActiveSupport::Duration[ActiveSupport::Duration::time_parts] other) -> (Time | ActiveSupport::TimeWithZone)
        | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
        | ...
 
-  def -: (ActiveSupport::Duration[:calendar] other) -> self
-       | (ActiveSupport::Duration[:clock] other) -> (Time | ActiveSupport::TimeWithZone)
+  def -: (ActiveSupport::Duration[ActiveSupport::Duration::date_parts] other) -> self
+       | (ActiveSupport::Duration[ActiveSupport::Duration::time_parts] other) -> (Time | ActiveSupport::TimeWithZone)
        | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
        | ...
 end
