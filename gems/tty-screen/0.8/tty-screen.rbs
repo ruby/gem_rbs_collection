@@ -1,0 +1,39 @@
+module TTY
+  # Terminal screen size detection. Call the methods on the module, e.g.
+  # `TTY::Screen.size`. The private instance copies that `module_function`
+  # makes are left out: they call `output` and `env`, which only exist on
+  # the module, so they raise NameError when included without a terminal.
+  module Screen
+    VERSION: String
+
+    # What `env` must respond to: `ENV` or a Hash of String names to String
+    # values, e.g. `{"LINES" => "51", "COLUMNS" => "211"}`.
+    interface _Env
+      def []: (String name) -> String?
+      def fetch: (String name, String default) -> String
+    end
+
+    # What `output` must respond to, e.g. `$stderr` (the default) or
+    # `$stdout`. `winsize` is used as well when the stream responds to it.
+    interface _Output
+      def tty?: () -> boolish
+    end
+
+    # The environment variables read for the size; `ENV` by default.
+    attr_accessor self.env: _Env
+
+    # The output stream checked for a terminal; `$stderr` by default.
+    attr_accessor self.output: _Output
+
+    # The terminal size as `[height, width]`; falls back to `[27, 80]`.
+    def self.size: (?verbose: boolish) -> [Integer, Integer]
+
+    def self.width: () -> Integer
+    alias self.columns self.width
+    alias self.cols self.width
+
+    def self.height: () -> Integer
+    alias self.rows self.height
+    alias self.lines self.height
+  end
+end
