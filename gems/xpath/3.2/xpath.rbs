@@ -1,0 +1,281 @@
+# XPath is a Ruby DSL for building XPath 1.0 expressions.
+#
+# Arguments that end up in the rendered XPath (comparison operands, function
+# arguments, `where` conditions) accept any object: a String is rendered as an
+# XPath string literal, an Expression or Union is rendered recursively, a
+# Literal is inserted as is, and anything else is inserted with `to_s` (so a
+# Symbol is an XPath name and an Integer a number). They are typed `untyped`.
+#
+# Element, attribute, axis and function names are Symbols: a String there is
+# rendered as a quoted string literal, which gives broken XPath.
+module XPath
+  extend XPath::DSL
+
+  include XPath::DSL
+
+  # Defined in xpath/version, which `require "xpath"` does not load.
+  VERSION: String
+
+  # Yields the XPath module itself (the block's self is not changed) and
+  # returns the block's value.
+  #
+  #   XPath.generate { |x| x.descendant(:ul)[x.attr(:id) == 'foo'] }
+  def self.generate: [T] () { (singleton(XPath) xpath) -> T } -> T
+
+  module DSL
+    METHODS: Array[Symbol]
+
+    OPERATORS: Array[Array[Symbol]]
+
+    AXES: Array[Symbol]
+
+    UPPERCASE_LETTERS: String
+
+    LOWERCASE_LETTERS: String
+
+    def current: () -> XPath::Expression
+
+    def descendant: (*Symbol expressions) -> XPath::Expression
+
+    def child: (*Symbol expressions) -> XPath::Expression
+
+    def axis: (Symbol name, *Symbol element_names) -> XPath::Expression
+
+    def anywhere: (*Symbol expressions) -> XPath::Expression
+
+    def attr: (Symbol expression) -> XPath::Expression
+
+    def text: () -> XPath::Expression
+
+    def css: (String selector) -> XPath::Expression
+
+    def function: (Symbol name, *untyped arguments) -> XPath::Expression
+
+    # Calls the XPath function `name` with the current node as first argument.
+    # Note: this overrides Object#method.
+    def method: (Symbol name, *untyped arguments) -> XPath::Expression
+
+    # Returns the current node when `expression` is nil or false.
+    def where: (untyped expression) -> XPath::Expression
+
+    alias [] where
+
+    def is: (untyped expression) -> XPath::Expression
+
+    def binary_operator: (Symbol name, untyped rhs) -> XPath::Expression
+
+    def union: (*XPath::Expression | XPath::Union expressions) -> XPath::Union
+
+    alias + union
+
+    def last: () -> XPath::Expression
+
+    def position: () -> XPath::Expression
+
+    # Generated from METHODS: XPath functions called with the current node
+    # as first argument.
+
+    def count: (*untyped args) -> XPath::Expression
+
+    def id: (*untyped args) -> XPath::Expression
+
+    def local_name: (*untyped args) -> XPath::Expression
+
+    def namespace_uri: (*untyped args) -> XPath::Expression
+
+    def string: (*untyped args) -> XPath::Expression
+
+    def concat: (*untyped args) -> XPath::Expression
+
+    def starts_with: (*untyped args) -> XPath::Expression
+
+    def contains: (*untyped args) -> XPath::Expression
+
+    def substring_before: (*untyped args) -> XPath::Expression
+
+    def substring_after: (*untyped args) -> XPath::Expression
+
+    def substring: (*untyped args) -> XPath::Expression
+
+    def string_length: (*untyped args) -> XPath::Expression
+
+    def normalize_space: (*untyped args) -> XPath::Expression
+
+    def translate: (*untyped args) -> XPath::Expression
+
+    def boolean: (*untyped args) -> XPath::Expression
+
+    def not: (*untyped args) -> XPath::Expression
+
+    def true: (*untyped args) -> XPath::Expression
+
+    def false: (*untyped args) -> XPath::Expression
+
+    def lang: (*untyped args) -> XPath::Expression
+
+    def number: (*untyped args) -> XPath::Expression
+
+    def sum: (*untyped args) -> XPath::Expression
+
+    def floor: (*untyped args) -> XPath::Expression
+
+    def ceiling: (*untyped args) -> XPath::Expression
+
+    def round: (*untyped args) -> XPath::Expression
+
+    def qname: () -> XPath::Expression
+
+    alias inverse not
+
+    alias ~ not
+
+    alias ! not
+
+    alias normalize normalize_space
+
+    alias n normalize_space
+
+    # Generated from OPERATORS.
+
+    def equals: (untyped rhs) -> XPath::Expression
+
+    alias == equals
+
+    def or: (untyped rhs) -> XPath::Expression
+
+    alias | or
+
+    def and: (untyped rhs) -> XPath::Expression
+
+    alias & and
+
+    def not_equals: (untyped rhs) -> XPath::Expression
+
+    alias != not_equals
+
+    def lte: (untyped rhs) -> XPath::Expression
+
+    alias <= lte
+
+    def lt: (untyped rhs) -> XPath::Expression
+
+    alias < lt
+
+    def gte: (untyped rhs) -> XPath::Expression
+
+    alias >= gte
+
+    def gt: (untyped rhs) -> XPath::Expression
+
+    alias > gt
+
+    def plus: (untyped rhs) -> XPath::Expression
+
+    def minus: (untyped rhs) -> XPath::Expression
+
+    def multiply: (untyped rhs) -> XPath::Expression
+
+    alias * multiply
+
+    def divide: (untyped rhs) -> XPath::Expression
+
+    alias / divide
+
+    def mod: (untyped rhs) -> XPath::Expression
+
+    alias % mod
+
+    # Generated from AXES.
+
+    def ancestor: (*Symbol element_names) -> XPath::Expression
+
+    def ancestor_or_self: (*Symbol element_names) -> XPath::Expression
+
+    def attribute: (*Symbol element_names) -> XPath::Expression
+
+    def descendant_or_self: (*Symbol element_names) -> XPath::Expression
+
+    def following: (*Symbol element_names) -> XPath::Expression
+
+    def following_sibling: (*Symbol element_names) -> XPath::Expression
+
+    def namespace: (*Symbol element_names) -> XPath::Expression
+
+    def parent: (*Symbol element_names) -> XPath::Expression
+
+    def preceding: (*Symbol element_names) -> XPath::Expression
+
+    def preceding_sibling: (*Symbol element_names) -> XPath::Expression
+
+    def `self`: (*Symbol element_names) -> XPath::Expression
+
+    alias self_axis self
+
+    def ends_with: (untyped suffix) -> XPath::Expression
+
+    def contains_word: (String word) -> XPath::Expression
+
+    def lowercase: () -> XPath::Expression
+
+    def uppercase: () -> XPath::Expression
+
+    # Returns nil when called without arguments.
+    def one_of: (untyped expression, *untyped expressions) -> XPath::Expression
+              | () -> nil
+
+    def next_sibling: (*Symbol expressions) -> XPath::Expression
+
+    def previous_sibling: (*Symbol expressions) -> XPath::Expression
+  end
+
+  class Expression
+    include XPath::DSL
+
+    attr_accessor expression: Symbol
+
+    attr_accessor arguments: Array[untyped]
+
+    def initialize: (Symbol expression, *untyped arguments) -> void
+
+    def current: () -> self
+
+    # `type` is `:exact` to render `is` as equality; anything else renders it
+    # as `contains`.
+    def to_xpath: (?Symbol? type) -> String
+
+    alias to_s to_xpath
+  end
+
+  class Literal
+    attr_reader value: String
+
+    def initialize: (String value) -> void
+  end
+
+  class Union
+    include Enumerable[XPath::Expression | XPath::Union]
+
+    attr_reader expressions: Array[XPath::Expression | XPath::Union]
+
+    alias arguments expressions
+
+    def initialize: (*XPath::Expression | XPath::Union expressions) -> void
+
+    def expression: () -> :union
+
+    def each: () { (XPath::Expression | XPath::Union expression) -> void } -> Array[XPath::Expression | XPath::Union]
+            | () -> Enumerator[XPath::Expression | XPath::Union, Array[XPath::Expression | XPath::Union]]
+
+    def to_xpath: (?Symbol? type) -> String
+
+    alias to_s to_xpath
+  end
+
+  class Renderer
+    def self.render: (XPath::Expression | XPath::Union node, Symbol? type) -> String
+
+    def initialize: (Symbol? type) -> void
+
+    def render: (XPath::Expression | XPath::Union node) -> String
+  end
+end
