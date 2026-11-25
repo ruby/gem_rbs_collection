@@ -1,0 +1,221 @@
+module Knapsack
+  VERSION: String
+
+  # What Knapsack calls on the object given to `Knapsack.logger=`.
+  # Knapsack::Logger and the standard library's Logger both fit.
+  interface _Logger
+    def info: (?untyped text) -> untyped
+    def warn: (?untyped text) -> untyped
+    def log: (Integer level, ?untyped text) -> untyped
+  end
+
+  def self.tracker: () -> Tracker
+  def self.report: () -> Report
+  def self.root: () -> String
+
+  # Imports the knapsack rake tasks (knapsack:rspec, knapsack:minitest, ...).
+  def self.load_tasks: () -> Array[String]
+
+  # Returns the logger set with `logger=`, or a Knapsack::Logger at the
+  # level from KNAPSACK_LOG_LEVEL.
+  def self.logger: () -> _Logger
+
+  # `nil` resets to the default logger.
+  def self.logger=: (_Logger? value) -> _Logger?
+
+  class Logger
+    DEBUG: Integer
+    INFO: Integer
+    WARN: Integer
+
+    class UnknownLogLevel < StandardError
+    end
+
+    # nil until set (Knapsack.logger sets it).
+    attr_reader level: Integer?
+    def level=: (Integer level) -> Integer
+
+    # Raises UnknownLogLevel unless level is DEBUG, INFO or WARN.
+    def log: (Integer level, ?untyped text) -> nil
+    def debug: (?untyped text) -> nil
+    def info: (?untyped text) -> nil
+    def warn: (?untyped text) -> nil
+  end
+
+  class Tracker
+    def self.instance: () -> Tracker
+
+    attr_reader global_time: Integer | Float
+    attr_reader test_files_with_time: Hash[String, Float]
+    attr_writer test_path: String?
+
+    # Options: enable_time_offset_warning, time_offset_in_seconds,
+    # generate_report.
+    def config: (?Hash[Symbol, untyped] opts) -> Hash[Symbol, untyped]
+    def reset!: () -> nil
+    def start_timer: () -> Float
+    def stop_timer: () -> Float
+    def test_path: () -> String?
+    def time_exceeded?: () -> bool
+    def max_node_time_execution: () -> Float
+    def exceeded_time: () -> Float
+  end
+
+  class Report
+    def self.instance: () -> Report
+
+    # Options: report_path, test_file_pattern.
+    def config: (?Hash[Symbol, untyped] args) -> Hash[Symbol, untyped]
+
+    # Raises RuntimeError when not configured.
+    def report_path: () -> String
+
+    # Raises RuntimeError when not configured.
+    def test_file_pattern: () -> String
+
+    def save: () -> Integer
+
+    # Raises RuntimeError when the report file does not exist.
+    def open: () -> Hash[String, Float | Integer]
+  end
+
+  class Allocator
+    def initialize: (report: Hash[String, Numeric], test_file_pattern: String, ci_node_total: Integer | String, ci_node_index: Integer | String) -> void
+                  | (Hash[Symbol, untyped] args) -> void
+
+    # nil when ci_node_index is a negative index past the first node.
+    def report_node_tests: () -> Array[String]?
+    def leftover_node_tests: () -> Array[String]?
+
+    # Raises NoMethodError where report_node_tests is nil.
+    def node_tests: () -> Array[String]
+    def stringify_node_tests: () -> String
+    def test_dir: () -> String
+  end
+
+  class AllocatorBuilder
+    def initialize: (singleton(Adapters::BaseAdapter) adapter_class) -> void
+    def allocator: () -> Allocator
+    def test_dir: () -> String
+  end
+
+  module Config
+    class Env
+      def self.report_path: () -> String?
+
+      # A String from the environment, or 1.
+      def self.ci_node_total: () -> (String | Integer)
+
+      # A String from the environment, an Integer for the CI systems that
+      # count from one, or 0.
+      def self.ci_node_index: () -> (String | Integer)
+
+      def self.test_file_pattern: () -> String?
+      def self.test_dir: () -> String?
+      def self.log_level: () -> Integer
+    end
+  end
+
+  module Distributors
+    class BaseDistributor
+      # Raises RuntimeError when an option is missing or
+      # ci_node_index >= ci_node_total.
+      def initialize: (report: Hash[String, Numeric], test_file_pattern: String, ci_node_total: Integer | String, ci_node_index: Integer | String) -> void
+                    | (Hash[Symbol, untyped] args) -> void
+
+      attr_reader report: Hash[String, Numeric]
+      attr_reader test_file_pattern: String
+
+      def ci_node_total: () -> Integer
+      def ci_node_index: () -> Integer
+      # nil when ci_node_index is a negative index past the first node.
+      def tests_for_current_node: () -> Array[String]?
+
+      # nil when there is no such node.
+      def tests_for_node: (Integer node_index) -> Array[String]?
+
+      def all_tests: () -> Array[String]
+    end
+
+    class ReportDistributor < BaseDistributor
+      # nil until tests are assigned.
+      attr_reader node_tests: Array[Hash[Symbol, untyped]]?
+
+      def assign_test_files_to_node: () -> Array[Array[[String, Numeric]]]
+      def sorted_report: () -> Array[[String, Numeric]]
+      def sorted_report_with_existing_tests: () -> Array[[String, Numeric]]
+      def total_time_execution: () -> Float
+      def node_time_execution: () -> Float
+    end
+
+    class LeftoverDistributor < BaseDistributor
+      # nil until tests are assigned.
+      attr_reader node_tests: Array[Array[String]]?
+
+      def assign_test_files_to_node: () -> Array[String]
+      def report_tests: () -> Array[String]
+      def leftover_tests: () -> Array[String]
+    end
+  end
+
+  module Adapters
+    class BaseAdapter
+      TEST_DIR_PATTERN: String
+      REPORT_PATH: String
+
+      def self.bind: () -> instance
+      def bind: () -> void
+    end
+
+    class RSpecAdapter < BaseAdapter
+      def bind_time_tracker: () -> void
+      def bind_report_generator: () -> void
+      def bind_time_offset_warning: () -> void
+    end
+
+    class RspecAdapter < RSpecAdapter
+    end
+
+    class CucumberAdapter < BaseAdapter
+      def bind_time_tracker: () -> void
+      def bind_report_generator: () -> void
+      def bind_time_offset_warning: () -> void
+    end
+
+    class MinitestAdapter < BaseAdapter
+      def bind_time_tracker: () -> void
+      def bind_report_generator: () -> void
+      def bind_time_offset_warning: () -> void
+
+      # Pass `__FILE__` of the test helper.
+      def set_test_helper_path: (String file_path) -> String
+    end
+
+    class SpinachAdapter < BaseAdapter
+      def bind_time_tracker: () -> void
+      def bind_report_generator: () -> void
+      def bind_time_offset_warning: () -> void
+    end
+  end
+
+  module Runners
+    class RSpecRunner
+      # Replaces the process with `bundle exec rspec`.
+      def self.run: (String? args) -> bot
+    end
+
+    class CucumberRunner
+      # Exits with cucumber's status when it fails.
+      def self.run: (String? args) -> nil
+    end
+
+    class MinitestRunner
+      def self.run: (String? args) -> void
+    end
+
+    class SpinachRunner
+      # Exits with spinach's status when it fails.
+      def self.run: (String? args) -> nil
+    end
+  end
+end
