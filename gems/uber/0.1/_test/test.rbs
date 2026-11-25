@@ -1,0 +1,36 @@
+class Tags
+  include Uber::Callable
+
+  def call: (untyped context, *untyped args) -> Array[Symbol]
+end
+
+class Song
+  extend Uber::InheritableAttr
+
+  def self.properties: () -> Array[Symbol]?
+  def self.properties=: (Array[Symbol]? value) -> Array[Symbol]?
+end
+
+class Album
+  extend Uber::InheritableAttribute
+end
+
+class SongDecorator
+  extend Uber::Delegates
+
+  @song: untyped
+
+  def initialize: (untyped song) -> void
+end
+
+class Admin
+end
+
+class User
+  include Uber::Builder
+  extend Uber::Builder::DSL
+  extend Uber::Builder::Build
+
+  def self.builder_method: (Hash[Symbol, untyped] options) -> nil
+  def self.admin?: (Hash[Symbol, untyped] options) -> bool
+end
