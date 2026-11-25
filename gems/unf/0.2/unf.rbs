@@ -1,0 +1,39 @@
+module UNF
+  VERSION: String
+
+  # UTF-8 string normalizer. On CRuby with String#unicode_normalize it is
+  # implemented by the gem itself; otherwise by unf_ext (or Java on JRuby).
+  class Normalizer
+    include Singleton
+
+    # One of the normalization forms. Any other value raises ArgumentError
+    # (TypeError with unf_ext for a non-Symbol).
+    type form = :nfc | :nfd | :nfkc | :nfkd
+
+    # Returns the singleton normalizer instance.
+    def self.instance: () -> instance
+
+    # Returns a new normalizer instance. Use `instance` instead.
+    def self.new: () -> instance
+
+    # A shortcut for `instance.normalize(string, form)`.
+    def self.normalize: (String string, form form) -> String
+
+    # Normalizes a UTF-8 string into the given form.
+    def normalize: (String string, form normalization_form) -> String
+  end
+end
+
+class String
+  # Converts the string to NFC.
+  def to_nfc: () -> String
+
+  # Converts the string to NFD.
+  def to_nfd: () -> String
+
+  # Converts the string to NFKC.
+  def to_nfkc: () -> String
+
+  # Converts the string to NFKD.
+  def to_nfkd: () -> String
+end

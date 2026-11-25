@@ -1,0 +1,89 @@
+module Uber
+  VERSION: String
+
+  # Marker module: an object that includes or extends it is invoked with
+  # `#call` by Uber::Option and Uber::Options instead of being treated as a
+  # static value.
+  module Callable
+  end
+
+  class Option
+    # Returns a callable for `value`:
+    #
+    # * a Proc is returned as is, or wrapped in a lambda that runs it with
+    #   `instance_exec` on its first argument when `instance_exec: true` is given,
+    # * an Uber::Callable is returned as is,
+    # * a Symbol becomes a lambda that sends it to its first argument,
+    # * any other value becomes a lambda that returns the value.
+    def self.[]: (untyped value, ?Hash[Symbol, untyped] options) -> (Proc | Uber::Callable)
+  end
+
+  class Options < Hash[untyped, untyped]
+    def initialize: (Hash[untyped, untyped] options) -> void
+
+    # Evaluates every option with `context` and `args` and returns a new Hash.
+    def evaluate: (untyped context, *untyped args) -> Hash[untyped, untyped]
+
+    # Evaluates a single option. The first element of `args` is the context
+    # for Proc and Symbol options.
+    def eval: (untyped key, *untyped args) -> untyped
+  end
+
+  # Usage: `extend Uber::InheritableAttr` in a class. Each `inheritable_attr`
+  # call defines a reader and a writer on the class; declare them in your own
+  # RBS.
+  module InheritableAttr
+    # Defines the class methods `name` and `name=`. Returns the reader's name.
+    def inheritable_attr: (interned name, ?Hash[Symbol, untyped] options) -> Symbol
+
+    # Returns the value of `name` from the superclass of `klass` (cloned
+    # unless `clone: false` is given), or nil when the superclass has no
+    # such attribute.
+    def self.inherit_for: (Class klass, interned name, ?Hash[Symbol, untyped] options) -> untyped
+
+    class Clone
+      # Returns `value` itself when it is an instance of one of `uncloneable`,
+      # otherwise `value.clone`.
+      def self.call: [T] (T value, ?Array[Module] uncloneable) -> T
+
+      def self.uncloneable: () -> Array[Class]
+    end
+  end
+
+  module InheritableAttribute = InheritableAttr
+
+  # Usage: `extend Uber::Delegates` in a class or module.
+  module Delegates : Module
+    # Defines `names` in a new module, delegating to the method or
+    # instance variable `model`, and includes that module. Returns self.
+    def delegates: (interned model, *interned names) -> self
+  end
+
+  # Usage: `include Uber::Builder` in a class. This extends the class with
+  # Uber::Builder::DSL and Uber::Builder::Build; declare those `extend`s in
+  # your own RBS.
+  module Builder
+    class Builders < Array[untyped]
+      # Calls each builder with `context` and `args` and returns the first
+      # truthy result, or `context` when every builder returned a falsy value.
+      def call: (untyped context, *untyped args) -> untyped
+
+      # Adds a builder: a Proc (run with `instance_exec` on the context), a
+      # Symbol (a method called on the context), an Uber::Callable or a
+      # static value.
+      def <<: (untyped proc) -> self
+    end
+
+    module DSL
+      def builders: () -> Builders
+
+      def builds: (untyped proc) -> Builders
+                | () { (*untyped args) [self: untyped] -> untyped } -> Builders
+    end
+
+    module Build : DSL
+      # Runs the builders and returns the class to build.
+      def build!: (untyped context, *untyped args) -> untyped
+    end
+  end
+end

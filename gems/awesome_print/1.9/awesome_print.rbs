@@ -1,0 +1,111 @@
+# Methods that `require "awesome_print"` adds to every object.
+module Kernel
+  # Returns the awesome_print representation of the receiver.
+  # With `html: true` the result is wrapped in `<pre>`.
+  # Note: a `:color` entry is deleted from the given options Hash.
+  def ai: (?Hash[Symbol, untyped] options) -> String
+
+  alias awesome_inspect ai
+
+  # Prints `object.ai(options)` and returns `object`, or nil when IRB or Pry is loaded.
+  def self?.ap: [T] (T object, ?Hash[Symbol, untyped] options) -> T?
+
+  # Same as `ap`, but a public instance method only.
+  def awesome_print: [T] (T object, ?Hash[Symbol, untyped] options) -> T?
+end
+
+# ANSI (or, with a truthy argument, HTML `<kbd>`) color methods.
+class String
+  def gray: (?boolish html) -> String
+  def red: (?boolish html) -> String
+  def green: (?boolish html) -> String
+  def yellow: (?boolish html) -> String
+  def blue: (?boolish html) -> String
+  def purple: (?boolish html) -> String
+  def cyan: (?boolish html) -> String
+  def white: (?boolish html) -> String
+
+  def grayish: (?boolish html) -> String
+  def redish: (?boolish html) -> String
+  def greenish: (?boolish html) -> String
+  def yellowish: (?boolish html) -> String
+  def blueish: (?boolish html) -> String
+  def purpleish: (?boolish html) -> String
+  def cyanish: (?boolish html) -> String
+  def whiteish: (?boolish html) -> String
+
+  alias black grayish
+  alias pale whiteish
+end
+
+module AwesomePrint
+  # Options merged into every Inspector (usually set in ~/.aprc).
+  attr_accessor self.defaults: Hash[Symbol, untyped]?
+
+  attr_accessor self.force_colors: bool?
+
+  def self.force_colors!: (?bool value) -> bool
+
+  def self.console?: () -> bool
+
+  def self.rails_console?: () -> bool
+
+  # Makes IRB print results with awesome_print (does nothing without IRB).
+  def self.irb!: () -> void
+
+  # Makes Pry print results with awesome_print (does nothing without Pry).
+  def self.pry!: () -> void
+
+  def self.version: () -> String
+
+  class Inspector
+    AP: :__awesome_print__
+
+    attr_accessor options: Hash[Symbol, untyped]
+
+    attr_accessor indentator: Indentator
+
+    # Note: a `:color` entry is deleted from the given options Hash.
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    def current_indentation: () -> Integer
+
+    def increase_indentation: [T] () { () -> T } -> T
+
+    def awesome: (untyped object) -> String
+
+    def colorize?: () -> (bool | String | nil)
+  end
+
+  module Colorize
+    def colorize: (String str, Symbol? type) -> String
+  end
+
+  class Formatter
+    include Colorize
+
+    CORE_FORMATTERS: Array[Symbol]
+
+    attr_reader inspector: Inspector
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    def initialize: (Inspector inspector) -> void
+
+    def format: (untyped object, ?Symbol? type) -> String
+
+    # Returns `type` if it is one of CORE_FORMATTERS, else `:self`.
+    # Extensions hook this to add formatters.
+    def cast: (untyped object, Symbol? type) -> Symbol
+  end
+
+  class Indentator
+    attr_reader shift_width: Integer
+
+    attr_reader indentation: Integer
+
+    def initialize: (Integer indentation) -> void
+
+    def indent: [T] () { () -> T } -> T
+  end
+end

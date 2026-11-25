@@ -13,6 +13,7 @@ module ActiveRecord
       def and: (::ActiveRecord::Relation) -> Relation
       def strict_loading: (?bool value) -> Relation
       def sole: () -> Model
+      def find_sole_by: (untyped arg, *untyped args) -> Model
       def from: (untyped value, ?untyped? subquery_name) -> untyped
     end
   end
@@ -318,6 +319,7 @@ module ActiveRecord
       def reorder: (*untyped args) -> self
       def unscope: (*untyped args) -> self
       def sole: () -> Model
+      def find_sole_by: (untyped arg, *untyped args) -> Model
     end
   end
 
@@ -370,7 +372,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
                        | (untyped) { (Model) -> void } -> Model
   def create_or_find_by!: (untyped) -> Model
                         | (untyped) { (Model) -> void } -> Model
-  def take: () -> Model
+  def take: () -> Model?
           | (Integer limit) -> Array[Model]
   def take!: () -> Model
   def first: () -> Model?
@@ -404,11 +406,11 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
   def sum: (?untyped? column_name) -> untyped
          | [T] (?T initial_value) { (Model) -> T } -> T
   def destroy_all: () -> untyped
-  def delete_all: () -> untyped
-  def update_all: (untyped) -> untyped
-  def touch_all: (*untyped, ?time: untyped) -> untyped
-  def destroy_by: (*untyped) -> untyped
-  def delete_by: (*untyped) -> untyped
+  def delete_all: () -> Integer
+  def update_all: (untyped) -> Integer
+  def touch_all: (*untyped, ?time: untyped) -> Integer
+  def destroy_by: (*untyped) -> Array[Model]
+  def delete_by: (*untyped) -> Integer
   def each: () { (Model) -> void } -> self
   def select: (*Symbol | String | Arel::Nodes::t) -> self
             | () { (Model) -> boolish } -> Array[Model]
@@ -417,6 +419,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
            | () { (Model) -> boolish } -> ::Integer
            | (Symbol | String column_name) -> ::Integer
   def sole: () -> Model
+  def find_sole_by: (untyped arg, *untyped args) -> Model
 
   def order_values: () -> Array[String | Symbol]?
   def joins_values: () -> Array[String | Symbol]?
@@ -469,7 +472,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
                        | (untyped) { (Model) -> void } -> Model
   def create_or_find_by!: (untyped) -> Model
                         | (untyped) { (Model) -> void } -> Model
-  def take: () -> Model
+  def take: () -> Model?
           | (Integer limit) -> Array[Model]
   def take!: () -> Model
   def first: () -> Model?
@@ -501,12 +504,12 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?cursor: untyped, ?order: untyped, ?use_ranges: bool?) { (Relation) -> void } -> nil
   def sum: (?untyped? column_name) -> untyped
          | [T] (?T initial_value) { (Model) -> T } -> T
-  def destroy_all: () -> untyped
-  def delete_all: () -> untyped
-  def update_all: (untyped) -> untyped
-  def touch_all: (*untyped, ?time: untyped) -> untyped
-  def destroy_by: (*untyped) -> untyped
-  def delete_by: (*untyped) -> untyped
+  def destroy_all: () -> Array[Model]
+  def delete_all: () -> Integer
+  def update_all: (untyped) -> Integer
+  def touch_all: (*untyped, ?time: untyped) -> Integer
+  def destroy_by: (*untyped) -> Array[Model]
+  def delete_by: (*untyped) -> Integer
   def select: (*Symbol | String | Arel::Nodes::t) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation
@@ -516,6 +519,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
            | (Symbol | String column_name) -> ::Integer
   def create_with: (nil | Hash[untyped, untyped]) -> Relation
   def sole: () -> Model
+  def find_sole_by: (untyped arg, *untyped args) -> Model
 end
 
 module ActiveRecord

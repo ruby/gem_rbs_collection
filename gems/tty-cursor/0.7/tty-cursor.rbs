@@ -1,0 +1,84 @@
+module TTY
+  # Terminal cursor movement ANSI codes. Every method is a module function:
+  # call it as `TTY::Cursor.up`, or include the module to use the private
+  # instance copies.
+  module Cursor
+    VERSION: String
+
+    ESC: String
+    CSI: String
+    DEC_RST: String
+    DEC_SET: String
+    DEC_TCEM: String
+
+    # An output stream for #invisible, e.g. `$stdout` or `$stderr`.
+    interface _Stream
+      def print: (String) -> untyped
+    end
+
+    def self?.show: () -> String
+
+    def self?.hide: () -> String
+
+    # Prints the hide code to `stream`, yields, then prints the show code
+    # (also when the block raises). Returns the block's value.
+    def self?.invisible: [T] (?_Stream stream) { () -> T } -> T
+
+    def self?.save: () -> String
+
+    def self?.restore: () -> String
+
+    def self?.current: () -> String
+
+    # Both arguments or neither: a single nil argument raises NoMethodError.
+    def self?.move_to: () -> String
+                     | (Integer row, Integer column) -> String
+
+    def self?.move: (Integer x, Integer y) -> String
+
+    def self?.up: (?Integer? n) -> String
+
+    def self?.down: (?Integer? n) -> String
+
+    def self?.backward: (?Integer? n) -> String
+
+    def self?.forward: (?Integer? n) -> String
+
+    def self?.column: (?Integer? n) -> String
+
+    def self?.row: (?Integer? n) -> String
+
+    def self?.next_line: () -> String
+
+    def self?.prev_line: () -> String
+
+    def self?.clear_char: (?Integer? n) -> String
+
+    def self?.clear_line: () -> String
+
+    def self?.clear_line_before: () -> String
+
+    def self?.clear_line_after: () -> String
+
+    # Any direction other than :up clears downwards.
+    def self?.clear_lines: (Integer n, ?(:up | :down) direction) -> String
+
+    def self?.clear_screen_down: () -> String
+
+    def self?.clear_screen_up: () -> String
+
+    def self?.clear_screen: () -> String
+
+    def self?.scroll_up: () -> String
+
+    def self?.scroll_down: () -> String
+
+    # These aliases are made after `module_function`, so they exist only as
+    # private instance methods (for classes that include the module).
+    alias cursor_up up
+    alias cursor_down down
+    alias cursor_backward backward
+    alias cursor_forward forward
+    alias clear_rows clear_lines
+  end
+end

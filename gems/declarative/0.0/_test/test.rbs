@@ -1,0 +1,20 @@
+class Model
+  extend Declarative::Schema
+  extend Declarative::Schema::DSL
+  extend Declarative::Schema::Feature
+  extend Declarative::Heritage::DSL
+  extend Declarative::Heritage::Inherited
+
+  def self.default_nested_class: () -> singleton(Model)
+end
+
+class Song < Model
+end
+
+module Linkable
+end
+
+module Mixin
+  extend Declarative::Heritage::DSL
+  extend Declarative::Heritage::Included
+end

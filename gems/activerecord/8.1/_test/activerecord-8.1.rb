@@ -53,7 +53,11 @@ module Test
   User.create_with(nil)
   User.sole.id
   User.all.sole.id
-  User.take.articles.sole.id
+  User.take!.articles.sole.id
+  User.find_sole_by(name: 'name').id
+  User.all.find_sole_by(name: 'name').id
+  User.find_sole_by(['name = ?', 'name']).id
+  User.take!.articles.find_sole_by(id: 1).id
   User.from('users AS users')
   User.from(User.where(:active), :u)
   user = User.new(secret: 'dummy', key: 'dummy', token: 'dummy', phrase: 'dummy')
@@ -248,3 +252,36 @@ secret = ActiveRecord::Base.signed_id_verifier_secret
 secret.is_a?(String) ? secret.upcase : secret&.call&.upcase
 instance_secret = ActiveRecord::Base.new.signed_id_verifier_secret
 instance_secret.is_a?(String) ? instance_secret.upcase : instance_secret&.call&.upcase
+
+# Bulk relation methods return the destroyed records or the affected row count
+Test::User.destroy_all.first&.new_record?
+Test::User.destroy_by(id: 1).first&.new_record?
+Test::User.where(id: 1).destroy_by(name: "x").first&.new_record?
+Test::User.delete_all.zero?
+Test::User.delete_by(id: 1).zero?
+Test::User.update_all(name: "x").zero?
+Test::User.touch_all(time: Time.now).zero?
+Test::User.where(id: 1).delete_all.zero?
+Test::User.where(id: 1).delete_by(name: "x").zero?
+Test::User.where(id: 1).update_all(name: "x").zero?
+Test::User.where(id: 1).touch_all.zero?
+
+# The same through a has_many association (CollectionProxy)
+Test::User.new.articles.delete_all.zero?
+Test::User.new.articles.delete_by(id: 1).zero?
+Test::User.new.articles.update_all(title: "x").zero?
+Test::User.new.articles.touch_all.zero?
+Test::User.new.articles.destroy_by(id: 1).first&.new_record?
+
+# The same through the _ActiveRecord_Relation interfaces
+Test::Comment.destroy_all.first&.new_record?
+Test::Comment.destroy_by(id: 1).first&.new_record?
+Test::Comment.where(id: 1).destroy_by(title: "x").first&.new_record?
+Test::Comment.delete_all.zero?
+Test::Comment.delete_by(id: 1).zero?
+Test::Comment.update_all(title: "x").zero?
+Test::Comment.touch_all(time: Time.now).zero?
+Test::Comment.where(id: 1).delete_all.zero?
+Test::Comment.where(id: 1).delete_by(title: "x").zero?
+Test::Comment.where(id: 1).update_all(title: "x").zero?
+Test::Comment.where(id: 1).touch_all.zero?

@@ -35,3 +35,29 @@ Article.where(id: 1).pluck(:id, "title").first&.size
 # Records built
 Article.build(title: "Hello") { |article| article.new_record? }.new_record?
 Article.build([{ title: "Hello" }, { title: "World" }]).first&.new_record?
+
+# Bulk relation methods return the destroyed records or the affected row count
+Post.destroy_all.first&.new_record?
+Post.destroy_by(id: 1).first&.new_record?
+Post.where(id: 1).destroy_by(title: "x").first&.new_record?
+Post.delete_all.zero?
+Post.delete_by(id: 1).zero?
+Post.update_all(title: "x").zero?
+Post.touch_all(time: Time.now).zero?
+Post.where(id: 1).delete_all.zero?
+Post.where(id: 1).delete_by(title: "x").zero?
+Post.where(id: 1).update_all(title: "x").zero?
+Post.where(id: 1).touch_all.zero?
+
+# The same through the _ActiveRecord_Relation interfaces
+Comment.destroy_all.first&.new_record?
+Comment.destroy_by(id: 1).first&.new_record?
+Comment.where(id: 1).destroy_by(title: "x").first&.new_record?
+Comment.delete_all.zero?
+Comment.delete_by(id: 1).zero?
+Comment.update_all(title: "x").zero?
+Comment.touch_all(time: Time.now).zero?
+Comment.where(id: 1).delete_all.zero?
+Comment.where(id: 1).delete_by(title: "x").zero?
+Comment.where(id: 1).update_all(title: "x").zero?
+Comment.where(id: 1).touch_all.zero?

@@ -95,6 +95,21 @@ hwia.transform_keys!(&:upcase).size
 [1, 2, 3].in_groups(2, false).first&.sum
 [1, 2, 3].in_groups(2, 0).first&.sum
 
+# Test Array access extensions
+[1, 2].second&.succ
+[1, 2, 3].third&.succ
+[1, 2, 3, 4].fourth&.succ
+[1, 2, 3, 4, 5].fifth&.succ
+(1..42).to_a.forty_two&.succ
+[1, 2, 3].third_to_last&.succ
+[1, 2].second_to_last&.succ
+[1, 2, 3].from(1).first&.succ
+[1, 2, 3].from(-2).first&.succ
+[1, 2, 3].to(1).first&.succ
+[1, 2, 3].to(-2).first&.succ
+[1, 2, 3].excluding(2, [3]).first&.succ
+[1, 2, 3].without(2).first&.succ
+
 # Test ActiveSupport::Testing::TimeHelpers returning the block's value
 class TimeHelpersTest
   include ActiveSupport::Testing::TimeHelpers

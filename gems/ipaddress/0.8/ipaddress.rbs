@@ -1,0 +1,222 @@
+# Shortcut for IPAddress.parse, defined at the top level.
+class Object
+  private
+
+  def IPAddress: (Integer str) -> IPAddress::IPv4
+               | (String str) -> (IPAddress::IPv4 | IPAddress::IPv6)
+end
+
+module IPAddress
+  NAME: String
+  GEM: String
+  AUTHORS: Array[String]
+
+  # A String with a ":" and a "." gives an IPv6::Mapped, one with a "."
+  # an IPv4 and one with a ":" an IPv6. An Integer must be in 0..0xffffffff.
+  # Raises ArgumentError for anything else.
+  def self.parse: (Integer str) -> IPv4
+                | (String str) -> (IPv4 | IPv6)
+
+  # Raises ArgumentError unless the Integer is in 0..0xffffffff.
+  def self.ntoa: (Integer uint) -> String
+
+  def self.valid?: (String? addr) -> bool
+  def self.valid_ipv4?: (String? addr) -> bool
+  def self.valid_ipv4_netmask?: (String? addr) -> bool
+  def self.valid_ipv6?: (String? addr) -> bool
+
+  def ipv4?: () -> bool
+  def ipv6?: () -> bool
+
+  class Prefix
+    include Comparable
+
+    attr_reader prefix: Integer
+
+    def initialize: (Integer num) -> void
+    def to_s: () -> String
+    alias inspect to_s
+    def to_i: () -> Integer
+    def <=>: (Prefix | Integer oth) -> Integer
+
+    # Prefix#+ and Prefix#- are left out: they refer to Fixnum and raise
+    # NameError on Ruby 3.2 and later.
+  end
+
+  class Prefix32 < Prefix
+    IN4MASK: Integer
+
+    # Raises ArgumentError unless num is in 0..32.
+    def initialize: (Integer num) -> void
+    def host_prefix: () -> Integer
+    def bits: () -> String
+    def to_ip: () -> String
+    def octets: () -> Array[Integer]
+    def to_u32: () -> Integer
+    # nil for an index outside the four octets.
+    def []: (Integer index) -> Integer?
+    def hostmask: () -> String
+    def self.parse_netmask: (String netmask) -> Prefix32
+  end
+
+  class Prefix128 < Prefix
+    # Raises ArgumentError unless num.to_i is in 0..128.
+    def initialize: (?Integer | String num) -> void
+    def bits: () -> String
+    def to_u128: () -> Integer
+    def host_prefix: () -> Integer
+  end
+
+  class IPv4
+    include IPAddress
+    include Enumerable[IPv4]
+    include Comparable
+
+    CLASSFUL: Hash[Regexp, Integer]
+    REGEXP: Regexp
+
+    # "a.b.c.d", "a.b.c.d/nn" or "a.b.c.d/m.m.m.m". Raises ArgumentError for
+    # an invalid address or netmask.
+    def initialize: (String str) -> void
+
+    def address: () -> String
+    def prefix: () -> Prefix32
+    def prefix=: (Integer num) -> Prefix32
+    def octets: () -> Array[Integer]
+    def to_s: () -> String
+    def to_string: () -> String
+    def netmask: () -> String
+    def netmask=: (String addr) -> Prefix32
+    def u32: () -> Integer
+    alias to_i u32
+    alias to_u32 u32
+    # The argument is ignored.
+    def hex: (?untyped space) -> String
+    alias to_h hex
+    alias to_hex hex
+    def data: () -> String
+    # nil for an index outside the four octets.
+    def []: (Integer index) -> Integer?
+    alias octet []
+    # Returns the new address as an Integer (see #u32).
+    def []=: (Integer index, Integer | String value) -> Integer
+    alias octet= []=
+    def bits: () -> String
+    def broadcast: () -> IPv4
+    def network?: () -> bool
+    def network: () -> IPv4
+    def first: () -> IPv4
+    def last: () -> IPv4
+    def each_host: () { (IPv4 host) -> void } -> Range[Integer]
+    def each: () { (IPv4 ip) -> void } -> Range[Integer]
+    def <=>: (IPv4 oth) -> Integer
+    def size: () -> Integer
+    def hosts: () -> Array[IPv4]
+    def network_u32: () -> Integer
+    def broadcast_u32: () -> Integer
+    def include?: (IPv4 oth) -> bool
+    def include_all?: (*IPv4 others) -> bool
+    def private?: () -> bool
+    def multicast?: () -> bool
+    def loopback?: () -> bool
+    def reverse: () -> String
+    alias arpa reverse
+    def to: (IPv4 | String e) -> Array[String]
+
+    # split and its alias / are left out: they go through Prefix#+, which
+    # raises NameError on Ruby 3.2 and later.
+
+    # Raises ArgumentError unless new_prefix is smaller than the prefix.
+    def supernet: (Integer new_prefix) -> IPv4
+    # Raises ArgumentError unless subprefix is between the prefix and 32.
+    def subnet: (Integer subprefix) -> Array[IPv4]
+    def -: (IPv4 oth) -> Integer
+    # Unless one network includes the other, this raises NameError on Ruby 3.2
+    # and later (Prefix#- refers to Fixnum).
+    def +: (IPv4 oth) -> Array[IPv4]
+    def a?: () -> bool
+    def b?: () -> bool
+    def c?: () -> bool
+    def to_ipv6: () -> String
+
+    def self.parse_u32: (Integer u32, ?Prefix32 | Integer prefix) -> IPv4
+    def self.parse_data: (String str, ?Prefix32 | Integer prefix) -> IPv4
+    # Raises ArgumentError when the String holds no IPv4 address.
+    def self.extract: (String str) -> IPv4
+    # Like #+, this can raise NameError on Ruby 3.2 and later.
+    def self.summarize: (*IPv4 args) -> Array[IPv4]
+    def self.parse_classful: (String ip) -> IPv4
+  end
+
+  class IPv6
+    include IPAddress
+    include Enumerable[IPv6]
+    include Comparable
+
+    IN6FORMAT: String
+
+    # "addr" or "addr/nn". Raises ArgumentError for an invalid address and for
+    # an IPv4 mapped address (use IPv6::Mapped).
+    def initialize: (String str) -> void
+
+    def address: () -> String
+    def groups: () -> Array[Integer]
+    def prefix: () -> Prefix128
+    def prefix=: (Integer | String num) -> Prefix128
+    def to_string_uncompressed: () -> String
+    def to_string: () -> String
+    def to_s: () -> String
+    def to_i: () -> Integer
+    alias to_u128 to_i
+    def network?: () -> bool
+    # nil for an index outside the eight groups.
+    def []: (Integer index) -> Integer?
+    alias group []
+    # A String value is read as a decimal number.
+    def []=: (Integer index, Integer | String value) -> Prefix128
+    alias group= []=
+    def to_hex: () -> String
+    def data: () -> String
+    def hexs: () -> Array[String]
+    def reverse: () -> String
+    alias arpa reverse
+    def network_u128: () -> Integer
+    def broadcast_u128: () -> Integer
+    def size: () -> Integer
+    def include?: (IPv6 oth) -> bool
+    def compressed: () -> String
+    def unspecified?: () -> bool
+    def loopback?: () -> bool
+    def mapped?: () -> bool
+    def each: () { (IPv6 ip) -> void } -> Range[Integer]
+    def <=>: (IPv6 oth) -> Integer
+    def bits: () -> String
+    def literal: () -> String
+    def network: () -> IPv6
+
+    def self.expand: (String str) -> String
+    def self.compress: (String str) -> String
+    def self.groups: (String str) -> Array[Integer]
+    def self.parse_data: (String str) -> IPv6
+    def self.parse_u128: (Integer u128, ?Prefix128 | Integer prefix) -> IPv6
+    def self.parse_hex: (String hex, ?Prefix128 | Integer prefix) -> IPv6
+
+    class Unspecified < IPv6
+      def initialize: () -> void
+    end
+
+    class Loopback < IPv6
+      def initialize: () -> void
+    end
+
+    class Mapped < IPv6
+      attr_reader ipv4: IPv4
+
+      # "::ffff:a.b.c.d" or "::ffff:xxxx:xxxx", optionally with "/nn".
+      def initialize: (String str) -> void
+      def to_s: () -> String
+      def to_string: () -> String
+      def mapped?: () -> true
+    end
+  end
+end

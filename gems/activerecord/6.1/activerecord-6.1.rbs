@@ -165,7 +165,7 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
                        | (untyped) { (Model) -> void } -> Model
   def create_or_find_by!: (untyped) -> Model
                         | (untyped) { (Model) -> void } -> Model
-  def take: () -> Model
+  def take: () -> Model?
           | (Integer limit) -> Array[Model]
   def take!: () -> Model
   def first: () -> Model?
@@ -199,11 +199,11 @@ interface _ActiveRecord_Relation[Model, PrimaryKey] # rubocop:disable RBS/Lint/T
   def sum: (?untyped? column_name) -> untyped
          | [T] (?T initial_value) { (Model) -> T } -> T
   def destroy_all: () -> untyped
-  def delete_all: () -> untyped
-  def update_all: (untyped) -> untyped
-  def touch_all: (*untyped, ?time: untyped) -> untyped
-  def destroy_by: (*untyped) -> untyped
-  def delete_by: (*untyped) -> untyped
+  def delete_all: () -> Integer
+  def update_all: (untyped) -> Integer
+  def touch_all: (*untyped, ?time: untyped) -> Integer
+  def destroy_by: (*untyped) -> Array[Model]
+  def delete_by: (*untyped) -> Integer
   def each: () { (Model) -> void } -> self
   def select: (*Symbol | String | Arel::Nodes::t) -> self
             | () { (Model) -> boolish } -> Array[Model]
@@ -261,7 +261,7 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
                        | (untyped) { (Model) -> void } -> Model
   def create_or_find_by!: (untyped) -> Model
                         | (untyped) { (Model) -> void } -> Model
-  def take: () -> Model
+  def take: () -> Model?
           | (Integer limit) -> Array[Model]
   def take!: () -> Model
   def first: () -> Model?
@@ -293,12 +293,12 @@ interface _ActiveRecord_Relation_ClassMethods[Model, Relation, PrimaryKey] # rub
   def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
   def sum: (?untyped? column_name) -> untyped
          | [T] (?T initial_value) { (Model) -> T } -> T
-  def destroy_all: () -> untyped
-  def delete_all: () -> untyped
-  def update_all: (untyped) -> untyped
-  def touch_all: (*untyped, ?time: untyped) -> untyped
-  def destroy_by: (*untyped) -> untyped
-  def delete_by: (*untyped) -> untyped
+  def destroy_all: () -> Array[Model]
+  def delete_all: () -> Integer
+  def update_all: (untyped) -> Integer
+  def touch_all: (*untyped, ?time: untyped) -> Integer
+  def destroy_by: (*untyped) -> Array[Model]
+  def delete_by: (*untyped) -> Integer
   def select: (*Symbol | String | Arel::Nodes::t) -> Relation
             | () { (Model) -> boolish } -> Array[Model]
   def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation

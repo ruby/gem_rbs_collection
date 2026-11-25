@@ -1,0 +1,111 @@
+# Timecop fakes `Time.now`, `Date.today`, `DateTime.now` and
+# `Process.clock_gettime`, so code that depends on the current time can be
+# tested.
+class Timecop
+  VERSION: String
+
+  # Timecop is a singleton; use its class methods.
+  private def self.new: () -> Timecop
+
+  # A point in time that `freeze`, `travel` and `scale` accept as one argument:
+  #
+  # * a `Time`, `Date` or `DateTime` to move to,
+  # * a `String` parsed by `Time.parse`,
+  # * an `Integer` or `Float` offset in seconds from now.
+  type time_arg = Time | Date | String | Integer | Float
+
+  # Freezes the time. With a block, the time is restored after the block and
+  # the value of the block is returned; the block receives the mocked time.
+  # Without a block, returns the mocked time.
+  #
+  #   Timecop.freeze(Time.local(2008, 10, 5))
+  #   Timecop.freeze(2008, 10, 5, 12, 0, 0) { Time.now }
+  #   Timecop.freeze(60 * 60) # one hour from now
+  #
+  def self.freeze: (?time_arg? time) -> Time
+                 | [T] (?time_arg? time) { (Time time) -> T } -> T
+                 | (Integer year, Integer month, ?Integer day, ?Integer hour, ?Integer minute, ?Numeric second) -> Time
+                 | [T] (Integer year, Integer month, ?Integer day, ?Integer hour, ?Integer minute, ?Numeric second) { (Time time) -> T } -> T
+
+  # Moves to the time and lets the clock keep running from there. It takes the
+  # same arguments as `freeze`.
+  def self.travel: (?time_arg? time) -> Time
+                 | [T] (?time_arg? time) { (Time time) -> T } -> T
+                 | (Integer year, Integer month, ?Integer day, ?Integer hour, ?Integer minute, ?Numeric second) -> Time
+                 | [T] (Integer year, Integer month, ?Integer day, ?Integer hour, ?Integer minute, ?Numeric second) { (Time time) -> T } -> T
+
+  # Makes the clock run `factor` times as fast, starting from the given time
+  # (the arguments after `factor` are the same as `freeze`). A nil factor
+  # leaves the clock running at normal speed.
+  def self.scale: (Numeric? factor, ?time_arg? time) -> Time
+                | [T] (Numeric? factor, ?time_arg? time) { (Time time) -> T } -> T
+                | (Numeric? factor, Integer year, Integer month, ?Integer day, ?Integer hour, ?Integer minute, ?Numeric second) -> Time
+                | [T] (Numeric? factor, Integer year, Integer month, ?Integer day, ?Integer hour, ?Integer minute, ?Numeric second) { (Time time) -> T } -> T
+
+  # Returns to the real time. With a block, the real time is used only during
+  # the block, and the value of the block is returned.
+  def self.return: () -> nil
+                 | [T] () { () -> T } -> T
+
+  alias self.unfreeze self.return
+
+  # The time that `return_to_baseline` travels back to, as it was given to
+  # `baseline=` (it is not converted to a `Time`).
+  def self.baseline: () -> time_arg?
+
+  def self.baseline=: (time_arg? baseline) -> time_arg?
+
+  # Drops every mock except the baseline (or every mock when there is no
+  # baseline), and returns the resulting `Time.now`.
+  def self.return_to_baseline: () -> Time
+
+  # When safe mode is enabled, `freeze`, `travel` and `scale` raise
+  # `Timecop::SafeModeException` unless they are called with a block.
+  def self.safe_mode=: (bool safe) -> bool
+
+  def self.safe_mode?: () -> bool
+
+  # When enabled, the mocked time is kept per thread.
+  def self.thread_safe=: (bool thread_safe) -> bool
+
+  def self.thread_safe: () -> bool
+
+  def self.frozen?: () -> bool
+
+  def self.travelled?: () -> bool
+
+  def self.scaled?: () -> bool
+
+  # When enabled, `Process.clock_gettime` is mocked too.
+  def self.mock_process_clock=: (bool mock) -> bool
+
+  def self.mock_process_clock?: () -> bool
+
+  class SafeModeException < StandardError
+    def initialize: () -> void
+  end
+end
+
+class Time
+  # The real `Time.now` and `Time.new`, ignoring Timecop.
+  alias self.now_without_mock_time self.now
+  alias self.new_without_mock_time self.new
+end
+
+class Date
+  # The real `Date.today`, `Date.strptime` and `Date.parse`, ignoring Timecop.
+  alias self.today_without_mock_date self.today
+  alias self.strptime_without_mock_date self.strptime
+  alias self.parse_without_mock_date self.parse
+end
+
+class DateTime
+  # The real `DateTime.now` and `DateTime.parse`, ignoring Timecop.
+  alias self.now_without_mock_time self.now
+  alias self.parse_without_mock_date self.parse
+end
+
+module Process
+  # The real `Process.clock_gettime`, ignoring Timecop.
+  alias self.clock_gettime_without_mock self.clock_gettime
+end

@@ -130,12 +130,12 @@ module ActiveRecord
 
     def will_save_change_to_attribute?: (String | Symbol attr_name, ?from: untyped, ?to: untyped) -> bool
 
-    def save!: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> void
+    def save!: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> true
     def save: (?context: Symbol | Array[Symbol] context, ?validate: bool, ?touch: bool) -> bool
-    def update!: (*untyped) -> self
+    def update!: (*untyped) -> true
     def update: (*untyped) -> bool
     def destroy!: () -> self
-    def destroy: () -> bool
+    def destroy: () -> (self | bool)?
     def valid?: (?Symbol | Array[Symbol] context) -> bool
     def invalid?: (?Symbol | Array[Symbol] context) -> bool
     def []: (Symbol) -> untyped
@@ -612,7 +612,7 @@ module ActiveRecord
       def new: (Array[untyped] attributes) ?{ (Model) -> void } -> Array[Model]
              | (?untyped? attributes) ?{ (Model) -> void } -> Model
       alias build new
-      def take: () -> Model
+      def take: () -> Model?
               | (Integer limit) -> Array[Model]
       def take!: () -> Model
       def first: () -> Model?
@@ -646,11 +646,11 @@ module ActiveRecord
       def sum: (?untyped? column_name) -> untyped
              | [T] (?T initial_value) { (Model) -> T } -> T
       def destroy_all: () -> untyped
-      def delete_all: () -> untyped
-      def update_all: (*untyped) -> untyped
-      def touch_all: (*untyped, ?time: untyped) -> untyped
-      def destroy_by: (*untyped) -> untyped
-      def delete_by: (*untyped) -> untyped
+      def delete_all: () -> Integer
+      def update_all: (*untyped) -> Integer
+      def touch_all: (*untyped, ?time: untyped) -> Integer
+      def destroy_by: (*untyped) -> Array[Model]
+      def delete_by: (*untyped) -> Integer
       def each: () { (Model) -> void } -> self
       def select: (*Symbol | String | Arel::Nodes::t) -> self
                 | () { (Model) -> boolish } -> Array[Model]
@@ -710,7 +710,7 @@ module ActiveRecord
                            | (*untyped) { (Model) -> void } -> Model
       def create_or_find_by!: (*untyped) -> Model
                             | (*untyped) { (Model) -> void } -> Model
-      def take: () -> Model
+      def take: () -> Model?
               | (Integer limit) -> Array[Model]
       def take!: () -> Model
       def first: () -> Model?
@@ -742,12 +742,12 @@ module ActiveRecord
       def in_batches: (?of: Integer, ?start: Integer, ?finish: Integer, ?load: bool, ?error_on_ignore: bool, ?order: untyped) { (Relation) -> void } -> nil
       def sum: (?untyped? column_name) -> untyped
              | [T] (?T initial_value) { (Model) -> T } -> T
-      def destroy_all: () -> untyped
-      def delete_all: () -> untyped
-      def update_all: (*untyped) -> untyped
-      def touch_all: (*untyped, ?time: untyped) -> untyped
-      def destroy_by: (*untyped) -> untyped
-      def delete_by: (*untyped) -> untyped
+      def destroy_all: () -> Array[Model]
+      def delete_all: () -> Integer
+      def update_all: (*untyped) -> Integer
+      def touch_all: (*untyped, ?time: untyped) -> Integer
+      def destroy_by: (*untyped) -> Array[Model]
+      def delete_by: (*untyped) -> Integer
       def select: (*Symbol | String | Arel::Nodes::t) -> Relation
                 | () { (Model) -> boolish } -> Array[Model]
       def reselect: (*Symbol | String | Arel::Nodes::t) -> Relation

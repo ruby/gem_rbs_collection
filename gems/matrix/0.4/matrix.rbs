@@ -1,0 +1,318 @@
+# Element type policy
+#
+# `Matrix[T]` and `Vector[T]` track the element type `T` only while it is
+# known to stay the same:
+#
+# * Methods that take elements out (`#[]`, `#row`, `#each`, `#to_a`, ...)
+#   return `T`.
+# * Arithmetic keeps `T` only when both operands have the same element type
+#   and the result has that element type at runtime as well
+#   (e.g. `Matrix[Integer] * Matrix[Integer]`).
+# * Everything else returns `Matrix[untyped]`, `Vector[untyped]`, or `untyped`.
+#   This includes promotions such as `Matrix[Integer] * 1.5` (Float elements)
+#   or `Matrix[Integer]#inverse` (Rational elements), which RBS cannot express
+#   precisely.
+module ExceptionForMatrix
+  class ErrDimensionMismatch < StandardError
+    def initialize: (?string? val) -> void
+  end
+
+  class ErrNotRegular < StandardError
+    def initialize: (?string? val) -> void
+  end
+
+  class ErrOperationNotDefined < StandardError
+    def initialize: (string | Array[untyped] vals) -> void
+  end
+
+  class ErrOperationNotImplemented < StandardError
+    def initialize: (Array[untyped] vals) -> void
+  end
+end
+
+class Matrix[T]
+  include Enumerable[T]
+  include ExceptionForMatrix
+
+  VERSION: String
+
+  SELECTORS: Hash[Symbol, bool]
+
+  # Selects the elements yielded by `#each` and related methods.
+  type selector = :all | :diagonal | :off_diagonal | :lower | :strict_lower | :strict_upper | :upper
+
+  interface _ToMatrix
+    def to_matrix: () -> Matrix[untyped]
+  end
+
+  def self.[]: [E] (*Array[E] | Vector[E] rows) -> Matrix[E]
+
+  def self.rows: [E] (Array[Array[E] | Vector[E]] rows, ?boolish copy) -> Matrix[E]
+
+  def self.columns: [E] (Array[Array[E] | Vector[E]] columns) -> Matrix[E]
+
+  def self.build: [E] (int row_count, ?int column_count) { (Integer row, Integer column) -> E } -> Matrix[E]
+                | (int row_count, ?int column_count) -> Enumerator[[Integer, Integer], Matrix[untyped]]
+
+  # The elements off the diagonal are `0`.
+  def self.diagonal: [E] (*E values) -> Matrix[E | Integer]
+
+  # The elements off the diagonal are `0`.
+  def self.scalar: [E] (int n, E value) -> Matrix[E | Integer]
+
+  def self.identity: (int n) -> Matrix[Integer]
+  alias self.unit self.identity
+  alias self.I self.identity
+
+  def self.zero: (int row_count, ?int column_count) -> Matrix[Integer]
+
+  def self.row_vector: [E] (Array[E] | Vector[E] row) -> Matrix[E]
+
+  def self.column_vector: [E] (Array[E] | Vector[E] column) -> Matrix[E]
+
+  def self.empty: (?Integer row_count, ?Integer column_count) -> Matrix[untyped]
+
+  def self.vstack: [E] (Matrix[E] x, *Matrix[E] matrices) -> Matrix[E]
+                 | (_ToMatrix x, *_ToMatrix matrices) -> Matrix[untyped]
+
+  def self.hstack: [E] (Matrix[E] x, *Matrix[E] matrices) -> Matrix[E]
+                 | (_ToMatrix x, *_ToMatrix matrices) -> Matrix[untyped]
+
+  def self.combine: [E, R] (*Matrix[E] matrices) { (Array[E] elements) -> R } -> Matrix[R]
+                  | [R] (*_ToMatrix matrices) { (Array[untyped] elements) -> R } -> Matrix[R]
+                  | (*_ToMatrix matrices) -> Enumerator[Array[untyped], Matrix[untyped]]
+
+  def combine: [R] (*Matrix[T] matrices) { (Array[T] elements) -> R } -> Matrix[R]
+             | [R] (*_ToMatrix matrices) { (Array[untyped] elements) -> R } -> Matrix[R]
+             | (*_ToMatrix matrices) -> Enumerator[Array[untyped], Matrix[untyped]]
+
+  private def initialize: (Array[Array[T]] rows, ?Integer column_count) -> void
+
+  def []: %a{implicitly-returns-nil} (int i, int j) -> T
+  alias element []
+  alias component []
+
+  def []=: (int i, int j, T v) -> void
+         | (Range[Integer?] rows, Range[Integer?] columns, Matrix[T] | T v) -> void
+         | (Range[Integer?] rows, int column, Vector[T] | Matrix[T] | T v) -> void
+         | (int row, Range[Integer?] columns, Vector[T] | Matrix[T] | T v) -> void
+
+  def row_count: () -> Integer
+  alias row_size row_count
+
+  def column_count: () -> Integer
+  alias column_size column_count
+
+  def row: %a{implicitly-returns-nil} (int i) -> Vector[T]
+         | (int i) { (T e) -> void } -> self
+
+  def column: %a{implicitly-returns-nil} (Integer j) -> Vector[T]
+            | (Integer j) { (T e) -> void } -> self
+
+  # With a selector other than `:all`, the elements not yielded are kept as they are.
+  def collect: [U] (?:all which) { (T e) -> U } -> Matrix[U]
+             | [U] (selector which) { (T e) -> U } -> Matrix[T | U]
+             | (?selector which) -> Enumerator[T, Matrix[untyped]]
+  alias map collect
+
+  def collect!: (?selector which) { (T e) -> T } -> self
+              | (?selector which) -> Enumerator[T, self]
+  alias map! collect!
+
+  def freeze: () -> self
+
+  def each: (?selector which) { (T e) -> void } -> self
+          | (?selector which) -> Enumerator[T, self]
+
+  def each_with_index: (?selector which) { (T e, Integer row, Integer column) -> void } -> self
+                     | (?selector which) -> Enumerator[[T, Integer, Integer], self]
+
+  def index: (T value, ?selector which) -> [Integer, Integer]?
+           | (?selector which) { (T e) -> boolish } -> [Integer, Integer]?
+           | (?selector which) -> Enumerator[T, [Integer, Integer]?]
+  alias find_index index
+
+  def minor: (Range[Integer] row_range, Range[Integer] col_range) -> Matrix[T]?
+           | (Integer start_row, Integer nrows, Integer start_col, Integer ncols) -> Matrix[T]?
+
+  def first_minor: (Integer row, Integer column) -> Matrix[T]
+
+  # The determinant of the first minor, so it can be an Integer (see `#determinant`).
+  def cofactor: (Integer row, Integer column) -> (T | Integer)
+
+  def adjugate: () -> Matrix[T | Integer]
+
+  # Each element is multiplied by its cofactor, so an Integer cofactor still gives `T`.
+  def laplace_expansion: (row: Integer) -> T
+                       | (column: Integer) -> T
+  alias cofactor_expansion laplace_expansion
+
+  def diagonal?: () -> bool
+
+  def empty?: () -> bool
+
+  def hermitian?: () -> bool
+
+  def lower_triangular?: () -> bool
+
+  def normal?: () -> bool
+
+  def orthogonal?: () -> bool
+
+  def permutation?: () -> bool
+
+  def real?: () -> bool
+
+  def regular?: () -> bool
+
+  def singular?: () -> bool
+
+  def square?: () -> bool
+
+  def symmetric?: () -> bool
+
+  def antisymmetric?: () -> bool
+  alias skew_symmetric? antisymmetric?
+
+  def unitary?: () -> bool
+
+  def upper_triangular?: () -> bool
+
+  def zero?: () -> bool
+
+  def ==: (untyped other) -> bool
+
+  def eql?: (untyped other) -> bool
+
+  def hash: () -> Integer
+
+  def *: (Matrix[T] m) -> Matrix[T]
+       | (Matrix[untyped] m) -> Matrix[untyped]
+       | (Vector[T] m) -> Vector[T]
+       | (Vector[untyped] m) -> Vector[untyped]
+       | (T m) -> Matrix[T]
+       | (Numeric m) -> Matrix[untyped]
+
+  def +: (Matrix[T] m) -> Matrix[T]
+       | (Matrix[untyped] m) -> Matrix[untyped]
+       | (Vector[T] m) -> Matrix[T]
+       | (Vector[untyped] m) -> Matrix[untyped]
+
+  def -: (Matrix[T] m) -> Matrix[T]
+       | (Matrix[untyped] m) -> Matrix[untyped]
+       | (Vector[T] m) -> Matrix[T]
+       | (Vector[untyped] m) -> Matrix[untyped]
+
+  # Dividing by a matrix multiplies by its inverse, so the element type is not kept.
+  def /: (Matrix[untyped] other) -> Matrix[untyped]
+       | (T other) -> Matrix[T]
+       | (Numeric other) -> Matrix[untyped]
+
+  def hadamard_product: (Matrix[T] m) -> Matrix[T]
+                      | (_ToMatrix m) -> Matrix[untyped]
+  alias entrywise_product hadamard_product
+
+  def inverse: () -> Matrix[untyped]
+  alias inv inverse
+
+  # `m ** 0` is an identity matrix of Integer, and a negative exponent uses the inverse.
+  def **: (Numeric exp) -> Matrix[untyped]
+
+  def +@: () -> Matrix[T]
+
+  def -@: () -> Matrix[T]
+
+  def abs: () -> Matrix[untyped]
+
+  # Returns an Integer for an empty matrix (`1`) and for a singular matrix of
+  # size 5 or more (`0`), whatever the element type is.
+  def determinant: () -> (T | Integer)
+  alias det determinant
+
+  %a{deprecated: Use Matrix#determinant}
+  def determinant_e: () -> (T | Integer)
+  alias det_e determinant_e
+
+  def hstack: (*Matrix[T] matrices) -> Matrix[T]
+            | (*_ToMatrix matrices) -> Matrix[untyped]
+
+  def rank: () -> Integer
+
+  %a{deprecated: Use Matrix#rank}
+  def rank_e: () -> Integer
+
+  def rotate_entries: (?:clockwise | :counter_clockwise | :half_turn | int rotation) -> Matrix[T]
+
+  def round: (?int ndigits) -> Matrix[untyped]
+
+  def trace: () -> T
+  alias tr trace
+
+  def transpose: () -> Matrix[T]
+  alias t transpose
+
+  def vstack: (*Matrix[T] matrices) -> Matrix[T]
+            | (*_ToMatrix matrices) -> Matrix[untyped]
+
+  def eigensystem: () -> Matrix::EigenvalueDecomposition
+  alias eigen eigensystem
+
+  def lup: () -> Matrix::LUPDecomposition
+  alias lup_decomposition lup
+
+  def conjugate: () -> Matrix[T]
+  alias conj conjugate
+
+  def adjoint: () -> Matrix[T]
+
+  def imaginary: () -> Matrix[untyped]
+  alias imag imaginary
+
+  def real: () -> Matrix[untyped]
+
+  def rect: () -> [Matrix[untyped], Matrix[untyped]]
+  alias rectangular rect
+
+  def coerce: (Numeric other) -> [Matrix::Scalar, self]
+
+  def row_vectors: () -> Array[Vector[T]]
+
+  def column_vectors: () -> Array[Vector[T]]
+
+  def to_matrix: () -> self
+
+  def to_a: () -> Array[Array[T]]
+
+  %a{deprecated: Use map(&:to_f)}
+  def elements_to_f: () -> Matrix[Float]
+
+  %a{deprecated: Use map(&:to_i)}
+  def elements_to_i: () -> Matrix[Integer]
+
+  %a{deprecated: Use map(&:to_r)}
+  def elements_to_r: () -> Matrix[Rational]
+
+  def to_s: () -> String
+
+  def inspect: () -> String
+
+  # The receiver of the operation after `Matrix#coerce` or `Vector#coerce`.
+  class Scalar < Numeric
+    include ExceptionForMatrix
+
+    def initialize: (Numeric value) -> void
+
+    def +: (Numeric other) -> Scalar
+
+    def -: (Numeric other) -> Scalar
+
+    def *: (Numeric other) -> Scalar
+         | (Matrix[untyped] other) -> Matrix[untyped]
+         | (Vector[untyped] other) -> Vector[untyped]
+
+    def /: (Numeric other) -> Scalar
+         | (Matrix[untyped] other) -> Matrix[untyped]
+
+    def **: (Numeric other) -> Scalar
+  end
+end

@@ -1,0 +1,77 @@
+# Reads and writes .netrc files, keeping their original formatting.
+class Netrc
+  # One machine entry as stored by the parser: keywords with their
+  # surrounding whitespace and comments, and the values. The default entry
+  # starts with :default.
+  type item = Array[String | Symbol]
+
+  VERSION: String
+
+  WINDOWS: Integer?
+
+  CYGWIN: Integer?
+
+  # The .netrc path: $NETRC or the home directory, plus `netrc_filename`.
+  def self.default_path: () -> String
+
+  def self.home_path: () -> String
+
+  # ".netrc", or "_netrc" on Windows.
+  def self.netrc_filename: () -> String
+
+  # Options; `allow_permissive_netrc_file: true` skips the 0600 check.
+  def self.config: () -> Hash[Symbol, untyped]
+
+  def self.configure: () ?{ (Hash[Symbol, untyped] config) -> void } -> Hash[Symbol, untyped]
+
+  # Raises Netrc::Error unless the file's permissions are 0600 (outside
+  # Windows, unless allowed in `config`).
+  def self.check_permissions: (String path) -> nil
+
+  # Reads and parses the file. A missing file gives an empty Netrc. Paths
+  # ending in .gpg are decrypted with gpg.
+  def self.read: (?String path) -> Netrc
+
+  def initialize: (String path, [String, Array[item]] data) -> void
+
+  # Prepended to entries added with `[]=`.
+  attr_accessor new_item_prefix: String
+
+  # The entry for the machine, or the default entry, or nil.
+  def []: (String machine) -> Entry?
+
+  # Sets the login and password of the machine's entry, adding the entry if
+  # it does not exist. `info` is [login, password] or an Entry.
+  def []=: (String machine, [String, String] | Entry info) -> void
+
+  # The number of machine entries (the default entry not counted).
+  def length: () -> Integer
+
+  def delete: (String machine) -> item?
+
+  def each: () { (item) -> void } -> Array[item]
+          | () -> Enumerator[item, Array[item]]
+
+  # Writes the file back (encrypted with gpg for .gpg paths).
+  def save: () -> nil
+
+  # The file content.
+  def unparse: () -> String
+
+  class Entry < ::Struct[String?]
+    attr_accessor login: String?
+
+    attr_accessor password: String?
+
+    def self.new: (?String? login, ?String? password) -> instance
+                | (?login: String?, ?password: String?) -> instance
+
+    def initialize: (?String? login, ?String? password) -> void
+                  | (?login: String?, ?password: String?) -> void
+
+    alias to_ary to_a
+  end
+
+  class Error < ::StandardError
+  end
+end
