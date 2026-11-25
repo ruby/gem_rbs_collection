@@ -60,6 +60,34 @@ module ActiveSupport
   end
 end
 
+# active_support/core_ext/date/calculations.rb
+class Date
+  # Keep these overloads split by part: a Duration with only date parts
+  # advances the Date and returns a Date, while any time part goes
+  # through Date#since and returns a Time or TimeWithZone. One signature
+  # for all Durations would be wrong for one of the two.
+  def +: (ActiveSupport::Duration[ActiveSupport::Duration::date_parts] other) -> self
+       | (ActiveSupport::Duration[ActiveSupport::Duration::time_parts] other) -> (Time | ActiveSupport::TimeWithZone)
+       | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+       | ...
+
+  def -: (ActiveSupport::Duration[ActiveSupport::Duration::date_parts] other) -> self
+       | (ActiveSupport::Duration[ActiveSupport::Duration::time_parts] other) -> (Time | ActiveSupport::TimeWithZone)
+       | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+       | ...
+end
+
+# active_support/core_ext/date_time/calculations.rb
+class DateTime
+  # DateTime acts like a Time, so any Duration keeps it a DateTime;
+  # without these it would inherit the Date overloads above.
+  def +: (ActiveSupport::Duration other) -> self
+       | ...
+
+  def -: (ActiveSupport::Duration other) -> self
+       | ...
+end
+
 # active_support/core_ext/string/output_safety.rb
 module ActiveSupport
   class SafeBuffer
