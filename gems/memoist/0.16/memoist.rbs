@@ -1,0 +1,53 @@
+# Memoist is extended into a class (or module, or a single object):
+#
+#   class Person
+#     extend Memoist
+#     def taxes_due(income) = income * 0.40
+#     memoize :taxes_due
+#   end
+#
+# `memoize` replaces each method with a memoizing version. A method without
+# parameters gains an optional `reload` parameter, and a method with
+# parameters accepts an extra trailing `true` or `:reload`. Declare those
+# signatures in your own RBS; this file cannot express them.
+module Memoist
+  VERSION: String
+
+  # Memoizes the named methods and includes `Memoist::InstanceMethods` into
+  # the receiver. Returns the method name given when there is one, otherwise
+  # the array of names. Returns nil (and warns) when a method was already
+  # memoized with the same identifier.
+  def memoize: [N < Symbol | String] (N method_name, ?identifier: Symbol | String) -> N?
+             | (*(Symbol | String) method_names, ?identifier: Symbol | String) -> Array[Symbol | String]?
+
+  # The memoized methods of the receiver and its ancestors. Cached; see
+  # `clear_structs`.
+  def all_memoized_structs: () -> Array[MemoizedMethod]
+
+  # Clears the cache of `all_memoized_structs`.
+  def clear_structs: () -> nil
+
+  # Included into a class when one of its methods is memoized.
+  module InstanceMethods
+    # Calls each memoized method without parameters and resets the cache of
+    # the others. Returns the memoized methods.
+    def memoize_all: () -> Array[MemoizedMethod]
+
+    # Flushes the cache of every memoized method.
+    def unmemoize_all: () -> Array[MemoizedMethod]
+
+    # Same as `memoize_all`, limited to the given methods when any are given.
+    # Names are compared with the names given to `memoize` (a Symbol does not
+    # match a String).
+    def prime_cache: (*(Symbol | String) method_names) -> Array[MemoizedMethod]
+
+    # Same as `unmemoize_all`, limited to the given methods when any are given.
+    def flush_cache: (*(Symbol | String) method_names) -> Array[MemoizedMethod]
+  end
+
+  class MemoizedMethod < Struct[untyped]
+    attr_accessor memoized_method: Symbol | String
+    attr_accessor ivar: String
+    attr_accessor arity: Integer
+  end
+end
