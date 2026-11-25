@@ -1,0 +1,10 @@
+class MemoryCache
+  @store: Hash[String, Faraday::Response]
+
+  def initialize: () -> void
+  def read: (String key) -> Faraday::Response?
+  def write: (String key, Faraday::Response response, ?untyped options) -> Faraday::Response
+end
+
+class UpcaseParser < FaradayMiddleware::ResponseMiddleware
+end
