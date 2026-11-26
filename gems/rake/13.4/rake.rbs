@@ -145,6 +145,19 @@ module Rake
     def rule: (Hash[untyped, untyped] pattern_and_sources) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
             | (String | Regexp pattern, *task_arg_names | Hash[untyped, untyped] arg_names_and_sources) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
     def task: (task_name | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+
+    # Rake::DSL makes every FileUtils and FileUtilsExt method private
+    # (`Rake::TestTask.new(:x).sh "true"` raises NoMethodError).
+    def sh: (*String cmd, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+          | (Hash[String, String?] env, *String cmd, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+    def ruby: (*String args, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+    def safe_ln: (FileUtils::pathlist src, ::path dest, **untyped options) -> void
+    def split_all: (String path) -> Array[String]
+    def verbose: (?bool? value) ?{ () -> void } -> (bool | Object)
+    def nowrite: (?bool? value) ?{ () -> void } -> bool
+    def when_writing: [T] (?_ToS? msg) { () -> T } -> T?
+    def rake_output_message: (_ToS message) -> nil
+    def rake_check_options: (Hash[Symbol, untyped] options, *Symbol optdecl) -> nil
   end
 
   module FileUtilsExt
@@ -206,6 +219,7 @@ module Rake
     def sort: () ?{ (String a, String b) -> Integer } -> Rake::FileList
     def sort_by: [U] () { (String) -> U } -> Rake::FileList
     def grep: (untyped pattern) -> Rake::FileList
+            | (untyped pattern) { (String) -> untyped } -> Rake::FileList
             | (untyped pattern) { (String) -> String } -> Rake::FileList
     def compact: () -> Rake::FileList
     def flatten: (?Integer depth) -> Rake::FileList
