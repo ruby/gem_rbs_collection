@@ -1,0 +1,431 @@
+module JWT
+  extend JWT::Configuration
+
+  # An algorithm name ('HS256', :rs256, ...) or an object that includes or
+  # extends JWT::JWA::SigningAlgorithm.
+  type algorithm = ::String | ::Symbol | JWT::JWA::SigningAlgorithm
+
+  # A claim to verify (:exp, :iat, ...) or a Hash of claims with their options
+  # (`{ exp: { leeway: 10 }, iss: 'issuer' }`).
+  type claim_option = ::Symbol | ::Hash[::Symbol, untyped]
+
+  # An object that finds the verification key for a token (a Proc, or JWT::JWK::KeyFinder).
+  interface _KeyFinder
+    def call: (JWT::EncodedToken token) -> untyped
+  end
+
+  # Raises ArgumentError for an algorithm object that does not include
+  # JWT::JWA::SigningAlgorithm and JWT::EncodeError for an unusable key.
+  # With a JWK as the key the algorithm only has to match one the JWK supports.
+  def self?.encode: (untyped payload, JWT::JWK::KeyBase key, ?(algorithm | ::Array[algorithm])? algorithm, ?::Hash[untyped, untyped] header_fields) -> ::String
+                  | (untyped payload, untyped key, ?algorithm algorithm, ?::Hash[untyped, untyped] header_fields) -> ::String
+
+  # Returns the payload and the header. Without signature verification the payload
+  # is whatever JSON value the token holds.
+  def self?.decode: (::String jwt, ?untyped key, ?boolish verify, ?::Hash[untyped, untyped] options) ?{ (::Hash[::String, untyped] header, ?untyped payload) -> untyped } -> [untyped, ::Hash[::String, untyped]]
+
+  def self.gem_version: () -> ::Gem::Version
+
+  module VERSION
+    MAJOR: ::Integer
+    MINOR: ::Integer
+    TINY: ::Integer
+    PRE: ::String?
+    STRING: ::String
+  end
+
+  class Error < StandardError
+  end
+
+  class EncodeError < Error
+  end
+
+  class DecodeError < Error
+  end
+
+  class TokenError < DecodeError
+  end
+
+  class MalformedTokenError < TokenError
+  end
+
+  class Base64DecodeError < MalformedTokenError
+  end
+
+  class SignatureError < TokenError
+  end
+
+  class VerificationError < SignatureError
+  end
+
+  class VerificationKeyError < VerificationError
+  end
+
+  class IncorrectAlgorithm < SignatureError
+  end
+
+  class UnsupportedEcdsaCurve < IncorrectAlgorithm
+  end
+
+  class ClaimValidationError < TokenError
+  end
+
+  class ExpiredSignature < ClaimValidationError
+  end
+
+  class ImmatureSignature < ClaimValidationError
+  end
+
+  class InvalidIssuerError < ClaimValidationError
+  end
+
+  class InvalidIatError < ClaimValidationError
+  end
+
+  class InvalidAudError < ClaimValidationError
+  end
+
+  class InvalidSubError < ClaimValidationError
+  end
+
+  class InvalidCritError < ClaimValidationError
+  end
+
+  class InvalidJtiError < ClaimValidationError
+  end
+
+  class InvalidPayload < ClaimValidationError
+  end
+
+  class MissingRequiredClaim < ClaimValidationError
+  end
+
+  class JWKError < DecodeError
+  end
+
+  class UnsupportedKeyType < JWKError
+  end
+
+  module Configuration
+    def configure: [T] () { (JWT::Configuration::Container config) -> T } -> T
+    def configuration: () -> JWT::Configuration::Container
+
+    class Container
+      attr_accessor decode: JWT::Configuration::DecodeConfiguration
+      attr_accessor jwk: JWT::Configuration::JwkConfiguration
+      # Not set by reset! and not read by the gem.
+      attr_accessor strict_base64_decoding: bool?
+      attr_reader deprecation_warnings: ::Symbol
+
+      def initialize: () -> void
+      def reset!: () -> void
+      # Raises ArgumentError unless the value is :once, :warn or :silent.
+      def deprecation_warnings=: (::Symbol value) -> ::Symbol
+    end
+
+    class DecodeConfiguration
+      attr_accessor verify_expiration: bool
+      attr_accessor verify_not_before: bool
+      attr_accessor verify_iss: bool
+      attr_accessor verify_iat: bool | ::Hash[::Symbol, untyped]
+      attr_accessor verify_jti: bool | ::Proc
+      attr_accessor verify_aud: bool
+      attr_accessor verify_sub: bool
+      attr_accessor leeway: ::Numeric
+      attr_accessor algorithms: ::Array[algorithm]
+      attr_accessor required_claims: ::Array[::String]
+      attr_accessor enforce_hmac_key_length: bool
+
+      def initialize: () -> void
+    end
+
+    class JwkConfiguration
+      def initialize: () -> void
+      # Raises ArgumentError unless the value is :key_digest or :rfc7638_thumbprint.
+      def kid_generator_type=: (::Symbol value) -> void
+      attr_accessor kid_generator: JWT::JWK::_KidGeneratorClass
+    end
+  end
+
+  class Token
+    def initialize: (payload: untyped, ?header: ::Hash[untyped, untyped]) -> void
+    def signature: () -> ::String
+    def encoded_signature: () -> ::String
+    attr_reader header: ::Hash[::String, untyped]
+    def encoded_header: () -> ::String
+    attr_reader payload: untyped
+    def encoded_payload: () -> ::String
+    def signing_input: () -> ::String
+    # Raises JWT::EncodeError when the token is not signed yet.
+    def jwt: () -> ::String
+    def detach_payload!: () -> nil
+    # With a JWK as the key the algorithm only has to match one the JWK supports.
+    def sign!: (key: JWT::JWK::KeyBase, algorithm: (algorithm | ::Array[algorithm])?) -> nil
+             | (key: untyped, algorithm: algorithm) -> nil
+    def verify_claims!: (*claim_option options) -> nil
+    def claim_errors: (*claim_option options) -> ::Array[JWT::Claims::Error]
+    def valid_claims?: (*claim_option options) -> bool
+    alias to_s jwt
+  end
+
+  class EncodedToken
+    attr_reader jwt: ::String
+
+    def initialize: (::String jwt) -> void
+    def signature: () -> ::String
+    attr_reader encoded_signature: ::String?
+    def header: () -> ::Hash[::String, untyped]
+    attr_reader encoded_header: ::String?
+    # Raises JWT::TokenError unless the signature and the claims were verified.
+    def payload: () -> untyped
+    def unverified_payload: () -> untyped
+    attr_reader encoded_payload: ::String?
+    def encoded_payload=: (::String encoded_payload) -> void
+    def signing_input: () -> ::String
+    def verify!: (signature: ::Hash[::Symbol, untyped], ?claims: (::Array[claim_option?] | claim_option)?) -> nil
+    def valid?: (signature: ::Hash[::Symbol, untyped], ?claims: (::Array[claim_option?] | claim_option)?) -> bool
+    def verify_signature!: (algorithm: (algorithm | ::Array[algorithm])?, ?key: untyped, ?key_finder: _KeyFinder?) -> nil
+    def valid_signature?: (?algorithm: (algorithm | ::Array[algorithm])?, ?key: untyped, ?key_finder: _KeyFinder?) -> bool
+    def verify_claims!: (*claim_option? options) -> nil
+    def claim_errors: (*claim_option? options) -> ::Array[JWT::Claims::Error]
+    def valid_claims?: (*claim_option? options) -> bool
+    alias to_s jwt
+  end
+
+  module Claims
+    class Error < ::Struct[untyped]
+      attr_accessor message: ::String
+
+      def initialize: (message: ::String) -> void
+      def self.new: (message: ::String) -> instance
+    end
+
+    def self.verify_payload!: (::Hash[untyped, untyped] payload, *claim_option options) -> nil
+    def self.valid_payload?: (::Hash[untyped, untyped] payload, *claim_option options) -> bool
+    def self.payload_errors: (::Hash[untyped, untyped] payload, *claim_option options) -> ::Array[JWT::Claims::Error]
+  end
+
+  module JWA
+    def self.find: (::String | ::Symbol algo) -> JWT::JWA::SigningAlgorithm
+    def self.register_algorithm: (JWT::JWA::SigningAlgorithm algo) -> JWT::JWA::SigningAlgorithm
+
+    # Included (or extended) by every algorithm. Custom algorithms implement
+    # alg, sign and verify.
+    module SigningAlgorithm
+      module ClassMethods
+        def register_algorithm: (JWT::JWA::SigningAlgorithm algo) -> JWT::JWA::SigningAlgorithm
+      end
+
+      @alg: ::String?
+
+      # nil for JWT::JWA::Unsupported.
+      def alg: () -> ::String?
+      def valid_alg?: (untyped alg_to_check) -> bool
+      def header: (*untyped) -> ::Hash[::String, untyped]
+      def sign: (data: ::String, signing_key: untyped) -> ::String
+      def verify: (data: ::String, signature: ::String, verification_key: untyped) -> boolish
+      def raise_verify_error!: (::String message) -> bot
+      def raise_sign_error!: (::String message) -> bot
+    end
+
+    class Ecdsa
+      include JWT::JWA::SigningAlgorithm
+      extend JWT::JWA::SigningAlgorithm::ClassMethods
+
+      def initialize: (::String alg, ::String digest) -> void
+      def sign: (data: ::String, signing_key: ::OpenSSL::PKey::EC) -> ::String
+      def verify: (data: ::String, signature: ::String, verification_key: ::OpenSSL::PKey::EC | ::OpenSSL::PKey::EC::Point) -> bool
+      def self.create_public_key_from_point: (::OpenSSL::PKey::EC::Point point) -> ::OpenSSL::PKey::EC
+    end
+
+    class Hmac
+      include JWT::JWA::SigningAlgorithm
+      extend JWT::JWA::SigningAlgorithm::ClassMethods
+
+      def initialize: (::String alg, singleton(::OpenSSL::Digest) digest) -> void
+      def sign: (data: ::String, signing_key: ::String) -> ::String
+      def verify: (data: ::String, signature: ::String, verification_key: ::String) -> bool
+    end
+
+    class None
+      include JWT::JWA::SigningAlgorithm
+      extend JWT::JWA::SigningAlgorithm::ClassMethods
+
+      def initialize: () -> void
+      def sign: (*untyped, **untyped) -> ::String
+      def verify: (*untyped, **untyped) -> bool
+    end
+
+    class Ps
+      include JWT::JWA::SigningAlgorithm
+      extend JWT::JWA::SigningAlgorithm::ClassMethods
+
+      def initialize: (::String alg) -> void
+      def sign: (data: ::String, signing_key: ::OpenSSL::PKey::RSA) -> ::String
+      def verify: (data: ::String, signature: ::String, verification_key: ::OpenSSL::PKey::RSA) -> bool
+    end
+
+    class Rsa
+      include JWT::JWA::SigningAlgorithm
+      extend JWT::JWA::SigningAlgorithm::ClassMethods
+
+      def initialize: (::String alg) -> void
+      def sign: (data: ::String, signing_key: ::OpenSSL::PKey::RSA) -> ::String
+      def verify: (data: ::String, signature: ::String, verification_key: ::OpenSSL::PKey::RSA) -> bool
+    end
+
+    # Returned by JWT::JWA.find for unknown algorithm names; signing and
+    # verifying with it always raise.
+    module Unsupported
+      extend JWT::JWA::SigningAlgorithm
+
+      def self.sign: (*untyped, **untyped) -> bot
+      def self.verify: (*untyped, **untyped) -> bot
+    end
+  end
+
+  module JWK
+    type key = ::Hash[untyped, untyped] | ::String | ::OpenSSL::PKey::RSA | ::OpenSSL::PKey::EC | JWT::JWK::KeyBase
+    type params = (::Hash[untyped, untyped] | ::String)?
+
+    # A kid generator class (JWT::JWK::Thumbprint or your own).
+    interface _KidGeneratorClass
+      def new: (JWT::JWK::KeyBase jwk) -> JWT::JWK::_KidGenerator
+    end
+
+    interface _KidGenerator
+      def generate: () -> untyped
+    end
+
+    # A Hash key gives the class registered for its kty (also those of other
+    # gems, such as jwt-eddsa), hence KeyBase.
+    def self.create_from: (::Hash[untyped, untyped] key, ?params params, ?::Hash[::Symbol, untyped]? options) -> JWT::JWK::KeyBase
+                        | (::OpenSSL::PKey::RSA | JWT::JWK::RSA key, ?params params, ?::Hash[::Symbol, untyped]? options) -> JWT::JWK::RSA
+                        | (::OpenSSL::PKey::EC | JWT::JWK::EC key, ?params params, ?::Hash[::Symbol, untyped]? options) -> JWT::JWK::EC
+                        | (::String | JWT::JWK::HMAC key, ?params params, ?::Hash[::Symbol, untyped]? options) -> JWT::JWK::HMAC
+                        | (key key, ?params params, ?::Hash[::Symbol, untyped]? options) -> JWT::JWK::KeyBase
+    alias self.new self.create_from
+    alias self.import self.create_from
+
+    def self.classes: () -> ::Array[singleton(JWT::JWK::KeyBase)]
+
+    class KeyBase
+      def initialize: (::Hash[::Symbol, untyped]? options, ?::Hash[untyped, untyped] params) -> void
+      def kid: () -> untyped
+      def hash: () -> ::Integer
+      def []: (::String | ::Symbol key) -> untyped
+      def []=: [T] (::String | ::Symbol key, T value) -> T
+      def ==: (untyped other) -> bool
+      alias eql? ==
+      def <=>: (untyped other) -> ::Integer?
+      def verify: (data: ::String, signature: ::String) -> boolish
+      def sign: (data: ::String) -> ::String
+      def inspect: () -> ::String
+      def jwa: () -> JWT::JWA::SigningAlgorithm
+      attr_reader parameters: ::Hash[::Symbol, untyped]
+    end
+
+    class EC < KeyBase
+      KTY: ::String
+
+      def initialize: (::OpenSSL::PKey::EC | JWT::JWK::EC | ::Hash[untyped, untyped] key, ?params params, ?::Hash[::Symbol, untyped]? options) -> void
+      def keypair: () -> ::OpenSSL::PKey::EC
+      def private?: () -> bool
+      def signing_key: () -> ::OpenSSL::PKey::EC
+      def verify_key: () -> ::OpenSSL::PKey::EC
+      def public_key: () -> ::OpenSSL::PKey::EC
+      def members: () -> ::Hash[::Symbol, untyped]
+      def export: (?::Hash[::Symbol, untyped] options) -> ::Hash[::Symbol, untyped]
+      def key_digest: () -> ::String
+      def []=: [T] (::String | ::Symbol key, T value) -> T
+      def jwa: () -> JWT::JWA::SigningAlgorithm
+      def self.import: (::OpenSSL::PKey::EC | JWT::JWK::EC | ::Hash[untyped, untyped] jwk_data) -> instance
+      def self.to_openssl_curve: (::String crv) -> ::String
+    end
+
+    class HMAC < KeyBase
+      KTY: ::String
+
+      def initialize: (::String | JWT::JWK::HMAC | ::Hash[untyped, untyped] key, ?params params, ?::Hash[::Symbol, untyped]? options) -> void
+      def keypair: () -> ::String
+      def private?: () -> bool
+      def public_key: () -> nil
+      def verify_key: () -> ::String
+      def signing_key: () -> ::String
+      def export: (?::Hash[::Symbol, untyped] options) -> ::Hash[::Symbol, untyped]
+      def members: () -> ::Hash[::Symbol, untyped]
+      def key_digest: () -> ::String
+      def []=: [T] (::String | ::Symbol key, T value) -> T
+      def self.import: (::String | JWT::JWK::HMAC | ::Hash[untyped, untyped] jwk_data) -> instance
+    end
+
+    class RSA < KeyBase
+      KTY: ::String
+
+      def initialize: (::OpenSSL::PKey::RSA | JWT::JWK::RSA | ::Hash[untyped, untyped] key, ?params params, ?::Hash[::Symbol, untyped]? options) -> void
+      def keypair: () -> ::OpenSSL::PKey::RSA
+      def private?: () -> bool
+      def public_key: () -> ::OpenSSL::PKey::RSA
+      # nil for a public key.
+      def signing_key: () -> ::OpenSSL::PKey::RSA?
+      def verify_key: () -> ::OpenSSL::PKey::RSA
+      def export: (?::Hash[::Symbol, untyped] options) -> ::Hash[::Symbol, untyped]
+      def members: () -> ::Hash[::Symbol, untyped]
+      def key_digest: () -> ::String
+      def []=: [T] (::String | ::Symbol key, T value) -> T
+      def self.import: (::OpenSSL::PKey::RSA | JWT::JWK::RSA | ::Hash[untyped, untyped] jwk_data) -> instance
+      def self.decode_open_ssl_bn: (::String? jwk_data) -> ::OpenSSL::BN?
+    end
+
+    class Set
+      include Enumerable[JWT::JWK::KeyBase]
+
+      attr_reader keys: ::Array[JWT::JWK::KeyBase]
+
+      # Raises ArgumentError for other types.
+      def initialize: (?(JWT::JWK::Set | JWT::JWK::KeyBase | ::Hash[untyped, untyped] | ::Array[untyped])? jwks, ?::Hash[::Symbol, untyped] options) -> void
+      def export: (?::Hash[::Symbol, untyped] options) -> ::Hash[::Symbol, ::Array[::Hash[::Symbol, untyped]]]
+      def each: () { (JWT::JWK::KeyBase key) -> void } -> ::Array[JWT::JWK::KeyBase]
+              | () -> ::Enumerator[JWT::JWK::KeyBase, ::Array[JWT::JWK::KeyBase]]
+      def size: () -> ::Integer
+      alias length size
+      def delete: (untyped key) -> JWT::JWK::KeyBase?
+      def dig: (::Integer index) -> JWT::JWK::KeyBase?
+      def select!: () { (JWT::JWK::KeyBase key) -> boolish } -> self?
+                 | () -> ::Enumerator[JWT::JWK::KeyBase, ::Array[JWT::JWK::KeyBase]?]
+      alias filter! select!
+      def reject!: () { (JWT::JWK::KeyBase key) -> boolish } -> self?
+                 | () -> ::Enumerator[JWT::JWK::KeyBase, ::Array[JWT::JWK::KeyBase]?]
+      def uniq!: () ?{ (JWT::JWK::KeyBase key) -> untyped } -> self?
+      def merge: (JWT::JWK::Set | ::Array[untyped] enum) -> self
+      def union: (JWT::JWK::Set | ::Array[untyped] enum) -> JWT::JWK::Set
+      alias | union
+      alias + union
+      def add: (key key) -> self
+      alias << add
+      def ==: (untyped other) -> bool
+      alias eql? ==
+    end
+
+    class KeyFinder
+      # Options: jwks (a JWT::JWK::Set, a JWKS Hash or a loader Proc), allow_nil_kid, key_fields.
+      def initialize: (::Hash[::Symbol, untyped] options) -> void
+      # Returns the verify_key of the matching JWK.
+      def key_for: (::String? kid, ?::String | ::Symbol key_field) -> untyped
+      def call: (JWT::EncodedToken token) -> untyped
+    end
+
+    class Thumbprint
+      attr_reader jwk: JWT::JWK::KeyBase
+
+      def initialize: (JWT::JWK::KeyBase jwk) -> void
+      def generate: () -> ::String
+      alias to_s generate
+    end
+  end
+
+  class X5cKeyFinder
+    def initialize: (::Array[::OpenSSL::X509::Certificate] root_certificates, ?::Array[::OpenSSL::X509::CRL]? crls) -> void
+    def from: (::Array[::OpenSSL::X509::Certificate] | ::Array[::String] x5c_header_or_certificates) -> ::OpenSSL::PKey::PKey
+  end
+end
