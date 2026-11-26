@@ -1,0 +1,31 @@
+module Faraday
+  class Adapter
+    class NetHttp < Faraday::Adapter
+      # Low-level errors that #call turns into Faraday::ConnectionFailed
+      # (or Faraday::SSLError for OpenSSL::SSL::SSLError).
+      NET_HTTP_EXCEPTIONS: Array[singleton(StandardError)]
+
+      # `app` is ignored by Faraday::Adapter; the block is called with the
+      # Net::HTTP connection before each request.
+      def initialize: (?untyped app, ?Hash[untyped, untyped] opts) ?{ (Net::HTTP http) -> void } -> void
+
+      # Builds a Net::HTTP for the request's URL and proxy, then applies the
+      # SSL options (for https URLs) and the request timeouts.
+      # Faraday::Adapter#connection also passes a Hash with :url, :request
+      # and :ssl keys.
+      # Raises RuntimeError for a socks:// proxy when socksify is not loaded.
+      def build_connection: (Faraday::Env | Hash[Symbol, untyped] env) -> Net::HTTP
+
+      # Builds the Net::HTTP for the request's URL and proxy without
+      # configuring SSL or timeouts. A socks:// proxy gives an instance of a
+      # Net::HTTP subclass.
+      def net_http_connection: (Faraday::Env | Hash[Symbol, untyped] env) -> Net::HTTP
+
+      def call: (Faraday::Env env) -> Faraday::Response
+    end
+  end
+
+  module NetHttp
+    VERSION: String
+  end
+end
