@@ -1,0 +1,39 @@
+module Unicode
+  class DisplayWidth
+    VERSION: String
+    UNICODE_VERSION: String
+    DATA_DIRECTORY: String
+    INDEX_FILENAME: String
+    DEFAULT_AMBIGUOUS: Integer
+
+    # Values accepted by the `emoji:` option. `true` and `:auto` (and `nil`)
+    # pick EmojiSupport.recommended; `false` is the same as `:none`.
+    type emoji_mode = :all | :all_no_vs16 | :possible | :rgi | :rgi_at | :vs16 | :none | :auto | bool
+
+    # Codepoint => width
+    type overwrite = Hash[Integer, Integer]
+
+    # Returns the monospace display width of `string`.
+    #
+    # `ambiguous` must be 1 or 2 (ArgumentError otherwise); nil means
+    # DEFAULT_AMBIGUOUS. The positional `ambiguous` wins over the keyword.
+    # The positional `overwrite` and `old_options` are the deprecated
+    # pre-3.0 API and print a warning when non-empty.
+    def self.of: (String string, ?Integer? ambiguous, ?overwrite? overwrite, ?Hash[Symbol, untyped] old_options,
+                  ?ambiguous: Integer?, ?overwrite: overwrite?, ?emoji: emoji_mode?) -> Integer
+
+    def initialize: (?ambiguous: Integer?, ?overwrite: overwrite?, ?emoji: emoji_mode?) -> void
+
+    # The options passed to DisplayWidth.of: the given keywords, falling back
+    # to the ones given to #initialize.
+    def get_config: (?ambiguous: Integer?, ?overwrite: overwrite?, ?emoji: emoji_mode?) -> { ambiguous: Integer?, overwrite: overwrite?, emoji: emoji_mode? }
+
+    def of: (String string, ?ambiguous: Integer?, ?overwrite: overwrite?, ?emoji: emoji_mode?) -> Integer
+
+    module EmojiSupport
+      # The emoji mode guessed from the terminal's environment variables
+      # (memoized).
+      def self.recommended: () -> (:rgi | :rgi_at | :all | :all_no_vs16 | :vs16 | :none)
+    end
+  end
+end
