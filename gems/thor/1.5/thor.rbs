@@ -1,0 +1,669 @@
+class Thor
+  VERSION: String
+
+  HELP_MAPPINGS: Array[String]
+  TREE_MAPPINGS: Array[String]
+  THOR_RESERVED_WORDS: Array[String]
+  TEMPLATE_EXTNAME: String
+
+  class Group
+    include Base
+    extend Base::ClassMethods
+    include Invocation
+    extend Invocation::ClassMethods
+    include Shell
+
+    # Without an argument, returns the description (nil when none was set).
+    def self.desc: () -> String?
+                 | (String description) -> String
+
+    def self.help: (Shell::Basic shell) -> void
+
+    # The block is called with (instance, klass, command), (instance, klass) or,
+    # for a block of arity 1, instance_exec'ed on the instance with klass.
+    def self.invoke: (*String | Symbol | Class names, ?verbose: bool) ?{ (*untyped) -> untyped } -> void
+
+    def self.invoke_from_option: (*Symbol | String names, ?verbose: bool | Symbol) ?{ (*untyped) -> untyped } -> void
+
+    def self.remove_invocation: (*Symbol | String names) -> void
+
+    def self.printable_commands: (*untyped) -> Array[[String, String]]
+    alias self.printable_tasks self.printable_commands
+  end
+
+  module Actions
+    class EmptyDirectory
+    end
+
+    class CreateFile < EmptyDirectory
+    end
+
+    class CreateLink < CreateFile
+    end
+
+    class Directory < EmptyDirectory
+    end
+
+    class InjectIntoFile < EmptyDirectory
+    end
+
+    module ClassMethods
+      def source_paths: () -> Array[String]
+
+      def source_root: (?String? path) -> String?
+
+      def source_paths_for_search: () -> Array[String]
+
+      def add_runtime_options!: () -> void
+    end
+
+    attr_accessor behavior: :invoke | :revoke
+
+    def destination_root: () -> String
+
+    def destination_root=: (String? root) -> String
+
+    def relative_to_original_destination_root: (String path, ?bool remove_dot) -> String
+
+    def source_paths: () -> Array[String]
+
+    # Raises Thor::Error when the file is not found.
+    def find_in_source_paths: (String file) -> String
+
+    def inside: [T] () { (?String destination_root) -> T } -> T
+              | [T] (String dir, ?verbose: bool) { (?String destination_root) -> T } -> T
+              | [T] (String dir, Hash[Symbol, untyped] config) { (?String destination_root) -> T } -> T
+
+    def in_root: [T] () { () -> T } -> T
+
+    def apply: (String path, ?verbose: bool) -> void
+             | (String path, Hash[Symbol, untyped] config) -> void
+
+    # Returns nil when behavior is :revoke or with the :pretend option, the
+    # output with capture: true, otherwise the result of Kernel#system.
+    def run: (String command, ?verbose: bool, ?with: String | Symbol, ?capture: bool, ?abort_on_failure: bool, ?env: Hash[String, String?]) -> (String | bool)?
+           | (String command, Hash[Symbol, untyped] config) -> (String | bool)?
+
+    def run_ruby_script: (String command, ?verbose: bool, ?capture: bool, ?abort_on_failure: bool, ?env: Hash[String, String?]) -> (String | bool)?
+                       | (String command, Hash[Symbol, untyped] config) -> (String | bool)?
+
+    # Other keywords are passed to the command as switches.
+    def thor: (Symbol | String command, *String args, ?verbose: bool, ?pretend: bool, ?capture: bool, **untyped switches) -> (String | bool)?
+            | (Symbol | String command, *String args, Hash[Symbol, untyped] config) -> (String | bool)?
+
+    def create_file: (String destination, ?String? data, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer) -> String
+                   | (String destination, String? data, Hash[Symbol, untyped] config) -> String
+                   | (String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer) { () -> String } -> String
+                   | (String destination, Hash[Symbol, untyped] config) { () -> String } -> String
+                   | (String destination, nil data, Hash[Symbol, untyped] config) { () -> String } -> String
+    alias add_file create_file
+
+    def create_link: (String destination, String source, ?verbose: bool, ?force: bool, ?skip: bool, ?symbolic: bool) -> String
+                   | (String destination, String source, Hash[Symbol, untyped] config) -> String
+    alias add_link create_link
+
+    def empty_directory: (String destination, ?verbose: bool) -> void
+                       | (String destination, Hash[Symbol, untyped] config) -> void
+
+    def directory: (String source, ?String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?recursive: bool, ?exclude_pattern: Regexp, ?mode: :preserve) ?{ (String content) -> String } -> void
+                 | (String source, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> void
+                 | (String source, String destination, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> void
+
+    def copy_file: (String source, ?String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer, ?mode: :preserve) ?{ (String content) -> String } -> void
+                 | (String source, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> void
+                 | (String source, String destination, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> void
+
+    def link_file: (String source, ?String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?symbolic: bool) -> String
+                 | (String source, Hash[Symbol, untyped] config) -> String
+                 | (String source, String destination, Hash[Symbol, untyped] config) -> String
+
+    # Without a destination, the block (given the content) returns the destination.
+    def get: (String source, ?String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer, ?http_headers: Hash[String, String]) -> String
+           | (String source, String destination, Hash[Symbol, untyped] config) -> String
+           | (String source, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer, ?http_headers: Hash[String, String]) { (?String content) -> String } -> String
+           | (String source, Hash[Symbol, untyped] config) ?{ (?String content) -> String } -> String
+
+    def template: (String source, ?String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer, ?context: Binding) ?{ (String content) -> String } -> String
+                | (String source, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> String
+                | (String source, String destination, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> String
+
+    def chmod: (String path, Integer | String mode, ?verbose: bool) -> void
+             | (String path, Integer | String mode, Hash[Symbol, untyped] config) -> void
+
+    def insert_into_file: (String destination, String data, ?after: String | Regexp, ?before: String | Regexp, ?force: bool, ?verbose: bool) -> void
+                        | (String destination, String data, Hash[Symbol, untyped] config) -> void
+                        | (String destination, ?after: String | Regexp, ?before: String | Regexp, ?force: bool, ?verbose: bool) { () -> String } -> void
+                        | (String destination, Hash[Symbol, untyped] config) { () -> String } -> void
+    alias inject_into_file insert_into_file
+
+    # Raises Thor::Error when the file does not change.
+    def insert_into_file!: (String destination, String data, ?after: String | Regexp, ?before: String | Regexp, ?force: bool, ?verbose: bool) -> void
+                         | (String destination, String data, Hash[Symbol, untyped] config) -> void
+                         | (String destination, ?after: String | Regexp, ?before: String | Regexp, ?force: bool, ?verbose: bool) { () -> String } -> void
+                         | (String destination, Hash[Symbol, untyped] config) { () -> String } -> void
+    alias inject_into_file! insert_into_file!
+
+    def prepend_to_file: (String path, String data, ?force: bool, ?verbose: bool) -> void
+                       | (String path, String data, Hash[Symbol, untyped] config) -> void
+                       | (String path, ?force: bool, ?verbose: bool) { () -> String } -> void
+                       | (String path, Hash[Symbol, untyped] config) { () -> String } -> void
+    alias prepend_file prepend_to_file
+
+    def append_to_file: (String path, String data, ?force: bool, ?verbose: bool) -> void
+                      | (String path, String data, Hash[Symbol, untyped] config) -> void
+                      | (String path, ?force: bool, ?verbose: bool) { () -> String } -> void
+                      | (String path, Hash[Symbol, untyped] config) { () -> String } -> void
+    alias append_file append_to_file
+
+    def inject_into_class: (String path, String | Module klass, String data, ?force: bool, ?verbose: bool) -> void
+                         | (String path, String | Module klass, String data, Hash[Symbol, untyped] config) -> void
+                         | (String path, String | Module klass, ?force: bool, ?verbose: bool) { () -> String } -> void
+                         | (String path, String | Module klass, Hash[Symbol, untyped] config) { () -> String } -> void
+
+    def inject_into_module: (String path, String | Module module_name, String data, ?force: bool, ?verbose: bool) -> void
+                          | (String path, String | Module module_name, String data, Hash[Symbol, untyped] config) -> void
+                          | (String path, String | Module module_name, ?force: bool, ?verbose: bool) { () -> String } -> void
+                          | (String path, String | Module module_name, Hash[Symbol, untyped] config) { () -> String } -> void
+
+    def gsub_file: (String path, Regexp | String flag, *String replacement, ?verbose: bool, ?force: bool) ?{ (String match) -> String } -> void
+                 | (String path, Regexp | String flag, *String replacement, Hash[Symbol, untyped] config) ?{ (String match) -> String } -> void
+
+    # Raises Thor::Error when the file does not change.
+    def gsub_file!: (String path, Regexp | String flag, *String replacement, ?verbose: bool, ?force: bool) ?{ (String match) -> String } -> void
+                  | (String path, Regexp | String flag, *String replacement, Hash[Symbol, untyped] config) ?{ (String match) -> String } -> void
+
+    def uncomment_lines: (String path, Regexp | String flag, ?verbose: bool, ?force: bool) -> void
+                       | (String path, Regexp | String flag, Hash[Symbol, untyped] config) -> void
+
+    def comment_lines: (String path, Regexp | String flag, ?verbose: bool, ?force: bool) -> void
+                     | (String path, Regexp | String flag, Hash[Symbol, untyped] config) -> void
+
+    def remove_file: (String path, ?verbose: bool) -> void
+                   | (String path, Hash[Symbol, untyped] config) -> void
+    alias remove_dir remove_file
+  end
+
+  class Error < StandardError
+  end
+
+  class UndefinedCommandError < Error
+    attr_reader command: String
+    attr_reader all_commands: Array[String]
+
+    def initialize: (String command, Array[String] all_commands, String? namespace) -> void
+  end
+
+  class UndefinedTaskError = UndefinedCommandError
+
+  class AmbiguousCommandError < Error
+  end
+
+  class AmbiguousTaskError = AmbiguousCommandError
+
+  class InvocationError < Error
+  end
+
+  class UnknownArgumentError < Error
+    attr_reader switches: Array[String]
+    attr_reader unknown: Array[String]
+
+    def initialize: (Array[String] switches, Array[String] unknown) -> void
+  end
+
+  class RequiredArgumentMissingError < InvocationError
+  end
+
+  class MalformattedArgumentError < InvocationError
+  end
+
+  class ExclusiveArgumentError < InvocationError
+  end
+
+  class AtLeastOneRequiredArgumentError < InvocationError
+  end
+
+  class Argument
+    attr_reader name: String
+    attr_reader description: String?
+    attr_reader enum: Enumerable[untyped]?
+    attr_reader required: boolish
+    attr_reader type: Symbol
+    attr_reader default: untyped
+    attr_reader banner: String?
+
+    def human_name: () -> String
+
+    def required?: () -> boolish
+  end
+
+  class Option < Argument
+    attr_reader aliases: Array[String]
+    attr_reader group: String?
+    attr_reader lazy_default: untyped
+    attr_reader hide: boolish
+    attr_reader repeatable: boolish
+
+    def switch_name: () -> String
+
+    def boolean?: () -> bool
+    def numeric?: () -> bool
+    def hash?: () -> bool
+    def array?: () -> bool
+    def string?: () -> bool
+  end
+
+  class Command < Struct[untyped]
+    attr_accessor name: String
+    attr_accessor description: String?
+    attr_accessor long_description: String?
+    attr_accessor wrap_long_description: bool?
+    attr_accessor usage: String | Array[String] | nil
+    attr_accessor options: Hash[Symbol | String | Array[Symbol | String], Option]
+    attr_accessor options_relation: Hash[Symbol, Array[Array[String]]]
+    attr_accessor ancestor_name: String | Symbol | nil
+
+    def self.new: (String | Symbol name, String? description, String? long_description, bool? wrap_long_description, String | Array[String] | nil usage, ?Hash[Symbol | String | Array[Symbol | String], Option]? options, ?Hash[Symbol, Array[Array[String]]]? options_relation) -> instance
+
+    def initialize: (String | Symbol name, String? description, String? long_description, bool? wrap_long_description, String | Array[String] | nil usage, ?Hash[Symbol | String | Array[Symbol | String], Option]? options, ?Hash[Symbol, Array[Array[String]]]? options_relation) -> void
+
+    def hidden?: () -> bool
+
+    # Calls the command on the instance and returns what the command returns.
+    def run: (Base instance, ?Array[untyped] args) -> untyped
+
+    def formatted_usage: (Base::ClassMethods klass, ?boolish namespace, ?boolish subcommand) -> String
+  end
+
+  class Task = Command
+
+  class HiddenCommand < Command
+  end
+
+  class HiddenTask = HiddenCommand
+
+  class DynamicCommand < Command
+    def self.new: (String | Symbol name, ?Hash[Symbol | String | Array[Symbol | String], Option]? options) -> instance
+
+    def initialize: (String | Symbol name, ?Hash[Symbol | String | Array[Symbol | String], Option]? options) -> void
+  end
+
+  class DynamicTask = DynamicCommand
+
+  class NestedContext
+    def initialize: () -> void
+
+    def enter: [T] () { () -> T } -> T
+
+    def entered?: () -> bool
+  end
+
+  module Base
+    attr_accessor options: Hash[String | Symbol, untyped]
+    attr_accessor parent_options: Hash[String | Symbol, untyped]?
+    attr_accessor args: Array[untyped]
+
+    def self.subclasses: () -> Array[Class]
+
+    def self.subclass_files: () -> Hash[String, Array[Class]]
+
+    def self.shell: () -> singleton(Shell::Basic)
+
+    attr_writer self.shell: singleton(Shell::Basic)?
+  end
+
+  module Base
+    module ClassMethods
+      def check_unknown_options!: () -> void
+
+      def check_default_type!: () -> void
+
+      def allow_incompatible_default_type!: () -> void
+
+      def strict_args_position!: () -> void
+
+      def argument: (
+        Symbol | String name,
+        ?type: :string | :hash | :array | :numeric,
+        ?desc: String,
+        ?required: bool,
+        ?optional: bool,
+        ?default: untyped,
+        ?banner: String,
+        ?enum: Enumerable[untyped]
+      ) -> void
+                  | (Symbol | String name, Hash[Symbol, untyped] options) -> void
+
+      def class_options: () -> Hash[Symbol | String | Array[Symbol | String], Option]
+                       | (Hash[Symbol | String | Array[Symbol | String], untyped] options) -> Hash[Symbol | String | Array[Symbol | String], Option]
+
+      def class_option: (
+        Symbol | String name,
+        ?aliases: String | Symbol | Array[String | Symbol],
+        ?banner: String,
+        ?default: untyped,
+        ?lazy_default: untyped,
+        ?desc: String,
+        ?group: String | Symbol,
+        ?hide: boolish,
+        ?required: bool,
+        ?type: :string | :hash | :array | :numeric | :boolean,
+        ?enum: Enumerable[untyped],
+        ?repeatable: bool,
+        ?check_default_type: bool,
+        **untyped
+      ) -> void
+                      | (Symbol | String name, Hash[Symbol, untyped] options) -> void
+
+      # The block is instance_eval'ed on the class, so options defined in it
+      # join the group.
+      def class_exclusive: (*Symbol | String names) ?{ (self) [self: self] -> void } -> void
+
+      def class_at_least_one: (*Symbol | String names) ?{ (self) [self: self] -> void } -> void
+
+      def class_exclusive_option_names: () -> Array[Array[String]]
+
+      def class_at_least_one_option_names: () -> Array[Array[String]]
+
+      def remove_argument: (*Symbol | String names, ?undefine: bool) -> void
+
+      def remove_class_option: (*Symbol | String names) -> void
+
+      def group: (?nil) -> String
+               | (String | Symbol name) -> String
+
+      def commands: () -> Hash[String, Command]
+      alias tasks commands
+
+      def all_commands: () -> Hash[String, Command]
+      alias all_tasks all_commands
+
+      def remove_command: (*Symbol | String names, ?undefine: bool) -> void
+      alias remove_task remove_command
+
+      def no_commands: [T] () { () -> T } -> T
+      alias no_tasks no_commands
+
+      def no_commands_context: () -> NestedContext
+
+      def no_commands?: () -> bool
+
+      def namespace: (?nil) -> String
+                   | (String | Symbol name) -> String
+
+      # Returns what the dispatched command returns, or nil after a Thor::Error
+      # when exit_on_failure? is false.
+      def start: (?Array[String] given_args, ?Hash[Symbol, untyped] config) -> untyped
+
+      def public_command: (*Symbol | String names) -> void
+      alias public_task public_command
+
+      def exit_on_failure?: () -> bool
+    end
+  end
+
+  module Invocation
+    module ClassMethods
+    end
+
+    def current_command_chain: () -> Array[Symbol]
+
+    # Takes an optional command name, an Array of arguments, an options Hash
+    # or Array and a config Hash, and returns what the command returns.
+    def invoke: (String | Symbol | Class name, *untyped args) -> untyped
+
+    def invoke_with_padding: (String | Symbol | Class name, *untyped args) -> untyped
+  end
+
+  module Shell
+    type color = Symbol | String | Array[Symbol | String | bool]
+
+    SHELL_DELEGATED_METHODS: Array[Symbol]
+
+    # Thor::Base#initialize does the work; it is declared here because the
+    # runtime checker hooks Thor::Base before base.rb defines it.
+    def initialize: (?Array[untyped] args, ?Hash[String | Symbol, untyped] | Array[String] options, ?Hash[Symbol, untyped] config) -> void
+
+    def shell: () -> Basic
+
+    attr_writer shell: Basic?
+
+    def with_padding: [T] () { () -> T } -> T
+
+    def ask: (String statement, ?color? color, ?default: String, ?limited_to: Array[String], ?case_insensitive: bool, ?echo: bool, ?path: bool, ?add_to_history: bool) -> String?
+           | (String statement, Hash[Symbol, untyped] options) -> String?
+           | (String statement, color? color, Hash[Symbol, untyped] options) -> String?
+    def say: (?_ToS message, ?color? color, ?boolish force_new_line) -> void
+    def say_error: (?_ToS message, ?color? color, ?boolish force_new_line) -> void
+    def say_status: (Symbol | String status, _ToS message, ?(bool | Symbol)? log_status) -> void
+
+    def yes?: (String statement, ?color? color) -> bool
+    def no?: (String statement, ?color? color) -> bool
+
+    def error: (String statement) -> void
+
+    def set_color: (String string, *(Symbol | String | bool)? colors) -> String
+
+    def print_in_columns: (Array[_ToS] array) -> void
+
+    def print_table: (Array[Array[untyped] | :separator] array, ?indent: Integer, ?colwidth: Integer, ?truncate: bool | Integer, ?borders: bool) -> void
+                   | (Array[Array[untyped] | :separator] array, Hash[Symbol, untyped] options) -> void
+
+    def print_wrapped: (String message, ?indent: Integer) -> void
+                     | (String message, Hash[Symbol, untyped] options) -> void
+
+    # Returns true to overwrite, false to skip, nil after a merge; the block
+    # gives the new content for diff and merge.
+    def file_collision: (String destination) ?{ () -> String? } -> bool?
+
+    class Basic
+      attr_accessor base: Base?
+      attr_reader padding: Integer
+
+      def initialize: () -> void
+
+      def mute: [T] () { () -> T } -> T
+
+      def mute?: () -> bool
+
+      def padding=: (Integer value) -> Integer
+
+      def indent: (?Integer count) { () -> void } -> void
+
+      def ask: (String statement, ?color? color, ?default: String, ?limited_to: Array[String], ?case_insensitive: bool, ?echo: bool, ?path: bool, ?add_to_history: bool) -> String?
+             | (String statement, Hash[Symbol, untyped] options) -> String?
+             | (String statement, color? color, Hash[Symbol, untyped] options) -> String?
+
+      def say: (?_ToS message, ?color? color, ?boolish force_new_line) -> void
+
+      def say_error: (?_ToS message, ?color? color, ?boolish force_new_line) -> void
+
+      def say_status: (Symbol | String status, _ToS message, ?(bool | Symbol)? log_status) -> void
+
+      def yes?: (String statement, ?color? color) -> bool
+
+      def no?: (String statement, ?color? color) -> bool
+
+      def print_in_columns: (Array[_ToS] array) -> void
+
+      def print_table: (Array[Array[untyped] | :separator] array, ?indent: Integer, ?colwidth: Integer, ?truncate: bool | Integer, ?borders: bool) -> void
+                     | (Array[Array[untyped] | :separator] array, Hash[Symbol, untyped] options) -> void
+
+      def print_wrapped: (String message, ?indent: Integer) -> void
+                       | (String message, Hash[Symbol, untyped] options) -> void
+
+      def file_collision: (String destination) ?{ () -> String? } -> bool?
+
+      def error: (String statement) -> void
+
+      def set_color: (String string, *(Symbol | String | bool)? colors) -> String
+    end
+
+    class Color < Basic
+      include LCSDiff
+
+      CLEAR: String
+      BOLD: String
+      BLACK: String
+      RED: String
+      GREEN: String
+      YELLOW: String
+      BLUE: String
+      MAGENTA: String
+      CYAN: String
+      WHITE: String
+      ON_BLACK: String
+      ON_RED: String
+      ON_GREEN: String
+      ON_YELLOW: String
+      ON_BLUE: String
+      ON_MAGENTA: String
+      ON_CYAN: String
+      ON_WHITE: String
+    end
+
+    class HTML < Basic
+      include LCSDiff
+
+      BOLD: String
+      BLACK: String
+      RED: String
+      GREEN: String
+      YELLOW: String
+      BLUE: String
+      MAGENTA: String
+      CYAN: String
+      WHITE: String
+      ON_BLACK: String
+      ON_RED: String
+      ON_GREEN: String
+      ON_YELLOW: String
+      ON_BLUE: String
+      ON_MAGENTA: String
+      ON_CYAN: String
+      ON_WHITE: String
+
+      # Always raises NotImplementedError.
+      def ask: (String statement, ?color? color) -> bot
+    end
+
+    module Terminal
+      DEFAULT_TERMINAL_WIDTH: Integer
+
+      def self.terminal_width: () -> Integer
+
+      def self.unix?: () -> Integer?
+    end
+
+    class ColumnPrinter
+      interface _Output
+        def puts: (*untyped) -> untyped
+        def printf: (String format, *untyped args) -> untyped
+      end
+
+      attr_reader stdout: _Output
+      attr_reader options: Hash[Symbol, untyped]
+
+      def initialize: (_Output stdout, ?Hash[Symbol, untyped] options) -> void
+
+      def print: (Array[_ToS] array) -> void
+    end
+
+    class TablePrinter < ColumnPrinter
+      BORDER_SEPARATOR: :separator
+
+      def print: (Array[Array[untyped] | :separator] array) -> void
+    end
+
+    class WrappedPrinter < ColumnPrinter
+      def print: (String message) -> void
+    end
+  end
+
+  include Base
+  extend Base::ClassMethods
+  include Invocation
+  extend Invocation::ClassMethods
+  include Shell
+
+  def self.package_name: (String? name, ?Hash[untyped, untyped] options) -> void
+
+  def self.default_command: (?nil) -> String
+                          | (Symbol | String meth) -> String
+  alias self.default_task self.default_command
+
+  def self.register: (singleton(Thor) | singleton(Group) klass, String | Symbol subcommand_name, String usage, String description, ?hide: boolish) -> void
+                   | (singleton(Thor) | singleton(Group) klass, String | Symbol subcommand_name, String usage, String description, Hash[Symbol, untyped] options) -> void
+
+  # With for:, changes the usage and description of an existing command.
+  def self.desc: (String | Array[String] usage, String description, ?hide: boolish) -> void
+               | (String | Array[String] | nil usage, String? description, for: Symbol | String, ?hide: boolish) -> void
+               | (String | Array[String] | nil usage, String? description, Hash[Symbol, untyped] options) -> void
+
+  def self.long_desc: (String long_description, ?for: Symbol | String, ?wrap: bool) -> void
+                    | (String long_description, Hash[Symbol, untyped] options) -> void
+
+  # Keys are command-line words (or Arrays of them), values the command names.
+  def self.map: (?Hash[untyped, String | Symbol]? mappings) -> Hash[String | Symbol, String | Symbol]
+
+  def self.method_options: () -> Hash[Symbol | String | Array[Symbol | String], Option]
+                         | (Hash[Symbol | String | Array[Symbol | String], untyped]? options) -> Hash[Symbol | String | Array[Symbol | String], Option]
+  alias self.options self.method_options
+
+  def self.method_option: (
+      Symbol | String name,
+      ?aliases: String | Symbol | Array[String | Symbol],
+      ?banner: String,
+      ?default: untyped,
+      ?lazy_default: untyped,
+      ?desc: String,
+      ?required: bool,
+      ?type: :string | :hash | :array | :numeric | :boolean,
+      ?enum: Enumerable[untyped],
+      ?repeatable: bool,
+      ?group: String | Symbol,
+      ?hide: boolish,
+      ?check_default_type: bool,
+      ?for: Symbol | String,
+      **untyped
+    ) -> void
+                        | (Symbol | String name, Hash[Symbol, untyped] options) -> void
+  alias self.option self.method_option
+
+  # The block is instance_eval'ed on the class, so options defined in it
+  # join the group.
+  def self.method_exclusive: (*Symbol | String names, ?for: Symbol | String) ?{ (self) [self: self] -> void } -> void
+  alias self.exclusive self.method_exclusive
+
+  def self.method_at_least_one: (*Symbol | String names, ?for: Symbol | String) ?{ (self) [self: self] -> void } -> void
+  alias self.at_least_one self.method_at_least_one
+
+  def self.command_help: (Shell::Basic shell, String command_name) -> void
+  alias self.task_help self.command_help
+
+  def self.help: (Shell::Basic shell, ?bool subcommand) -> void
+
+  def self.printable_commands: (?bool all, ?bool subcommand) -> Array[[String, String]]
+  alias self.printable_tasks self.printable_commands
+
+  def self.subcommands: () -> Array[String]
+  alias self.subtasks self.subcommands
+
+  def self.subcommand_classes: () -> Hash[String, singleton(Thor)]
+
+  def self.subcommand: (String | Symbol subcommand, singleton(Thor) subcommand_class) -> void
+  alias self.subtask self.subcommand
+
+  def self.check_unknown_options!: (?only: Symbol | Array[Symbol], ?except: Symbol | Array[Symbol]) -> void
+                                 | (Hash[Symbol, untyped] options) -> void
+
+  def self.stop_on_unknown_option!: (*Symbol command_names) -> void
+
+  def self.disable_required_check!: (*Symbol command_names) -> void
+
+  def help: (?String? command, ?bool subcommand) -> void
+
+  def tree: () -> void
+end
+
+module LCSDiff
+end
