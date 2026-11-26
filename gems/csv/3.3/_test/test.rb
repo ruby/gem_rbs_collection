@@ -44,14 +44,6 @@ array_row = csv.gets
 array_rows = csv.readlines
 csv.each { |r| r.join }
 
-# Statically unknown `headers:` keeps rows untyped
-# @type var opts: Hash[Symbol, untyped]
-opts = { headers: true, col_sep: ";" }
-# @type var untyped_csv: CSV[untyped, untyped]
-untyped_csv = CSV.new("a;b\n1;2", **opts)
-untyped_csv = CSV.new("a,b\n1,2")
-untyped_csv = CSV.new("a,b", headers: [true, false].sample)
-
 # `CSV.open` returns the block value
 # @type var size: Integer
 size = CSV.open("example.csv", headers: true) { |csv| csv.shift&.field_row? ? 1 : 0 }

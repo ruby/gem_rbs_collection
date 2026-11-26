@@ -1897,7 +1897,7 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
               | (String | IO | StringIO io, headers: false | nil, **untyped options) -> without_headers
               | (String | IO | StringIO io, **untyped options) -> CSV[untyped, untyped]
 
-  def initialize: (?String | IO | StringIO io, ?::Hash[Symbol, untyped] options) -> void
+  def initialize: (String | IO | StringIO io, ?::Hash[Symbol, untyped] options) -> void
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2131,10 +2131,38 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
 
   # <!--
   #   rdoc-file=lib/csv.rb
-  #   - shift()
+  #   - csv.shift -> array, csv_row, or nil
   # -->
-  # Returns the next row of data as an Array (without headers) or a CSV::Row (with headers),
-  # or `nil` at the end of the data. Aliased as `gets` and `readline`.
+  # Returns the next row of data as:
+  # *   An Array if no headers are used.
+  # *   A CSV::Row object if headers are used.
+  #
+  # The data source must be opened for reading.
+  #
+  # Without headers:
+  #     string = "foo,0\nbar,1\nbaz,2\n"
+  #     csv = CSV.new(string)
+  #     csv.shift # => ["foo", "0"]
+  #     csv.shift # => ["bar", "1"]
+  #     csv.shift # => ["baz", "2"]
+  #     csv.shift # => nil
+  #
+  # With headers:
+  #     string = "Name,Value\nfoo,0\nbar,1\nbaz,2\n"
+  #     csv = CSV.new(string, headers: true)
+  #     csv.shift # => #<CSV::Row "Name":"foo" "Value":"0">
+  #     csv.shift # => #<CSV::Row "Name":"bar" "Value":"1">
+  #     csv.shift # => #<CSV::Row "Name":"baz" "Value":"2">
+  #     csv.shift # => nil
+  #
+  # ---
+  #
+  # Raises an exception if the source is not opened for reading:
+  #     string = "foo,0\nbar,1\nbaz,2\n"
+  #     csv = CSV.new(string)
+  #     csv.close
+  #     # Raises IOError (not opened for reading)
+  #     csv.shift
   #
   def shift: () -> Elem?
 
