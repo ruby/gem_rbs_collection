@@ -1,0 +1,431 @@
+module Rake
+  VERSION: String
+
+  # A task name or a prerequisite as Rakefiles write it.
+  type task_name = String | Symbol
+
+  # Task arguments of `task`, `file`, `multitask`, `rule` and `define_task`:
+  #
+  #   task :name
+  #   task :name, [:arg1, :arg2]
+  #   task :name, :arg1, :arg2
+  #   task name: [:prereq]
+  #   task :name, [:arg1] => [:prereq], order_only: [:other]
+  type task_arg_names = task_name | Array[task_name]
+
+  extend FileUtilsExt
+
+  def self.application: () -> Rake::Application
+  def self.application=: (Rake::Application app) -> Rake::Application
+  def self.original_dir: () -> String
+  def self.load_rakefile: (String path) -> bool
+  def self.add_rakelib: (*String files) -> Array[String]
+  def self.with_application: (?Rake::Application block_application) { (Rake::Application) -> void } -> Rake::Application
+
+  class CommandLineOptionError < StandardError
+  end
+
+  class TaskArgumentError < ArgumentError
+  end
+
+  class RuleRecursionOverflowError < StandardError
+    def add_target: (String target) -> void
+    def message: () -> String
+  end
+
+  module Cloneable
+  end
+
+  class TaskLib
+    include Cloneable
+    include Rake::DSL
+  end
+
+  class Task
+    attr_reader prerequisites: Array[String | Symbol]
+    alias prereqs prerequisites
+    attr_reader order_only_prerequisites: Array[String]
+    attr_reader actions: Array[Proc]
+    attr_accessor application: Rake::Application
+    attr_reader locations: Array[String]
+    attr_reader already_invoked: bool
+    attr_writer sources: Array[String]
+
+    def initialize: (task_name task_name, Rake::Application app) -> void
+    def to_s: () -> String
+    def sources: () -> Array[String | Symbol]
+    def source: () -> (String | Symbol | nil)
+    def prerequisite_tasks: () -> Array[Rake::Task]
+    def all_prerequisite_tasks: () -> Array[Rake::Task]
+    def enhance: (?(Array[task_name] | Rake::FileList)? deps) ?{ (self, Rake::TaskArguments) -> void } -> self
+    def name: () -> String
+    def arg_names: () -> Array[Symbol]
+    def reenable: () -> void
+    def clear: () -> self
+    def clear_prerequisites: () -> self
+    def clear_actions: () -> self
+    def clear_comments: () -> self
+    def clear_args: () -> self
+    def invoke: (*untyped args) -> void
+    def execute: (?Rake::TaskArguments? args) -> void
+    def needed?: () -> bool
+
+    # Rake::FileTask and Rake::FileCreationTask return Rake::LateTime and
+    # Rake::EarlyTime, and Rake::Task.[] can return any of them.
+    def timestamp: () -> (Time | Rake::EarlyTime | Rake::LateTime)
+
+    def add_description: (String? description) -> void
+    def full_comment: () -> String?
+    def comment: () -> String?
+    def set_arg_names: (Array[task_name] args) -> Array[Symbol]
+    def investigation: () -> String
+    def |: (task_name | Array[task_name] deps) -> self
+
+    def self.clear: () -> void
+    def self.tasks: () -> Array[Rake::Task]
+    def self.[]: (task_name task_name) -> Rake::Task
+    def self.task_defined?: (task_name task_name) -> bool
+    def self.define_task: (task_name | _ToPath | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+    def self.create_rule: (Hash[untyped, untyped] pattern_and_sources) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
+                        | (String | Regexp pattern, *task_arg_names | Hash[untyped, untyped] arg_names_and_sources) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
+  end
+
+  class FileTask < Task
+    def needed?: () -> bool
+    def timestamp: () -> (Time | Rake::LateTime)
+  end
+
+  class FileCreationTask < FileTask
+    def needed?: () -> bool
+    def timestamp: () -> Rake::EarlyTime
+  end
+
+  class MultiTask < Task
+  end
+
+  class TaskArguments
+    include Enumerable[[Symbol, untyped]]
+
+    attr_reader names: Array[task_name]
+
+    def initialize: (Array[task_name] names, Array[untyped] values, ?Rake::TaskArguments? parent) -> void
+    def to_a: () -> Array[untyped]
+    def extras: () -> Array[untyped]
+    def new_scope: (Array[task_name] names) -> self
+    def []: (task_name index) -> untyped
+    def with_defaults: (Hash[untyped, untyped] defaults) -> Hash[untyped, untyped]
+    def each: () { ([Symbol, untyped]) -> void } -> Hash[Symbol, untyped]
+            | () -> Enumerator[[Symbol, untyped], Hash[Symbol, untyped]]
+    def values_at: (*Symbol keys) -> Array[untyped]
+    def to_hash: () -> Hash[Symbol, untyped]
+    def has_key?: (Symbol key) -> bool
+    alias key? has_key?
+    def fetch: (Symbol key) -> untyped
+             | (Symbol key, untyped default) -> untyped
+             | (Symbol key) { (Symbol key) -> untyped } -> untyped
+    def deconstruct_keys: (Array[Symbol]? keys) -> Hash[Symbol, untyped]
+  end
+
+  module DSL
+    include Rake::FileUtilsExt
+
+    private
+
+    # `file`, `directory` and `multitask` return (and pass to the block) the
+    # task already defined under that name, whatever its class, so they are
+    # typed Rake::Task.
+
+    def desc: (String description) -> void
+    def directory: (task_name | _ToPath | Rake::FileList | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+    def file: (task_name | _ToPath | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+    def file_create: (task_name | _ToPath | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+    def import: (*String fns) -> void
+    def multitask: (task_name | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+    def namespace: (?(task_name | _ToStr)? name) { (Rake::NameSpace) -> void } -> Rake::NameSpace
+    def rule: (Hash[untyped, untyped] pattern_and_sources) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
+            | (String | Regexp pattern, *task_arg_names | Hash[untyped, untyped] arg_names_and_sources) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> void
+    def task: (task_name | Hash[untyped, untyped] name, *task_arg_names | Hash[untyped, untyped] arg_names_and_deps) ?{ (Rake::Task, Rake::TaskArguments) -> void } -> Rake::Task
+
+    # Rake::DSL makes every FileUtils and FileUtilsExt method private
+    # (`Rake::TestTask.new(:x).sh "true"` raises NoMethodError).
+    def sh: (*String cmd, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+          | (Hash[String, String?] env, *String cmd, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+    def ruby: (*String args, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+    def safe_ln: (FileUtils::pathlist src, ::path dest, **untyped options) -> void
+    def split_all: (String path) -> Array[String]
+    def verbose: (?bool? value) ?{ () -> void } -> (bool | Object)
+    def nowrite: (?bool? value) ?{ () -> void } -> bool
+    def when_writing: [T] (?_ToS? msg) { () -> T } -> T?
+    def rake_output_message: (_ToS message) -> nil
+    def rake_check_options: (Hash[Symbol, untyped] options, *Symbol optdecl) -> nil
+  end
+
+  module FileUtilsExt
+    include FileUtils
+    extend FileUtilsExt
+
+    # The initial value of verbose_flag: neither true nor false.
+    DEFAULT: Object
+
+    attr_accessor self.verbose_flag: bool | Object
+    attr_accessor self.nowrite_flag: bool
+
+    def verbose: (?bool? value) ?{ () -> void } -> (bool | Object)
+    def nowrite: (?bool? value) ?{ () -> void } -> bool
+    def when_writing: [T] (?_ToS? msg) { () -> T } -> T?
+    def rake_output_message: (_ToS message) -> nil
+    def rake_check_options: (Hash[Symbol, untyped] options, *Symbol optdecl) -> nil
+  end
+
+  type file_list_pattern = String | _ToPath | Array[file_list_pattern] | Rake::FileList
+
+  class FileList
+    include Cloneable
+
+    def self.[]: (*file_list_pattern patterns) -> instance
+    def self.glob: (String | Array[String] pattern, ?Integer flags) -> Array[String]
+
+    def initialize: (*file_list_pattern patterns) ?{ (self) -> void } -> void
+    def include: (*file_list_pattern filenames) -> self
+    alias add include
+    def exclude: (*file_list_pattern | Regexp patterns) ?{ (String) -> boolish } -> self
+    def clear_exclude: () -> self
+    def ==: (untyped array) -> bool
+    def to_a: () -> Array[String]
+    def to_ary: () -> Array[String]
+    def *: (Integer times) -> Rake::FileList
+         | (String separator) -> String
+    def <<: (String | _ToPath obj) -> self
+    def resolve: () -> self
+    def sub: (Regexp | String pattern, String replacement) -> Rake::FileList
+    def gsub: (Regexp | String pattern, String replacement) -> Rake::FileList
+    def sub!: (Regexp | String pattern, String replacement) -> self
+    def gsub!: (Regexp | String pattern, String replacement) -> self
+    def pathmap: (?String? spec) ?{ (String match) -> _ToS } -> Rake::FileList
+    def ext: (?String newext) -> Rake::FileList
+    def egrep: (Regexp pattern, *Integer options) ?{ (String file_name, Integer line_number, String line) -> void } -> Integer
+    def existing: () -> Rake::FileList
+    def existing!: () -> self
+    def to_s: () -> String
+    def excluded_from_list?: (String file_name) -> bool
+
+    # Array methods delegated to the resolved file names. These return a new
+    # Rake::FileList:
+    def map: () { (String) -> untyped } -> Rake::FileList
+    def collect: () { (String) -> untyped } -> Rake::FileList
+    def select: () { (String) -> boolish } -> Rake::FileList
+    def find_all: () { (String) -> boolish } -> Rake::FileList
+    def reject: () { (String) -> boolish } -> Rake::FileList
+    def sort: () ?{ (String a, String b) -> Integer } -> Rake::FileList
+    def sort_by: [U] () { (String) -> U } -> Rake::FileList
+    def grep: (untyped pattern) -> Rake::FileList
+            | (untyped pattern) { (String) -> untyped } -> Rake::FileList
+            | (untyped pattern) { (String) -> String } -> Rake::FileList
+    def compact: () -> Rake::FileList
+    def flatten: (?Integer depth) -> Rake::FileList
+    def uniq: () ?{ (String) -> untyped } -> Rake::FileList
+    def values_at: (*Integer | Range[Integer] selectors) -> Rake::FileList
+    def +: (Array[String] | Rake::FileList other) -> Rake::FileList
+    def -: (Array[String] | Rake::FileList other) -> Rake::FileList
+    def &: (Array[String] | Rake::FileList other) -> Rake::FileList
+    def |: (Array[String] | Rake::FileList other) -> Rake::FileList
+
+    # These return what Array returns, or self where Array returns itself:
+    def each: () { (String) -> void } -> self
+            | () -> Enumerator[String, Array[String]]
+    def each_with_index: () { (String, Integer) -> void } -> self
+                       | () -> Enumerator[[String, Integer], Array[String]]
+    def []: (Integer index) -> String?
+          | (Integer start, Integer length) -> Array[String]?
+          | (Range[Integer?] range) -> Array[String]?
+    def first: () -> String?
+             | (Integer n) -> Array[String]
+    def last: () -> String?
+            | (Integer n) -> Array[String]
+    def size: () -> Integer
+    def length: () -> Integer
+    def empty?: () -> bool
+    def include?: (String file_name) -> bool
+    def join: (?String separator) -> String
+    def push: (*String file_names) -> self
+    def concat: (*Array[String] lists) -> self
+    def delete: (String file_name) -> String?
+  end
+
+  class DefaultLoader
+    def load: (String fn) -> bool
+  end
+
+  class EarlyTime
+    include Comparable
+    include Singleton
+
+    def self.instance: () -> Rake::EarlyTime
+    def <=>: (untyped other) -> Integer
+    def to_s: () -> String
+  end
+
+  EARLY: Rake::EarlyTime
+
+  class LateTime
+    include Comparable
+    include Singleton
+
+    def self.instance: () -> Rake::LateTime
+    def <=>: (untyped other) -> Integer
+    def to_s: () -> String
+  end
+
+  LATE: Rake::LateTime
+
+  class NameSpace
+    def []: (task_name name) -> Rake::Task?
+    def tasks: () -> Array[Rake::Task]
+  end
+
+  class Options
+    # $stderr, $stdout or a StringIO: Rake calls #print and #puts on it.
+    interface _TraceOutput
+      def print: (*untyped args) -> nil
+      def puts: (*untyped objects) -> nil
+    end
+
+    attr_accessor always_multitask: bool
+    attr_accessor backtrace: bool
+    attr_accessor build_all: bool
+    attr_accessor dryrun: bool
+    attr_accessor ignore_deprecate: bool
+    attr_accessor ignore_system: bool
+    attr_accessor job_stats: bool | :history
+    attr_accessor load_system: bool
+    attr_accessor nosearch: bool
+    attr_accessor rakelib: Array[String]
+    attr_accessor show_all_tasks: bool
+    attr_accessor show_prereqs: bool
+    attr_accessor show_task_pattern: Regexp?
+    attr_accessor show_tasks: (:tasks | :describe | :lines)?
+    attr_accessor silent: bool
+    attr_accessor suppress_backtrace_pattern: Regexp?
+    attr_accessor thread_pool_size: Integer | Float
+    attr_accessor trace: bool
+    attr_accessor trace_output: _TraceOutput
+    attr_accessor trace_rules: bool
+  end
+
+  module TaskManager
+    attr_accessor last_description: String?
+
+    def intern: (singleton(Rake::Task) task_class, task_name task_name) -> Rake::Task
+    def []: (task_name | Rake::Task task_name, ?untyped scopes) -> Rake::Task
+    def generate_message_for_undefined_task: (task_name task_name) -> String
+    def generate_did_you_mean_suggestions: (task_name task_name) -> String
+    def enhance_with_matching_rule: (String task_name, ?Integer level) -> Rake::Task?
+    def tasks: () -> Array[Rake::Task]
+    def clear: () -> void
+    def lookup: (task_name task_name, ?untyped initial_scope) -> Rake::Task?
+    def in_namespace: (String? name) { (Rake::NameSpace) -> void } -> Rake::NameSpace
+  end
+
+  module TraceOutput
+  end
+
+  class Application
+    include TaskManager
+    include TraceOutput
+
+    interface _Loader
+      def load: (String fn) -> void
+    end
+
+    DEFAULT_RAKEFILES: Array[String]
+
+    attr_reader name: String
+    attr_reader original_dir: String
+    attr_reader rakefile: String?
+    attr_accessor terminal_columns: Integer
+    attr_reader top_level_tasks: Array[String]
+    attr_writer tty_output: bool
+
+    def initialize: () -> void
+    def run: (?Array[String] argv) -> void
+    def init: (?String app_name, ?Array[String]? argv) -> void
+    def load_rakefile: () -> void
+    def top_level: () -> void
+    def run_with_threads: [T] () { () -> T } -> T
+    def add_loader: (String ext, _Loader loader) -> _Loader
+    def options: () -> Rake::Options
+  end
+
+  module Cleaner
+    def self?.cleanup_files: (_Each[String] file_names) -> void
+    def self?.cleanup: (String file_name, ?force: boolish, ?noop: boolish, ?verbose: boolish, ?secure: boolish) -> void
+  end
+
+  class TestTask < TaskLib
+    attr_accessor name: task_name
+    attr_accessor libs: Array[String]
+    attr_accessor verbose: bool
+    attr_accessor options: String?
+    attr_accessor warning: bool
+    attr_accessor pattern: String?
+    attr_accessor loader: :rake | :direct | :testrb
+    attr_accessor ruby_opts: Array[String]
+    attr_accessor description: String
+    attr_accessor deps: task_name | Array[task_name]
+
+    def test_files=: (Array[String] | Rake::FileList list) -> (Array[String] | Rake::FileList)
+    def initialize: (?task_name | Hash[task_name, task_name | Array[task_name]] name) ?{ (self) -> void } -> void
+    def define: () -> self
+  end
+
+  class PackageTask < TaskLib
+    attr_accessor name: String?
+    attr_accessor version: String | :noversion | nil
+    attr_accessor package_dir: String
+    attr_accessor need_tar: bool
+    attr_accessor need_tar_gz: bool
+    attr_accessor need_tar_bz2: bool
+    attr_accessor need_tar_xz: bool
+    attr_accessor need_zip: bool
+    attr_accessor package_files: Rake::FileList
+    attr_accessor tar_command: String
+    attr_accessor zip_command: String
+    attr_accessor without_parent_dir: bool
+
+    def initialize: (?String? name, ?(String | :noversion)? version) ?{ (self) -> void } -> void
+    def init: (String? name, (String | :noversion)? version) -> void
+    def define: () -> self
+    def package_name: () -> String?
+    def package_dir_path: () -> String
+    def tgz_file: () -> String
+    def tar_gz_file: () -> String
+    def tar_bz2_file: () -> String
+    def tar_xz_file: () -> String
+    def zip_file: () -> String
+    def working_dir: () -> String
+    def target_dir: () -> String?
+  end
+end
+
+class FileList = Rake::FileList
+
+module RakeFileUtils = Rake::FileUtilsExt
+
+# Defined by `require "rake/clean"`.
+CLEAN: Rake::FileList
+CLOBBER: Rake::FileList
+
+module FileUtils
+  RUBY: String
+
+  def sh: (*String cmd, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+        | (Hash[String, String?] env, *String cmd, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+  def ruby: (*String args, **untyped options) ?{ (bool? ok, Process::Status status) -> void } -> void
+  def safe_ln: (pathlist src, ::path dest, **untyped options) -> void
+  def split_all: (String path) -> Array[String]
+end
+
+class String
+  def ext: (?String newext) -> String
+  def pathmap: (?String? spec) ?{ (String match) -> _ToS } -> String
+end
