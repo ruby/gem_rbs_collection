@@ -4,10 +4,13 @@ require "builder/version"
 xml = Builder::XmlMarkup.new(indent: 2, margin: 1, quote: :single, explicit_nil_handling: true)
 xml.instruct!
 xml.instruct!(:xml, version: "1.0", encoding: "UTF-8")
+xml.instruct!("xml-stylesheet", type: "text/xsl", href: "style.xsl")
 xml.comment!("generated")
 xml.declare!(:DOCTYPE, :html, :PUBLIC, "-//W3C//DTD XHTML 1.0 Strict//EN")
 xml.declare!(:DOCTYPE, :html) { |b| b.declare!(:ELEMENT, :p) }
 xml.cdata!("<raw>")
+xml.cdata_value!("content:encoded", "<p>text</p>")
+xml.cdata_value!(:summary, "x ]]> y")
 
 xml.tag!(:rss, version: "2.0", "xmlns:g": "http://base.google.com/ns/1.0") do |rss|
   rss.tag!("channel") do |channel|
@@ -15,6 +18,7 @@ xml.tag!(:rss, version: "2.0", "xmlns:g": "http://base.google.com/ns/1.0") do |r
     channel.tag!(:item) do |item|
       item.tag!("g:id", 1)
       item.tag!(:p, :a, "text")
+      item.tag!(:empty, nil)
       item.text!("a < b")
       item << "<br/>"
       item.tag!(:br)
@@ -26,14 +30,35 @@ end
 output = xml.target!
 output.length
 
+options = { indent: 2 } #: Hash[Symbol, untyped]
+Builder::XmlMarkup.new(options)
+Builder::XmlMarkup.new
+
 buffer = +""
 to_buffer = Builder::XmlMarkup.new(target: buffer)
 to_buffer.tag!(:sitemapindex, xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9")
+
 Builder::XmlBase.cache_method_calls = false
-Builder::XmlBase.cache_method_calls.!
-xml.explicit_nil_handling?
-xml.nil?.!
-Builder::VERSION.length
+# @type var caching: boolish
+caching = Builder::XmlBase.cache_method_calls
+
+# @type var nil_handling: bool?
+nil_handling = xml.explicit_nil_handling?
+nil_handling.nil?
+
+# @type var is_nil: false
+is_nil = xml.nil?
+is_nil.!
+
+# @type var version: String
+version = Builder::VERSION
+version.length
+# @type var version_numbers: Array[Integer]
+version_numbers = Builder::VERSION_NUMBERS
+version_numbers.sum
+# @type var major: Integer
+major = Builder::VERSION_MAJOR
+major + Builder::VERSION_MINOR + Builder::VERSION_BUILD
 
 class EventCollector
   def initialize
@@ -61,3 +86,7 @@ begin
 rescue Builder::IllegalBlockError => e
   e.message.length
 end
+
+# @type var collision: nil
+collision = Builder.check_for_name_collision(String, :no_such_builder_method)
+collision.nil?
