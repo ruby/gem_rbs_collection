@@ -1,6 +1,3 @@
-# Write Ruby code to test the RBS.
-# It is type checked by `steep check` command.
-
 require "docile"
 
 class PizzaBuilder
@@ -59,3 +56,26 @@ end
 
 # @type var version: String
 version = Docile::VERSION
+
+# @type var list: Array[Integer]
+list = Docile.dsl_eval([0]) do
+  push(1)
+  push(2)
+end
+
+# @type var total: Integer
+total = Docile.dsl_eval_with_block_return([1, 2], step: 3) do
+  size * 3
+end
+
+# @type var nothing: nil
+nothing = Docile.dsl_eval_with_block_return(PizzaBuilder.new) do
+  cheese
+  nil
+end
+
+# @type var chained: Array[Symbol]
+chained = Docile.dsl_eval_immutable(%i[b a], :c) do |extra|
+  push(extra)
+  sort
+end
