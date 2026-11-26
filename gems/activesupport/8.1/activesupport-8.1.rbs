@@ -464,12 +464,6 @@ end
 
 # active_support/core_ext/date/calculations.rb
 class Date
-  def +: (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
-       | ...
-
-  def -: (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
-       | ...
-
   # Allow Date to be compared with Time by converting to DateTime and relying on the <=> from there.
   def compare_with_coercion: (untyped other) -> (-1 | 0 | 1 | nil)
 end
@@ -538,7 +532,7 @@ end
 
 # active_support/duration.rb
 module ActiveSupport
-  class Duration
+  class Duration[out K = top]
     class Scalar
       def <=>: (untyped other) -> (-1 | 0 | 1 | nil)
     end

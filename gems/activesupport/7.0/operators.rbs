@@ -1,6 +1,14 @@
 # active_support/duration.rb
 module ActiveSupport
-  class Duration
+  # K is the union of the keys a Duration can hold in @parts, or top
+  # when unknown. Date#+ uses it to tell a Date result from a Time one.
+  class Duration[out K = top]
+    # Parts that Date#advance handles (Duration::VARIABLE_PARTS)
+    type date_parts = :years | :months | :weeks | :days
+
+    # Parts that go through Date#since
+    type time_parts = :hours | :minutes | :seconds
+
     class Scalar
       def coerce: (untyped other) -> [Scalar, self]
                 | ...
@@ -26,20 +34,25 @@ module ActiveSupport
            | ...
     end
 
+    def self.new: (Numeric value, Hash[Symbol, Numeric] parts) -> Duration
+
     def coerce: (untyped other) -> [Scalar, self]
               | ...
 
-    def +: (Duration | Numeric other) -> Duration
+    # A Numeric operand is added to the :seconds part.
+    def +: [K2] (Duration[K2] other) -> Duration[K | K2]
+         | (Numeric other) -> Duration[K | :seconds]
          | ...
 
-    def -: (Duration | Numeric other) -> Duration
+    def -: [K2] (Duration[K2] other) -> Duration[K | K2]
+         | (Numeric other) -> Duration[K | :seconds]
          | ...
 
-    def *: (Duration | Numeric other) -> Duration
+    def *: (Duration | Numeric other) -> Duration[K]
          | ...
 
     def /: (Duration other) -> Numeric
-         | (Numeric other) -> Duration
+         | (Numeric other) -> Duration[K]
          | ...
 
     def %: (Duration | Numeric other) -> Duration
@@ -49,10 +62,29 @@ end
 
 # active_support/core_ext/date/calculations.rb
 class Date
-  def +: (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+  # Keep these overloads split by part: a Duration with only date parts
+  # advances the Date and returns a Date, while any time part goes
+  # through Date#since and returns a Time or TimeWithZone. One signature
+  # for all Durations would be wrong for one of the two.
+  def +: (ActiveSupport::Duration[ActiveSupport::Duration::date_parts] other) -> self
+       | (ActiveSupport::Duration[ActiveSupport::Duration::time_parts] other) -> (Time | ActiveSupport::TimeWithZone)
+       | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
        | ...
 
-  def -: (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+  def -: (ActiveSupport::Duration[ActiveSupport::Duration::date_parts] other) -> self
+       | (ActiveSupport::Duration[ActiveSupport::Duration::time_parts] other) -> (Time | ActiveSupport::TimeWithZone)
+       | (ActiveSupport::Duration other) -> (Date | Time | ActiveSupport::TimeWithZone)
+       | ...
+end
+
+# active_support/core_ext/date_time/calculations.rb
+class DateTime
+  # DateTime acts like a Time, so any Duration keeps it a DateTime;
+  # without these it would inherit the Date overloads above.
+  def +: (ActiveSupport::Duration other) -> self
+       | ...
+
+  def -: (ActiveSupport::Duration other) -> self
        | ...
 end
 

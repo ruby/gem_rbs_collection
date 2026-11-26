@@ -56,3 +56,61 @@ scores[:alice].succ
 moment = Date.today + 1.hour
 moment = Date.today - 1.day
 moment.to_date
+
+# Each Numeric and Integer helper records its part key
+# @type var weeks: ActiveSupport::Duration[:weeks]
+weeks = 1.week
+weeks = 1.fortnight
+weeks = ActiveSupport::Duration.weeks(1)
+# @type var days_and_seconds: ActiveSupport::Duration[:days | :seconds]
+days_and_seconds = 1.day + 60
+days_and_seconds = 1.day - 1.second
+days_and_seconds = -(1.day + 60)
+days_and_seconds = (1.day + 60) * 2
+weeks.parts
+days_and_seconds.parts
+
+# Date parts keep a Date
+# @type var later_date: Date
+later_date = Date.today + 1.day
+later_date = Date.today - 2.weeks
+later_date = Date.today + 1.fortnight
+later_date = Date.today + 1.month
+later_date = Date.today + 1.year
+later_date = Date.today + 1.month + 1.year
+later_date = Date.today + (1.day + 1.fortnight + 1.month + 1.year)
+later_date = Date.today - -(1.day * 2)
+later_date = Date.today + ActiveSupport::Duration.days(1)
+later_date.to_date
+
+# Time parts turn a Date into a Time or TimeWithZone
+# @type var later_time: Time | ActiveSupport::TimeWithZone
+later_time = Date.today + 1.hour
+later_time = Date.today - 30.minutes
+later_time = Date.today + 1.second
+later_time = Date.today + (1.hour + 1.second)
+later_time = Date.today + (1.hour + 60)
+later_time = Date.today + ActiveSupport::Duration.seconds(1)
+later_time.hour
+
+# Mixed or unknown parts keep the wide type
+# @type var later: Date | Time | ActiveSupport::TimeWithZone
+later = Date.today + days_and_seconds
+later = Date.today - (1.day + 1.hour)
+later = Date.today + (1.day + 60)
+later = Date.today + ActiveSupport::Duration.build(3600)
+later = Date.today + ActiveSupport::Duration.parse("PT1H")
+later = Date.today + ActiveSupport::Duration.new(3600, { hours: 1 })
+later.to_date
+
+# DateTime and Time keep their class for any Duration
+# @type var date_time: DateTime
+date_time = DateTime.now + 1.hour
+date_time = DateTime.now - 1.day
+date_time = DateTime.now + days_and_seconds
+date_time.hour
+# @type var time: Time
+time = Time.now + 1.day
+time = Time.now - 1.hour
+time = Time.now + days_and_seconds
+time.hour
