@@ -1,0 +1,188 @@
+# Core API of database_cleaner 2.x. The code ships in the database_cleaner-core
+# gem; the ORM strategies (DatabaseCleaner::ActiveRecord::Truncation, ...) come
+# from the adapter gems (database_cleaner-active_record, ...).
+module DatabaseCleaner
+  VERSION: String
+
+  # What a cleaner runs. Strategies created from a Symbol are usually
+  # subclasses of DatabaseCleaner::Strategy; any object with these methods can
+  # be assigned. An object without `db=` only works with the `:default` db.
+  interface _Strategy
+    def start: () -> untyped
+
+    def clean: () -> untyped
+
+    def cleaning: [T] () { () -> T } -> T
+  end
+
+  # A strategy name (with the adapter's options), or a strategy object.
+  type strategy = Symbol | [ Symbol ] | [ Symbol, Hash[Symbol, untyped] ] | _Strategy
+
+  # The key under which DatabaseCleaner[orm, **opts] stores a cleaner.
+  type cleaner_key = [ Symbol, Hash[Symbol, untyped] ]
+
+  # Returns the cleaner for this ORM and database, creating it on first use.
+  # `db` is adapter-specific (a Symbol, a model class, a config Hash, ...).
+  def self.[]: (Symbol orm, ?db: untyped) -> Cleaner
+
+  # The strategy object of every cleaner (needs database_cleaner-core 2.1).
+  def self.strategy: () -> Hash[cleaner_key, _Strategy]
+
+  # Sets the strategy of every cleaner, then drops duplicate cleaners.
+  def self.strategy=: (strategy strategy) -> Cleaners
+
+  # These run the safeguards first and raise a DatabaseCleaner::Safeguard::Error
+  # (an Exception, not a StandardError) when one fails.
+  def self.start: () -> Array[Cleaner]
+
+  def self.clean: () -> Array[Cleaner]
+
+  def self.clean_with: (Symbol strategy, *untyped args) -> Array[Cleaner]
+
+  def self.cleaning: [T] () { () -> T } -> T
+
+  attr_accessor self.allow_remote_database_url: bool?
+
+  attr_accessor self.allow_production: bool?
+
+  # Elements are matched against ENV['DATABASE_URL'] with `===`.
+  attr_accessor self.url_allowlist: Array[String | Regexp | Proc]?
+
+  alias self.url_whitelist self.url_allowlist
+
+  alias self.url_whitelist= self.url_allowlist=
+
+  def self.cleaners: () -> Cleaners
+
+  attr_writer self.cleaners: Cleaners
+
+  class UnknownStrategySpecified < ArgumentError
+  end
+
+  class Cleaners < Hash[cleaner_key, Cleaner]
+    def initialize: (?Hash[cleaner_key, Cleaner] hash) -> void
+
+    # Raises ArgumentError for a nil orm.
+    def []: (Symbol orm, ?db: untyped) -> Cleaner
+
+    def strategy: () -> Hash[cleaner_key, _Strategy]
+
+    def strategy=: (strategy strategy) -> self
+
+    def start: () -> Array[Cleaner]
+
+    def clean: () -> Array[Cleaner]
+
+    def cleaning: [T] () { () -> T } -> T
+
+    def clean_with: (Symbol strategy, *untyped args) -> Array[Cleaner]
+  end
+
+  class Cleaner
+    include Comparable
+
+    # The strategies an adapter module defines (subclasses of Strategy, except Base).
+    def self.available_strategies: (Module orm_module) -> Array[Symbol]
+
+    # nil when the dbs cannot be compared (e.g. a Symbol and a model class).
+    def <=>: (Cleaner other) -> Integer?
+
+    def initialize: (Symbol orm, ?db: untyped) -> void
+
+    attr_reader orm: Symbol
+
+    # Raises ArgumentError for a db other than :default when the strategy has no `db=`.
+    def db=: (untyped desired_db) -> untyped
+
+    # :default unless a db was given.
+    def db: () -> untyped
+
+    # Raises UnknownStrategySpecified for a Symbol the adapter does not define.
+    def strategy=: (strategy args) -> void
+
+    # A NullStrategy until a strategy is set.
+    def strategy: () -> _Strategy
+
+    def start: () -> untyped
+
+    def clean: () -> untyped
+
+    def cleaning: [T] () { () -> T } -> T
+
+    # Creates the named strategy with the remaining arguments, cleans with it
+    # once, and returns it.
+    def clean_with: (Symbol strategy, *untyped args) -> _Strategy
+  end
+
+  # Base class for the strategies of adapter gems.
+  class Strategy
+    # Raises ArgumentError when options are given; subclasses that take
+    # options override it.
+    def initialize: (?nil options) -> void
+
+    def db: () -> untyped
+
+    attr_writer db: untyped
+
+    def start: () -> void
+
+    # Raises NotImplementedError; every subclass overrides it.
+    def clean: () -> void
+
+    # Calls start, yields, and calls clean (also when the block raises).
+    def cleaning: [T] () { () -> T } -> T
+  end
+
+  # The strategy of a cleaner that has none set: does nothing.
+  class NullStrategy
+    def start: () -> nil
+
+    def db=: (untyped db) -> nil
+
+    def clean: () -> nil
+
+    def cleaning: [T] () { () -> T } -> T
+  end
+
+  class Safeguard
+    class Error < Exception
+      class RemoteDatabaseUrl < Error
+        def initialize: () -> void
+      end
+
+      class ProductionEnv < Error
+        def initialize: (String env) -> void
+      end
+
+      class UrlNotAllowed < Error
+        def initialize: () -> void
+      end
+    end
+
+    # Raises Error::UrlNotAllowed when url_allowlist is set and
+    # ENV['DATABASE_URL'] matches none of its elements.
+    class AllowedUrl
+      def run: () -> nil
+    end
+
+    # Raises Error::RemoteDatabaseUrl when ENV['DATABASE_URL'] points to a
+    # remote host, unless allowed.
+    class RemoteDatabaseUrl
+      LOCAL: Array[String]
+
+      def run: () -> nil
+    end
+
+    # Raises Error::ProductionEnv when one of KEYS is "production", unless allowed.
+    class Production
+      KEYS: Array[String]
+
+      def run: () -> nil
+    end
+
+    CHECKS: Array[singleton(RemoteDatabaseUrl) | singleton(Production) | singleton(AllowedUrl)]
+
+    # Runs every check in CHECKS.
+    def run: () -> Array[singleton(RemoteDatabaseUrl) | singleton(Production) | singleton(AllowedUrl)]
+  end
+end
