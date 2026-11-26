@@ -1,0 +1,302 @@
+module Terminal
+  class Table
+    VERSION: String
+
+    # Cell alignment. Other values (including the Strings "left", "center"
+    # and "right", which Cell#alignment= accepts) make rendering raise.
+    type alignment = :left | :center | :right
+
+    # A row given to add_row, rows= or the :rows option: the cell values (any
+    # object, or a Hash with :value, :alignment, :colspan), or :separator.
+    type row_input = Array[untyped] | :separator
+
+    # Options of Style#apply, Table#style= and the :style option, e.g.
+    # { width: 40, padding_left: 2, border: :unicode, border_top: false }.
+    type style_options = Hash[Symbol | String, untyped]
+
+    attr_reader title: untyped
+
+    attr_reader headings: Array[Row]
+
+    # A block that takes a parameter is called with the table; a block
+    # without parameters is evaluated with instance_eval (which also passes
+    # the table). RBS cannot tie self to the block's arity, so the block type
+    # declares both: only blocks without parameters really run with the
+    # table as self.
+    def initialize: (?title: untyped, ?headings: Array[untyped]?, ?rows: Array[row_input], ?style: style_options) ?{ (Terminal::Table table) [self: Terminal::Table] -> void } -> void
+                  | (Hash[Symbol, untyped] options) ?{ (Terminal::Table table) [self: Terminal::Table] -> void } -> void
+
+    # Raises RuntimeError for an alignment other than :left, :center, :right.
+    def align_column: (Integer n, alignment alignment) -> Array[Cell]
+
+    def add_row: (row_input array) -> void
+
+    alias << add_row
+
+    def add_separator: (?border_type: Symbol) -> void
+
+    def cell_spacing: () -> Integer
+
+    def cell_padding: () -> Integer
+
+    # With a nil method the cells themselves are returned, otherwise the
+    # result of calling method (default :value) on each cell.
+    def column: (Integer n, nil method, ?Array[Row] array) -> Array[Cell]
+              | (Integer n, ?Symbol method, ?Array[Row] array) -> Array[untyped]
+
+    def column_with_headings: (Integer n, nil method) -> Array[Cell]
+                            | (Integer n, ?Symbol method) -> Array[untyped]
+
+    def columns: () -> Array[Array[untyped]]
+
+    # Raises RuntimeError when the table does not fit in style.width.
+    def column_width: (Integer n) -> Integer
+
+    alias length_of_column column_width
+
+    def number_of_columns: () -> Integer
+
+    # A flat Array is one heading row; an Array of Arrays is several.
+    def headings=: (Array[untyped] arrays) -> Array[Row]
+                 | (nil arrays) -> nil
+
+    # Inserts the implicit separators (Separator rows) and returns all rows.
+    def elaborate_rows: () -> Array[Row]
+
+    # Raises RuntimeError when the table does not fit in style.width.
+    def render: () -> String
+
+    alias to_s render
+
+    # The rows without separators.
+    def rows: () -> Array[Row]
+
+    def rows=: (Array[row_input] array) -> Array[row_input]
+
+    def style=: (style_options options) -> style_options
+
+    def style: () -> Style
+
+    def title=: (untyped title) -> void
+
+    def ==: (untyped other) -> bool?
+
+    class Border
+      attr_accessor data: Hash[Symbol?, String?]
+
+      attr_accessor top: bool
+
+      attr_accessor bottom: bool
+
+      attr_accessor left: bool
+
+      attr_accessor right: bool
+
+      def initialize: () -> void
+
+      def []=: (Symbol key, String val) -> String
+
+      def []: (Symbol? key) -> String?
+
+      def remove_verticals: () -> void
+
+      def remove_horizontals: () -> void
+
+      def maybeleft: (Symbol key) -> String?
+
+      def mayberight: (Symbol key) -> String?
+    end
+
+    class AsciiBorder < Border
+      HORIZONTALS: Array[Symbol]
+
+      VERTICALS: Array[Symbol]
+
+      INTERSECTIONS: Array[Symbol]
+
+      def initialize: () -> void
+
+      # [left, center, right]
+      def vertical: () -> Array[String]
+
+      # [left, horizontal bar, up/down, right, down, up]
+      def horizontal: (Symbol type) -> Array[String]
+    end
+
+    class MarkdownBorder < AsciiBorder
+      def initialize: () -> void
+    end
+
+    class UnicodeBorder < Border
+      ALLOWED_SEPARATOR_BORDER_STYLES: Array[Symbol]
+
+      HORIZONTALS: Array[Symbol]
+
+      VERTICALS: Array[Symbol]
+
+      INTERSECTIONS: Array[Symbol]
+
+      def initialize: () -> void
+
+      # [left, center, right]
+      def vertical: () -> Array[String]
+
+      # [left, horizontal bar, up/down, right, down, up]; nil where :top and
+      # :bot have no down or up crossing. Raises ArgumentError for a type
+      # not in ALLOWED_SEPARATOR_BORDER_STYLES.
+      def horizontal: (Symbol type) -> Array[String?]
+    end
+
+    class UnicodeRoundBorder < UnicodeBorder
+      def initialize: () -> void
+    end
+
+    class UnicodeThickEdgeBorder < UnicodeBorder
+      def initialize: () -> void
+    end
+
+    class Style
+      extend Forwardable
+
+      def self.defaults: () -> style_options
+
+      def self.defaults=: (style_options options) -> style_options
+
+      def border_x=: (String val) -> String
+
+      def border_y=: (String val) -> String
+
+      def border_i=: (String val) -> String
+
+      def border_y: () -> String
+
+      def border_y_width: () -> Integer
+
+      attr_reader border: Border
+
+      # A Symbol names a Border class: :unicode_round is UnicodeRoundBorder.
+      # Raises RuntimeError when there is no such class.
+      def border=: (Symbol | Border val) -> Border
+
+      def border_top=: (bool val) -> bool
+
+      def border_bottom=: (bool val) -> bool
+
+      def border_left=: (bool val) -> bool
+
+      def border_right=: (bool val) -> bool
+
+      def border_top: () -> bool
+
+      def border_bottom: () -> bool
+
+      def border_left: () -> bool
+
+      def border_right: () -> bool
+
+      attr_accessor padding_left: Integer
+
+      attr_accessor padding_right: Integer
+
+      attr_accessor margin_left: String
+
+      attr_accessor width: Integer?
+
+      attr_accessor alignment: alignment?
+
+      attr_accessor all_separators: bool
+
+      def initialize: (?style_options options) -> void
+
+      def apply: (style_options options) -> style_options
+
+      def on_change: (Symbol | String attr) { (Symbol attr, untyped value) -> void } -> Symbol
+
+      # Delegated to border.
+      def vertical: () -> Array[String]
+
+      def horizontal: (Symbol type) -> Array[String?]
+
+      def remove_verticals: () -> void
+
+      def remove_horizontals: () -> void
+    end
+
+    class Cell
+      attr_reader value: untyped
+
+      attr_reader colspan: Integer
+
+      # options: :value, :alignment, :colspan, :width, and the required
+      # :index and :table.
+      def initialize: (Hash[Symbol, untyped] options) -> void
+
+      def alignment?: () -> bool
+
+      def alignment: () -> alignment
+
+      # Raises RuntimeError for other values.
+      def alignment=: (alignment val) -> alignment
+
+      def align: (String val, alignment position, Integer length) -> String
+
+      def lines: () -> Array[String]
+
+      def render: (?Integer line) -> String
+
+      alias to_s render
+
+      # nil for an empty value.
+      def value_for_column_width_recalc: () -> String?
+
+      def width: () -> Integer
+
+      def inspect: () -> String
+    end
+
+    class Row
+      attr_reader cells: Array[Cell]
+
+      attr_reader table: Terminal::Table
+
+      def initialize: (Terminal::Table table, ?Array[untyped] array, **untyped) -> void
+
+      # A cell value, or a Hash with :value, :alignment, :colspan, :width.
+      def add_cell: (untyped item) -> void
+
+      alias << add_cell
+
+      def []: (Integer index) -> Cell?
+
+      def height: () -> Integer
+
+      def render: () -> String
+
+      def number_of_columns: () -> Integer
+
+      def crossings: () -> Array[Integer]
+    end
+
+    class Separator < Row
+      def initialize: (Terminal::Table table, ?Array[untyped] array, ?border_type: Symbol, ?implicit: bool) -> void
+
+      attr_accessor border_type: Symbol
+
+      attr_reader implicit: bool
+
+      def render: () -> String
+
+      def save_adjacent_rows: (Row? prevrow, Row? nextrow) -> void
+    end
+
+    module TableHelper
+      # The block is passed to Terminal::Table.new.
+      def table: (?Array[untyped]? headings, *row_input rows) ?{ (Terminal::Table table) [self: Terminal::Table] -> void } -> Terminal::Table
+    end
+
+    module Util
+      # Removes ANSI escape sequences.
+      def self?.ansi_escape: (_ToS line) -> String
+    end
+  end
+end
