@@ -1,0 +1,87 @@
+class ConnectionPool[T]
+  VERSION: String
+
+  class Error < ::RuntimeError
+  end
+
+  class PoolShuttingDownError < ::ConnectionPool::Error
+  end
+
+  class TimeoutError < ::Timeout::Error
+  end
+
+  class TimedStack[T]
+    attr_reader max: Integer
+
+    def initialize: (?size: Integer) ?{ () -> T } -> void
+
+    # Additional keywords are ignored by TimedStack but passed on to the
+    # extension points that subclasses override.
+    def push: (T obj, **untyped options) -> void
+
+    alias << push
+
+    # Raises ConnectionPool::TimeoutError (or +exception+) when nothing is
+    # available within +timeout+ seconds, unless +exception+ is false.
+    def pop: (?timeout: Numeric, ?exception: singleton(Exception), **untyped options) -> T
+           | (?timeout: Numeric, exception: false | nil, **untyped options) -> T?
+
+    def shutdown: (?reload: bool) { (T) -> void } -> void
+
+    def reap: (idle_seconds: Numeric) { (T) -> void } -> void
+
+    def empty?: () -> bool
+
+    def length: () -> Integer
+
+    def idle: () -> Integer
+
+    def decrement_created: () -> void
+  end
+
+  class Wrapper[T] < ::BasicObject
+    METHODS: Array[Symbol]
+
+    def initialize: (pool: ConnectionPool[T]) -> void
+                  | (?size: int | String, ?timeout: Numeric, ?auto_reload_after_fork: bool, ?name: untyped) { () -> T } -> void
+    def wrapped_pool: () -> ConnectionPool[T]
+    def with: [A] (?timeout: Numeric, **untyped options) { (T) -> A } -> A
+    def pool_shutdown: () { (T) -> void } -> void
+    def pool_size: () -> Integer
+    def pool_available: () -> Integer
+    def respond_to?: (interned id, ?boolish include_all) -> bool
+
+    # Every other method call is forwarded to a connection checked out from
+    # the pool.
+    def method_missing: (Symbol name, *untyped args, **untyped kwargs) ?{ (*untyped) -> untyped } -> untyped
+
+    private
+
+    def respond_to_missing?: (interned id, ?boolish include_all) -> bool
+  end
+
+  def self.wrap: [T] (pool: ConnectionPool[T]) -> Wrapper[T]
+               | [T] (?size: int | String, ?timeout: Numeric, ?auto_reload_after_fork: bool, ?name: untyped) { () -> T } -> Wrapper[T]
+
+  # Called in the child process after fork to drop the inherited connections.
+  def self.after_fork: () -> nil
+
+  # +name+ is accepted for backwards compatibility and ignored.
+  def initialize: (?size: int | String, ?timeout: Numeric, ?auto_reload_after_fork: bool, ?name: untyped) { () -> T } -> void
+
+  # Additional keywords are passed on to the TimedStack.
+  def with: [A] (?timeout: Numeric, **untyped options) { (T) -> A } -> A
+  def checkout: (?timeout: Numeric, **untyped options) -> T
+  def checkin: (?force: bool) -> void
+  def discard_current_connection: () ?{ (T) -> void } -> void
+  def shutdown: () { (T) -> void } -> void
+  def reload: () { (T) -> void } -> void
+  def reap: (?idle_seconds: Numeric) { (T) -> void } -> void
+
+  attr_reader size: Integer
+
+  def available: () -> Integer
+  def idle: () -> Integer
+
+  alias then with
+end
