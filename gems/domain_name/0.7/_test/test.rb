@@ -1,50 +1,65 @@
-# Write Ruby code to test the RBS.
-# It is type checked by `steep check` command.
-
 require "domain_name"
 
+# @type var host: DomainName
 host = DomainName.new("www.example.co.uk")
-host.hostname.upcase
-host.domain&.upcase
-host.tld&.upcase
-host.ipaddr&.ipv4?
-host.uri_host.upcase
-host.ipaddr?
-host.canonical?
-host.canonical_tld?
-host.cookie_domain?("example.co.uk")
-host.cookie_domain?(DomainName("example.co.uk"))
-host.cookie_domain?("www.example.co.uk", true)
-host.superdomain&.hostname
-host == "www.example.co.uk"
-host == nil
-(host <=> "example.co.uk")&.positive?
-host < "example.co.uk"
-host > "example.co.uk"
-host <= "example.co.uk"
-host >= "example.co.uk"
-host.to_s.upcase
-host.to_str.upcase
-host.hostname_idn.upcase
-host.idn.upcase
-host.domain_idn&.upcase
-host.tld_idn&.upcase
-host.inspect.upcase
+host = DomainName("www.example.co.uk")
 
-DomainName.normalize("Example.COM.").upcase
-DomainName.etld_data["com"]&.zero?
-DomainName::ETLD_DATA.size
-DomainName::VERSION.upcase
-DomainName::ETLD_DATA_DATE.upcase
+# @type var str: String
+str = host.hostname
+str = host.uri_host
+str = host.to_s
+str = host.to_str
+str = host.hostname_idn
+str = host.idn
+str = host.inspect
 
-DomainName::Punycode.encode("bücher").upcase
-DomainName::Punycode.decode("bcher-kva").upcase
-DomainName::Punycode.encode_hostname("bücher.example").upcase
-DomainName::Punycode.decode_hostname("xn--bcher-kva.example").upcase
+# @type var maybe_str: String?
+maybe_str = host.domain
+maybe_str = host.tld
+maybe_str = host.domain_idn
+maybe_str = host.tld_idn
+
+# @type var ipaddr: IPAddr?
+ipaddr = host.ipaddr
+
+# @type var bool: bool
+bool = host.ipaddr?
+bool = host.cookie_domain?("example.co.uk")
+bool = host.cookie_domain?(DomainName("example.co.uk"))
+bool = host.cookie_domain?("www.example.co.uk", true)
+bool = host == "www.example.co.uk"
+bool = host == nil
+
+# @type var maybe_bool: bool?
+maybe_bool = host.canonical?
+maybe_bool = host.canonical_tld?
+maybe_bool = host < "example.co.uk"
+maybe_bool = host > "example.co.uk"
+maybe_bool = host <= "example.co.uk"
+maybe_bool = host >= "example.co.uk"
+
+# @type var order: Integer?
+order = host <=> "example.co.uk"
+
+# @type var superdomain: DomainName?
+superdomain = host.superdomain
+
+str = DomainName.normalize("Example.COM.")
+
+# @type var etld: Hash[String, Integer]
+etld = DomainName.etld_data
+etld = DomainName::ETLD_DATA
+str = DomainName::VERSION
+str = DomainName::ETLD_DATA_DATE
+
+str = DomainName::Punycode.encode("bücher")
+str = DomainName::Punycode.decode("bcher-kva")
+str = DomainName::Punycode.encode_hostname("bücher.example")
+str = DomainName::Punycode.decode_hostname("xn--bcher-kva.example")
 
 begin
   DomainName::Punycode.decode("!")
 rescue DomainName::Punycode::ArgumentError => e
-  e.message.upcase
+  str = e.message
 end
 DomainName::Punycode::BufferOverflowError.new.is_a?(ArgumentError)
