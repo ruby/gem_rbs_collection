@@ -91,8 +91,8 @@ class Thor
     def thor: (Symbol | String command, *String args, ?verbose: bool, ?pretend: bool, ?capture: bool, **untyped switches) -> (String | bool)?
             | (Symbol | String command, *String args, Hash[Symbol, untyped] config) -> (String | bool)?
 
-    def create_file: (String destination, String data, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer) -> String
-                   | (String destination, String data, Hash[Symbol, untyped] config) -> String
+    def create_file: (String destination, ?String? data, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer) -> String
+                   | (String destination, String? data, Hash[Symbol, untyped] config) -> String
                    | (String destination, ?verbose: bool, ?force: bool, ?skip: bool, ?perm: Integer) { () -> String } -> String
                    | (String destination, Hash[Symbol, untyped] config) { () -> String } -> String
                    | (String destination, nil data, Hash[Symbol, untyped] config) { () -> String } -> String
@@ -127,8 +127,8 @@ class Thor
                 | (String source, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> String
                 | (String source, String destination, Hash[Symbol, untyped] config) ?{ (String content) -> String } -> String
 
-    def chmod: (String path, Integer mode, ?verbose: bool) -> void
-             | (String path, Integer mode, Hash[Symbol, untyped] config) -> void
+    def chmod: (String path, Integer | String mode, ?verbose: bool) -> void
+             | (String path, Integer | String mode, Hash[Symbol, untyped] config) -> void
 
     def insert_into_file: (String destination, String data, ?after: String | Regexp, ?before: String | Regexp, ?force: bool, ?verbose: bool) -> void
                         | (String destination, String data, Hash[Symbol, untyped] config) -> void
