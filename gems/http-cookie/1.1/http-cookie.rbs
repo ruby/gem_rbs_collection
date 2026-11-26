@@ -1,0 +1,257 @@
+module HTTP
+  # This class is used to represent an HTTP Cookie.
+  class Cookie
+    include Comparable
+
+    VERSION: String
+
+    # Maximum number of bytes per cookie
+    MAX_LENGTH: Integer
+
+    # Maximum number of cookies per domain
+    MAX_COOKIES_PER_DOMAIN: Integer
+
+    # Maximum number of cookies total
+    MAX_COOKIES_TOTAL: Integer
+
+    # Attribute keys may be downcased Symbols or (mixed case) Strings;
+    # unknown keys are ignored.
+    def initialize: (_ToStr name, ?_ToStr? value, **untyped attrs) -> void
+                  | (_ToStr name, _ToStr? value, Hash[untyped, untyped] attr_hash) -> void
+                  | (_ToStr name, Hash[untyped, untyped] attr_hash) -> void
+                  | (Hash[untyped, untyped] attr_hash) -> void
+                  | (name: _ToStr, **untyped attrs) -> void
+
+    # Tests if `target_path` is under `base_path` as described in RFC 6265 5.1.4.
+    def self.path_match?: (String base_path, String target_path) -> bool
+
+    # Parses a Set-Cookie header value. Options: `:created_at` (Time) and
+    # `:logger`.
+    def self.parse: (String set_cookie, URI::Generic | String origin, ?Hash[Symbol, untyped]? options) ?{ (HTTP::Cookie cookie) -> void } -> Array[HTTP::Cookie]
+                  | (String set_cookie, URI::Generic | String origin, ?created_at: Time, ?logger: untyped) ?{ (HTTP::Cookie cookie) -> void } -> Array[HTTP::Cookie]
+
+    # Returns a string for use in the Cookie header, like "name1=value2; name2=value2".
+    def self.cookie_value: (Array[HTTP::Cookie] cookies) -> String
+
+    # Parses a Cookie header value into a hash of name-value string pairs.
+    def self.cookie_value_to_hash: (String cookie_value) -> Hash[String, String]
+
+    attr_reader name: String
+
+    # Raises ArgumentError for an empty name or one with invalid characters.
+    def name=: (_ToStr name) -> String
+
+    attr_reader value: String
+
+    # nil sets the value to "" and expires the cookie.
+    def value=: (_ToStr? value) -> String
+
+    attr_reader domain: String?
+
+    # Accepts a String-like, a DomainName object or nil.
+    def domain=: (_ToStr? domain) -> String?
+               | (untyped domain_name) -> String?
+
+    # Returns the domain, with a dot prefixed only if the domain flag is on.
+    def dot_domain: () -> String?
+
+    # The domain attribute value as a DomainName object.
+    attr_reader domain_name: untyped
+
+    attr_accessor for_domain: bool
+
+    alias for_domain? for_domain
+
+    attr_reader path: String?
+
+    def path=: (_ToStr path) -> String
+
+    attr_reader origin: URI::Generic?
+
+    # Raises ArgumentError if the origin is already set to a different one.
+    def origin=: (URI::Generic | String origin) -> URI::Generic
+
+    attr_accessor secure: bool
+
+    alias secure? secure
+
+    attr_accessor httponly: bool
+
+    alias httponly? httponly
+
+    attr_reader session: bool
+
+    alias session? session
+
+    def expires: () -> Time?
+
+    def expires=: (Time | DateTime | String | nil t) -> Time?
+
+    alias expires_at expires
+
+    alias expires_at= expires=
+
+    attr_reader max_age: Integer?
+
+    # A String must represent an integer.
+    def max_age=: (Integer | _ToStr | nil sec) -> Integer?
+
+    def expired?: (?Time time) -> bool
+
+    def expire!: () -> self
+
+    attr_accessor created_at: Time
+
+    attr_accessor accessed_at: Time
+
+    def acceptable_from_uri?: (URI::Generic | String uri) -> bool
+
+    # Raises RuntimeError if the domain or the path is missing.
+    def acceptable?: () -> bool
+
+    # Raises RuntimeError if the domain is unknown.
+    def valid_for_uri?: (URI::Generic | String uri) -> bool
+
+    # Returns `name=value` or `name="value"`.
+    def cookie_value: () -> String
+
+    alias to_s cookie_value
+
+    # Raises RuntimeError if the path (or the domain, with `for_domain`) is unknown.
+    def set_cookie_value: () -> String
+
+    def inspect: () -> String
+
+    def <=>: (HTTP::Cookie other) -> Integer
+
+    def to_h: () -> Hash[Symbol, untyped]
+
+    # YAML serialization helpers.
+    def to_yaml_properties: () -> Array[String]
+
+    def encode_with: (untyped coder) -> void
+
+    def init_with: (untyped coder) -> void
+
+    def yaml_initialize: (String tag, Hash[String, untyped] map) -> void
+  end
+
+  # This class is used to manage the Cookies that have been returned from
+  # any particular website.
+  class CookieJar
+    include Enumerable[HTTP::Cookie]
+
+    attr_reader store: HTTP::CookieJar::AbstractStore
+
+    # `:store` is a Symbol (`:hash`, `:mozilla`), a store class or a store
+    # instance; other options go to the store's initializer.
+    def initialize: (?store: Symbol | singleton(HTTP::CookieJar::AbstractStore) | HTTP::CookieJar::AbstractStore, **untyped options) -> void
+                  | (Hash[Symbol, untyped]? options) -> void
+
+    # Raises ArgumentError if the cookie lacks a domain or a path.
+    def add: (HTTP::Cookie cookie) -> self
+
+    alias << add
+
+    def delete: (HTTP::Cookie cookie) -> self
+
+    def cookies: (?URI::Generic | String | nil url) -> Array[HTTP::Cookie]
+
+    def empty?: (?URI::Generic | String | nil url) -> bool
+
+    def each: (?URI::Generic | String | nil uri) { (HTTP::Cookie cookie) -> void } -> self
+            | (?URI::Generic | String | nil uri) -> Enumerator[HTTP::Cookie, self]
+
+    def parse: (String set_cookie, URI::Generic | String origin, ?Hash[Symbol, untyped]? options) ?{ (HTTP::Cookie cookie) -> boolish } -> Array[HTTP::Cookie]
+             | (String set_cookie, URI::Generic | String origin, ?created_at: Time, ?logger: untyped) ?{ (HTTP::Cookie cookie) -> boolish } -> Array[HTTP::Cookie]
+
+    # `format` is a Symbol (`:yaml`, `:cookiestxt`), a saver class or a saver
+    # instance. Given alone without options, only a Symbol is honoured.
+    # Other options go to the saver's initializer. An object that responds
+    # to #write is used as the IO, anything else is opened as a file name
+    # (so a Pathname is not accepted).
+    def save: (String | IO | StringIO writable, ?Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, ?format: Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver, ?session: boolish, **untyped options) -> self
+            | (String | IO | StringIO writable, Hash[Symbol, untyped] options) -> self
+            | (String | IO | StringIO writable, Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, Hash[Symbol, untyped] options) -> self
+
+    def load: (String | IO | StringIO readable, ?Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, ?format: Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver, **untyped options) -> self
+            | (String | IO | StringIO readable, Hash[Symbol, untyped] options) -> self
+            | (String | IO | StringIO readable, Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, Hash[Symbol, untyped] options) -> self
+
+    def clear: () -> self
+
+    # Removes expired cookies, and session cookies as well if `session` is true.
+    def cleanup: (?boolish session) -> self
+
+    # An abstract superclass for all store classes.
+    class AbstractStore
+      include MonitorMixin
+
+      include Enumerable[HTTP::Cookie]
+
+      # Raises IndexError for an unknown name.
+      def self.implementation: (Symbol symbol) -> singleton(HTTP::CookieJar::AbstractStore)
+
+      def initialize: (?logger: untyped, **untyped options) -> void
+                    | (Hash[Symbol, untyped]? options) -> void
+
+      def add: (HTTP::Cookie cookie) -> void
+
+      def delete: (HTTP::Cookie cookie) -> void
+
+      def each: (?URI::Generic? uri) { (HTTP::Cookie cookie) -> void } -> void
+
+      def empty?: () -> bool
+
+      def clear: () -> void
+
+      def cleanup: (?boolish session) -> void
+    end
+
+    # A store class that uses a hash-based cookie store.
+    class HashStore < AbstractStore
+      def initialize: (?gc_threshold: Integer, ?logger: untyped, **untyped options) -> void
+                    | (Hash[Symbol, untyped]? options) -> void
+
+      def add: (HTTP::Cookie cookie) -> self
+
+      def delete: (HTTP::Cookie cookie) -> self
+
+      def each: (?URI::Generic? uri) { (HTTP::Cookie cookie) -> void } -> self
+
+      def clear: () -> self
+
+      def cleanup: (?boolish session) -> self
+    end
+
+    # An abstract superclass for all saver classes.
+    class AbstractSaver
+      # Raises IndexError for an unknown name.
+      def self.implementation: (Symbol symbol) -> singleton(HTTP::CookieJar::AbstractSaver)
+
+      def initialize: (?session: boolish, ?logger: untyped, **untyped options) -> void
+                    | (Hash[Symbol, untyped]? options) -> void
+
+      def save: (IO | StringIO io, HTTP::CookieJar jar) -> void
+
+      def load: (IO | StringIO io, HTTP::CookieJar jar) -> void
+    end
+
+    # YAMLSaver saves and loads cookies in the YAML format.
+    class YAMLSaver < AbstractSaver
+      def save: (IO | StringIO io, HTTP::CookieJar jar) -> void
+
+      def load: (IO | StringIO io, HTTP::CookieJar jar) -> void
+    end
+
+    # CookiestxtSaver saves and loads cookies in the cookies.txt format.
+    class CookiestxtSaver < AbstractSaver
+      def initialize: (?header: String?, ?linefeed: String, ?session: boolish, ?logger: untyped, **untyped options) -> void
+                    | (Hash[Symbol, untyped]? options) -> void
+
+      def save: (IO | StringIO io, HTTP::CookieJar jar) -> void
+
+      def load: (IO | StringIO io, HTTP::CookieJar jar) -> void
+    end
+  end
+end
