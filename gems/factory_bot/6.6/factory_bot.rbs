@@ -1,0 +1,296 @@
+module FactoryBot
+  VERSION: String
+
+  class AssociationDefinitionError < RuntimeError
+  end
+
+  class TraitDefinitionError < RuntimeError
+  end
+
+  class InvalidCallbackNameError < RuntimeError
+  end
+
+  class DuplicateDefinitionError < RuntimeError
+  end
+
+  class SequenceAbuseError < RuntimeError
+  end
+
+  class AttributeDefinitionError < RuntimeError
+  end
+
+  class MethodDefinitionError < RuntimeError
+  end
+
+  class InvalidFactoryError < RuntimeError
+  end
+
+  class Factory
+    attr_reader name: Symbol
+
+    # The factory's name followed by its aliases.
+    def names: () -> Array[Symbol | String]
+
+    def human_names: () -> Array[String]
+
+    def build_class: () -> Class
+  end
+
+  # The gem keeps factories, sequences, traits and strategies in Registries.
+  # FactoryBot.factories returns a Decorator (a BasicObject) that forwards
+  # every call to the factories' Registry; it is declared as that Registry.
+  class Registry[T = Factory]
+    include Enumerable[T]
+
+    attr_reader name: String
+
+    def clear: () -> void
+
+    # Raises KeyError for an unregistered name.
+    def find: (Symbol | String name) -> T
+
+    alias [] find
+
+    def registered?: (Symbol | String name) -> bool
+
+    def each: () { (T) -> void } -> void
+            | () -> Enumerator[T, void]
+  end
+
+  class SyntaxRunner
+    include Syntax::Methods
+  end
+
+  class FactoryRunner
+    def initialize: (Symbol | String name, Symbol | String | Class strategy, Array[Symbol | String | Hash[Symbol, untyped]] traits_and_overrides) -> void
+
+    # Returns nil for the null strategy (associations of attributes_for).
+    def run: (?Symbol | String | Class runner_strategy) ?{ (untyped instance) -> void } -> untyped
+  end
+
+  class Evaluation
+    def object: () -> untyped
+
+    def hash: () -> Hash[Symbol, untyped]
+
+    def create: (untyped result_instance) -> untyped
+
+    def notify: (Symbol name, untyped result_instance) -> void
+  end
+
+  module Strategy
+    def self.lookup_strategy: (Symbol | String | Class name_or_object) -> Class
+
+    class Build
+      def association: (FactoryRunner runner) -> untyped
+
+      def result: (Evaluation evaluation) -> untyped
+
+      def to_sym: () -> Symbol
+    end
+
+    class Create
+      def association: (FactoryRunner runner) -> untyped
+
+      def result: (Evaluation evaluation) -> untyped
+
+      def to_sym: () -> Symbol
+    end
+
+    class AttributesFor
+      def association: (FactoryRunner runner) -> nil
+
+      def result: (Evaluation evaluation) -> Hash[Symbol, untyped]
+
+      def to_sym: () -> Symbol
+    end
+
+    class Stub
+      def self.next_id=: (Integer id) -> Integer
+
+      def association: (FactoryRunner runner) -> untyped
+
+      def result: (Evaluation evaluation) -> untyped
+
+      def to_sym: () -> Symbol
+    end
+
+    class Null
+      def association: (FactoryRunner runner) -> nil
+
+      def result: (Evaluation evaluation) -> nil
+
+      def to_sym: () -> Symbol
+    end
+  end
+
+  # Attribute blocks and inline sequence blocks run on an instance of a
+  # subclass of Evaluator made for each factory. Its methods for the
+  # factory's attributes and transient attributes are defined at runtime and
+  # not declared here; other calls are forwarded to the instance being built
+  # (when it responds) or to Syntax::Methods.
+  class Evaluator
+    # The instance being built; nil until initialize_with has run.
+    attr_reader instance: untyped
+
+    # Returns nil when the strategy is attributes_for.
+    def association: (Symbol | String factory_name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) -> untyped
+  end
+
+  # What initialize_with blocks can call besides the evaluator's methods:
+  # `new` forwards to the factory's class.
+  interface _InitializeWithContext
+    def new: (*untyped, **untyped) -> untyped
+
+    def attributes: () -> Hash[Symbol, untyped]
+  end
+
+  # Blocks given to factory, trait, transient, define and modify run with
+  # instance_eval, which also passes the receiver as the block's argument.
+  class DefinitionProxy
+    # The block is passed the evaluator when it takes an argument.
+    def add_attribute: (Symbol | String name) { (?untyped evaluator) [self: Evaluator & Syntax::Methods] -> untyped } -> void
+
+    def transient: () { (?DefinitionProxy proxy) [self: DefinitionProxy] -> void } -> void
+
+    # When the attribute is built, the block runs with the evaluator as self.
+    def sequence: (Symbol | String name, ?untyped initial, ?aliases: Array[Symbol | String]) ?{ (untyped value) [self: Evaluator & Syntax::Methods] -> untyped } -> void
+
+    def association: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] options) -> void
+
+    def to_create: () { (untyped instance, ?untyped evaluator) -> untyped } -> void
+
+    def skip_create: () -> void
+
+    def factory: (Symbol | String name, ?Hash[Symbol, untyped] options) ?{ (?DefinitionProxy proxy) [self: DefinitionProxy] -> void } -> void
+
+    def trait: (Symbol | String name) ?{ (?DefinitionProxy proxy) [self: DefinitionProxy] -> void } -> void
+
+    def traits_for_enum: (Symbol | String attribute_name, ?Enumerable[untyped]? values) -> void
+
+    def initialize_with: () { () [self: Evaluator & Syntax::Methods & _InitializeWithContext] -> untyped } -> void
+
+    def before: (*Symbol | String names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+    def after: (*Symbol | String names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+    def callback: (*Symbol | String names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+  end
+
+  module Syntax
+    module Methods
+      def create: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> untyped
+
+      def build: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> untyped
+
+      def build_stubbed: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> untyped
+
+      def attributes_for: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (Hash[Symbol, untyped] attributes) -> void } -> Hash[Symbol, untyped]
+
+      def create_list: (Symbol | String name, Integer amount, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance, ?Integer index) -> void } -> Array[untyped]
+
+      def build_list: (Symbol | String name, Integer amount, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance, ?Integer index) -> void } -> Array[untyped]
+
+      def build_stubbed_list: (Symbol | String name, Integer amount, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance, ?Integer index) -> void } -> Array[untyped]
+
+      def attributes_for_list: (Symbol | String name, Integer amount, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (Hash[Symbol, untyped] attributes, ?Integer index) -> void } -> Array[Hash[Symbol, untyped]]
+
+      def create_pair: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> Array[untyped]
+
+      def build_pair: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> Array[untyped]
+
+      def build_stubbed_pair: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (untyped instance) -> void } -> Array[untyped]
+
+      def attributes_for_pair: (Symbol | String name, *Symbol | String | Hash[Symbol, untyped] traits_and_overrides) ?{ (Hash[Symbol, untyped] attributes) -> void } -> Array[Hash[Symbol, untyped]]
+
+      def generate: (*Symbol | String uri_parts, ?scope: untyped) -> untyped
+
+      # The last positional argument is the count (Integer); Steep cannot match
+      # a required parameter after a rest parameter.
+      def generate_list: (*Symbol | String | Integer uri_parts_and_count, ?scope: untyped) -> Array[untyped]
+    end
+
+    module Default
+      include Methods
+
+      def define: () { (?DSL dsl) [self: DSL] -> void } -> void
+
+      def modify: () { (?ModifyDSL dsl) [self: ModifyDSL] -> void } -> void
+
+      class DSL
+        def factory: (Symbol | String name, ?Hash[Symbol, untyped] options) ?{ (?DefinitionProxy proxy) [self: DefinitionProxy] -> void } -> void
+
+        def sequence: (Symbol | String name, ?untyped initial, ?aliases: Array[Symbol | String]) ?{ (untyped value) -> untyped } -> void
+
+        def trait: (Symbol | String name) ?{ (?DefinitionProxy proxy) [self: DefinitionProxy] -> void } -> void
+
+        def before: (*Symbol | String names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+        def after: (*Symbol | String names) { (untyped instance, untyped evaluator) [self: SyntaxRunner] -> void } -> void
+
+        # `callback` is not declared here: DSL delegates it to Internal, which
+        # does not define it, so it always raises NoMethodError.
+
+        def initialize_with: () { () [self: Evaluator & Syntax::Methods & _InitializeWithContext] -> untyped } -> void
+
+        def skip_create: () -> void
+
+        def to_create: () { (untyped instance, ?untyped evaluator) -> untyped } -> void
+      end
+
+      class ModifyDSL
+        def factory: (Symbol | String name, ?Hash[Symbol, untyped] _options) { (?DefinitionProxy proxy) [self: DefinitionProxy] -> void } -> void
+      end
+    end
+  end
+
+  extend Syntax::Default
+
+  def self.use_parent_strategy: () -> bool
+
+  def self.use_parent_strategy=: (bool value) -> bool
+
+  def self.automatically_define_enum_traits: () -> bool
+
+  def self.automatically_define_enum_traits=: (bool value) -> bool
+
+  # Seconds; passed to Timeout.timeout (the docs set 1.5).
+  def self.sequence_setting_timeout: () -> Numeric
+
+  def self.sequence_setting_timeout=: (Numeric value) -> Numeric
+
+  def self.definition_file_paths: () -> Array[String]
+
+  def self.definition_file_paths=: (Array[String] paths) -> Array[String]
+
+  def self.aliases: () -> Array[[Regexp, String]]
+
+  def self.aliases=: (Array[[Regexp, String]] aliases) -> Array[[Regexp, String]]
+
+  # The names the alias patterns map the attribute to, then the attribute itself.
+  def self.aliases_for: (Symbol attribute) -> Array[Symbol]
+                      | (String attribute) -> Array[Symbol | String]
+
+  def self.build_stubbed_starting_id=: (Integer starting_id) -> Integer
+
+  def self.factories: () -> Registry[Factory]
+
+  def self.register_strategy: (Symbol | String strategy_name, Class strategy_class) -> void
+
+  # Raises KeyError for an unregistered name.
+  def self.strategy_by_name: (Symbol | String name) -> Class
+
+  def self.find_definitions: () -> void
+
+  def self.reload: () -> void
+
+  def self.lint: (?Enumerable[Factory] factories, ?strategy: Symbol, ?traits: bool, ?verbose: bool) -> void
+               | (Enumerable[Factory] factories, Hash[Symbol, untyped] options) -> void
+
+  def self.rewind_sequences: () -> void
+
+  def self.rewind_sequence: (*Symbol | String | Array[Symbol | String] uri_parts) -> void
+
+  # The URI parts (Symbol, String or an Array of them) followed by the new value.
+  def self.set_sequence: (*untyped uri_parts_and_value) -> void
+end

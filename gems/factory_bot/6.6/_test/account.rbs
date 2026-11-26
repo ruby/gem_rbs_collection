@@ -1,0 +1,45 @@
+class Account
+  @name: String
+  @email: String?
+  @serial: Integer?
+  @status: Symbol?
+  @sequence: String?
+  @company: Account?
+
+  def name: () -> String
+  def name=: (String value) -> String
+  def email: () -> String?
+  def email=: (String? value) -> String?
+  def serial: () -> Integer?
+  def serial=: (Integer? value) -> Integer?
+  def status: () -> Symbol?
+  def status=: (Symbol? value) -> Symbol?
+  def sequence: () -> String?
+  def sequence=: (String? value) -> String?
+  def company: () -> Account?
+  def company=: (Account? value) -> Account?
+
+  def initialize: () -> void
+
+  def save!: () -> true
+end
+
+class AccountHelper
+  include FactoryBot::Syntax::Methods
+
+  def run: () -> void
+
+  def rename: (untyped instance, ?String name) -> String
+end
+
+class JsonStrategy
+  @strategy: untyped
+
+  def initialize: () -> void
+
+  def association: (FactoryBot::FactoryRunner runner) -> untyped
+
+  def result: (FactoryBot::Evaluation evaluation) -> String
+
+  def to_sym: () -> Symbol
+end
