@@ -1604,9 +1604,18 @@
 # feel free to [report](mailto:james@grayproductions.net) any issues you find
 # with it.
 #
-class CSV < Object
-  include Enumerable[untyped]
+class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out Rows < Array[Array[String?]] | CSV::Table[CSV::Row] = Array[Array[String?]] | CSV::Table[CSV::Row]] < Object
+  include Enumerable[Elem]
   extend Forwardable
+
+  # Values of the `headers:` option that make rows CSV::Row
+  type enable_headers = true | :first_row | Array[untyped] | String
+
+  # CSV whose rows are CSV::Row (created with `headers:` option)
+  type with_headers = CSV[CSV::Row, CSV::Table[CSV::Row]]
+
+  # CSV whose rows are Array (created without `headers:` option)
+  type without_headers = CSV[Array[String?], Array[Array[String?]]]
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1793,7 +1802,20 @@ class CSV < Object
                   ?undef: :replace,
                   ?replace: String,
                   ?encoding: Encoding | String,
-                  **untyped options) ?{ (instance) -> void } -> instance
+                  headers: enable_headers,
+                  **untyped options) ?{ (with_headers) -> void } -> with_headers
+                | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  ?headers: false | nil,
+                  **untyped options) ?{ (without_headers) -> void } -> without_headers
+                | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  **untyped options) ?{ (CSV) -> void } -> CSV
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1838,6 +1860,10 @@ class CSV < Object
   #     # Raises ArgumentError (Cannot parse nil as CSV):
   #     CSV.new(nil)
   #
+  def self.new: (String | IO | StringIO io, headers: enable_headers, **untyped options) -> with_headers
+              | (?String | IO | StringIO io, ?headers: false | nil, **untyped options) -> without_headers
+              | (?String | IO | StringIO io, **untyped options) -> CSV
+
   def initialize: (?String | IO | StringIO io, ?::Hash[Symbol, untyped] options) -> void
 
   # <!--
@@ -1958,7 +1984,12 @@ class CSV < Object
   #     # Raises NoMethodError (undefined method `close' for :foo:Symbol)
   #     CSV.parse(:foo)
   #
-  def self.parse: (String str, ?::Hash[Symbol, untyped] options) ?{ (::Array[String?] arg0) -> void } -> ::Array[::Array[String?]]?
+  def self.parse: (String str, headers: enable_headers, **untyped options) -> ::CSV::Table[::CSV::Row]
+                | (String str, headers: enable_headers, **untyped options) { (::CSV::Row row) -> void } -> void
+                | (String str, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
+                | (String str, ?headers: false | nil, **untyped options) { (::Array[String?] row) -> void } -> void
+                | (String str, **untyped options) -> (::Array[::Array[String?]] | ::CSV::Table[::CSV::Row])
+                | (String str, **untyped options) { (::Array[String?] | ::CSV::Row row) -> void } -> void
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2061,14 +2092,20 @@ class CSV < Object
   #     # Raises IOError (not opened for reading)
   #     csv.read
   #
-  def read: () -> ::Array[::Array[String?]]
+  def read: () -> Rows
+
+  alias readlines read
 
   # <!--
   #   rdoc-file=lib/csv.rb
   #   - readline()
   # -->
   #
-  def readline: () -> ::Array[String?]?
+  def shift: () -> Elem?
+
+  alias gets shift
+
+  alias readline shift
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2252,8 +2289,8 @@ class CSV < Object
   #       p row
   #     end
   #
-  def each: () -> Enumerator[untyped, Integer]
-          | () { (untyped) -> void } -> Integer
+  def each: () -> Enumerator[Elem, Integer]
+          | () { (Elem) -> void } -> Integer
 
   # <!--
   #   rdoc-file=lib/csv.rb
