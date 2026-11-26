@@ -1604,7 +1604,7 @@
 # feel free to [report](mailto:james@grayproductions.net) any issues you find
 # with it.
 #
-class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out Rows < Array[Array[String?]] | CSV::Table[CSV::Row] = Array[Array[String?]] | CSV::Table[CSV::Row]] < Object
+class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]] | CSV::Table[CSV::Row]] < Object
   include Enumerable[Elem]
   extend Forwardable
 
@@ -1704,10 +1704,12 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
   #     would read `UTF-32BE` data from the file but transcode it to `UTF-8`
   #     before parsing.
   #
-  def self.foreach: (String | IO path, ?String mode, headers: true | :first_row | Array[untyped] | String, **untyped options) { (::CSV::Row arg0) -> void } -> void
-                  | (String | IO path, ?String mode, headers: true | :first_row | Array[untyped] | String, **untyped options) -> Enumerator[::CSV::Row, void]
-                  | (String | IO path, ?String mode, **untyped options) { (::Array[String?] arg0) -> void } -> void
-                  | (String | IO path, ?String mode, **untyped options) -> Enumerator[::Array[String?], void]
+  def self.foreach: (String | IO path, ?String mode, headers: enable_headers, **untyped options) { (::CSV::Row arg0) -> void } -> void
+                  | (String | IO path, ?String mode, headers: enable_headers, **untyped options) -> Enumerator[::CSV::Row, void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, **untyped options) { (::Array[String?] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, **untyped options) -> Enumerator[::Array[String?], void]
+                  | (String | IO path, ?String mode, **untyped options) { (untyped arg0) -> void } -> void
+                  | (String | IO path, ?String mode, **untyped options) -> Enumerator[untyped, void]
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1795,7 +1797,16 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
   #   # Raises TypeError (no implicit conversion of Symbol into String)
   #   CSV.open(:foo)
   #
-  def self.open: (String | _ToPath | IO | StringIO filename_or_io,
+  def self.open: [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: enable_headers,
+                      **untyped options) { (with_headers csv) -> T } -> T
+               | (String | _ToPath | IO | StringIO filename_or_io,
                   ?String mode,
                   ?newline: untyped,
                   ?invalid: nil | :replace,
@@ -1803,7 +1814,16 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
                   ?replace: String,
                   ?encoding: Encoding | String,
                   headers: enable_headers,
-                  **untyped options) ?{ (with_headers) -> void } -> with_headers
+                  **untyped options) -> with_headers
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      **untyped options) { (without_headers csv) -> T } -> T
                | (String | _ToPath | IO | StringIO filename_or_io,
                   ?String mode,
                   ?newline: untyped,
@@ -1811,11 +1831,24 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
                   ?undef: :replace,
                   ?replace: String,
                   ?encoding: Encoding | String,
-                  ?headers: false | nil,
-                  **untyped options) ?{ (without_headers) -> void } -> without_headers
+                  headers: false | nil,
+                  **untyped options) -> without_headers
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      **untyped options) { (CSV[untyped, untyped] csv) -> T } -> T
                | (String | _ToPath | IO | StringIO filename_or_io,
                   ?String mode,
-                  **untyped options) ?{ (CSV) -> void } -> CSV
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  **untyped options) -> CSV[untyped, untyped]
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1861,8 +1894,8 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
   #     CSV.new(nil)
   #
   def self.new: (String | IO | StringIO io, headers: enable_headers, **untyped options) -> with_headers
-              | (?String | IO | StringIO io, ?headers: false | nil, **untyped options) -> without_headers
-              | (?String | IO | StringIO io, **untyped options) -> CSV
+              | (String | IO | StringIO io, headers: false | nil, **untyped options) -> without_headers
+              | (String | IO | StringIO io, **untyped options) -> CSV[untyped, untyped]
 
   def initialize: (?String | IO | StringIO io, ?::Hash[Symbol, untyped] options) -> void
 
@@ -1988,8 +2021,8 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
                 | (String str, headers: enable_headers, **untyped options) { (::CSV::Row row) -> void } -> void
                 | (String str, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
                 | (String str, ?headers: false | nil, **untyped options) { (::Array[String?] row) -> void } -> void
-                | (String str, **untyped options) -> (::Array[::Array[String?]] | ::CSV::Table[::CSV::Row])
-                | (String str, **untyped options) { (::Array[String?] | ::CSV::Row row) -> void } -> void
+                | (String str, **untyped options) -> untyped
+                | (String str, **untyped options) { (untyped row) -> void } -> void
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2098,8 +2131,10 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
 
   # <!--
   #   rdoc-file=lib/csv.rb
-  #   - readline()
+  #   - shift()
   # -->
+  # Returns the next row of data as an Array (without headers) or a CSV::Row (with headers),
+  # or `nil` at the end of the data. Aliased as `gets` and `readline`.
   #
   def shift: () -> Elem?
 
@@ -2128,8 +2163,9 @@ class CSV[out Elem < Array[String?] | CSV::Row = Array[String?] | CSV::Row, out 
   #     File.write(path, string)
   #     CSV.read(path, headers: true) # => #<CSV::Table mode:col_or_row row_count:4>
   #
-  def self.read: (String | IO path, headers: true | :first_row | Array[untyped] | String, **untyped options) -> ::CSV::Table[CSV::Row]
-               | (String | IO path, ?::Hash[Symbol, untyped] options) -> ::Array[::Array[String?]]
+  def self.read: (String | IO path, headers: enable_headers, **untyped options) -> ::CSV::Table[CSV::Row]
+               | (String | IO path, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
+               | (String | IO path, **untyped options) -> untyped
 
   # <!--
   #   rdoc-file=lib/csv.rb

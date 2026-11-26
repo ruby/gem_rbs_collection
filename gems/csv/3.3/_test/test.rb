@@ -37,15 +37,27 @@ row = csv.shift
 table = csv.read
 csv.each { |r| r.fields }
 
-csv = CSV.new("a,b\n1,2")
+csv = CSV.new("a,b\n1,2", headers: false)
 # @type var array_row: Array[String?]?
 array_row = csv.gets
 # @type var array_rows: Array[Array[String?]]
 array_rows = csv.readlines
 csv.each { |r| r.join }
 
-CSV.open("example.csv", headers: true) { |csv| csv.shift&.fields }
-CSV.open("example.csv") { |csv| csv.shift&.join }
+# Statically unknown `headers:` keeps rows untyped
+# @type var opts: Hash[Symbol, untyped]
+opts = { headers: true, col_sep: ";" }
+# @type var untyped_csv: CSV[untyped, untyped]
+untyped_csv = CSV.new("a;b\n1;2", **opts)
+untyped_csv = CSV.new("a,b\n1,2")
+untyped_csv = CSV.new("a,b", headers: [true, false].sample)
+
+# `CSV.open` returns the block value
+# @type var size: Integer
+size = CSV.open("example.csv", headers: true) { |csv| csv.shift&.field_row? ? 1 : 0 }
+size = CSV.open("example.csv", headers: false) { |csv| csv.shift&.size || 0 }
+# @type var with_headers: CSV::with_headers
+with_headers = CSV.open("example.csv", headers: :first_row)
 
 # @type var table: CSV::Table[CSV::Row]
 table = CSV.parse("a,b\n1,2", headers: true)
@@ -54,17 +66,21 @@ CSV.parse("a,b\n1,2", headers: true) { |r| r.fields }
 array_rows = CSV.parse("a,b\n1,2")
 CSV.parse("a,b\n1,2") { |r| r.join }
 
-# Bare `CSV` accepts both modes
+# @type var table: CSV::Table[CSV::Row]
+table = CSV.read("example.csv", headers: true)
+# @type var array_rows: Array[Array[String?]]
+array_rows = CSV.read("example.csv")
+
+CSV.foreach("example.csv", headers: "a,b") { |r| r.fields }
+CSV.foreach("example.csv") { |r| r.join }
+
+# Bare `CSV` accepts any mode
 # @type var take_any_csv: ^(CSV) -> void
 take_any_csv = ->(csv) { csv.shift }
 take_any_csv.(CSV.new("a,b", headers: true))
+take_any_csv.(CSV.new("a,b", headers: false))
 take_any_csv.(CSV.new("a,b"))
 
 # @type var take_csv_with_headers: ^(CSV::with_headers) -> CSV::Row?
 take_csv_with_headers = ->(csv) { csv.shift }
 take_csv_with_headers.(CSV.new("a,b", headers: true))
-
-# Not statically known
-csv = CSV.new("a,b", headers: [true, false].sample)
-# @type var any_row: Array[String?] | CSV::Row | nil
-any_row = csv.shift
