@@ -1,0 +1,161 @@
+module Aws
+  module Sigv4
+    VERSION: String
+
+    # The credentials object the signer reads. `Aws::Credentials` from
+    # aws-sdk-core and the objects returned by STS calls match it.
+    # A nil or empty access key id or secret access key makes signing raise
+    # Aws::Sigv4::Errors::MissingCredentialsError.
+    interface _Credentials
+      def access_key_id: () -> String?
+      def secret_access_key: () -> String?
+      def session_token: () -> String?
+    end
+
+    # Any object that responds to `#credentials`, e.g. the credential
+    # providers of aws-sdk-core. When it also responds to `#expiration`
+    # (a Time or nil), #presign_url caps the expiry at that time.
+    interface _CredentialsProvider
+      def credentials: () -> _Credentials
+    end
+
+    # A request body other than a String: File, Tempfile, StringIO or any
+    # object that can be read in chunks and rewound.
+    interface _Body
+      def read: (Integer length) -> String?
+      def rewind: () -> untyped
+    end
+
+    # Request headers: a Hash or any object converted with #to_hash, such as
+    # Seahorse::Client::Http::Headers from aws-sdk-core.
+    interface _Headers
+      def to_hash: () -> Hash[String, untyped]
+    end
+
+    # The event stream encoder passed to Signer#sign_event,
+    # e.g. Aws::EventStream::Encoder from aws-eventstream.
+    interface _EventStreamEncoder
+      def encode_headers: (untyped message) -> String
+    end
+
+    module Errors
+      class MissingCredentialsError < ArgumentError
+        def initialize: (?String? msg) -> void
+      end
+
+      class MissingRegionError < ArgumentError
+        # The arguments are ignored.
+        def initialize: (*untyped args) -> void
+      end
+    end
+
+    class Signature
+      # Lower cased header names, e.g. 'host', 'x-amz-date',
+      # 'x-amz-security-token', 'x-amz-content-sha256', 'authorization'.
+      attr_accessor headers: Hash[String, String]
+
+      attr_accessor canonical_request: String
+
+      attr_accessor string_to_sign: String
+
+      attr_accessor content_sha256: String
+
+      attr_accessor signature: String
+
+      # The signer never sets it.
+      attr_accessor extra: Hash[untyped, untyped]?
+    end
+
+    class Signer
+      # Raises ArgumentError without :service, Errors::MissingRegionError
+      # without :region, and Errors::MissingCredentialsError without
+      # :credentials_provider, :credentials or :access_key_id.
+      def initialize: (
+                        service: String,
+                        region: String,
+                        ?access_key_id: String,
+                        ?secret_access_key: String,
+                        ?session_token: String?,
+                        ?credentials: _Credentials,
+                        ?credentials_provider: _CredentialsProvider,
+                        ?unsigned_headers: Array[String],
+                        ?uri_escape_path: bool,
+                        ?apply_checksum_header: bool,
+                        ?signing_algorithm: :sigv4 | :sigv4a | :"sigv4-s3express",
+                        ?omit_session_token: bool,
+                        ?normalize_path: bool
+                      ) -> void
+                    | (Hash[Symbol, untyped] options) -> void
+
+      # Always false (kept for backwards compatibility).
+      def self.use_crt?: () -> false
+
+      attr_reader service: String
+
+      attr_reader region: String
+
+      attr_reader credentials_provider: _CredentialsProvider
+
+      # Downcased header names that are not signed.
+      attr_reader unsigned_headers: Set[String]
+
+      attr_reader apply_checksum_header: bool
+
+      # Raises Errors::MissingCredentialsError when the credentials are not set.
+      def sign_request: (
+                          http_method: String,
+                          url: String | URI::Generic,
+                          ?headers: _Headers?,
+                          ?body: String | _Body | nil
+                        ) -> Signature
+                      | (Hash[Symbol, untyped] request) -> Signature
+
+      # Returns the event headers (':date' and ':chunk-signature', as
+      # Aws::EventStream::HeaderValue) and the hex-encoded signature to pass
+      # as prior_signature for the next event.
+      def sign_event: (String prior_signature, String payload, _EventStreamEncoder encoder) -> [Hash[String, untyped], String]
+
+      # Returns the parsed :url with the signature added to its query.
+      # Raises ArgumentError when :expires_in is not an Integer.
+      def presign_url: (
+                         http_method: String,
+                         url: String | URI::Generic,
+                         ?headers: _Headers?,
+                         ?expires_in: Integer?,
+                         ?body: String | _Body | nil,
+                         ?body_digest: String?,
+                         ?time: Time?
+                       ) -> URI::Generic
+                     | (Hash[Symbol, untyped] options) -> URI::Generic
+    end
+
+    # Not loaded by `require "aws-sigv4"`; needs `require "aws-sigv4/request"`.
+    class Request
+      def initialize: (
+                        ?http_method: String,
+                        ?endpoint: String | URI::Generic,
+                        ?headers: Hash[String, String],
+                        ?body: String | _Body
+                      ) -> void
+                    | (Hash[Symbol, untyped] options) -> void
+
+      def http_method=: (String http_method) -> String
+
+      # nil until set.
+      def http_method: () -> String?
+
+      def endpoint=: (String | URI::Generic endpoint) -> URI::Generic
+
+      # nil until set.
+      def endpoint: () -> URI::Generic?
+
+      def headers=: (Hash[String, String] headers) -> Hash[String, String]
+
+      def headers: () -> Hash[String, String]
+
+      def body=: (String | _Body body) -> (String | _Body)
+
+      def body: () -> (String | _Body)
+    end
+  end
+end
