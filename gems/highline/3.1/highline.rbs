@@ -1,0 +1,697 @@
+class HighLine
+  # The input stream methods HighLine reads with (IO, StringIO, ...).
+  interface _Input
+    def gets: () -> ::String?
+    def eof?: () -> bool
+  end
+
+  # The output stream methods HighLine writes with (IO, StringIO, ...).
+  interface _Output
+    def puts: (*untyped) -> untyped
+    def print: (*untyped) -> untyped
+    def flush: () -> untyped
+  end
+
+  # What HighLine.Style and the color methods accept: a style name
+  # (:red, :bold, :rgb_ff6000, a color scheme key), an escape code String,
+  # a Style, a Style definition Hash, or a list of those.
+  type style = Symbol | ::String | HighLine::Style | Hash[Symbol, untyped] | Array[style] | nil
+
+  include BuiltinStyles
+  include CustomErrors
+  extend SingleForwardable
+  extend BuiltinStyles::ClassMethods
+
+  VERSION: ::String
+
+  # nil only while highline.rb creates the first instance.
+  def self.default_instance: () -> HighLine?
+
+  def self.default_instance=: (HighLine default_instance) -> HighLine
+
+  attr_accessor self.color_scheme: ColorScheme?
+
+  def self.using_color_scheme?: () -> bool?
+
+  # Raises RuntimeError when a key is already in the current scheme.
+  def self.add_to_color_scheme: (Hash[untyped, Array[style]] hash) -> ColorScheme
+
+  def self.reset_color_scheme: () -> nil
+
+  def self.reset: () -> void
+
+  def self.supports_rgb_color?: () -> bool
+
+  def self.Style: (*style args) -> Style
+
+  # Raises NameError when the argument names no style.
+  def self.find_or_create_style: (style arg) -> Style
+
+  def self.find_or_create_style_list: (*style args) -> Style
+
+  def self.String: (::String s) -> HighLine::String
+
+  # Adds the HighLine::String color methods to ::String.
+  def self.colorize_strings: () -> void
+
+  # Delegated to HighLine.default_instance.
+  def self.agree: (::String yes_or_no_question, ?(bool | :getc)? character) ?{ (Question question) -> void } -> bool
+  def self.ask: (::String | Question template_or_question, ?untyped answer_type) ?{ (Question question) -> void } -> untyped
+  def self.choose: (*untyped items) ?{ (Menu menu) -> void } -> untyped
+  def self.say: (_ToS? statement) -> void
+  def self.use_color=: (bool setting) -> bool
+  def self.use_color?: () -> bool
+  def self.reset_use_color: () -> bool
+  def self.track_eof=: (bool setting) -> bool
+  def self.track_eof?: () -> bool?
+  def self.color: (::String string, *style colors) -> ::String
+  def self.uncolor: (::String string) -> ::String
+  def self.color_code: (*style colors) -> ::String
+
+  def initialize: (?_Input? input, ?_Output output, ?(Integer | :auto)? wrap_at, ?(Integer | :auto)? page_at, ?Integer indent_size, ?Integer indent_level) -> void
+
+  attr_accessor use_color: bool
+
+  def use_color?: () -> bool
+
+  def reset_use_color: () -> bool
+
+  attr_accessor track_eof: bool
+
+  def track_eof?: () -> bool?
+
+  attr_reader wrap_at: Integer?
+
+  attr_reader page_at: Integer?
+
+  attr_accessor multi_indent: bool?
+
+  attr_accessor indent_size: Integer
+
+  attr_accessor indent_level: Integer
+
+  # nil for an output-only HighLine (HighLine.new(nil, output)).
+  attr_reader input: _Input?
+
+  attr_reader output: _Output
+
+  # The key of the Hash being gathered (Question#gather).
+  attr_accessor key: untyped
+
+  attr_reader terminal: Terminal
+
+  # Raises EOFError when the input is exhausted.
+  def agree: (::String yes_or_no_question, ?(bool | :getc)? character) ?{ (Question question) -> void } -> bool
+
+  # Returns the answer converted by the answer type (a String without one),
+  # or an Array/Hash of answers with Question#gather.
+  # Raises EOFError when the input is exhausted.
+  def ask: (::String | Question template_or_question, ?untyped answer_type) ?{ (Question question) -> void } -> untyped
+
+  # Returns the chosen item's name, or what its action returned.
+  # Raises EOFError when the input is exhausted.
+  def choose: (*untyped items) ?{ (Menu menu) -> void } -> untyped
+
+  def color: (::String string, *style colors) -> ::String
+
+  def color_code: (*style colors) -> ::String
+
+  def uncolor: (::String string) -> ::String
+
+  def list: (_ToAry[untyped] items, ?Symbol? mode, ?(Integer | ::String)? option) -> ::String
+
+  def say: (_ToS? statement) -> void
+
+  def render_and_ident_statement: (_ToS? statement) -> ::String
+
+  def render_statement: (_ToS? statement) -> ::String
+
+  def wrap_at=: (Integer | :auto | nil setting) -> Integer?
+
+  def page_at=: (Integer | :auto | nil setting) -> Integer?
+
+  def indentation: () -> ::String
+
+  def indent: [T] (?Integer increase, ?_ToS? statement, ?bool? multiline) { (HighLine highline) -> T } -> T
+            | (?Integer increase, ?_ToS? statement, ?bool? multiline) -> void
+
+  def newline: () -> void
+
+  def output_cols: () -> Integer
+
+  def output_rows: () -> Integer
+
+  def puts: (*untyped args) -> void
+
+  def new_scope: () -> HighLine
+
+  module BuiltinStyles
+    STYLE_LIST: Hash[Symbol, ::String]
+    STYLES: Array[::String]
+    COLOR_LIST: Hash[Symbol, { code: ::String, rgb: Array[Integer] }]
+    BASIC_COLORS: Array[::String]
+    COLORS: Array[::String]
+
+    BLACK: ::String
+    BLACK_STYLE: HighLine::Style
+    BLINK: ::String
+    BLINK_STYLE: HighLine::Style
+    BLUE: ::String
+    BLUE_STYLE: HighLine::Style
+    BOLD: ::String
+    BOLD_STYLE: HighLine::Style
+    BRIGHT_BLACK: ::String
+    BRIGHT_BLACK_STYLE: HighLine::Style
+    BRIGHT_BLUE: ::String
+    BRIGHT_BLUE_STYLE: HighLine::Style
+    BRIGHT_CYAN: ::String
+    BRIGHT_CYAN_STYLE: HighLine::Style
+    BRIGHT_GRAY: ::String
+    BRIGHT_GRAY_STYLE: HighLine::Style
+    BRIGHT_GREEN: ::String
+    BRIGHT_GREEN_STYLE: HighLine::Style
+    BRIGHT_GREY: ::String
+    BRIGHT_GREY_STYLE: HighLine::Style
+    BRIGHT_MAGENTA: ::String
+    BRIGHT_MAGENTA_STYLE: HighLine::Style
+    BRIGHT_NONE: ::String
+    BRIGHT_NONE_STYLE: HighLine::Style
+    BRIGHT_RED: ::String
+    BRIGHT_RED_STYLE: HighLine::Style
+    BRIGHT_WHITE: ::String
+    BRIGHT_WHITE_STYLE: HighLine::Style
+    BRIGHT_YELLOW: ::String
+    BRIGHT_YELLOW_STYLE: HighLine::Style
+    CLEAR: ::String
+    CLEAR_STYLE: HighLine::Style
+    CONCEALED: ::String
+    CONCEALED_STYLE: HighLine::Style
+    CYAN: ::String
+    CYAN_STYLE: HighLine::Style
+    DARK: ::String
+    DARK_STYLE: HighLine::Style
+    ERASE_CHAR: ::String
+    ERASE_CHAR_STYLE: HighLine::Style
+    ERASE_LINE: ::String
+    ERASE_LINE_STYLE: HighLine::Style
+    GRAY: ::String
+    GRAY_STYLE: HighLine::Style
+    GREEN: ::String
+    GREEN_STYLE: HighLine::Style
+    GREY: ::String
+    GREY_STYLE: HighLine::Style
+    LIGHT_BLACK: ::String
+    LIGHT_BLACK_STYLE: HighLine::Style
+    LIGHT_BLUE: ::String
+    LIGHT_BLUE_STYLE: HighLine::Style
+    LIGHT_CYAN: ::String
+    LIGHT_CYAN_STYLE: HighLine::Style
+    LIGHT_GRAY: ::String
+    LIGHT_GRAY_STYLE: HighLine::Style
+    LIGHT_GREEN: ::String
+    LIGHT_GREEN_STYLE: HighLine::Style
+    LIGHT_GREY: ::String
+    LIGHT_GREY_STYLE: HighLine::Style
+    LIGHT_MAGENTA: ::String
+    LIGHT_MAGENTA_STYLE: HighLine::Style
+    LIGHT_NONE: ::String
+    LIGHT_NONE_STYLE: HighLine::Style
+    LIGHT_RED: ::String
+    LIGHT_RED_STYLE: HighLine::Style
+    LIGHT_WHITE: ::String
+    LIGHT_WHITE_STYLE: HighLine::Style
+    LIGHT_YELLOW: ::String
+    LIGHT_YELLOW_STYLE: HighLine::Style
+    MAGENTA: ::String
+    MAGENTA_STYLE: HighLine::Style
+    NONE: ::String
+    NONE_STYLE: HighLine::Style
+    ON_BLACK: ::String
+    ON_BLACK_STYLE: HighLine::Style
+    ON_BLUE: ::String
+    ON_BLUE_STYLE: HighLine::Style
+    ON_BRIGHT_BLACK: ::String
+    ON_BRIGHT_BLACK_STYLE: HighLine::Style
+    ON_BRIGHT_BLUE: ::String
+    ON_BRIGHT_BLUE_STYLE: HighLine::Style
+    ON_BRIGHT_CYAN: ::String
+    ON_BRIGHT_CYAN_STYLE: HighLine::Style
+    ON_BRIGHT_GRAY: ::String
+    ON_BRIGHT_GRAY_STYLE: HighLine::Style
+    ON_BRIGHT_GREEN: ::String
+    ON_BRIGHT_GREEN_STYLE: HighLine::Style
+    ON_BRIGHT_GREY: ::String
+    ON_BRIGHT_GREY_STYLE: HighLine::Style
+    ON_BRIGHT_MAGENTA: ::String
+    ON_BRIGHT_MAGENTA_STYLE: HighLine::Style
+    ON_BRIGHT_NONE: ::String
+    ON_BRIGHT_NONE_STYLE: HighLine::Style
+    ON_BRIGHT_RED: ::String
+    ON_BRIGHT_RED_STYLE: HighLine::Style
+    ON_BRIGHT_WHITE: ::String
+    ON_BRIGHT_WHITE_STYLE: HighLine::Style
+    ON_BRIGHT_YELLOW: ::String
+    ON_BRIGHT_YELLOW_STYLE: HighLine::Style
+    ON_CYAN: ::String
+    ON_CYAN_STYLE: HighLine::Style
+    ON_GRAY: ::String
+    ON_GRAY_STYLE: HighLine::Style
+    ON_GREEN: ::String
+    ON_GREEN_STYLE: HighLine::Style
+    ON_GREY: ::String
+    ON_GREY_STYLE: HighLine::Style
+    ON_LIGHT_BLACK: ::String
+    ON_LIGHT_BLACK_STYLE: HighLine::Style
+    ON_LIGHT_BLUE: ::String
+    ON_LIGHT_BLUE_STYLE: HighLine::Style
+    ON_LIGHT_CYAN: ::String
+    ON_LIGHT_CYAN_STYLE: HighLine::Style
+    ON_LIGHT_GRAY: ::String
+    ON_LIGHT_GRAY_STYLE: HighLine::Style
+    ON_LIGHT_GREEN: ::String
+    ON_LIGHT_GREEN_STYLE: HighLine::Style
+    ON_LIGHT_GREY: ::String
+    ON_LIGHT_GREY_STYLE: HighLine::Style
+    ON_LIGHT_MAGENTA: ::String
+    ON_LIGHT_MAGENTA_STYLE: HighLine::Style
+    ON_LIGHT_NONE: ::String
+    ON_LIGHT_NONE_STYLE: HighLine::Style
+    ON_LIGHT_RED: ::String
+    ON_LIGHT_RED_STYLE: HighLine::Style
+    ON_LIGHT_WHITE: ::String
+    ON_LIGHT_WHITE_STYLE: HighLine::Style
+    ON_LIGHT_YELLOW: ::String
+    ON_LIGHT_YELLOW_STYLE: HighLine::Style
+    ON_MAGENTA: ::String
+    ON_MAGENTA_STYLE: HighLine::Style
+    ON_NONE: ::String
+    ON_NONE_STYLE: HighLine::Style
+    ON_RED: ::String
+    ON_RED_STYLE: HighLine::Style
+    ON_WHITE: ::String
+    ON_WHITE_STYLE: HighLine::Style
+    ON_YELLOW: ::String
+    ON_YELLOW_STYLE: HighLine::Style
+    RED: ::String
+    RED_STYLE: HighLine::Style
+    RESET: ::String
+    RESET_STYLE: HighLine::Style
+    REVERSE: ::String
+    REVERSE_STYLE: HighLine::Style
+    UNDERLINE: ::String
+    UNDERLINE_STYLE: HighLine::Style
+    UNDERSCORE: ::String
+    UNDERSCORE_STYLE: HighLine::Style
+    WHITE: ::String
+    WHITE_STYLE: HighLine::Style
+    YELLOW: ::String
+    YELLOW_STYLE: HighLine::Style
+
+    module ClassMethods
+      RGB_COLOR_PATTERN: Regexp
+
+      # Resolves RGB constants such as RGB_FF6000 (a code String) and
+      # ON_RGB_FF6000_STYLE (a Style). Raises NameError for other names.
+      def const_missing: (Symbol name) -> (::String | HighLine::Style)
+    end
+  end
+
+  module CustomErrors
+    class ExplainableError < StandardError
+      def explanation_key: () -> Symbol?
+    end
+
+    class QuestionError < ExplainableError
+      def explanation_key: () -> nil
+    end
+
+    class NotValidQuestionError < ExplainableError
+      def explanation_key: () -> Symbol
+    end
+
+    class NotInRangeQuestionError < ExplainableError
+      def explanation_key: () -> Symbol
+    end
+
+    class NoConfirmationQuestionError < ExplainableError
+      def explanation_key: () -> nil
+    end
+
+    class NoAutoCompleteMatch < ExplainableError
+      def explanation_key: () -> Symbol
+    end
+  end
+
+  class Style
+    def self.index: (Style style) -> Style
+
+    def self.clear_index: () -> void
+
+    # An Array argument is turned into its to_s (Style.new(rgb: [...])
+    # passes one).
+    def self.rgb_hex: (*(Numeric | ::String | Array[Integer]) colors) -> ::String
+
+    def self.rgb_parts: (::String hex) -> Array[Integer]
+
+    def self.rgb: (*(Numeric | ::String) colors) -> Style
+
+    def self.rgb_number: (*(Numeric | Array[Numeric]) parts) -> Integer
+
+    # Raises RuntimeError outside 16..231.
+    def self.ansi_rgb_to_hex: (Integer ansi_number) -> ::String
+
+    def self.list: () -> Hash[untyped, Style]
+
+    def self.code_index: () -> Hash[::String, Array[Style]]
+
+    def self.uncolor: (::String string) -> ::String
+
+    attr_reader name: (Symbol | ::String | Array[HighLine::style])?
+
+    attr_reader list: Array[HighLine::style]?
+
+    attr_accessor rgb: Array[Integer]?
+
+    attr_accessor builtin: bool?
+
+    def initialize: (?Hash[Symbol, untyped] defn) -> void
+
+    def dup: () -> Style
+
+    def to_hash: () -> Hash[Symbol, untyped]
+
+    def color: (::String string) -> ::String
+
+    def code: () -> ::String
+
+    def red: () -> Integer?
+
+    def green: () -> Integer?
+
+    def blue: () -> Integer?
+
+    # Raises RuntimeError for a Style list.
+    def variant: (untyped new_name, ?Hash[Symbol, untyped] options) -> Style
+
+    def on: () -> Style
+
+    # Raises for a Style list.
+    def bright: () -> Style
+
+    # Raises for a Style list.
+    def light: () -> Style
+  end
+
+  class ColorScheme
+    def initialize: (?Hash[untyped, Array[HighLine::style]]? h) ?{ (ColorScheme scheme) -> void } -> void
+
+    def load_from_hash: (Hash[untyped, Array[HighLine::style]] h) -> void
+
+    def include?: (_ToS color_tag) -> bool
+
+    def []: (_ToS color_tag) -> Style?
+
+    def definition: (_ToS color_tag) -> Array[HighLine::style]?
+
+    # Keys are downcased Strings.
+    def keys: () -> Array[::String]
+
+    def []=: (_ToS color_tag, Array[HighLine::style] constants) -> void
+
+    def to_hash: () -> Hash[::String, Array[HighLine::style]]
+  end
+
+  class SampleColorScheme < ColorScheme
+    SAMPLE_SCHEME: Hash[Symbol, Array[Symbol]]
+
+    # super(SAMPLE_SCHEME) passes the block on to ColorScheme#initialize.
+    def initialize: (?untyped _h) ?{ (ColorScheme scheme) -> void } -> void
+  end
+
+  class Question
+    include CustomErrors
+
+    # A custom validator for Question#validate.
+    interface _Validator
+      def valid?: (untyped answer) -> boolish
+    end
+
+    def self.build: (::String | Question template_or_question, ?untyped answer_type) ?{ (Question question) -> void } -> Question
+
+    def initialize: (_ToS template, untyped answer_type) ?{ (Question question) -> void } -> void
+
+    attr_accessor template: ::String
+
+    attr_accessor answer: untyped
+
+    attr_accessor answer_type: untyped
+
+    attr_accessor completion: untyped
+
+    attr_accessor character: (bool | :getc)?
+
+    attr_accessor limit: Integer?
+
+    # true echoes the input, false or nil echoes nothing, a String is echoed
+    # for each character.
+    attr_accessor echo: (bool | ::String)?
+
+    attr_accessor readline: bool?
+
+    # :strip (the default), :chomp, :collapse, :strip_and_collapse,
+    # :chomp_and_collapse, :remove, or nil/false for none.
+    attr_accessor whitespace: (Symbol | false)?
+
+    # :up, :upcase, :down, :downcase, :capitalize or nil.
+    attr_accessor case: Symbol?
+
+    attr_accessor default: untyped
+
+    attr_accessor default_hint_show: bool
+
+    attr_accessor validate: (Regexp | ^(untyped answer) -> boolish | _Validator)?
+
+    attr_accessor above: untyped
+
+    attr_accessor below: untyped
+
+    # Any object responding to include?.
+    attr_accessor in: untyped
+
+    attr_accessor confirm: (bool | ::String | ^(untyped answer) -> ::String)?
+
+    attr_accessor gather: (Integer | ::String | Symbol | Regexp | Hash[untyped, untyped] | false)?
+
+    attr_accessor verify_match: bool?
+
+    attr_writer first_answer: ::String?
+
+    attr_accessor directory: Pathname | ::String
+
+    attr_accessor glob: ::String
+
+    # The messages shown to the user, by key (:ask_on_error, :not_valid,
+    # :not_in_range, :invalid_type, :no_completion, :ambiguous_completion,
+    # :mismatch). A value may be a String, :question (for :ask_on_error),
+    # or a callable given the answer.
+    def responses: () -> Hash[Symbol, untyped]
+
+    attr_accessor overwrite: bool
+
+    def to_s: () -> ::String
+  end
+
+  class Menu < Question
+    attr_accessor self.index_color: untyped
+
+    def initialize: () ?{ (Menu menu) -> void } -> void
+
+    attr_reader index: Symbol | ::String
+
+    attr_accessor index_suffix: ::String
+
+    # :index, :name or :index_or_name.
+    attr_accessor select_by: Symbol
+
+    attr_accessor flow: Symbol
+
+    attr_accessor list_option: (Integer | ::String)?
+
+    attr_accessor header: ::String?
+
+    attr_accessor prompt: ::String
+
+    attr_reader layout: Symbol | ::String
+
+    attr_accessor shell: bool
+
+    attr_accessor nil_on_handled: bool
+
+    # false, or the colors to give HighLine.color.
+    attr_accessor index_color: untyped
+
+    # The action gets the item name, and in shell mode the rest of the line.
+    def choice: (untyped name, ?::String? help, ?untyped text) ?{ (untyped name, ?::String details) -> untyped } -> void
+
+    def build_item: (untyped name, Hash[Symbol, untyped] attributes) -> Menu::Item
+
+    def add_item: (Menu::Item item) -> void
+
+    def choices: (*untyped names) ?{ (untyped name, ?::String details) -> untyped } -> void
+
+    def hidden: (untyped name, ?::String? help) ?{ (untyped name, ?::String details) -> untyped } -> void
+
+    # :number, :letter, :capital_letter, :none or a literal String.
+    def index=: (Symbol | ::String style) -> void
+
+    def init_help: () -> void
+
+    def help: (::String topic, ::String help) -> void
+
+    # :list, :one_line, :menu_only or an ERB String.
+    def layout=: (:list | :one_line | :menu_only | ::String new_layout) -> void
+
+    def options: () -> Array[untyped]
+
+    def select: (HighLine highline_context, untyped selection, ?untyped details) -> untyped
+
+    def to_ary: () -> Array[::String]
+
+    def to_s: () -> ::String
+
+    def update_responses: () -> Hash[Symbol, untyped]
+
+    class Item
+      attr_reader name: untyped
+
+      attr_reader text: untyped
+
+      attr_reader help: ::String?
+
+      attr_reader action: Proc?
+
+      def initialize: (untyped name, Hash[Symbol, untyped] attributes) -> void
+
+      def item_help: () -> Hash[::String, ::String]
+    end
+  end
+
+  class String < ::String
+    include StringExtensions
+
+    def color: (*HighLine::style args) -> self
+
+    alias foreground color
+
+    def on: (_ToS arg) -> self
+
+    def uncolor: () -> self
+
+    # Raises RuntimeError unless the colors make a 6-digit hex code.
+    def rgb: (*(Numeric | ::String) colors) -> self
+
+    def on_rgb: (*(Numeric | ::String) colors) -> self
+
+    def black: () -> self
+    def red: () -> self
+    def green: () -> self
+    def yellow: () -> self
+    def blue: () -> self
+    def magenta: () -> self
+    def cyan: () -> self
+    def white: () -> self
+    def gray: () -> self
+    def grey: () -> self
+    def none: () -> self
+    def bright_black: () -> self
+    def light_black: () -> self
+    def bright_red: () -> self
+    def light_red: () -> self
+    def bright_green: () -> self
+    def light_green: () -> self
+    def bright_yellow: () -> self
+    def light_yellow: () -> self
+    def bright_blue: () -> self
+    def light_blue: () -> self
+    def bright_magenta: () -> self
+    def light_magenta: () -> self
+    def bright_cyan: () -> self
+    def light_cyan: () -> self
+    def bright_white: () -> self
+    def light_white: () -> self
+    def bright_gray: () -> self
+    def light_gray: () -> self
+    def bright_grey: () -> self
+    def light_grey: () -> self
+    def bright_none: () -> self
+    def light_none: () -> self
+    def on_black: () -> self
+    def on_red: () -> self
+    def on_green: () -> self
+    def on_yellow: () -> self
+    def on_blue: () -> self
+    def on_magenta: () -> self
+    def on_cyan: () -> self
+    def on_white: () -> self
+    def on_gray: () -> self
+    def on_grey: () -> self
+    def on_none: () -> self
+    def on_bright_black: () -> self
+    def on_light_black: () -> self
+    def on_bright_red: () -> self
+    def on_light_red: () -> self
+    def on_bright_green: () -> self
+    def on_light_green: () -> self
+    def on_bright_yellow: () -> self
+    def on_light_yellow: () -> self
+    def on_bright_blue: () -> self
+    def on_light_blue: () -> self
+    def on_bright_magenta: () -> self
+    def on_light_magenta: () -> self
+    def on_bright_cyan: () -> self
+    def on_light_cyan: () -> self
+    def on_bright_white: () -> self
+    def on_light_white: () -> self
+    def on_bright_gray: () -> self
+    def on_light_gray: () -> self
+    def on_bright_grey: () -> self
+    def on_light_grey: () -> self
+    def on_bright_none: () -> self
+    def on_light_none: () -> self
+
+    # These replace ::String#clear and ::String#reverse with styling.
+    def clear: () -> self
+    def reset: () -> self
+    def bold: () -> self
+    def dark: () -> self
+    def underline: () -> self
+    def underscore: () -> self
+    def blink: () -> self
+    def reverse: () -> self
+    def concealed: () -> self
+  end
+
+  module StringExtensions
+    STYLE_METHOD_NAME_PATTERN: Regexp
+  end
+
+  class Terminal
+    # Returns an IOConsole terminal unless io/console fails to load.
+    def self.get_terminal: (HighLine::_Input? input, HighLine::_Output output) -> Terminal
+
+    attr_reader input: HighLine::_Input?
+
+    attr_reader output: HighLine::_Output
+
+    def initialize: (HighLine::_Input? input, HighLine::_Output output) -> void
+
+    # [columns, lines]
+    def terminal_size: () -> Array[Integer]?
+
+    def character_mode: () -> ::String
+
+    class IOConsole < Terminal
+      def terminal_size: () -> Array[Integer]?
+    end
+  end
+end
