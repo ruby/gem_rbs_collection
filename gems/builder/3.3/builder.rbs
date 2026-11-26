@@ -1,13 +1,30 @@
 module Builder
+  # Defined in builder/version, which `require "builder"` does not load.
+  VERSION_NUMBERS: Array[Integer]
+  VERSION_MAJOR: Integer
+  VERSION_MINOR: Integer
+  VERSION_BUILD: Integer
   VERSION: String
+
+  # Raises RuntimeError when +klass+ already defines +method_name+.
+  def self.check_for_name_collision: (Module klass, String | Symbol method_name, ?untyped defined_constant) -> nil
 
   class IllegalBlockError < RuntimeError
   end
 
+  # Tags are created by calling any method on a builder (method_missing):
+  # `xml.title("text")`. Steep cannot see those calls; use `tag!` instead.
+  #
+  # Most methods return what the target's `<<` returned (or the target itself
+  # for `tag!`), so their return types depend on the target and stay untyped.
+  # With the default String target, `tag!` and `target!` return that String.
   class XmlBase < BasicObject
-    def self.cache_method_calls: () -> bool
-    def self.cache_method_calls=: (boolish value) -> bool
+    def self.cache_method_calls: () -> boolish
+    def self.cache_method_calls=: (boolish value) -> boolish
 
+    def initialize: (?Integer indent, ?Integer initial, ?String encoding) -> void
+
+    # Raises ArgumentError when a text argument is mixed with a block.
     def tag!: (Symbol | String sym, *untyped args) ?{ (self builder) -> untyped } -> untyped
     def text!: (String text) -> untyped
     def <<: (String text) -> untyped
@@ -19,13 +36,16 @@ module Builder
     type options = { ?indent: Integer, ?margin: Integer, ?quote: :single | :double, ?explicit_nil_handling: bool, ?target: untyped }
 
     def initialize: (?options options) -> void
+                  | (Hash[Symbol, untyped] options) -> void
     def target!: () -> untyped
     def comment!: (String comment_text) -> untyped
     def declare!: (Symbol | String inst, *(String | Symbol) args) ?{ (self builder) -> untyped } -> untyped
-    def instruct!: (?Symbol directive_tag, ?Hash[Symbol, untyped] attrs) -> untyped
+    def instruct!: (?Symbol | String directive_tag, ?Hash[Symbol, untyped] attrs) -> untyped
     def cdata!: (String text) -> untyped
+    def cdata_value!: (Symbol | String open, String text) -> untyped
   end
 
+  # The target receives start_tag(Symbol, Hash?), end_tag(Symbol) and text(String).
   class XmlEvents < XmlMarkup
   end
 end
