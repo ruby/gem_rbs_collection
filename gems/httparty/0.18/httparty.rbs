@@ -315,7 +315,7 @@ module HTTParty
     #   # Simple get with full url and query parameters
     #   # ie: http://foo.com/resource.json?limit=10
     #   Foo.get('http://foo.com/resource.json', query: {limit: 10})
-    type string_or_uri = String |  URI::Generic | untyped
+    type string_or_uri = String | URI::Generic | untyped
     def get: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
            | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
 
@@ -422,7 +422,7 @@ module HTTParty
 
     attr_reader headers: HTTParty::Response::Headers
 
-    def initialize: (HTTParty::Request request, untyped response, String parsed_block, ?Hash[untyped, untyped] options) -> instance
+    def initialize: (HTTParty::Request request, untyped response, String parsed_block, ?Hash[untyped, untyped] options) -> void
 
     def parsed_response: () -> Object
 
@@ -466,7 +466,7 @@ module HTTParty
 
     def code: () -> Integer
 
-    def initialize: (untyped fragment, untyped http_response, untyped connection) -> instance
+    def initialize: (untyped fragment, untyped http_response, untyped connection) -> void
   end
 
   class Request
@@ -489,17 +489,17 @@ module HTTParty
 
     attr_accessor redirect: bool
 
-    attr_accessor last_uri:  (URI::Generic | untyped)
+    attr_accessor last_uri: (URI::Generic | untyped)
 
-    attr_reader path:  (URI::Generic | untyped)
+    attr_reader path: (URI::Generic | untyped)
 
-    def initialize: (singleton(Net::HTTPRequest) http_method,  (URI::Generic | untyped) path, ?Hash[untyped, untyped] o) -> void
+    def initialize: (singleton(Net::HTTPRequest) http_method, (URI::Generic | untyped) path, ?Hash[untyped, untyped] o) -> void
 
     def path=: ( (URI::Generic | untyped) uri) -> void
 
-    def request_uri: ( (URI::Generic | untyped) uri) ->  (URI::Generic | untyped)
+    def request_uri: ( (URI::Generic | untyped) uri) -> (URI::Generic | untyped)
 
-    def uri: () ->  (URI::Generic | untyped)
+    def uri: () -> (URI::Generic | untyped)
 
     def base_uri: () -> String
 

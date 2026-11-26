@@ -1,0 +1,941 @@
+module HTTParty
+  VERSION: String
+
+  # Network errors that are re-raised as HTTParty::NetworkError when the
+  # foul option is on.
+  COMMON_NETWORK_ERRORS: Array[singleton(StandardError)]
+
+  def self.included: (Module base) -> void
+
+  # Something that Net::HTTP#set_debug_output can write to.
+  interface _DebugOutput
+    def <<: (String) -> untyped
+  end
+
+  # A URI adapter class such as URI or Addressable::URI.
+  interface _URIAdapter
+    def parse: (String uri) -> untyped
+  end
+
+  # A code, a regexp source or a range of codes for raise_on.
+  type raise_on_matcher = Integer | String | Range[Integer] | Range[String]
+
+  module ClassMethods
+    # Turns on or off the foul option.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     foul true
+    #   end
+    def foul: (boolish bool) -> void
+
+    # Turns on logging
+    #
+    #   class Foo
+    #     include HTTParty
+    #     logger Logger.new('http_logger'), :info, :apache
+    #   end
+    def logger: (untyped logger, ?Symbol | String level, ?Symbol format) -> void
+
+    # Raises HTTParty::ResponseError if response's code matches this statuses
+    #
+    #   class Foo
+    #     include HTTParty
+    #     raise_on [404, 500..599, '3..']
+    #   end
+    def raise_on: (?raise_on_matcher | Enumerable[raise_on_matcher] codes) -> void
+
+    # Allows setting http proxy information to be used
+    #
+    #   class Foo
+    #     include HTTParty
+    #     http_proxy 'http://foo.com', 80, 'user', 'pass'
+    #   end
+    def http_proxy: (?String? addr, ?Integer? port, ?String? user, ?String? pass) -> void
+
+    # Allows setting a base uri to be used for each request.
+    # Will normalize uri to include http, etc.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     base_uri 'twitter.com'
+    #   end
+    def base_uri: (?nil) -> String?
+                | (String uri) -> String
+
+    # Allows setting basic authentication username and password.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     basic_auth 'username', 'password'
+    #   end
+    def basic_auth: (String u, String p) -> void
+
+    # Allows setting digest authentication username and password.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     digest_auth 'username', 'password'
+    #   end
+    def digest_auth: (String u, String p) -> void
+
+    # Do not send rails style query strings.
+    # Specifically, don't use bracket notation when sending an array
+    #
+    # For a query:
+    #   get '/', query: {selected_ids: [1,2,3]}
+    #
+    # The default query string looks like this:
+    #   /?selected_ids[]=1&selected_ids[]=2&selected_ids[]=3
+    #
+    # Call `disable_rails_query_string_format` to transform the query string
+    # into:
+    #   /?selected_ids=1&selected_ids=2&selected_ids=3
+    #
+    # @example
+    #   class Foo
+    #     include HTTParty
+    #     disable_rails_query_string_format
+    #   end
+    def disable_rails_query_string_format: () -> void
+
+    # Allows setting default parameters to be appended to each request.
+    # Great for api keys and such.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     default_params api_key: 'secret', another: 'foo'
+    #   end
+    def default_params: (?Hash[untyped, untyped] | _ToHash[untyped, untyped] h) -> Hash[untyped, untyped]
+
+    # Allows setting a default timeout for all HTTP calls
+    # Timeout is specified in seconds.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     default_timeout 10
+    #   end
+    def default_timeout: (Integer | Float value) -> void
+
+    # Allows setting a default open_timeout for all HTTP calls in seconds
+    #
+    #   class Foo
+    #     include HTTParty
+    #     open_timeout 10
+    #   end
+    def open_timeout: (Integer | Float value) -> void
+
+    # Allows setting a default read_timeout for all HTTP calls in seconds
+    #
+    #   class Foo
+    #     include HTTParty
+    #     read_timeout 10
+    #   end
+    def read_timeout: (Integer | Float value) -> void
+
+    # Allows setting a default write_timeout for all HTTP calls in seconds
+    # Supported by Ruby > 2.6.0
+    #
+    #   class Foo
+    #     include HTTParty
+    #     write_timeout 10
+    #   end
+    def write_timeout: (Integer | Float value) -> void
+
+    # Set an output stream for debugging, defaults to $stderr.
+    # The output stream is passed on to Net::HTTP#set_debug_output.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     debug_output $stderr
+    #   end
+    def debug_output: (?_DebugOutput stream) -> void
+
+    # Allows setting HTTP headers to be used for each request.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     headers 'Accept' => 'text/html'
+    #   end
+    def headers: (?_ToHash[untyped, untyped]? h) -> Hash[untyped, untyped]
+
+    def cookies: (?_ToHash[untyped, untyped] h) -> HTTParty::CookieHash
+
+    # Proceed to the location header when an HTTP response dictates a redirect.
+    # Redirects are always followed by default.
+    #
+    # @example
+    #   class Foo
+    #     include HTTParty
+    #     base_uri 'http://google.com'
+    #     follow_redirects true
+    #   end
+    def follow_redirects: (?bool value) -> void
+
+    # Allows setting the format with which to parse.
+    # Must be one of the allowed formats ie: json, xml
+    #
+    #   class Foo
+    #     include HTTParty
+    #     format :json
+    #   end
+    def format: (?nil) -> (Symbol | String)?
+              | (Symbol | String f) -> void
+
+    # Declare whether or not to follow redirects.  When true, an
+    # {HTTParty::RedirectionTooDeep} error will raise upon encountering a
+    # redirect. You can then gain access to the response object via
+    # HTTParty::RedirectionTooDeep#response.
+    #
+    # @see HTTParty::ResponseError#response
+    #
+    # @example
+    #   class Foo
+    #     include HTTParty
+    #     base_uri 'http://google.com'
+    #     no_follow true
+    #   end
+    #
+    #   begin
+    #     Foo.get('/')
+    #   rescue HTTParty::RedirectionTooDeep => e
+    #     puts e.response.body
+    #   end
+    def no_follow: (?bool value) -> void
+
+    def maintain_method_across_redirects: (?bool value) -> void
+
+    def resend_on_redirect: (?bool value) -> void
+
+    # Allows setting a PEM file to be used
+    #
+    #   class Foo
+    #     include HTTParty
+    #     pem File.read('/home/user/my.pem'), "optional password"
+    #   end
+    def pem: (String pem_contents, ?String? password) -> void
+
+    # Allows setting a PKCS12 file to be used
+    #
+    #   class Foo
+    #     include HTTParty
+    #     pkcs12 File.read('/home/user/my.p12'), "password"
+    #   end
+    def pkcs12: (String p12_contents, String password) -> void
+
+    # Override the way query strings are normalized.
+    # Helpful for overriding the default rails normalization of Array queries.
+    #
+    # For a query:
+    #   get '/', query: {selected_ids: [1,2,3]}
+    #
+    # The default query string normalizer returns:
+    #   /?selected_ids[]=1&selected_ids[]=2&selected_ids[]=3
+    #
+    # Let's change it to this:
+    #  /?selected_ids=1&selected_ids=2&selected_ids=3
+    #
+    # Pass a Proc to the query normalizer which accepts the yielded query.
+    #
+    # @example Modifying Array query strings
+    #   class ServiceWrapper
+    #     include HTTParty
+    #
+    #     query_string_normalizer proc { |query|
+    #       query.map do |key, value|
+    #         value.map {|v| "#{key}=#{v}"}
+    #       end.join('&')
+    #     }
+    #   end
+    #
+    # @param [Proc] normalizer custom query string normalizer.
+    # @yield [Hash, String] query string
+    # @yieldreturn [Array] an array that will later be joined with '&'
+    def query_string_normalizer: (untyped normalizer) -> void
+
+    # Allows setting of SSL version to use. This only works in Ruby 1.9+.
+    # You can get a list of valid versions from OpenSSL::SSL::SSLContext::METHODS.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     ssl_version :SSLv3
+    #   end
+    def ssl_version: (String | Symbol version) -> void
+
+    # Allows setting of SSL ciphers to use.  This only works in Ruby 1.9+.
+    # You can get a list of valid specific ciphers from OpenSSL::Cipher.ciphers.
+    # You also can specify a cipher suite here, listed here at openssl.org:
+    # http://www.openssl.org/docs/apps/ciphers.html#CIPHER_SUITE_NAMES
+    #
+    #   class Foo
+    #     include HTTParty
+    #     ciphers "RC4-SHA"
+    #   end
+    def ciphers: (String | Array[String] cipher_names) -> void
+
+    # Deactivate automatic decompression of the response body.
+    # This will require you to explicitly handle body decompression
+    # by inspecting the Content-Encoding response header.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     skip_decompression
+    #   end
+    def skip_decompression: (?boolish value) -> void
+
+    # Allows setting an OpenSSL certificate authority file.  The file
+    # should contain one or more certificates in PEM format.
+    #
+    # Setting this option enables certificate verification.  All
+    # certificates along a chain must be available in ssl_ca_file or
+    # ssl_ca_path for verification to succeed.
+    #
+    #
+    #   class Foo
+    #     include HTTParty
+    #     ssl_ca_file '/etc/ssl/certs/ca-certificates.crt'
+    #   end
+    def ssl_ca_file: (String path) -> void
+
+    # Allows setting an OpenSSL certificate authority path (directory).
+    #
+    # Setting this option enables certificate verification.  All
+    # certificates along a chain must be available in ssl_ca_file or
+    # ssl_ca_path for verification to succeed.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     ssl_ca_path '/etc/ssl/certs/'
+    #   end
+    def ssl_ca_path: (String path) -> void
+
+    # Allows setting a custom parser for the response.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     parser Proc.new {|data| ...}
+    #   end
+    def parser: (?nil) -> untyped
+              | (untyped custom_parser) -> void
+
+    # Allows setting a custom URI adapter.
+    #
+    #   class Foo
+    #     include HTTParty
+    #     uri_adapter Addressable::URI
+    #   end
+    def uri_adapter: (_URIAdapter uri_adapter) -> void
+
+    # Allows setting a custom connection_adapter for the http connections
+    #
+    # @example
+    #   class Foo
+    #     include HTTParty
+    #     connection_adapter Proc.new {|uri, options| ... }
+    #   end
+    #
+    # @example provide optional configuration for your connection_adapter
+    #   class Foo
+    #     include HTTParty
+    #     connection_adapter Proc.new {|uri, options| ... }, {foo: :bar}
+    #   end
+    #
+    # @see HTTParty::ConnectionAdapter
+    def connection_adapter: (?nil) -> untyped
+                          | (untyped custom_adapter, ?Hash[untyped, untyped]? options) -> void
+
+    # Allows making a get request to a url.
+    #
+    #   class Foo
+    #     include HTTParty
+    #   end
+    #
+    #   # Simple get with full url
+    #   Foo.get('http://foo.com/resource.json')
+    #
+    #   # Simple get with full url and query parameters
+    #   # ie: http://foo.com/resource.json?limit=10
+    #   Foo.get('http://foo.com/resource.json', query: {limit: 10})
+    type string_or_uri = String | URI::Generic | untyped
+    def get: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+           | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Allows making a post request to a url.
+    #
+    #   class Foo
+    #     include HTTParty
+    #   end
+    #
+    #   # Simple post with full url and setting the body
+    #   Foo.post('http://foo.com/resources', body: {bar: 'baz'})
+    #
+    #   # Simple post with full url using :query option,
+    #   # which appends the parameters to the URI.
+    #   Foo.post('http://foo.com/resources', query: {bar: 'baz'})
+    def post: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+            | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a PATCH request to a path
+    def patch: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+             | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a PUT request to a path
+    def put: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+           | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a DELETE request to a path
+    def delete: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+              | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a MOVE request to a path
+    def move: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+            | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a COPY request to a path
+    def copy: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+            | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a HEAD request to a path
+    def head: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+            | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform an OPTIONS request to a path
+    def options: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Perform a MKCOL request to a path
+    def mkcol: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+             | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    def lock: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+            | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    def unlock: (string_or_uri, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+              | (string_or_uri, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+    # Builds the HTTParty::Request for a call without performing it.
+    def build_request: (singleton(Net::HTTPRequest) http_method, string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Request
+
+    attr_reader default_options: Hash[untyped, untyped]
+  end
+
+  def self.normalize_base_uri: (String url) -> String
+
+  class Basement
+    # nodoc:
+    include HTTParty
+    extend HTTParty::ClassMethods
+  end
+
+  def self.get: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+              | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.post: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.patch: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+                | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.put: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+              | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.delete: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+                 | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.move: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.copy: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.head: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.options: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+                  | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.mkcol: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+                | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.lock: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.unlock: (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+                 | (ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Response
+
+  def self.build_request: (singleton(Net::HTTPRequest) http_method, ClassMethods::string_or_uri path, ?Hash[untyped, untyped] options) -> HTTParty::Request
+
+  class Error < StandardError
+  end
+
+  # Exception raised when you attempt to set a non-existent format
+  # or when an HTTParty option is used incorrectly (foul).
+  class Foul < Error
+  end
+
+  # Exception that is raised when request has redirected too many times.
+  class UnsupportedFormat < Foul
+  end
+
+  # Exception raised when using a URI scheme other than HTTP or HTTPS
+  class UnsupportedURIScheme < Foul
+  end
+
+  # Exception raised when the response code matches raise_on.
+  class ResponseError < Foul
+    # The response that caused the exception. nil only for a
+    # RedirectionTooDeep raised before any request (the :limit option was 0).
+    attr_reader response: Net::HTTPResponse?
+
+    def initialize: (Net::HTTPResponse? response) -> void
+  end
+
+  # Exception that is raised when request has redirected too many times.
+  class RedirectionTooDeep < ResponseError
+  end
+
+  # Exception that is raised when request redirects and location header is present more than once
+  class DuplicateLocationHeader < ResponseError
+  end
+
+  # Exception that is raised when common network errors occur (with the foul option).
+  class NetworkError < Foul
+  end
+
+  # Exception that is raised when an absolute URI's host does not match
+  # the configured base_uri.
+  class UnsafeURIError < Foul
+  end
+
+  class CookieHash < Hash[untyped, untyped]
+    CLIENT_COOKIES: Array[String]
+
+    def add_cookies: (Hash[untyped, untyped] data) -> self
+                   | (String data) -> Array[String]
+
+    def to_cookie_string: () -> String
+  end
+
+  module Logger
+    def self.formatters: () -> Hash[Symbol, untyped]
+
+    def self.add_formatter: (Symbol | String name, untyped formatter) -> Hash[Symbol, untyped]
+
+    def self.build: (untyped logger, (Symbol | String)? level, Symbol? formatter) -> untyped
+  end
+
+  # Decompresses the response body based on the Content-Encoding header.
+  class Decompressor
+    SupportedEncodings: Hash[String, Symbol]
+
+    # The response body of the request
+    attr_reader body: String?
+
+    # The Content-Encoding algorithm used to encode the body
+    attr_reader encoding: String?
+
+    def initialize: (String? body, String? encoding) -> void
+
+    # Perform decompression on the response body
+    # nil when the response body is nil or cannot decompressed
+    def decompress: () -> String?
+  end
+
+  class Response < Object
+    def self.underscore: (String string) -> String
+
+    def self._load: (String data) -> instance
+
+    attr_reader request: HTTParty::Request
+
+    attr_reader response: Net::HTTPResponse
+
+    # nil for responses without a body (HEAD, 204, 304).
+    attr_reader body: String?
+
+    attr_reader headers: HTTParty::Response::Headers
+
+    def initialize: (HTTParty::Request request, Net::HTTPResponse response, ^() -> untyped parsed_block, ?body: String?) -> void
+                  | (HTTParty::Request request, Net::HTTPResponse response, ^() -> untyped parsed_block, Hash[Symbol, untyped] options) -> void
+
+    def parsed_response: () -> untyped
+
+    def code: () -> Integer
+
+    def http_version: () -> String
+
+    def tap: () { (HTTParty::Response) -> untyped } -> HTTParty::Response
+
+    def inspect: () -> String
+
+    CODES_TO_OBJ: Hash[String, singleton(Net::HTTPResponse)]
+
+    def information?: () -> bool
+    def success?: () -> bool
+    def redirection?: () -> bool
+    def client_error?: () -> bool
+    def server_error?: () -> bool
+    def continue?: () -> bool
+    def switch_protocol?: () -> bool
+    def processing?: () -> bool
+    def early_hints?: () -> bool
+    def ok?: () -> bool
+    def created?: () -> bool
+    def accepted?: () -> bool
+    def non_authoritative_information?: () -> bool
+    def no_content?: () -> bool
+    def reset_content?: () -> bool
+    def partial_content?: () -> bool
+    def multi_status?: () -> bool
+    def already_reported?: () -> bool
+    def im_used?: () -> bool
+    def multiple_choices?: () -> bool
+    def moved_permanently?: () -> bool
+    def found?: () -> bool
+    def see_other?: () -> bool
+    def not_modified?: () -> bool
+    def use_proxy?: () -> bool
+    def temporary_redirect?: () -> bool
+    def permanent_redirect?: () -> bool
+    def bad_request?: () -> bool
+    def unauthorized?: () -> bool
+    def payment_required?: () -> bool
+    def forbidden?: () -> bool
+    def not_found?: () -> bool
+    def method_not_allowed?: () -> bool
+    def not_acceptable?: () -> bool
+    def proxy_authentication_required?: () -> bool
+    def request_timeout?: () -> bool
+    def conflict?: () -> bool
+    def gone?: () -> bool
+    def length_required?: () -> bool
+    def precondition_failed?: () -> bool
+    def payload_too_large?: () -> bool
+    def uri_too_long?: () -> bool
+    def unsupported_media_type?: () -> bool
+    def range_not_satisfiable?: () -> bool
+    def expectation_failed?: () -> bool
+    def misdirected_request?: () -> bool
+    def unprocessable_entity?: () -> bool
+    def locked?: () -> bool
+    def failed_dependency?: () -> bool
+    def upgrade_required?: () -> bool
+    def precondition_required?: () -> bool
+    def too_many_requests?: () -> bool
+    def request_header_fields_too_large?: () -> bool
+    def unavailable_for_legal_reasons?: () -> bool
+    def internal_server_error?: () -> bool
+    def not_implemented?: () -> bool
+    def bad_gateway?: () -> bool
+    def service_unavailable?: () -> bool
+    def gateway_timeout?: () -> bool
+    def version_not_supported?: () -> bool
+    def variant_also_negotiates?: () -> bool
+    def insufficient_storage?: () -> bool
+    def loop_detected?: () -> bool
+    def not_extended?: () -> bool
+    def network_authentication_required?: () -> bool
+
+    # Support old multiple_choice? method from pre 2.0.0 era (not defined on JRuby)
+    alias multiple_choice? multiple_choices?
+
+    # Support old status codes method from pre 2.6.0 era (not defined on JRuby)
+    alias gateway_time_out? gateway_timeout?
+    alias request_entity_too_large? payload_too_large?
+    alias request_time_out? request_timeout?
+    alias request_uri_too_long? uri_too_long?
+    alias requested_range_not_satisfiable? range_not_satisfiable?
+
+    def nil?: () -> bool
+
+    def to_s: () -> String
+
+    # PP - PrettyPrint module
+    def pretty_print: (untyped pp) -> untyped
+
+    def display: (?_Writer port) -> void
+
+    def _dump: (Integer _level) -> String
+
+    private
+
+    def respond_to_missing?: (Symbol name, *untyped args) -> bool
+
+    class Headers < SimpleDelegator
+      include Net::HTTPHeader
+
+      def initialize: (?Hash[String, untyped]? header_values) -> void
+
+      # nil when other is neither a Net::HTTPHeader nor a Hash.
+      def ==: (untyped other) -> bool?
+
+      # Delegated to the headers Hash.
+      def to_s: () -> String
+    end
+  end
+
+  # Allow access to http_response and code by delegation on fragment
+  class ResponseFragment < SimpleDelegator
+    attr_reader http_response: Net::HTTPResponse
+
+    attr_reader connection: untyped
+
+    def code: () -> Integer
+
+    # Delegated to the fragment String.
+    def to_s: () -> String
+
+    def initialize: (String fragment, Net::HTTPResponse http_response, untyped connection) -> void
+  end
+
+  class Request
+    # include Body
+    # include MultipartBoundary
+    # nodoc:
+    SupportedHTTPMethods: Array[singleton(Net::HTTPRequest)]
+
+    SupportedURISchemes: Array[String?]
+
+    DEFAULT_PORTS: Hash[String, Integer]
+
+    CONTENT_HEADERS: Array[String]
+
+    NON_RAILS_QUERY_STRING_NORMALIZER: ^(untyped query) -> String
+
+    JSON_API_QUERY_STRING_NORMALIZER: ^(untyped query) -> String
+
+    def self._load: (String data) -> instance
+
+    attr_accessor http_method: singleton(Net::HTTPRequest)
+
+    attr_accessor options: Hash[untyped, untyped]
+
+    # nil until the request has been performed.
+    attr_accessor last_response: Net::HTTPResponse?
+
+    attr_accessor redirect: bool?
+
+    attr_accessor last_uri: (URI::Generic | untyped)
+
+    attr_reader path: (URI::Generic | untyped)
+
+    def initialize: (singleton(Net::HTTPRequest) http_method, (URI::Generic | untyped) path, ?Hash[untyped, untyped] o) -> void
+
+    def path=: ( (URI::Generic | untyped) uri) -> void
+
+    def request_uri: ( (URI::Generic | untyped) uri) -> String
+
+    def uri: () -> (URI::Generic | untyped)
+
+    def base_uri: () -> String?
+
+    def format: () -> (Symbol | String)?
+
+    def parser: () -> untyped
+
+    def connection_adapter: () -> untyped
+
+    def perform: () { (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response
+               | () -> HTTParty::Response
+
+    def handle_unauthorized: () ?{ (HTTParty::ResponseFragment) -> untyped } -> HTTParty::Response?
+
+    # The body of the prepared Net::HTTP request; nil without a body.
+    def raw_body: () -> String?
+
+    def _dump: (Integer _level) -> String
+
+    class Body
+      def initialize: (Hash[untyped, untyped] | _ToHash[untyped, untyped] | String params, ?query_string_normalizer: untyped, ?force_multipart: boolish) -> void
+
+      def call: () -> String
+
+      def boundary: () -> String
+
+      def multipart?: () -> boolish
+
+      def streaming?: () -> bool
+
+      def to_stream: () -> HTTParty::Request::StreamingMultipartBody?
+
+      # [key, value, file?] for each multipart part.
+      def prepared_parts: () -> Array[[String, untyped, bool]]
+
+      private
+
+      def generate_multipart: () -> String
+
+      def has_file?: (untyped value) -> bool
+
+      def file?: (untyped object) -> bool
+
+      def normalize_query: (untyped query) -> String
+
+      def content_body: (untyped object) -> String
+
+      def content_type: (untyped object) -> String
+
+      def file_name: (untyped object) -> String
+
+      attr_reader params: Hash[untyped, untyped] | _ToHash[untyped, untyped] | String
+
+      attr_reader query_string_normalizer: untyped
+
+      attr_reader force_multipart: boolish
+    end
+
+    class MultipartBoundary
+      def self.generate: () -> String
+    end
+
+    class StreamingMultipartBody
+      NEWLINE: String
+
+      CHUNK_SIZE: Integer
+
+      def initialize: (Array[[String, untyped, bool]] parts, String boundary) -> void
+
+      def size: () -> Integer
+
+      def read: (?Integer? length, ?String? outbuf) -> String?
+
+      def rewind: () -> void
+    end
+  end
+
+  class ConnectionAdapter
+    # Private: Regex used to strip brackets from IPv6 URIs.
+    StripIpv6BracketsRegex: Regexp
+
+    OPTION_DEFAULTS: Hash[Symbol, bool]
+
+    # Public
+    def self.call: ( URI::Generic | untyped uri, Hash[untyped, untyped] options) -> Net::HTTP
+
+    def self.default_cert_store: () -> OpenSSL::X509::Store
+
+    attr_reader uri: untyped
+
+    attr_reader options: Hash[untyped, untyped]
+
+    def initialize: (untyped uri, ?Hash[untyped, untyped] options) -> void
+
+    def connection: () -> Net::HTTP
+
+    private
+
+    def add_timeout?: (untyped timeout) -> bool?
+
+    def add_max_retries?: (untyped max_retries) -> bool?
+
+    def clean_host: (String host) -> String
+
+    def strip_ipv6_brackets: (String host) -> String
+
+    def ssl_implied?: (untyped uri) -> bool
+
+    def verify_ssl_certificate?: () -> bool
+
+    def attach_ssl_certificates: (Net::HTTP http, Hash[untyped, untyped] options) -> void
+  end
+
+  # @abstract Read the Custom Parsers section for more information.
+  class Parser
+    SupportedFormats: Hash[String, Symbol]
+
+    # The response body of the request; nil for responses without a body
+    attr_reader body: String?
+
+    # The intended parsing format for the request
+    # @return [Symbol] e.g. :json
+    attr_reader format: (Symbol | String)?
+
+    # Instantiate the parser and call {#parse}.
+    # @param [String] body the response body
+    # @param [Symbol] format the response format
+    # @return parsed response
+    def self.call: (String? body, (Symbol | String)? format) -> untyped
+
+    # @return [Hash] the SupportedFormats hash
+    def self.formats: () -> Hash[String, Symbol]
+
+    # @param [String] mimetype response MIME type
+    # @return [Symbol]
+    # @return [nil] mime type not supported
+    def self.format_from_mimetype: (String mimetype) -> Symbol?
+
+    # @return [Array<Symbol>] list of supported formats
+    def self.supported_formats: () -> Array[Symbol]
+
+    # @param [Symbol] format e.g. :json, :xml
+    # @return [Boolean]
+    def self.supports_format?: ((Symbol | String)? format) -> bool
+
+    def initialize: (String? body, (Symbol | String)? format) -> void
+
+    # @return [Object] the parsed body
+    # @return [nil] when the response body is nil, an empty string, spaces only or "null"
+    def parse: () -> untyped
+
+    UTF8_BOM: String
+
+    UTF8_BOM_ENCODINGS: Array[Encoding]
+
+    private
+
+    def xml: () -> untyped
+
+    def json: () -> untyped
+
+    def csv: () -> Array[Array[String?]]?
+
+    def html: () -> String
+
+    def plain: () -> String
+
+    def supports_format?: () -> bool
+
+    def parse_supported_format: () -> untyped
+  end
+
+  module HashConversions
+    # @return <String> This hash as a query string
+    #
+    # @example
+    #   { name: "Bob",
+    #     address: {
+    #       street: '111 Ruby Ave.',
+    #       city: 'Ruby Central',
+    #       phones: ['111-111-1111', '222-222-2222']
+    #     }
+    #   }.to_params
+    #     #=> "name=Bob&address[city]=Ruby Central&address[phones][]=111-111-1111&address[phones][]=222-222-2222&address[street]=111 Ruby Ave."
+    def self.to_params: (Hash[untyped, untyped] | _ToHash[untyped, untyped] hash) -> String
+
+    # @param key<Object> The key for the param.
+    # @param value<Object> The value for the param.
+    #
+    # @return <String> This key value pair as a param
+    #
+    # @example normalize_param(:name, "Bob Jones") #=> "name=Bob%20Jones&"
+    def self.normalize_param: (Object key, Object value) -> String
+
+    def self.normalize_keys: (Object key, Object value) -> Array[Array[untyped]]
+  end
+end
+
+module Net
+  module HTTPHeader
+    # Added by httparty: adds a digest Authorization header answering the
+    # challenge in response.
+    def digest_auth: (String username, String password, Net::HTTPHeader | Hash[String, untyped] response) -> void
+
+    class DigestAuthenticator
+      def initialize: (String username, String password, String method, String path, Net::HTTPHeader | Hash[String, untyped] response_header) -> void
+
+      def authorization_header: () -> Array[String]
+
+      def cookie_header: () -> Array[String]
+    end
+  end
+end
