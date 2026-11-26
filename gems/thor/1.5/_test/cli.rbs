@@ -1,0 +1,16 @@
+class CLI < Thor
+  def example: (*String args) -> void
+  def multi: (?String? arg) -> void
+  def helper: () -> void
+end
+
+class Sub < Thor
+  def list: () -> void
+end
+
+class Generator < Thor::Group
+  include Thor::Actions
+  extend Thor::Actions::ClassMethods
+
+  def create_files: () -> void
+end
