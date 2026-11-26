@@ -1,0 +1,749 @@
+module MIME
+  # MIME::Types is a registry of MIME types. It is both a class (created with
+  # MIME::Types.new) and a default registry (loaded automatically or through
+  # interactions with MIME::Types.[] and MIME::Types.type_for).
+  #
+  # == The Default mime-types Registry
+  #
+  # The default mime-types registry is loaded automatically when the library
+  # is required (<tt>require 'mime/types'</tt>), but it may be lazily loaded
+  # (loaded on first use) with the use of the environment variable
+  # +RUBY_MIME_TYPES_LAZY_LOAD+ having any value other than +false+. The
+  # initial startup is about 14× faster (~10 ms vs ~140 ms), but the
+  # registry will be loaded at some point in the future.
+  #
+  # The default mime-types registry can also be loaded from a Marshal cache
+  # file specific to the version of MIME::Types being loaded. This will be
+  # handled automatically with the use of a file referred to in the
+  # environment variable +RUBY_MIME_TYPES_CACHE+. MIME::Types will attempt to
+  # load the registry from this cache file (MIME::Type::Cache.load); if it
+  # cannot be loaded (because the file does not exist, there is an error, or
+  # the data is for a different version of mime-types), the default registry
+  # will be loaded from the normal JSON version and then the cache file will
+  # be *written* to the location indicated by +RUBY_MIME_TYPES_CACHE+. Cache
+  # file loads just over 4½× faster (~30 ms vs ~140 ms).
+  # loads.
+  #
+  # Notes:
+  # * The loading of the default registry is *not* atomic; when using a
+  #   multi-threaded environment, it is recommended that lazy loading is not
+  #   used and mime-types is loaded as early as possible.
+  # * Cache files should be specified per application in a multiprocess
+  #   environment and should be initialized during deployment or before
+  #   forking to minimize the chance that the multiple processes will be
+  #   trying to write to the same cache file at the same time, or that two
+  #   applications that are on different versions of mime-types would be
+  #   thrashing the cache.
+  # * Unless cache files are preinitialized, the application using the
+  #   mime-types cache file must have read/write permission to the cache file.
+  #
+  # == Usage
+  #  require 'mime/types'
+  #
+  #  plaintext = MIME::Types['text/plain']
+  #  print plaintext.media_type           # => 'text'
+  #  print plaintext.sub_type             # => 'plain'
+  #
+  #  puts plaintext.extensions.join(" ")  # => 'asc txt c cc h hh cpp'
+  #
+  #  puts plaintext.encoding              # => 8bit
+  #  puts plaintext.binary?               # => false
+  #  puts plaintext.ascii?                # => true
+  #  puts plaintext.obsolete?             # => false
+  #  puts plaintext.registered?           # => true
+  #  puts plaintext.provisional?          # => false
+  #  puts plaintext == 'text/plain'       # => true
+  #  puts MIME::Type.simplified('x-appl/x-zip') # => 'appl/zip'
+  #
+  class Types
+    # The release version of Ruby MIME::Types
+    VERSION: String
+
+    include Enumerable[MIME::Type]
+
+    extend Enumerable[MIME::Type]
+
+    # What MIME::Types.logger= accepts: the gem only calls #debug and #error
+    # with a message String.
+    interface _Logger
+      def debug: (String message) -> untyped
+
+      def error: (String message) -> untyped
+    end
+
+    # Creates a new MIME::Types registry.
+    def initialize: () -> void
+
+    # Returns the number of known type variants.
+    def count: () -> Integer
+
+    def inspect: () -> String
+
+    # Iterates through the type variants.
+    def each: () { (MIME::Type) -> void } -> void
+            | () -> Enumerator[MIME::Type, untyped]
+
+    # Returns a list of MIME::Type objects, which may be empty. The optional
+    # flag parameters are <tt>:complete</tt> (finds only complete MIME::Type
+    # objects) and <tt>:registered</tt> (finds only MIME::Types that are
+    # registered). It is possible for multiple matches to be returned for
+    # either type (in the example below, 'text/plain' returns two values --
+    # one for the general case, and one for VMS systems).
+    #
+    #   puts "\nMIME::Types['text/plain']"
+    #   MIME::Types['text/plain'].each { |t| puts t.to_a.join(", ") }
+    #
+    #   puts "\nMIME::Types[/^image/, complete: true]"
+    #   MIME::Types[/^image/, :complete => true].each do |t|
+    #     puts t.to_a.join(", ")
+    #   end
+    #
+    # If multiple type definitions are returned, returns them sorted as
+    # follows:
+    #   1. Complete definitions sort before incomplete ones;
+    #   2. IANA-registered definitions sort before LTSW-recorded
+    #      definitions.
+    #   3. Current definitions sort before obsolete ones;
+    #   4. Obsolete definitions with use-instead clauses sort before those
+    #      without;
+    #   5. Obsolete definitions use-instead clauses are compared.
+    #   6. Sort on name.
+    def []: (String | Symbol | Regexp | MIME::Type | _ToStr type_id, ?complete: boolish, ?registered: boolish) -> Array[MIME::Type]
+
+    # Return the list of MIME::Types which belongs to the file based on its
+    # filename extension. If there is no extension, the filename will be used
+    # as the matching criteria on its own.
+    #
+    # This will always return a merged, flatten, priority sorted, unique array.
+    #
+    #   puts MIME::Types.type_for('citydesk.xml')
+    #     => [application/xml, text/xml]
+    #   puts MIME::Types.type_for('citydesk.gif')
+    #     => [image/gif]
+    #   puts MIME::Types.type_for(%w(citydesk.xml citydesk.gif))
+    #     => [application/xml, image/gif, text/xml]
+    def type_for: (String | Array[String] filename) -> Array[MIME::Type]
+
+    alias of type_for
+
+    # Add one or more MIME::Type objects to the set of known types. If the
+    # type is already known, a warning will be displayed.
+    #
+    # The last parameter may be the value <tt>:silent</tt> or +true+ which
+    # will suppress duplicate MIME type warnings.
+    #
+    # Returns the arguments as an Array.
+    def add: (*MIME::Type | MIME::Types | Array[MIME::Type] | Symbol | bool | nil types) -> Array[untyped]
+
+    # Add a single MIME::Type object to the set of known types. If the +type+ is
+    # already known, a warning will be displayed. The +quiet+ parameter may be a
+    # truthy value to suppress that warning.
+    #
+    # Returns the extensions of +type+.
+    def add_type: (MIME::Type type, ?boolish quiet) -> Array[String]
+
+    # MIME::Types#[] against the default MIME::Types registry.
+    def self.[]: (String | Symbol | Regexp | MIME::Type | _ToStr type_id, ?complete: boolish, ?registered: boolish) -> Array[MIME::Type]
+
+    # MIME::Types#count against the default MIME::Types registry.
+    def self.count: () -> Integer
+
+    # MIME::Types#each against the default MIME::Types registry.
+    def self.each: () { (MIME::Type) -> void } -> void
+                 | () -> Enumerator[MIME::Type, untyped]
+
+    # MIME::Types#type_for against the default MIME::Types registry.
+    def self.type_for: (String | Array[String] filename) -> Array[MIME::Type]
+
+    alias self.of self.type_for
+
+    # MIME::Types#add against the default MIME::Types registry.
+    def self.add: (*MIME::Type | MIME::Types | Array[MIME::Type] | Symbol | bool | nil types) -> Array[untyped]
+
+    # Configure the MIME::Types logger. This defaults to an instance of a
+    # logger that passes messages (unformatted) through to Kernel#warn.
+    def self.logger: () -> _Logger
+
+    # Setting +nil+ installs a MIME::Types::NullLogger.
+    def self.logger=: (_Logger? logger) -> _Logger
+
+    private
+
+    def add_type_variant!: (MIME::Type mime_type) -> Set[MIME::Type]
+
+    def reindex_extensions!: (MIME::Type mime_type) -> Array[String]?
+
+    def index_extensions!: (MIME::Type mime_type) -> Array[String]
+
+    def prune_matches: (Set[MIME::Type] matches, boolish complete, boolish registered) -> Set[MIME::Type]
+
+    def match: (Regexp pattern) -> Set[MIME::Type]
+
+    private def self.lazy_load?: () -> bool?
+
+    private def self.__types__: () -> MIME::Types
+
+    private def self.load_mode: () -> { columnar: bool }
+
+    private def self.load_default_mime_types: (?Hash[Symbol, bool] mode) -> MIME::Types
+
+    private def self.__instances__: () -> Set[MIME::Types]
+
+    private def self.reindex_extensions: (MIME::Type type) -> true
+
+    # Caching of MIME::Types registries is advisable if you will be loading
+    # the default registry relatively frequently. With the class methods on
+    # MIME::Types::Cache, any MIME::Types registry can be marshaled quickly
+    # and easily.
+    #
+    # The cache is invalidated on a per-data-version basis; a cache file for
+    # version 3.2015.1118 will not be reused with version 3.2015.1201.
+    class Cache < Struct[untyped]
+      # The mime-types-data version the cache was written with.
+      attr_accessor version: String
+
+      # The registry, dumped with Marshal.
+      attr_accessor data: String
+
+      # Attempts to load the cache from the file provided as a parameter or in
+      # the environment variable +RUBY_MIME_TYPES_CACHE+. Returns +nil+ if the
+      # file does not exist, if the file cannot be loaded, or if the data in
+      # the cache version is different than this version.
+      def self.load: (?String? cache_file) -> MIME::Types?
+
+      # Attempts to save the types provided to the cache file provided.
+      #
+      # If +types+ is not provided or is +nil+, the cache will contain the
+      # current MIME::Types default registry.
+      #
+      # If +cache_file+ is not provided or is +nil+, the cache will be written
+      # to the file specified in the environment variable
+      # +RUBY_MIME_TYPES_CACHE+. If there is no cache file specified either
+      # directly or through the environment, this method will return +nil+;
+      # otherwise it returns the number of bytes written.
+      def self.save: (?MIME::Types? types, ?String? cache_file) -> Integer?
+    end
+
+    # MIME::Types requires a serializable keyed container that returns an empty Set
+    # on a key miss. Hash#default_value cannot be used because, while it traverses
+    # the Marshal format correctly, it won't survive any other serialization
+    # format (plus, a default of a mutable object resuls in a shared mess).
+    # Hash#default_proc cannot be used without a wrapper because it prevents
+    # Marshal serialization (and doesn't survive the round-trip).
+    class Container
+      def initialize: (?Hash[untyped, untyped] | MIME::Types::Container hash) -> void
+
+      def []: (untyped key) -> Set[untyped]
+
+      def []=: (untyped key, untyped value) -> Set[untyped]
+
+      def merge: (Hash[untyped, untyped] | MIME::Types::Container other) -> MIME::Types::Container
+
+      def merge!: (Hash[untyped, untyped] | MIME::Types::Container other) -> self
+
+      def to_hash: () -> Hash[untyped, Set[untyped]]
+
+      def ==: (untyped other) -> bool
+
+      # Without arguments the block is ignored; with an argument and a block
+      # the argument is ignored.
+      def count: (*untyped args) ?{ ([ untyped, Set[untyped] ]) -> boolish } -> Integer
+
+      def each_pair: () { ([ untyped, Set[untyped] ]) -> void } -> Hash[untyped, Set[untyped]]
+                   | () -> Enumerator[[ untyped, Set[untyped] ], Hash[untyped, Set[untyped]]]
+
+      alias each each_pair
+
+      def each_value: () { (Set[untyped]) -> void } -> Hash[untyped, Set[untyped]]
+                    | () -> Enumerator[Set[untyped], Hash[untyped, Set[untyped]]]
+
+      def empty?: () -> bool
+
+      def flat_map: [U] () { ([ untyped, Set[untyped] ]) -> (Array[U] | U) } -> Array[U]
+                  | () -> Enumerator[[ untyped, Set[untyped] ], Array[untyped]]
+
+      def keys: () -> Array[untyped]
+
+      def values: () -> Array[Set[untyped]]
+
+      def select: () { (untyped, Set[untyped]) -> boolish } -> Hash[untyped, Set[untyped]]
+                | () -> Enumerator[[ untyped, Set[untyped] ], Hash[untyped, Set[untyped]]]
+
+      def add: (untyped key, untyped value) -> Set[untyped]
+
+      def marshal_dump: () -> Hash[untyped, Set[untyped]]
+
+      def marshal_load: (Hash[untyped, Set[untyped]] hash) -> Hash[untyped, Set[untyped]]
+
+      def encode_with: (untyped coder) -> Hash[untyped, Set[untyped]]
+
+      def init_with: (untyped coder) -> void
+
+      private
+
+      # protected in the gem
+      attr_accessor container: Hash[untyped, Set[untyped]]
+
+      # protected in the gem
+      def normalize: () -> Hash[untyped, Set[untyped]]
+    end
+
+    # This class is responsible for initializing the MIME::Types registry from
+    # the data files supplied with the mime-types library.
+    #
+    # The Loader will use one of the following paths:
+    # 1.  The +path+ provided in its constructor argument;
+    # 2.  The value of ENV["RUBY_MIME_TYPES_DATA"]; or
+    # 3.  The value of MIME::Types::Data::PATH.
+    #
+    # When #load is called, the +path+ will be searched recursively for all YAML
+    # (.yml or .yaml) files. By convention, there is one file for each media
+    # type (application.yml, audio.yml, etc.), but this is not required.
+    class Loader
+      # The path that will be read for the MIME::Types files.
+      attr_reader path: String
+
+      # The MIME::Types container instance that will be loaded. If not provided
+      # at initialization, a new MIME::Types instance will be constructed.
+      attr_reader container: MIME::Types
+
+      # Creates a Loader object that can be used to load MIME::Types registries
+      # into memory, using YAML, JSON, or Columnar registry format loaders.
+      def initialize: (?(String | _ToPath)? path, ?MIME::Types? container) -> void
+
+      # Loads a MIME::Types registry from YAML files (<tt>*.yml</tt> or
+      # <tt>*.yaml</tt>) recursively found in +path+.
+      def load_yaml: () -> MIME::Types
+
+      # Loads a MIME::Types registry from JSON files (<tt>*.json</tt>)
+      # recursively found in +path+.
+      def load_json: () -> MIME::Types
+
+      # Loads a MIME::Types registry from columnar files recursively found in
+      # +path+.
+      def load_columnar: () -> MIME::Types
+
+      # Loads a MIME::Types registry. Loads from JSON files by default
+      # (#load_json).
+      #
+      # This will load from columnar files (#load_columnar) if <tt>columnar:
+      # true</tt> is provided in +options+ and there are columnar files in +path+.
+      def load: (?Hash[Symbol, untyped] options) -> MIME::Types
+
+      # Loads the default MIME::Type registry.
+      def self.load: (?Hash[Symbol, untyped] options) -> MIME::Types
+
+      # Loads MIME::Types from a single YAML file.
+      def self.load_from_yaml: (String | _ToPath filename) -> Array[MIME::Type]
+
+      # Loads MIME::Types from a single JSON file.
+      def self.load_from_json: (String | _ToPath filename) -> Array[MIME::Type]
+    end
+
+    # A logger that discards every message. MIME::Types.logger = nil installs
+    # one.
+    class NullLogger < ::Logger
+      def initialize: (*untyped) -> void
+
+      def reopen: (untyped logdev) -> self
+
+      def <<: (untyped msg) -> nil
+
+      def close: () -> nil
+
+      def add: (untyped severity, ?untyped message, ?untyped progname) ?{ () -> untyped } -> nil
+    end
+  end
+
+  # The definition of one MIME content-type.
+  #
+  # == Usage
+  #  require 'mime/types'
+  #
+  #  plaintext = MIME::Types['text/plain'] # => [ text/plain ]
+  #  text = plaintext.first
+  #  puts text.media_type            # => 'text'
+  #  puts text.sub_type              # => 'plain'
+  #
+  #  puts text.extensions.join(' ')  # => 'txt asc c cc h hh cpp hpp dat hlp'
+  #  puts text.preferred_extension   # => 'txt'
+  #  puts text.friendly              # => 'Text Document'
+  #  puts text.i18n_key              # => 'text.plain'
+  #
+  #  puts text.encoding              # => quoted-printable
+  #  puts text.default_encoding      # => quoted-printable
+  #  puts text.binary?               # => false
+  #  puts text.ascii?                # => true
+  #  puts text.obsolete?             # => false
+  #  puts text.registered?           # => true
+  #  puts text.provisional?          # => false
+  #  puts text.complete?             # => true
+  #
+  #  puts text                       # => 'text/plain'
+  #
+  #  puts text == 'text/plain'       # => true
+  #  puts 'text/plain' == text       # => true
+  #  puts text == 'text/x-plain'     # => false
+  #  puts 'text/x-plain' == text     # => false
+  #
+  #  puts MIME::Type.simplified('x-appl/x-zip') # => 'x-appl/x-zip'
+  #  puts MIME::Type.i18n_key('x-appl/x-zip') # => 'x-appl.x-zip'
+  #
+  #  puts text.like?('text/x-plain') # => true
+  #  puts text.like?(MIME::Type.new('x-text/x-plain')) # => true
+  #
+  #  puts text.xrefs.inspect # => { "rfc" => [ "rfc2046", "rfc3676", "rfc5147" ] }
+  #  puts text.xref_urls # => [ "http://www.iana.org/go/rfc2046",
+  #                      #      "http://www.iana.org/go/rfc3676",
+  #                      #      "http://www.iana.org/go/rfc5147" ]
+  #
+  #  xtext = MIME::Type.new('x-text/x-plain')
+  #  puts xtext.media_type # => 'text'
+  #  puts xtext.raw_media_type # => 'x-text'
+  #  puts xtext.sub_type # => 'plain'
+  #  puts xtext.raw_sub_type # => 'x-plain'
+  #  puts xtext.complete? # => false
+  #
+  #  puts MIME::Types.any? { |type| type.content_type == 'text/plain' } # => true
+  #  puts MIME::Types.all?(&:registered?) # => false
+  #
+  #  # Various string representations of MIME types
+  #  qcelp = MIME::Types['audio/QCELP'].first # => audio/QCELP
+  #  puts qcelp.content_type         # => 'audio/QCELP'
+  #  puts qcelp.simplified           # => 'audio/qcelp'
+  #
+  #  xwingz = MIME::Types['application/x-Wingz'].first # => application/x-Wingz
+  #  puts xwingz.content_type        # => 'application/x-Wingz'
+  #  puts xwingz.simplified          # => 'application/x-wingz'
+  class Type
+    # Reflects a MIME content-type specification that is not correctly
+    # formatted (it isn't +type+/+subtype+).
+    class InvalidContentType < ArgumentError
+      # :stopdoc:
+      def initialize: (untyped type_string) -> void
+
+      def to_s: () -> String
+    end
+
+    # Reflects an unsupported MIME encoding.
+    class InvalidEncoding < ArgumentError
+      # :stopdoc:
+      def initialize: (untyped encoding) -> void
+
+      def to_s: () -> String
+    end
+
+    # What #encode_with writes to: a Hash or a Psych::Coder.
+    interface _CoderWriter
+      def []=: (String key, untyped value) -> untyped
+    end
+
+    # What #init_with reads from: a Hash or a Psych::Coder.
+    interface _CoderReader
+      def []: (String key) -> untyped
+    end
+
+    # The released version of the mime-types library.
+    VERSION: String
+
+    include Comparable
+
+    # Builds a MIME::Type object from the +content_type+, a MIME Content Type
+    # value (e.g., 'text/plain' or 'application/x-eruby'). The constructed object
+    # is yielded to an optional block for additional configuration, such as
+    # associating extensions and encoding information.
+    #
+    # * When provided a Hash or a MIME::Type, the MIME::Type will be
+    #   constructed with #init_with.
+    # * When provided an Array, the MIME::Type will be constructed using
+    #   the first element as the content type and the remaining flattened
+    #   elements as extensions (deprecated).
+    # * Otherwise, the content_type will be used as a string (deprecated).
+    #
+    # Yields the newly constructed +self+ object.
+    def initialize: (Hash[String, untyped] | MIME::Type | String | Array[String | Array[String]] content_type) ?{ (self) -> void } -> void
+
+    # Indicates that a MIME type is like another type. This differs from
+    # <tt>==</tt> because <tt>x-</tt> prefixes are removed for this comparison.
+    def like?: (untyped other) -> bool
+
+    # Compares the +other+ MIME::Type against the exact content type or the
+    # simplified type (the simplified type will be used if comparing against
+    # something that can be treated as a String with #to_s). In comparisons, this
+    # is done against the lowercase version of the MIME::Type.
+    def <=>: (untyped other) -> Integer?
+
+    # Compares the +other+ MIME::Type based on how reliable it is before doing a
+    # normal <=> comparison. Used by MIME::Types#[] to sort types. The
+    # comparisons involved are:
+    #
+    # 1. self.simplified <=> other.simplified (ensures that we
+    #    don't try to compare different types)
+    # 2. IANA-registered definitions < other definitions.
+    # 3. Complete definitions < incomplete definitions.
+    # 4. Current definitions < obsolete definitions.
+    # 5. Obselete with use-instead names < obsolete without.
+    # 6. Obsolete use-instead definitions are compared.
+    #
+    # While this method is public, its use is strongly discouraged by consumers
+    # of mime-types. In mime-types 3, this method is likely to see substantial
+    # revision and simplification to ensure current registered content types sort
+    # before unregistered or obsolete content types.
+    #
+    # Returns +nil+ when the sort priority of either type is not known, which
+    # happens after the extensions of a type from the columnar registry were
+    # changed.
+    def priority_compare: (MIME::Type other) -> Integer?
+
+    # Returns +true+ if the +other+ object is a MIME::Type and the content types
+    # match.
+    def eql?: (untyped other) -> bool
+
+    # Returns a hash based on the #simplified value.
+    #
+    # This maintains the invariant that two #eql? instances must have the same
+    # #hash (although having the same #hash does *not* imply that the objects are
+    # #eql?).
+    def hash: () -> Integer
+
+    # Returns the whole MIME content-type string.
+    #
+    # The content type is a presentation value from the MIME type registry and
+    # should not be used for comparison. The case of the content type is
+    # preserved, and extension markers (<tt>x-</tt>) are kept.
+    #
+    #   text/plain        => text/plain
+    #   x-chemical/x-pdb  => x-chemical/x-pdb
+    #   audio/QCELP       => audio/QCELP
+    attr_reader content_type: String
+
+    # A simplified form of the MIME content-type string, suitable for
+    # case-insensitive comparison, with the content_type converted to lowercase.
+    #
+    #   text/plain        => text/plain
+    #   x-chemical/x-pdb  => x-chemical/x-pdb
+    #   audio/QCELP       => audio/qcelp
+    #
+    # (Only MIME::Type#initialize itself sees +nil+ here, before the content
+    # type is set; the same holds for #encoding and #xrefs.)
+    attr_reader simplified: String
+
+    # Returns the media type of the simplified MIME::Type.
+    #
+    #   text/plain        => text
+    #   x-chemical/x-pdb  => x-chemical
+    #   audio/QCELP       => audio
+    attr_reader media_type: String
+
+    # Returns the media type of the unmodified MIME::Type.
+    #
+    #   text/plain        => text
+    #   x-chemical/x-pdb  => x-chemical
+    #   audio/QCELP       => audio
+    attr_reader raw_media_type: String
+
+    # Returns the sub-type of the simplified MIME::Type.
+    #
+    #   text/plain        => plain
+    #   x-chemical/x-pdb  => pdb
+    #   audio/QCELP       => QCELP
+    attr_reader sub_type: String
+
+    # Returns the media type of the unmodified MIME::Type.
+    #
+    #   text/plain        => plain
+    #   x-chemical/x-pdb  => x-pdb
+    #   audio/QCELP       => qcelp
+    attr_reader raw_sub_type: String
+
+    #
+    # The list of extensions which are known to be used for this MIME::Type.
+    # Non-array values will be coerced into an array with #to_a. Array values
+    # will be flattened, +nil+ values removed, and made unique.
+    #
+    # :attr_accessor: extensions
+    def extensions: () -> Array[String]
+
+    #
+    def extensions=: (String | Array[String | Array[String] | nil] | nil value) -> bool
+
+    # Merge the +extensions+ provided into this MIME::Type. The extensions added
+    # will be merged uniquely.
+    #
+    # Returns the extensions with the arguments appended, before flattening;
+    # +nil+ arguments are ignored.
+    def add_extensions: (*String | Array[String] | nil extensions) -> Array[String | Array[String] | nil]
+
+    # The preferred extension, or the first extension; +nil+ when the type has
+    # no extensions.
+    def preferred_extension: () -> String?
+
+    #
+    def preferred_extension=: (String? value) -> String?
+
+    #
+    attr_reader encoding: String
+
+    # Raises MIME::Type::InvalidEncoding for anything but base64, 8bit, 7bit,
+    # quoted-printable, :default or nil.
+    def encoding=: (String | :default | nil enc) -> String
+
+    # Returns the default encoding for the MIME::Type based on the media type.
+    def default_encoding: () -> ("quoted-printable" | "base64")
+
+    # The type to use instead; +nil+ unless the type is obsolete.
+    def use_instead: () -> String?
+
+    #
+    attr_writer use_instead: String?
+
+    # Returns +true+ if the media type is obsolete.
+    attr_reader obsolete: bool
+    # Stores `!!value`.
+    def obsolete=: (boolish value) -> boolish
+
+    alias obsolete? obsolete
+
+    # The documentation for this MIME::Type.
+    attr_accessor docs: String?
+
+    # A friendly short description for this MIME::Type.
+    #
+    # call-seq:
+    #   text_plain.friendly         # => "Text File"
+    #   text_plain.friendly('en')   # => "Text File"
+    #
+    # Given an Array of language/description pairs or a Hash, merges them
+    # into the translations and returns all translations.
+    def friendly: (?String | Symbol lang) -> String?
+                | (Array[String] | Hash[String, String] lang) -> Hash[String, String]
+
+    # A key suitable for use as a lookup key for translations, such as with
+    # the I18n library.
+    #
+    # call-seq:
+    #    text_plain.i18n_key # => "text.plain"
+    #    3gpp_xml.i18n_key   # => "application.vnd-3gpp-bsf-xml"
+    #      # from application/vnd.3gpp.bsf+xml
+    #    x_msword.i18n_key   # => "application.word"
+    #      # from application/x-msword
+    attr_reader i18n_key: String
+
+    # The cross-references. Types loaded from the default (columnar) registry
+    # hold a plain Hash until #xrefs= is called; #xrefs= always stores a
+    # MIME::Types::Container.
+    attr_reader xrefs: MIME::Types::Container | Hash[String, Array[String]]
+
+    #
+    def xrefs=: (Hash[untyped, untyped] | MIME::Types::Container xrefs) -> MIME::Types::Container
+
+    # The decoded cross-reference URL list for this MIME::Type.
+    def xref_urls: () -> Array[String]
+
+    # Indicates whether the MIME type has been registered with IANA.
+    attr_reader registered: bool
+    # Stores `!!value`.
+    def registered=: (boolish value) -> boolish
+
+    alias registered? registered
+
+    # Indicates whether the MIME type's registration with IANA is provisional.
+    attr_reader provisional: bool
+    # Stores `!!value`.
+    def provisional=: (boolish value) -> boolish
+
+    # Indicates whether the MIME type's registration with IANA is provisional.
+    def provisional?: () -> bool
+
+    # MIME types can be specified to be sent across a network in particular
+    # formats. This method returns +true+ when the MIME::Type encoding is set
+    # to <tt>base64</tt>.
+    def binary?: () -> bool
+
+    # MIME types can be specified to be sent across a network in particular
+    # formats. This method returns +false+ when the MIME::Type encoding is
+    # set to <tt>base64</tt>.
+    def ascii?: () -> bool
+
+    # Indicateswhether the MIME type is declared as a signature type.
+    attr_accessor signature: bool?
+
+    alias signature? signature
+
+    # Returns +true+ if the MIME::Type specifies an extension list,
+    # indicating that it is a complete MIME::Type.
+    def complete?: () -> bool
+
+    # Returns the MIME::Type as a string.
+    def to_s: () -> String
+
+    # Returns the MIME::Type as a string for implicit conversions. This allows
+    # MIME::Type objects to appear on either side of a comparison.
+    #
+    #   'text/plain' == MIME::Type.new('text/plain')
+    def to_str: () -> String
+
+    # Converts the MIME::Type to a JSON string.
+    def to_json: (*untyped args) -> String
+
+    # Converts the MIME::Type to a hash. The output of this method can also be
+    # used to initialize a MIME::Type.
+    def to_h: () -> Hash[String, untyped]
+
+    # Populates the +coder+ with attributes about this record for
+    # serialization. The structure of +coder+ should match the structure used
+    # with #init_with.
+    #
+    # This method should be considered a private implementation detail.
+    def encode_with: [C < _CoderWriter] (C coder) -> C
+
+    # Initialize an empty object from +coder+, which must contain the
+    # attributes necessary for initializing an empty object.
+    #
+    # This method should be considered a private implementation detail.
+    def init_with: (_CoderReader coder) -> void
+
+    def inspect: () -> String
+
+    # MIME media types are case-insensitive, but are typically presented in a
+    # case-preserving format in the type registry. This method converts
+    # +content_type+ to lowercase.
+    #
+    # In previous versions of mime-types, this would also remove any extension
+    # prefix (<tt>x-</tt>). This is no longer default behaviour, but may be
+    # provided by providing a truth value to +remove_x_prefix+.
+    #
+    # Returns +nil+ when +content_type+ is not a valid content type.
+    def self.simplified: (String | Symbol | MatchData | _ToStr content_type, ?remove_x_prefix: boolish) -> String?
+
+    # Converts a provided +content_type+ into a translation key suitable for
+    # use with the I18n library.
+    #
+    # Returns +nil+ when +content_type+ is not a valid content type.
+    def self.i18n_key: (String | Symbol | MatchData | _ToStr content_type) -> String?
+
+    # Return a +MatchData+ object of the +content_type+ against pattern of
+    # media types.
+    def self.match: (String | Symbol | MatchData | _ToStr content_type) -> MatchData?
+
+    private
+
+    private def self.simplify_matchdata: (MatchData? matchdata, ?boolish remove_x, ?joiner: String) ?{ (String) -> void } -> String?
+
+    def content_type=: (String type_string) -> String
+
+    def intern_string: (String string) -> String
+
+    def xref_map: (Set[String] | Array[String] values, Symbol helper) -> Array[String]
+
+    def xref_url_for_rfc: (String value) -> String
+
+    def xref_url_for_draft: (String value) -> String
+
+    def xref_url_for_rfc_errata: (String value) -> String
+
+    def xref_url_for_person: (String value) -> String
+
+    def xref_url_for_template: (String value) -> String
+  end
+end
