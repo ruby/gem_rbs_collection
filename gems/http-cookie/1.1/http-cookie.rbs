@@ -141,6 +141,22 @@ module HTTP
   class CookieJar
     include Enumerable[HTTP::Cookie]
 
+    # What a saver writes to: an IO, StringIO, Tempfile or any object with
+    # these methods.
+    interface _Writer
+      def write: (String) -> untyped
+      def puts: (String) -> untyped
+      def print: (String) -> untyped
+    end
+
+    # What a saver reads from (YAMLSaver reads it whole, CookiestxtSaver by
+    # line).
+    interface _Reader
+      def read: () -> String?
+      def each_line: () { (String line) -> untyped } -> untyped
+      def rewind: () -> untyped
+    end
+
     attr_reader store: HTTP::CookieJar::AbstractStore
 
     # `:store` is a Symbol (`:hash`, `:mozilla`), a store class or a store
@@ -168,15 +184,15 @@ module HTTP
     # `format` is a Symbol (`:yaml`, `:cookiestxt`), a saver class or a saver
     # instance. Given alone without options, only a Symbol is honoured.
     # Other options go to the saver's initializer. An object that responds
-    # to #write is used as the IO, anything else is opened as a file name
-    # (so a Pathname is not accepted).
-    def save: (String | IO | StringIO writable, ?Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, ?format: Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver, ?session: boolish, **untyped options) -> self
-            | (String | IO | StringIO writable, Hash[Symbol, untyped] options) -> self
-            | (String | IO | StringIO writable, Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, Hash[Symbol, untyped] options) -> self
+    # to #write is used as the IO (for #load too), anything else is opened
+    # as a file name (so a Pathname is not accepted).
+    def save: (String | _Writer writable, ?Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, ?format: Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver, ?session: boolish, **untyped options) -> self
+            | (String | _Writer writable, Hash[Symbol, untyped] options) -> self
+            | (String | _Writer writable, Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, Hash[Symbol, untyped] options) -> self
 
-    def load: (String | IO | StringIO readable, ?Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, ?format: Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver, **untyped options) -> self
-            | (String | IO | StringIO readable, Hash[Symbol, untyped] options) -> self
-            | (String | IO | StringIO readable, Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, Hash[Symbol, untyped] options) -> self
+    def load: (String | (_Reader & _Writer) readable, ?Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, ?format: Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver, **untyped options) -> self
+            | (String | (_Reader & _Writer) readable, Hash[Symbol, untyped] options) -> self
+            | (String | (_Reader & _Writer) readable, Symbol | singleton(HTTP::CookieJar::AbstractSaver) | HTTP::CookieJar::AbstractSaver format, Hash[Symbol, untyped] options) -> self
 
     def clear: () -> self
 
@@ -232,16 +248,16 @@ module HTTP
       def initialize: (?session: boolish, ?logger: untyped, **untyped options) -> void
                     | (Hash[Symbol, untyped]? options) -> void
 
-      def save: (IO | StringIO io, HTTP::CookieJar jar) -> void
+      def save: (_Writer io, HTTP::CookieJar jar) -> void
 
-      def load: (IO | StringIO io, HTTP::CookieJar jar) -> void
+      def load: (_Reader io, HTTP::CookieJar jar) -> void
     end
 
     # YAMLSaver saves and loads cookies in the YAML format.
     class YAMLSaver < AbstractSaver
-      def save: (IO | StringIO io, HTTP::CookieJar jar) -> void
+      def save: (_Writer io, HTTP::CookieJar jar) -> void
 
-      def load: (IO | StringIO io, HTTP::CookieJar jar) -> void
+      def load: (_Reader io, HTTP::CookieJar jar) -> void
     end
 
     # CookiestxtSaver saves and loads cookies in the cookies.txt format.
@@ -249,9 +265,9 @@ module HTTP
       def initialize: (?header: String?, ?linefeed: String, ?session: boolish, ?logger: untyped, **untyped options) -> void
                     | (Hash[Symbol, untyped]? options) -> void
 
-      def save: (IO | StringIO io, HTTP::CookieJar jar) -> void
+      def save: (_Writer io, HTTP::CookieJar jar) -> void
 
-      def load: (IO | StringIO io, HTTP::CookieJar jar) -> void
+      def load: (_Reader io, HTTP::CookieJar jar) -> void
     end
   end
 end
