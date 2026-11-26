@@ -1,0 +1,119 @@
+# Represents a domain name ready for extracting its registered domain
+# and TLD.
+class DomainName
+  VERSION: String
+
+  ETLD_DATA_DATE: String
+
+  # Effective TLD data from the Public Suffix List. The values are 0
+  # (normal rule), 1 (exception rule) or -1 (wildcard rule).
+  ETLD_DATA: Hash[String, Integer]
+
+  # Returns ETLD_DATA.
+  def self.etld_data: () -> Hash[String, Integer]
+
+  # Normalizes a domain using the Punycode algorithm as necessary.
+  # The result is a downcased, ASCII-only string.
+  # Raises DomainName::Punycode::ArgumentError for a label that is too long.
+  def self.normalize: (String domain) -> String
+
+  # The full host name, normalized. For an IP address, its string
+  # representation.
+  attr_reader hostname: String
+
+  # The registered domain, e.g. "example.co.uk" for "www.sub.example.co.uk".
+  # nil for an IP address, an effective TLD or higher, or a
+  # non-canonical domain.
+  attr_reader domain: String?
+
+  # The TLD part. nil for an IP address.
+  attr_reader tld: String?
+
+  # The IPAddr if this is an IP address, otherwise nil.
+  attr_reader ipaddr: IPAddr?
+
+  # A host name, an IPv4 address, or an IPv6 address enclosed in square
+  # brackets.
+  attr_reader uri_host: String
+
+  # Raises TypeError unless hostname is a String or converts to one with
+  # #to_str, and ArgumentError if it starts with a dot or is an invalid
+  # IP address.
+  def initialize: (String | _ToStr hostname) -> void
+
+  def ipaddr?: () -> bool
+
+  # nil for an IP address.
+  def canonical_tld?: () -> bool?
+
+  # nil for an IP address.
+  def canonical?: () -> bool?
+
+  # A truthy host_only checks only hostname equality.
+  def cookie_domain?: (DomainName | String | _ToStr domain, ?boolish host_only) -> bool
+
+  # nil for an IP address or a single-label host name.
+  def superdomain: () -> DomainName?
+
+  # false for an object that does not convert to a String with #to_str.
+  def ==: (untyped other) -> bool
+
+  # 0 if equal, -1 if this is a subdomain of other, 1 if other is a
+  # subdomain of this, nil otherwise (including objects that do not
+  # convert to a String with #to_str).
+  def <=>: (untyped other) -> Integer?
+
+  def <: (untyped other) -> bool?
+
+  def >: (untyped other) -> bool?
+
+  def <=: (untyped other) -> bool?
+
+  def >=: (untyped other) -> bool?
+
+  def to_s: () -> String
+
+  alias to_str to_s
+
+  # The Unicode representation of #hostname.
+  def hostname_idn: () -> String
+
+  alias idn hostname_idn
+
+  # The Unicode representation of #domain.
+  def domain_idn: () -> String?
+
+  # The Unicode representation of #tld. nil for an IP address.
+  def tld_idn: () -> String?
+
+  def inspect: () -> String
+
+  # The Punycode algorithm (RFC 3492).
+  module Punycode
+    class ArgumentError < ::ArgumentError
+    end
+
+    class BufferOverflowError < ArgumentError
+    end
+
+    def self.encode: (String string) -> String
+
+    # Encodes each non-ASCII label with the "xn--" prefix.
+    # Raises DomainName::Punycode::ArgumentError for a label that is too long.
+    def self.encode_hostname: (String hostname) -> String
+
+    # Raises DomainName::Punycode::ArgumentError for invalid input.
+    def self.decode: (String string) -> String
+
+    # Decodes each "xn--" label.
+    # Raises DomainName::Punycode::ArgumentError for a label that is too long.
+    def self.decode_hostname: (String hostname) -> String
+  end
+end
+
+# Shorthand for DomainName.new, defined at the top level.
+class Object
+  private
+
+  def DomainName: (String | _ToStr hostname) -> DomainName
+end
