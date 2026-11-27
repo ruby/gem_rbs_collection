@@ -1,0 +1,371 @@
+module Diff
+end
+
+module Diff::LCS
+  VERSION: String
+
+  # A sequenced enumerable Diff::LCS can compare: elements are read with
+  # `seq[index]` and counted with `seq.size`.
+  type sequence = Array[untyped] | String
+
+  # A patchset as returned by Diff::LCS.diff or Diff::LCS.sdiff: an Array of
+  # Change or ContextChange objects, of hunks (Arrays) of them, or of their
+  # Array forms (Change#to_a, ContextChange#to_a).
+  type patchset = Array[untyped]
+
+  # The callback object Diff::LCS.traverse_sequences and
+  # Diff::LCS.traverse_balanced call for each event. `finished_a`,
+  # `finished_b` (traverse_sequences) and `change` (traverse_balanced) are
+  # called too when the object responds to them.
+  interface _TraversalCallbacks
+    def match: (Diff::LCS::ContextChange[untyped] event) -> untyped
+
+    def discard_a: (Diff::LCS::ContextChange[untyped] event) -> untyped
+
+    def discard_b: (Diff::LCS::ContextChange[untyped] event) -> untyped
+  end
+
+  # A callback object for Diff::LCS.diff and Diff::LCS.sdiff. `finish` is
+  # called too when the object responds to it.
+  interface _DiffCallbacks[D]
+    include _TraversalCallbacks
+
+    def diffs: () -> D
+  end
+
+  # A callback class: Diff::LCS.diff and Diff::LCS.sdiff call `new` on the
+  # callbacks argument and use the object itself when that fails.
+  interface _DiffCallbacksFactory[D]
+    def new: () -> _DiffCallbacks[D]
+  end
+
+  # The instance methods below are available on objects extended with
+  # Diff::LCS, and on String and Array after `require "diff/lcs/string"` and
+  # `require "diff/lcs/array"`.
+
+  def lcs: (sequence other) -> Array[untyped]
+         | [R] (sequence other) { (untyped element) -> R } -> Array[R]
+
+  def diff: (sequence other, ?nil callbacks) -> Array[Array[Diff::LCS::Change[untyped]]]
+          | [R] (sequence other, ?nil callbacks) { (Diff::LCS::Change[untyped] change) -> R } -> Array[Array[R]]
+          | [D] (sequence other, _DiffCallbacks[D] | _DiffCallbacksFactory[D] callbacks) -> D
+          | (sequence other, _DiffCallbacks[untyped] | _DiffCallbacksFactory[untyped] callbacks) { (untyped change) -> untyped } -> Array[untyped]
+
+  def sdiff: (sequence other, ?nil callbacks) -> Array[Diff::LCS::ContextChange[untyped]]
+           | [R] (sequence other, ?nil callbacks) { (Diff::LCS::ContextChange[untyped] change) -> R } -> Array[R]
+           | [D] (sequence other, _DiffCallbacks[D] | _DiffCallbacksFactory[D] callbacks) -> D
+           | (sequence other, _DiffCallbacks[untyped] | _DiffCallbacksFactory[untyped] callbacks) { (untyped change) -> untyped } -> Array[untyped]
+
+  def traverse_sequences: (sequence other, ?_TraversalCallbacks? callbacks) ?{ (Diff::LCS::ContextChange[untyped] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+
+  def traverse_balanced: (sequence other, ?_TraversalCallbacks? callbacks) ?{ (Diff::LCS::ContextChange[untyped] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+
+  def patch: (patchset patchset) -> self
+
+  alias unpatch patch
+
+  def patch!: (patchset patchset) -> self
+
+  def unpatch!: (patchset patchset) -> self
+
+  def patch_me: (patchset patchset) -> self
+
+  def unpatch_me: (patchset patchset) -> self
+
+  def self.lcs: [T] (Array[T] seq1, sequence seq2) -> Array[T]
+              | [T, R] (Array[T] seq1, sequence seq2) { (T element) -> R } -> Array[R]
+              | (String seq1, sequence seq2) -> Array[String]
+              | [R] (String seq1, sequence seq2) { (String element) -> R } -> Array[R]
+              | (sequence seq1, sequence seq2) -> Array[untyped]
+              | [R] (sequence seq1, sequence seq2) { (untyped element) -> R } -> Array[R]
+
+  def self.diff: [T, U] (Array[T] seq1, Array[U] seq2, ?nil callbacks) -> Array[Array[Diff::LCS::Change[T | U]]]
+               | [T, U, R] (Array[T] seq1, Array[U] seq2, ?nil callbacks) { (Diff::LCS::Change[T | U] change) -> R } -> Array[Array[R]]
+               | (String seq1, String seq2, ?nil callbacks) -> Array[Array[Diff::LCS::Change[String]]]
+               | [R] (String seq1, String seq2, ?nil callbacks) { (Diff::LCS::Change[String] change) -> R } -> Array[Array[R]]
+               | (sequence seq1, sequence seq2, ?nil callbacks) -> Array[Array[Diff::LCS::Change[untyped]]]
+               | [R] (sequence seq1, sequence seq2, ?nil callbacks) { (Diff::LCS::Change[untyped] change) -> R } -> Array[Array[R]]
+               | [D] (sequence seq1, sequence seq2, _DiffCallbacks[D] | _DiffCallbacksFactory[D] callbacks) -> D
+               | (sequence seq1, sequence seq2, _DiffCallbacks[untyped] | _DiffCallbacksFactory[untyped] callbacks) { (untyped change) -> untyped } -> Array[untyped]
+
+  def self.sdiff: [T, U] (Array[T] seq1, Array[U] seq2, ?nil callbacks) -> Array[Diff::LCS::ContextChange[T | U]]
+                | [T, U, R] (Array[T] seq1, Array[U] seq2, ?nil callbacks) { (Diff::LCS::ContextChange[T | U] change) -> R } -> Array[R]
+                | (String seq1, String seq2, ?nil callbacks) -> Array[Diff::LCS::ContextChange[String]]
+                | [R] (String seq1, String seq2, ?nil callbacks) { (Diff::LCS::ContextChange[String] change) -> R } -> Array[R]
+                | (sequence seq1, sequence seq2, ?nil callbacks) -> Array[Diff::LCS::ContextChange[untyped]]
+                | [R] (sequence seq1, sequence seq2, ?nil callbacks) { (Diff::LCS::ContextChange[untyped] change) -> R } -> Array[R]
+                | [D] (sequence seq1, sequence seq2, _DiffCallbacks[D] | _DiffCallbacksFactory[D] callbacks) -> D
+                | (sequence seq1, sequence seq2, _DiffCallbacks[untyped] | _DiffCallbacksFactory[untyped] callbacks) { (untyped change) -> untyped } -> Array[untyped]
+
+  # The block may replace each event before it is passed to the callbacks.
+  def self.traverse_sequences: [T, U] (Array[T] seq1, Array[U] seq2, ?_TraversalCallbacks? callbacks) ?{ (Diff::LCS::ContextChange[T | U] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+                             | (String seq1, String seq2, ?_TraversalCallbacks? callbacks) ?{ (Diff::LCS::ContextChange[String] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+                             | (sequence seq1, sequence seq2, ?_TraversalCallbacks? callbacks) ?{ (Diff::LCS::ContextChange[untyped] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+
+  def self.traverse_balanced: [T, U] (Array[T] seq1, Array[U] seq2, ?_TraversalCallbacks callbacks) ?{ (Diff::LCS::ContextChange[T | U] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+                            | (String seq1, String seq2, ?_TraversalCallbacks callbacks) ?{ (Diff::LCS::ContextChange[String] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+                            | (sequence seq1, sequence seq2, ?_TraversalCallbacks callbacks) ?{ (Diff::LCS::ContextChange[untyped] event) -> Diff::LCS::ContextChange[untyped] } -> nil
+
+  # Patched Arrays hold elements taken from the patchset as well as from src.
+  def self.patch: (Array[untyped] src, patchset patchset, ?(:patch | :unpatch)? direction) -> Array[untyped]
+                | (String src, patchset patchset, ?(:patch | :unpatch)? direction) -> String
+                | (sequence src, patchset patchset, ?(:patch | :unpatch)? direction) -> sequence
+
+  def self.patch!: (Array[untyped] src, patchset patchset) -> Array[untyped]
+                 | (String src, patchset patchset) -> String
+                 | (sequence src, patchset patchset) -> sequence
+
+  def self.unpatch!: (Array[untyped] src, patchset patchset) -> Array[untyped]
+                   | (String src, patchset patchset) -> String
+                   | (sequence src, patchset patchset) -> sequence
+end
+
+class String
+  include Diff::LCS
+end
+
+class Array[unchecked out Elem]
+  include Diff::LCS
+
+  # A patched Array holds elements taken from the patchset, not only Elem.
+  def patch: (Diff::LCS::patchset patchset) -> Array[untyped]
+
+  alias unpatch patch
+
+  def patch!: (Diff::LCS::patchset patchset) -> Array[untyped]
+
+  def unpatch!: (Diff::LCS::patchset patchset) -> Array[untyped]
+end
+
+# Represents the removal or addition of an element from either the old or the
+# new sequence.
+class Diff::LCS::Change[out Elem] < Data
+  include Comparable
+
+  type action = "=" | "-" | "+" | "!" | ">" | "<"
+
+  VALID_ACTIONS: Array[String]
+
+  def self.valid_action?: (untyped action) -> bool
+
+  # Raises for an action not in VALID_ACTIONS.
+  def self.new: [T] (String action, Integer position, T element) -> Diff::LCS::Change[T]
+              | [T] (action: String, position: Integer, element: T) -> Diff::LCS::Change[T]
+
+  def self.[]: [T] (String action, Integer position, T element) -> Diff::LCS::Change[T]
+             | [T] (action: String, position: Integer, element: T) -> Diff::LCS::Change[T]
+
+  # Raises for an Array in neither format.
+  def self.from_a: [T] ([String, [Integer, T], [Integer, T]] arr) -> Diff::LCS::ContextChange[T]
+                 | [T] ([String, Integer, T] arr) -> Diff::LCS::Change[T]
+                 | (Array[untyped] arr) -> (Diff::LCS::Change[untyped] | Diff::LCS::ContextChange[untyped])
+
+  def initialize: (action: String, position: Integer, element: Elem) -> void
+
+  attr_reader action: action
+
+  attr_reader position: Integer
+
+  attr_reader element: Elem
+
+  def inspect: (*untyped _args) -> String
+
+  def to_a: () -> [action, Integer, Elem]
+
+  alias to_ary to_a
+
+  alias deconstruct to_a
+
+  def deconstruct_keys: (Array[Symbol]? _keys) -> { action: action, position: Integer, element: Elem }
+
+  def ==: (untyped other) -> bool
+
+  def <=>: (Diff::LCS::Change[untyped] other) -> Integer?
+
+  def adding?: () -> bool
+
+  def deleting?: () -> bool
+
+  def unchanged?: () -> bool
+
+  def changed?: () -> bool
+
+  def finished_a?: () -> bool
+
+  def finished_b?: () -> bool
+end
+
+# Represents a contextual change: the positions and elements in both the old
+# and the new sequence, and the action taken. An element is nil when the
+# change has no element on that side.
+class Diff::LCS::ContextChange[out Elem] < Data
+  # Raises for an action not in Diff::LCS::Change::VALID_ACTIONS.
+  def self.new: [T] (String action, Integer old_position, T old_element, Integer new_position, T new_element) -> Diff::LCS::ContextChange[T]
+              | [T] (action: String, old_position: Integer, old_element: T, new_position: Integer, new_element: T) -> Diff::LCS::ContextChange[T]
+
+  def self.[]: [T] (String action, Integer old_position, T old_element, Integer new_position, T new_element) -> Diff::LCS::ContextChange[T]
+             | [T] (action: String, old_position: Integer, old_element: T, new_position: Integer, new_element: T) -> Diff::LCS::ContextChange[T]
+
+  # Raises for an Array in neither format.
+  def self.from_a: [T] ([String, [Integer, T], [Integer, T]] arr) -> Diff::LCS::ContextChange[T]
+                 | [T] ([String, Integer, T] arr) -> Diff::LCS::Change[T]
+                 | (Array[untyped] arr) -> (Diff::LCS::Change[untyped] | Diff::LCS::ContextChange[untyped])
+
+  # Converts '<' to '-' and '>' to '+', and drops the element of the side
+  # that was not changed.
+  def self.simplify: [T] (Diff::LCS::ContextChange[T] event) -> Diff::LCS::ContextChange[T]
+
+  def initialize: (action: String, old_position: Integer, old_element: Elem?, new_position: Integer, new_element: Elem?) -> void
+
+  attr_reader action: Diff::LCS::Change::action
+
+  attr_reader old_position: Integer
+
+  attr_reader old_element: Elem?
+
+  attr_reader new_position: Integer
+
+  attr_reader new_element: Elem?
+
+  def to_a: () -> [Diff::LCS::Change::action, [Integer, Elem?], [Integer, Elem?]]
+
+  alias to_ary to_a
+
+  alias deconstruct to_a
+
+  def deconstruct_keys: (Array[Symbol]? _keys) -> { action: Diff::LCS::Change::action, old_position: Integer, old_element: Elem?, new_position: Integer, new_element: Elem? }
+
+  def ==: (untyped other) -> bool
+
+  def <=>: (Diff::LCS::ContextChange[untyped] other) -> Integer?
+
+  def adding?: () -> bool
+
+  def deleting?: () -> bool
+
+  def unchanged?: () -> bool
+
+  def changed?: () -> bool
+
+  def finished_a?: () -> bool
+
+  def finished_b?: () -> bool
+end
+
+# The default callbacks: each event method returns the event.
+class Diff::LCS::DefaultCallbacks
+  def self.match: [E] (E event) -> E
+
+  def self.discard_a: [E] (E event) -> E
+
+  def self.discard_b: [E] (E event) -> E
+
+  def self.change: [E] (E event) -> E
+
+  private def self.new: () -> singleton(Diff::LCS::DefaultCallbacks)
+end
+
+class Diff::LCS::SequenceCallbacks = Diff::LCS::DefaultCallbacks
+
+class Diff::LCS::BalancedCallbacks = Diff::LCS::DefaultCallbacks
+
+# Collects hunks of Diff::LCS::Change objects. Call #finish after the
+# traversal, or pass a block to .new. `C` is the class of the collected
+# changes (Diff::LCS::ContextChange in ContextDiffCallbacks).
+class Diff::LCS::DiffCallbacks[out C = Diff::LCS::Change[untyped]]
+  def self.new: () ?{ (Diff::LCS::DiffCallbacks[Diff::LCS::Change[untyped]] callbacks) -> void } -> Diff::LCS::DiffCallbacks[Diff::LCS::Change[untyped]]
+
+  def initialize: () ?{ (self callbacks) -> void } -> void
+
+  attr_reader diffs: Array[Array[C]]
+
+  def finish: () -> Array[C]
+
+  def match: (Diff::LCS::ContextChange[untyped] _event) -> Array[C]
+
+  def discard_a: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::Change[untyped]]
+
+  def discard_b: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::Change[untyped]]
+end
+
+# Collects hunks of Diff::LCS::ContextChange objects.
+class Diff::LCS::ContextDiffCallbacks < Diff::LCS::DiffCallbacks[Diff::LCS::ContextChange[untyped]]
+  def self.new: () ?{ (Diff::LCS::ContextDiffCallbacks callbacks) -> void } -> Diff::LCS::ContextDiffCallbacks
+
+  def discard_a: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+
+  def discard_b: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+
+  def change: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+end
+
+# Collects a flat list of Diff::LCS::ContextChange objects, unchanged elements
+# included.
+class Diff::LCS::SDiffCallbacks
+  def initialize: () ?{ (self callbacks) -> void } -> void
+
+  attr_reader diffs: Array[Diff::LCS::ContextChange[untyped]]
+
+  def match: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+
+  def discard_a: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+
+  def discard_b: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+
+  def change: (Diff::LCS::ContextChange[untyped] event) -> Array[Diff::LCS::ContextChange[untyped]]
+end
+
+# A group of changes, each adding or deleting a single item. Loaded by
+# `require "diff/lcs/hunk"`.
+class Diff::LCS::Block < Data
+  def self.from_chunk: (Array[Diff::LCS::Change[untyped]] chunk) -> Diff::LCS::Block
+
+  private def self.new: (changes: Array[Diff::LCS::Change[untyped]], insert: Array[Diff::LCS::Change[untyped]], remove: Array[Diff::LCS::Change[untyped]]) -> Diff::LCS::Block
+
+  private def self.[]: (changes: Array[Diff::LCS::Change[untyped]], insert: Array[Diff::LCS::Change[untyped]], remove: Array[Diff::LCS::Change[untyped]]) -> Diff::LCS::Block
+
+  attr_reader changes: Array[Diff::LCS::Change[untyped]]
+
+  attr_reader insert: Array[Diff::LCS::Change[untyped]]
+
+  attr_reader remove: Array[Diff::LCS::Change[untyped]]
+
+  def diff_size: () -> Integer
+
+  def op: () -> ("^" | "-" | "+" | "!")
+end
+
+# A group of Blocks that overlap because of their context lines, as used by
+# `ldiff` and RSpec's differ. Loaded by `require "diff/lcs/hunk"`.
+class Diff::LCS::Hunk
+  # Raises when `piece` has no additions or deletions.
+  def initialize: (Array[String] data_old, Array[String] data_new, Array[Diff::LCS::Change[untyped]] piece, Integer? flag_context, Integer file_length_difference) -> void
+
+  attr_reader blocks: Array[Diff::LCS::Block]
+
+  attr_reader start_old: Integer
+
+  attr_reader start_new: Integer
+
+  attr_reader end_old: Integer
+
+  attr_reader end_new: Integer
+
+  attr_reader file_length_difference: Integer
+
+  # The writer adds the context to the start and end positions; it never sets
+  # this reader's value.
+  attr_reader flag_context: nil
+
+  def flag_context=: (Integer? context) -> Integer?
+
+  # Returns nil when the hunks do not overlap.
+  def merge: (Diff::LCS::Hunk? hunk) -> Array[Diff::LCS::Block]?
+
+  alias unshift merge
+
+  def overlaps?: (Diff::LCS::Hunk? hunk) -> bool?
+
+  # Raises for any other format.
+  def diff: (:old | :unified | :context format, ?boolish last) -> String
+end
