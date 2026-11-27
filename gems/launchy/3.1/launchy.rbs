@@ -1,0 +1,308 @@
+module Launchy
+  VERSION: String
+
+  # Opens `uri` with the application that handles it (a browser by default).
+  #
+  # Options: `:debug`, `:application` (the name of an Application subclass),
+  # `:host_os` and `:dry_run`.
+  # Raises Launchy::Error on failure. With a block, the exception is yielded
+  # instead and nil is returned.
+  def self.open: (_ToS uri, ?Hash[Symbol, untyped] options) ?{ (Exception error) -> void } -> untyped
+
+  def self.app_for_uri: (Addressable::URI uri) -> singleton(Launchy::Application)
+
+  def self.app_for_name: (_ToS name) -> singleton(Launchy::Application)?
+
+  def self.app_for_uri_string: (_ToS str) -> singleton(Launchy::Application)
+
+  # Raises Addressable::URI::InvalidURIError for an invalid URI.
+  def self.string_to_uri: (_ToS str) -> Addressable::URI
+
+  def self.reset_global_options: () -> String?
+
+  # Sets the global options from `options` (or the LAUNCHY_* environment
+  # variables) and returns the value given to Launchy.dry_run=.
+  def self.extract_global_options: (Hash[Symbol, untyped] options) -> untyped
+
+  # A String is true only when it is "true"; any other object only when it is true.
+  def self.debug=: (untyped enabled) -> bool
+
+  def self.debug?: () -> bool
+
+  def self.application=: ((String | Symbol)? app) -> (String | Symbol)?
+
+  def self.application: () -> (String | Symbol)?
+
+  def self.host_os=: (String? host_os) -> String?
+
+  def self.host_os: () -> String?
+
+  # A String is true only when it is "true"; any other object only when it is true.
+  def self.dry_run=: (untyped dry_run) -> bool
+
+  def self.dry_run?: () -> bool
+
+  def self.bug_report_message: () -> String
+
+  def self.log: (_ToS msg) -> nil
+
+  def self.path: () -> String?
+
+  def self.path=: (String? path) -> String?
+
+  class Error < ::StandardError
+  end
+
+  class ApplicationNotFoundError < Error
+  end
+
+  class CommandNotFoundError < Error
+  end
+
+  class ArgumentError < Error
+  end
+
+  module Version
+    MAJOR: Integer
+    MINOR: Integer
+    PATCH: Integer
+
+    def self.to_a: () -> Array[Integer]
+
+    def self.to_s: () -> String
+  end
+
+  # Tracks the classes that inherit from the class extended with it.
+  module DescendantTracker
+    def inherited: (Class klass) -> void
+
+    def children: () -> Array[Class]
+
+    # Returns the first child for which `child.send(method, *args)` is truthy.
+    def find_child: (interned method, *untyped args) -> Class?
+  end
+
+  class Application
+    extend DescendantTracker
+
+    # Raises Launchy::ApplicationNotFoundError when no application handles it.
+    def self.handling: (Addressable::URI uri) -> singleton(Launchy::Application)
+
+    # Raises Launchy::ApplicationNotFoundError when no application has the name.
+    def self.for_name: (_ToS name) -> singleton(Launchy::Application)
+
+    # Searches `paths`, or Launchy.path when none are given.
+    def self.find_executable: (path bin, *path paths) -> String?
+
+    def self.has_name?: (_ToS qname) -> bool
+
+    attr_reader host_os_family: Launchy::Detect::HostOsFamily
+
+    attr_reader runner: Launchy::Runner
+
+    def initialize: () -> void
+
+    def find_executable: (path bin, *path paths) -> String?
+
+    # Returns nil in dry run mode, where the command is printed instead.
+    def run: (_ToS cmd, *untyped args) -> ChildProcess::AbstractProcess?
+
+    class Browser < Launchy::Application
+      def self.schemes: () -> Array[String]
+
+      def self.handles?: (Addressable::URI uri) -> bool?
+
+      def windows_app_list: () -> Array[String]
+
+      def cygwin_app_list: () -> Array[String]
+
+      def darwin_app_list: () -> Array[String?]
+
+      def nix_app_list: () -> Array[Launchy::Argv]
+
+      def app_list: () -> Array[String | Launchy::Argv | nil]
+
+      def browser_env: () -> Array[String]
+
+      # Raises Launchy::CommandNotFoundError when no browser is found.
+      def browser_cmdline: () -> (String | Launchy::Argv)
+
+      # `options` is ignored. Launchy.open passes the value of
+      # Launchy.extract_global_options here, which is not a Hash.
+      def cmd_and_args: (_ToS uri, ?untyped options) -> [ String, Array[String] ]
+
+      # `options` is ignored. Launchy.open passes the value of
+      # Launchy.extract_global_options here, which is not a Hash.
+      def open: (_ToS uri, ?untyped options) -> ChildProcess::AbstractProcess?
+    end
+  end
+
+  class Runner
+    # Raises Launchy::CommandNotFoundError for a nil command. Returns nil in
+    # dry run mode, where the command is printed instead.
+    def run: (_ToS cmd, *untyped args) -> ChildProcess::AbstractProcess?
+
+    def wet_run: (_ToS cmd, *untyped args) -> ChildProcess::AbstractProcess
+
+    def dry_run: (_ToS cmd, *untyped args) -> String
+
+    def shell_commands: (_ToS cmd, Array[untyped] args) -> Array[String]
+
+    def commandline_normalize: (Array[Array[untyped]] cmdline) -> Array[String]
+  end
+
+  class Argv
+    attr_reader argv: Array[String]
+
+    def initialize: (*String | Array[String] args) -> void
+
+    def to_s: () -> String
+
+    def to_str: () -> String
+
+    def []: (Integer idx) -> String?
+
+    # The executable's path when it is found, otherwise false or nil.
+    def valid?: () -> (String | false | nil)
+
+    def blank?: () -> bool
+
+    def executable?: () -> String?
+
+    def ==: (Launchy::Argv other) -> bool
+  end
+
+  class Cli
+    attr_reader options: Hash[Symbol, String | bool]
+
+    def initialize: () -> void
+
+    def parser: () -> OptionParser
+
+    def parse: (Array[String] argv, untyped env) -> bool
+
+    def good_run: (Array[String] argv, untyped env) -> bool
+
+    def error_output: (Exception error) -> bool
+
+    # Exits with status 1 when the run fails.
+    def run: (?Array[String] argv, ?untyped env) -> nil
+  end
+
+  module Detect
+    class HostOs
+      attr_reader host_os: String
+
+      def initialize: (?String? host_os) -> void
+
+      alias to_s host_os
+
+      alias to_str host_os
+
+      def default_host_os: () -> String
+
+      def override_host_os: () -> String?
+    end
+
+    class HostOsFamily
+      class NotFoundError < Launchy::Error
+      end
+
+      extend ::Launchy::DescendantTracker
+
+      # Raises Launchy::Detect::HostOsFamily::NotFoundError for an unknown host os.
+      def self.detect: (?Launchy::Detect::HostOs | String host_os) -> Launchy::Detect::HostOsFamily
+
+      def self.matches?: (_ToS host_os) -> MatchData?
+
+      def self.windows?: () -> bool
+
+      def self.darwin?: () -> bool
+
+      def self.nix?: () -> bool
+
+      def self.cygwin?: () -> bool
+
+      attr_reader host_os: Launchy::Detect::HostOs | String
+
+      def initialize: (?Launchy::Detect::HostOs | String host_os) -> void
+
+      def windows?: () -> bool
+
+      def darwin?: () -> bool
+
+      def nix?: () -> bool
+
+      def cygwin?: () -> bool
+
+      class Windows < HostOsFamily
+        def self.matching_regex: () -> Regexp
+
+        def app_list: (Launchy::Application::Browser app) -> Array[String]
+      end
+
+      class Darwin < HostOsFamily
+        def self.matching_regex: () -> Regexp
+
+        def app_list: (Launchy::Application::Browser app) -> Array[String?]
+      end
+
+      class Nix < HostOsFamily
+        def self.matching_regex: () -> Regexp
+
+        def app_list: (Launchy::Application::Browser app) -> Array[Launchy::Argv]
+      end
+
+      class Cygwin < HostOsFamily
+        def self.matching_regex: () -> Regexp
+
+        def app_list: (Launchy::Application::Browser app) -> Array[String]
+      end
+    end
+
+    class NixDesktopEnvironment
+      class NotFoundError < Launchy::Error
+      end
+
+      extend ::Launchy::DescendantTracker
+
+      # NotFound matches when no other desktop environment does.
+      def self.detect: () -> singleton(Launchy::Detect::NixDesktopEnvironment)
+
+      def self.fallback_browsers: () -> Array[Launchy::Argv]
+
+      # Called on a subclass, which defines .browser.
+      def self.browsers: () -> Array[Launchy::Argv]
+
+      class Kde < NixDesktopEnvironment
+        def self.is_current_desktop_environment?: () -> String?
+
+        def self.browser: () -> Launchy::Argv
+      end
+
+      class Gnome < NixDesktopEnvironment
+        def self.is_current_desktop_environment?: () -> String?
+
+        def self.browser: () -> Launchy::Argv
+      end
+
+      class Xfce < NixDesktopEnvironment
+        def self.is_current_desktop_environment?: () -> bool
+
+        def self.browser: () -> Launchy::Argv
+      end
+
+      class Xdg < NixDesktopEnvironment
+        def self.is_current_desktop_environment?: () -> String?
+
+        def self.browser: () -> Launchy::Argv
+      end
+
+      class NotFound < NixDesktopEnvironment
+        def self.is_current_desktop_environment?: () -> bool
+
+        def self.browser: () -> Launchy::Argv
+      end
+    end
+  end
+end
