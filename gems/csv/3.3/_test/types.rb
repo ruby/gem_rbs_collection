@@ -35,3 +35,16 @@ CSV.read("example.csv", headers: true).___error___
 CSV.read("example.csv").___error___
 CSV.foreach("example.csv", headers: true).___error___
 CSV.foreach("example.csv").___error___
+
+# `converters:`, `nil_value:` and `empty_value:` change field types, so fields are untyped
+CSV.new("1,2", headers: false, converters: :numeric).___error___
+CSV.new("1,2", headers: false, nil_value: 0).shift.___error___
+CSV.new("1,2", headers: false, empty_value: 0).read.___error___
+CSV.new("1,2", headers: true, converters: :numeric).___error___
+CSV.open("example.csv", headers: false, converters: :numeric).___error___
+CSV.open("example.csv", headers: false, converters: :numeric) { |csv| csv }.___error___
+CSV.parse("1,2", converters: :numeric).___error___
+CSV.parse("1,2", nil_value: 0) { |row| row.___error___ }
+CSV.read("example.csv", converters: :numeric).___error___
+CSV.foreach("example.csv", empty_value: 0).___error___
+CSV.foreach("example.csv", converters: :all) { |row| row.___error___ }

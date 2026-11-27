@@ -1706,7 +1706,13 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
   #
   def self.foreach: (String | IO path, ?String mode, headers: enable_headers, **untyped options) { (::CSV::Row arg0) -> void } -> void
                   | (String | IO path, ?String mode, headers: enable_headers, **untyped options) -> Enumerator[::CSV::Row, void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, converters: untyped, **untyped options) { (::Array[untyped] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, nil_value: untyped, **untyped options) { (::Array[untyped] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, empty_value: untyped, **untyped options) { (::Array[untyped] arg0) -> void } -> void
                   | (String | IO path, ?String mode, ?headers: false | nil, **untyped options) { (::Array[String?] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, converters: untyped, **untyped options) -> Enumerator[::Array[untyped], void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, nil_value: untyped, **untyped options) -> Enumerator[::Array[untyped], void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, empty_value: untyped, **untyped options) -> Enumerator[::Array[untyped], void]
                   | (String | IO path, ?String mode, ?headers: false | nil, **untyped options) -> Enumerator[::Array[String?], void]
                   | (String | IO path, ?String mode, **untyped options) { (untyped arg0) -> void } -> void
                   | (String | IO path, ?String mode, **untyped options) -> Enumerator[untyped, void]
@@ -1823,7 +1829,67 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
                       ?replace: String,
                       ?encoding: Encoding | String,
                       headers: false | nil,
+                      converters: untyped,
+                      **untyped options) { (CSV[Array[untyped], Array[Array[untyped]]] csv) -> T } -> T
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      nil_value: untyped,
+                      **untyped options) { (CSV[Array[untyped], Array[Array[untyped]]] csv) -> T } -> T
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      empty_value: untyped,
+                      **untyped options) { (CSV[Array[untyped], Array[Array[untyped]]] csv) -> T } -> T
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
                       **untyped options) { (without_headers csv) -> T } -> T
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  converters: untyped,
+                  **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  nil_value: untyped,
+                  **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  empty_value: untyped,
+                  **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
                | (String | _ToPath | IO | StringIO filename_or_io,
                   ?String mode,
                   ?newline: untyped,
@@ -1894,6 +1960,9 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
   #     CSV.new(nil)
   #
   def self.new: (String | IO | StringIO io, headers: enable_headers, **untyped options) -> with_headers
+              | (String | IO | StringIO io, headers: false | nil, converters: untyped, **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+              | (String | IO | StringIO io, headers: false | nil, nil_value: untyped, **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+              | (String | IO | StringIO io, headers: false | nil, empty_value: untyped, **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
               | (String | IO | StringIO io, headers: false | nil, **untyped options) -> without_headers
               | (String | IO | StringIO io, **untyped options) -> CSV[untyped, untyped]
 
@@ -2019,7 +2088,13 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
   #
   def self.parse: (String str, headers: enable_headers, **untyped options) -> ::CSV::Table[::CSV::Row]
                 | (String str, headers: enable_headers, **untyped options) { (::CSV::Row row) -> void } -> void
+                | (String str, ?headers: false | nil, converters: untyped, **untyped options) -> ::Array[::Array[untyped]]
+                | (String str, ?headers: false | nil, nil_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
+                | (String str, ?headers: false | nil, empty_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
                 | (String str, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
+                | (String str, ?headers: false | nil, converters: untyped, **untyped options) { (::Array[untyped] row) -> void } -> void
+                | (String str, ?headers: false | nil, nil_value: untyped, **untyped options) { (::Array[untyped] row) -> void } -> void
+                | (String str, ?headers: false | nil, empty_value: untyped, **untyped options) { (::Array[untyped] row) -> void } -> void
                 | (String str, ?headers: false | nil, **untyped options) { (::Array[String?] row) -> void } -> void
                 | (String str, **untyped options) -> untyped
                 | (String str, **untyped options) { (untyped row) -> void } -> void
@@ -2192,6 +2267,9 @@ class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]]
   #     CSV.read(path, headers: true) # => #<CSV::Table mode:col_or_row row_count:4>
   #
   def self.read: (String | IO path, headers: enable_headers, **untyped options) -> ::CSV::Table[CSV::Row]
+               | (String | IO path, ?headers: false | nil, converters: untyped, **untyped options) -> ::Array[::Array[untyped]]
+               | (String | IO path, ?headers: false | nil, nil_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
+               | (String | IO path, ?headers: false | nil, empty_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
                | (String | IO path, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
                | (String | IO path, **untyped options) -> untyped
 
