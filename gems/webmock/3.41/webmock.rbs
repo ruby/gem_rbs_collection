@@ -1,0 +1,424 @@
+module WebMock
+  include API
+  extend API
+
+  VERSION: String
+
+  # A host name ("example.com"), a host and port ("example.com:8080"), a URL
+  # ("https://example.com/path"), a Regexp, or a callable that gets the URI.
+  type net_connect_rule = String | Regexp | ^(Addressable::URI) -> boolish
+
+  type net_connect_allow = net_connect_rule | Array[net_connect_rule]
+
+  def self.version: () -> String
+
+  def self.disable!: (?Hash[Symbol, untyped] options) -> void
+
+  def self.enable!: (?Hash[Symbol, untyped] options) -> void
+
+  # With a block, the settings apply only while the block runs, and the
+  # block's value is returned.
+  def self.allow_net_connect!: (?net_http_connect_on_start: bool | net_connect_allow | nil) -> void
+                             | (Hash[Symbol, untyped] options) -> void
+                             | [T] (?net_http_connect_on_start: bool | net_connect_allow | nil) { () -> T } -> T
+                             | [T] (Hash[Symbol, untyped] options) { () -> T } -> T
+  alias self.enable_net_connect! self.allow_net_connect!
+
+  def self.disable_net_connect!: (?allow_localhost: bool?, ?allow: net_connect_allow?, ?net_http_connect_on_start: bool | net_connect_allow | nil) -> void
+                               | (Hash[Symbol, untyped] options) -> void
+                               | [T] (?allow_localhost: bool?, ?allow: net_connect_allow?, ?net_http_connect_on_start: bool | net_connect_allow | nil) { () -> T } -> T
+                               | [T] (Hash[Symbol, untyped] options) { () -> T } -> T
+  alias self.disallow_net_connect! self.disable_net_connect!
+
+  # The value of the callable from the allow list, when one decides.
+  def self.net_connect_allowed?: (?(Addressable::URI | String)? uri) -> boolish
+
+  def self.net_connect_allowed_by_settings?: (?(Addressable::URI | String)? uri) -> boolish
+
+  def self.net_http_connect_on_start?: (Addressable::URI uri) -> boolish
+
+  def self.net_connect_explicit_allowed?: (net_connect_allow allowed, ?Addressable::URI uri) -> boolish
+
+  def self.show_body_diff!: () -> void
+
+  def self.hide_body_diff!: () -> void
+
+  def self.show_body_diff?: () -> bool
+
+  def self.show_stubbing_instructions!: () -> void
+
+  def self.hide_stubbing_instructions!: () -> void
+
+  def self.show_stubbing_instructions?: () -> bool
+
+  def self.reset!: () -> void
+
+  def self.reset_callbacks: () -> void
+
+  # Options: except: (adapter names such as :net_http), real_requests_only:.
+  def self.after_request: (?Hash[Symbol, untyped] options) { (RequestSignature request_signature, Response response) -> void } -> void
+
+  def self.registered_request?: (RequestSignature request_signature) -> RequestStub?
+
+  def self.print_executed_requests: () -> nil
+
+  # The block returns the response options, or nil for a request it does not stub.
+  def self.globally_stub_request: (?(:before_local_stubs | :after_local_stubs) order) { (RequestSignature request) -> RequestStub::response_value? } -> void
+
+  alias self.request self.a_request
+
+  module API
+    extend API
+
+    type uri_pattern = String | Regexp | Addressable::URI | Addressable::Template | URI::Generic | ^(Addressable::URI) -> boolish
+
+    type method_pattern = Symbol | String
+
+    def stub_request: (method_pattern method, uri_pattern uri) -> RequestStub
+    alias stub_http_request stub_request
+
+    def a_request: (method_pattern method, uri_pattern uri) -> RequestPattern
+
+    alias self.request self.a_request
+
+    def assert_requested: (method_pattern method, uri_pattern uri, ?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> void
+                        | (RequestStub stub, ?Hash[Symbol, untyped] options) -> void
+
+    def assert_not_requested: (method_pattern method, uri_pattern uri, ?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> void
+                            | (RequestStub stub, ?Hash[Symbol, untyped] options) -> void
+    alias refute_requested assert_not_requested
+
+    # Returns a WebMock::Matchers::HashIncludingMatcher, or RSpec's
+    # hash_including matcher when RSpec's argument matchers come later in the
+    # ancestors (in RSpec examples).
+    def hash_including: (*Symbol | String | Hash[untyped, untyped] args) -> untyped
+
+    # Like hash_including, RSpec's matcher in RSpec examples.
+    def hash_excluding: (*Symbol | String | Hash[untyped, untyped] args) -> untyped
+
+    def remove_request_stub: (RequestStub stub) -> void
+
+    def reset_executed_requests!: () -> void
+
+    def executed_requests: () -> Array[RequestSignature]
+  end
+
+  module Matchers
+    def have_been_made: () -> RequestPatternMatcher
+
+    def have_been_requested: () -> RequestPatternMatcher
+
+    def have_not_been_made: () -> RequestPatternMatcher
+
+    def have_requested: (API::method_pattern method, API::uri_pattern uri) -> WebMockMatcher
+
+    def have_not_requested: (API::method_pattern method, API::uri_pattern uri) -> WebMockMatcher
+
+    class HashArgumentMatcher
+      def initialize: (Hash[untyped, untyped] expected) -> void
+
+      # Subclasses pass the comparison of each expected key and value.
+      def ==: (untyped actual) ?{ ([untyped, untyped] pair) -> boolish } -> bool
+    end
+
+    class HashIncludingMatcher < HashArgumentMatcher
+      def ==: (untyped actual) -> bool
+
+      def inspect: () -> String
+    end
+
+    class HashExcludingMatcher < HashArgumentMatcher
+      def ==: (untyped actual) -> bool
+
+      def inspect: () -> String
+    end
+
+    class AnyArgMatcher
+      def initialize: (untyped ignore) -> void
+
+      def ==: (untyped other) -> bool
+
+      def inspect: () -> String
+    end
+  end
+
+  class Config
+    include Singleton
+
+    def self.instance: () -> Config
+
+    attr_accessor allow_net_connect: bool?
+    attr_accessor allow_localhost: bool?
+    attr_accessor allow: net_connect_allow?
+    attr_accessor net_http_connect_on_start: bool | net_connect_allow | nil
+    attr_accessor show_stubbing_instructions: bool
+    # :subscript (the default when nil), :flat_array, :dot or :flat
+    attr_accessor query_values_notation: Symbol?
+    attr_accessor show_body_diff: bool
+  end
+
+  class RequestSignature
+    attr_reader method: Symbol
+    attr_accessor uri: Addressable::URI
+    # A String for most HTTP clients. Clients that upload a stream or
+    # multipart fields (curb, patron, typhoeus, em-http-request) can give the
+    # stream or a Hash or Array of fields.
+    attr_accessor body: untyped
+    attr_reader headers: Hash[String, String | Array[String]]?
+
+    def initialize: (API::method_pattern method, Addressable::URI | String uri, ?Hash[Symbol, untyped] options) -> void
+
+    def method=: (API::method_pattern method) -> Symbol
+
+    def headers=: (Hash[untyped, untyped]? headers) -> Hash[String, String | Array[String]]?
+
+    def to_s: () -> String
+
+    def hash: () -> Integer
+
+    def eql?: (untyped other) -> bool
+    alias == eql?
+
+    def content_type: () -> String?
+
+    def url_encoded?: () -> bool
+
+    def json_headers?: () -> bool
+  end
+
+  class RequestPattern
+    def initialize: (API::method_pattern method, API::uri_pattern uri, ?Hash[Symbol, untyped] options) -> void
+
+    attr_reader with_block: Proc?
+
+    def with: (?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> self
+
+    # The value of the #with block when it decides.
+    def matches?: (RequestSignature request_signature) ?{ (Object token, boolish matched) -> void } -> boolish
+
+    def to_s: () -> String
+  end
+
+  class RequestStub
+    type response = Hash[Symbol, untyped] | String | IO | StringIO | responder
+
+    # A lambda or any object with #call that gets the request and returns
+    # the response options.
+    # What a responder or a to_return block returns (Response.new reads IO
+    # and StringIO as raw responses).
+    type response_value = Hash[Symbol, untyped] | String | IO | StringIO
+
+    type responder = ^(RequestSignature) -> response_value | _Responder
+
+    interface _Responder
+      def call: (RequestSignature request) -> response_value
+    end
+
+    attr_accessor request_pattern: RequestPattern
+
+    def self.from_request_signature: (RequestSignature signature) -> RequestStub
+
+    def initialize: (API::method_pattern method, API::uri_pattern uri) -> void
+
+    def with: (?Hash[Symbol, untyped] params) ?{ (RequestSignature) -> boolish } -> self
+
+    def to_return: (response | Array[response] response, *response | Array[response] more) -> self
+                 | () { (RequestSignature) -> response_value } -> self
+    alias and_return to_return
+
+    # Raises ArgumentError when given a block.
+    def to_return_json: (*Hash[Symbol, untyped] | Array[Hash[Symbol, untyped]] response_hashes) -> self
+    alias and_return_json to_return_json
+
+    # Does not return the stub, so it cannot be chained.
+    def to_rack: (_RackApp app, ?Hash[Symbol, untyped] options) -> void
+
+    def to_raise: (singleton(Exception) | Exception | String | Array[singleton(Exception) | Exception | String] exception, *singleton(Exception) | Exception | String | Array[singleton(Exception) | Exception | String] more) -> self
+    alias and_raise to_raise
+
+    def to_timeout: () -> self
+    alias and_timeout to_timeout
+
+    def response: () -> Response
+
+    def has_responses?: () -> bool
+
+    def then: () -> self
+
+    def times: (Integer number) -> self
+
+    def matches?: (RequestSignature request_signature) -> boolish
+
+    def to_s: () -> String
+
+    interface _RackApp
+      def call: (Hash[String, untyped] env) -> untyped
+    end
+  end
+
+  class Response
+    # A Hash of options (Symbol or String keys) or a raw HTTP response.
+    def initialize: (?Hash[Symbol, untyped] | Hash[String, untyped] | String | IO | StringIO options) -> void
+
+    # A Proc until the response is evaluated for a request.
+    def headers: () -> (Hash[String, String | Array[String]] | Proc)?
+
+    def headers=: ((Hash[untyped, untyped] | Proc)? headers) -> void
+
+    # A Proc until the response is evaluated for a request.
+    def body: () -> (String | Array[untyped] | Proc)
+
+    def body=: ((String | Array[untyped] | IO | Pathname | Proc)? body) -> void
+
+    # [code, message] for an Integer or a numeric String status; other
+    # values (an Array, a Proc until evaluated, ...) are kept as given.
+    def status: () -> untyped
+
+    # A Symbol or Float status is deprecated (a warning, and a broken status for clients).
+    def status=: ((Integer | String | Array[untyped] | Enumerator[untyped, untyped] | Proc | false)? status) -> void
+
+    def exception: () -> Exception?
+
+    def exception=: ((String | singleton(Exception) | Exception)? exception) -> void
+
+    def raise_error_if_any: () -> nil
+
+    def should_timeout: () -> bool
+
+    def options=: (Hash[Symbol, untyped] | Hash[String, untyped] options) -> void
+
+    def evaluate: (RequestSignature request_signature) -> Response
+
+    def ==: (untyped other) -> bool
+
+    class InvalidBody < StandardError
+    end
+  end
+
+  class DynamicResponse < Response
+    attr_accessor responder: RequestStub::responder
+
+    def initialize: (RequestStub::responder responder) -> void
+
+    def evaluate: (RequestSignature request_signature) -> Response
+  end
+
+  class RackResponse < Response
+    def initialize: (RequestStub::_RackApp app) -> void
+
+    def evaluate: (RequestSignature request) -> Response
+  end
+
+  class NetConnectNotAllowedError < Exception
+    def initialize: (RequestSignature request_signature) -> void
+  end
+
+  class AssertionFailure
+    def self.error_class: () -> singleton(Exception)
+
+    def self.error_class=: (singleton(Exception) error_class) -> singleton(Exception)
+
+    def self.failure: (String message) -> bot
+  end
+
+  class StubRegistry
+    include Singleton
+
+    def self.instance: () -> StubRegistry
+
+    attr_accessor request_stubs: Array[RequestStub]
+
+    def global_stubs: () -> Hash[Symbol, Array[RequestStub]]
+
+    def reset!: () -> void
+
+    def register_global_stub: (?(:before_local_stubs | :after_local_stubs) order) { (RequestSignature request) -> RequestStub::response_value? } -> void
+
+    def register_request_stub: (RequestStub stub) -> RequestStub
+
+    # Raises when the stub is not registered.
+    def remove_request_stub: (RequestStub stub) -> nil
+
+    def registered_request?: (RequestSignature request_signature) -> RequestStub?
+  end
+
+  class RequestRegistry
+    include Singleton
+
+    def self.instance: () -> RequestRegistry
+
+    def reset!: () -> void
+
+    def executed_requests: () -> Array[RequestSignature]
+
+    def to_s: () -> String
+  end
+
+  # Loaded by webmock/rspec (webmock/rspec/matchers).
+  class RequestPatternMatcher
+    def initialize: () -> void
+
+    def once: () -> self
+
+    def twice: () -> self
+
+    def times: (Integer times) -> self
+
+    def at_least_once: () -> self
+
+    def at_least_twice: () -> self
+
+    def at_least_times: (Integer times) -> self
+
+    def at_most_once: () -> self
+
+    def at_most_twice: () -> self
+
+    def at_most_times: (Integer times) -> self
+
+    # Counts only the requests that also match these conditions.
+    def with: (?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> self
+
+    def matches?: (RequestPattern | RequestStub request_pattern) -> bool
+
+    def does_not_match?: (RequestPattern | RequestStub request_pattern) -> bool
+
+    def failure_message: () -> String
+
+    def failure_message_when_negated: () -> String
+    alias negative_failure_message failure_message_when_negated
+
+    def description: () -> String
+  end
+
+  # Loaded by webmock/rspec (webmock/rspec/matchers).
+  class WebMockMatcher
+    def initialize: (API::method_pattern method, API::uri_pattern uri) -> void
+
+    def once: () -> self
+
+    def twice: () -> self
+
+    def at_least_once: () -> self
+
+    def at_least_twice: () -> self
+
+    def at_least_times: (Integer times) -> self
+
+    def with: (?Hash[Symbol, untyped] options) ?{ (RequestSignature) -> boolish } -> self
+
+    def times: (Integer times) -> self
+
+    # The argument (usually WebMock) is not used.
+    def matches?: (untyped webmock) -> bool
+
+    def does_not_match?: (untyped webmock) -> bool
+
+    def failure_message: () -> String
+
+    def failure_message_when_negated: () -> String
+    alias negative_failure_message failure_message_when_negated
+
+    def description: () -> String
+  end
+end
