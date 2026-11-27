@@ -1,0 +1,31 @@
+module RequestStore
+  VERSION: String
+
+  def self.store: () -> Hash[untyped, untyped]
+  # nil resets the store: the next #store starts a new Hash.
+  def self.store=: (Hash[untyped, untyped] store) -> Hash[untyped, untyped]
+                 | (nil store) -> nil
+  def self.clear!: () -> Hash[untyped, untyped]
+  def self.begin!: () -> bool
+  def self.end!: () -> bool
+  def self.active?: () -> bool
+  def self.read: (untyped key) -> untyped
+  def self.[]: (untyped key) -> untyped
+  def self.write: [T] (untyped key, T value) -> T
+  def self.[]=: [T] (untyped key, T value) -> T
+  def self.exist?: (untyped key) -> bool
+
+  # Returns the stored value when the key exists, otherwise stores and returns the block's value.
+  # The block runs only when the key is missing.
+  def self.fetch: (untyped key) ?{ () -> untyped } -> untyped
+
+  # Same as Hash#delete on the store: the block is called with the key when it is missing.
+  def self.delete: (untyped key) ?{ (untyped key) -> untyped } -> untyped
+
+  class Middleware
+    def initialize: (Rack::_Application app) -> void
+
+    # The body is wrapped in a Rack::BodyProxy that ends and clears the store when it is closed.
+    def call: (Rack::env env) -> Rack::response
+  end
+end
