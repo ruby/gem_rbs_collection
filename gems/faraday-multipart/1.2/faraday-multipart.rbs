@@ -1,0 +1,111 @@
+module Faraday
+  module Multipart
+    VERSION: String
+
+    # The version of the multipart-post gem in use.
+    def self.multipart_post_version: () -> Gem::Version
+
+    # Multipart value used to POST binary data from a file or an IO
+    # (multipart-post's UploadIO; ::UploadIO with multipart-post < 2.2).
+    class FilePart = ::Multipart::Post::UploadIO
+
+    module Parts = ::Multipart::Post::Parts
+
+    # Reads the IOs of several parts one after another as one stream.
+    # Similar to, but not compatible with, multipart-post's CompositeReadIO.
+    class CompositeReadIO
+      # An IO-like object such as a StringIO.
+      interface _IO
+        def read: (Integer length) -> String?
+                | (nil length) -> String?
+
+        def rewind: () -> untyped
+
+        def close: () -> untyped
+      end
+
+      # A part such as Faraday::Multipart::Parts::ParamPart, FilePart or
+      # EpiloguePart.
+      interface _Part
+        def to_io: () -> _IO
+
+        def length: () -> Integer
+      end
+
+      # Array arguments are flattened.
+      def initialize: (*_Part | Array[_Part] parts) -> void
+
+      # The sum of the lengths of all the parts.
+      def length: () -> Integer
+
+      # Rewinds each of the IOs and starts reading from the first one again.
+      def rewind: () -> Integer
+
+      # Reads everything when `length` is nil. With a `length`, returns nil
+      # once all the IOs are exhausted. `outbuf` is cleared and filled when
+      # given, unless it is frozen.
+      def read: (?nil length, ?String? outbuf) -> String
+              | (Integer length, ?String? outbuf) -> String?
+
+      # Closes each of the IOs.
+      def close: () -> void
+
+      # Does nothing (Rubinius compatibility).
+      def ensure_open_and_readable: () -> nil
+    end
+
+    # Multipart value used to POST data with a content type.
+    class ParamPart
+      def initialize: (String value, String content_type, ?String? content_id) -> void
+
+      # Converts this value to a form part with `headers`. A String value
+      # always gives a ParamPart (multipart-post's Part.new only returns a
+      # FilePart for values that respond to #content_type and #original_filename).
+      def to_part: (String boundary, String | Symbol key) -> ::Multipart::Post::Parts::ParamPart
+
+      def headers: () -> Hash[String, String?]
+
+      attr_reader value: String
+
+      attr_reader content_type: String
+
+      attr_reader content_id: String?
+    end
+
+    # Middleware for supporting multipart requests, registered as
+    # `request :multipart`.
+    class Middleware < Faraday::Middleware
+      CONTENT_TYPE: String
+
+      DEFAULT_BOUNDARY_PREFIX: String
+
+      # `content_type` is used when it starts with "multipart/", otherwise
+      # "multipart/form-data". `flat_encode` sends Array values under the
+      # same key (`files`) instead of `files[]`.
+      def initialize: (?untyped app, ?Hash[Symbol, untyped] options) -> void
+
+      # Turns a Hash body that contains multipart values (or any Hash body
+      # when the request's Content-Type is the multipart type) into a
+      # Faraday::Multipart::CompositeReadIO, then calls the next app.
+      # Returns what the next app returns (a Faraday::Response in a connection).
+      def call: (Faraday::Env env) -> untyped
+    end
+  end
+
+  # Aliases for Faraday v1, deprecated by faraday-multipart.
+
+  %a{deprecated: Use Faraday::Multipart::FilePart instead}
+  class FilePart = ::Multipart::Post::UploadIO
+
+  %a{deprecated: Use Faraday::Multipart::ParamPart instead}
+  class ParamPart = Multipart::ParamPart
+
+  %a{deprecated: Use Faraday::Multipart::Parts instead}
+  module Parts = ::Multipart::Post::Parts
+
+  %a{deprecated: Use Faraday::Multipart::CompositeReadIO instead}
+  class CompositeReadIO = Multipart::CompositeReadIO
+
+  %a{deprecated: Use Faraday::Multipart::FilePart instead}
+  class UploadIO = ::Multipart::Post::UploadIO
+end
