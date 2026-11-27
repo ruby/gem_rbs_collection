@@ -1,0 +1,33 @@
+module Hashdiff
+  VERSION: String
+
+  # A change in a diff: `['+', path, value]`, `['-', path, value]` or
+  # `['~', path, old_value, new_value]`. The path is a String such as
+  # `"a.b[0]"`, or an Array of keys and indexes with `array_path: true`.
+  type change = Array[untyped]
+
+  # Diffs two hashes or arrays, nested to any depth. Other objects are
+  # compared as values.
+  #
+  # The block (or the `comparison:` option) is called with the path and the
+  # two values. Returning true or false decides whether they are equal; any
+  # other value falls back to the default comparison.
+  def self.diff: (untyped obj1, untyped obj2, ?delimiter: String, ?similarity: Numeric, ?strict: bool, ?ignore_keys: untyped, ?indifferent: bool, ?numeric_tolerance: Numeric, ?strip: bool, ?case_insensitive: bool, ?array_path: false, ?use_lcs: bool, ?preserve_key_order: bool, ?comparison: ^(String path, untyped obj1, untyped obj2) -> boolish) ?{ (String path, untyped obj1, untyped obj2) -> boolish } -> Array[change]
+               | (untyped obj1, untyped obj2, array_path: true, ?delimiter: String, ?similarity: Numeric, ?strict: bool, ?ignore_keys: untyped, ?indifferent: bool, ?numeric_tolerance: Numeric, ?strip: bool, ?case_insensitive: bool, ?use_lcs: bool, ?preserve_key_order: bool, ?comparison: ^(Array[untyped] path, untyped obj1, untyped obj2) -> boolish) ?{ (Array[untyped] path, untyped obj1, untyped obj2) -> boolish } -> Array[change]
+               | (untyped obj1, untyped obj2, ?Hash[Symbol, untyped] options) ?{ (String | Array[untyped] path, untyped obj1, untyped obj2) -> boolish } -> Array[change]
+
+  # Diffs with similarity 0.3, 0.5 and 0.8 (unless `similarity:` is given)
+  # and returns the diff with the fewest changed nodes. Takes the options of
+  # `diff`.
+  def self.best_diff: (untyped obj1, untyped obj2, ?delimiter: String, ?similarity: Numeric, ?strict: bool, ?ignore_keys: untyped, ?indifferent: bool, ?numeric_tolerance: Numeric, ?strip: bool, ?case_insensitive: bool, ?array_path: false, ?use_lcs: bool, ?preserve_key_order: bool, ?comparison: ^(String path, untyped obj1, untyped obj2) -> boolish) ?{ (String path, untyped obj1, untyped obj2) -> boolish } -> Array[change]
+                    | (untyped obj1, untyped obj2, array_path: true, ?delimiter: String, ?similarity: Numeric, ?strict: bool, ?ignore_keys: untyped, ?indifferent: bool, ?numeric_tolerance: Numeric, ?strip: bool, ?case_insensitive: bool, ?use_lcs: bool, ?preserve_key_order: bool, ?comparison: ^(Array[untyped] path, untyped obj1, untyped obj2) -> boolish) ?{ (Array[untyped] path, untyped obj1, untyped obj2) -> boolish } -> Array[change]
+                    | (untyped obj1, untyped obj2, ?Hash[Symbol, untyped] options) ?{ (String | Array[untyped] path, untyped obj1, untyped obj2) -> boolish } -> Array[change]
+
+  # Applies the changes to `obj` in place and returns it.
+  def self.patch!: [T < Hash[untyped, untyped] | Array[untyped]] (T obj, Array[change] changes, ?delimiter: String) -> T
+                 | [T < Hash[untyped, untyped] | Array[untyped]] (T obj, Array[change] changes, ?Hash[Symbol, untyped] options) -> T
+
+  # Reverts the changes on `obj` in place and returns it.
+  def self.unpatch!: [T < Hash[untyped, untyped] | Array[untyped]] (T obj, Array[change] changes, ?delimiter: String) -> T
+                   | [T < Hash[untyped, untyped] | Array[untyped]] (T obj, Array[change] changes, ?Hash[Symbol, untyped] options) -> T
+end
