@@ -1,0 +1,575 @@
+module Excon
+  VERSION: String
+  DEFAULT_CA_FILE: String
+  CR_NL: String
+  DEFAULT_CHUNK_SIZE: Integer
+  CHUNK_SIZE: Integer
+  DEFAULT_REDIRECT_LIMIT: Integer
+  DEFAULT_RETRY_LIMIT: Integer
+  DEFAULT_RETRY_ERRORS: Array[singleton(Error)]
+  FORCE_ENC: bool
+  HTTP_1_1: String
+  HTTP_VERBS: Array[String]
+  HTTPS: String
+  NO_ENTITY: Array[Integer]
+  REDACTED: String
+  UNIX: String
+  USER_AGENT: String
+  VERSIONS: String
+  VALID_REQUEST_KEYS: Array[Symbol]
+  VALID_CONNECTION_KEYS: Array[Symbol]
+  DEPRECATED_VALID_REQUEST_KEYS: Hash[Symbol, String]
+  DEFAULTS: Hash[Symbol, untyped]
+
+  type params = Hash[Symbol, untyped]
+  type stub_response = params | ^(params) -> params
+  type stub = [params, stub_response]
+
+  def self.defaults: () -> Hash[Symbol, untyped]
+  def self.defaults=: (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+  def self.new: (String url, ?params params) -> Connection
+
+  # Raises Excon::Error::Warning instead when set_raise_on_warnings!(true) was called.
+  def self.display_warning: (String warning) -> nil
+  def self.set_raise_on_warnings!: (boolish should_raise) -> boolish
+
+  # Deprecated: use Excon.defaults[:mock], [:ssl_ca_path] and [:ssl_verify_peer].
+  def self.mock: () -> untyped
+  def self.mock=: [T] (T new_mock) -> T
+  def self.ssl_ca_path: () -> untyped
+  def self.ssl_ca_path=: [T] (T new_ssl_ca_path) -> T
+  def self.ssl_verify_peer: () -> untyped
+  def self.ssl_verify_peer=: [T] (T new_ssl_verify_peer) -> T
+
+  # Raises ArgumentError unless exactly one of response_params and a block is given.
+  def self.stub: (params request_params, stub_response response_params) -> stub
+               | (?params request_params, ?nil response_params) { (params) -> params } -> stub
+  def self.stub_for: (?params request_params) -> stub?
+  def self.stubs: () -> Array[stub]
+  def self.unstub: (?params request_params) -> stub?
+  def self.stub_call_count: (stub stub) -> Integer
+  def self.record_stub_call: (stub stub) -> Integer
+
+  # Raises Excon::Error::StubNotCalled when a stub has answered no request.
+  def self.verify_stubs: (*stub stubs) -> true
+
+  # The block is deprecated (it warns); pass response_block: in params instead.
+  def self.connect: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.delete: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.get: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.head: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.options: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.patch: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.post: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.put: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  def self.trace: (String url, ?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+
+  class Headers < Hash[String, String]
+    def initialize: () -> void
+    def []: (String | Symbol key) -> String?
+    def []=: (String | Symbol key, String value) -> String
+    alias store []=
+    def assoc: (String key) -> [String, String]?
+    def delete: (String | Symbol key) -> String?
+              | [T] (String | Symbol key) { (String | Symbol key) -> T } -> (String | T)
+    def fetch: (String | Symbol key) -> String?
+             | [T] (String | Symbol key, T default) -> (String | T)
+             | [T] (String | Symbol key, ?untyped default) { (String key) -> T } -> (String | T)
+    def has_key?: (String | Symbol key) -> bool
+    alias key? has_key?
+    alias member? has_key?
+    def merge: (Hash[untyped, untyped] other_hash) -> Headers
+    def merge!: (Hash[untyped, untyped] other_hash) -> self
+    def rehash: () -> self
+    def values_at: (*String | Symbol keys) -> Array[String?]
+  end
+
+  class Response
+    attr_accessor data: Hash[Symbol, untyped]
+    attr_accessor body: String
+    attr_accessor headers: Headers
+    attr_accessor status: Integer
+    attr_accessor status_line: String?
+    attr_accessor reason_phrase: String?
+    attr_accessor remote_ip: String?
+    attr_reader host: String?
+    attr_reader scheme: String?
+    attr_reader local_address: String?
+    attr_reader local_port: Integer?
+    attr_reader http_method: (Symbol | String)?
+    attr_reader path: String?
+    attr_reader query: (String | Hash[untyped, untyped])?
+    attr_reader port: Integer?
+
+    def initialize: (?Hash[Symbol, untyped] params) -> void
+    def []: (Symbol key) -> untyped
+    def get_header: (String | Symbol name) -> String?
+
+    # Deprecated: use #data.
+    def params: () -> Hash[Symbol, untyped]
+
+    # Prints data to $stdout.
+    def pp: () -> void
+  end
+
+  class Connection
+    include Utils
+
+    type proxy = params | String | URI::Generic
+
+    attr_reader data: Hash[Symbol, untyped]
+
+    def initialize: (?params params) -> void
+
+    # Returns the request datum instead of a Response when params has pipeline: true
+    # (as #requests passes it); use #requests for pipelining.
+    def request: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def requests: (Array[params] pipeline_params) -> Array[Response]
+    def batch_requests: (Array[params] pipeline_params, ?Integer? limit) -> Array[Response]
+    def reset: () -> void
+    # The instrumentor's own logger when it has one (LoggingInstrumentor has none).
+    def logger: () -> untyped
+    # Sets LoggingInstrumentor as the instrumentor; it only calls #info on the logger.
+    def logger=: [L < LoggingInstrumentor::_Logger] (L logger) -> L
+    def inspect: () -> String
+    def valid_request_keys: (Array[untyped] middlewares) -> Array[Symbol]
+
+    # The connection is the innermost layer of the middleware stack.
+    def request_call: (params datum) -> params
+    def response_call: (params datum) -> params
+    def error_call: (params datum) -> nil
+
+    # Deprecated: use #data and the :proxy and :retry_limit params.
+    def connection: () -> params
+    def connection=: (params new_params) -> params
+    def params: () -> params
+    def params=: (params new_params) -> params
+    def proxy: () -> proxy?
+    def proxy=: (proxy? new_proxy) -> proxy?
+    def retry_limit: () -> Integer
+    def retry_limit=: (Integer new_retry_limit) -> Integer
+
+    # The block is deprecated (it warns); pass response_block: in params instead.
+    def connect: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def delete: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def get: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def head: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def options: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def patch: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def post: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def put: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+    def trace: (?params params) ?{ (String chunk, Integer? remaining_bytes, Integer? total_bytes) -> void } -> Response
+  end
+
+  class Error < StandardError
+    class Socket < Error
+      # The wrapped error, or the error itself when it was given a message.
+      attr_reader socket_error: Exception
+      def initialize: (?Exception | String socket_error) -> void
+    end
+
+    class Certificate < Socket
+      def initialize: (?Exception socket_error) -> void
+    end
+
+    class StubNotFound < Error
+    end
+
+    class StubNotCalled < Error
+    end
+
+    class InvalidStub < Error
+    end
+
+    class Warning < Error
+    end
+
+    class InvalidParameter < Error
+    end
+
+    class InvalidHeaderKey < InvalidParameter
+    end
+
+    class InvalidHeaderValue < InvalidParameter
+    end
+
+    class InvalidHost < InvalidParameter
+    end
+
+    class InvalidMethod < InvalidParameter
+    end
+
+    class InvalidPath < InvalidParameter
+    end
+
+    class InvalidQuery < InvalidParameter
+    end
+
+    class Timeout < Error
+    end
+
+    class ResponseParse < Error
+    end
+
+    class ProxyParse < Error
+    end
+
+    class TooManyRedirects < Error
+    end
+
+    # Raised when a proxy refuses a CONNECT tunnel: request is the CONNECT
+    # request sent (credentials redacted), response the parsed response datum.
+    class ProxyConnectionError < Socket
+      attr_reader request: String?
+      attr_reader response: params?
+      def initialize: (String msg, ?String? request, ?params? response) -> void
+    end
+
+    class SOCKS5Error < Socket
+    end
+
+    class HTTPStatus < Error
+      attr_reader request: params?
+      attr_reader response: Response?
+      def initialize: (String msg, ?params? request, ?Response? response) -> void
+    end
+
+    class Informational < HTTPStatus
+    end
+
+    class Success < HTTPStatus
+    end
+
+    class Redirection < HTTPStatus
+    end
+
+    class Client < HTTPStatus
+    end
+
+    class Server < HTTPStatus
+    end
+
+    class Continue < Informational
+    end
+
+    class SwitchingProtocols < Informational
+    end
+
+    class OK < Success
+    end
+
+    class Created < Success
+    end
+
+    class Accepted < Success
+    end
+
+    class NonAuthoritativeInformation < Success
+    end
+
+    class NoContent < Success
+    end
+
+    class ResetContent < Success
+    end
+
+    class PartialContent < Success
+    end
+
+    class MultipleChoices < Redirection
+    end
+
+    class MovedPermanently < Redirection
+    end
+
+    class Found < Redirection
+    end
+
+    class SeeOther < Redirection
+    end
+
+    class NotModified < Redirection
+    end
+
+    class UseProxy < Redirection
+    end
+
+    class TemporaryRedirect < Redirection
+    end
+
+    class BadRequest < Client
+    end
+
+    class Unauthorized < Client
+    end
+
+    class PaymentRequired < Client
+    end
+
+    class Forbidden < Client
+    end
+
+    class NotFound < Client
+    end
+
+    class MethodNotAllowed < Client
+    end
+
+    class NotAcceptable < Client
+    end
+
+    class ProxyAuthenticationRequired < Client
+    end
+
+    class RequestTimeout < Client
+    end
+
+    class Conflict < Client
+    end
+
+    class Gone < Client
+    end
+
+    class LengthRequired < Client
+    end
+
+    class PreconditionFailed < Client
+    end
+
+    class RequestEntityTooLarge < Client
+    end
+
+    class RequestURITooLong < Client
+    end
+
+    class UnsupportedMediaType < Client
+    end
+
+    class RequestedRangeNotSatisfiable < Client
+    end
+
+    class ExpectationFailed < Client
+    end
+
+    class UnprocessableEntity < Client
+    end
+
+    class TooManyRequests < Client
+    end
+
+    class InternalServerError < Server
+    end
+
+    class NotImplemented < Server
+    end
+
+    class BadGateway < Server
+    end
+
+    class ServiceUnavailable < Server
+    end
+
+    class GatewayTimeout < Server
+    end
+
+    def self.status_errors: () -> Hash[Integer, [singleton(HTTPStatus), String]]
+    def self.status_error: (params request, Response response) -> HTTPStatus
+  end
+
+  module Errors
+    class Error = Excon::Error
+    class StubNotFound = Excon::Error::StubNotFound
+    class StubNotCalled = Excon::Error::StubNotCalled
+    class InvalidStub = Excon::Error::InvalidStub
+    class Warning = Excon::Error::Warning
+    class InvalidHeaderKey = Excon::Error::InvalidHeaderKey
+    class InvalidHeaderValue = Excon::Error::InvalidHeaderValue
+    class InvalidHost = Excon::Error::InvalidHost
+    class InvalidMethod = Excon::Error::InvalidMethod
+    class InvalidPath = Excon::Error::InvalidPath
+    class InvalidQuery = Excon::Error::InvalidQuery
+    class InvalidParameter = Excon::Error::InvalidParameter
+    class Timeout = Excon::Error::Timeout
+    class ResponseParse = Excon::Error::ResponseParse
+    class ProxyParse = Excon::Error::ProxyParse
+    class TooManyRedirects = Excon::Error::TooManyRedirects
+    class ProxyConnectionError = Excon::Error::ProxyConnectionError
+    class SOCKS5Error = Excon::Error::SOCKS5Error
+    class Informational = Excon::Error::Informational
+    class Success = Excon::Error::Success
+    class Redirection = Excon::Error::Redirection
+    class Continue = Excon::Error::Continue
+    class SwitchingProtocols = Excon::Error::SwitchingProtocols
+    class OK = Excon::Error::OK
+    class Created = Excon::Error::Created
+    class Accepted = Excon::Error::Accepted
+    class NonAuthoritativeInformation = Excon::Error::NonAuthoritativeInformation
+    class NoContent = Excon::Error::NoContent
+    class ResetContent = Excon::Error::ResetContent
+    class PartialContent = Excon::Error::PartialContent
+    class MultipleChoices = Excon::Error::MultipleChoices
+    class MovedPermanently = Excon::Error::MovedPermanently
+    class Found = Excon::Error::Found
+    class SeeOther = Excon::Error::SeeOther
+    class NotModified = Excon::Error::NotModified
+    class UseProxy = Excon::Error::UseProxy
+    class TemporaryRedirect = Excon::Error::TemporaryRedirect
+    class BadRequest = Excon::Error::BadRequest
+    class Unauthorized = Excon::Error::Unauthorized
+    class PaymentRequired = Excon::Error::PaymentRequired
+    class Forbidden = Excon::Error::Forbidden
+    class NotFound = Excon::Error::NotFound
+    class MethodNotAllowed = Excon::Error::MethodNotAllowed
+    class NotAcceptable = Excon::Error::NotAcceptable
+    class ProxyAuthenticationRequired = Excon::Error::ProxyAuthenticationRequired
+    class RequestTimeout = Excon::Error::RequestTimeout
+    class Conflict = Excon::Error::Conflict
+    class Gone = Excon::Error::Gone
+    class LengthRequired = Excon::Error::LengthRequired
+    class PreconditionFailed = Excon::Error::PreconditionFailed
+    class RequestEntityTooLarge = Excon::Error::RequestEntityTooLarge
+    class RequestURITooLong = Excon::Error::RequestURITooLong
+    class UnsupportedMediaType = Excon::Error::UnsupportedMediaType
+    class RequestedRangeNotSatisfiable = Excon::Error::RequestedRangeNotSatisfiable
+    class ExpectationFailed = Excon::Error::ExpectationFailed
+    class UnprocessableEntity = Excon::Error::UnprocessableEntity
+    class TooManyRequests = Excon::Error::TooManyRequests
+    class InternalServerError = Excon::Error::InternalServerError
+    class NotImplemented = Excon::Error::NotImplemented
+    class BadGateway = Excon::Error::BadGateway
+    class ServiceUnavailable = Excon::Error::ServiceUnavailable
+    class GatewayTimeout = Excon::Error::GatewayTimeout
+    class SocketError = Excon::Error::Socket
+    class CertificateError = Excon::Error::Certificate
+    class HTTPStatusError = Excon::Error::HTTPStatus
+    class ClientError = Excon::Error::Client
+    class ServerError = Excon::Error::Server
+
+    def self.status_error: (params request, Response response) -> Error::HTTPStatus
+  end
+
+  module Middleware
+    # What a middleware wraps: the next middleware, or the Connection itself.
+    interface _Stack
+      def request_call: (params datum) -> params
+      def response_call: (params datum) -> params
+      def error_call: (params datum) -> untyped
+    end
+
+    class Base
+      @stack: _Stack
+
+      def self.valid_parameter_keys: () -> Array[Symbol]
+      def initialize: (_Stack stack) -> void
+      def request_call: (params datum) -> params
+      def response_call: (params datum) -> params
+
+      # What Connection#request returns after an error: Idempotent returns the
+      # retried request's Response, the Connection raises the error.
+      def error_call: (params datum) -> untyped
+    end
+
+    class Decompress < Base
+      INFLATE_ZLIB_OR_GZIP: Integer
+      INFLATE_RAW: Integer
+
+      def request_call: (params datum) -> params
+      def response_call: (params datum) -> params
+    end
+
+    class EscapePath < Base
+      def request_call: (params datum) -> params
+    end
+
+    class Expects < Base
+      def self.valid_parameter_keys: () -> Array[Symbol]
+      def response_call: (params datum) -> params
+    end
+
+    class Idempotent < Base
+      def self.valid_parameter_keys: () -> Array[Symbol]
+      def request_call: (params datum) -> params
+      def error_call: (params datum) -> untyped
+    end
+
+    class Instrumentor < Base
+      def self.valid_parameter_keys: () -> Array[Symbol]
+      def request_call: (params datum) -> params
+      def response_call: (params datum) -> params
+      def error_call: (params datum) -> untyped
+    end
+
+    class Mock < Base
+      def self.valid_parameter_keys: () -> Array[Symbol]
+      def request_call: (params datum) -> params
+    end
+
+    class RedirectFollower < Base
+      CONTENT_HEADERS: Array[String]
+      REDACTION_HEADERS: Array[String]
+
+      def self.valid_parameter_keys: () -> Array[Symbol]
+      def request_call: (params datum) -> params
+      def response_call: (params datum) -> params
+      def get_header: (params datum, String header) -> String?
+    end
+
+    class ResponseParser < Base
+      def response_call: (params datum) -> params
+    end
+  end
+
+  class StandardInstrumentor
+    def self.instrument: [T] (String name, ?params params) { () -> T } -> T
+                       | (String name, ?params params) -> nil
+  end
+
+  class LoggingInstrumentor
+    interface _Logger
+      def info: (String message) -> untyped
+    end
+
+    def self.instrument: [T] (String name, ?params params) { () -> T } -> T
+                       | (String name, ?params params) -> nil
+  end
+
+  class PrettyPrinter
+    interface _IO
+      def write: (String) -> untyped
+      def puts: (*untyped) -> untyped
+    end
+
+    def self.pp: (_IO io, Hash[untyped, untyped] datum, ?Integer indent) -> void
+  end
+
+  # The default :resolver_factory; a custom one only needs create_resolver.
+  class ResolverFactory
+    def self.create_resolver: () -> Resolv
+  end
+
+  module Utils
+    CONTROL: String
+    DELIMS: String
+    UNWISE: String
+    NONASCII: String
+    UNESCAPED: Regexp
+    ESCAPED: Regexp
+
+    def self?.binary_encode: (String string) -> String
+    # The instance copy (private, module_function) defaults datum to @data,
+    # which only a Connection (where Utils is included) has.
+    def self.connection_uri: (params datum) -> String
+    private def connection_uri: (?params datum) -> String
+    def self?.redact: [H < Hash[untyped, untyped]] (H datum) -> H
+    def self?.request_uri: (params datum) -> String
+    def self?.port_string: (params datum) -> String
+    def self?.default_port?: (params datum) -> bool?
+    def self?.query_string: (params datum) -> String
+    def self?.split_header_value: (String? str) -> Array[String]
+    def self?.escape_uri: (String str) -> String
+    def self?.unescape_uri: (String str) -> String
+    def self?.unescape_form: (String str) -> String
+    def self?.include_unsafe_chars?: (String str) -> bool
+    def self?.headers_hash_to_s: (Hash[untyped, untyped] headers) -> String
+  end
+end
