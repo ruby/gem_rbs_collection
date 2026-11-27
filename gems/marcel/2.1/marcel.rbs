@@ -1,0 +1,100 @@
+module Marcel
+  VERSION: String
+
+  # Content that Marcel::Magic.by_magic and Marcel::MimeType.for read: an object
+  # with read and rewind. read may take only the length (a reader defining
+  # read(length)) or the length and a buffer to fill (IO, or read(*args) as
+  # Rack::RewindableInput defines it).
+  interface _Reader
+    def read: (Integer length) -> String?
+    def rewind: () -> void
+  end
+
+  interface _BufferReader
+    def read: (Integer length, String buffer) -> String?
+    def rewind: () -> void
+  end
+
+  # A Pathname is opened in binary mode; any other object without read is
+  # matched as its String content.
+  type content = Pathname | _Reader | _BufferReader | String
+
+  # A magic rule: [offset, value] or [offset, value, children]. The offset is an
+  # Integer (or a Range of offsets to search), the value the bytes or Regexp to
+  # match (a rule with a nil value never matches), the children rules that must match too.
+  # Declared as an Array rather than tuples: Steep infers nested Array literals
+  # held in variables as Arrays, which tuples would reject.
+  type magic_rule = Array[Integer | Range[Integer] | String | Regexp | Array[magic_rule] | nil]
+
+  # Generated tables, mutated by Marcel::Magic.add, .remove and .canonicalize.
+  EXTENSIONS: Hash[String, String]
+  TYPE_EXTS: Hash[String, Array[String]]
+  TYPE_ALIASES: Hash[String, String]
+  TYPE_PARENTS: Hash[String, Array[String]]
+  MAGIC: Array[[String, Array[magic_rule]]]
+
+  class Magic
+    attr_reader type: String
+    # nil when the type String is empty (mediatype) or has no "/" (subtype).
+    attr_reader mediatype: String?
+    attr_reader subtype: String?
+
+    def initialize: (String type) -> void
+
+    # Options: :extensions, :parents and :aliases (a String or an Array of them),
+    # :magic (Array of magic rules) and :comment (ignored).
+    # Raises ArgumentError when an alias is a registered type.
+    def self.add: (String type, Hash[Symbol, String | Array[String] | Array[magic_rule] | nil] options) -> void
+
+    # Raises ArgumentError when instead_of is an alias.
+    def self.canonicalize: (String type, instead_of: String) -> void
+
+    def self.remove: (String type) -> void
+
+    def text?: () -> bool
+    def image?: () -> bool
+    def audio?: () -> bool
+    def video?: () -> bool
+
+    def child_of?: (String parent) -> bool
+
+    def extensions: () -> Array[String]
+
+    def canonical: () -> self
+
+    # Deprecated, always nil.
+    def comment: () -> nil
+
+    def self.by_type: (String type) -> instance
+                    | (nil type) -> nil
+                    | (String? type) -> instance?
+
+    def self.by_extension: (_ToS ext) -> instance?
+    def self.by_path: (String | Pathname path) -> instance?
+    def self.by_magic: (content io) -> instance?
+    def self.all_by_magic: (content io) -> Array[instance]
+
+    def to_s: () -> String
+
+    def eql?: (untyped other) -> bool
+    alias == eql?
+
+    def hash: () -> Integer
+
+    def self.child?: (String child, String parent) -> bool
+
+    def self.canonical: (String type) -> String
+                      | (nil type) -> nil
+                      | (String? type) -> String?
+  end
+
+  class MimeType
+    BINARY: String
+
+    def self.canonicalize: (String type, instead_of: String) -> void
+
+    def self.extend: (String type, ?extensions: String | Array[String] | nil, ?aliases: String | Array[String] | nil, ?parents: String | Array[String] | nil, ?magic: Array[magic_rule]?) -> void
+
+    def self.for: (?content? pathname_or_io, ?name: String?, ?extension: String?, ?declared_type: String?) -> String
+  end
+end
