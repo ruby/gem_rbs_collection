@@ -1,0 +1,96 @@
+module Faraday
+  # Exception used to control the Retry middleware. Raised for responses whose
+  # status is listed in `retry_statuses`; its `response` is the Faraday::Response.
+  class RetriableResponse < Error
+  end
+
+  # Adds the ability to retry a request based on settings and errors that have occurred.
+  # The including class provides `calculate_sleep_amount`, `retry_request?` and `rewind_files`
+  # (Faraday::Retry::Middleware does).
+  module Retryable
+    # Returns the block's value, or the response of a Faraday::RetriableResponse
+    # once no retry is left. Other matching errors are re-raised.
+    def with_retries: [T] (env: Faraday::Env, options: Faraday::Retry::Middleware::Options, retries: Integer, body: untyped, errmatch: Module) { () -> T } -> (T | Faraday::Response | Hash[Symbol, untyped] | nil)
+  end
+
+  module Retry
+    VERSION: String
+
+    class Middleware < Faraday::Middleware
+      include Retryable
+
+      type exception_matcher = Module | String
+
+      type options = Integer | Hash[untyped, untyped] | Options
+
+      DEFAULT_EXCEPTIONS: Array[exception_matcher]
+      IDEMPOTENT_METHODS: Array[Symbol]
+
+      # Options contains the configurable parameters for the Retry middleware.
+      class Options
+        type retry_if = ^(Faraday::Env env, Exception exception) -> boolish
+
+        type retry_block = ^(env: Faraday::Env, options: Options, retry_count: Integer, exception: Exception, will_retry_in: Numeric) -> void
+
+        type exhausted_retries_block = ^(env: Faraday::Env, exception: Exception, options: Options) -> void
+
+        type header_parser_block = ^(String? value) -> Numeric?
+
+        DEFAULT_CHECK: ^(untyped env, untyped exception) -> bool
+
+        def self.from: (options? value) -> instance
+
+        def max: () -> Integer
+        attr_writer max: Integer?
+
+        def interval: () -> Float
+        attr_writer interval: Numeric?
+
+        def max_interval: () -> Float
+        attr_writer max_interval: Numeric?
+
+        def interval_randomness: () -> Float
+        attr_writer interval_randomness: Numeric?
+
+        def backoff_factor: () -> Float
+        attr_writer backoff_factor: Numeric?
+
+        def exceptions: () -> Array[exception_matcher]
+        attr_writer exceptions: Array[exception_matcher] | exception_matcher | nil
+
+        def methods: () -> Array[Symbol]
+        attr_writer methods: Array[Symbol] | Symbol | nil
+
+        def retry_if: () -> retry_if
+        attr_writer retry_if: retry_if?
+
+        def retry_block: () -> retry_block
+        attr_writer retry_block: retry_block?
+
+        def retry_statuses: () -> Array[Integer]
+        attr_writer retry_statuses: Array[Integer] | Integer | nil
+
+        def exhausted_retries_block: () -> exhausted_retries_block
+        attr_writer exhausted_retries_block: exhausted_retries_block?
+
+        attr_accessor rate_limit_retry_header: String?
+        attr_accessor rate_limit_reset_header: String?
+        attr_accessor header_parser_block: header_parser_block?
+      end
+
+      # Faraday::Middleware#options returns the Options built by #initialize.
+      def options: () -> Options
+
+      def initialize: (untyped app, ?options? options) -> void
+
+      # Seconds to wait before the next retry, or nil when the server asks for
+      # longer than `max_interval`.
+      def calculate_sleep_amount: (Integer retries, Faraday::Env env) -> Numeric?
+
+      # When retries run out on a retry_statuses response this is the
+      # error's response: a Hash with RaiseError's include_request: false, or
+      # nil when the RetriableResponse carried none.
+      def call: (Faraday::Env env) -> (Faraday::Response | Hash[Symbol, untyped] | nil)
+    end
+  end
+end
