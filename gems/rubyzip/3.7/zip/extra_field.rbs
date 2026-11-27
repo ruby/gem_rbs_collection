@@ -1,0 +1,28 @@
+module Zip
+  class ExtraField < Hash[untyped, untyped]
+    ID_MAP: Hash[String, singleton(ExtraField::Generic)]
+
+    def initialize: (?String? binstr, ?local: bool) -> void
+
+    def merge: (String binstr, ?local: bool) -> nil
+
+    # `name` is a field name such as :universaltime, :zip64 or :aes; an
+    # unknown name raises Zip::Error.
+    def create: (Symbol name) -> ExtraField::Generic
+
+    # Removes the fields that may be suppressed: all of them for true,
+    # otherwise only the named ones.
+    def suppress_fields!: (bool | Symbol | Array[Symbol] | nil fields) -> self?
+
+    def local_size: () -> Integer
+    alias length local_size
+    alias size local_size
+
+    def c_dir_size: () -> Integer
+
+    def to_local_bin: () -> String
+    alias to_s to_local_bin
+
+    def to_c_dir_bin: () -> String
+  end
+end

@@ -1,0 +1,17 @@
+module Zip
+  # A `DelegateClass(Entry)`: every Entry method is forwarded to the
+  # wrapped entry.
+  class StreamableStream < Delegator
+    def initialize: (Entry entry) -> void
+
+    def get_output_stream: [TContent] () { (Tempfile) -> TContent } -> TContent
+                         | () -> Tempfile
+
+    def get_input_stream: [TContent] () { (Tempfile) -> TContent } -> TContent
+                        | () -> Tempfile
+
+    def write_to_zip_output_stream: (OutputStream output_stream) -> void
+
+    def clean_up: () -> void
+  end
+end

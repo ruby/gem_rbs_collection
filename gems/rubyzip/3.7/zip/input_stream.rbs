@@ -1,0 +1,43 @@
+module Zip
+  class InputStream
+    include IOExtras::AbstractInputStream
+
+    CHUNK_SIZE: Integer
+
+    def self.open: [TContent] (
+      String | IO | StringIO | Tempfile filename_or_io,
+      ?offset: Integer,
+      ?decrypter: Decrypter?,
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) { (InputStream) -> TContent } -> TContent
+                 | (
+      String | IO | StringIO | Tempfile filename_or_io,
+      ?offset: Integer,
+      ?decrypter: Decrypter?,
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) -> InputStream
+
+    def initialize: (
+      String | IO | StringIO | Tempfile context,
+      ?offset: Integer,
+      ?decrypter: Decrypter?,
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) -> void
+
+    def close: () -> void
+
+    def get_next_entry: () -> Entry?
+
+    def rewind: () -> Entry?
+
+    def sysread: (?Integer? maxlen, ?String? out_string) -> String?
+
+    def size: () -> Integer?
+  end
+end

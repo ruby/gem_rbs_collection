@@ -1,0 +1,158 @@
+module Zip
+  class File
+    # Entries written with get_output_stream are StreamableStream wrappers until
+    # the archive is committed; they forward every Entry method.
+    include Enumerable[Entry]
+    extend FileSplit
+
+    IO_METHODS: Array[Symbol]
+
+    # The path of the archive, or the StringIO it was opened from with
+    # `open_buffer`.
+    attr_reader name: String | StringIO
+    attr_accessor restore_ownership: bool
+    attr_accessor restore_permissions: bool
+    attr_accessor restore_times: bool
+
+    def comment: () -> String
+    def comment=: (String comment) -> String
+    def each: () { (Entry) -> void } -> Array[Entry]
+            | () -> Enumerator[Entry, Array[Entry]]
+    def entries: () -> Array[Entry]
+    def glob: (String pattern, ?Integer flags) ?{ (Entry) -> void } -> Array[Entry]
+    def size: () -> Integer
+
+    def self.open: [TContent] (
+      String file_name,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol]
+    ) { (File) -> TContent } -> TContent
+                 | (
+      String file_name,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol]
+    ) -> File
+
+    # With a block, the changes are written back to `io` (a String is
+    # wrapped in a new StringIO) and that stream is returned, or nil when
+    # `io` is not open for writing.
+    def self.open_buffer: (
+      ?String | IO | StringIO io,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol]
+    ) -> File
+                        | (
+      ?String | IO | StringIO io,
+      ?create: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol]
+    ) { (File) -> void } -> (IO | StringIO)?
+
+    def self.foreach: (String zip_file_name) { (Entry) -> void } -> Array[Entry]
+                    | (String zip_file_name) -> Enumerator[Entry, Array[Entry]]
+
+    def self.count_entries: (String | IO | StringIO path_or_io) -> Integer
+
+    def self.add_recursive: (String zip_file_name, String src_dir, ?prefix: _ToS, ?max_depth: Integer) ?{ () -> boolish } -> File
+
+    def self.extract_all: (String zip_file_name, ?String? destination_directory) ?{ (Entry, String) -> boolish } -> File
+
+    def initialize: (
+      String | IO | StringIO path_or_io,
+      ?create: bool,
+      ?buffer: bool,
+      ?restore_ownership: bool,
+      ?restore_permissions: bool,
+      ?restore_times: bool,
+      ?compression_level: Integer,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol]
+    ) -> void
+
+    # A directory entry gives the `Zip::NullInputStream` module instead,
+    # which has no IO methods, and a symlink added from disk gives a
+    # StringIO even with a block.
+    def get_input_stream: [TContent] (String | Entry entry) { (entry_input_stream) -> TContent } -> TContent
+                        | (String | Entry entry) -> entry_input_stream
+
+    def get_output_stream: [TContent] (
+      String | Entry entry,
+      ?permissions: Integer?,
+      ?comment: String?,
+      ?extra: (ExtraField | String)?,
+      ?compressed_size: Integer?,
+      ?crc: Integer?,
+      ?compression_method: Integer?,
+      ?compression_level: Integer?,
+      ?size: Integer?,
+      ?time: Time?
+    ) { (Tempfile) -> TContent } -> TContent
+                         | (
+      String | Entry entry,
+      ?permissions: Integer?,
+      ?comment: String?,
+      ?extra: (ExtraField | String)?,
+      ?compressed_size: Integer?,
+      ?crc: Integer?,
+      ?compression_method: Integer?,
+      ?compression_level: Integer?,
+      ?size: Integer?,
+      ?time: Time?
+    ) -> Tempfile
+
+    # A symlink entry added from disk gives its StringIO instead of the
+    # content; a directory entry raises NoMethodError.
+    def read: (String | Entry entry) -> String
+
+    # The block is called without arguments when the entry already exists;
+    # a truthy result replaces it.
+    def add: (String | Entry entry, String src_path) ?{ () -> boolish } -> Entry
+
+    def add_stored: (String | Entry entry, String src_path) ?{ () -> boolish } -> Entry
+
+    def add_recursive: (String src_dir, ?prefix: _ToS, ?max_depth: Integer) ?{ () -> boolish } -> self
+
+    def remove: (String | Entry entry) -> Entry
+
+    def rename: (String | Entry entry, String new_name) ?{ () -> boolish } -> void
+
+    def replace: (String | Entry entry, String src_path) -> void
+
+    def extract: (String | Entry entry, ?String? entry_path, ?destination_directory: String?) ?{ (Entry, String) -> boolish } -> Entry
+
+    def extract_all: (?String? destination_directory) ?{ (Entry, String) -> boolish } -> self
+
+    def mkdir: (String entry_name, ?Integer permission) -> void
+
+    def find_entry: (String | Entry entry_name) -> Entry?
+
+    def get_entry: (String | Entry entry) -> Entry
+
+    def commit: () -> void
+
+    def close: () -> void
+
+    def write_buffer: (?StringIO io) -> StringIO
+                    | (IO io) -> IO
+                    | (Tempfile io) -> Tempfile
+
+    def commit_required?: () -> bool
+
+    # The name, or the StringIO the archive was opened from.
+    def to_s: () -> (String | StringIO)
+  end
+end
