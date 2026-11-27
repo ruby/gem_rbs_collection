@@ -1,0 +1,25 @@
+module Zip
+  class DOSTime < Time
+    DOS_EPOCH_YEAR: Integer
+    DOS_MAX_YEAR: Integer
+    DOS_MIN_DATE: Integer
+    DOS_MAX_DATE: Integer
+    DOS_MIN_TIME: Integer
+    DOS_MAX_TIME: Integer
+
+    attr_writer absolute_time: bool
+
+    def self.parse_binary_dos_format: (Integer dos_date, Integer dos_time) -> DOSTime
+
+    def self.from_time: (Time time) -> DOSTime
+
+    def absolute_time?: () -> bool
+
+    def to_binary_dos_time: () -> Integer
+
+    def to_binary_dos_date: () -> Integer
+
+    def <=>: (Time other) -> Integer
+           | (untyped other) -> Integer?
+  end
+end

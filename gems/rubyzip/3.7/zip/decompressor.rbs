@@ -1,0 +1,14 @@
+module Zip
+  class Decompressor
+    CHUNK_SIZE: Integer
+
+    attr_reader decompressed_size: Integer?
+    attr_reader input_stream: IO | StringIO | Tempfile | DecryptedIo
+
+    def self.register: (Integer compression_method, singleton(Decompressor) decompressor_class) -> void
+
+    def self.find_by_compression_method: (Integer compression_method) -> singleton(Decompressor)?
+
+    def initialize: (IO | StringIO | Tempfile | DecryptedIo input_stream, ?Integer? decompressed_size) -> void
+  end
+end

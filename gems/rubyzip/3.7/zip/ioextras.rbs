@@ -1,0 +1,28 @@
+module Zip
+  module IOExtras
+    CHUNK_SIZE: Integer
+
+    def self.copy_stream: (_Writer ostream, _Reader istream) -> void
+
+    def self.copy_stream_n: (_Writer ostream, _Reader istream, Integer nbytes) -> void
+
+    interface _Writer
+      def write: (String data) -> untyped
+    end
+
+    interface _Reader
+      def read: (Integer length, String outbuf) -> String?
+
+      def eof?: () -> bool
+    end
+
+    module FakeIO
+      attr_reader external_encoding: Encoding
+      attr_reader internal_encoding: Encoding?
+
+      def set_encoding: (encoding ext_enc, ?encoding? int_enc) -> Encoding
+
+      def kind_of?: (Module mod) -> bool
+    end
+  end
+end

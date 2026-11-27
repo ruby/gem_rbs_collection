@@ -1,0 +1,33 @@
+module Zip
+  class ExtraField
+    class Zip64 < ExtraField::Generic
+      HEADER_ID: String
+
+      attr_accessor original_size: Integer?
+      attr_accessor compressed_size: Integer?
+      attr_accessor relative_header_offset: Integer?
+      attr_accessor disk_start_number: Integer?
+
+      def initialize: (?String? binstr) -> void
+
+      def merge: (String binstr) -> void
+
+      # Returns the four values, each from the extra field where the base
+      # value is the 0xFFFFFFFF (0xFFFF) placeholder.
+      def parse: (
+        Integer original_size,
+        Integer compressed_size,
+        ?Integer? relative_header_offset,
+        ?Integer? disk_start_number
+      ) -> [Integer, Integer, Integer?, Integer?]
+
+      def suppress?: () -> bool
+
+      def pack_for_local: () -> String
+
+      def pack_for_c_dir: () -> String
+
+      def ==: (untyped other) -> bool
+    end
+  end
+end

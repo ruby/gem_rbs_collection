@@ -1,0 +1,37 @@
+module Zip
+  # Holds Entry objects, and StreamableStream wrappers (a DelegateClass of
+  # Entry) for entries written with Zip::File#get_output_stream.
+  class EntrySet
+    include Enumerable[Entry | StreamableStream]
+
+    def initialize: (?Array[Entry | StreamableStream] an_enumerable) -> void
+
+    def include?: (Entry | StreamableStream | String entry) -> bool
+
+    def find_entry: (Entry | StreamableStream | String entry) -> (Entry | StreamableStream)?
+
+    def <<: (Entry | StreamableStream entry) -> void
+    alias push <<
+
+    def size: () -> Integer
+    alias length size
+
+    # Returns the argument when an entry with that name was removed.
+    def delete: (Entry entry) -> Entry?
+              | (StreamableStream entry) -> StreamableStream?
+              | (String entry) -> String?
+
+    def each: () { (Entry | StreamableStream) -> void } -> Array[Entry | StreamableStream]
+            | () -> Enumerator[Entry | StreamableStream, Array[Entry | StreamableStream]]
+
+    def entries: () -> Array[Entry | StreamableStream]
+
+    def dup: () -> EntrySet
+
+    def ==: (untyped other) -> bool
+
+    def parent: (Entry | StreamableStream entry) -> (Entry | StreamableStream)?
+
+    def glob: (String pattern, ?Integer flags) ?{ (Entry | StreamableStream) -> void } -> Array[Entry | StreamableStream]
+  end
+end

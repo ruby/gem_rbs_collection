@@ -1,0 +1,32 @@
+module Zip
+  module IOExtras
+    module AbstractInputStream
+      include Enumerable[String]
+      include FakeIO
+
+      attr_accessor lineno: Integer
+      attr_reader pos: Integer
+
+      def read: (?Integer? maxlen, ?String? out_string) -> String?
+
+      # An Integer `sep` is taken as the limit (and `limit` is then ignored).
+      def readlines: (?String | Integer | nil sep, ?Integer? limit, ?chomp: boolish) -> Array[String]
+
+      def gets: (?String | Integer | nil sep, ?Integer? limit, ?chomp: boolish) -> String?
+
+      # Raises EOFError at the end of the stream.
+      def readline: (?String | Integer | nil sep, ?Integer? limit, ?chomp: boolish) -> String
+
+      def ungetc: (Integer byte) -> void
+
+      def flush: () -> void
+
+      def each: (?String | Integer | nil sep, ?Integer? limit, ?chomp: boolish) { (String) -> void } -> nil
+              | (?String | Integer | nil sep, ?Integer? limit, ?chomp: boolish) -> Enumerator[String, nil]
+      alias each_line each
+
+      def eof?: () -> bool
+      alias eof eof?
+    end
+  end
+end

@@ -1,0 +1,78 @@
+module Zip
+  class OutputStream
+    include IOExtras::AbstractOutputStream
+
+    def self.open: [TContent] (
+      String file_name,
+      ?encrypter: Encrypter?,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol],
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) { (OutputStream) -> TContent } -> TContent
+                 | (
+      String file_name,
+      ?encrypter: Encrypter?,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol],
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) -> OutputStream
+
+    # Returns a copy of `io` (reopened on the same data), after writing the
+    # archive to it.
+    def self.write_buffer: (
+      ?StringIO io,
+      ?encrypter: Encrypter?,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol],
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) { (OutputStream) -> void } -> StringIO
+                         | (
+      Tempfile io,
+      ?encrypter: Encrypter?,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol],
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) { (OutputStream) -> void } -> Tempfile
+                         | (
+      IO io,
+      ?encrypter: Encrypter?,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol],
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) { (OutputStream) -> void } -> IO
+
+    def initialize: (
+      String | IO | StringIO | Tempfile file_name,
+      ?stream: bool,
+      ?encrypter: Encrypter?,
+      ?suppress_extra_fields: bool | Symbol | Array[Symbol],
+      ?external_encoding: encoding?,
+      ?internal_encoding: encoding?,
+      ?encoding: encoding?
+    ) -> void
+
+    def comment: () -> String
+    def comment=: (String comment) -> String
+
+    def close: () -> void
+
+    def close_buffer: () -> (IO | StringIO | Tempfile)
+
+    def put_next_entry: (
+      String | Entry | StreamableStream entry_name,
+      ?String? comment,
+      ?(ExtraField | String)? extra,
+      ?Integer? compression_method,
+      ?Integer? level
+    ) -> void
+
+    def copy_raw_entry: (Entry entry) -> void
+
+    def <<: (String data) -> self
+  end
+end
