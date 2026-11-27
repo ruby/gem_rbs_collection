@@ -7,9 +7,29 @@ module Builder
   VERSION: String
 
   # Raises RuntimeError when +klass+ already defines +method_name+.
+  # +defined_constant+ is ignored.
   def self.check_for_name_collision: (Module klass, String | Symbol method_name, ?untyped defined_constant) -> nil
 
   class IllegalBlockError < RuntimeError
+  end
+
+  # Escapes text for XML (marked :nodoc: in the gem; used by the builders).
+  # String#to_xs and Integer#xchr are only defined on Rubies without
+  # String#encode, so they are not declared.
+  module XChar
+    # Returns +string+ converted to UTF-8. ASCII-only binary strings are
+    # returned unchanged; input that is not valid UTF-8 is read as ISO-8859-1.
+    def self.unicode: (String string) -> String
+
+    # Returns +string+ in UTF-8 with &, < and > escaped and characters that
+    # XML does not allow replaced.
+    def self.encode: (String string) -> String
+  end
+
+  # What a builder appends its markup to (the :target option): Strings,
+  # IO and StringIO, Arrays, other builders, ...
+  interface _Target
+    def <<: (String markup) -> untyped
   end
 
   # Tags are created by calling any method on a builder (method_missing):
@@ -18,14 +38,23 @@ module Builder
   # Most methods return what the target's `<<` returned (or the target itself
   # for `tag!`), so their return types depend on the target and stay untyped.
   # With the default String target, `tag!` and `target!` return that String.
+  # With no indentation, comment!, declare!, instruct!, cdata! and
+  # cdata_value! return nil.
   class XmlBase < BasicObject
     def self.cache_method_calls: () -> boolish
     def self.cache_method_calls=: (boolish value) -> boolish
 
     def initialize: (?Integer indent, ?Integer initial, ?String encoding) -> void
 
+    # A Symbol as the first argument is a namespace (`tag!(:g, :id)` is
+    # `<g:id/>`), Hashes are attributes, nil is skipped (or nil="true" with
+    # :explicit_nil_handling) and anything else is text (to_s).
     # Raises ArgumentError when a text argument is mixed with a block.
-    def tag!: (Symbol | String sym, *untyped args) ?{ (self builder) -> untyped } -> untyped
+    def tag!: (Symbol | String sym, *_ToS args) ?{ (self builder) -> void } -> untyped
+
+    # Creates the tag +sym+, like tag!. Called for every unknown method.
+    def method_missing: (Symbol sym, *_ToS args) ?{ (self builder) -> void } -> untyped
+
     def text!: (String text) -> untyped
     def <<: (String text) -> untyped
     def explicit_nil_handling?: () -> bool?
@@ -33,13 +62,14 @@ module Builder
   end
 
   class XmlMarkup < XmlBase
-    type options = { ?indent: Integer, ?margin: Integer, ?quote: :single | :double, ?explicit_nil_handling: bool, ?target: untyped }
+    type options = { ?indent: Integer?, ?margin: Integer?, ?quote: :single | :double, ?explicit_nil_handling: bool, ?target: _Target? }
 
     def initialize: (?options options) -> void
                   | (Hash[Symbol, untyped] options) -> void
     def target!: () -> untyped
     def comment!: (String comment_text) -> untyped
-    def declare!: (Symbol | String inst, *(String | Symbol) args) ?{ (self builder) -> untyped } -> untyped
+    # String arguments are quoted, Symbols are not and other values are skipped.
+    def declare!: (Symbol | String inst, *(String | Symbol) args) ?{ (self builder) -> void } -> untyped
     def instruct!: (?Symbol | String directive_tag, ?Hash[Symbol, untyped] attrs) -> untyped
     def cdata!: (String text) -> untyped
     def cdata_value!: (Symbol | String open, String text) -> untyped
@@ -47,5 +77,23 @@ module Builder
 
   # The target receives start_tag(Symbol, Hash?), end_tag(Symbol) and text(String).
   class XmlEvents < XmlMarkup
+    # What an XmlEvents builder sends its events to (the :target option).
+    # comment!, declare!, instruct!, cdata! and cdata_value! also call `<<`
+    # on it.
+    interface _Handler
+      def start_tag: (Symbol tag, Hash[untyped, untyped]? attrs) -> untyped
+      def end_tag: (Symbol tag) -> untyped
+      def text: (String text) -> untyped
+    end
+
+    # The handler is required: without one the builder writes to a String,
+    # which has no start_tag, and every tag raises NoMethodError.
+    type options = { target: _Handler, ?indent: Integer?, ?margin: Integer?, ?quote: :single | :double, ?explicit_nil_handling: bool }
+
+    def initialize: (options options) -> void
+                  | (Hash[Symbol, untyped] options) -> void
+
+    # Returns what the handler's text returned.
+    def text!: (String text) -> untyped
   end
 end

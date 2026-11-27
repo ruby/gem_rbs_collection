@@ -1,6 +1,7 @@
 require "builder"
 require "builder/version"
 
+# @type var xml: Builder::XmlMarkup
 xml = Builder::XmlMarkup.new(indent: 2, margin: 1, quote: :single, explicit_nil_handling: true)
 xml.instruct!
 xml.instruct!(:xml, version: "1.0", encoding: "UTF-8")
@@ -35,8 +36,23 @@ Builder::XmlMarkup.new(options)
 Builder::XmlMarkup.new
 
 buffer = +""
-to_buffer = Builder::XmlMarkup.new(target: buffer)
-to_buffer.tag!(:sitemapindex, xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9")
+# @type var to_buffer: Builder::XmlMarkup
+to_buffer = Builder::XmlMarkup.new(target: buffer, indent: nil, margin: nil)
+# With a String target, tag! returns it.
+# @type var sitemap: String
+sitemap = to_buffer.tag!(:sitemapindex, xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9")
+sitemap.length
+to_buffer.tag!(:changefreq) { to_buffer.text!("daily") }
+to_buffer.tag!(:g, :id, "1")
+to_buffer.method_missing(:loc, "https://example.com/", nil, { lang: "en" })
+to_buffer.method_missing(:url) { |url| url.tag!(:loc, "https://example.com/") }
+
+# Builders can be targets of other builders, as can IO and Arrays.
+nested = Builder::XmlMarkup.new(target: to_buffer)
+nested.tag!(:inner)
+Builder::XmlMarkup.new(target: $stdout)
+lines = [] #: Array[String]
+Builder::XmlMarkup.new(target: lines).tag!(:line)
 
 Builder::XmlBase.cache_method_calls = false
 # @type var caching: boolish
@@ -78,9 +94,20 @@ class EventCollector
   end
 end
 
-events = Builder::XmlEvents.new(target: EventCollector.new)
+# @type var events: Builder::XmlEvents
+events = Builder::XmlEvents.new(target: EventCollector.new, indent: 2)
 events.tag!(:title, "x")
 events.text!("y")
+event_options = { target: EventCollector.new } #: Hash[Symbol, untyped]
+Builder::XmlEvents.new(event_options)
+
+# @type var escaped: String
+escaped = Builder::XChar.encode("a < b & \u00e9")
+escaped.length
+# @type var utf8: String
+utf8 = Builder::XChar.unicode("caf\xE9".b)
+utf8.length
+
 begin
   xml.comment!("x")
 rescue Builder::IllegalBlockError => e
