@@ -1,0 +1,69 @@
+module Crack
+  VERSION: String
+
+  # Raised by Crack::JSON.parse for input it cannot parse.
+  class ParseError < StandardError
+  end
+
+  module Util
+    extend Util
+
+    def snake_case: (String str) -> String
+
+    def to_xml_attributes: (Hash[_ToS, _ToS] hash) -> String
+  end
+
+  class JSON
+    # Exception classes that Crack::JSON.parse turns into Crack::ParseError.
+    def self.parser_exceptions: () -> Array[singleton(Exception)]
+
+    # Returns the parsed value: nested Hash, Array, String, Integer, Float,
+    # Date, Time, Regexp, true, false or nil. Hash keys are usually Strings, but
+    # lenient input such as `{1: 2}` gives other keys, and input with values
+    # YAML is not allowed to load is returned as the converted YAML String.
+    # Raises Crack::ParseError for invalid input.
+    def self.parse: (String json) -> untyped
+  end
+
+  class REXMLParser
+    # Returns `{ root_name => value }`, where value is a nested Hash, Array,
+    # REXMLUtiliyNodeString, String, Integer, Float, BigDecimal, Date, Time,
+    # StringIO (for `type="file"`), true, false or nil.
+    def self.parse: (String xml) -> Hash[String, untyped]
+  end
+
+  class XML
+    interface _Parser
+      def parse: (String xml) -> untyped
+    end
+
+    # Returns the default parser, Crack::REXMLParser, unless another one was set.
+    def self.parser: () -> _Parser
+
+    # Setting nil restores the default parser.
+    def self.parser=: (_Parser? parser) -> _Parser?
+
+    # Returns `{}` for blank input, otherwise what the parser returns
+    # (a Hash for Crack::REXMLParser; see Crack::REXMLParser.parse).
+    def self.parse: (String xml) -> untyped
+  end
+end
+
+# The internal node class of Crack::REXMLParser. Its typecasts table maps the
+# `type` attribute of an element to a conversion of the element's text.
+class REXMLUtilityNode
+  def self.typecasts: () -> Hash[String, ^(String?) -> untyped]
+
+  def self.typecasts=: (Hash[String, ^(String?) -> untyped] obj) -> Hash[String, ^(String?) -> untyped]
+
+  def self.available_typecasts: () -> Array[String]
+
+  def self.available_typecasts=: (Array[String] obj) -> Array[String]
+
+  def initialize: (String name, ?Hash[String, String] normalized_attributes) -> void
+end
+
+# Text values parsed by Crack::XML carry the element's attributes.
+class REXMLUtiliyNodeString < String
+  attr_accessor attributes: Hash[String, String]
+end
