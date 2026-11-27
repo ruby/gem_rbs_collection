@@ -1,0 +1,269 @@
+module Addressable
+  module VERSION
+    MAJOR: Integer
+    MINOR: Integer
+    TINY: Integer
+    STRING: String
+  end
+
+  # Loaded from the idn gem when it is installed (addressable/idna/native),
+  # otherwise the pure Ruby implementation (addressable/idna/pure).
+  module IDNA
+    def self.to_ascii: (_ToS input) -> String
+    def self.to_unicode: (_ToS input) -> String
+
+    # Deprecated: use String#unicode_normalize(:nfkc).
+    def self.unicode_normalize_kc: (_ToS value) -> String
+  end
+
+  class Template
+    class InvalidTemplateValueError < StandardError
+    end
+
+    class InvalidTemplateError < StandardError
+    end
+
+    class InvalidTemplateOperatorError < InvalidTemplateError
+    end
+
+    class TemplateOperatorAbortedError < StandardError
+    end
+
+    # An object that looks up a variable by name, such as a lambda or a Struct.
+    interface _VariableLookup
+      def []: (String name) -> untyped
+    end
+
+    # A Hash, an Array of name and value pairs, or an object with #[].
+    type variable_mapping = Hash[untyped, untyped] | Array[[untyped, untyped]] | _VariableLookup
+
+    class MatchData
+      def initialize: (Addressable::URI uri, Addressable::Template template, Hash[String, untyped] mapping) -> void
+
+      attr_reader uri: Addressable::URI
+      attr_reader template: Addressable::Template
+
+      # The values are Strings, Arrays or Hashes of Strings, or nil without a
+      # processor; a processor's #restore can return anything.
+      attr_reader mapping: Hash[String, untyped]
+
+      def variables: () -> Array[String]
+      alias keys variables
+      alias names variables
+      def values: () -> Array[untyped]
+      alias captures values
+      def []: (String | Symbol | Integer key) -> untyped
+            | (Range[Integer] range) -> Array[untyped]?
+            | (Integer start, int length) -> Array[untyped]?
+      def to_a: () -> Array[untyped]
+      def to_s: () -> String
+      alias string to_s
+      def values_at: (*String | Symbol | Integer indexes) -> Array[untyped]
+      def inspect: () -> String
+      def pre_match: () -> String
+      alias post_match pre_match
+    end
+
+    attr_reader pattern: String
+
+    def initialize: (_ToStr pattern) -> void
+    def freeze: () -> self
+    def inspect: () -> String
+    def ==: (untyped template) -> bool
+    alias eql? ==
+    def hash: () -> Integer
+    def extract: (String | Addressable::URI | ::URI::Generic | _ToStr uri, ?untyped processor) -> Hash[String, untyped]?
+    def match: (String | Addressable::URI | ::URI::Generic | _ToStr uri, ?untyped processor) -> MatchData?
+    def partial_expand: (variable_mapping mapping, ?untyped processor, ?bool normalize_values) -> Addressable::Template
+                      | (?nil mapping, ?untyped processor, ?bool normalize_values) { (String name) -> untyped } -> Addressable::Template
+    def expand: (variable_mapping mapping, ?untyped processor, ?bool normalize_values) -> URI
+              | (?nil mapping, ?untyped processor, ?bool normalize_values) { (String name) -> untyped } -> URI
+    def variables: () -> Array[String]
+    alias keys variables
+    alias names variables
+    def variable_defaults: () -> Hash[String, String]
+    def to_regexp: () -> Regexp
+  end
+
+  class URI
+    class InvalidURIError < StandardError
+    end
+
+    module CharacterClasses
+      ALPHA: String
+      DIGIT: String
+      GEN_DELIMS: String
+      SUB_DELIMS: String
+      RESERVED: String
+      UNRESERVED: String
+      RESERVED_AND_UNRESERVED: String
+      PCHAR: String
+      SCHEME: String
+      HOST: String
+      AUTHORITY: String
+      PATH: String
+      QUERY: String
+      FRAGMENT: String
+    end
+
+    module CharacterClassesRegexps
+      AUTHORITY: Regexp
+      FRAGMENT: Regexp
+      HOST: Regexp
+      PATH: Regexp
+      QUERY: Regexp
+      RESERVED: Regexp
+      RESERVED_AND_UNRESERVED: Regexp
+      SCHEME: Regexp
+      UNRESERVED: Regexp
+    end
+
+    # An IP address object such as IPAddr (#hostname= checks for #ipv4?/#ipv6?).
+    interface _IPAddress
+      def ipv4?: () -> bool
+      def to_s: () -> String
+    end
+
+    # What .encode_component accepts as a component.
+    type component = String | Symbol | Numeric | bool | _ToStr
+
+    # A value of #query_values=: nil gives "key", an Array repeats the key.
+    type query_value = component | Array[component?] | nil
+
+    # What #query_values= takes: a Hash, or an Array of pairs (an Array such as
+    # #query_values(Array) returns, or a key alone).
+    type query_values_input = Hash[component, query_value] | Array[[component, query_value] | [component] | Array[component?] | component]
+
+    def self.parse: (nil uri) -> nil
+                  | (String | URI | ::URI::Generic | _ToStr uri) -> instance
+                  | (String | URI | ::URI::Generic | _ToStr | nil uri) -> instance?
+    def self.heuristic_parse: (nil uri, ?Hash[Symbol, String] hints) -> nil
+                            | (String | Addressable::URI | ::URI::Generic | _ToStr uri, ?Hash[Symbol, String] hints) -> instance
+                            | (String | Addressable::URI | ::URI::Generic | _ToStr | nil uri, ?Hash[Symbol, String] hints) -> instance?
+    def self.convert_path: (nil path) -> nil
+                         | (String | Addressable::URI | _ToStr path) -> instance
+                         | (String | Addressable::URI | _ToStr | nil path) -> instance?
+    def self.join: (String | Addressable::URI | _ToStr uri, *String | Addressable::URI | _ToStr uris) -> instance
+                 | () -> nil
+    def self.encode_component: (nil component, ?String | Regexp character_class, ?String upcase_encoded) -> nil
+                             | (component component, ?String | Regexp character_class, ?String upcase_encoded) -> String
+                             | (component? component, ?String | Regexp character_class, ?String upcase_encoded) -> String?
+    alias self.escape_component self.encode_component
+    def self.unencode: (nil uri, ?singleton(String) | singleton(Addressable::URI) return_type, ?String leave_encoded) -> nil
+                     | (String | _ToStr uri, ?singleton(String) return_type, ?String leave_encoded) -> String
+                     | (String | _ToStr uri, singleton(Addressable::URI) return_type, ?String leave_encoded) -> Addressable::URI
+                     | (String | _ToStr | nil uri, ?singleton(String) return_type, ?String leave_encoded) -> String?
+    alias self.unescape self.unencode
+    alias self.unencode_component self.unencode
+    alias self.unescape_component self.unencode
+    def self.normalize_component: (nil component, ?String | Regexp character_class, ?String leave_encoded) -> nil
+                                | (String | _ToStr component, ?String | Regexp character_class, ?String leave_encoded) -> String
+                                | (String | _ToStr | nil component, ?String | Regexp character_class, ?String leave_encoded) -> String?
+    def self.encode: (nil uri, ?singleton(String) | singleton(Addressable::URI) return_type) -> nil
+                   | (String | _ToStr uri, ?singleton(String) return_type) -> String
+                   | (String | _ToStr uri, singleton(Addressable::URI) return_type) -> Addressable::URI
+                   | (String | _ToStr | nil uri, ?singleton(String) return_type) -> String?
+    alias self.escape self.encode
+    def self.normalized_encode: (String | _ToStr uri, ?singleton(String) return_type) -> String
+                              | (String | _ToStr uri, singleton(Addressable::URI) return_type) -> Addressable::URI
+    def self.form_encode: (Hash[_ToS, _ToS | Array[_ToS]] | Array[[_ToS, _ToS | Array[_ToS]] | Array[_ToS]] form_values, ?bool sort) -> String
+    def self.form_unencode: (String | _ToStr encoded_value) -> Array[[String?, String?]]
+    def self.ip_based_schemes: () -> Array[String]
+    def self.port_mapping: () -> Hash[String, Integer]
+
+    def initialize: (?scheme: _ToStr?, ?user: _ToStr?, ?password: _ToStr?, ?userinfo: _ToStr?, ?host: _ToStr?, ?port: (Integer | _ToStr)?, ?authority: _ToStr?, ?path: _ToStr?, ?query: _ToStr?, ?query_values: query_values_input?, ?fragment: _ToStr?) -> void
+                  | (Hash[Symbol, untyped] options) -> void
+    def freeze: () -> self
+
+    # The setters return nil (#hostname=, #tld= and #site= the value they set
+    # through another setter); an assignment expression is typed by its value.
+    attr_reader scheme: String?
+    def normalized_scheme: () -> String?
+    def scheme=: (_ToStr? new_scheme) -> nil
+    attr_reader user: String?
+    def normalized_user: () -> String?
+    def user=: (_ToStr? new_user) -> nil
+    attr_reader password: String?
+    def normalized_password: () -> String?
+    def password=: (_ToStr? new_password) -> nil
+    def userinfo: () -> String?
+    def normalized_userinfo: () -> String?
+    def userinfo=: (_ToStr? new_userinfo) -> nil
+    attr_reader host: String?
+    def normalized_host: () -> String?
+    def host=: (_ToStr? new_host) -> nil
+    def hostname: () -> String?
+    def hostname=: (_ToStr | _IPAddress | nil new_hostname) -> String?
+
+    # Raises PublicSuffix::DomainInvalid for a host without a public suffix.
+    def tld: () -> String
+    def tld=: (String new_tld) -> String
+    def domain: () -> String?
+    def authority: () -> String?
+    def normalized_authority: () -> String?
+    def authority=: (_ToStr? new_authority) -> nil
+    def omit: (*Symbol components) -> URI
+    def omit!: (*Symbol components) -> URI
+    def origin: () -> String
+    def origin=: (_ToStr? new_origin) -> nil
+    attr_reader port: Integer?
+    def normalized_port: () -> Integer?
+    def port=: (Integer | _ToStr | nil new_port) -> nil
+    def inferred_port: () -> Integer?
+    def default_port: () -> Integer?
+    def site: () -> String?
+    def normalized_site: () -> String?
+    def site=: (_ToStr? new_site) -> String?
+    attr_reader path: String
+    def normalized_path: () -> String
+    def path=: (_ToStr? new_path) -> nil
+    def basename: () -> String
+    def extname: () -> String?
+    attr_reader query: String?
+    def normalized_query: (*Symbol flags) -> String?
+    def query=: (_ToStr? new_query) -> nil
+
+    # A key without "=" has a nil value (Hash) or a one-element pair (Array).
+    def query_values: (?singleton(Hash) return_type) -> Hash[String, String?]?
+                    | (singleton(Array) return_type) -> Array[Array[String]]?
+    def query_values=: (nil new_query_values) -> nil
+                     | (query_values_input new_query_values) -> String
+                     | (query_values_input? new_query_values) -> String?
+    def request_uri: () -> String?
+    def request_uri=: (_ToStr new_request_uri) -> nil
+    attr_reader fragment: String?
+    def normalized_fragment: () -> String?
+    def fragment=: (_ToStr? new_fragment) -> nil
+
+    def ip_based?: () -> bool
+    def relative?: () -> bool
+    def absolute?: () -> bool
+    def join: (String | Addressable::URI | _ToStr uri) -> self
+    alias + join
+    def join!: (String | Addressable::URI | _ToStr uri) -> self
+    def merge: (?scheme: _ToStr?, ?authority: _ToStr?, ?userinfo: _ToStr?, ?user: _ToStr?, ?password: _ToStr?, ?host: _ToStr?, ?port: (Integer | _ToStr)?, ?path: _ToStr?, ?query: _ToStr?, ?fragment: _ToStr?) -> self
+             | (Hash[Symbol, untyped] hash) -> self
+    def merge!: (?scheme: _ToStr?, ?authority: _ToStr?, ?userinfo: _ToStr?, ?user: _ToStr?, ?password: _ToStr?, ?host: _ToStr?, ?port: (Integer | _ToStr)?, ?path: _ToStr?, ?query: _ToStr?, ?fragment: _ToStr?) -> self
+              | (Hash[Symbol, untyped] hash) -> self
+    def route_from: (String | Addressable::URI | ::URI::Generic | _ToStr uri) -> Addressable::URI
+    def route_to: (String | Addressable::URI | ::URI::Generic | _ToStr uri) -> Addressable::URI
+
+    # A "feed:http://..." URI normalizes to a plain Addressable::URI.
+    def normalize: () -> Addressable::URI
+    def normalize!: () -> self
+    def display_uri: () -> Addressable::URI
+    def ===: (untyped uri) -> bool
+    def ==: (untyped uri) -> bool
+    def eql?: (untyped uri) -> bool
+    def hash: () -> Integer
+    def dup: () -> self
+    def empty?: () -> bool
+    def to_s: () -> String
+    alias to_str to_s
+    def to_hash: () -> { scheme: String?, user: String?, password: String?, host: String?, port: Integer?, path: String, query: String?, fragment: String? }
+    def inspect: () -> String
+
+    # Raises LocalJumpError without a block.
+    def defer_validation: () { () -> void } -> nil
+  end
+end
