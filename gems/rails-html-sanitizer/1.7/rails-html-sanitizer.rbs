@@ -1,0 +1,197 @@
+module Rails
+  module Html = HTML
+end
+
+module Rails
+  module HTML
+    class Sanitizer
+      VERSION: String
+
+      extend HTML4::Sanitizer::VendorMethods
+
+      def self.html5_support?: () -> bool
+
+      def self.best_supported_vendor: () -> (singleton(HTML4::Sanitizer) | singleton(HTML5::Sanitizer))
+
+      def self.allowed_uri?: (String uri_string) -> bool
+
+      # Raises NotImplementedError: subclasses implement it.
+      def sanitize: (String html, ?Hash[untyped, untyped] options) -> String
+                  | (nil html, ?Hash[untyped, untyped] options) -> nil
+                  | (String? html, ?Hash[untyped, untyped] options) -> String?
+    end
+
+    module Concern
+      module ComposedSanitize
+        def sanitize: (String html, ?Hash[untyped, untyped] options) -> String
+                    | (nil html, ?Hash[untyped, untyped] options) -> nil
+                    | (String? html, ?Hash[untyped, untyped] options) -> String?
+      end
+
+      module Parser
+        module HTML4
+          def parse_fragment: (String html) -> Loofah::HTML4::DocumentFragment
+        end
+
+        module HTML5
+          def parse_fragment: (String html) -> Loofah::HTML5::DocumentFragment
+        end
+      end
+
+      module Scrubber
+        module Full
+          def scrub: [F < Loofah::ScrubBehavior::Node] (F fragment, ?Hash[untyped, untyped] options) -> F
+        end
+
+        module Link
+          def initialize: () -> void
+
+          def scrub: [F < Loofah::ScrubBehavior::Node] (F fragment, ?Hash[untyped, untyped] options) -> F
+        end
+
+        module SafeList
+          DEFAULT_ALLOWED_TAGS: Set[String]
+
+          DEFAULT_ALLOWED_ATTRIBUTES: Set[String]
+
+          def initialize: (?prune: bool) -> void
+
+          def scrub: [F < Loofah::ScrubBehavior::Node] (F fragment, ?Hash[untyped, untyped] options) -> F
+
+          def sanitize_css: (String style_string) -> String
+        end
+      end
+
+      module Serializer
+        module UTF8Encode
+          def serialize: (Nokogiri::XML::DocumentFragment fragment) -> String
+        end
+      end
+    end
+
+    class PermitScrubber < Loofah::Scrubber
+      attr_reader tags: Enumerable[String]?
+
+      attr_reader attributes: Enumerable[String]?
+
+      attr_reader prune: bool
+
+      def initialize: (?prune: bool) -> void
+
+      def tags=: (Enumerable[String]? tags) -> Enumerable[String]?
+
+      def attributes=: (Enumerable[String]? attributes) -> Enumerable[String]?
+
+      def scrub: (Nokogiri::XML::Node node) -> Object
+
+      private
+
+      # protected in the gem: the hooks subclasses override
+      def allowed_node?: (Nokogiri::XML::Node node) -> bool
+
+      def skip_node?: (Nokogiri::XML::Node node) -> bool
+
+      def scrub_attribute?: (String name) -> bool
+    end
+
+    class TargetScrubber < PermitScrubber
+      def allowed_node?: (Nokogiri::XML::Node node) -> bool
+
+      def scrub_attribute?: (String name) -> bool
+    end
+
+    class TextOnlyScrubber < Loofah::Scrubber
+      def initialize: () -> void
+
+      def scrub: (Nokogiri::XML::Node node) -> Object
+    end
+
+    class FullSanitizer = HTML4::FullSanitizer
+    class LinkSanitizer = HTML4::LinkSanitizer
+    class SafeListSanitizer = HTML4::SafeListSanitizer
+    class WhiteListSanitizer = SafeListSanitizer
+  end
+
+  module HTML4
+    module Sanitizer
+      module VendorMethods
+        def full_sanitizer: () -> singleton(FullSanitizer)
+
+        def link_sanitizer: () -> singleton(LinkSanitizer)
+
+        def safe_list_sanitizer: () -> singleton(SafeListSanitizer)
+
+        def white_list_sanitizer: () -> singleton(SafeListSanitizer)
+      end
+
+      extend VendorMethods
+    end
+
+    class FullSanitizer < Rails::HTML::Sanitizer
+      include HTML::Concern::ComposedSanitize
+      include HTML::Concern::Parser::HTML4
+      include HTML::Concern::Scrubber::Full
+      include HTML::Concern::Serializer::UTF8Encode
+    end
+
+    class LinkSanitizer < Rails::HTML::Sanitizer
+      include HTML::Concern::ComposedSanitize
+      include HTML::Concern::Parser::HTML4
+      include HTML::Concern::Scrubber::Link
+      include HTML::Concern::Serializer::UTF8Encode
+    end
+
+    class SafeListSanitizer < Rails::HTML::Sanitizer
+      include HTML::Concern::ComposedSanitize
+      include HTML::Concern::Parser::HTML4
+      include HTML::Concern::Scrubber::SafeList
+      include HTML::Concern::Serializer::UTF8Encode
+
+      # Set on this class only: a subclass reads nil (and then strips every tag)
+      # until it sets its own.
+      attr_accessor self.allowed_tags: Enumerable[String]?
+
+      attr_accessor self.allowed_attributes: Enumerable[String]?
+    end
+  end
+
+  # Only defined when Loofah supports HTML5 (not on JRuby).
+  module HTML5
+    class Sanitizer
+      def self.full_sanitizer: () -> singleton(FullSanitizer)
+
+      def self.link_sanitizer: () -> singleton(LinkSanitizer)
+
+      def self.safe_list_sanitizer: () -> singleton(SafeListSanitizer)
+
+      def self.white_list_sanitizer: () -> singleton(SafeListSanitizer)
+    end
+
+    class FullSanitizer < Rails::HTML::Sanitizer
+      include HTML::Concern::ComposedSanitize
+      include HTML::Concern::Parser::HTML5
+      include HTML::Concern::Scrubber::Full
+      include HTML::Concern::Serializer::UTF8Encode
+    end
+
+    class LinkSanitizer < Rails::HTML::Sanitizer
+      include HTML::Concern::ComposedSanitize
+      include HTML::Concern::Parser::HTML5
+      include HTML::Concern::Scrubber::Link
+      include HTML::Concern::Serializer::UTF8Encode
+    end
+
+    class SafeListSanitizer < Rails::HTML::Sanitizer
+      include HTML::Concern::ComposedSanitize
+      include HTML::Concern::Parser::HTML5
+      include HTML::Concern::Scrubber::SafeList
+      include HTML::Concern::Serializer::UTF8Encode
+
+      # Set on this class only: a subclass reads nil (and then strips every tag)
+      # until it sets its own.
+      attr_accessor self.allowed_tags: Enumerable[String]?
+
+      attr_accessor self.allowed_attributes: Enumerable[String]?
+    end
+  end
+end
