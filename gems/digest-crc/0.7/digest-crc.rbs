@@ -1,0 +1,285 @@
+module Digest
+  # Base class for all CRC algorithms.
+  class CRC < Digest::Class
+    include Digest::Instance
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    WIDTH: Integer
+
+    # nil in Digest::CRC itself; subclasses set true or false.
+    REFLECT_INPUT: bool?
+
+    TABLE: Array[Integer]
+
+    def self.checksum: (String data) -> Integer
+
+    # Raises NotImplementedError when WIDTH is not positive (Digest::CRC itself).
+    def self.pack: (Integer crc) -> String
+
+    def self.implementation: () -> (:c_ext | :pure)
+
+    def initialize: () -> void
+
+    def block_length: () -> Integer
+
+    def digest_length: () -> Integer
+
+    # Raises NotImplementedError when WIDTH, TABLE or REFLECT_INPUT are not
+    # set (Digest::CRC itself). The optional C extensions replace this method
+    # in most subclasses with the same signature.
+    def update: (String data) -> self
+
+    def <<: (String data) -> self
+
+    # Returns the initial CRC value, not self.
+    def reset: () -> Integer
+
+    def checksum: () -> Integer
+
+    def finish: () -> String
+  end
+
+  class CRC1 < CRC
+    WIDTH: Integer
+
+    def self.pack: (Integer crc) -> String
+
+    def update: (String data) -> self
+  end
+
+  class CRC5 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    CRC_MASK: Integer
+
+    TABLE: Array[Integer]
+
+    def initialize: () -> void
+  end
+
+  class CRC8 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC8_1Wire < CRC8
+    TABLE: Array[Integer]
+  end
+
+  class CRC81Wire = CRC8_1Wire
+
+  class CRC15 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16CCITT < CRC16
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16DNP < CRC16
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+
+    def finish: () -> String
+  end
+
+  class CRC16Genibus < CRC16
+    REFLECT_INPUT: bool
+
+    INIT_XOR: Integer
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16Kermit < CRC16
+    REFLECT_INPUT: bool
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16Modbus < CRC16
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16USB < CRC16
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+  end
+
+  class CRC16X25 < CRC16
+    REFLECT_INPUT: bool
+
+    INIT_XOR: Integer
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16QT < CRC16X25
+  end
+
+  class CRC16XModem < CRC16
+    REFLECT_INPUT: bool
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC16ZModem < CRC16
+    REFLECT_INPUT: bool
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC24 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC32 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC32BZip2 < CRC32
+    REFLECT_INPUT: bool
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC32Jam < CRC32
+    INIT_XOR: Integer
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+  end
+
+  class CRC32MPEG < CRC32
+    REFLECT_INPUT: bool
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC32Mpeg = CRC32MPEG
+
+  class CRC32POSIX < CRC32
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC32XFER < CRC32
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC32c < CRC32
+    TABLE: Array[Integer]
+  end
+
+  class CRC64 < CRC
+    WIDTH: Integer
+
+    REFLECT_INPUT: bool
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC64Jones < CRC64
+    INIT_XOR: Integer
+
+    INIT_CRC: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC64NVMe < CRC64
+    INIT_XOR: Integer
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+
+  class CRC64XZ < CRC64
+    INIT_XOR: Integer
+
+    INIT_CRC: Integer
+
+    XOR_MASK: Integer
+
+    TABLE: Array[Integer]
+  end
+end
