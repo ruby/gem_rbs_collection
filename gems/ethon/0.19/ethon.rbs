@@ -27,10 +27,12 @@ module Ethon
     # The libcurl version string, e.g. "libcurl/8.5.0 OpenSSL/3.0.13 ...".
     def self.version: () -> String
 
-    def self.version_info: () -> VersionInfoData
+    # curl_version_info_data (an FFI::Struct); read fields with #[] (e.g.
+    # :version, :features).
+    def self.version_info: () -> _VersionInfo
 
-    # curl_version_info_data; read fields with #[] (e.g. :version, :features).
-    class VersionInfoData < ::FFI::Struct[::FFI::Pointer, untyped]
+    interface _VersionInfo
+      def []: (Symbol field) -> untyped
     end
   end
 
@@ -407,8 +409,9 @@ module Ethon
       def postfieldsize_large=: (integer_option value) -> integer_option
 
       # Observes libcurl's debug messages (only sent with verbose: true);
-      # no block clears the observer.
-      def debugfunction: () ?{ (::FFI::Pointer handle, Symbol type, ::FFI::Pointer data, Integer size, ::FFI::Pointer user_data) -> void } -> nil
+      # no block clears the observer. handle, data and user_data are
+      # FFI::Pointers.
+      def debugfunction: () ?{ (untyped handle, Symbol type, untyped data, Integer size, untyped user_data) -> void } -> nil
 
       # Boolean options (true/false, or 1/0).
       def verbose=: (bool_option value) -> bool_option
@@ -860,7 +863,8 @@ module Ethon
 
       def ongoing?: () -> bool
 
-      def assign: (IO | Integer io, ::FFI::Pointer? pointer) -> Symbol
+      # pointer is an FFI::Pointer or nil.
+      def assign: (IO | Integer io, untyped pointer) -> Symbol
     end
 
     module Options
@@ -881,11 +885,13 @@ module Ethon
       # 0, 1 or 2 (CURLPIPE_*); true and false are taken as 1 and 0.
       def pipelining=: (Integer | bool | nil value) -> void
 
-      def socketdata=: (::FFI::Pointer? value) -> void
+      # An FFI::Pointer or nil.
+      def socketdata=: (untyped value) -> void
 
       def socketfunction=: (Proc? value) -> Proc?
 
-      def timerdata=: (::FFI::Pointer? value) -> void
+      # An FFI::Pointer or nil.
+      def timerdata=: (untyped value) -> void
 
       def timerfunction=: (Proc? value) -> Proc?
     end
