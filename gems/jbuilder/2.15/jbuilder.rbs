@@ -3,6 +3,12 @@ class Jbuilder < BasicObject
 
   type key_format = Symbol | Proc
 
+  # A collection that `array!`, `set!` and `call` iterate with `map`
+  # (Array, Hash, any Enumerable, or an object that only responds to `map`).
+  interface _Collection[T]
+    def map: [U] () { (T) -> U } -> Array[U]
+  end
+
   def self.encode: (?key_formatter: KeyFormatter?, ?ignore_nil: boolish, ?deep_format_keys: boolish) ?{ (Jbuilder) -> void } -> String
 
   def self.key_format: (*key_format formats, **untyped formats_with_options) -> KeyFormatter
@@ -13,9 +19,9 @@ class Jbuilder < BasicObject
 
   def initialize: (?key_formatter: KeyFormatter?, ?ignore_nil: boolish, ?deep_format_keys: boolish) ?{ (Jbuilder) -> void } -> void
 
-  def set!: (String | Symbol key) { (Jbuilder) -> void } -> void
-          | [T] (String | Symbol key, Enumerable[T] collection, *untyped attributes) ?{ (T) -> void } -> void
-          | (String | Symbol key, untyped value, *untyped attributes) -> void
+  def set!: (_ToS key) { (Jbuilder) -> void } -> void
+          | [T] (_ToS key, _Collection[T]? collection, *String | Symbol attributes) { (T) -> void } -> void
+          | (_ToS key, untyped value, *String | Symbol attributes) -> void
 
   def key_format!: (*key_format formats, **untyped formats_with_options) -> KeyFormatter
 
@@ -25,44 +31,68 @@ class Jbuilder < BasicObject
 
   def child!: () { (Jbuilder) -> void } -> void
 
-  def array!: [T] (?Enumerable[T]? collection, *untyped attributes) ?{ (T) -> void } -> void
+  # Without a block or attributes the collection is converted with `to_a`.
+  def array!: [T] (_Collection[T]? collection, *String | Symbol attributes) { (T) -> void } -> void
+            | (_Collection[untyped]? collection, String | Symbol attribute, *String | Symbol attributes) -> void
+            | (?_ToA[untyped]? collection) -> void
 
-  def extract!: (untyped object, *(String | Symbol) attributes) -> void
+  def extract!: (untyped object, *String | Symbol attributes) -> void
 
-  def call: [T] (Enumerable[T] collection) { (T) -> void } -> void
-          | (untyped object, *(String | Symbol) attributes) -> void
+  def call: [T] (_Collection[T]? collection, *String | Symbol attributes) { (T) -> void } -> void
+          | (untyped object, *String | Symbol attributes) -> void
 
   def nil!: () -> nil
 
   alias null! nil!
 
-  def attributes!: () -> (Hash[String, untyped] | Array[untyped] | Blank | nil)
+  def attributes!: () -> (Hash[untyped, untyped] | Array[untyped] | Blank | nil)
 
-  def merge!: (Hash[untyped, untyped] | Array[untyped] | Jbuilder object) -> (Hash[untyped, untyped] | Array[untyped] | Blank | nil)
+  # Blank and nil come from `cache!`, which merges the cached result of its block.
+  def merge!: (Hash[untyped, untyped] | Array[untyped] | Jbuilder | Blank | nil object) -> (Hash[untyped, untyped] | Array[untyped] | Blank | nil)
 
   def target!: () -> String
 
   class Blank
+    def ==: (untyped other) -> bool
+
     def empty?: () -> true
   end
 
   class KeyFormatter
     def initialize: (*key_format formats, **untyped formats_with_options) -> void
 
-    def format: (String | Symbol key) -> String
+    # A Proc format is expected to return a String.
+    def format: (_ToS key) -> String
   end
 
   class NullError < ::NoMethodError[untyped]
+    def self.build: (_ToS key) -> instance
   end
 
   class ArrayError < ::StandardError
+    def self.build: (_ToS key) -> instance
   end
 
   class MergeError < ::StandardError
+    def self.build: (untyped current_value, untyped updates) -> instance
   end
 
   class DependencyTracker
-    def self.call: (String name, untyped template, ?untyped view_paths) -> Array[String]
+    interface _Template
+      def source: () -> String
+    end
+
+    EXPLICIT_DEPENDENCY: Regexp
+
+    DIRECT_RENDERS: Regexp
+
+    INDIRECT_RENDERS: Regexp
+
+    def self.call: (String name, _Template template, ?untyped view_paths) -> Array[String]
+
+    def initialize: (String name, _Template template, ?untyped view_paths) -> void
+
+    def dependencies: () -> Array[String]
   end
 end
 
@@ -71,23 +101,40 @@ class JbuilderTemplate < Jbuilder
 
   def self.template_lookup_options=: (Hash[Symbol, untyped] value) -> Hash[Symbol, untyped]
 
+  # context is the ActionView view context the template is rendered in.
+  def initialize: (untyped context, ?Hash[Symbol, untyped]? options) ?{ (JbuilderTemplate) -> void } -> void
+
   def partial!: (String partial, **untyped locals) -> void
               | (**untyped options) -> void
               | (untyped model, **untyped options) -> void
 
-  def cache!: (?untyped key, ?Hash[Symbol, untyped] options) { () -> void } -> void
+  # The block gets the builder when caching is enabled, and no argument otherwise.
+  def cache!: (?untyped key, ?Hash[Symbol, untyped] options) { (?JbuilderTemplate) -> void } -> void
 
   def cache_root!: (?untyped key, ?Hash[Symbol, untyped] options) { () -> void } -> void
 
-  def cache_if!: (boolish condition, ?untyped key, ?Hash[Symbol, untyped] options) { () -> void } -> void
+  def cache_if!: (boolish condition, ?untyped key, ?Hash[Symbol, untyped] options) { (?JbuilderTemplate) -> void } -> void
 
   def target!: () -> String
 
-  def array!: (untyped collection, partial: String, ?as: Symbol, **untyped locals) -> void
-            | [T] (?Enumerable[T]? collection, *untyped attributes) ?{ (T) -> void } -> void
+  def array!: (untyped collection, partial: String, as: Symbol | String, **untyped options) -> void
+            | [T] (Jbuilder::_Collection[T]? collection, *String | Symbol attributes) { (T) -> void } -> void
+            | (Jbuilder::_Collection[untyped]? collection, String | Symbol attribute, *String | Symbol attributes) -> void
+            | (?_ToA[untyped]? collection) -> void
 
-  def set!: (String | Symbol key, untyped collection, partial: String, ?as: Symbol, **untyped locals) -> void
-          | (String | Symbol key) { (JbuilderTemplate) -> void } -> void
-          | [T] (String | Symbol key, Enumerable[T] collection, *untyped attributes) ?{ (T) -> void } -> void
-          | (String | Symbol key, untyped value, *untyped attributes) -> void
+  # A String `as:` works only when object is a collection; use a Symbol for a
+  # single object.
+  def set!: (_ToS key, untyped object, partial: String, as: Symbol | String, **untyped options) -> void
+          | (_ToS key) { (JbuilderTemplate) -> void } -> void
+          | [T] (_ToS key, Jbuilder::_Collection[T]? collection, *String | Symbol attributes) { (T) -> void } -> void
+          | (_ToS key, untyped value, *String | Symbol attributes) -> void
+end
+
+class JbuilderHandler
+  def self.default_format: () -> Symbol
+
+  def self.default_format=: (Symbol value) -> Symbol
+
+  # Compiles a .jbuilder template into Ruby source for ActionView.
+  def self.call: (untyped template, ?String? source) -> String
 end
