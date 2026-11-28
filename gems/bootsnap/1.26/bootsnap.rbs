@@ -1,0 +1,226 @@
+module Bootsnap
+  extend Bootsnap
+
+  VERSION: String
+
+  RUBY_CACHE_KEY: String
+
+  class InvalidConfiguration < StandardError
+  end
+
+  # A callback for `Bootsnap.instrumentation=`. The event is `:hit`,
+  # `:miss`, `:stale` or `:revalidated`.
+  interface _Instrumentation
+    def call: (Symbol event, String path) -> untyped
+  end
+
+  # A logger for `Bootsnap.logger=`: an object with `debug`, such as a
+  # Logger ...
+  interface _DebugLogger
+    def debug: (String message) -> untyped
+  end
+
+  # ... or any callable, such as `$stderr.method(:puts)`.
+  interface _CallableLogger
+    def call: (String message) -> untyped
+  end
+
+  type logger = _DebugLogger | _CallableLogger
+
+  # Set by `setup` to "<cache_dir>/bootsnap"; nil before setup.
+  def self.cache_dir: () -> String?
+
+  def self.logger: () -> logger?
+
+  def self.logger=: (logger logger) -> void
+
+  def self.log!: () -> void
+
+  def self.log_stats!: () -> void
+
+  def self.instrumentation=: ((^(Symbol event, String path) -> untyped) | _Instrumentation | nil callback) -> void
+
+  def self.setup: (
+    cache_dir: String | Pathname,
+    ?development_mode: boolish,
+    ?load_path_cache: boolish,
+    ?ignore_directories: Array[String]?,
+    ?readonly: boolish,
+    ?revalidation: boolish,
+    ?compile_cache_iseq: boolish,
+    ?compile_cache_yaml: boolish,
+    ?compile_cache_json: untyped,
+    ?config_path: (String | Pathname)?
+  ) -> void
+
+  # Requires the file when it exists; nil when there is no path or no file.
+  def self.load_config: ((String | Pathname)? config_path) -> bool?
+
+  def self.enable_frozen_string_literal: (?app_only: boolish) -> void
+
+  def self.unload_cache!: () -> nil
+
+  # What `require "bootsnap/setup"` runs; configured by environment
+  # variables. Raises RuntimeError when the cache directory cannot be
+  # inferred.
+  def self.default_setup: () -> void
+
+  def bundler?: () -> bool
+
+  module LoadPathCache
+    # Returned by Cache#find when Ruby has to search the load path itself.
+    FALLBACK_SCAN: BasicObject
+
+    def self.setup: (cache_path: String, development_mode: boolish, ignore_directories: Array[String]?, ?readonly: boolish) -> void
+
+    def self.unload!: () -> nil
+
+    # nil on platforms other than darwin, linux, BSD and Windows.
+    def self.supported?: () -> bool?
+
+    def self.enabled?: () -> bool
+
+    def self.load_path_cache: () -> Cache?
+
+    def self.loaded_features_index: () -> LoadedFeaturesIndex?
+
+    class Cache
+      AGE_THRESHOLD: Integer
+
+      def initialize: (Store store, Array[String] path_obj, ?development_mode: boolish) -> void
+
+      # An absolute path, false for a feature built into Ruby, FALLBACK_SCAN
+      # when the load path must be searched, or nil when it is not found.
+      def find: (String feature) -> (String | false | BasicObject | nil)
+
+      def unshift_paths: (Array[String] sender, *String paths) -> void
+
+      def push_paths: (Array[String] sender, *String paths) -> void
+
+      def reinitialize: (?Array[String] path_obj) -> void
+    end
+
+    class Store
+      VERSION_KEY: String
+
+      CURRENT_VERSION: String
+
+      class NestedTransactionError < StandardError
+      end
+
+      class SetOutsideTransactionNotAllowed < StandardError
+      end
+
+      def initialize: (String store_path, ?readonly: boolish) -> void
+
+      def get: (String key) -> untyped
+
+      # Raises SetOutsideTransactionNotAllowed outside of #transaction.
+      def fetch: (String key) { () -> untyped } -> untyped
+
+      # Raises SetOutsideTransactionNotAllowed outside of #transaction.
+      def set: (String key, untyped value) -> void
+
+      # Raises NestedTransactionError inside another transaction.
+      def transaction: [T] () { () -> T } -> T
+    end
+
+    class LoadedFeaturesIndex
+      def initialize: () -> void
+
+      def purge: (String feature) -> void
+
+      def purge_multi: (Array[String] features) -> void
+
+      def key?: (String feature) -> bool
+
+      def cursor: (String short) -> Integer?
+
+      def identify: (String short, Integer cursor) -> String?
+
+      def register: (String short, String? long) -> void
+    end
+  end
+
+  module CompileCache
+    UNCOMPILABLE: BasicObject
+
+    class Error < StandardError
+    end
+
+    def self.setup: (cache_dir: String, iseq: boolish, yaml: boolish, ?json: untyped, ?readonly: boolish, ?revalidation: boolish) -> void
+
+    def self.supported?: () -> bool
+
+    module ISeq
+      # Picks the compiler for a path; nil means the default compiler.
+      interface _CompilerSelector
+        def call: (String path) -> Compiler?
+      end
+
+      type compiler_selector = (^(String path) -> Compiler?) | _CompilerSelector
+
+      def self.cache_dir: () -> String?
+
+      def self.cache_dir=: (String? cache_dir) -> String?
+
+      def self.compiler_selector: () -> compiler_selector?
+
+      def self.compiler_selector=: (compiler_selector? compiler_selector) -> compiler_selector?
+
+      def self.default_compiler: () -> Compiler
+
+      def self.default_compiler=: (Compiler default_compiler) -> Compiler
+
+      # `defined?(RubyVM)` ("constant") or nil when CompileCache is
+      # supported, false otherwise.
+      def self.supported?: () -> (String | false | nil)
+
+      def self.coverage_supported?: (?String ruby_version) -> bool
+
+      def self.coverage_on?: () -> bool?
+
+      def self.fetch: (String path, ?cache_dir: String?) -> RubyVM::InstructionSequence?
+
+      # nil from the no-op stub on Rubies without ISeq support.
+      def self.precompile: (String path) -> bool?
+
+      def self.install!: (String? cache_dir) -> void
+
+      class Compiler
+        attr_reader namespace: String?
+
+        def initialize: (?String? namespace, ?Hash[Symbol, untyped]? compile_options) -> void
+
+        def update_options: () -> Hash[Symbol, untyped]?
+
+        # The binary iseq, or UNCOMPILABLE when Ruby cannot compile the file.
+        def input_to_storage: (untyped _, String path) -> (String | BasicObject)
+
+        def storage_to_output: (String binary, untyped _args) -> RubyVM::InstructionSequence?
+
+        def input_to_output: (String? source, String path, untyped _kwargs) -> RubyVM::InstructionSequence?
+      end
+
+      DEFAULT: Compiler
+
+      FROZEN_STRING_LITERAL: Compiler
+    end
+  end
+
+  module ExplicitRequire
+    ARCHDIR: String
+
+    RUBYLIBDIR: String
+
+    DLEXT: String
+
+    def self.from_self: (String feature) -> bool
+
+    def self.from_rubylibdir: (String feature) -> bool
+
+    def self.from_archdir: (String feature) -> bool
+
+    def self.with_gems: [T] (*String gems) { () -> T } -> T
+  end
+end
