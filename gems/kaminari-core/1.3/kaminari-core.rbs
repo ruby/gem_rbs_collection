@@ -1,0 +1,158 @@
+module Kaminari
+  def self.config: () -> Kaminari::Config
+  def self.configure: () { (Kaminari::Config) -> void } -> void
+  def self.deprecator: () -> ActiveSupport::Deprecation
+
+  # Wraps an Array so that it can be paginated with `page`/`per`.
+  # With both `limit:` and `offset:` the result is already paginated.
+  def self.paginate_array: [T] (Array[T] array, limit: Integer, offset: Integer, ?total_count: Integer?, ?padding: Integer?) -> (Kaminari::PaginatableArray[T] & Kaminari::PaginatableArray::_PageScopeMethods[T])
+                         | [T] (Array[T] array, ?limit: Integer?, ?offset: Integer?, ?total_count: Integer?, ?padding: Integer?) -> Kaminari::PaginatableArray[T]
+
+  module Core
+    VERSION: String
+  end
+
+  class ZeroPerPageOperation < ZeroDivisionError
+  end
+
+  class Config
+    attr_accessor default_per_page: Integer
+    attr_accessor max_per_page: Integer?
+    attr_accessor window: Integer
+    attr_accessor outer_window: Integer
+    attr_accessor left: Integer
+    attr_accessor right: Integer
+    attr_accessor page_method_name: Symbol | String
+    attr_accessor max_pages: Integer?
+    attr_accessor params_on_first_page: bool
+
+    attr_writer param_name: Symbol | String | _Callable
+
+    def initialize: () -> void
+
+    # Calls the configured object when it responds to `call`.
+    def param_name: () -> (Symbol | String)
+  end
+
+  module PageScopeMethods : _Model_Relation
+    # A negative or non-numeric `num` (e.g. nil, "abc") keeps the current per value.
+    def per: ((Integer | String)? num, ?max_per_page: Integer?) -> self
+    def max_paginates_per: (Integer? new_max_per_page) -> self
+    # Raises ArgumentError for a negative value.
+    def padding: (Integer | String num) -> self
+    # Raises Kaminari::ZeroPerPageOperation after per(0).
+    def total_pages: () -> Integer
+    # Raises Kaminari::ZeroPerPageOperation after per(0).
+    def current_page: () -> Integer
+    # Deprecated: use limit_value.
+    def current_per_page: () -> Integer
+    def next_page: () -> Integer?
+    def prev_page: () -> Integer?
+    def first_page?: () -> bool
+    def last_page?: () -> bool
+    def out_of_range?: () -> bool
+    def paginated?: () -> bool
+  end
+
+  interface _Model_Relation
+    def limit: (Integer) -> self
+    def offset: (Integer) -> self
+  end
+
+  interface _Callable
+    def call: () -> (Symbol | String)
+  end
+
+  module ConfigurationMethods
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def paginates_per: (Integer? val) -> Integer?
+      def default_per_page: () -> Integer
+      def max_paginates_per: (Integer? val) -> Integer?
+      def max_per_page: () -> Integer?
+      # Returns the max_pages value without an argument (or with :none), sets it otherwise.
+      def max_pages: (?Integer | :none | nil val) -> Integer?
+      # Deprecated: use max_pages.
+      def max_pages_per: (Integer? val) -> Integer?
+    end
+  end
+
+  # An Array that can be paginated. Created by Kaminari.paginate_array.
+  # `page`, `limit` and `offset` return a copy extended with Kaminari::PageScopeMethods
+  # (also when `limit:` and `offset:` are both given to `new`).
+  class PaginatableArray[unchecked out Elem] < Array[Elem]
+    include Kaminari::ConfigurationMethods::ClassMethods
+
+    # The methods Kaminari::PageScopeMethods adds to a paginated copy.
+    interface _PageScopeMethods[Elem]
+      def per: ((Integer | String)? num, ?max_per_page: Integer?) -> (Kaminari::PaginatableArray[Elem] & _PageScopeMethods[Elem])
+      def max_paginates_per: (Integer? new_max_per_page) -> (Kaminari::PaginatableArray[Elem] & _PageScopeMethods[Elem])
+      def padding: (Integer | String num) -> (Kaminari::PaginatableArray[Elem] & _PageScopeMethods[Elem])
+      def total_pages: () -> Integer
+      def current_page: () -> Integer
+      def current_per_page: () -> Integer
+      def next_page: () -> Integer?
+      def prev_page: () -> Integer?
+      def first_page?: () -> bool
+      def last_page?: () -> bool
+      def out_of_range?: () -> bool
+    end
+
+    ENTRY: String
+
+    def initialize: (?Array[Elem] original_array, ?limit: Integer?, ?offset: Integer?, ?total_count: Integer?, ?padding: Integer?) -> void
+
+    def limit_value: () -> Integer
+    def limit_value=: (Integer) -> Integer
+    def offset_value: () -> Integer
+    def offset_value=: (Integer) -> Integer
+
+    # Without :count, I18n returns all the plural forms of helpers.page_entries_info.entry.
+    def entry_name: (count: Integer, **untyped options) -> String
+                  | (?Hash[Symbol, untyped] options) -> (String | Hash[Symbol, String])
+
+    # Named after Kaminari.config.page_method_name (`page` by default) when the class is loaded.
+    def page: (?untyped num) -> (Kaminari::PaginatableArray[Elem] & _PageScopeMethods[Elem])
+    def limit: (Integer num) -> (Kaminari::PaginatableArray[Elem] & _PageScopeMethods[Elem])
+    def offset: (Integer num) -> (Kaminari::PaginatableArray[Elem] & _PageScopeMethods[Elem])
+    def paginated?: () -> bool
+    def total_count: () -> Integer
+  end
+
+  module Helpers
+    module UrlHelper
+      def next_page_url: (untyped scope, ?Hash[Symbol, untyped] options) -> String?
+      alias url_to_next_page next_page_url
+
+      # Deprecated: use next_page_url.
+      def path_to_next_url: (untyped scope, ?Hash[Symbol, untyped] options) -> String?
+
+      def prev_page_url: (untyped scope, ?Hash[Symbol, untyped] options) -> String?
+      alias previous_page_url prev_page_url
+      alias url_to_prev_page prev_page_url
+      alias url_to_previous_page prev_page_url
+
+      def next_page_path: (untyped scope, ?Hash[Symbol, untyped] options) -> String?
+      alias path_to_next_page next_page_path
+
+      def prev_page_path: (untyped scope, ?Hash[Symbol, untyped] options) -> String?
+      alias previous_page_path prev_page_path
+      alias path_to_previous_page prev_page_path
+      alias path_to_prev_page prev_page_path
+    end
+
+    module HelperMethods
+      include UrlHelper
+
+      def paginate: (untyped scope, ?paginator_class: Class, ?template: untyped?, **untyped options) -> String
+      def link_to_previous_page: (untyped scope, String? name, **untyped options) -> String?
+                               | [T] (untyped scope, String? name, **untyped options) { () -> T } -> (String | T)
+      alias link_to_prev_page link_to_previous_page
+      def link_to_next_page: (untyped scope, String? name, **untyped options) -> String?
+                           | [T] (untyped scope, String? name, **untyped options) { () -> T } -> (String | T)
+      def page_entries_info: (untyped collection, ?entry_name: String?) -> String
+      def rel_next_prev_link_tags: (untyped scope, ?Hash[Symbol, untyped] options) -> String
+    end
+  end
+end
