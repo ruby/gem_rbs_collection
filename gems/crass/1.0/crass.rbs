@@ -1,0 +1,164 @@
+# A CSS parser based on the CSS Syntax Module Level 3 spec.
+module Crass
+  # Defined by `require "crass/version"` (not loaded by `require "crass"`).
+  VERSION: String
+
+  # A token or parse tree node: a Hash with Symbol keys. `:node` names its
+  # kind (`:ident`, `:whitespace`, `:style_rule`, `:property`, `:at_rule`,
+  # `:error`, ...); the other keys depend on the kind (`:raw`, `:pos`,
+  # `:value`, `:name`, `:children`, `:tokens`, ...).
+  type node = Hash[Symbol, untyped]
+
+  # Options for parsing and tokenizing. A Hash built elsewhere (e.g. from a
+  # configuration) is accepted too, as the gem's own tests pass one.
+  type options = {
+    ?maximum_depth: Integer,
+    ?preserve_comments: bool,
+    ?preserve_hacks: bool
+  } | Hash[Symbol, untyped]
+
+  # Parses _input_ as a CSS stylesheet and returns a parse tree.
+  def self.parse: (String | Array[node] input, ?options options) -> Array[node]
+
+  # Parses _input_ as a string of CSS properties (such as the contents of an
+  # HTML element's `style` attribute) and returns a parse tree.
+  def self.parse_properties: (String | Array[node] input, ?options options) -> Array[node]
+
+  # Parses a CSS string or list of tokens.
+  class Parser
+    BLOCK_END_TOKENS: Hash[Symbol, Symbol]
+
+    DEFAULT_MAXIMUM_DEPTH: Integer
+
+    type declarations_options = { ?strict: bool } | Hash[Symbol, untyped]
+
+    type stringify_options = { ?exclude_comments: bool } | Hash[Symbol, untyped]
+
+    def self.parse_properties: (String | Array[node] input, ?options options) -> Array[node]
+
+    def self.parse_rules: (String | Array[node] input, ?options options) -> Array[node]
+
+    def self.parse_stylesheet: (String | Array[node] input, ?options options) -> Array[node]
+
+    # Converts a node or array of nodes into a CSS string based on their
+    # original tokenized input. `nil` elements are skipped.
+    def self.stringify: (node | Array[node?] nodes, ?stringify_options options) -> String
+
+    # TokenScanner wrapping the tokens generated from this parser's input.
+    attr_reader tokens: TokenScanner
+
+    # _input_ may be a CSS string or an array of tokens.
+    def initialize: (String | Array[node] input, ?options options) -> void
+
+    def consume_at_rule: (?TokenScanner input) -> node
+
+    # Returns `nil` when there are no more tokens.
+    def consume_component_value: (?TokenScanner input) -> node?
+
+    # Returns an `:error` node on a parse error.
+    def consume_declaration: (?TokenScanner input) -> node
+
+    def consume_declarations: (?TokenScanner input, ?declarations_options options) -> Array[node]
+
+    def consume_function: (?TokenScanner input) -> node
+
+    # Returns an `:error` node on a parse error.
+    def consume_qualified_rule: (?TokenScanner input) -> node
+
+    def consume_rules: (?{ ?top_level: bool } flags) -> Array[node]
+
+    def consume_simple_block: (?TokenScanner input) -> node
+
+    def create_node: (Symbol type, ?Hash[Symbol, untyped] properties) -> node
+
+    def create_selector: (Array[node] input) -> node
+
+    def create_style_rule: (node rule) -> node
+
+    def parse_component_value: (?TokenScanner | Array[node] input) -> node
+
+    def parse_component_values: (?TokenScanner | Array[node] input) -> Array[node]
+
+    def parse_declaration: (?TokenScanner | Array[node] input) -> node
+
+    def parse_declarations: (?TokenScanner | Array[node] input, ?declarations_options options) -> Array[node]
+
+    def parse_properties: (?TokenScanner | Array[node] input) -> Array[node]
+
+    def parse_rule: (?TokenScanner | Array[node] input) -> node
+
+    # Returns the unescaped value of a selector name or property declaration.
+    def parse_value: (node | Array[node] nodes) -> String
+  end
+
+  # Similar to a StringScanner, but with extra functionality needed to
+  # tokenize CSS while preserving the original text.
+  class Scanner
+    # Current character, or `nil` if the scanner hasn't yet consumed a
+    # character.
+    attr_reader current: String?
+
+    attr_accessor marker: Integer
+
+    attr_accessor pos: Integer
+
+    attr_reader string: String
+
+    def initialize: (String | IO input) -> void
+
+    # Returns an empty string at the end of the string.
+    def consume: () -> String
+
+    def consume_rest: () -> String
+
+    def eos?: () -> bool
+
+    def mark: () -> Integer
+
+    def marked: () -> String
+
+    def peek: (?Integer length) -> String
+
+    def reconsume: () -> Integer?
+
+    def reset: () -> Integer
+
+    def scan: (Regexp pattern) -> String?
+
+    def scan_until: (Regexp pattern) -> String?
+  end
+
+  # Like Scanner, but for tokens.
+  class TokenScanner
+    attr_reader current: node?
+
+    attr_reader pos: Integer
+
+    attr_reader tokens: Array[node]
+
+    def initialize: (Array[node] tokens) -> void
+
+    # Executes the block and returns the tokens consumed while it ran.
+    def collect: () { () -> void } -> Array[node]
+
+    def consume: () -> node?
+
+    def peek: () -> node?
+
+    def reconsume: () -> Integer?
+
+    def reset: () -> Integer
+  end
+
+  # Tokenizes a CSS string.
+  class Tokenizer
+    def self.tokenize: (String input, ?options options) -> Array[node]
+
+    def initialize: (String input, ?options options) -> void
+
+    # Consumes a token and returns it, or `nil` at the end of the input.
+    def consume: () -> node?
+
+    def tokenize: () -> Array[node]
+  end
+end
