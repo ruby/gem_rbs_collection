@@ -1,0 +1,724 @@
+module Google
+  # Module Auth provides classes that provide Google-specific authorization
+  # used to access Google APIs.
+  module Auth
+    # Defined by `require "googleauth/version"`, which `require "googleauth"`
+    # does not load.
+    VERSION: String
+
+    NOT_FOUND_ERROR: String
+
+    NO_METADATA_SERVER_ERROR: String
+
+    UNEXPECTED_ERROR_SUFFIX: String
+
+    # The credentials Google::Auth::DefaultCredentials.make_creds builds from
+    # a JSON key (or the GOOGLE_ACCOUNT_TYPE environment variable).
+    type default_credentials = ServiceAccountCredentials
+                             | UserRefreshCredentials
+                             | ExternalAccount::AwsCredentials
+                             | ExternalAccount::IdentityPoolCredentials
+                             | ExternalAccount::PluggableAuthCredentials
+                             | ImpersonatedServiceAccountCredentials
+
+    # Obtains the default credentials implementation to use in this
+    # environment.
+    #
+    # Searches the GOOGLE_APPLICATION_CREDENTIALS environment variable (and the
+    # service account / authorized user variables), the well known path, the
+    # system default path, and finally the GCE metadata server.
+    #
+    # Raises Google::Auth::InitializationError if no credentials are found.
+    def self?.get_application_default: (?(String | Array[String])? scope, ?Hash[untyped, untyped] options) -> (default_credentials | GCECredentials)
+
+    # Error mixin module for Google Auth errors
+    # All Google Auth errors should include this module
+    module Error
+    end
+
+    # Mixin module that contains detailed error information
+    # typically this is available if credentials initialization
+    # succeeds and credentials object is valid
+    module DetailedError
+      include Error
+
+      # The type of the credentials that the error was originated from
+      attr_reader credential_type_name: String?
+
+      # The principal for the authentication flow. Typically obtained from credentials
+      attr_reader principal: (String | Symbol)?
+
+      # All details passed in the options hash when creating the error
+      attr_reader details: Hash[untyped, untyped]?
+
+      # Class methods to be added to including classes
+      module ClassMethods
+        # Creates a new error with detailed information
+        def with_details: (String message, credential_type_name: String?, principal: (String | Symbol)?) -> untyped
+      end
+    end
+
+    # Error raised during Credentials initialization.
+    class InitializationError < StandardError
+      include Error
+    end
+
+    # Generic error raised during operation of Credentials
+    class CredentialsError < StandardError
+      include DetailedError
+
+      extend DetailedError::ClassMethods
+
+      def self.with_details: (String message, credential_type_name: String?, principal: (String | Symbol)?) -> instance
+    end
+
+    # An error indicating the remote server refused to authorize the client.
+    class AuthorizationError < Signet::AuthorizationError
+      include DetailedError
+
+      extend DetailedError::ClassMethods
+
+      def self.with_details: (String message, credential_type_name: String?, principal: (String | Symbol)?) -> instance
+    end
+
+    # BaseClient is a class used to contain common methods that are required by
+    # any Credentials Client, including AwsCredentials, ServiceAccountCredentials,
+    # and UserRefreshCredentials. This is a superclass of Signet::OAuth2::Client
+    # and has been created to create a generic interface for all credentials
+    # clients to use, including ones which do not inherit from
+    # Signet::OAuth2::Client.
+    module BaseClient
+      AUTH_METADATA_KEY: Symbol
+
+      # Updates a_hash updated with the authentication token and returns the
+      # header value.
+      def apply!: (Hash[untyped, untyped] a_hash, ?Hash[untyped, untyped] opts) -> String
+
+      # Returns a clone of a_hash updated with the authentication token
+      def apply: [T < Hash[untyped, untyped]] (T a_hash, ?Hash[untyped, untyped] opts) -> T
+
+      # Whether the id_token or access_token is missing or about to expire.
+      # nil when a token is set but its expiry is unknown.
+      def needs_access_token?: () -> bool?
+
+      # Returns a reference to the #apply method, suitable for passing as
+      # a closure
+      def updater_proc: () -> ^(Hash[untyped, untyped] a_hash, ?Hash[untyped, untyped] opts) -> Hash[untyped, untyped]
+
+      # Registers a block to be called with the credentials after each token
+      # refresh.
+      def on_refresh: () { (self credentials) -> void } -> Array[Proc]
+
+      # Calls every block registered with #on_refresh.
+      def notify_refresh_listeners: () -> Array[Proc]
+
+      # The logger used to log operations on this client, such as token refresh.
+      attr_accessor logger: ::Logger?
+    end
+
+    module Helpers
+      # Connection provides a Faraday connection for use with Google::Auth.
+      module Connection
+        def self?.default_connection: () -> Faraday::Connection?
+
+        def self?.default_connection=: (Faraday::Connection? conn) -> Faraday::Connection?
+
+        def self?.connection: () -> Faraday::Connection
+      end
+    end
+
+    # Small utility for normalizing scopes into canonical form.
+    module ScopeUtil
+      # Aliases understood by this utility
+      ALIASES: Hash[String, String]
+
+      # Normalize the input, which may be an array of scopes or a whitespace-
+      # delimited scope string. The output is always an array, even if a single
+      # scope is input.
+      def self.normalize: (String | Array[String] scope) -> Array[String]
+
+      # Ensure the input is an array. If a single string is passed in, splits
+      # it via whitespace. Does not interpret aliases.
+      #
+      # Raises ArgumentError for any other value.
+      def self.as_array: (String | Array[String] scope) -> Array[String]
+    end
+
+    # Representation of an application's identity for user authorization flows.
+    class ClientId
+      INSTALLED_APP: String
+
+      WEB_APP: String
+
+      CLIENT_ID: String
+
+      CLIENT_SECRET: String
+
+      MISSING_TOP_LEVEL_ELEMENT_ERROR: String
+
+      # Text identifier of the client ID
+      attr_reader id: String
+
+      # Secret associated with the client ID
+      attr_reader secret: String
+
+      attr_accessor self.default: ClientId?
+
+      # Initialize the Client ID. Both id and secret must be non-nil.
+      def initialize: (String id, String secret) -> void
+
+      # Constructs a Client ID from a JSON file downloaded from the
+      # Google Developers Console.
+      def self.from_file: (String | Pathname file) -> ClientId
+
+      # Constructs a Client ID from a previously loaded JSON file. The hash
+      # structure should match the expected JSON format.
+      def self.from_hash: (Hash[String, untyped] config) -> ClientId
+    end
+
+    # Authenticates requests using IAM credentials.
+    class IAMCredentials
+      SELECTOR_KEY: String
+
+      TOKEN_KEY: String
+
+      # Initializes an IAMCredentials. Raises TypeError unless both are Strings.
+      def initialize: (String selector, String token) -> void
+
+      # Adds the credential fields to the hash.
+      def apply!: [T < Hash[untyped, untyped]] (T a_hash) -> T
+
+      # Returns a clone of a_hash updated with the authorization header
+      def apply: [T < Hash[untyped, untyped]] (T a_hash) -> T
+
+      # Returns a reference to the #apply method, suitable for passing as
+      # a closure
+      def updater_proc: () -> ^(Hash[untyped, untyped] a_hash, ?untyped opts) -> Hash[untyped, untyped]
+    end
+
+    # Implementation of Google API Key authentication.
+    class APIKeyCredentials
+      include BaseClient
+
+      # The API key
+      attr_reader api_key: String
+
+      # The universe domain of the universe this API key is for
+      attr_accessor universe_domain: String
+
+      # Creates an APIKeyCredentials from the GOOGLE_API_KEY environment
+      # variable, or returns nil when it is not set.
+      def self.from_env: (?untyped _scope, ?Hash[Symbol, untyped] options) -> instance?
+
+      # Create the APIKeyCredentials (options: `:api_key`, `:universe_domain`).
+      def self.make_creds: (?Hash[Symbol, untyped] options) -> instance
+
+      # Raises ArgumentError if the API key is nil or empty.
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+
+      # API keys don't expire, so this always returns false.
+      def expires_within?: (Numeric _seconds) -> bool
+
+      # Creates a duplicate of these credentials.
+      def duplicate: (?Hash[Symbol, untyped] options) -> self
+
+      # Updates the provided hash with the API Key header and returns it.
+      def apply!: [T < Hash[untyped, untyped]] (T a_hash, ?Hash[untyped, untyped] _opts) -> T
+    end
+
+    # Implementation of Bearer Token authentication scenario.
+    class BearerTokenCredentials
+      include BaseClient
+
+      # The token to be sent as a part of Bearer claim
+      attr_reader token: String
+
+      alias bearer_token token
+
+      # The token expiration time provided by the end-user.
+      attr_reader expires_at: Time?
+
+      # The universe domain of the universe this token is for
+      attr_accessor universe_domain: String
+
+      # Create the BearerTokenCredentials (options: `:token`, `:expires_at`
+      # as a Time or seconds since epoch, `:universe_domain`).
+      def self.make_creds: (?Hash[Symbol, untyped] options) -> instance
+
+      # Raises ArgumentError if the bearer token is nil or empty.
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+
+      # Determines if the credentials object has expired. Always false when
+      # no expiration time was given.
+      def expires_within?: (Numeric seconds) -> bool
+
+      # Creates a duplicate of these credentials.
+      def duplicate: (?Hash[Symbol, untyped] options) -> self
+    end
+
+    # Extends Signet::OAuth2::Client so that the auth token is obtained from
+    # the GCE metadata server.
+    class GCECredentials < Signet::OAuth2::Client
+      # Detect if this appear to be a GCE instance, by checking if metadata
+      # is available. The parameters are deprecated and unused.
+      def self.on_gce?: (?Hash[untyped, untyped] _options, ?boolish _reload) -> bool
+
+      # Resets the cached metadata server lookups.
+      def self.reset_cache: () -> void
+
+      alias self.unmemoize_all self.reset_cache
+
+      # Construct a GCECredentials
+      def initialize: (?Hash[untyped, untyped] options) -> void
+
+      # Creates a duplicate of these credentials without the cached token.
+      def duplicate: (?Hash[untyped, untyped] options) -> self
+
+      # Fetches the auth token from the metadata server.
+      def fetch_access_token: (?Hash[untyped, untyped] _options) -> Hash[String, untyped]
+
+      # Destructively updates these credentials.
+      def update!: (?Hash[untyped, untyped] options) -> self
+    end
+
+    # Authenticates requests using User Refresh credentials.
+    class UserRefreshCredentials < Signet::OAuth2::Client
+      TOKEN_CRED_URI: String
+
+      AUTHORIZATION_URI: String
+
+      REVOKE_TOKEN_URI: String
+
+      extend CredentialsLoader
+
+      attr_reader project_id: String?
+
+      attr_reader quota_project_id: String?
+
+      # Create a UserRefreshCredentials from `:json_key_io` (or the
+      # GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REFRESH_TOKEN
+      # environment variables) and `:scope`.
+      def self.make_creds: (?Hash[untyped, untyped] options) -> instance
+
+      # Reads a JSON key from an IO object and checks the required fields.
+      def self.read_json_key: (_JsonKeyIO json_key_io) -> Hash[String, untyped]
+
+      def initialize: (?Hash[untyped, untyped]? options) -> void
+
+      # Creates a duplicate of these credentials without the cached token.
+      def duplicate: (?Hash[untyped, untyped] options) -> self
+
+      # Revokes the credential and returns the response body.
+      def revoke!: (?Hash[Symbol, untyped] options) -> untyped
+
+      # Verifies that a credential grants the requested scope
+      def includes_scope?: (String | Array[String] required_scope) -> bool
+
+      # Destructively updates these credentials.
+      def update!: (?Hash[untyped, untyped] options) -> self
+    end
+
+    # Reads the credentials type from a JSON key and builds the matching
+    # credentials.
+    class DefaultCredentials
+      extend CredentialsLoader
+
+      # Override CredentialsLoader#make_creds to use the class determined by
+      # loading the json.
+      def self.make_creds: (?Hash[untyped, untyped] options) -> default_credentials
+
+      # Reads the input json and determines which creds class to use.
+      def self.determine_creds_class: (_JsonKeyIO json_key_io) -> [Hash[String, untyped], singleton(ServiceAccountCredentials) | singleton(UserRefreshCredentials) | singleton(ExternalAccount::Credentials) | singleton(ImpersonatedServiceAccountCredentials)]
+                                    | (?nil json_key_io) -> [nil, singleton(ServiceAccountCredentials) | singleton(UserRefreshCredentials) | singleton(ExternalAccount::Credentials) | singleton(ImpersonatedServiceAccountCredentials)]
+    end
+
+    # Authenticates requests using impersonation from base credentials.
+    class ImpersonatedServiceAccountCredentials
+      CREDENTIAL_TYPE_NAME: String
+
+      ERROR_SUFFIX: String
+
+      IAM_SCOPE: Array[String]
+
+      include BaseClient
+
+      include Helpers::Connection
+
+      # The original authenticated credentials used to fetch short-lived
+      # impersonation access tokens
+      attr_reader base_credentials: untyped
+
+      # The modified version of base credentials, tailored for impersonation
+      # purposes with necessary scope adjustments
+      attr_reader source_credentials: untyped
+
+      # The URL endpoint used to generate an impersonation token.
+      attr_reader impersonation_url: String
+
+      # The scope(s) required for the impersonated access token
+      attr_reader scope: String | Array[String]
+
+      # The short-lived impersonation access token, nil until fetched
+      attr_reader access_token: String?
+
+      # The expiration time of the current access token, nil until fetched
+      attr_reader expires_at: Time?
+
+      # Creates a new ImpersonatedServiceAccountCredentials instance, from
+      # `:json_key_io` or from `:base_credentials` / `:source_credentials`,
+      # `:impersonation_url` and `:scope`.
+      def self.make_creds: (?Hash[Symbol, untyped] options) -> instance
+
+      # Raises ArgumentError if a required option is missing.
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+
+      # Determines whether the current access token expires within the
+      # specified number of seconds (nil before the first fetch).
+      def expires_within?: (Numeric seconds) -> bool?
+
+      # The universe domain of the source credentials.
+      def universe_domain: () -> String?
+
+      # The logger of the source credentials.
+      def logger: () -> ::Logger?
+
+      # Creates a duplicate of these credentials without the cached token.
+      def duplicate: (?Hash[untyped, untyped] options) -> self
+    end
+
+    # Authenticates requests using External Account credentials, such
+    # as those provided by the AWS provider.
+    module ExternalAccount
+      # Provides an entrypoint for all Exernal Account credential classes.
+      class Credentials
+        AWS_SUBJECT_TOKEN_TYPE: String
+
+        MISSING_CREDENTIAL_SOURCE: String
+
+        INVALID_EXTERNAL_ACCOUNT_TYPE: String
+
+        # Create a ExternalAccount::Credentials from `:json_key_io` (required)
+        # and `:scope`.
+        #
+        # Raises Google::Auth::InitializationError if the JSON is missing or
+        # invalid.
+        def self.make_creds: (?Hash[Symbol, untyped] options) -> (AwsCredentials | IdentityPoolCredentials | PluggableAuthCredentials)
+
+        # Reads the required fields from the JSON.
+        def self.read_json_key: (_JsonKeyIO json_key_io) -> Hash[Symbol, untyped]
+      end
+
+      # Authenticates requests using External Account credentials, such
+      # as those provided by the AWS provider or OIDC provider like Azure, etc.
+      module BaseCredentials
+        EXTERNAL_ACCOUNT_JSON_TYPE: String
+
+        STS_GRANT_TYPE: String
+
+        STS_REQUESTED_TOKEN_TYPE: String
+
+        IAM_SCOPE: Array[String]
+
+        include BaseClient
+
+        include Helpers::Connection
+
+        attr_reader expires_at: Time?
+
+        attr_accessor access_token: String?
+
+        attr_accessor universe_domain: String
+
+        # Whether the token expires within the given number of seconds (nil
+        # before the first fetch).
+        def expires_within?: (Numeric seconds) -> bool?
+
+        def expires_at=: (Time | String | nil new_expires_at) -> Time?
+
+        # Exchanges the subject token for an access token and stores it.
+        def fetch_access_token!: (?Hash[untyped, untyped] _options) -> void
+
+        # Returns whether the credentials represent a workforce pool (True) or
+        # workload (False) based on the credentials' audience.
+        def is_workforce_pool?: () -> bool
+      end
+
+      # Helpers shared by the external account credentials.
+      module ExternalAccountUtils
+        CLOUD_RESOURCE_MANAGER: String
+
+        # Retrieves the project ID corresponding to the workload identity or
+        # workforce pool, or nil when not determinable.
+        def project_id: () -> String?
+
+        # Retrieve the project number corresponding to workload identity pool
+        def project_number: () -> String?
+
+        # Normalizes a timestamp value to a Time object. Raises
+        # Google::Auth::CredentialsError for other values.
+        def normalize_timestamp: (Time | String time) -> Time
+                               | (nil time) -> nil
+
+        # Extracts the service account email from the impersonation URL
+        def service_account_email: () -> String?
+      end
+
+      # Retrieves credentials from the AWS EC2 metadata service and exchanges
+      # them for a short-lived Google Cloud access token.
+      class AwsCredentials
+        IMDSV2_TOKEN_EXPIRATION_IN_SECONDS: Integer
+
+        include BaseCredentials
+
+        include ExternalAccountUtils
+
+        extend CredentialsLoader
+
+        attr_reader client_id: String?
+
+        def initialize: (?Hash[Symbol, untyped] options) -> void
+
+        # Retrieves the subject token using the credential_source object.
+        def retrieve_subject_token!: () -> String
+      end
+
+      # Implements an AWS request signer based on the AWS Signature Version 4
+      # signing process.
+      class AwsRequestSigner
+        def initialize: (String region_name) -> void
+
+        # Generates an AWS signature version 4 signed request.
+        def generate_signed_request: (Hash[Symbol, String?] aws_credentials, Hash[Symbol, untyped] original_request) -> Hash[Symbol, untyped]
+      end
+
+      # Retrieves a subject token from a file or URL and exchanges it for a
+      # short-lived Google Cloud access token.
+      class IdentityPoolCredentials
+        include BaseCredentials
+
+        include ExternalAccountUtils
+
+        extend CredentialsLoader
+
+        attr_reader client_id: String?
+
+        # Raises Google::Auth::InitializationError for an invalid
+        # credential_source.
+        def initialize: (?Hash[Symbol, untyped] options) -> void
+
+        # Implementation of BaseCredentials retrieve_subject_token!
+        def retrieve_subject_token!: () -> String
+      end
+
+      # Retrieves a subject token by running an executable and exchanges it for
+      # a short-lived Google Cloud access token.
+      class PluggableAuthCredentials
+        ENABLE_PLUGGABLE_ENV: String
+
+        EXECUTABLE_SUPPORTED_MAX_VERSION: Integer
+
+        EXECUTABLE_TIMEOUT_MILLIS_DEFAULT: Integer
+
+        EXECUTABLE_TIMEOUT_MILLIS_LOWER_BOUND: Integer
+
+        EXECUTABLE_TIMEOUT_MILLIS_UPPER_BOUND: Integer
+
+        ID_TOKEN_TYPE: Array[String]
+
+        include BaseCredentials
+
+        include ExternalAccountUtils
+
+        extend CredentialsLoader
+
+        attr_reader client_id: String?
+
+        # Raises Google::Auth::InitializationError if the executable or command
+        # is missing or the timeout is out of range.
+        def initialize: (?Hash[Symbol, untyped] options) -> void
+
+        # Retrieves the subject token using the credential_source object.
+        def retrieve_subject_token!: () -> String
+      end
+    end
+
+    # Verifies ID tokens issued by Google.
+    module IDTokens
+      # Anything that provides keys to a Verifier.
+      interface _KeySource
+        def current_keys: () -> Array[KeyInfo]
+
+        def refresh_keys: () -> Array[KeyInfo]
+      end
+
+      # Expected audience, authorized party or issuer (nil skips the check).
+      type claim = String | Array[String] | nil
+
+      OIDC_ISSUERS: Array[String]
+
+      IAP_ISSUERS: Array[String]
+
+      OAUTH2_V3_CERTS_URL: String
+
+      IAP_JWK_URL: String
+
+      # The key source providing public keys that can be used to verify
+      # ID tokens issued by Google OIDC.
+      def self.oidc_key_source: () -> JwkHttpKeySource
+
+      # The key source providing public keys that can be used to verify
+      # ID tokens issued by Google IAP.
+      def self.iap_key_source: () -> JwkHttpKeySource
+
+      # Verifies a token allegedly issued by Google OIDC and returns the
+      # decoded payload.
+      def self.verify_oidc: (String token, ?aud: claim, ?azp: claim, ?iss: claim) -> Hash[String, untyped]
+
+      # Verifies a token allegedly issued by Google IAP and returns the
+      # decoded payload.
+      def self.verify_iap: (String token, ?aud: claim, ?azp: claim, ?iss: claim) -> Hash[String, untyped]
+
+      # Failed to obtain keys from the key source.
+      class KeySourceError < StandardError
+        include Google::Auth::Error
+      end
+
+      # Failed to verify a token.
+      class VerificationError < StandardError
+        include Google::Auth::Error
+      end
+
+      # Failed to verify a token because it is expired.
+      class ExpiredTokenError < VerificationError
+      end
+
+      # Failed to verify a token because its signature did not match.
+      class SignatureError < VerificationError
+      end
+
+      # Failed to verify a token because its issuer did not match.
+      class IssuerMismatchError < VerificationError
+      end
+
+      # Failed to verify a token because its audience did not match.
+      class AudienceMismatchError < VerificationError
+      end
+
+      # Failed to verify a token because its authorized party did not match.
+      class AuthorizedPartyMismatchError < VerificationError
+      end
+
+      # A public key used for verifying ID tokens.
+      class KeyInfo
+        def initialize: (?id: String?, ?key: OpenSSL::PKey::PKey?, ?algorithm: String?) -> void
+
+        # The key ID.
+        attr_reader id: String?
+
+        # The key itself.
+        attr_reader key: OpenSSL::PKey::PKey?
+
+        # The signature algorithm. (normally `RS256` or `ES256`)
+        attr_reader algorithm: String?
+
+        # Create a KeyInfo from a single JWK, given as either a hash or an
+        # unparsed JSON string.
+        #
+        # Raises Google::Auth::IDTokens::KeySourceError if the key could not be
+        # extracted.
+        def self.from_jwk: (Hash[untyped, untyped] | String jwk) -> instance
+
+        # Create an array of KeyInfo from a JWK Set, given as either a hash or
+        # an unparsed JSON string.
+        def self.from_jwk_set: (Hash[untyped, untyped] | String jwk_set) -> Array[instance]
+      end
+
+      # A key source that contains a static set of keys.
+      class StaticKeySource
+        def initialize: (KeyInfo | Array[KeyInfo] keys) -> void
+
+        # Return the current keys. Does not perform any refresh.
+        attr_reader current_keys: Array[KeyInfo]
+
+        alias refresh_keys current_keys
+
+        # Create a static key source containing a single key parsed from a
+        # single JWK.
+        def self.from_jwk: (Hash[untyped, untyped] | String jwk) -> instance
+
+        # Create a static key source containing multiple keys parsed from a
+        # JWK Set.
+        def self.from_jwk_set: (Hash[untyped, untyped] | String jwk_set) -> instance
+      end
+
+      # A base key source that downloads keys from a URI.
+      class HttpKeySource
+        DEFAULT_RETRY_INTERVAL: Integer
+
+        def initialize: (String | URI::Generic uri, ?retry_interval: Numeric?) -> void
+
+        # The URI from which to download keys.
+        attr_reader uri: URI::Generic
+
+        # Return the current keys, without attempting to re-download.
+        attr_reader current_keys: Array[KeyInfo]
+
+        # Attempt to re-download keys (if the retry interval has expired) and
+        # return the new keys.
+        def refresh_keys: () -> Array[KeyInfo]
+      end
+
+      # A key source that downloads X509 certificates.
+      class X509CertHttpKeySource < HttpKeySource
+        def initialize: (String | URI::Generic uri, ?algorithm: String, ?retry_interval: Numeric?) -> void
+      end
+
+      # A key source that downloads a JWK set.
+      class JwkHttpKeySource < HttpKeySource
+        def initialize: (String | URI::Generic uri, ?retry_interval: Numeric?) -> void
+      end
+
+      # A key source that aggregates other key sources.
+      class AggregateKeySource
+        def initialize: (_KeySource | Array[_KeySource] sources) -> void
+
+        # Return the current keys, without attempting to refresh.
+        def current_keys: () -> Array[KeyInfo]
+
+        # Attempt to refresh keys and return the new keys.
+        def refresh_keys: () -> Array[KeyInfo]
+      end
+
+      # An object that can verify ID tokens.
+      class Verifier
+        def initialize: (?key_source: _KeySource?, ?aud: claim, ?azp: claim, ?iss: claim) -> void
+
+        # Verify the given token and return the decoded payload.
+        #
+        # Raises Google::Auth::IDTokens::KeySourceError if no key source is
+        # given or it failed, and VerificationError subclasses if the token
+        # verification failed.
+        def verify: (String token, ?key_source: _KeySource, ?aud: claim, ?azp: claim, ?iss: claim) -> Hash[String, untyped]
+      end
+    end
+  end
+end
+
+module Signet
+  module OAuth2
+    # googleauth reopens Signet::OAuth2::Client to add the BaseClient methods
+    # and a few helpers.
+    class Client
+      include Google::Auth::BaseClient
+
+      # The universe domain of the credentials
+      attr_accessor universe_domain: String?
+
+      # Remembers the `:connection_builder` or `:default_connection` option.
+      def configure_connection: (Hash[untyped, untyped] options) -> self
+
+      # Creates a duplicate of these credentials without the cached token.
+      def duplicate: (?Hash[untyped, untyped] options) -> self
+    end
+  end
+end
