@@ -1,0 +1,213 @@
+module Google
+  module Cloud
+    def self.env: () -> Env
+
+    class Env
+      VERSION: String
+
+      def self.get: () -> Env
+
+      def initialize: () -> void
+
+      attr_reader variables: Variables
+      attr_reader file_system: FileSystem
+      attr_reader compute_smbios: ComputeSMBIOS
+      attr_reader compute_metadata: ComputeMetadata
+
+      def metadata?: () -> bool
+
+      # Raises MetadataServerNotResponding when the connection cannot be confirmed.
+      def ensure_metadata: (?timeout: Numeric?) -> :confirmed
+
+      # Raises MetadataServerNotResponding when the Metadata Server does not respond.
+      def lookup_metadata: (String type, String entry, ?query: (Hash[String, String] | Hash[Symbol, String])?) -> String?
+
+      # Raises MetadataServerNotResponding when the Metadata Server does not respond.
+      def lookup_metadata_response: (String type, String entry, ?query: (Hash[String, String] | Hash[Symbol, String])?) -> ComputeMetadata::Response
+
+      def knative?: () -> bool
+      def app_engine?: () -> bool
+      def app_engine_flexible?: () -> bool
+      def app_engine_standard?: () -> bool
+      def kubernetes_engine?: () -> bool
+      alias container_engine? kubernetes_engine?
+      def cloud_shell?: () -> bool
+      def compute_engine?: () -> bool
+      def raw_compute_engine?: () -> bool
+
+      def project_id: () -> String?
+      def numeric_project_id: () -> Integer?
+      def instance_name: () -> String?
+      def instance_description: () -> String?
+      def instance_zone: () -> String?
+      def instance_machine_type: () -> String?
+      def instance_tags: () -> Array[String]?
+      def instance_attribute_keys: () -> Array[String]?
+      def instance_attribute: (String key) -> String?
+
+      def knative_service_id: () -> String?
+      alias knative_service_name knative_service_id
+      def knative_service_revision: () -> String?
+
+      def app_engine_service_id: () -> String?
+      alias app_engine_service_name app_engine_service_id
+      def app_engine_service_version: () -> String?
+      def app_engine_memory_mb: () -> Integer?
+
+      def kubernetes_engine_cluster_name: () -> String?
+      alias container_engine_cluster_name kubernetes_engine_cluster_name
+      def kubernetes_engine_namespace_id: () -> String?
+      alias container_engine_namespace_id kubernetes_engine_namespace_id
+
+      def logging_agent_expected?: () -> bool
+
+      class ComputeMetadata
+        DEFAULT_HOST: String
+        DEFAULT_OPEN_TIMEOUT: Float
+        DEFAULT_REQUEST_TIMEOUT: Float
+        DEFAULT_RETRY_COUNT: Integer
+        DEFAULT_RETRY_TIMEOUT: nil
+        DEFAULT_RETRY_INTERVAL: Float
+        DEFAULT_WARMUP_TIME: Integer
+
+        class Response
+          def initialize: (Integer status, String body, Hash[String, String] | Faraday::Utils::Headers headers) -> void
+
+          attr_reader status: Integer
+          attr_reader body: String
+          attr_reader headers: Hash[String, String] | Faraday::Utils::Headers
+          attr_reader retrieval_monotonic_time: Float
+
+          def google_flavor?: () -> bool
+        end
+
+        class Overrides
+          def initialize: () -> void
+
+          # A nil path is the ping request (see #add_ping).
+          def add_response: (String? path, Response response, ?query: Hash[String, String]?) -> self
+
+          def add: (String? path, String string, ?query: Hash[String, String]?, ?headers: Hash[String, String]?) -> self
+
+          def add_ping: () -> self
+
+          def clear: () -> self
+
+          def lookup: (String? path, ?query: Hash[String, String]?) -> Response?
+
+          def empty?: () -> bool
+        end
+
+        def initialize: (?variables: Variables?, ?compute_smbios: ComputeSMBIOS?) -> void
+
+        attr_reader host: String
+
+        # nil selects GCE_METADATA_HOST or DEFAULT_HOST.
+        def host=: (String? new_host) -> String
+
+        attr_accessor retry_count: Integer?
+
+        attr_accessor retry_timeout: Numeric?
+
+        attr_accessor retry_interval: Numeric
+
+        # The docs allow nil, but existence checks then raise TypeError
+        # (`@startup_time + warmup_time`), so only Numeric is accepted.
+        attr_accessor warmup_time: Numeric
+
+        def open_timeout: () -> Numeric
+
+        def open_timeout=: (Numeric timeout) -> Numeric
+
+        def request_timeout: () -> Numeric
+
+        def request_timeout=: (Numeric timeout) -> Numeric
+
+        # A nil path is the ping request. :default uses #retry_count and
+        # #retry_timeout. Raises MetadataServerNotResponding.
+        def lookup_response: (String? path,
+                              ?query: (Hash[String, String] | Hash[Symbol, String])?,
+                              ?open_timeout: Numeric?,
+                              ?request_timeout: Numeric?,
+                              ?retry_count: Integer | :default | nil,
+                              ?retry_timeout: Numeric | :default | nil) -> Response
+
+        # Raises MetadataServerNotResponding.
+        def lookup: (String? path,
+                     ?query: (Hash[String, String] | Hash[Symbol, String])?,
+                     ?open_timeout: Numeric?,
+                     ?request_timeout: Numeric?,
+                     ?retry_count: Integer | :default | nil,
+                     ?retry_timeout: Numeric | :default | nil) -> String?
+
+        def check_existence: (?open_timeout: Numeric?,
+                              ?request_timeout: Numeric?,
+                              ?retry_count: Integer | :default | nil,
+                              ?retry_timeout: Numeric | :default | nil) -> (:no | :unconfirmed | :confirmed)
+
+        def existence_immediate: () -> (:no | :unconfirmed | :confirmed)?
+
+        # Raises MetadataServerNotResponding when the connection cannot be confirmed.
+        def ensure_existence: (?timeout: Numeric?) -> :confirmed
+
+        # false when the data has not been retrieved, nil when it does not expire.
+        def expiration_time_of: (String? path, ?query: Hash[String, String]?) -> (Float | false | nil)
+
+        attr_reader overrides: Overrides?
+
+        def overrides=: (Overrides? new_overrides) -> Overrides?
+
+        def with_overrides: [T] (Overrides? temp_overrides) { () -> T } -> T
+      end
+
+      class MetadataServerNotResponding < StandardError
+        DEFAULT_MESSAGE: String
+
+        def initialize: (?String? message) -> void
+      end
+
+      class ComputeSMBIOS
+        def initialize: () -> void
+
+        def product_name: () -> String
+
+        def product_name_source: () -> (:linux | :windows | :error | :override)
+
+        def google_compute?: () -> bool
+
+        attr_accessor override_product_name: String?
+
+        def with_override_product_name: [T] (String? override_name) { () -> T } -> T
+      end
+
+      class FileSystem
+        def initialize: () -> void
+
+        # Raises IOError when binary does not match an earlier read of the path.
+        def read: (String path, ?binary: bool) -> String?
+
+        attr_reader overrides: Hash[String, String]?
+
+        def overrides=: (Hash[String, String]? new_overrides) -> Hash[String, String]?
+
+        def with_overrides: [T] (Hash[String, String]? temp_overrides) { () -> T } -> T
+      end
+
+      class Variables
+        # ENV, or a Hash used for mocking.
+        interface _BackingData
+          def []: (String key) -> String?
+        end
+
+        def initialize: () -> void
+
+        def []: (String | Symbol key) -> String?
+        alias get []
+
+        attr_accessor backing_data: _BackingData
+
+        def with_backing_data: [T] (_BackingData temp_backing_data) { () -> T } -> T
+      end
+    end
+  end
+end
