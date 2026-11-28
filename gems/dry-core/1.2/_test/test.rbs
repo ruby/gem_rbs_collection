@@ -1,0 +1,41 @@
+class Settings
+  extend Dry::Core::ClassAttributes
+end
+
+class Calculator
+  extend Dry::Core::Cache
+  include Dry::Core::Cache::Methods
+
+  def sum: (Integer left, Integer right) -> Integer
+end
+
+class Point
+  include Dry::Core::Equalizer::Methods
+
+  attr_reader x: Integer
+  attr_reader y: Integer
+
+  def initialize: (Integer x, Integer y) -> void
+end
+
+class Service
+  extend Dry::Core::Deprecations::Interface
+
+  def old_call: () -> nil
+  def new_call: () -> nil
+end
+
+class Base
+  extend Dry::Core::DescendantsTracker
+end
+
+class Plugin
+  extend Dry::Core::Extensions
+end
+
+class Report
+  include Dry::Core::Memoizable
+  extend Dry::Core::Memoizable::ClassInterface::Object
+
+  def total: () -> Integer
+end
