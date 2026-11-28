@@ -1,0 +1,673 @@
+module Puma
+  # A Rack application: anything that responds to `call(env)`.
+  interface _RackApp
+    def call: (Hash[String, untyped] env) -> untyped
+  end
+
+  # Where LogWriter writes: an IO, a StringIO or a Puma::NullIO.
+  interface _Output
+    def write: (_ToS str) -> untyped
+    def flush: () -> untyped
+    def sync: () -> untyped
+  end
+
+  # The environment variables: ENV or a Hash.
+  interface _Env
+    def []: (String name) -> String?
+    def key?: (String name) -> bool
+    def delete: (String name) -> String?
+    def select: () { (String name, String value) -> boolish } -> Hash[String, String]
+  end
+
+  HAS_FORK: bool
+  HAS_NATIVE_IO_WAIT: bool
+  IS_JRUBY: bool
+  IS_OSX: bool
+  IS_WINDOWS: bool
+  IS_LINUX: bool
+  IS_ARM: bool
+  IS_MRI: bool
+  HAS_SSL: bool
+  HAS_UNIX_SOCKET: bool
+
+  # "SIGINFO" or "SIGPWR", nil when the platform has neither.
+  BACKTRACE_SIGNAL: String?
+
+  HTTP_STATUS_CODES: Hash[Integer, String]
+  STATUS_WITH_NO_ENTITY_BODY: Hash[Integer, bool]
+
+  Plugins: Puma::PluginRegistry
+
+  def self.jruby?: () -> bool
+  def self.osx?: () -> bool
+  def self.windows?: () -> bool
+  def self.mri?: () -> bool
+  def self.forkable?: () -> bool
+  def self.backtrace_signal: () -> String?
+  def self.ssl?: () -> bool
+  def self.abstract_unix_socket?: () -> bool
+
+  # The stats of the running server (set by Puma::Launcher), as JSON.
+  def self.stats: () -> String
+
+  # The stats of the running server (set by Puma::Launcher).
+  def self.stats_hash: () -> Hash[Symbol, untyped]
+
+  class UnsupportedOption < RuntimeError
+  end
+
+  class UnknownPlugin < RuntimeError
+  end
+
+  module Const
+    PUMA_VERSION: String
+    VERSION: String
+    CODE_NAME: String
+    PUMA_SERVER_STRING: String
+    WRITE_TIMEOUT: Integer
+    ACCEPT_ERROR_DELAY: Float
+    REQUEST_URI: String
+    REQUEST_PATH: String
+    QUERY_STRING: String
+    CONTENT_LENGTH: String
+    PATH_INFO: String
+    PUMA_TMP_BASE: String
+    ERROR_RESPONSE: Hash[Integer, String]
+    CHUNK_SIZE: Integer
+    MAX_HEADER: Integer
+    MAX_BODY: Integer
+    REQUEST_METHOD: String
+    HEAD: String
+    SUPPORTED_HTTP_METHODS: Array[String]
+    IANA_HTTP_METHODS: Array[String]
+    LINE_END: String
+    REMOTE_ADDR: String
+    HTTP_X_FORWARDED_FOR: String
+    HTTP_X_FORWARDED_SSL: String
+    HTTP_X_FORWARDED_SCHEME: String
+    HTTP_X_FORWARDED_PROTO: String
+    SERVER_NAME: String
+    SERVER_PORT: String
+    HTTP_HOST: String
+    PORT_80: String
+    PORT_443: String
+    LOCALHOST: String
+    LOCALHOST_IPV4: String
+    LOCALHOST_IPV6: String
+    UNSPECIFIED_IPV4: String
+    UNSPECIFIED_IPV6: String
+    SERVER_PROTOCOL: String
+    HTTP_11: String
+    SERVER_SOFTWARE: String
+    GATEWAY_INTERFACE: String
+    CGI_VER: String
+    STOP_COMMAND: String
+    HALT_COMMAND: String
+    RESTART_COMMAND: String
+    RACK_INPUT: String
+    RACK_URL_SCHEME: String
+    RACK_AFTER_REPLY: String
+    RACK_RESPONSE_FINISHED: String
+    PUMA_SOCKET: String
+    PUMA_CONFIG: String
+    PUMA_PEERCERT: String
+    PUMA_UNDERSCORE_HEADERS: String
+    HTTP: String
+    HTTPS: String
+    HTTPS_KEY: String
+    HTTP_VERSION: String
+    HTTP_CONNECTION: String
+    HTTP_EXPECT: String
+    CONTINUE: String
+    HTTP_11_100: String
+    HTTP_11_200: String
+    HTTP_10_200: String
+    CLOSE: String
+    KEEP_ALIVE: String
+    CONTENT_LENGTH2: String
+    CONTENT_LENGTH_S: String
+    TRANSFER_ENCODING: String
+    TRANSFER_ENCODING2: String
+    CONNECTION_CLOSE: String
+    CONNECTION_KEEP_ALIVE: String
+    TRANSFER_ENCODING_CHUNKED: String
+    CLOSE_CHUNKED: String
+    CHUNKED: String
+    COLON: String
+    NEWLINE: String
+    HIJACK_P: String
+    HIJACK: String
+    HIJACK_IO: String
+    EARLY_HINTS: String
+    DQUOTE: String
+    HTTP_HEADER_DELIMITER: String
+    ILLEGAL_HEADER_KEY_REGEX: Regexp
+    ILLEGAL_HEADER_VALUE_REGEX: Regexp
+    UNMASKABLE_HEADERS: Hash[String, bool]
+    BANNED_HEADER_KEY: Regexp
+    PROXY_PROTOCOL_V1_REGEX: Regexp
+    PROXY_PROTOCOL_V1_MAX_LENGTH: Integer
+
+    module PipeRequest
+      PIPE_WAKEUP: String
+      PIPE_BOOT: String
+      PIPE_FORK: String
+      PIPE_EXTERNAL_TERM: String
+      PIPE_TERM: String
+      PIPE_PING: String
+      PIPE_IDLE: String
+      PIPE_MOLD: String
+    end
+  end
+
+  # The methods available in a configuration file (config/puma.rb).
+  class DSL
+    ON_WORKER_KEY: Array[Class]
+
+    # Builds the `ssl://` URL that #ssl_bind binds to.
+    def self.ssl_bind_str: (String host, Integer | String port, Hash[Symbol, untyped] opts) -> String
+
+    def initialize: (Hash[Symbol, untyped] options, Puma::Configuration config) -> void
+
+    def set_default_host: (String host) -> void
+    def default_host: () -> String
+
+    # Runs the block with the DSL as self.
+    def inject: [T] () { (Puma::DSL dsl) [self: Puma::DSL] -> T } -> T
+
+    # The value of an option already set, or +default+.
+    def get: (Symbol | String key, ?untyped default) -> untyped
+
+    def plugin: (String | Symbol name) -> void
+
+    def app: (Puma::_RackApp obj) -> void
+           | (?nil obj) { (Hash[String, untyped] env) -> untyped } -> void
+
+    def activate_control_app: (?String url) -> void
+                            | (String url, ?no_token: bool, ?auth_token: String, ?umask: Integer, ?data_only: bool) -> void
+                            | (String url, Hash[Symbol, untyped] opts) -> void
+
+    def load: (String file) -> void
+    def bind: (String url) -> void
+    def clear_binds!: () -> void
+    def bind_to_activated_sockets: (?bool | "only" bind) -> void
+    def port: (Integer | String port, ?String? host) -> void
+    def first_data_timeout: (Integer | String seconds) -> void
+    def persistent_timeout: (Integer | String seconds) -> void
+    def idle_timeout: (Integer | String seconds) -> void
+    def fiber_per_request: (?bool which) -> void
+    alias clean_thread_locals fiber_per_request
+    def drain_on_shutdown: (?bool which) -> void
+    def shutdown_body_timeout: (Numeric | String seconds) -> void
+    def environment: (String environment) -> void
+    def force_shutdown_after: (?:forever | :immediately | Numeric | String val) -> void
+
+    # Runs before the server restarts (single and cluster mode).
+    def before_restart: () { (Puma::Launcher launcher) -> void } -> void
+    alias on_restart before_restart
+
+    def restart_command: (_ToS cmd) -> void
+    def pidfile: (_ToS path) -> void
+    def quiet: (?bool which) -> void
+    def log_requests: (?bool which) -> void
+    def custom_logger: (untyped custom_logger) -> void
+    def debug: () -> void
+    def rackup: (_ToS path) -> void
+    def rack_url_scheme: (?String? scheme) -> void
+    def early_hints: (?bool answer) -> void
+    def stdout_redirect: (?String? stdout, ?String? stderr, ?bool append) -> void
+    # The block gets the message: a String, except the backtrace lines (an Array) on
+    # SIGINFO/SIGPWR and the exception when a worker fails to boot.
+    def log_formatter: () { (_ToS str) -> _ToS } -> void
+    def threads: (Integer | String min, ?Integer | String max) -> void
+    def max_io_threads: (Integer | String max) -> void
+
+    def ssl_bind: (String host, Integer | String port, ?Hash[Symbol, untyped] opts) -> void
+                | (String host, Integer | String port, **untyped opts) -> void
+
+    def state_path: (_ToS path) -> void
+    def state_permission: (Integer? permission) -> void
+
+    # A count, :auto or "auto" (needs concurrent-ruby), or nil for single mode.
+    def workers: (Integer | String | :auto | nil count) -> void
+
+    def silence_single_worker_warning: () -> void
+    def silence_fork_callback_warning: () -> void
+    def single: () { () -> void } -> void
+    def cluster: () { () -> void } -> void
+
+    # The block is called with nil.
+    def before_fork: () { (nil) -> void } -> void
+
+    # The block is called with the worker index, plus a Hash kept for the worker when +key+ is given.
+    def before_worker_boot: (?nil key) { (Integer index) -> void } -> void
+                          | (String | Symbol key) { (Integer index, Hash[untyped, untyped] data) -> void } -> void
+    alias on_worker_boot before_worker_boot
+
+    def before_worker_shutdown: (?nil key) { (Integer index) -> void } -> void
+                              | (String | Symbol key) { (Integer index, Hash[untyped, untyped] data) -> void } -> void
+    alias on_worker_shutdown before_worker_shutdown
+
+    def before_worker_fork: () { (Integer index) -> void } -> void
+    alias on_worker_fork before_worker_fork
+
+    def after_worker_fork: () { (Integer index) -> void } -> void
+    alias after_worker_boot after_worker_fork
+
+    def after_worker_shutdown: () { (Puma::Cluster::WorkerHandle worker) -> void } -> void
+
+    def after_booted: () { () -> void } -> void
+    alias on_booted after_booted
+
+    def after_stopped: () { () -> void } -> void
+    alias on_stopped after_stopped
+
+    def before_refork: (?nil key) { (nil) -> void } -> void
+                     | (String | Symbol key) { (nil, Hash[untyped, untyped] data) -> void } -> void
+    alias on_refork before_refork
+
+    def after_refork: (?nil key) { (nil) -> void } -> void
+                    | (String | Symbol key) { (nil, Hash[untyped, untyped] data) -> void } -> void
+
+    def after_mold_promotion: (?nil key) { (Integer index) -> void } -> void
+                            | (String | Symbol key) { (Integer index, Hash[untyped, untyped] data) -> void } -> void
+
+    def before_mold_shutdown: (?nil key) { (Integer index) -> void } -> void
+                            | (String | Symbol key) { (Integer index, Hash[untyped, untyped] data) -> void } -> void
+
+    def before_thread_start: () { (Puma::ServerPluginControl control) -> void } -> void
+    alias on_thread_start before_thread_start
+
+    def before_thread_exit: () { () -> void } -> void
+    alias on_thread_exit before_thread_exit
+
+    def out_of_band: () { () -> void } -> void
+    def directory: (_ToS dir) -> void
+    def preload_app!: (?bool answer) -> void
+
+    # The handler is called with as many of (error, env, status) as its arity takes.
+    def lowlevel_error_handler: (untyped obj) -> void
+                              | (?nil obj) { (Exception error, Hash[String, untyped] env, Integer status) -> untyped } -> void
+
+    def hook_error_handler: (untyped obj) -> void
+                          | (?nil obj) { (StandardError error, Symbol hook) -> void } -> void
+
+    def continue_callback: (untyped obj) -> void
+                         | (?nil obj) { (Hash[String, untyped] env) -> untyped } -> void
+
+    def prune_bundler: (?bool answer) -> void
+    def raise_exception_on_sigterm: (?bool answer) -> void
+    def extra_runtime_dependencies: (?Array[String] | String answer) -> void
+    def tag: (_ToS string) -> void
+    def worker_check_interval: (Numeric | String interval) -> void
+    def worker_timeout: (Integer | String timeout) -> void
+    def worker_boot_timeout: (Integer | String timeout) -> void
+    def worker_shutdown_timeout: (Integer | String timeout) -> void
+    def worker_culling_strategy: (String | Symbol strategy) -> void
+    def queue_requests: (?bool answer) -> void
+    def shutdown_debug: (?bool val, ?on_force: bool) -> void
+    def wait_for_less_busy_worker: (?Numeric | String val) -> void
+    # proxy_protocol: only v1 is supported; other versions raise.
+    def set_remote_address: (?:socket | :localhost | String | { header: String } | { proxy_protocol: String | Symbol } val) -> void
+    def fork_worker: (?Integer | String after_requests) -> void
+    def mold_worker: (*Integer | String thresholds) -> void
+    def max_fast_inline: (Numeric | String | nil num_of_requests) -> void
+    def max_keep_alive: (Numeric | String | nil num_of_requests) -> void
+    def enable_keep_alives: (?bool enabled) -> void
+    def allow_underscore_headers: (?bool allowed) -> void
+    def io_selector_backend: (String | Symbol backend) -> void
+    def mutate_stdout_and_stderr_to_sync_on_write: (?bool enabled) -> void
+    def http_content_length_limit: (Integer? limit) -> void
+    def supported_http_methods: (:any | Array[String] methods) -> void
+  end
+
+  # The user, file and default layers of the options, read in that order.
+  class UserFileDefaultOptions
+    def initialize: (Hash[Symbol, untyped] user_options, Hash[Symbol, untyped] default_options) -> void
+
+    attr_reader user_options: Hash[Symbol, untyped]
+    attr_reader file_options: Hash[Symbol, untyped]
+    attr_reader default_options: Hash[Symbol, untyped]
+
+    def []: (Symbol key) -> untyped
+    def []=: (Symbol key, untyped value) -> untyped
+    def fetch: (Symbol key, ?untyped default_value) -> untyped
+
+    # The values of every layer, user first, nils dropped.
+    def all_of: (Symbol key) -> Array[untyped]
+
+    def finalize_values: () -> void
+    def final_options: () -> Hash[Symbol, untyped]
+  end
+
+  class Configuration
+    class NotLoadedError < StandardError
+    end
+
+    class NotClampedError < StandardError
+    end
+
+    DEFAULTS: Hash[Symbol, untyped]
+
+    def self.default_tcp_host: () -> String
+    def self.default_tcp_bind: (?Integer | String port) -> String
+    def self.ipv6_interface_available?: () -> bool
+    def self.temp_path: () -> String
+    def self.random_token: () -> String
+
+    def initialize: (?Hash[Symbol, untyped] user_options, ?Hash[Symbol, untyped] default_options, ?Puma::_Env env) ?{ (Puma::DSL user_config, Puma::DSL file_config, Puma::DSL default_config) -> void } -> void
+
+    attr_reader plugins: Puma::PluginLoader
+    attr_reader events: Puma::Events
+    attr_reader hooks: Hash[Symbol, bool]
+
+    # Raises NotClampedError before #clamp.
+    def options: () -> Puma::UserFileDefaultOptions
+
+    def configure: [T] () { (Puma::DSL user_config, Puma::DSL file_config, Puma::DSL default_config) -> T } -> T
+    def puma_default_options: (?Puma::_Env env) -> Hash[Symbol, untyped]
+    def puma_options_from_env: (?Puma::_Env env) -> Hash[Symbol, untyped]
+
+    # Reads the config files.
+    def load: () -> Puma::UserFileDefaultOptions
+
+    # The config files #load reads; [nil] when none is given and no default file exists.
+    def config_files: () -> Array[String?]
+
+    # Loads the config files if needed and finalizes the options.
+    def clamp: () -> Puma::UserFileDefaultOptions
+
+    # The configured app or true if the rackup file exists (a truthy value), else false or nil.
+    def app_configured?: () -> boolish
+
+    def rackup: () -> String
+    def app: () -> Puma::Configuration::ConfigMiddleware
+    def environment: () -> String
+    def load_plugin: (String | Symbol name) -> Puma::Plugin
+    def final_options: () -> Hash[Symbol, untyped]
+
+    # Sets env["puma.config"] and calls the app.
+    class ConfigMiddleware
+      def initialize: (Puma::Configuration config, Puma::_RackApp app) -> void
+      def call: (Hash[String, untyped] env) -> untyped
+    end
+  end
+
+  class Events
+    def initialize: () -> void
+
+    def fire: (Symbol hook, *untyped args) -> void
+
+    def register: (Symbol hook, untyped obj) -> untyped
+                | (Symbol hook, ?nil obj) { (?) -> void } -> Proc
+
+    def after_booted: () { () -> void } -> Proc
+    def before_restart: () { () -> void } -> Proc
+    def after_stopped: () { () -> void } -> Proc
+    def on_booted: () { () -> void } -> Proc
+    def on_restart: () { () -> void } -> Proc
+    def on_stopped: () { () -> void } -> Proc
+    def fire_after_booted!: () -> void
+    def fire_before_restart!: () -> void
+    def fire_after_stopped!: () -> void
+  end
+
+  class LogWriter
+    interface _Formatter
+      def call: (_ToS str) -> _ToS
+    end
+
+    class DefaultFormatter
+      def call: [T < _ToS] (T str) -> T
+    end
+
+    class PidFormatter
+      def call: (_ToS str) -> String
+    end
+
+    DEFAULT: Puma::LogWriter
+
+    def self.strings: (?env: Puma::_Env) -> Puma::LogWriter
+    def self.stdio: (?env: Puma::_Env) -> Puma::LogWriter
+    def self.null: (?env: Puma::_Env) -> Puma::LogWriter
+
+    def initialize: (Puma::_Output stdout, Puma::_Output stderr, ?env: Puma::_Env) -> void
+
+    attr_reader stdout: Puma::_Output
+    attr_reader stderr: Puma::_Output
+    attr_accessor formatter: Puma::LogWriter::_Formatter
+
+    # Used instead of stdout by #log when it responds to `write`.
+    attr_accessor custom_logger: untyped
+
+    # Puma also logs Arrays of backtrace lines and exceptions.
+    def log: (_ToS str) -> void
+    def write: (_ToS str) -> void
+    def debug?: () -> bool
+    def debug: (?_ToS? str) ?{ () -> untyped } -> void
+
+    # Logs the message and exits with status 1.
+    def error: (_ToS str) -> bot
+
+    def format: (_ToS str) -> _ToS
+    def connection_error: (Exception error, untyped req, ?String text) -> void
+    def parse_error: (Exception error, untyped req) -> void
+    def ssl_error: (Exception error, untyped ssl_socket) -> void
+    def unknown_error: (Exception error, ?untyped req, ?String text) -> void
+    def debug_error: (Exception error, ?untyped req, ?String text) -> void
+  end
+
+  class Binder
+    include Puma::Const
+
+    RACK_VERSION: Array[Integer]
+
+    def initialize: (Puma::LogWriter log_writer, Puma::UserFileDefaultOptions | Hash[Symbol, untyped] options, ?env: Puma::_Env) -> void
+
+    # The listening sockets.
+    attr_accessor ios: Array[untyped]
+
+    # [url, socket] pairs of the parsed binds.
+    attr_accessor listeners: Array[[String, untyped]]
+
+    attr_reader envs: Hash[untyped, Hash[String, untyped]]
+    attr_reader proto_env: Hash[String, untyped]
+    attr_reader unix_paths: Array[String]
+
+    # The Rack env template for a socket.
+    def env: (untyped sock) -> Hash[String, untyped]
+
+    def close: () -> void
+
+    # Ports of TCP listeners, paths of UNIX ones.
+    def connected_ports: () -> Array[Integer | String]
+
+    # Opens a listener for each URL (tcp://, ssl://, unix://).
+    def parse: (Array[String] binds, ?Puma::LogWriter? log_writer, ?String log_msg) -> void
+
+    # nil for "localhost", which adds a listener per loopback address.
+    def add_tcp_listener: (String? host, Integer port, ?boolish optimize_for_latency, ?Integer backlog) -> TCPServer?
+
+    def add_unix_listener: (String path, ?Integer? umask, ?Integer? mode, ?Integer backlog) -> UNIXServer
+    def close_listeners: () -> void
+  end
+
+  class Launcher
+    def initialize: (Puma::Configuration conf, ?log_writer: Puma::LogWriter, ?events: Puma::Events, ?argv: Array[String], ?env: Puma::_Env) -> void
+                  | (Puma::Configuration conf, Hash[Symbol, untyped] launcher_args) -> void
+
+    attr_reader binder: Puma::Binder
+    attr_reader log_writer: Puma::LogWriter
+    attr_reader events: Puma::Events
+    attr_reader config: Puma::Configuration
+    attr_reader options: Puma::UserFileDefaultOptions
+    attr_reader restart_dir: String
+
+    def stats: () -> Hash[Symbol, untyped]
+
+    # Writes the pidfile and the state file when they are configured.
+    def write_state: () -> void
+
+    def delete_pidfile: () -> void
+    def halt: () -> void
+    def stop: () -> void
+    def restart: () -> void
+
+    # Falls back to #restart when a phased restart is not available.
+    def phased_restart: () -> void
+
+    # false when neither fork_worker nor mold_worker is configured.
+    def refork: () -> bool
+
+    # Runs the server until it is stopped (or execs itself on restart).
+    def run: () -> void
+
+    def connected_ports: () -> Array[Integer | String]
+    def restart_args: () -> Array[String]
+    def close_binder_listeners: () -> void
+    def thread_status: () { (String name, Array[String] backtrace) -> void } -> void
+  end
+
+  class Runner
+    include Puma::Const::PipeRequest
+  end
+
+  class Cluster < Runner
+    # The worker passed to after_worker_shutdown hooks.
+    class WorkerHandle
+      attr_reader index: Integer
+      # nil until a worker forked by fork_worker or mold_worker reports in.
+      attr_reader pid: Integer?
+      attr_reader phase: Integer
+      attr_reader started_at: Time
+      attr_reader last_checkin: Time
+      attr_reader last_status: Hash[Symbol, Integer]
+      attr_reader process_status: Process::Status?
+      def booted?: () -> bool
+      def uptime: () -> Float
+      def term?: () -> bool
+    end
+  end
+
+  module Response
+    include Puma::Const
+  end
+
+  class Server
+    include Puma::Const
+    include Puma::Response
+
+    STAT_METHODS: Array[Symbol]
+
+    # The server handling the current request thread, if any.
+    def self.current: () -> Puma::Server?
+
+    def initialize: (Puma::_RackApp app, ?Puma::Events? events, ?Hash[Symbol, untyped] | Puma::UserFileDefaultOptions options) -> void
+
+    attr_reader options: Puma::UserFileDefaultOptions
+    attr_reader thread: Thread?
+    attr_reader log_writer: Puma::LogWriter
+    attr_reader events: Puma::Events
+    attr_reader min_threads: Integer
+    attr_reader max_threads: Integer
+    attr_reader requests_count: Integer
+    attr_accessor app: Puma::_RackApp
+    attr_accessor binder: Puma::Binder
+
+    def inherit_binder: (Puma::Binder bind) -> Puma::Binder
+
+    # nil before #run.
+    def backlog: () -> Integer?
+    def running: () -> Integer?
+    def pool_capacity: () -> Integer?
+
+    # In the background (default) returns the server thread; otherwise handles requests until stopped.
+    def run: (?true background, ?thread_name: String) -> Thread
+           | (false | nil background, ?thread_name: String) -> void
+           | (boolish background, ?thread_name: String) -> untyped
+
+    def stop: (?boolish sync) -> void
+    def halt: (?boolish sync) -> void
+    def begin_restart: (?boolish sync) -> void
+    def shutting_down?: () -> bool
+    def stats: () -> Hash[Symbol, untyped]
+    def reset_max: () -> void
+    def add_tcp_listener: (String? host, Integer port, ?boolish optimize_for_latency, ?Integer backlog) -> TCPServer?
+    def add_unix_listener: (String path, ?Integer? umask, ?Integer? mode, ?Integer backlog) -> UNIXServer
+
+    # Logs a message and changes nothing when min > max or min < 0.
+    def update_thread_pool_min_max: (?min: Integer, ?max: Integer) -> void
+
+    def connected_ports: () -> Array[Integer | String]
+  end
+
+  # Passed to before_thread_start hooks.
+  class ServerPluginControl
+    def initialize: (Puma::Server server) -> void
+    def max_threads: () -> Integer
+    def min_threads: () -> Integer
+    def update_thread_pool_min_max: (?min: Integer, ?max: Integer) -> void
+  end
+
+  class PluginLoader
+    def initialize: () -> void
+
+    # Raises UnknownPlugin for an unknown name.
+    def create: (String | Symbol name) -> Puma::Plugin
+
+    # Calls `start(launcher)` on each plugin that defines it.
+    def fire_starts: (Puma::Launcher launcher) -> void
+  end
+
+  class PluginRegistry
+    def initialize: () -> void
+    def register: (String name, singleton(Puma::Plugin) cls) -> singleton(Puma::Plugin)
+
+    # Requires puma/plugin/<name> when needed; raises UnknownPlugin.
+    def find: (String | Symbol name) -> singleton(Puma::Plugin)
+
+    def add_background: (Proc blk) -> void
+    def fire_background: () -> void
+  end
+
+  # Plugins are defined in puma/plugin/<name>.rb with Puma::Plugin.create,
+  # whose block defines `start(launcher)` and/or `config(dsl)`.
+  class Plugin
+    CALLER_FILE: Regexp
+
+    # Registers a plugin named after the file that calls it.
+    def self.create: () { (singleton(Puma::Plugin) plugin_class) [self: singleton(Puma::Plugin)] -> void } -> singleton(Puma::Plugin)
+
+    # Runs the block in a thread once the server has booted.
+    def in_background: () { () -> void } -> void
+  end
+
+  class CLI
+    def initialize: (Array[String] argv, ?Puma::LogWriter log_writer, ?Puma::Events events, ?env: Puma::_Env) -> void
+    attr_reader launcher: Puma::Launcher
+    def run: () -> void
+  end
+
+  class ControlCLI
+    interface _Output
+      def puts: (*untyped) -> untyped
+      def write: (_ToS str) -> untyped
+      def flush: () -> untyped
+      def sync: () -> untyped
+    end
+
+    def initialize: (Array[String] argv, ?Puma::ControlCLI::_Output stdout, ?Puma::ControlCLI::_Output stderr, ?env: Puma::_Env) -> void
+
+    # Exits with status 1 when the command fails.
+    def run: () -> void
+  end
+
+  # Included into the singleton class of Rack::Handler::Puma (or Rackup::Handler::Puma).
+  module RackHandler
+    DEFAULT_OPTIONS: Hash[Symbol, untyped]
+
+    def config: (Puma::_RackApp app, ?Hash[Symbol, untyped] options) -> Puma::Configuration
+    def run: (Puma::_RackApp app, **untyped options) ?{ (Puma::Launcher launcher) -> void } -> void
+    def valid_options: () -> Hash[String, String]
+  end
+end
