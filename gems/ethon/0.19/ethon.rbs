@@ -1,0 +1,893 @@
+# Ethon is a libcurl wrapper built on FFI. These signatures cover the API
+# applications use: Ethon::Easy, Ethon::Multi, the response mirror, logging and
+# errors. The FFI bindings (Ethon::Curl, Ethon::Curls, Ethon::Libc) are left
+# out except for the global init/cleanup and version helpers.
+module Ethon
+  extend Loggable
+
+  VERSION: String
+
+  module Loggable
+    # Returns the configured logger, else Rails' logger, else a new logger
+    # writing to $stdout.
+    def logger: () -> Logger
+
+    # Passing nil makes the next #logger call pick the default again.
+    def logger=: (Logger? logger) -> Logger?
+  end
+
+  module Curl
+    # Initializes libcurl once per process.
+    # Raises Ethon::Errors::GlobalInit when curl_global_init fails.
+    def self.init: () -> void
+
+    # Releases libcurl's global state.
+    def self.cleanup: () -> void
+
+    # The libcurl version string, e.g. "libcurl/8.5.0 OpenSSL/3.0.13 ...".
+    def self.version: () -> String
+
+    def self.version_info: () -> VersionInfoData
+
+    # curl_version_info_data; read fields with #[] (e.g. :version, :features).
+    class VersionInfoData < ::FFI::Struct[::FFI::Pointer, untyped]
+    end
+  end
+
+  module Errors
+    class EthonError < StandardError
+    end
+
+    class ForkSafety < EthonError
+      def initialize: (?String message) -> void
+    end
+
+    class FormAdd < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class GlobalInit < EthonError
+      def initialize: () -> void
+    end
+
+    class Header < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class InvalidOption < EthonError
+      def initialize: (untyped option) -> void
+    end
+
+    class InvalidValue < EthonError
+      def initialize: (untyped option, untyped value) -> void
+    end
+
+    class Mime < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiAdd < EthonError
+      def initialize: (Integer | Symbol code, Easy easy) -> void
+    end
+
+    class MultiAssign < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiFdset < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiPerform < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiPoll < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiRemove < EthonError
+      def initialize: (Integer | Symbol code, Easy easy) -> void
+    end
+
+    class MultiTimeout < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiWait < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class MultiWakeup < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class Select < EthonError
+      def initialize: (Integer errno) -> void
+    end
+
+    class SetOption < EthonError
+      def initialize: (untyped option, Integer | Symbol code, ?:easy | :multi type) -> void
+    end
+
+    class Share < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+
+    class UnsupportedOption < EthonError
+      def initialize: (untyped option) -> void
+    end
+
+    class Url < EthonError
+      def initialize: (Integer | Symbol code) -> void
+    end
+  end
+
+  module Multipart
+    # One part of a multipart/form-data body, used as a value in the :body
+    # Hash of Easy#http_request.
+    class Part
+      attr_reader value: String | File | Tempfile
+
+      attr_reader filename: String?
+
+      attr_reader content_type: String?
+
+      # Raises ArgumentError for an IO that is not a File or Tempfile.
+      def initialize: (String | File | Tempfile value, ?filename: String?, ?content_type: String?) -> void
+
+      def file?: () -> bool
+
+      def upload?: () -> bool
+
+      def to_s: () -> String
+
+      def ==: (untyped other) -> bool
+
+      alias eql? ==
+
+      def hash: () -> Integer
+
+      def inspect: () -> String
+    end
+  end
+
+  # The libcurl easy interface: one transfer.
+  class Easy
+    include Informations
+    include Options
+    include Header
+    include Http
+    include Operations
+    include ResponseCallbacks
+    include Files
+    extend Features
+
+    # The curl return code of the last transfer (:ok, :couldnt_connect,
+    # :operation_timedout, ...); nil before a transfer.
+    attr_accessor return_code: Symbol?
+
+    # The buffered response body; nil while the body is streamed with #file=.
+    attr_accessor response_body: String?
+
+    attr_accessor response_headers: String
+
+    attr_accessor debug_info: DebugInfo
+
+    # Takes the option setters' names as keys (url:, followlocation:,
+    # headers:, ...). Raises Ethon::Errors::InvalidOption for an unknown key.
+    def initialize: (?Hash[Symbol | String, untyped] options) -> void
+
+    def set_attributes: (Hash[Symbol | String, untyped] options) -> void
+
+    def reset: () -> void
+
+    def dup: () -> self
+
+    def clone: (?freeze: bool?) -> self
+
+    def escape: (String value) -> String
+
+    def unescape: (String value) -> String
+
+    # Deprecated; use #mirror.
+    def to_hash: () -> Hash[Symbol, untyped]
+
+    def mirror: () -> Mirror
+
+    def log_inspect: () -> String
+
+    def pause: (?Integer bitmask) -> Symbol
+
+    def upkeep: () -> Symbol
+
+    # Values read from libcurl after a transfer (curl_easy_getinfo). They are
+    # nil when libcurl cannot report them (strings that are not set, and
+    # informations newer than the loaded libcurl).
+    module Informations
+      AVAILABLE_INFORMATIONS: Hash[Symbol, Symbol]
+
+      LIST_INFORMATIONS: Array[Symbol]
+
+      def size_upload_t: () -> Integer?
+
+      def size_download_t: () -> Integer?
+
+      def speed_download_t: () -> Integer?
+
+      def speed_upload_t: () -> Integer?
+
+      def filetime_t: () -> Integer?
+
+      def content_length_download_t: () -> Integer?
+
+      def content_length_upload_t: () -> Integer?
+
+      def total_time_t: () -> Integer?
+
+      def namelookup_time_t: () -> Integer?
+
+      def connect_time_t: () -> Integer?
+
+      def pretransfer_time_t: () -> Integer?
+
+      def starttransfer_time_t: () -> Integer?
+
+      def redirect_time_t: () -> Integer?
+
+      def appconnect_time_t: () -> Integer?
+
+      def retry_after: () -> Integer?
+
+      def xfer_id: () -> Integer?
+
+      def conn_id: () -> Integer?
+
+      def queue_time_t: () -> Integer?
+
+      def posttransfer_time_t: () -> Integer?
+
+      def earlydata_sent_t: () -> Integer?
+
+      def size_delivered: () -> Integer?
+
+      def http_version: () -> Integer?
+
+      def httpauth_used: () -> Integer?
+
+      def proxyauth_used: () -> Integer?
+
+      def proxy_ssl_verifyresult: () -> Integer?
+
+      def ssl_verifyresult: () -> Integer
+
+      def proxy_error: () -> Integer?
+
+      def used_proxy: () -> Integer?
+
+      def local_port: () -> Integer
+
+      def num_connects: () -> Integer
+
+      def os_errno: () -> Integer
+
+      def http_connectcode: () -> Integer
+
+      def proxyauth_avail: () -> Integer
+
+      def condition_unmet: () -> Integer
+
+      def header_size: () -> Integer
+
+      def scheme: () -> String?
+
+      def effective_method: () -> String?
+
+      def referer: () -> String?
+
+      def cainfo: () -> String?
+
+      def capath: () -> String?
+
+      def content_type: () -> String?
+
+      def activesocket: () -> Integer?
+
+      def httpauth_avail: () -> Integer
+
+      def total_time: () -> Float
+
+      def starttransfer_time: () -> Float
+
+      def appconnect_time: () -> Float
+
+      def pretransfer_time: () -> Float
+
+      def connect_time: () -> Float
+
+      def namelookup_time: () -> Float
+
+      def redirect_time: () -> Float
+
+      def effective_url: () -> String?
+
+      def primary_ip: () -> String?
+
+      def local_ip: () -> String?
+
+      def primary_port: () -> Integer
+
+      def response_code: () -> Integer
+
+      def request_size: () -> Integer
+
+      def redirect_count: () -> Integer
+
+      def redirect_url: () -> String?
+
+      def size_upload: () -> Float
+
+      def size_download: () -> Float
+
+      def speed_upload: () -> Float
+
+      def speed_download: () -> Float
+
+      def ssl_engines: () -> Array[String]?
+
+      def cookielist: () -> Array[String]?
+
+      # One Array of "Name:value" strings per certificate.
+      def certinfo: () -> Array[Array[String]]?
+
+      # Deprecated; use Ethon::Easy.supports_zlib?.
+      def supports_zlib?: () -> bool
+    end
+
+    module Features
+      def supports_zlib?: () -> bool
+
+      def supports_asynch_dns?: () -> bool
+
+      def supports_timeout_ms?: () -> bool
+    end
+
+    # Setters for libcurl options (curl_easy_setopt). Every option of libcurl
+    # has a setter; the common ones are declared here.
+    module Options
+      type bool_option = bool | Integer | nil
+
+      type integer_option = Integer?
+
+      type string_option = _ToS?
+
+      type enum_option = Symbol | String | Integer | nil
+
+      type bitmask_option = Symbol | String | Integer | Array[Symbol | String | Integer] | nil
+
+      CALLBACK_TYPES: Array[Symbol]
+
+      CALLBACK_DEFAULTS: Hash[Symbol, Symbol]
+
+      POSTFIELD_OPTIONS: Array[Symbol]
+
+      attr_reader url: String?
+
+      def url=: (string_option value) -> string_option
+
+      def escape=: (bool? b) -> bool?
+
+      def escape?: () -> bool
+
+      def multipart=: (bool? b) -> bool?
+
+      def multipart?: () -> bool
+
+      # Enables CURLOPT_ERRORBUFFER; read it with #error_message.
+      def errorbuffer=: (bool? value) -> bool?
+
+      def error_message: () -> String?
+
+      def noprogress=: (bool_option value) -> bool_option
+
+      # :none or nil clears it, :srp selects TLS-SRP.
+      def tlsauth_type=: (String | Symbol | nil value) -> (String | Symbol | nil)
+
+      # Comma-separated protocol names (e.g. "http,https"); libcurl rejects nil.
+      def protocols_str=: (String | Symbol value) -> (String | Symbol)
+
+      def redir_protocols_str=: (String | Symbol value) -> (String | Symbol)
+
+      def postfields=: (string_option value) -> string_option
+
+      def copypostfields=: (string_option value) -> string_option
+
+      def postfieldsize=: (integer_option value) -> integer_option
+
+      def postfieldsize_large=: (integer_option value) -> integer_option
+
+      # Observes libcurl's debug messages (only sent with verbose: true);
+      # no block clears the observer.
+      def debugfunction: () ?{ (::FFI::Pointer handle, Symbol type, ::FFI::Pointer data, Integer size, ::FFI::Pointer user_data) -> void } -> nil
+
+      # Boolean options (true/false, or 1/0).
+      def verbose=: (bool_option value) -> bool_option
+      def header=: (bool_option value) -> bool_option
+      def nosignal=: (bool_option value) -> bool_option
+      def failonerror=: (bool_option value) -> bool_option
+      def followlocation=: (bool_option value) -> bool_option
+      def autoreferer=: (bool_option value) -> bool_option
+      def unrestricted_auth=: (bool_option value) -> bool_option
+      def post=: (bool_option value) -> bool_option
+      def httpget=: (bool_option value) -> bool_option
+      def nobody=: (bool_option value) -> bool_option
+      def upload=: (bool_option value) -> bool_option
+      def fresh_connect=: (bool_option value) -> bool_option
+      def forbid_reuse=: (bool_option value) -> bool_option
+      def ssl_verifypeer=: (bool_option value) -> bool_option
+      def ssl_verifystatus=: (bool_option value) -> bool_option
+      def proxy_ssl_verifypeer=: (bool_option value) -> bool_option
+      def tcp_nodelay=: (bool_option value) -> bool_option
+      def tcp_keepalive=: (bool_option value) -> bool_option
+      def tcp_fastopen=: (bool_option value) -> bool_option
+      def cookiesession=: (bool_option value) -> bool_option
+      def certinfo=: (bool_option value) -> bool_option
+      def http_content_decoding=: (bool_option value) -> bool_option
+      def http_transfer_decoding=: (bool_option value) -> bool_option
+      def path_as_is=: (bool_option value) -> bool_option
+      def httpproxytunnel=: (bool_option value) -> bool_option
+      def ignore_content_length=: (bool_option value) -> bool_option
+      def transfer_encoding=: (bool_option value) -> bool_option
+      def suppress_connect_headers=: (bool_option value) -> bool_option
+      def pipewait=: (bool_option value) -> bool_option
+      def ssl_enable_alpn=: (bool_option value) -> bool_option
+
+      # Integer options (seconds, milliseconds, sizes, ports).
+      def timeout=: (integer_option value) -> integer_option
+      def timeout_ms=: (integer_option value) -> integer_option
+      def connecttimeout=: (integer_option value) -> integer_option
+      def connecttimeout_ms=: (integer_option value) -> integer_option
+      def accepttimeout_ms=: (integer_option value) -> integer_option
+      def maxredirs=: (integer_option value) -> integer_option
+      def low_speed_limit=: (integer_option value) -> integer_option
+      def low_speed_time=: (integer_option value) -> integer_option
+      def dns_cache_timeout=: (integer_option value) -> integer_option
+      def maxconnects=: (integer_option value) -> integer_option
+      def port=: (integer_option value) -> integer_option
+      def proxyport=: (integer_option value) -> integer_option
+      def localport=: (integer_option value) -> integer_option
+      def localportrange=: (integer_option value) -> integer_option
+      def buffersize=: (integer_option value) -> integer_option
+      def upload_buffersize=: (integer_option value) -> integer_option
+      def tcp_keepidle=: (integer_option value) -> integer_option
+      def tcp_keepintvl=: (integer_option value) -> integer_option
+      def ssl_verifyhost=: (integer_option value) -> integer_option
+      def proxy_ssl_verifyhost=: (integer_option value) -> integer_option
+      def resume_from=: (integer_option value) -> integer_option
+      def infilesize=: (integer_option value) -> integer_option
+      def maxfilesize=: (integer_option value) -> integer_option
+      def expect_100_timeout_ms=: (integer_option value) -> integer_option
+      def happy_eyeballs_timeout_ms=: (integer_option value) -> integer_option
+      def maxage_conn=: (integer_option value) -> integer_option
+      def maxlifetime_conn=: (integer_option value) -> integer_option
+      def server_response_timeout=: (integer_option value) -> integer_option
+      def timevalue=: (integer_option value) -> integer_option
+      def resume_from_large=: (integer_option value) -> integer_option
+      def infilesize_large=: (integer_option value) -> integer_option
+      def maxfilesize_large=: (integer_option value) -> integer_option
+      def max_send_speed_large=: (integer_option value) -> integer_option
+      def max_recv_speed_large=: (integer_option value) -> integer_option
+      def timevalue_large=: (integer_option value) -> integer_option
+
+      # String options (the value is converted with to_s; CR/LF/NUL raise Ethon::Errors::InvalidValue).
+      def proxy=: (string_option value) -> string_option
+      def noproxy=: (string_option value) -> string_option
+      def pre_proxy=: (string_option value) -> string_option
+      def interface=: (string_option value) -> string_option
+      def userpwd=: (string_option value) -> string_option
+      def proxyuserpwd=: (string_option value) -> string_option
+      def username=: (string_option value) -> string_option
+      def password=: (string_option value) -> string_option
+      def proxyusername=: (string_option value) -> string_option
+      def proxypassword=: (string_option value) -> string_option
+      def accept_encoding=: (string_option value) -> string_option
+      def encoding=: (string_option value) -> string_option
+      def referer=: (string_option value) -> string_option
+      def useragent=: (string_option value) -> string_option
+      def cookie=: (string_option value) -> string_option
+      def cookiefile=: (string_option value) -> string_option
+      def cookiejar=: (string_option value) -> string_option
+      def cookielist=: (string_option value) -> string_option
+      def customrequest=: (string_option value) -> string_option
+      def range=: (string_option value) -> string_option
+      def unix_socket_path=: (string_option value) -> string_option
+      def abstract_unix_socket=: (string_option value) -> string_option
+      def sslcert=: (string_option value) -> string_option
+      def sslcerttype=: (string_option value) -> string_option
+      def sslkey=: (string_option value) -> string_option
+      def sslkeytype=: (string_option value) -> string_option
+      def keypasswd=: (string_option value) -> string_option
+      def sslengine=: (string_option value) -> string_option
+      def cainfo=: (string_option value) -> string_option
+      def capath=: (string_option value) -> string_option
+      def crlfile=: (string_option value) -> string_option
+      def issuercert=: (string_option value) -> string_option
+      def ssl_cipher_list=: (string_option value) -> string_option
+      def tls13_ciphers=: (string_option value) -> string_option
+      def ssl_ec_curves=: (string_option value) -> string_option
+      def pinnedpublickey=: (string_option value) -> string_option
+      def proxy_cainfo=: (string_option value) -> string_option
+      def proxy_capath=: (string_option value) -> string_option
+      def proxy_sslcert=: (string_option value) -> string_option
+      def proxy_sslkey=: (string_option value) -> string_option
+      def proxy_keypasswd=: (string_option value) -> string_option
+      def netrc_file=: (string_option value) -> string_option
+      def request_target=: (string_option value) -> string_option
+      def aws_sigv4=: (string_option value) -> string_option
+      def doh_url=: (string_option value) -> string_option
+      def default_protocol=: (string_option value) -> string_option
+      def login_options=: (string_option value) -> string_option
+      def xoauth2_bearer=: (string_option value) -> string_option
+      def altsvc=: (string_option value) -> string_option
+      def hsts=: (string_option value) -> string_option
+
+      # Enum options, by name (e.g. proxytype: :socks5, http_version: :httpv2_0) or number.
+      def proxytype=: (enum_option value) -> enum_option
+      def netrc=: (enum_option value) -> enum_option
+      def http_version=: (enum_option value) -> enum_option
+      def ipresolve=: (enum_option value) -> enum_option
+      def use_ssl=: (enum_option value) -> enum_option
+      def sslversion=: (enum_option value) -> enum_option
+      def proxy_sslversion=: (enum_option value) -> enum_option
+      def timecondition=: (enum_option value) -> enum_option
+      def headeropt=: (enum_option value) -> enum_option
+
+      # Bitmask options, by name, number or an Array of them (e.g. httpauth: [:basic, :digest]).
+      def protocols=: (bitmask_option value) -> bitmask_option
+      def redir_protocols=: (bitmask_option value) -> bitmask_option
+      def httpauth=: (bitmask_option value) -> bitmask_option
+      def proxyauth=: (bitmask_option value) -> bitmask_option
+      def postredir=: (bitmask_option value) -> bitmask_option
+      def ssl_options=: (bitmask_option value) -> bitmask_option
+      def proxy_ssl_options=: (bitmask_option value) -> bitmask_option
+    end
+
+    module Header
+      # A copy of the request headers set with #headers=.
+      def request_headers: () -> Hash[String | Symbol, untyped]
+
+      # Raises Ethon::Errors::InvalidValue for a header containing CR, LF or NUL.
+      def headers=: (Hash[String | Symbol, _ToS]? value) -> void
+
+      alias request_headers= headers=
+    end
+
+    module Http
+      ACTION_CLASSES: Hash[String, Class]
+
+      # Sets up the Easy for an HTTP request. options takes :params (query
+      # Hash), :body (Hash or String), :params_encoding (:typhoeus, :rack or
+      # :multi), :multipart and the option setters' names.
+      def http_request: (String url, String | Symbol action_name, ?Hash[Symbol | String, untyped] options) -> void
+    end
+
+    module Operations
+      # Runs the transfer and returns the curl return code.
+      def perform: () -> Symbol
+
+      # Frees the native handle; the Easy cannot be used afterwards.
+      def cleanup: () -> nil
+    end
+
+    # Callbacks run by the transfer. Each on_* method adds the block (if any)
+    # and returns the list of callbacks.
+    module ResponseCallbacks
+      # A callback returning :abort stops the transfer.
+      def on_headers: () ?{ (Easy easy) -> untyped } -> Array[^(Easy) -> untyped]
+
+      # Runs the on_headers callbacks once per transfer.
+      def headers: () -> untyped
+
+      def on_complete: () ?{ (Easy easy) -> untyped } -> Array[^(Easy) -> untyped]
+
+      # Runs the on_complete callbacks.
+      def complete: () -> void
+
+      # The totals are Integer with libcurl 7.32.0 and later (CURLOPT_XFERINFOFUNCTION),
+      # Float before.
+      def on_progress: () ?{ (Integer | Float dltotal, Integer | Float dlnow, Integer | Float ultotal, Integer | Float ulnow) -> untyped } -> Array[^(Integer | Float, Integer | Float, Integer | Float, Integer | Float) -> untyped]
+
+      def progress: (Integer | Float dltotal, Integer | Float dlnow, Integer | Float ultotal, Integer | Float ulnow) -> void
+
+      # With on_body callbacks the body is not buffered in #response_body.
+      # A callback returning :abort stops the transfer.
+      def on_body: () ?{ (String chunk, Easy easy) -> untyped } -> Array[^(String, Easy) -> untyped]
+
+      # Runs the on_body callbacks; :unyielded when there are none.
+      def body: (String chunk) -> untyped
+    end
+
+    module Files
+      interface _ResponseBodyWriter
+        def write: (String chunk) -> untyped
+      end
+
+      # Streams the response body to a path, a Pathname-like object or a
+      # writable object; nil buffers it in #response_body again.
+      def file=: (String | ::_ToPath | _ResponseBodyWriter | nil destination) -> (String | ::_ToPath | _ResponseBodyWriter | nil)
+
+      alias writedata= file=
+    end
+
+    # Debug messages collected while verbose is set.
+    class DebugInfo
+      MESSAGE_TYPES: Array[Symbol]
+
+      class Message
+        attr_reader type: Symbol
+
+        attr_reader message: String
+
+        def initialize: (Symbol type, String message) -> void
+      end
+
+      def initialize: () -> void
+
+      def add: (Symbol type, String message) -> Array[Message]
+
+      def messages_for: (Symbol type) -> Array[String]
+
+      def text: () -> Array[String]
+
+      def header_in: () -> Array[String]
+
+      def header_out: () -> Array[String]
+
+      def data_in: () -> Array[String]
+
+      def data_out: () -> Array[String]
+
+      def ssl_data_in: () -> Array[String]
+
+      def ssl_data_out: () -> Array[String]
+
+      def to_a: () -> Array[String]
+
+      def to_h: () -> Hash[Symbol, Array[String]]
+    end
+
+    # A snapshot of an Easy's informations and response, kept after the
+    # handle is reset. Readers return nil for values missing from the Hash.
+    class Mirror
+      INFORMATIONS_TO_MIRROR: Array[Symbol]
+
+      INFORMATIONS_TO_LOG: Array[Symbol]
+
+      URL_CREDENTIALS: Regexp
+
+      attr_reader options: Hash[Symbol, untyped]
+
+      alias to_hash options
+
+      def self.from_easy: (Easy easy) -> instance
+
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+
+      def log_informations: () -> Hash[Symbol, untyped]
+
+      def size_upload_t: () -> Integer?
+
+      def size_download_t: () -> Integer?
+
+      def speed_download_t: () -> Integer?
+
+      def speed_upload_t: () -> Integer?
+
+      def filetime_t: () -> Integer?
+
+      def content_length_download_t: () -> Integer?
+
+      def content_length_upload_t: () -> Integer?
+
+      def total_time_t: () -> Integer?
+
+      def namelookup_time_t: () -> Integer?
+
+      def connect_time_t: () -> Integer?
+
+      def pretransfer_time_t: () -> Integer?
+
+      def starttransfer_time_t: () -> Integer?
+
+      def redirect_time_t: () -> Integer?
+
+      def appconnect_time_t: () -> Integer?
+
+      def retry_after: () -> Integer?
+
+      def xfer_id: () -> Integer?
+
+      def conn_id: () -> Integer?
+
+      def queue_time_t: () -> Integer?
+
+      def posttransfer_time_t: () -> Integer?
+
+      def earlydata_sent_t: () -> Integer?
+
+      def size_delivered: () -> Integer?
+
+      def http_version: () -> Integer?
+
+      def httpauth_used: () -> Integer?
+
+      def proxyauth_used: () -> Integer?
+
+      def proxy_ssl_verifyresult: () -> Integer?
+
+      def ssl_verifyresult: () -> Integer?
+
+      def proxy_error: () -> Integer?
+
+      def used_proxy: () -> Integer?
+
+      def local_port: () -> Integer?
+
+      def num_connects: () -> Integer?
+
+      def os_errno: () -> Integer?
+
+      def http_connectcode: () -> Integer?
+
+      def proxyauth_avail: () -> Integer?
+
+      def condition_unmet: () -> Integer?
+
+      def header_size: () -> Integer?
+
+      def scheme: () -> String?
+
+      def effective_method: () -> String?
+
+      def referer: () -> String?
+
+      def cainfo: () -> String?
+
+      def capath: () -> String?
+
+      def content_type: () -> String?
+
+      def activesocket: () -> Integer?
+
+      def httpauth_avail: () -> Integer?
+
+      def total_time: () -> Float?
+
+      def starttransfer_time: () -> Float?
+
+      def appconnect_time: () -> Float?
+
+      def pretransfer_time: () -> Float?
+
+      def connect_time: () -> Float?
+
+      def namelookup_time: () -> Float?
+
+      def redirect_time: () -> Float?
+
+      def effective_url: () -> String?
+
+      def primary_ip: () -> String?
+
+      def local_ip: () -> String?
+
+      def primary_port: () -> Integer?
+
+      def response_code: () -> Integer?
+
+      def request_size: () -> Integer?
+
+      def redirect_count: () -> Integer?
+
+      def redirect_url: () -> String?
+
+      def size_upload: () -> Float?
+
+      def size_download: () -> Float?
+
+      def speed_upload: () -> Float?
+
+      def speed_download: () -> Float?
+
+      def return_code: () -> Symbol?
+
+      def response_headers: () -> String?
+
+      def response_body: () -> String?
+
+      def debug_info: () -> DebugInfo?
+
+      def error_message: () -> String?
+
+      def certinfo: () -> Array[Array[String]]?
+    end
+  end
+
+  # The libcurl multi interface: runs several Easy transfers at once.
+  class Multi
+    include Stack
+    include Operations
+    include Options
+
+    EXECUTION_MODES: Array[Symbol]
+
+    # Takes :execution_mode (:perform or :socket_action) and the option
+    # setters' names as keys. Raises Ethon::Errors::InvalidOption for an
+    # unknown key and ArgumentError for an unknown execution mode.
+    def initialize: (?Hash[Symbol | String, untyped] options) -> void
+
+    module Stack
+      # A frozen snapshot of the attached easy handles.
+      def easy_handles: () -> Array[Easy]
+
+      # Returns nil when the easy is already added.
+      def add: (Easy easy) -> Array[Easy]?
+
+      def delete: (Easy easy) -> void
+    end
+
+    module Operations
+      STARTED_MULTI: String
+
+      PERFORMED_MULTI: String
+
+      # Frees the native handle after removing the easy handles; the Multi
+      # cannot be used afterwards.
+      def cleanup: () -> nil
+
+      # Runs until every added easy has completed (execution_mode :perform).
+      def perform: () -> nil
+
+      def wait: (?Integer timeout_ms) -> Integer
+
+      def poll: (?Integer timeout_ms) -> Integer
+
+      def wakeup: () -> Symbol
+
+      # For execution_mode :socket_action: io is nil for a timeout, readiness
+      # takes CURL_CSELECT_* bits or :in, :out, :err.
+      def socket_action: (?(IO | Integer)? io, ?Integer | Symbol | Array[Symbol] readiness) -> Symbol
+
+      def ongoing?: () -> bool
+
+      def assign: (IO | Integer io, ::FFI::Pointer? pointer) -> Symbol
+    end
+
+    module Options
+      def max_total_connections=: (Integer? value) -> void
+
+      def max_concurrent_streams=: (Integer? value) -> void
+
+      def maxconnects=: (Integer? value) -> void
+
+      def max_host_connections=: (Integer? value) -> void
+
+      def max_pipeline_length=: (Integer? value) -> void
+
+      def content_length_penalty_size=: (Integer? value) -> void
+
+      def chunk_length_penalty_size=: (Integer? value) -> void
+
+      # 0, 1 or 2 (CURLPIPE_*); true and false are taken as 1 and 0.
+      def pipelining=: (Integer | bool | nil value) -> void
+
+      def socketdata=: (::FFI::Pointer? value) -> void
+
+      def socketfunction=: (Proc? value) -> Proc?
+
+      def timerdata=: (::FFI::Pointer? value) -> void
+
+      def timerfunction=: (Proc? value) -> Proc?
+    end
+  end
+end
