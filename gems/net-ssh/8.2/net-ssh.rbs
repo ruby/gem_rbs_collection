@@ -1,0 +1,836 @@
+# Net::SSH reopens these OpenSSL classes to give keys their SSH wire format.
+module OpenSSL
+  class BN
+    # The number in SSH "mpint" format.
+    def to_ssh: () -> String
+  end
+
+  module PKey
+    class PKey
+      include Net::SSH::Authentication::PubKeyFingerprint
+    end
+
+    class RSA
+      def ssh_type: () -> String
+      alias ssh_signature_type ssh_type
+      def to_blob: () -> String
+    end
+
+    class DSA
+      def ssh_type: () -> String
+      alias ssh_signature_type ssh_type
+      def to_blob: () -> String
+    end
+
+    class EC
+      def ssh_type: () -> String
+      alias ssh_signature_type ssh_type
+      def to_blob: () -> String
+
+      # What OpenSSL::PKey::EC#public_key returns; Net::SSH uses it as a
+      # public key.
+      class Point
+        def ssh_type: () -> String
+        alias ssh_signature_type ssh_type
+        def to_blob: () -> String
+      end
+    end
+  end
+end
+
+module Net
+  module SSH
+    # A private key as loaded by Net::SSH::KeyFactory.
+    type private_key = OpenSSL::PKey::PKey | Net::SSH::Authentication::ED25519::PrivKey
+
+    # A public key as read from a key file, an agent, known_hosts or the wire.
+    type public_key = OpenSSL::PKey::PKey
+                    | Net::SSH::Authentication::ED25519::PubKey
+                    | Net::SSH::Authentication::Certificate
+                    | Net::SSH::Authentication::SecurityKey::PubKey
+
+    # A key used as an identity: for an EC private key, KeyManager uses what
+    # OpenSSL::PKey::EC#public_key returns, an OpenSSL::PKey::EC::Point.
+    type identity = public_key | OpenSSL::PKey::EC::Point
+
+    # What Net::SSH.default_configuration may hold besides a Proc.
+    interface _DefaultConfiguration
+      def call: (String host, Hash[Symbol, untyped] ssh_config) -> Hash[Symbol, untyped]
+    end
+
+    # The :password_prompt option and the prompt argument of KeyFactory.
+    interface _Prompt
+      def start: (Hash[Symbol, untyped] info) -> _Prompter
+    end
+
+    # What a prompt's start returns.
+    interface _Prompter
+      def ask: (String prompt, bool echo) -> String
+      def success: () -> untyped
+    end
+
+    VALID_OPTIONS: Array[Symbol]
+
+    def self.default_configuration: () -> (^(String host, Hash[Symbol, untyped] ssh_config) -> Hash[Symbol, untyped] | _DefaultConfiguration)?
+
+    # Raises ArgumentError for an object that does not respond to call.
+    def self.default_configuration=: (^(String host, Hash[Symbol, untyped] ssh_config) -> Hash[Symbol, untyped] callable) -> ^(String host, Hash[Symbol, untyped] ssh_config) -> Hash[Symbol, untyped]
+                                   | (_DefaultConfiguration callable) -> _DefaultConfiguration
+                                   | (nil callable) -> nil
+
+    # Opens a connection. +options+ takes the keys in VALID_OPTIONS, e.g.
+    # :password, :port, :keys, :key_data, :passphrase, :auth_methods,
+    # :timeout, :keepalive, :keepalive_interval, :non_interactive, :proxy,
+    # :verify_host_key, :known_hosts, :user_known_hosts_file, :config,
+    # :forward_agent, :logger, :verbose, :use_agent, :host_key, :kex,
+    # :encryption, :hmac, :compression, :send_env, :set_env, :properties,
+    # :control_master and :control_path. Unknown keys and nil values (except
+    # for :password, :passphrase, :logger and :password_prompt) raise
+    # ArgumentError. With a block, the session is closed when the block ends
+    # and the block's value is returned.
+    def self.start: (String host, ?String? user, ?Hash[Symbol, untyped] options) -> Net::SSH::Connection::Session
+                  | [T] (String host, ?String? user, ?Hash[Symbol, untyped] options) { (Net::SSH::Connection::Session ssh) -> T } -> T
+
+    # The options ssh_config gives for +host+: +use_ssh_config+ is true for
+    # the default files, false or nil for none, or a file name or names.
+    def self.configuration_for: (String host, bool | String | Array[String] | nil use_ssh_config, ?user: String?) -> Hash[Symbol, untyped]
+
+    class Exception < ::RuntimeError
+    end
+
+    class AuthenticationFailed < Net::SSH::Exception
+    end
+
+    class ConnectionTimeout < Net::SSH::Exception
+    end
+
+    class Disconnect < Net::SSH::Exception
+    end
+
+    class Timeout < Disconnect
+    end
+
+    class UnsupportedKeyType < Net::SSH::Exception
+    end
+
+    class NotSupportedOverControlMaster < Net::SSH::Exception
+    end
+
+    class ChannelRequestFailed < Net::SSH::Exception
+    end
+
+    class ChannelOpenFailed < Net::SSH::Exception
+      attr_reader code: Integer
+      attr_reader reason: String
+
+      def initialize: (Integer code, String reason) -> void
+    end
+
+    class HostKeyError < Net::SSH::Exception
+      def []: (Symbol key) -> untyped
+      def fingerprint: () -> String?
+      def host: () -> String?
+      def port: () -> Integer?
+      def ip: () -> String?
+      def key: () -> Net::SSH::public_key?
+
+      # Adds the server's key to the known hosts and lets the connection go on.
+      def remember_host!: () -> void
+    end
+
+    class HostKeyMismatch < HostKeyError
+    end
+
+    class HostKeyUnknown < HostKeyError
+    end
+
+    class HostKeyRevoked < HostKeyError
+      # A revoked key can't be remembered: always raises the error itself.
+      def remember_host!: () -> bot
+    end
+
+    class Version
+      include Comparable
+
+      def self.[]: (Integer major, Integer minor, Integer tiny, ?String? pre) -> instance
+
+      attr_reader major: Integer
+      attr_reader minor: Integer
+      attr_reader tiny: Integer
+
+      def initialize: (Integer major, Integer minor, Integer tiny, ?String? pre) -> void
+      def <=>: (_ToI version) -> Integer
+      def to_s: () -> String
+      def to_i: () -> Integer
+
+      MAJOR: Integer
+      MINOR: Integer
+      TINY: Integer
+      PRE: String?
+      CURRENT: Net::SSH::Version
+      STRING: String
+    end
+
+    module Loggable
+      attr_accessor logger: Logger?
+
+      def debug: () { () -> String } -> void
+      def info: () { () -> String } -> void
+      def lwarn: () { () -> String } -> void
+      def error: () { () -> String } -> void
+      def fatal: () { () -> String } -> void
+    end
+
+    class Buffer
+      def self.from: (*untyped args) -> instance
+
+      attr_reader content: String
+      attr_accessor position: Integer
+
+      def initialize: (?_ToS content) -> void
+      def length: () -> Integer
+      def available: () -> Integer
+      def to_s: () -> String
+      def ==: (untyped buffer) -> bool
+      def empty?: () -> bool
+      def reset!: () -> void
+      def eof?: () -> bool
+      def clear!: () -> void
+      def consume!: (?Integer n) -> self
+      def append: (String text) -> self
+      def remainder_as_buffer: () -> Net::SSH::Buffer
+      def read_to: (String | Regexp pattern) -> String?
+      def read: (?Integer? count) -> String
+      def read!: (?Integer? count) -> String
+      def read_all: [T] () { (self buffer) -> T } -> Array[T]
+      def read_int64: () -> Integer?
+      def read_long: () -> Integer?
+      def read_byte: () -> Integer?
+      def read_string: () -> String?
+      def read_bool: () -> bool?
+      def read_bignum: () -> OpenSSL::BN?
+      def read_key: () -> Net::SSH::public_key?
+      def read_keyblob: (String type) -> Net::SSH::public_key
+      def read_buffer: () -> Net::SSH::Buffer
+      def write: (*String data) -> self
+      def write_moved: (String string) -> self
+      def write_int64: (*Integer n) -> self
+      def write_long: (*Integer n) -> self
+      def write_byte: (*Integer n) -> self
+      def write_string: (*_ToS text) -> self
+      def write_mstring: (*_ToS text) -> self
+      def write_bool: (*boolish b) -> self
+      def write_bignum: (*OpenSSL::BN n) -> self
+      def write_key: (*Net::SSH::identity key) -> self
+    end
+
+    class Config
+      def self.default_files: () -> Array[String]
+      def self.default_auth_methods: () -> Array[String]
+
+      # The options for +host+ from the given files, with Symbol keys.
+      def self.for: (String host, ?Array[String] files, ?user: String?) -> Hash[Symbol, untyped]
+
+      # The raw settings for +host+ from one file, with String keys.
+      def self.load: (String path, String host, ?Hash[String, untyped] settings, ?String? base_dir, ?user: String?) -> Hash[String, untyped]
+
+      def self.translate: (Hash[String, untyped] settings) -> Hash[Symbol, untyped]
+      def self.expandable_default_files: () -> Array[String]
+    end
+
+    class Prompt
+      def self.default: (?Hash[Symbol, untyped] options) -> instance
+      def self.can_ask?: () -> bool
+      def self.askpass: () -> String?
+
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+      def start: (Hash[Symbol, untyped] info) -> Net::SSH::Prompt::Prompter
+
+      class Prompter
+        def initialize: (Hash[Symbol, untyped] info) -> void
+        def ask: (String prompt, ?boolish echo) -> String
+        def success: () -> nil
+      end
+    end
+
+    class KeyFactory
+      MAP: Hash[String, Class]
+
+      def self.load_private_key: (String filename, ?String? passphrase, ?boolish ask_passphrase, ?Net::SSH::_Prompt? prompt) -> Net::SSH::private_key
+      def self.load_data_private_key: (String data, ?String? passphrase, ?boolish ask_passphrase, ?String filename, ?Net::SSH::_Prompt? prompt) -> Net::SSH::private_key
+      def self.load_public_key: (String filename) -> Net::SSH::public_key
+      def self.load_data_public_key: (String data, ?String filename) -> Net::SSH::public_key
+    end
+
+    module HostKeyEntries
+      class PubKey
+        attr_reader key: Net::SSH::public_key
+
+        def initialize: (Net::SSH::public_key key, ?comment: String?) -> void
+        def ssh_type: () -> String
+        def ssh_types: () -> Array[String]
+        def to_blob: () -> String
+        def matches_key?: (Net::SSH::public_key server_key) -> bool
+      end
+
+      class CertAuthority
+        def ssh_types: () -> Array[String]
+        def initialize: (Net::SSH::public_key key, ?comment: String?) -> void
+        def matches_key?: (Net::SSH::public_key server_key) -> bool
+        def matches_principal?: (Net::SSH::Authentication::Certificate server_key, String hostname) -> bool
+        def matches_validity?: (Net::SSH::Authentication::Certificate server_key) -> bool
+        def matches_type?: (Net::SSH::Authentication::Certificate server_key) -> bool
+        def critical_options_supported?: (Net::SSH::Authentication::Certificate server_key) -> bool
+      end
+
+      class Revoked
+        def initialize: (Net::SSH::public_key key, ?comment: String?) -> void
+        def matches_key?: (Net::SSH::public_key server_key) -> bool
+      end
+    end
+
+    # The keys known for a host. Keys accepted during the connection are
+    # added as plain public keys.
+    class HostKeys
+      include Enumerable[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority | Net::SSH::public_key]
+
+      attr_reader host: String
+
+      def initialize: (Array[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority | Net::SSH::public_key] host_keys, String host, untyped known_hosts, ?Hash[Symbol, untyped] options, ?Array[Net::SSH::HostKeyEntries::Revoked] revoked_keys) -> void
+      def revoked?: (Net::SSH::public_key key) -> bool
+      def add_host_key: (Net::SSH::public_key key) -> void
+      def each: () { (Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority | Net::SSH::public_key key) -> void } -> Array[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority | Net::SSH::public_key]
+              | () -> Enumerator[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority | Net::SSH::public_key, Array[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority | Net::SSH::public_key]]
+      def empty?: () -> bool
+      def hostname: () -> String
+    end
+
+    class KnownHosts
+      SUPPORTED_TYPE: Array[String]
+
+      def self.search_for: (String host, ?Hash[Symbol, untyped] options) -> Net::SSH::HostKeys
+      def self.search_in: (Array[String] files, String host, ?Hash[Symbol, untyped] options) -> Array[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority]
+      def self.hostfiles: (Hash[Symbol, untyped] options, ?:all | :user | :global which) -> Array[String]
+
+      # Appends the key to the first writable user known hosts file.
+      def self.add: (String host, Net::SSH::public_key key, ?Hash[Symbol, untyped] options) -> void
+
+      attr_reader source: String
+
+      def initialize: (String source) -> void
+      def keys_for: (String host, ?Hash[Symbol, untyped] options) -> Array[Net::SSH::HostKeyEntries::PubKey | Net::SSH::HostKeyEntries::CertAuthority]
+      def revoked_keys_for: (String host) -> Array[Net::SSH::HostKeyEntries::Revoked]
+      def add: (String host, Net::SSH::public_key key) -> void
+    end
+
+    module Authentication
+      class DisallowedMethod < Net::SSH::Exception
+      end
+
+      class AgentError < Net::SSH::Exception
+      end
+
+      class AgentNotAvailable < AgentError
+      end
+
+      class AgentClosedConnection < AgentError
+      end
+
+      class KeyManagerError < Net::SSH::Exception
+      end
+
+      module PubKeyFingerprint
+        # +algorithm+ is "MD5" or "SHA256"; others raise OpenSSL::Digest::DigestError.
+        def fingerprint: (?String algorithm) -> String
+        def self.fingerprint: (String blob, ?String algorithm) -> String
+      end
+
+      class Certificate
+        attr_accessor nonce: String
+        # A private key when the certificate is added to an agent with its key.
+        attr_accessor key: Net::SSH::public_key | Net::SSH::Authentication::ED25519::PrivKey
+        attr_accessor serial: Integer
+        attr_accessor type: :user | :host
+        attr_accessor key_id: String
+        attr_accessor valid_principals: Array[String]
+        attr_accessor valid_after: Time
+        attr_accessor valid_before: Time
+        attr_accessor critical_options: Hash[String, String]
+        attr_accessor extensions: Hash[String, String]
+        attr_accessor reserved: String
+        # The signing key: sign! stores the private key it signed with.
+        attr_accessor signature_key: (Net::SSH::public_key | Net::SSH::Authentication::ED25519::PrivKey)?
+        attr_accessor signature: String?
+
+        def self.read_certblob: (Net::SSH::Buffer buffer, String type) -> Net::SSH::Authentication::Certificate
+
+        def ssh_type: () -> String
+        def ssh_signature_type: () -> String
+        def to_blob: () -> String
+        def to_pem: () -> String
+        def fingerprint: (?String algorithm) -> String
+        def sign!: (Net::SSH::private_key key, ?String? sign_nonce) -> self
+        def sign: (Net::SSH::private_key key, ?String? sign_nonce) -> Net::SSH::Authentication::Certificate
+        def signature_valid?: () -> bool
+      end
+
+      module ED25519
+        class OpenSSHPrivateKeyLoader
+          class DecryptError < ArgumentError
+            def initialize: (String message, ?encrypted_key: bool) -> void
+            def encrypted_key?: () -> bool
+          end
+
+          # Reads an "OPENSSH PRIVATE KEY" PEM block.
+          def self.read: (String datafull, String? password) -> Net::SSH::private_key
+        end
+
+        class PubKey
+          include Net::SSH::Authentication::PubKeyFingerprint
+
+          def self.read_keyblob: (Net::SSH::Buffer buffer) -> Net::SSH::Authentication::ED25519::PubKey
+
+          def initialize: (String data) -> void
+          def to_blob: () -> String
+          def ssh_type: () -> String
+          def ssh_signature_type: () -> String
+          def to_pem: () -> String
+          def public_key_bytes: () -> String
+          def verify_key: () -> OpenSSL::PKey::PKey
+        end
+
+        class PrivKey
+          def self.read: (String data, String? password) -> Net::SSH::private_key
+
+          attr_reader sign_key: OpenSSL::PKey::PKey
+
+          def initialize: (Net::SSH::Buffer buffer) -> void
+          def to_blob: () -> String
+          def ssh_type: () -> String
+          def ssh_signature_type: () -> String
+          def public_key: () -> Net::SSH::Authentication::ED25519::PubKey
+          def public_key_bytes: () -> String
+          def private_key_bytes: () -> String
+          def private_key_bytes_for_agent: () -> String
+        end
+      end
+
+      module SecurityKey
+        SK_ECDSA_SHA2_NISTP256: String
+        SK_SSH_ED25519: String
+        TYPES: Array[String]
+
+        def self.understands?: (String type) -> bool
+
+        class PubKey
+          include Net::SSH::Authentication::PubKeyFingerprint
+
+          def self.read_keyblob: (String type, Net::SSH::Buffer buffer) -> instance
+
+          attr_reader ssh_type: String
+          attr_reader curve: String?
+          attr_reader public_key_data: String
+          attr_reader application: String
+
+          def initialize: (String ssh_type, String public_key_data, String application, ?curve: String?) -> void
+          def to_blob: () -> String
+          def ssh_signature_type: () -> String
+          def to_pem: () -> String
+        end
+      end
+
+      class Agent
+        include Net::SSH::Loggable
+
+        # Keys returned by Agent#identities carry the agent's comment.
+        module Comment
+          attr_accessor comment: String
+        end
+
+        SSH2_AGENT_REQUEST_VERSION: Integer
+        SSH2_AGENT_REQUEST_IDENTITIES: Integer
+        SSH2_AGENT_IDENTITIES_ANSWER: Integer
+        SSH2_AGENT_SIGN_REQUEST: Integer
+        SSH2_AGENT_SIGN_RESPONSE: Integer
+        SSH2_AGENT_ADD_IDENTITY: Integer
+        SSH2_AGENT_REMOVE_IDENTITY: Integer
+        SSH2_AGENT_REMOVE_ALL_IDENTITIES: Integer
+        SSH2_AGENT_LOCK: Integer
+        SSH2_AGENT_UNLOCK: Integer
+        SSH2_AGENT_ADD_ID_CONSTRAINED: Integer
+        SSH2_AGENT_FAILURE: Integer
+        SSH2_AGENT_VERSION_RESPONSE: Integer
+        SSH_COM_AGENT2_FAILURE: Integer
+        SSH_AGENT_REQUEST_RSA_IDENTITIES: Integer
+        SSH_AGENT_RSA_IDENTITIES_ANSWER1: Integer
+        SSH_AGENT_RSA_IDENTITIES_ANSWER2: Integer
+        SSH_AGENT_FAILURE: Integer
+        SSH_AGENT_SUCCESS: Integer
+        SSH_AGENT_CONSTRAIN_LIFETIME: Integer
+        SSH_AGENT_CONSTRAIN_CONFIRM: Integer
+        SSH_AGENT_RSA_SHA2_256: Integer
+        SSH_AGENT_RSA_SHA2_512: Integer
+
+        # The agent connection: a UNIXSocket, Pageant socket, or what the
+        # socket factory returned.
+        attr_reader socket: untyped
+
+        # Raises AgentNotAvailable when no agent can be reached.
+        def self.connect: (?Logger? logger, ?(^() -> untyped)? agent_socket_factory, ?String? identity_agent) -> instance
+
+        def initialize: (?Logger? logger) -> void
+        def connect!: (?(^() -> untyped)? agent_socket_factory, ?String? identity_agent) -> untyped
+        def negotiate!: () -> void
+        def identities: () -> Array[Net::SSH::public_key & Net::SSH::Authentication::Agent::Comment]
+        def close: () -> void
+        def sign: (Net::SSH::public_key key, String data, ?Integer flags) -> String
+        def add_identity: (Net::SSH::private_key | Net::SSH::Authentication::Certificate priv_key, String comment, ?lifetime: Integer?, ?confirm: boolish) -> nil
+        def remove_identity: (Net::SSH::public_key key) -> nil
+        def remove_all_identities: () -> nil
+        def lock: (String password) -> nil
+        def unlock: (String password) -> nil
+      end
+
+      class KeyManager
+        include Net::SSH::Loggable
+
+        attr_reader key_files: Array[String]
+        attr_reader key_data: Array[String]
+        attr_reader keycert_files: Array[String]
+        attr_reader keycert_data: Array[String]
+        attr_reader known_identities: Hash[Net::SSH::identity, Hash[Symbol, untyped]]
+        attr_reader options: Hash[Symbol, untyped]
+
+        def initialize: (Logger? logger, ?Hash[Symbol, untyped] options) -> void
+        def clear!: () -> self
+        def add: (String key_file) -> self
+        def add_keycert: (String keycert_file) -> self
+        def add_keycert_data: (String keycert_data_) -> self
+        def add_key_data: (String key_data_) -> self
+
+        # Closes the agent connection, if any.
+        def finish: () -> nil
+
+        # Yields every public key the agent and the configured files offer.
+        def each_identity: () { (Net::SSH::identity key) -> void } -> self
+
+        # Signs +data+ with the private key of +identity+, which must have
+        # come from each_identity.
+        def sign: (Net::SSH::identity identity, String data, ?String? sig_alg) -> String
+
+        def use_agent?: () -> bool
+        def use_agent=: (bool use_agent) -> bool
+        def agent: () -> Net::SSH::Authentication::Agent?
+        def no_keys?: () -> bool
+      end
+    end
+
+    module Connection
+      module Constants
+        GLOBAL_REQUEST: Integer
+        REQUEST_SUCCESS: Integer
+        REQUEST_FAILURE: Integer
+        CHANNEL_OPEN: Integer
+        CHANNEL_OPEN_CONFIRMATION: Integer
+        CHANNEL_OPEN_FAILURE: Integer
+        CHANNEL_WINDOW_ADJUST: Integer
+        CHANNEL_DATA: Integer
+        CHANNEL_EXTENDED_DATA: Integer
+        CHANNEL_EOF: Integer
+        CHANNEL_CLOSE: Integer
+        CHANNEL_REQUEST: Integer
+        CHANNEL_SUCCESS: Integer
+        CHANNEL_FAILURE: Integer
+      end
+
+      # Terminal mode opcodes for the :modes option of Channel#request_pty.
+      module Term
+        VINTR: Integer
+        VQUIT: Integer
+        VERASE: Integer
+        VKILL: Integer
+        VEOF: Integer
+        VEOL: Integer
+        VEOL2: Integer
+        VSTART: Integer
+        VSTOP: Integer
+        VSUSP: Integer
+        VDSUSP: Integer
+        VREPRINT: Integer
+        VWERASE: Integer
+        VLNEXT: Integer
+        VFLUSH: Integer
+        VSWITCH: Integer
+        VSTATUS: Integer
+        VDISCARD: Integer
+        IGNPAR: Integer
+        PARMRK: Integer
+        INPCK: Integer
+        ISTRIP: Integer
+        INCLR: Integer
+        IGNCR: Integer
+        ICRNL: Integer
+        IUCLC: Integer
+        IXON: Integer
+        IXANY: Integer
+        IXOFF: Integer
+        IMAXBEL: Integer
+        ISIG: Integer
+        ICANON: Integer
+        XCASE: Integer
+        ECHO: Integer
+        ECHOE: Integer
+        ECHOK: Integer
+        ECHONL: Integer
+        NOFLSH: Integer
+        TOSTOP: Integer
+        IEXTEN: Integer
+        ECHOCTL: Integer
+        ECHOKE: Integer
+        PENDIN: Integer
+        OPOST: Integer
+        OLCUC: Integer
+        ONLCR: Integer
+        OCRNL: Integer
+        ONOCR: Integer
+        ONLRET: Integer
+        CS7: Integer
+        CS8: Integer
+        PARENB: Integer
+        PARODD: Integer
+        TTY_OP_ISPEED: Integer
+        TTY_OP_OSPEED: Integer
+      end
+
+      class Session
+        include Net::SSH::Loggable
+        include Net::SSH::Connection::Constants
+
+        DEFAULT_IO_SELECT_TIMEOUT: Integer
+
+        # The underlying transport: a Net::SSH::Transport::Session, or a
+        # proxy transport for a session through a ControlMaster.
+        attr_reader transport: untyped
+
+        attr_reader options: Hash[Symbol, untyped]
+        attr_reader properties: Hash[untyped, untyped]
+
+        def initialize: (untyped transport, ?Hash[Symbol, untyped] options) -> void
+        def []: (untyped key) -> untyped
+        def []=: [T] (untyped key, T value) -> T
+        def host: () -> String
+        def closed?: () -> bool
+
+        # Closes the remaining channels and the connection.
+        def close: () -> void
+
+        # Closes the connection without closing the channels first.
+        def shutdown!: () -> void
+
+        def busy?: (?boolish include_invisible) -> bool
+
+        # Processes events until the block returns false (by default, until
+        # no channel is open).
+        def loop: (?Numeric? wait) ?{ (Net::SSH::Connection::Session session) -> boolish } -> void
+
+        # Runs one iteration of the event loop; false when the block said stop.
+        def process: (?Numeric? wait) ?{ (Net::SSH::Connection::Session session) -> boolish } -> bool
+
+        def send_global_request: (String type, *untyped extra) ?{ (bool success, Net::SSH::Buffer response) -> void } -> self
+        def open_channel: (?String type, *untyped extra) ?{ (Net::SSH::Connection::Channel ch) -> void } -> Net::SSH::Connection::Channel
+
+        # Runs +command+ on a new channel. Without a block, its output goes to
+        # $stdout and $stderr. With status:, the Hash gets :exit_code and
+        # :exit_signal.
+        def exec: (String command, ?status: Hash[Symbol, untyped]?) ?{ (Net::SSH::Connection::Channel ch, :stdout | :stderr stream, String data) -> void } -> Net::SSH::Connection::Channel
+
+        # Runs +command+, waits for it, and returns its output (empty when a
+        # block takes the output) with the exit status.
+        def exec!: (String command, ?status: Hash[Symbol, untyped]?) ?{ (Net::SSH::Connection::Channel ch, :stdout | :stderr stream, String data) -> void } -> Net::SSH::Connection::Session::StringWithExitstatus
+
+        def send_message: (Net::SSH::Buffer message) -> void
+        def listen_to: (IO io) ?{ (IO io) -> void } -> void
+        def stop_listening_to: (IO io) -> void
+        def forward: () -> Net::SSH::Service::Forward
+        def on_open_channel: (String type) ?{ (Net::SSH::Connection::Session session, Net::SSH::Connection::Channel channel, Net::SSH::Buffer packet) -> void } -> void
+
+        # The block returns true, false or :sent; returns the previous handler.
+        def on_global_request: (String type) ?{ (Net::SSH::Buffer data, bool want_reply) -> (bool | :sent) } -> Proc?
+
+        class StringWithExitstatus < String
+          def initialize: (String str, Integer? exitstatus) -> void
+
+          attr_reader exitstatus: Integer?
+        end
+      end
+
+      class Channel
+        include Net::SSH::Loggable
+        include Net::SSH::Connection::Constants
+
+        DEFAULT_MAX_WIN_SIZE: Integer
+        VALID_PTY_OPTIONS: Hash[Symbol, untyped]
+
+        attr_reader local_id: Integer
+
+        # nil until the server confirms the channel.
+        attr_reader remote_id: Integer?
+
+        attr_reader type: String
+        attr_reader connection: Net::SSH::Connection::Session
+        attr_reader local_maximum_packet_size: Integer
+        attr_reader local_maximum_window_size: Integer
+        attr_reader remote_maximum_packet_size: Integer?
+        attr_reader remote_maximum_window_size: Integer?
+        attr_reader local_window_size: Integer
+        attr_reader remote_window_size: Integer?
+        attr_reader properties: Hash[untyped, untyped]
+
+        def initialize: (Net::SSH::Connection::Session connection, String type, Integer local_id, ?Integer max_pkt_size, ?Integer max_win_size) ?{ (Net::SSH::Connection::Channel ch) -> void } -> void
+        def []: (untyped name) -> untyped
+        def []=: [T] (untyped name, T value) -> T
+
+        # The request methods raise RuntimeError before the channel is
+        # confirmed; call them from the open_channel block.
+        def exec: (String command) ?{ (Net::SSH::Connection::Channel ch, bool success) -> void } -> void
+        def subsystem: (String subsystem) ?{ (Net::SSH::Connection::Channel ch, bool success) -> void } -> void
+        def env: (_ToS variable_name, _ToS variable_value) ?{ (Net::SSH::Connection::Channel ch, bool success) -> void } -> void
+
+        # Raises ArgumentError for other keys.
+        def request_pty: (?term: String, ?chars_wide: Integer, ?chars_high: Integer, ?pixels_wide: Integer, ?pixels_high: Integer, ?modes: Hash[Integer, Integer]) ?{ (Net::SSH::Connection::Channel ch, bool success) -> void } -> void
+                       | (Hash[Symbol, untyped] opts) ?{ (Net::SSH::Connection::Channel ch, bool success) -> void } -> void
+
+        def send_channel_request: (String request_name, *untyped data) ?{ (Net::SSH::Connection::Channel ch, bool success) -> void } -> void
+
+        # Raises EOFError after eof!.
+        def send_data: (_ToS data) -> void
+
+        def active?: () -> bool
+
+        # Processes the connection until the channel is closed.
+        def wait: () -> void
+
+        def closing?: () -> bool
+        def local_closed?: () -> bool
+        def remote_closed?: () -> bool
+        def close: () -> void
+        def eof?: () -> bool
+        def eof!: () -> void
+
+        # The on_* methods set (or, without a block, remove) a callback and
+        # return the previous one.
+        def on_data: () ?{ (Net::SSH::Connection::Channel ch, String data) -> void } -> Proc?
+        def on_extended_data: () ?{ (Net::SSH::Connection::Channel ch, Integer type, String data) -> void } -> Proc?
+        def on_process: () ?{ (Net::SSH::Connection::Channel ch) -> void } -> Proc?
+        def on_close: () ?{ (Net::SSH::Connection::Channel ch) -> void } -> Proc?
+        def on_eof: () ?{ (Net::SSH::Connection::Channel ch) -> void } -> Proc?
+        def on_open_failed: () ?{ (Net::SSH::Connection::Channel ch, Integer reason_code, String description) -> void } -> Proc?
+
+        # The block may raise Net::SSH::ChannelRequestFailed to answer with a failure.
+        def on_request: (String type) ?{ (Net::SSH::Connection::Channel ch, Net::SSH::Buffer data) -> void } -> Proc?
+      end
+    end
+
+    module Service
+      class Forward
+        include Net::SSH::Loggable
+
+        attr_reader session: Net::SSH::Connection::Session
+
+        def initialize: (Net::SSH::Connection::Session session) -> void
+
+        # Forwards a local port (0 for an ephemeral one) to remote_host:remote_port
+        # and returns the local port. Given a UNIXServer, forwards its
+        # connections and returns nil.
+        def local: (Integer | String port, String remote_host, Integer | String remote_port) -> Integer
+                 | (String bind_address, Integer | String port, String remote_host, Integer | String remote_port) -> Integer
+                 | (UNIXServer socket, String remote_host, Integer | String remote_port) -> nil
+
+        def cancel_local: (Integer port, ?String bind_address) -> void
+        def active_locals: () -> Array[[Integer, String] | [nil, nil]]
+        def local_socket: (String local_socket_path, String remote_socket_path) -> String
+        def cancel_local_socket: (String local_socket_path) -> void
+        def active_local_sockets: () -> Array[String]
+
+        # Asks the server to forward remote_host:remote_port to host:port.
+        # The block gets the bound port and address, or :error if the server
+        # refused; returning :no_exception from it then avoids the
+        # Net::SSH::Exception.
+        def remote: (Integer port, String host, Integer remote_port, ?String remote_host) ?{ (Integer | :error remote_port, ?String remote_host) -> untyped } -> void
+        alias remote_to remote
+
+        def cancel_remote: (Integer port, ?String host) -> void
+        def active_remotes: () -> Array[[Integer, String]]
+        def active_remote_destinations: () -> Hash[[Integer, String], [Integer, String]]
+        def agent: (Net::SSH::Connection::Channel channel) -> void
+      end
+    end
+
+    module Proxy
+      class Error < Net::SSH::Exception
+      end
+
+      class ConnectError < Error
+      end
+
+      class UnauthorizedError < Error
+      end
+
+      # Connects through a command such as "ssh gw nc %h %p" (%h host, %p
+      # port, %r remote user).
+      class Command
+        INVALID_HOST_NAME: Regexp
+        INVALID_USER_NAME: Regexp
+
+        attr_reader command_line_template: String
+        attr_reader command_line: String?
+        attr_accessor timeout: Numeric?
+
+        def initialize: (String command_line_template) -> void
+      end
+
+      # Connects through "ssh -W" with the given ProxyJump hosts.
+      class Jump < Command
+        attr_reader jump_proxies: String
+
+        # nil until the proxy is opened.
+        def command_line_template: () -> String?
+
+        def initialize: (String jump_proxies, ?options: Hash[String | Symbol, untyped]) -> void
+        def build_proxy_command_equivalent: (?Hash[Symbol, untyped]? connection_options) -> String
+      end
+
+      class HTTP
+        attr_reader proxy_host: String
+        attr_reader proxy_port: Integer
+        attr_reader options: Hash[Symbol, untyped]
+
+        def initialize: (String proxy_host, ?Integer proxy_port, ?Hash[Symbol, untyped] options) -> void
+      end
+
+      class HTTPS < HTTP
+      end
+
+      class SOCKS4
+        attr_reader proxy_host: String
+        attr_reader proxy_port: Integer
+        attr_reader options: Hash[Symbol, untyped]
+
+        def initialize: (String proxy_host, ?Integer proxy_port, ?Hash[Symbol, untyped] options) -> void
+      end
+
+      class SOCKS5
+        attr_reader proxy_host: String
+        attr_reader proxy_port: Integer
+        attr_reader options: Hash[Symbol, untyped]
+
+        def initialize: (String proxy_host, ?Integer proxy_port, ?Hash[Symbol, untyped] options) -> void
+      end
+    end
+
+    module Multiplex
+      class Error < Net::SSH::Exception
+      end
+    end
+  end
+end
