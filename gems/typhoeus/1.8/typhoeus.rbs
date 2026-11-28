@@ -1,0 +1,462 @@
+module Typhoeus
+  extend Request::Actions
+  extend Request::Callbacks::Types
+
+  USER_AGENT: String
+
+  VERSION: String
+
+  # The cache backends Typhoeus::Config.cache and the :cache request option
+  # accept: Typhoeus::Cache::Dalli, ::Rails and ::Redis or any object with
+  # these two methods.
+  interface _Cache
+    def get: (Typhoeus::Request request) -> Typhoeus::Response?
+
+    def set: (Typhoeus::Request request, Typhoeus::Response response) -> untyped
+  end
+
+  def self.configure: [T] () { (singleton(Typhoeus::Config) config) -> T } -> T
+
+  # A nil base_url matches every URL.
+  # A block returning nil makes the stubbed request raise Errors::NoResponse.
+  def self.stub: (String | Regexp | URI::Generic | nil base_url, ?Hash[Symbol, untyped] options) ?{ (Typhoeus::Request request) -> Typhoeus::Response? } -> Typhoeus::Expectation
+
+  def self.before: () ?{ (Typhoeus::Request request) -> untyped } -> Array[^(Typhoeus::Request) -> untyped]
+
+  def self.with_connection: [T] () { () -> T } -> T
+                          | () -> nil
+
+  module Config
+    extend Config
+
+    attr_accessor block_connection: bool?
+
+    attr_accessor memoize: bool?
+
+    attr_accessor verbose: bool?
+
+    attr_accessor timeout: (Integer | Float)?
+
+    attr_accessor connecttimeout: (Integer | Float)?
+
+    # nil or false turns caching off.
+    attr_accessor cache: Typhoeus::_Cache | false | nil
+
+    attr_accessor exclude_features: Array[Symbol]?
+
+    attr_accessor user_agent: String?
+
+    attr_accessor proxy: String?
+
+    attr_reader max_idle_easies: Integer?
+
+    # Raises ArgumentError for a negative Integer or a non-Integer.
+    def max_idle_easies=: (Integer? value) -> Integer?
+
+    attr_reader max_idle_multis: Integer?
+
+    # Raises ArgumentError for a negative Integer or a non-Integer.
+    def max_idle_multis=: (Integer? value) -> Integer?
+  end
+
+  module Errors
+    class TyphoeusError < StandardError
+    end
+
+    class NoStub < TyphoeusError
+      def initialize: (Typhoeus::Request request) -> void
+    end
+
+    class NoResponse < TyphoeusError
+      def initialize: (untyped base_url, ?String? reason) -> void
+    end
+  end
+
+  class Expectation
+    def self.all: () -> Array[Typhoeus::Expectation]
+
+    def self.clear: () -> Array[Typhoeus::Expectation]
+
+    # Use Typhoeus.stub, which also registers the expectation.
+    def initialize: (String | Regexp | URI::Generic | nil base_url, ?Hash[Symbol, untyped] options) -> void
+
+    attr_reader response_counter: Integer
+
+    # Adds the responses returned one by one when the expectation is hit.
+    def and_return: (Typhoeus::Response | Array[Typhoeus::Response] response) -> Array[untyped]
+                  | () { (Typhoeus::Request request) -> Typhoeus::Response? } -> Array[untyped]
+  end
+
+  class Request
+    extend Request::Actions
+    include Request::Callbacks::Types
+    include Request::Callbacks
+    include Request::Streamable
+    include Request::Marshal
+
+    attr_accessor base_url: String | URI::Generic
+
+    attr_accessor options: Hash[Symbol, untyped]
+
+    def initialize: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> void
+
+    # Returns nil when a before callback returns nil or false and the request
+    # has no response yet.
+    def run: () -> Typhoeus::Response?
+
+    def before: () ?{ (Typhoeus::Request request) -> untyped } -> Array[^(Typhoeus::Request) -> untyped]
+
+    def blocked?: () -> bool?
+
+    def memoizable?: () -> bool?
+
+    # Returns the cache backend, or nil or false when the request is not cached.
+    def cacheable?: () -> boolish
+
+    def cache_ttl: () -> Integer?
+
+    def finish: (Typhoeus::Response response, ?boolish bypass_memoization) -> Typhoeus::Response
+
+    def response: () -> Typhoeus::Response?
+
+    def response=: (Typhoeus::Response value) -> Typhoeus::Response
+
+    def url: () -> String
+
+    def eql?: (untyped other) -> bool
+
+    def hash: () -> Integer
+
+    def cache_key: () -> String
+
+    module Actions
+      def get: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+
+      def post: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+
+      def put: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+
+      def delete: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+
+      def head: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+
+      def patch: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+
+      def options: (String | URI::Generic base_url, ?Hash[Symbol, untyped] options) -> Typhoeus::Response?
+    end
+
+    module Callbacks
+      module Types
+        # The block's value becomes the response's handled_response.
+        def on_complete: () ?{ (Typhoeus::Response response) -> untyped } -> Array[^(Typhoeus::Response) -> untyped]
+
+        def on_success: () ?{ (Typhoeus::Response response) -> untyped } -> Array[^(Typhoeus::Response) -> untyped]
+
+        def on_failure: () ?{ (Typhoeus::Response response) -> untyped } -> Array[^(Typhoeus::Response) -> untyped]
+
+        def on_headers: () ?{ (Typhoeus::Response response) -> untyped } -> Array[^(Typhoeus::Response) -> untyped]
+
+        def on_progress: () ?{ (Integer dltotal, Integer dlnow, Integer ultotal, Integer ulnow) -> untyped } -> Array[^(Integer, Integer, Integer, Integer) -> untyped]
+      end
+    end
+
+    module Streamable
+      # Return :abort from the block to stop the transfer. The chunk is the
+      # body of a stubbed or before-callback response, which can be nil.
+      def on_body: () ?{ (String? chunk, Typhoeus::Response response) -> untyped } -> Array[^(String?, Typhoeus::Response) -> untyped]
+
+      def streaming?: () -> bool?
+    end
+
+    module Marshal
+      def marshal_dump: () -> Array[[Symbol, untyped]]
+
+      def marshal_load: (Array[[Symbol, untyped]] attributes) -> void
+    end
+  end
+
+  class Response
+    include Response::Informations
+    include Response::Status
+    include Response::Cacheable
+
+    # nil until the response is finished by a request.
+    attr_accessor request: Typhoeus::Request?
+
+    attr_accessor options: Hash[Symbol, untyped]
+
+    attr_writer handled_response: untyped
+
+    def initialize: (?Hash[Symbol, untyped] options) -> void
+
+    # The value of the last on_complete, on_success or on_failure callback,
+    # or the response itself.
+    def handled_response: () -> untyped
+
+    # Values are Strings, or Arrays of Strings for repeated headers. Keys are
+    # looked up case-insensitively.
+    class Header < Delegator
+      type value = String | Array[String]
+
+      def initialize: (String | Hash[String | Symbol, value] | Typhoeus::Response::Header | nil raw) -> void
+
+      def []: (String | Symbol key) -> value?
+
+      def []=: (String | Symbol key, value value) -> value
+
+      alias store []=
+
+      def merge: (Hash[String | Symbol, value] | Typhoeus::Response::Header other) ?{ (String | Symbol key, value? old_value, value new_value) -> value } -> Typhoeus::Response::Header
+
+      def update: (Hash[String | Symbol, value] | Typhoeus::Response::Header other) ?{ (String | Symbol key, value? old_value, value new_value) -> value } -> self
+
+      alias merge! update
+
+      def replace: (Hash[String | Symbol, value] | Typhoeus::Response::Header other) -> self
+
+      def delete: (String | Symbol key) -> value?
+
+      def clear: () -> self
+
+      def include?: (String | Symbol key) -> bool
+
+      alias has_key? include?
+
+      alias key? include?
+
+      alias member? include?
+
+      def fetch: (String | Symbol key) -> value
+               | [T] (String | Symbol key, T default) -> (value | T)
+               | [T] (String | Symbol key) { (String | Symbol key) -> T } -> (value | T)
+
+      def values_at: (*String | Symbol keys) -> Array[value?]
+
+      # Delegated to the underlying Hash, which keeps the original spelling
+      # of the header names.
+      def keys: () -> Array[String]
+
+      def to_hash: () -> Hash[String, value]
+
+      def to_h: () -> Hash[String, value]
+
+      def each: () { ([String, value]) -> void } -> Hash[String, value]
+
+      def each_pair: () { ([String, value]) -> void } -> Hash[String, value]
+
+      def size: () -> Integer
+
+      def empty?: () -> bool
+    end
+
+    module Informations
+      def return_code: () -> Symbol?
+
+      def return_message: () -> String?
+
+      def error_message: () -> String?
+
+      def response_body: () -> String?
+
+      alias body response_body
+
+      def response_headers: () -> String?
+
+      def response_code: () -> Integer
+
+      alias code response_code
+
+      def httpauth_avail: () -> Integer?
+
+      def total_time: () -> Float?
+
+      alias time total_time
+
+      def starttransfer_time: () -> Float?
+
+      alias start_transfer_time starttransfer_time
+
+      def appconnect_time: () -> Float?
+
+      alias app_connect_time appconnect_time
+
+      def pretransfer_time: () -> Float?
+
+      def connect_time: () -> Float?
+
+      def namelookup_time: () -> Float?
+
+      alias name_lookup_time namelookup_time
+
+      def redirect_time: () -> Float?
+
+      def effective_url: () -> String?
+
+      def primary_ip: () -> String?
+
+      def redirect_count: () -> Integer?
+
+      def redirect_url: () -> String?
+
+      def certinfo: () -> Array[Array[String]]?
+
+      def request_size: () -> Integer?
+
+      def size_upload: () -> Float?
+
+      def size_download: () -> Float?
+
+      def speed_upload: () -> Float?
+
+      def speed_download: () -> Float?
+
+      # An Ethon::Easy::DebugInfo when the request was made with verbose: true.
+      def debug_info: () -> untyped
+
+      def headers: () -> Typhoeus::Response::Header?
+
+      alias headers_hash headers
+
+      def redirections: () -> Array[Typhoeus::Response]
+    end
+
+    module Status
+      def status_message: () -> String?
+
+      def http_version: () -> String?
+
+      def success?: () -> bool
+
+      def failure?: () -> bool
+
+      def modified?: () -> bool
+
+      def timed_out?: () -> bool
+    end
+
+    module Cacheable
+      attr_writer cached: boolish
+
+      def cached?: () -> bool
+    end
+  end
+
+  class Hydra
+    include Hydra::Queueable
+
+    def self.hydra: () -> Typhoeus::Hydra
+
+    # Other options are passed to Ethon::Multi.new.
+    def initialize: (?max_concurrency: Integer | String, **untyped) -> void
+                  | (Hash[Symbol, untyped] options) -> void
+
+    attr_reader max_concurrency: Integer
+
+    # Raises ArgumentError unless the value is greater than zero.
+    def max_concurrency=: (Integer | String value) -> Integer
+
+    def release: () -> nil
+
+    # Returns the value of a short-circuiting before callback or stub, or
+    # the result of adding the request to the multi.
+    def add: (Typhoeus::Request request) -> untyped
+
+    def memory: () -> Hash[Typhoeus::Request, Typhoeus::Response]
+
+    def run: () -> nil
+
+    module Queueable
+      def queued_requests: () -> Array[Typhoeus::Request]
+
+      def abort: () -> Array[Typhoeus::Request]
+
+      def queue: (Typhoeus::Request request) -> Array[Typhoeus::Request]
+
+      def queue_front: (Typhoeus::Request request) -> Array[Typhoeus::Request]
+
+      def dequeue: () -> untyped
+
+      def dequeue_many: () -> nil
+    end
+  end
+
+  module Cache
+    class Dalli
+      interface _Client
+        def get: (String key) -> untyped
+
+        def set: (String key, Typhoeus::Response value, Integer? ttl) -> untyped
+      end
+
+      def initialize: (?_Client client, ?Hash[Symbol, Integer] options) -> void
+
+      def get: (Typhoeus::Request request) -> Typhoeus::Response?
+
+      def set: (Typhoeus::Request request, Typhoeus::Response response) -> untyped
+    end
+
+    class Rails
+      interface _Store
+        def read: (String key) -> untyped
+
+        def write: (String key, Typhoeus::Response value, Hash[Symbol, Integer?] options) -> untyped
+      end
+
+      def initialize: (?_Store cache, ?Hash[Symbol, Integer] options) -> void
+
+      def get: (Typhoeus::Request request) -> Typhoeus::Response?
+
+      def set: (Typhoeus::Request request, Typhoeus::Response response) -> untyped
+    end
+
+    class Redis
+      interface _Client
+        def get: (String key) -> String?
+
+        def set: (String key, String value) -> untyped
+
+        def expire: (String key, Integer seconds) -> untyped
+      end
+
+      def initialize: (?_Client redis, ?Hash[Symbol, Integer] options) -> void
+
+      def get: (Typhoeus::Request request) -> Typhoeus::Response?
+
+      def set: (Typhoeus::Request request, Typhoeus::Response response) -> untyped
+    end
+  end
+end
+
+module Rack
+  module Typhoeus
+    module Middleware
+      class ParamsDecoder
+        include Helper
+
+        interface _App
+          def call: (Hash[String, untyped] env) -> untyped
+        end
+
+        def initialize: (_App app) -> void
+
+        def call: (Hash[String, untyped] env) -> untyped
+
+        module Helper
+          # Decodes the params of the including controller in place.
+          def decode_typhoeus_arrays: () -> untyped
+
+          # Decodes in place and returns the argument; frozen and other
+          # values are returned as they are.
+          def decode!: (Hash[untyped, untyped] hash) -> Hash[untyped, untyped]
+                     | (Array[untyped] hash) -> Array[untyped]
+                     | [T] (T hash) -> T
+
+          # Decodes a deep copy; hash-like objects come back as a Hash.
+          def decode: (Hash[untyped, untyped] hash) -> Hash[untyped, untyped]
+                    | (Array[untyped] hash) -> Array[untyped]
+                    | (untyped hash) -> untyped
+        end
+      end
+    end
+  end
+end
