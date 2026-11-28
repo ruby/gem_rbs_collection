@@ -1,0 +1,717 @@
+module REXML
+  COPYRIGHT: String
+  DATE: String
+  VERSION: String
+  REVISION: String
+  Copyright: String
+  Version: String
+
+  # Anything written to with `<<`: a String, an IO, an Array, REXML::Output.
+  interface _Output
+    def <<: (String) -> untyped
+  end
+
+  # An IO-like object the parsers read from (IO, StringIO, ...).
+  interface _Stream
+    def read: (Integer) -> String?
+    def readline: (String) -> String
+    def eof?: () -> bool
+  end
+
+  # What Document.new and the parsers accept as the XML source.
+  type source = String | _Stream | Source
+
+  # The listener StreamParser and Document.parse_stream call. Every
+  # document makes them call tag_start and tag_end, and text for text
+  # nodes; the other StreamListener methods (instruction, comment,
+  # doctype, ...) are called when the document has such nodes, so a
+  # listener either defines them or includes REXML::StreamListener.
+  interface _StreamListener
+    def tag_start: (String name, Hash[String, String] attrs) -> void
+    def tag_end: (String name) -> void
+    def text: (String text) -> void
+  end
+
+  # A listener for SAX2Parser#listen. The parser calls these for every
+  # document; the other SAX2Listener methods are called when the document
+  # has such nodes, so a listener either defines them or includes
+  # REXML::SAX2Listener.
+  interface _SAX2Listener
+    def start_document: () -> void
+    def end_document: () -> void
+    def start_element: (String? uri, String localname, String qname, Hash[String, String] attributes) -> void
+    def end_element: (String? uri, String localname, String qname) -> void
+    def characters: (String text) -> void
+    def progress: (Integer position) -> void
+  end
+
+  module XMLTokens
+  end
+
+  module Encoding
+    attr_reader encoding: String
+
+    # Raises ArgumentError for an unknown encoding name.
+    def encoding=: (String | ::Encoding | nil encoding) -> bool
+  end
+
+  module Security
+    def self.entity_expansion_limit=: (Integer val) -> Integer
+    def self.entity_expansion_limit: () -> Integer
+    def self.entity_expansion_text_limit=: (Integer val) -> Integer
+    def self.entity_expansion_text_limit: () -> Integer
+  end
+
+  class Source
+    include Encoding
+
+    def initialize: (String arg, ?String? encoding) -> void
+
+    # nil when the encoding did not change.
+    def encoding=: (String | ::Encoding | nil encoding) -> void
+  end
+
+  class Output
+    include Encoding
+
+    attr_reader encoding: String
+
+    def initialize: (_Output real_IO, ?String encd) -> void
+    def <<: (String content) -> untyped
+    def to_s: () -> String
+  end
+
+  class ParseException < RuntimeError
+    attr_accessor source: Source?
+    attr_accessor parser: untyped
+    attr_accessor continued_exception: Exception?
+
+    def initialize: (String message, ?Source? source, ?untyped parser, ?Exception? exception) -> void
+    def to_s: () -> String
+    def position: () -> Integer?
+    def line: () -> Integer?
+    def context: () -> untyped
+  end
+
+  class UndefinedNamespaceException < ParseException
+    def initialize: (String prefix, Source? source, untyped parser) -> void
+  end
+
+  module Node
+    def next_sibling_node: () -> Child?
+    def previous_sibling_node: () -> Child?
+
+    # Passing an indent is deprecated (use REXML::Formatters).
+    def to_s: (?Integer? indent) -> String
+    def parent?: () -> bool
+
+    # Yields the descendant elements of a Parent, depth first.
+    def each_recursive: () { (Element node) -> void } -> nil
+    def find_first_recursive: () { (Element node) -> boolish } -> Element?
+
+    # The 1-based position in the parent.
+    def index_in_parent: () -> Integer
+  end
+
+  module Namespace
+    include XMLTokens
+
+    NAME_WITHOUT_NAMESPACE: Regexp
+    NAMESPLIT: Regexp
+
+    # nil (and prefix nil) only for an element created with an empty name
+    # (see Elements#add) and for a Document copied with clone or deep_clone.
+    attr_reader name: String
+    attr_reader expanded_name: String
+    attr_accessor prefix: String
+
+    # Raises ArgumentError for a name that is not a valid XML name.
+    def name=: (String name) -> String?
+    def has_name?: (String other, ?String? ns) -> bool
+    alias local_name name
+    def fully_expanded_name: () -> String
+  end
+
+  class Child
+    include Node
+
+    attr_reader parent: Parent?
+
+    # Element.new passes an Elements on (Elements#add); for other children
+    # pass a Parent.
+    def initialize: (?(Parent | Elements)? parent) -> void
+    def replace_with: (Child child) -> self
+    def remove: () -> self
+    def parent=: (Parent? other) -> Parent?
+    alias next_sibling next_sibling_node
+    alias previous_sibling previous_sibling_node
+    def next_sibling=: (Child other) -> Parent
+    def previous_sibling=: (Child other) -> Parent
+    def document: () -> Document?
+    def bytes: () -> String
+  end
+
+  class Parent < Child
+    include Enumerable[Child]
+
+    # Element.new passes an Elements on (Elements#add).
+    def initialize: (?(Parent | Elements)? parent) -> void
+    def add: [C < Child] (C object) -> C
+    alias push add
+    alias << push
+    def unshift: (Child object) -> Array[Child]
+    def delete: [C < Child] (C object) -> C?
+    def each: () { (Child child) -> void } -> Array[Child]
+            | () -> Enumerator[Child, Array[Child]]
+    def delete_if: () { (Child child) -> boolish } -> Array[Child]
+                 | () -> Enumerator[Child, Array[Child]]
+    def delete_at: (Integer index) -> Child?
+    def each_index: () { (Integer index) -> void } -> Array[Child]
+                  | () -> Enumerator[Integer, Array[Child]]
+    def []: (Integer index) -> Child?
+    alias each_child each
+    def []=: (Integer index, Child child) -> Child
+           | (Integer start, Integer length, Child child) -> Child
+           | (Range[Integer?] range, Child child) -> Child
+
+    # A String is an XPath to the reference child.
+    def insert_before: (Child | String child1, Child child2) -> self
+    def insert_after: (Child | String child1, Child child2) -> self
+    def to_a: () -> Array[Child]
+
+    # The 0-based index; size - 1 when +child+ is not one of them.
+    def index: (Child child) -> Integer
+    def size: () -> Integer
+    alias length size
+    def replace_child: (Child to_replace, Child replacement) -> self
+    def deep_clone: () -> self
+    alias children to_a
+    def parent?: () -> bool
+  end
+
+  class Element < Parent
+    include Namespace
+
+    UNDEFINED: String
+
+    attr_reader attributes: Attributes
+    attr_reader elements: Elements
+    attr_accessor context: Hash[Symbol, untyped]?
+
+    def initialize: (?String | Element arg, ?(Parent | Elements)? parent, ?Hash[Symbol, untyped]? context) -> void
+    def inspect: () -> String
+    def clone: () -> self
+    def root_node: () -> Element
+
+    # A plain REXML::Parent at the top of the tree is returned as it is.
+    def root: () -> Parent?
+    def document: () -> Document?
+    def whitespace: () -> bool
+    def ignore_whitespace_nodes: () -> bool?
+    def raw: () -> bool?
+    def prefixes: () -> Array[String]
+    def namespaces: () -> Hash[String, String]
+    def namespace: (?String? prefix) -> String?
+    def add_namespace: (String prefix, ?String? uri) -> self
+    def delete_namespace: (?String namespace) -> self
+    def add_element: (String | Element element, ?Hash[String, untyped]? attrs) -> Element
+
+    # A String is an XPath and may select a node other than an element.
+    def delete_element: (Element | Integer element) -> Element?
+                      | (String xpath) -> untyped
+    def has_elements?: () -> bool
+    def each_element_with_attribute: (String key, ?String? value, ?Integer max, ?String? name) { (Element element) -> void } -> void
+    def each_element_with_text: (?String? text, ?Integer max, ?String? name) { (Element element) -> void } -> void
+    def each_element: (?String? xpath) { (Element element) -> void } -> void
+    def get_elements: (String xpath) -> Array[Element]
+    def next_element: () -> Element?
+    def previous_element: () -> Element?
+    def has_text?: () -> bool
+    def text: (?String? path) -> String?
+    def get_text: (?String? path) -> Text?
+    def text=: (_ToS? text) -> self
+
+    # Returns nil when the text is appended to the last child.
+    def add_text: (String text) -> self?
+                | (Text text) -> self
+    def node_type: () -> (:element | :document)
+    def xpath: () -> String
+    def []: (String | Symbol name) -> String?
+          | (Integer index) -> Child?
+    def attribute: (String name, ?String? namespace) -> Attribute?
+    def has_attributes?: () -> bool
+    def add_attribute: (Attribute attribute) -> Attribute
+                     | [T < _ToS] (String name, T value) -> T
+                     | (String name) -> nil
+    def add_attributes: (Hash[String, untyped] hash) -> Hash[String, untyped]
+                      | (Array[[String, untyped]] array) -> Array[[String, untyped]]
+    def delete_attribute: (String key) -> Element?
+    def cdatas: () -> Array[CData]
+    def comments: () -> Array[Comment]
+    def instructions: () -> Array[Instruction]
+    def texts: () -> Array[Text]
+
+    # Deprecated: use REXML::Formatters.
+    def write: (?_Output output, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+  end
+
+  class Document < Element
+    DECLARATION: XMLDecl
+
+    # Raises REXML::ParseException for malformed XML.
+    def initialize: (?source | Document | nil source, ?Hash[Symbol, untyped] context) -> void
+    def node_type: () -> :document
+    def clone: () -> Document
+    def expanded_name: () -> String
+    alias name expanded_name
+
+    # An XMLDecl or a DocType goes to its place in the prolog and the
+    # document is returned. Raises RuntimeError for a second root element.
+    def add: (XMLDecl | DocType child) -> self
+           | [C < Child] (C child) -> C
+    alias << add
+
+    # Raises RuntimeError for a second root element. The first argument
+    # defaults to nil, which Element#add_element rejects (RuntimeError).
+    def add_element: (String | Element element, ?Hash[String, untyped]? attrs) -> Element
+    def root: () -> Element?
+    def doctype: () -> DocType?
+    def xml_decl: () -> XMLDecl
+    def version: () -> String
+    def encoding: () -> String
+
+    # The standalone value of the XML declaration ("yes", "no" or nil).
+    def stand_alone?: () -> String?
+    def write: (?_Output? output, ?Integer? indent, ?bool? transitive, ?bool? ie_hack, ?String? encoding) -> void
+             | (?output: _Output?, ?indent: Integer?, ?transitive: bool?, ?ie_hack: bool?, ?encoding: String?) -> void
+    def self.parse_stream: (source source, _StreamListener listener) -> void
+    def self.entity_expansion_limit=: (Integer val) -> Integer
+    def self.entity_expansion_limit: () -> Integer
+    def self.entity_expansion_text_limit=: (Integer val) -> Integer
+    def self.entity_expansion_text_limit: () -> Integer
+
+    attr_reader entity_expansion_count: Integer
+    attr_writer entity_expansion_limit: Integer
+    attr_accessor entity_expansion_text_limit: Integer
+
+    def document: () -> self
+  end
+
+  class Elements
+    include Enumerable[Element]
+
+    def initialize: (Element parent) -> void
+    def parent: () -> Element
+
+    # Raises RuntimeError for an index below 1. A String is an XPath and
+    # may select a node other than an element.
+    def []: (Integer index, ?String? name) -> Element?
+          | (String xpath) -> untyped
+    def []=: (Integer index, Element element) -> Element?
+           | (String xpath, Element element) -> untyped
+    def empty?: () -> bool
+
+    # -1 when +element+ is not a child element.
+    def index: (Child element) -> Integer
+    def delete: (Element | Integer element) -> Element?
+              | (String xpath) -> untyped
+    def delete_all: (String xpath) -> Array[Element]
+    # Without an argument (or with nil) the new element has no name, which
+    # Namespace#name and #prefix then return as nil; that form is left out
+    # so that name stays a String.
+    def add: (String | Element element) -> Element
+    alias << add
+    def each: (?String? xpath) { (Element element) -> void } -> void
+    def collect: [T] (?String? xpath) { (Element element) -> T } -> Array[T]
+    def inject: (?String? xpath, ?untyped initial) { (untyped memo, Element element) -> untyped } -> untyped
+    def size: () -> Integer
+    def to_a: (?String? xpath) -> Array[Element]
+  end
+
+  class Attributes < Hash[String, Attribute | Hash[String, Attribute]]
+    def initialize: (Element element) -> void
+    def []: (String name) -> String?
+    def to_a: () -> Array[Attribute]
+    def length: () -> Integer
+    alias size length
+    def each_attribute: () { (Attribute attribute) -> void } -> self
+                      | () -> Enumerator[Attribute, self]
+    def each: () { ([String, String] pair) -> void } -> self
+            | () -> Enumerator[[String, String], self]
+
+    # Enumerable methods go through #each, so they see [name, value] String
+    # pairs; the Hash methods (each_pair, select, values, fetch, ...) see
+    # the stored Attributes.
+    def map: [U] () { ([String, String] pair) -> U } -> Array[U]
+    alias collect map
+    def first: () -> [String, String]?
+             | (Integer n) -> Array[[String, String]]
+    def find: (?untyped ifnone) { ([String, String] pair) -> boolish } -> [String, String]?
+    alias detect find
+    def each_with_index: () { ([String, String] pair, Integer index) -> void } -> self
+    def sort_by: [U] () { ([String, String] pair) -> U } -> Array[[String, String]]
+    def get_attribute: (String name) -> Attribute?
+
+    # nil deletes the attribute.
+    def []=: (String name, nil) -> nil
+           | (String name, Attribute | _ToS value) -> Element
+    def prefixes: () -> Array[String]
+    def namespaces: () -> Hash[String, String]
+    # nil (what []= passes for a missing attribute) deletes nothing.
+    def delete: (Attribute | String | nil attribute) -> Element
+    def add: (Attribute attribute) -> Attribute
+    alias << add
+    def delete_all: (String name) -> Array[Attribute]
+    def get_attribute_ns: (String namespace, String name) -> Attribute?
+  end
+
+  class Attribute
+    include Node
+    include Namespace
+
+    attr_reader element: Element?
+
+    # +parent+ is the owning Element; the tree parser passes itself and
+    # Attributes#[]= then sets the element.
+    def initialize: (Attribute first, ?Element? second) -> void
+                  | (String first, ?_ToS? second, ?untyped parent) -> void
+    def prefix: () -> String
+
+    # Needs the owning element unless the prefix is empty.
+    def namespace: (?String? arg) -> String?
+    def ==: (untyped other) -> bool
+    def hash: () -> Integer
+    def to_string: () -> String
+    def doctype: () -> DocType?
+    def to_s: () -> String
+    def value: () -> String
+    def normalized=: (String new_normalized) -> nil
+    def clone: () -> Attribute
+    def element=: (Element element) -> self
+    def remove: () -> Element?
+    def write: (_Output output, ?Integer indent) -> void
+    def node_type: () -> :attribute
+    def inspect: () -> String
+    def xpath: () -> String
+    def document: () -> Document?
+  end
+
+  class Text < Child
+    include Comparable
+
+    attr_accessor raw: bool?
+
+    # +entity_filter+ lists entity names not to substitute; CData passes true.
+    def initialize: (String | Text arg, ?bool respect_whitespace, ?Element? parent, ?bool? raw, ?(Array[String] | bool)? entity_filter, ?Regexp illegal) -> void
+    def parent=: (Parent? parent) -> void
+    def node_type: () -> :text
+    def empty?: () -> bool
+    def clone: () -> Text
+    def <<: (String to_append) -> self
+    def <=>: (_ToS other) -> Integer
+    def doctype: () -> DocType?
+    def to_s: () -> String
+    def inspect: () -> String
+    def value: () -> String
+    def value=: (String val) -> void
+
+    # Deprecated: use REXML::Formatters.
+    def write: (_Output writer, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+    def xpath: () -> String
+    def self.normalize: (_ToS input, ?DocType? doctype, ?Array[String]? entity_filter) -> String
+    def self.unnormalize: (String string, ?DocType? doctype, ?Array[String]? filter, ?Regexp? illegal, ?entity_expansion_text_limit: Integer?) -> String
+  end
+
+  class CData < Text
+    START: String
+    STOP: String
+    ILLEGAL: Regexp
+
+    def initialize: (String | Text first, ?bool whitespace, ?Element? parent) -> void
+    def clone: () -> CData
+    def to_s: () -> String
+    def value: () -> String
+
+    # Deprecated.
+    def write: (?_Output output, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+  end
+
+  class Comment < Child
+    include Comparable
+
+    START: String
+    STOP: String
+
+    attr_accessor string: String
+
+    def initialize: (String | Comment first, ?Parent? second) -> void
+    def clone: () -> Comment
+
+    # Deprecated: use REXML::Formatters.
+    def write: (_Output output, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+    alias to_s string
+    def <=>: (_ToS other) -> Integer
+    def ==: (untyped other) -> bool
+    def node_type: () -> :comment
+  end
+
+  class Instruction < Child
+    START: String
+    STOP: String
+
+    attr_accessor target: String
+    attr_accessor content: String?
+
+    # The second argument is the content for a String target and the
+    # parent for an Instruction to copy.
+    def initialize: (String target, ?String? content) -> void
+                  | (Instruction target, ?Parent? parent) -> void
+    def clone: () -> Instruction
+
+    # Deprecated.
+    def write: (_Output writer, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+    def ==: (untyped other) -> bool
+    def node_type: () -> :processing_instruction
+    def inspect: () -> String
+  end
+
+  class XMLDecl < Child
+    include Encoding
+
+    DEFAULT_VERSION: String
+    DEFAULT_ENCODING: String
+    DEFAULT_STANDALONE: String
+    START: String
+    STOP: String
+
+    attr_accessor version: String
+    attr_accessor standalone: String?
+    attr_reader writeencoding: bool
+    attr_reader writethis: bool
+
+    def initialize: (?String | XMLDecl | nil version, ?String? encoding, ?String? standalone) -> void
+    def clone: () -> XMLDecl
+    def write: (_Output writer, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+    def ==: (untyped other) -> bool
+    def xmldecl: (String version, String? encoding, String? standalone) -> void
+    def node_type: () -> :xmldecl
+    alias stand_alone? standalone
+    def encoding=: (String | ::Encoding | nil enc) -> void
+    def self.default: () -> XMLDecl
+    def nowrite: () -> void
+    def dowrite: () -> void
+    def inspect: () -> String
+  end
+
+  class DocType < Parent
+    include XMLTokens
+
+    START: String
+    STOP: String
+    SYSTEM: String
+    PUBLIC: String
+    DEFAULT_ENTITIES: Hash[String, Entity]
+
+    attr_reader name: String
+    attr_reader external_id: String?
+    attr_reader entities: Hash[String, Entity]
+
+    def initialize: (String name, ?String? external_id) -> void
+                  | (DocType | Array[String?] | Source first, ?Parent? parent) -> void
+    def node_type: () -> :doctype
+    def attributes_of: (String element) -> Array[Attribute]
+    def attribute_of: (String element, String attribute) -> String?
+    def clone: () -> DocType
+    def write: (_Output output, ?Integer indent, ?bool transitive, ?bool ie_hack) -> void
+    def context: () -> Hash[Symbol, untyped]?
+    def entity: (String name) -> String?
+    def add: (Entity child) -> Entity
+           | (Child child) -> nil
+    def public: () -> String?
+    def system: () -> String?
+    def notations: () -> Array[NotationDecl]
+    def notation: (String name) -> NotationDecl?
+  end
+
+  # #write chains `out << a << b`: `<<` must return something that also
+  # takes `<<` (String, IO, Array and REXML::Output do).
+  class Entity < Child
+    include XMLTokens
+
+    attr_reader name: String
+    attr_reader external: String?
+    attr_reader ref: String?
+    attr_reader ndata: String?
+    attr_reader pubid: String?
+    attr_reader value: String?
+
+    # The Array form is a parser event ([:entitydecl, name, ...]).
+    def initialize: (String | Array[String | Symbol] stream, ?String? value, ?Parent? parent, ?bool reference) -> void
+    def self.matches?: (String string) -> bool
+    def unnormalized: () -> String?
+    def normalized: () -> String?
+    def write: (_Output out, ?Integer indent) -> void
+    def to_s: () -> String
+  end
+
+  class NotationDecl < Child
+    attr_accessor public: String?
+    attr_accessor system: String?
+
+    def initialize: (String name, String middle, String? pub, String? sys) -> void
+    def to_s: () -> String
+    def write: (_Output output, ?Integer indent) -> void
+    def name: () -> String
+  end
+
+  class XPath
+    # +element+ is the context node; +namespaces+ maps prefixes to URIs,
+    # +variables+ gives $variables. The results are nodes, or a String,
+    # Integer, Float or boolean for other expressions.
+    def self.first: (Node element, ?String? path, ?Hash[String, String]? namespaces, ?Hash[String, untyped] variables, ?Hash[Symbol, untyped] options) -> untyped
+    def self.each: (Node element, ?String? path, ?Hash[String, String]? namespaces, ?Hash[String, untyped] variables, ?Hash[Symbol, untyped] options) { (untyped node) -> void } -> Array[untyped]
+                 | (Node element, ?String? path, ?Hash[String, String]? namespaces, ?Hash[String, untyped] variables, ?Hash[Symbol, untyped] options) -> Enumerator[untyped, Array[untyped]]
+    def self.match: (Node element, ?String? path, ?Hash[String, String]? namespaces, ?Hash[String, untyped] variables, ?Hash[Symbol, untyped] options) -> Array[untyped]
+  end
+
+  module Formatters
+    class Default
+      def initialize: (?bool ie_hack) -> void
+      def write: (Node node, _Output output) -> void
+    end
+
+    class Pretty < Default
+      attr_accessor compact: bool
+      attr_accessor width: Integer
+
+      def initialize: (?Integer indentation, ?bool ie_hack) -> void
+    end
+
+    # Needs require "rexml/formatters/transitive".
+    class Transitive < Default
+      def initialize: (?Integer indentation, ?bool ie_hack) -> void
+    end
+  end
+
+  # Needs require "rexml/streamlistener".
+  module StreamListener
+    def tag_start: (String name, Hash[String, String] attrs) -> void
+    def tag_end: (String name) -> void
+    def text: (String text) -> void
+    def instruction: (String name, String? instruction) -> void
+    def comment: (String comment) -> void
+    def doctype: (String name, String? pub_sys, String? long_name, String? uri) -> void
+    def doctype_end: () -> void
+    def attlistdecl: (String element_name, Hash[String, String?] attributes, String raw_content) -> void
+    def elementdecl: (String content) -> void
+    def entitydecl: (Array[String] content) -> void
+    def notationdecl: (Array[String?] content) -> void
+    def entity: (String content) -> void
+    def cdata: (String content) -> void
+    def xmldecl: (String version, String? encoding, String? standalone) -> void
+  end
+
+  # Needs require "rexml/sax2listener".
+  module SAX2Listener
+    def start_document: () -> void
+    def end_document: () -> void
+    def start_prefix_mapping: (String? prefix, String uri) -> void
+    def end_prefix_mapping: (String? prefix) -> void
+    def start_element: (String? uri, String localname, String qname, Hash[String, String] attributes) -> void
+    def end_element: (String? uri, String localname, String qname) -> void
+    def characters: (String text) -> void
+    def processing_instruction: (String target, String? data) -> void
+    def doctype: (String name, String? pub_sys, String? long_name, String? uri) -> void
+    def attlistdecl: (String element, Hash[String, String?] pairs, String contents) -> void
+    def elementdecl: (String content) -> void
+    def entitydecl: (Array[String] declaration) -> void
+    def notationdecl: (String name, String public_or_system, String? public_id, String? system_id) -> void
+    def cdata: (String content) -> void
+    def xmldecl: (String version, String? encoding, String? standalone) -> void
+    def comment: (String comment) -> void
+    def progress: (Integer position) -> void
+  end
+
+  module Parsers
+    # Needs require "rexml/parsers/streamparser" (loaded by rexml/document).
+    class StreamParser
+      def initialize: (source source, _StreamListener listener) -> void
+      def entity_expansion_count: () -> Integer
+      def entity_expansion_limit=: (Integer limit) -> Integer
+      def entity_expansion_text_limit=: (Integer limit) -> Integer
+
+      # Raises REXML::ParseException for malformed XML.
+      def parse: () -> void
+    end
+
+    # Needs require "rexml/parsers/sax2parser".
+    class SAX2Parser
+      def initialize: (source source) -> void
+      def source: () -> Source
+      def entity_expansion_count: () -> Integer
+      def entity_expansion_limit=: (Integer limit) -> Integer
+      def entity_expansion_text_limit=: (Integer limit) -> Integer
+
+      # The block gets the arguments of the matching SAX2Listener method.
+      # Matches are element names (String or Regexp).
+      def listen: (Symbol event, Array[String | Regexp] matches) { (*untyped) -> void } -> void
+                | (Symbol event) { (*untyped) -> void } -> void
+                | (Array[String | Regexp] matches, _SAX2Listener listener) -> void
+                | (Array[String | Regexp] matches) { (*untyped) -> void } -> void
+                | (_SAX2Listener listener) -> void
+      def deafen: (_SAX2Listener listener) -> void
+                | () { (*untyped) -> void } -> void
+
+      # Raises REXML::ParseException for malformed XML.
+      def parse: () -> void
+    end
+
+    # Needs require "rexml/parsers/pullparser".
+    class PullParser
+      include XMLTokens
+
+      def initialize: (source stream) -> void
+      def has_next?: () -> bool
+      def entity: (String reference, Hash[String, String]? entities) -> String?
+      def empty?: () -> bool
+      def source: () -> Source
+      def entity_expansion_count: () -> Integer
+      def entity_expansion_limit=: (Integer limit) -> Integer
+      def entity_expansion_text_limit=: (Integer limit) -> Integer
+      def each: () { (PullEvent event) -> void } -> void
+      # depth must be 0 or more: a negative one returns nil before anything
+      # was peeked.
+      def peek: (?Integer depth) -> PullEvent
+
+      # Raises REXML::ParseException for malformed XML.
+      def pull: () -> PullEvent
+      def unshift: (PullEvent token) -> void
+      def reset: () -> void
+    end
+
+    class PullEvent
+      def initialize: (Array[untyped] arg) -> void
+
+      # Indexes the event's arguments (the event type is not counted).
+      def []: (Integer start) -> untyped
+            | (Integer start, Integer endd) -> Array[untyped]?
+            | (Range[Integer] start) -> Array[untyped]?
+      def event_type: () -> Symbol
+      def start_element?: () -> bool
+      def end_element?: () -> bool
+      def text?: () -> bool
+      def instruction?: () -> bool
+      def comment?: () -> bool
+      def doctype?: () -> bool
+      def attlistdecl?: () -> bool
+      def elementdecl?: () -> bool
+      def entitydecl?: () -> bool
+      def notationdecl?: () -> bool
+      def entity?: () -> bool
+      def cdata?: () -> bool
+      def xmldecl?: () -> bool
+      def error?: () -> bool
+      def inspect: () -> String
+    end
+  end
+end
