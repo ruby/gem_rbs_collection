@@ -1,0 +1,482 @@
+module Kramdown
+  VERSION: String
+
+  def self.data_dir: () -> String
+
+  class Error < RuntimeError
+  end
+
+  class Document
+    attr_accessor root: Element
+
+    attr_reader options: Hash[Symbol, untyped]
+
+    attr_reader warnings: Array[String]
+
+    def initialize: (String source, ?Hash[Symbol | String, untyped] options) -> void
+
+    # The `to_*` methods are dispatched by `method_missing` to the converter
+    # class of the same name (`to_hash_ast` -> `Kramdown::Converter::HashAst`).
+    def to_html: () -> String
+
+    def to_kramdown: () -> String
+
+    def to_latex: () -> String
+
+    def to_man: () -> String
+
+    def to_toc: () -> Element
+
+    def to_remove_html_tags: () -> Element
+
+    # A `:template` option renders the hash through the ERB template, which
+    # returns a String instead.
+    def to_hash_ast: () -> (Hash[Symbol, untyped] | String)
+  end
+
+  class Element
+    attr_accessor type: Symbol
+
+    attr_accessor value: untyped
+
+    attr_accessor children: Array[Element]
+
+    def initialize: (Symbol `type`, ?untyped value, ?Hash[String | Symbol, untyped]? attr, ?Hash[Symbol, untyped]? options) -> void
+
+    # Parsers use String keys and values; the TOC converter builds `:toc`
+    # elements with a Symbol `:id` key and the HTML converter sets Integer values.
+    def attr: () -> Hash[String | Symbol, untyped]
+
+    def options: () -> Hash[Symbol, untyped]
+
+    def self.category: (Element el) -> (:block | :span | nil)
+
+    def block?: () -> bool
+
+    def span?: () -> bool
+  end
+
+  module Options
+    class Boolean
+      def self.===: (untyped other) -> bool
+    end
+
+    type option_type = singleton(String) | singleton(Integer) | singleton(Float) | singleton(Symbol) | singleton(Boolean) | singleton(Object)
+
+    class Definition < Struct[untyped]
+      def self.new: (Symbol name, option_type `type`, untyped default, String desc, ?Proc? validator) -> instance
+
+      attr_accessor name: Symbol
+
+      attr_accessor type: option_type
+
+      attr_accessor default: untyped
+
+      attr_accessor desc: String
+
+      attr_accessor validator: Proc?
+    end
+
+    ALLOWED_TYPES: Array[option_type]
+
+    def self.define: (Symbol | String name, option_type type, untyped default, String desc) ?{ (untyped value) -> untyped } -> nil
+
+    def self.definitions: () -> Hash[Symbol, Definition]
+
+    def self.defined?: (Symbol | String name) -> bool
+
+    def self.defaults: () -> Hash[Symbol, untyped]
+
+    def self.merge: (Hash[Symbol | String, untyped] hash) -> Hash[Symbol, untyped]
+
+    def self.parse: (Symbol | String name, untyped data) -> untyped
+
+    def self.str_to_sym: (String data) -> Symbol?
+
+    def self.simple_array_validator: (String | Array[untyped] val, Symbol name, ?Integer? size) -> Array[untyped]
+
+    def self.simple_hash_validator: (String | Hash[untyped, untyped] val, Symbol name) -> Hash[untyped, untyped]
+  end
+
+  module Utils
+    def self.camelize: (String name) -> String
+
+    def self.snake_case: (String name) -> String
+
+    def self.deep_const_get: (String str) -> untyped
+
+    module Configurable
+      def configurable: (Symbol name) -> Symbol
+    end
+
+    module Entities
+      class Entity < Struct[untyped]
+        def self.new: (Integer code_point, String? name) -> instance
+
+        attr_accessor code_point: Integer
+
+        attr_accessor name: String?
+
+        # nil for a code point `Array#pack("U")` rejects (negative or 2**31 and above).
+        def char: () -> String?
+      end
+
+      # Raises Kramdown::Error for an unknown entity name.
+      def self?.entity: (Integer | String point_or_name) -> Entity
+    end
+
+    # Mixed into converters and parsers; #entity_to_str reads their
+    # `@options` and `@root`.
+    module Html
+      def entity_to_str: (Entities::Entity e, ?String? original) -> String
+
+      def html_attributes: (Hash[String | Symbol, untyped] attr) -> String
+
+      def escape_html: (String str, ?(:all | :text | :attribute) type) -> String
+
+      def fix_cjk_line_break: (String str) -> String
+    end
+  end
+
+  module Parser
+    class Base
+      attr_reader options: Hash[Symbol, untyped]
+
+      attr_reader warnings: Array[String]
+
+      attr_reader source: String
+
+      attr_reader root: Element
+
+      def self.parse: (String source, ?Hash[Symbol | String, untyped] options) -> [Element, Array[String]]
+
+      def initialize: (String source, Hash[Symbol | String, untyped] options) -> void
+
+      def parse: () -> void
+
+      def warning: (String text) -> Array[String]
+
+      def adapt_source: (String source) -> String
+
+      def add_text: (String text, ?Element tree, ?Symbol `type`) -> void
+    end
+
+    class Html < Base
+      module Constants
+      end
+
+      module Parser
+        include Constants
+      end
+
+      include Html::Parser
+    end
+
+    class Kramdown < Base
+      include ::Kramdown
+
+      include Html::Parser
+
+      include ::Kramdown::Utils::Html
+
+      class Data < Struct[untyped]
+        def self.new: (Symbol name, Regexp start_re, String? span_start, String method) -> instance
+
+        attr_accessor name: Symbol
+
+        attr_accessor start_re: Regexp
+
+        attr_accessor span_start: String?
+
+        attr_accessor method: String
+      end
+
+      def self.define_parser: (Symbol name, Regexp start_re, ?String? span_start, ?String meth_name) -> Data
+
+      def self.parser: (?Symbol? name) -> Data?
+
+      def self.has_parser?: (Symbol name) -> bool
+    end
+
+    class Markdown < Kramdown
+    end
+  end
+
+  module Converter
+    interface _SyntaxHighlighter
+      def call: (Base converter, String text, String? lang, Symbol `type`, Hash[Symbol, untyped] opts) -> String?
+    end
+
+    interface _MathEngine
+      def call: (Base converter, Element el, Hash[Symbol, untyped] opts) -> String?
+    end
+
+    extend Utils::Configurable
+
+    def self.configurables: () -> Hash[Symbol, Hash[untyped, untyped]]
+
+    def self.syntax_highlighter: (Symbol name) -> _SyntaxHighlighter?
+
+    def self.add_syntax_highlighter: (Symbol name, _SyntaxHighlighter highlighter) -> _SyntaxHighlighter
+                                   | (Symbol name) { (Base converter, String text, String? lang, Symbol `type`, Hash[Symbol, untyped] opts) -> String? } -> Proc
+
+    def self.math_engine: (Symbol name) -> _MathEngine?
+
+    def self.add_math_engine: (Symbol name, _MathEngine engine) -> _MathEngine
+                            | (Symbol name) { (Base converter, Element el, Hash[Symbol, untyped] opts) -> String? } -> Proc
+
+    class Base
+      attr_reader data: Hash[Symbol, untyped]
+
+      attr_reader options: Hash[Symbol, untyped]
+
+      attr_reader root: Element
+
+      attr_reader warnings: Array[String]
+
+      # Returns the converted tree (whatever #convert returns, or the String
+      # from the `:template` option) and the warnings.
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [untyped, Array[String]]
+
+      def initialize: (Element root, Hash[Symbol, untyped] options) -> void
+
+      def apply_template_before?: () -> bool
+
+      def apply_template_after?: () -> bool
+
+      def convert: (Element el) -> untyped
+
+      def warning: (String text) -> Array[String]
+
+      def in_toc?: (Element el) -> bool
+
+      def output_header_level: (Integer level) -> Integer
+
+      def extract_code_language: (Hash[String | Symbol, untyped] attr) -> String?
+
+      def extract_code_language!: (Hash[String | Symbol, untyped] attr) -> String?
+
+      def highlight_code: (String text, String? lang, Symbol `type`, ?Hash[Symbol, untyped] opts) -> String?
+
+      def format_math: (Element el, ?Hash[Symbol, untyped] opts) -> String?
+
+      def generate_id: (String str) -> String
+
+      def basic_generate_id: (String str) -> String
+
+      def smart_quote_entity: (Element el) -> Utils::Entities::Entity
+    end
+
+    class Html < Base
+      include Utils::Html
+
+      include ::Kramdown::Parser::Html::Constants
+
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [String, Array[String]]
+
+      attr_accessor indent: Integer
+
+      def convert: (Element el, ?Integer indent) -> String
+
+      def inner: (Element el, Integer indent) -> String
+
+      def convert_blank: (Element el, Integer indent) -> String
+
+      def convert_text: (Element el, Integer indent) -> String
+
+      def convert_p: (Element el, Integer indent) -> String
+
+      def convert_standalone_image: (Element el, Integer indent) -> String
+
+      def convert_codeblock: (Element el, Integer indent) -> String
+
+      def convert_blockquote: (Element el, Integer indent) -> String
+
+      def convert_header: (Element el, Integer indent) -> String
+
+      def convert_hr: (Element el, Integer indent) -> String
+
+      def convert_ul: (Element el, Integer indent) -> String
+
+      alias convert_ol convert_ul
+
+      def convert_dl: (Element el, Integer indent) -> String
+
+      def convert_li: (Element el, Integer indent) -> String
+
+      alias convert_dd convert_li
+
+      def convert_dt: (Element el, Integer indent) -> String
+
+      def convert_html_element: (Element el, Integer indent) -> String
+
+      def convert_xml_comment: (Element el, Integer indent) -> String
+
+      alias convert_xml_pi convert_xml_comment
+
+      def convert_table: (Element el, Integer indent) -> String
+
+      alias convert_thead convert_table
+
+      alias convert_tbody convert_table
+
+      alias convert_tfoot convert_table
+
+      alias convert_tr convert_table
+
+      def convert_td: (Element el, Integer indent) -> String
+
+      def convert_comment: (Element el, Integer indent) -> String
+
+      def convert_br: (Element el, Integer indent) -> String
+
+      def convert_a: (Element el, Integer indent) -> String
+
+      def convert_img: (Element el, Integer indent) -> String
+
+      def convert_codespan: (Element el, Integer indent) -> String
+
+      def convert_footnote: (Element el, Integer indent) -> String
+
+      def convert_raw: (Element el, Integer indent) -> String
+
+      def convert_em: (Element el, Integer indent) -> String
+
+      alias convert_strong convert_em
+
+      def convert_entity: (Element el, Integer indent) -> String
+
+      def convert_typographic_sym: (Element el, Integer indent) -> String
+
+      def convert_smart_quote: (Element el, Integer indent) -> String
+
+      def convert_math: (Element el, Integer indent) -> String
+
+      def convert_abbreviation: (Element el, Integer indent) -> String
+
+      def convert_root: (Element el, Integer indent) -> String
+
+      def format_as_span_html: (String | Symbol name, Hash[String | Symbol, untyped] attr, String body) -> String
+
+      def format_as_block_html: (String | Symbol name, Hash[String | Symbol, untyped] attr, String body, Integer indent) -> String
+
+      def format_as_indented_block_html: (String | Symbol name, Hash[String | Symbol, untyped] attr, String body, Integer indent) -> String
+    end
+
+    class Kramdown < Base
+      include Utils::Html
+
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [String, Array[String]]
+    end
+
+    class Latex < Base
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [String, Array[String]]
+
+      def convert: (Element el, ?Hash[Symbol, untyped] opts) -> String
+
+      def inner: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_root: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_blank: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_text: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_p: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_standalone_image: (Element el, Hash[Symbol, untyped] opts, String img) -> String
+
+      def convert_codeblock: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_blockquote: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_header: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_hr: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_ul: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      alias convert_ol convert_ul
+
+      def convert_dl: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_li: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_dt: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_dd: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_html_element: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_xml_comment: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_xml_pi: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_table: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_thead: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_tbody: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_tfoot: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_tr: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_td: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_comment: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_br: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_a: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_img: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_codespan: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_footnote: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_raw: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_em: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_strong: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_entity: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_typographic_sym: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_smart_quote: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_math: (Element el, Hash[Symbol, untyped] opts) -> String
+
+      def convert_abbreviation: (Element el, Hash[Symbol, untyped] opts) -> String
+    end
+
+    class Man < Base
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [String, Array[String]]
+    end
+
+    class RemoveHtmlTags < Base
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [Element, Array[String]]
+
+      def convert: (Element el) -> Element
+    end
+
+    class Toc < Base
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [Element, Array[String]]
+
+      def convert: (Element el) -> Element
+    end
+
+    class HashAST < Base
+      # A `:template` option renders the hash through the ERB template, which
+      # returns a String instead.
+      def self.convert: (Element tree, ?Hash[Symbol | String, untyped] options) -> [Hash[Symbol, untyped] | String, Array[String]]
+
+      def convert: (Element el) -> Hash[Symbol, untyped]
+    end
+
+    class HashAst = HashAST
+  end
+end
