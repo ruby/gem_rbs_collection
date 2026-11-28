@@ -1,0 +1,529 @@
+module Sprockets
+  VERSION: String
+
+  # What a processor returns: a metadata Hash (with an optional :data
+  # String), the new source String, or nil for no change.
+  type processor_result = Hash[Symbol, untyped] | String | nil
+
+  # A processor is any object that responds to `call(input)`: a Proc, a
+  # Method, an instance or a class with `self.call`.
+  interface _Processor
+    def call: (Hash[Symbol, untyped] input) -> processor_result
+  end
+
+  type processor = _Processor | ^(Hash[Symbol, untyped] input) -> processor_result
+
+  # An object assigned to `css_compressor=` / `js_compressor=`.
+  interface _Compressor
+    def compress: (String source) -> String
+  end
+
+  # Charset detecter for `register_mime_type(charset:)`.
+  interface _CharsetDetecter
+    def call: (String data) -> String
+  end
+
+  extend Configuration
+
+  class Error < StandardError
+  end
+
+  class ArgumentError < Error
+  end
+
+  class ContentTypeMismatch < Error
+  end
+
+  class NotImplementedError < Error
+  end
+
+  class NotFound < Error
+  end
+
+  class ConversionError < NotFound
+  end
+
+  class FileNotFound < NotFound
+  end
+
+  class FileOutsidePaths < NotFound
+  end
+
+  class DoubleLinkError < Error
+    def initialize: (parent_filename: String, logical_path: String, last_filename: String, filename: String) -> void
+  end
+
+  module Paths
+    def root: () -> String
+
+    def paths: () -> Array[String]
+
+    def prepend_path: (path path) -> void
+
+    def append_path: (path path) -> void
+
+    def clear_paths: () -> void
+
+    def each_file: () { (String filename) -> void } -> nil
+                 | () -> Enumerator[String, nil]
+  end
+
+  module Mime
+    def mime_types: () -> Hash[String, Hash[Symbol, untyped]]
+
+    def register_mime_type: (String mime_type, ?extensions: Array[String] | String, ?charset: (Symbol | _CharsetDetecter)?) -> void
+
+    def read_file: (path filename, ?String? content_type) -> String
+  end
+
+  module Transformers
+    def transformers: () -> Hash[String, Hash[String, untyped]]
+
+    def register_transformer: (String from, String to, processor processor) -> void
+  end
+
+  module Processing
+    def pipelines: () -> Hash[Symbol, untyped]
+
+    def register_pipeline: (Symbol | String name, ^(Base env, String? type, String? file_type) -> Array[untyped] pipeline) -> void
+                         | (Symbol | String name) { (Base env, String? type, String? file_type) -> Array[untyped] } -> void
+
+    def preprocessors: () -> Hash[String, Array[untyped]]
+
+    alias processors preprocessors
+
+    def postprocessors: () -> Hash[String, Array[untyped]]
+
+    def register_preprocessor: (String mime_type, processor processor) -> void
+                             | (String mime_type) { (Hash[Symbol, untyped] input) -> processor_result } -> void
+
+    alias register_processor register_preprocessor
+
+    def register_postprocessor: (String mime_type, processor processor) -> void
+                              | (String mime_type) { (Hash[Symbol, untyped] input) -> processor_result } -> void
+
+    # The processor is matched by `==` or by its class.
+    def unregister_preprocessor: (String mime_type, untyped processor) -> void
+
+    alias unregister_processor unregister_preprocessor
+
+    def unregister_postprocessor: (String mime_type, untyped processor) -> void
+
+    def bundle_processors: () -> Hash[String, Array[untyped]]
+
+    def register_bundle_processor: (String mime_type, processor processor) -> void
+                                 | (String mime_type) { (Hash[Symbol, untyped] input) -> processor_result } -> void
+
+    def unregister_bundle_processor: (String mime_type, untyped processor) -> void
+
+    # Raises Sprockets::ArgumentError for more than four arguments.
+    def register_bundle_metadata_reducer: (String mime_type, Symbol key) { (untyped memo, untyped value) -> untyped } -> void
+                                        | (String mime_type, Symbol key, untyped initial) { (untyped memo, untyped value) -> untyped } -> void
+                                        | (String mime_type, Symbol key, _ToProc reducer) -> void
+                                        | (String mime_type, Symbol key, untyped initial, _ToProc reducer) -> void
+  end
+
+  module Exporting
+    def exporters: () -> Hash[String, Set[Class]]
+
+    # `klass` defaults to nil in the source, but a nil exporter breaks
+    # Manifest#compile, so it is required here.
+    def register_exporter: (String | Array[String] mime_types, Class klass) -> void
+
+    def unregister_exporter: (String | Array[String] mime_types, Class exporter) -> void
+                           | (Class exporter) -> void
+
+    def export_concurrent: () -> bool
+
+    def export_concurrent=: (bool export_concurrent) -> void
+  end
+
+  module Compressing
+    def compressors: () -> Hash[String, Hash[Symbol, untyped]]
+
+    def register_compressor: (String mime_type, Symbol sym, processor klass) -> void
+
+    def css_compressor: () -> (Symbol | _Processor)?
+
+    # A Symbol names a registered compressor (Sprockets::Error if unknown).
+    def css_compressor=: (Symbol | _Compressor | processor | nil compressor) -> void
+
+    def js_compressor: () -> (Symbol | _Processor)?
+
+    # A Symbol names a registered compressor (Sprockets::Error if unknown).
+    def js_compressor=: (Symbol | _Compressor | processor | nil compressor) -> void
+
+    def gzip?: () -> (bool | :zopfli | nil)
+
+    def skip_gzip?: () -> bool
+
+    def gzip=: (bool | :zopfli | nil gzip) -> (bool | :zopfli | nil)
+  end
+
+  module Dependencies
+    def dependency_resolvers: () -> Hash[String, Proc]
+
+    def dependencies: () -> Set[String]
+
+    def register_dependency_resolver: (String scheme) { (Base env, String uri) -> untyped } -> void
+
+    def add_dependency: (String uri) -> void
+
+    alias depend_on add_dependency
+  end
+
+  module Configuration
+    include Paths
+    include Mime
+    include Transformers
+    include Processing
+    include Exporting
+    include Compressing
+    include Dependencies
+
+    attr_accessor logger: Logger
+
+    def version: () -> String?
+
+    def version=: (String? version) -> void
+
+    def digest_class: () -> singleton(Digest::Class)
+
+    def digest_class=: (singleton(Digest::Class) klass) -> void
+
+    def ignore_mtime: () -> bool?
+
+    def ignore_mtime=: (bool? ignore_mtime) -> void
+
+    attr_reader context_class: singleton(Context)
+  end
+
+  module Resolve
+    # Returns the asset URI, or nil when nothing matches, and the
+    # dependencies of the lookup.
+    def resolve: (String path, ?load_paths: Array[String], ?accept: String?, ?pipeline: (Symbol | String)?, ?base_path: String?) -> [String?, Set[String]]
+
+    # Raises Sprockets::FileNotFound when nothing matches.
+    def resolve!: (String path, ?load_paths: Array[String], ?accept: String?, ?pipeline: (Symbol | String)?, ?base_path: String?) -> [String, Set[String]]
+  end
+
+  module Loader
+    include Mime
+    include Processing
+    include Resolve
+    include Transformers
+
+    def load: (String | Pathname uri) -> Asset
+  end
+
+  module Server
+    # Rack interface.
+    def call: (Hash[String, untyped] env) -> [Integer, Hash[String, String], Asset | Array[String]]
+  end
+
+  class Base
+    include Configuration
+    include Server
+    include Resolve
+    include Loader
+
+    attr_reader cache: Cache
+
+    # Takes a Sprockets::Cache, or a store that responds to get/set, []/[]= or
+    # read/write; anything else disables the persistent cache.
+    def cache=: (untyped cache) -> Cache
+
+    # Implemented by Environment and CachedEnvironment (raises
+    # Sprockets::NotImplementedError on Base itself).
+    def cached: () -> CachedEnvironment
+
+    alias index cached
+
+    def find_asset: (String path, ?load_paths: Array[String], ?accept: String?, ?pipeline: (Symbol | String)?, ?base_path: String?) -> Asset?
+
+    def find_all_linked_assets: (String path) { (Asset asset) -> void } -> nil
+                              | (String path) -> Enumerator[Asset, nil]
+
+    def []: (String path, ?load_paths: Array[String], ?accept: String?, ?pipeline: (Symbol | String)?, ?base_path: String?) -> Asset?
+
+    # Raises Sprockets::FileNotFound when the asset is not found.
+    def find_asset!: (String path) -> Asset
+
+    def inspect: () -> String
+  end
+
+  class Environment < Base
+    def initialize: (?path root) ?{ (self env) -> void } -> void
+
+    def cached: () -> CachedEnvironment
+
+    alias index cached
+
+    def find_asset: (String path, ?load_paths: Array[String], ?accept: String?, ?pipeline: (Symbol | String)?, ?base_path: String?) -> Asset?
+
+    def find_asset!: (String path) -> Asset
+
+    def find_all_linked_assets: (String path) { (Asset asset) -> void } -> nil
+                              | (String path) -> Enumerator[Asset, nil]
+
+    def load: (String | Pathname uri) -> Asset
+  end
+
+  # Use Environment#cached rather than creating one directly. Methods that
+  # change the configuration raise RuntimeError on it.
+  class CachedEnvironment < Base
+    def initialize: (Base environment) -> void
+
+    def cached: () -> self
+
+    alias index cached
+
+    def load: (String | Pathname uri) -> Asset
+  end
+
+  class Asset
+    attr_reader logical_path: String
+
+    attr_reader metadata: Hash[Symbol, untyped]
+
+    attr_reader filename: String
+
+    attr_reader id: String
+
+    attr_reader uri: String
+
+    def digest_path: () -> String
+
+    def full_digest_path: () -> String
+
+    attr_reader content_type: String?
+
+    def links: () -> Set[String]
+
+    def source: () -> String
+
+    def to_s: () -> String
+
+    def charset: () -> String?
+
+    def length: () -> Integer
+
+    alias bytesize length
+
+    def digest: () -> String
+
+    def hexdigest: () -> String
+
+    def etag: () -> String
+
+    def base64digest: () -> String
+
+    # nil when digest_class has no SRI name (only SHA256/384/512 have one).
+    def integrity: () -> String?
+
+    def each: [T] () { (String part) -> T } -> T
+
+    def write_to: (String filename) -> nil
+
+    def inspect: () -> String
+
+    def hash: () -> Integer
+
+    def eql?: (untyped other) -> bool
+
+    alias == eql?
+  end
+
+  class Manifest
+    attr_reader environment: Base?
+
+    # Raises Sprockets::ArgumentError when neither a directory nor a filename
+    # is given.
+    def initialize: (Base? environment, path? directory, ?path? filename) -> void
+                  | (path directory, ?path? filename) -> void
+
+    attr_reader filename: String
+
+    alias path filename
+
+    attr_reader directory: String
+
+    alias dir directory
+
+    def assets: () -> Hash[String, String]
+
+    def files: () -> Hash[String, Hash[String, untyped]]
+
+    # Raises Sprockets::Error without an environment.
+    def find: (*String | Array[String] paths) { (Asset asset) -> void } -> nil
+            | (*String | Array[String] paths) -> Enumerator[Asset, nil]
+
+    def find_sources: (*String paths) { (String source) -> void } -> void
+                    | (*String paths) -> Enumerator[String, void]
+
+    # Raises Sprockets::Error without an environment.
+    def compile: (*String | Array[String] paths) -> Array[String]
+
+    def remove: (String filename) -> nil
+
+    def clean: (?Integer count, ?Numeric age) -> void
+
+    def clobber: () -> nil
+
+    def save: () -> void
+  end
+
+  class Context
+    attr_reader environment: Base
+
+    attr_reader filename: String
+
+    def initialize: (Hash[Symbol, untyped] input) -> void
+
+    def metadata: () -> { required: Set[String], stubbed: Set[String], links: Set[String], dependencies: Set[String] }
+
+    attr_reader load_path: String
+
+    alias root_path load_path
+
+    attr_reader logical_path: String
+
+    attr_reader content_type: String?
+
+    # Raises Sprockets::FileNotFound when nothing matches.
+    def resolve: (String path, ?load_paths: Array[String], ?accept: String?, ?pipeline: (Symbol | String)?) -> String
+
+    def load: (String | Pathname uri) -> Asset
+
+    def depend_on: (String path) -> nil
+
+    def depend_on_asset: (String path) -> Asset
+
+    def depend_on_env: (String key) -> void
+
+    def require_asset: (String path) -> nil
+
+    def stub_asset: (String path) -> nil
+
+    def link_asset: (String path) -> Asset
+
+    def asset_data_uri: (String path) -> String
+
+    # Meant to be overridden in `environment.context_class`: Context itself
+    # raises Sprockets::NotImplementedError.
+    def asset_path: (String path, ?Hash[Symbol, untyped] options) -> String
+
+    def image_path: (String path) -> String
+
+    def video_path: (String path) -> String
+
+    def audio_path: (String path) -> String
+
+    def font_path: (String path) -> String
+
+    def javascript_path: (String path) -> String
+
+    def stylesheet_path: (String path) -> String
+  end
+
+  class Cache
+    VERSION: String
+
+    def self.default_logger: () -> Logger
+
+    # `cache` is a store as accepted by Base#cache=.
+    def initialize: (?untyped cache, ?Logger logger) -> void
+
+    def fetch: (untyped key) { () -> untyped } -> untyped
+
+    def get: (untyped key, ?bool local) -> untyped
+
+    def set: (untyped key, untyped value, ?bool local) -> untyped
+
+    def inspect: () -> String
+
+    def clear: (?untyped options) -> bool
+
+    class FileStore
+      DEFAULT_MAX_SIZE: Integer
+
+      def self.default_logger: () -> Logger
+
+      def initialize: (path root, ?Integer? max_size, ?Logger logger) -> void
+
+      def get: (untyped key) -> untyped
+
+      def set: [T] (untyped key, T value) -> T
+
+      def inspect: () -> String
+
+      def clear: (?untyped options) -> bool
+    end
+
+    class MemoryStore
+      DEFAULT_MAX_SIZE: Integer
+
+      def initialize: (?Integer? max_size) -> void
+
+      def get: (untyped key) -> untyped
+
+      def set: [T] (untyped key, T value) -> T
+
+      def inspect: () -> String
+
+      def clear: (?untyped options) -> bool
+    end
+
+    class NullStore
+      def get: (untyped key) -> nil
+
+      def set: [T] (untyped key, T value) -> T
+
+      def inspect: () -> String
+
+      def clear: (?untyped options) -> bool
+    end
+  end
+
+  module Exporters
+    # Base class for exporters given to `register_exporter`.
+    class Base
+      attr_reader asset: Asset
+
+      attr_reader environment: Sprockets::Base?
+
+      attr_reader directory: String
+
+      attr_reader target: String
+
+      def initialize: (asset: Asset, ?environment: Sprockets::Base?, directory: String) -> void
+
+      def setup: () -> void
+
+      def skip?: (Logger logger) -> bool
+
+      # Subclasses implement it (raises RuntimeError on Base itself).
+      def call: () -> void
+
+      def write: (?String filename) { (File file) -> void } -> void
+    end
+
+    class FileExporter < Base
+      def skip?: (Logger logger) -> bool
+
+      def call: () -> void
+    end
+
+    class ZlibExporter < Base
+      def setup: () -> void
+
+      def skip?: (Logger logger) -> bool
+
+      def call: () -> void
+    end
+
+    class ZopfliExporter < ZlibExporter
+      def setup: () -> void
+    end
+  end
+end
