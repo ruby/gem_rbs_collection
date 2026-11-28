@@ -1,0 +1,121 @@
+module Aws
+  module EventStream
+    class Decoder
+      # The IO-like object #decode reads the whole input from. IO and StringIO
+      # declare read as returning String?, although read with no length
+      # returns "" at the end of the input.
+      interface _Reader
+        def read: () -> String?
+      end
+
+      def initialize: (?format: bool) -> void
+                    | (Hash[Symbol, untyped] options) -> void
+
+      # Without a block, returns an Enumerator that yields the decoded message
+      # (nil when the input does not hold a whole message) and whether the
+      # input was fully consumed.
+      def decode: [T] (_Reader io) { (Message? message) -> T } -> T
+                | (_Reader io) -> Enumerator[[Message?, bool], untyped]
+
+      # Returns the decoded message, or nil when the buffered data does not
+      # hold a whole message yet, and whether the buffer is now empty.
+      def decode_chunk: (?String? chunk) -> [Message?, bool]
+    end
+
+    class Encoder
+      # The IO-like object #encode writes the encoded message to and closes.
+      interface _Writer
+        def write: (String) -> untyped
+        def close: () -> untyped
+      end
+
+      OVERHEAD_LENGTH: Integer
+      MAX_HEADER_NAME_LENGTH: Integer
+      MAX_HEADER_VALUE_LENGTH: Integer
+      MAX_HEADERS_LENGTH: Integer
+      MAX_PAYLOAD_LENGTH: Integer
+
+      # Returns the encoded message, or writes it to io, closes io and returns
+      # what io.close returned.
+      def encode: (Message message, ?nil io) -> String
+                | (Message message, _Writer io) -> void
+      def encode_message: (Message message) -> String
+      def encode_headers: (Message message) -> String
+    end
+
+    class Message
+      # Encoder#encode reads the payload (length and read), so it needs a
+      # StringIO or Tempfile; encode_headers ignores it, and aws-sigv4
+      # passes an encoded event String there.
+      def initialize: (headers: Hash[String, HeaderValue]?, ?payload: (StringIO | Tempfile | String)?) -> void
+                    | (payload: (StringIO | Tempfile | String)?) -> void
+                    | (Hash[Symbol, untyped] options) -> void
+
+      attr_reader headers: Hash[String, HeaderValue]
+
+      # Decoded payloads larger than 1MB are Tempfiles.
+      attr_reader payload: StringIO | Tempfile | String
+    end
+
+    class HeaderValue
+      # Decoded timestamps are Time when the decoder formats values (the
+      # default) and Integer milliseconds otherwise.
+      type value = Integer | Float | String | bool | Time
+
+      def initialize: (type: String, value: value, ?format: boolish) -> void
+                    | (Hash[Symbol, untyped] options) -> void
+
+      attr_reader value: value
+
+      # One of Types.types; nil for a decoded header whose type index is not
+      # one of them.
+      attr_reader type: String?
+    end
+
+    module Types
+      def self.types: () -> Array[String]
+
+      # Pack/unpack pattern (true or false for the boolean types), byte size
+      # and type index for each type name.
+      def self.pattern: () -> Hash[String, [String | bool | nil, Integer?, Integer]]
+    end
+
+    module Errors
+      class ReadBytesExceedLengthError < RuntimeError
+        def initialize: (_ToS target_byte, _ToS total_len) -> void
+      end
+
+      class IncompleteMessageError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class PreludeChecksumError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class MessageChecksumError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class EventPayloadLengthExceedError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class EventHeadersLengthExceedError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class EventHeaderNameLengthExceedError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class EventHeaderValueLengthExceedError < RuntimeError
+        def initialize: (*untyped args) -> void
+      end
+
+      class EventHeaderValueWidthError < RuntimeError
+        def initialize: (?_ToS type, *untyped args) -> void
+      end
+    end
+  end
+end
