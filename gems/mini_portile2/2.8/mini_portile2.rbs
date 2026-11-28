@@ -1,0 +1,141 @@
+# Downloads, verifies, patches, configures, compiles and installs an
+# autoconf-based C library into a per-host directory under `target`.
+class MiniPortile
+  VERSION: String
+
+  DEFAULT_TIMEOUT: Integer
+
+  # What the recipe writes its progress to (STDOUT by default).
+  interface _Logger
+    def print: (String text) -> untyped
+
+    def puts: (String text) -> untyped
+
+    def flush: () -> untyped
+  end
+
+  # An entry of `files`: a URL, or a Hash with `:url` and optionally
+  # `:sha256`, `:sha1`, `:md5` or `:gpg` (`{ key:, signature_url: }`).
+  type file = String | Hash[Symbol, untyped]
+
+  # The `target_os =~ /.../` match position, or nil.
+  def self.windows?: () -> Integer?
+
+  def self.mingw?: () -> Integer?
+
+  def self.mswin?: () -> Integer?
+
+  def self.darwin?: () -> Integer?
+
+  def self.freebsd?: () -> Integer?
+
+  def self.openbsd?: () -> Integer?
+
+  def self.linux?: () -> Integer?
+
+  def self.solaris?: () -> Integer?
+
+  def self.target_os: () -> String
+
+  def self.target_cpu: () -> String
+
+  def self.native_path: (path path) -> String
+
+  def self.posix_path: (path path) -> String
+
+  attr_reader name: String
+
+  attr_reader version: String
+
+  attr_reader original_host: String?
+
+  attr_reader source_directory: String?
+
+  attr_writer configure_options: Array[String]
+
+  attr_accessor host: String?
+
+  attr_accessor files: Array[file]
+
+  attr_accessor patch_files: Array[String]
+
+  attr_accessor target: String
+
+  attr_accessor logger: _Logger
+
+  # Other keywords are ignored (MiniPortileCMake passes its own ones on
+  # through super).
+  def initialize: (String name, String version, ?logger: _Logger?, ?cc_command: String?, ?gcc_command: String?,
+                   ?cxx_command: String?, ?make_command: String?, ?open_timeout: Numeric?,
+                   ?read_timeout: Numeric?, **untyped) -> void
+
+  def source_directory=: (path path) -> String
+
+  def prepare_build_directory: () -> void
+
+  def download: () -> void
+
+  def extract: () -> void
+
+  def apply_patch: (String patch_file) -> true
+
+  def patch: () -> void
+
+  def configure_options: () -> Array[String]
+
+  def configure: () -> true?
+
+  def compile: () -> true
+
+  def install: () -> true?
+
+  def downloaded?: () -> bool
+
+  def configured?: () -> bool
+
+  def installed?: () -> bool
+
+  def cook: () -> true
+
+  def activate: () -> void
+
+  def mkmf_config: (?pkg: String?, ?dir: String?, ?static: String?) -> void
+
+  def path: () -> String
+
+  def include_path: () -> String
+
+  def lib_path: () -> String
+
+  def cc_cmd: () -> String
+
+  alias gcc_cmd cc_cmd
+
+  def cxx_cmd: () -> String
+
+  def make_cmd: () -> String
+end
+
+# The same recipe for CMake-based projects.
+class MiniPortileCMake < MiniPortile
+  attr_accessor system_name: String?
+
+  def configure_prefix: () -> String
+
+  def initialize: (String name, String version, ?logger: MiniPortile::_Logger?, ?cc_command: String?,
+                   ?gcc_command: String?, ?cxx_command: String?, ?make_command: String?,
+                   ?open_timeout: Numeric?, ?read_timeout: Numeric?, ?cmake_command: String?,
+                   ?cmake_build_type: String?, **untyped) -> void
+
+  def configure_defaults: () -> Array[String]
+
+  def configure: () -> true?
+
+  def configured?: () -> bool
+
+  def make_cmd: () -> String
+
+  def cmake_cmd: () -> String
+
+  def cmake_build_type: () -> String
+end
