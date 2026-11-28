@@ -1,0 +1,76 @@
+module Google
+  module Cloud
+    # Returns a plain object extended with Google::Cloud, which the
+    # google-cloud-* service gems add their entry points (#storage, ...) to.
+    # The arguments are stored as they are; `credentials` is a keyfile path,
+    # the keyfile contents as a Hash, or a Google::Auth::Credentials.
+    def self.new: (?String? project_id, ?untyped credentials, ?retries: Integer?, ?timeout: Numeric?) -> Google::Cloud
+
+    # The top-level configuration shared by the google-cloud-* gems. It has
+    # the fields project_id (alias project), credentials (alias keyfile) and
+    # on_error, and a subconfig for each loaded service gem.
+    def self.configure: () ?{ (Config config) -> void } -> Config
+
+    module Core
+      VERSION: String
+    end
+
+    # Fields and subconfigs are also reachable as methods (`config.timeout`,
+    # `config.timeout = 10`) through method_missing; RBS cannot list them,
+    # so use #[] and #[]= in typed code.
+    class Config < BasicObject
+      def self.create: (?show_warnings: boolish) ?{ (Config config) -> void } -> Config
+
+      def self.config?: (untyped obj) -> bool
+
+      # The validator is a block or `validator:`, `match:` (compared with
+      # `===`, or an Array of such values), or `enum:`; without one it is
+      # inferred from the initial value. The options are a positional Hash,
+      # so they need an initial value before them: `add_field! :k, match: X`
+      # makes `{ match: X }` the initial value.
+      def add_field!: (Symbol | String key, ?untyped initial) ?{ (untyped value) -> boolish } -> self
+                    | (Symbol | String key, untyped initial, ?match: untyped, ?enum: Enumerable[untyped], ?allow_nil: boolish, ?validator: ^(untyped value) -> boolish) ?{ (untyped value) -> boolish } -> self
+                    | (Symbol | String key, untyped initial, Hash[Symbol, untyped] opts) ?{ (untyped value) -> boolish } -> self
+
+      def add_config!: (Symbol | String key, ?Config? config) ?{ (Config config) -> void } -> self
+
+      def add_alias!: (Symbol | String key, Symbol | String to_key) -> self
+
+      def reset!: (?(Symbol | String)? key) -> self
+
+      # Keys are stored as Symbols and this method does not convert its
+      # argument, so a String key deletes nothing.
+      def delete!: (?Symbol? key) -> self
+
+      def []=: [T] (Symbol | String key, T value) -> T
+
+      def []: (Symbol | String key) -> untyped
+
+      def value_set?: (Symbol | String key) -> bool
+
+      alias option? value_set?
+
+      def field?: (Symbol | String key) -> bool
+
+      alias respond_to? field?
+
+      def subconfig?: (Symbol | String key) -> bool
+
+      def alias?: (Symbol | String key) -> Symbol?
+
+      def fields!: () -> Array[Symbol]
+
+      def subconfigs!: () -> Array[Symbol]
+
+      def aliases!: () -> Array[Symbol]
+
+      def to_s!: () -> String
+
+      alias inspect to_s!
+
+      # Field values are given as their #inspect strings, subconfigs as
+      # nested Hashes.
+      def to_h!: () -> Hash[Symbol, String | Hash[Symbol, untyped]]
+    end
+  end
+end
