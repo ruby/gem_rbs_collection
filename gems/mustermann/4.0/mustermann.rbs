@@ -10,6 +10,9 @@ module Mustermann
   # Anything Mustermann.new accepts as a pattern.
   type input = String | Symbol | Regexp | Pattern | _ToPattern | Array[input]
 
+  # Patterns Mustermann::Set and Mustermann::Router accept (no plain Regexp).
+  type ast_input = String | Symbol | Pattern | _ToPattern | Array[ast_input]
+
   # Values used to expand a pattern, keyed by capture name.
   type values = Hash[Symbol | String, untyped]
 
@@ -67,7 +70,8 @@ module Mustermann
 
     def inspect: () -> String
 
-    def match: (String string) -> Match?
+    # Patterns that do not override it (Identity) also get nil from #params.
+    def match: (String? string) -> Match?
 
     def names: () -> Array[String]
 
@@ -94,7 +98,9 @@ module Mustermann
     def expand: (?additional_values? behavior, ?values values) -> String
               | (values values) -> String
 
-    def to_templates: () -> Array[String]
+    # An optional group at the top level gives a nested Array, e.g.
+    # `[["/{foo}"], ""]` for "(/:foo)?".
+    def to_templates: () -> Array[String | Array[untyped]]
 
     def |: (input other) -> Pattern
 
@@ -112,11 +118,36 @@ module Mustermann
     attr_reader regexp: Regexp
 
     alias to_regexp regexp
+
+    # Overrides of Pattern methods, declared again so that they are checked at runtime.
+    def match: (String string) -> Match?
+
+    def params: (?String? string) -> Hash[String, untyped]?
+
+    def peek_size: (String string) -> Integer?
+
+    def peek_match: (String string) -> Match?
+
+    def ===: (String string) -> bool
+
+    def =~: (String string) -> Integer?
+
+    def names: () -> Array[String]
   end
 
   # Matches a string exactly, taking URI decoding into account.
   class Identity < Pattern
     def self.new: (String string, ?ignore_unknown_options: bool, **untyped options) -> instance
+
+    # Pattern#match passes nil on from #params.
+    def ===: (String? string) -> bool
+
+    def peek_size: (String string) -> Integer?
+
+    def to_templates: () -> Array[String]
+
+    def expand: (?additional_values? behavior, ?values values) -> String
+              | (values values) -> String
   end
 
   # Pattern type for plain regular expressions.
@@ -130,6 +161,13 @@ module Mustermann
     # Superclass for patterns built from a parsed syntax tree.
     class Pattern < RegexpBased
       def self.new: (String string, ?ignore_unknown_options: bool, **untyped options) -> instance
+
+      # An optional group at the top level gives a nested Array, e.g.
+      # `[["/{foo}"], ""]` for "(/:foo)?".
+      def to_templates: () -> Array[String | Array[untyped]]
+
+      def expand: (?additional_values? behavior, ?values values) -> String
+                | (values values) -> String
     end
   end
 
@@ -142,6 +180,8 @@ module Mustermann
     def self.try_convert: (untyped input, **untyped options) -> instance?
 
     def safe_string: () -> String
+
+    def |: (input other) -> Pattern
   end
 
   # Sinatra style pattern where groups do not need to be followed by `?` to be optional.
@@ -151,21 +191,76 @@ module Mustermann
   # Rails style pattern.
   class Rails < AST::Pattern
     def self.new: (String string, ?version: String?, ?ignore_unknown_options: bool, **untyped options) -> instance
+
+    def |: (input other) -> Pattern
+
+    def +: (input other) -> Pattern
   end
 
   # Combines several patterns with an operator (`|`, `&` or `^`).
   class Composite < Pattern
-    def self.new: (*input patterns, ?operator: Symbol, ?type: Symbol | String, **untyped options) -> Pattern
+    # Arrays are flattened. A single pattern is returned as it is, so a single
+    # Array gives a Composite only when it holds more than one pattern.
+    def self.new: (input pattern, input other, *input patterns, ?operator: Symbol, ?type: Symbol | String, **untyped options) -> instance
+                | (Pattern pattern, ?operator: Symbol, ?type: Symbol | String, **untyped options) -> Pattern
+                | (Array[input] patterns, ?operator: Symbol, ?type: Symbol | String, **untyped options) -> untyped
 
     attr_reader patterns: Array[Pattern]
 
     attr_reader operator: Symbol
 
+    # Composite does not call Pattern#initialize, so these are always nil.
+    def options: () -> nil
+
+    def uri_decode: () -> nil
+
     def params: (String string) -> Hash[String, untyped]?
+
+    def match: (String string) -> Match?
+
+    def ===: (String string) -> bool
+
+    def names: () -> Array[String]
+
+    def to_s: () -> String
+
+    def inspect: () -> String
+
+    def hash: () -> Integer
+
+    def ==: (untyped other) -> bool
+
+    def eql?: (untyped other) -> bool
+
+    # An optional group at the top level gives a nested Array, e.g.
+    # `[["/{foo}"], ""]` for "(/:foo)?".
+    def to_templates: () -> Array[String | Array[untyped]]
+
+    def expand: (?additional_values? behavior, ?values values) -> String
+              | (values values) -> String
   end
 
   # Patterns that match one after another.
   class Concat < Composite
+    # Always `:+`.
+    def operator: () -> Symbol
+
+    def params: (String string) -> Hash[String, untyped]?
+
+    def match: (String string) -> Match?
+
+    def ===: (String string) -> bool
+
+    def peek_size: (String string) -> Integer?
+
+    def peek_match: (String string) -> Match?
+
+    def peek_params: (String string) -> [ Hash[String, untyped], Integer ]?
+
+    def to_templates: () -> Array[String]
+
+    def expand: (?additional_values? behavior, ?values values) -> String
+              | (values values) -> String
   end
 
   # Expands one or more patterns into strings.
@@ -200,6 +295,17 @@ module Mustermann
     def hash: () -> Integer
   end
 
+  # Cache keyed by equality (rather than identity) whose entries can be
+  # garbage collected. The block given to #fetch has to be idempotent.
+  class EqualityMap
+    def self.new: () -> instance
+
+    def initialize: () -> void
+
+    # Returns the cached value for an equal key, or stores what the block returns.
+    def fetch: [T] (untyped key) { () -> T } -> T
+  end
+
   # A match of a Mustermann::Pattern against a string.
   class Match
     attr_reader pattern: Pattern
@@ -218,7 +324,9 @@ module Mustermann
 
     attr_reader regexp: Regexp?
 
-    def initialize: (Pattern | Match | MatchData pattern_or_match, ?(String | Match | MatchData)? string_or_match, ?matched: String?, ?params: Hash[String, untyped]?, ?post_match: String?, ?pre_match: String?, ?captures: Array[untyped]?, ?named_captures: Hash[String, untyped]?, ?regexp: Regexp?) -> void
+    # A MatchData gives the string and captures, but the params have to be passed.
+    def initialize: (Pattern | Match pattern_or_match, ?(String | Match)? string_or_match, ?matched: String?, ?params: Hash[String, untyped]?, ?post_match: String?, ?pre_match: String?, ?captures: Array[untyped]?, ?named_captures: Hash[String, untyped]?, ?regexp: Regexp?) -> void
+                  | (Pattern pattern, MatchData match, params: Hash[String, untyped], ?matched: String?, ?post_match: String?, ?pre_match: String?, ?captures: Array[untyped]?, ?named_captures: Hash[String, untyped]?, ?regexp: Regexp?) -> void
 
     def names: () -> Array[String]
 
@@ -227,7 +335,7 @@ module Mustermann
           | (Integer start, Integer length) -> Array[untyped]?
           | (Range[Integer?] range) -> Array[untyped]?
 
-    def deconstruct_keys: (Array[String | Symbol] keys) -> Hash[String | Symbol, untyped]
+    def deconstruct_keys: (Array[String | Symbol]? keys) -> Hash[String | Symbol, untyped]
 
     def values_at: (*String | Symbol | Integer keys) -> Array[untyped]
 
@@ -259,7 +367,7 @@ module Mustermann
 
     def use_trie?: () -> bool
 
-    def add: (input pattern, *untyped values) -> self
+    def add: (ast_input pattern, *untyped values) -> self
 
     alias []= add
 
@@ -283,7 +391,9 @@ module Mustermann
 
     def expander: (?untyped value) -> Expander
 
-    def expand: (?untyped value, ?untyped behavior, ?values? values) -> String
+    # The first argument is the value whose patterns to use, an
+    # additional_values behavior, or the values to expand.
+    def expand: (?untyped value, ?(additional_values | values)? behavior, ?values? values) -> String
 
     def has_value?: (untyped value) -> bool?
 
@@ -294,7 +404,8 @@ module Mustermann
     class Match < Mustermann::Match
       attr_reader value: untyped
 
-      def initialize: (*untyped args, ?value: untyped, **untyped options) -> void
+      def initialize: (Pattern | Mustermann::Match pattern_or_match, ?(String | Mustermann::Match)? string_or_match, ?value: untyped, ?matched: String?, ?params: Hash[String, untyped]?, ?post_match: String?, ?pre_match: String?, ?captures: Array[untyped]?, ?named_captures: Hash[String, untyped]?, ?regexp: Regexp?) -> void
+                    | (Pattern pattern, MatchData match, params: Hash[String, untyped], ?value: untyped, ?matched: String?, ?post_match: String?, ?pre_match: String?, ?captures: Array[untyped]?, ?named_captures: Hash[String, untyped]?, ?regexp: Regexp?) -> void
     end
   end
 
@@ -314,24 +425,24 @@ module Mustermann
 
     def fallback: (?app? fallback) ?{ (env env) -> untyped } -> app
 
-    def route: (String verb, input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def route: (String verb, ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def path_for: (untyped app, ?untyped behavior, ?values params) -> String
+    def path_for: (untyped app, ?(additional_values | values)? behavior, ?values params) -> String
 
-    def get: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def get: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def post: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def post: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def put: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def put: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def patch: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def patch: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def delete: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def delete: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def options: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def options: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def link: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def link: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
 
-    def unlink: (input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
+    def unlink: (ast_input pattern, ?app? target, **untyped options) ?{ (env env) -> untyped } -> Set
   end
 end
