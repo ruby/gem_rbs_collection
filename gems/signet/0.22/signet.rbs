@@ -1,0 +1,603 @@
+module Signet
+  VERSION: String
+
+  def self.parse_auth_param_list: (String auth_param_string) -> Array[[String, String]]
+
+  class UnsafeOperationError < StandardError
+  end
+
+  class ParseError < StandardError
+  end
+
+  class MalformedAuthorizationError < StandardError
+  end
+
+  class RemoteServerError < StandardError
+  end
+
+  class UnexpectedStatusError < StandardError
+  end
+
+  class AuthorizationError < StandardError
+    type options = {
+      ?request: Faraday::Request?,
+      ?response: Faraday::Response?,
+      ?code: untyped,
+      ?description: untyped,
+      ?uri: (String | Addressable::URI)?
+    }
+
+    def initialize: (String message, ?options options) -> void
+                  | (String message, Hash[Symbol, untyped] options) -> void
+
+    # The request (Faraday::Request) that failed, when one was given.
+    attr_reader request: Faraday::Request?
+
+    # The response the server sent, when one was given.
+    attr_reader response: Faraday::Response?
+  end
+
+  module OAuth2
+    # Raises Signet::ParseError for schemes other than Basic and OAuth.
+    def self.parse_authorization_header: (String field_value) -> Array[[String, String?]]
+
+    # Raises Signet::ParseError for schemes other than OAuth.
+    def self.parse_www_authenticate_header: (String field_value) -> Array[[String, String]]
+
+    def self.parse_basic_credentials: (String credential_string) -> Array[[String, String?]]
+
+    def self.parse_bearer_credentials: (String credential_string) -> Array[[String, String?]]
+
+    def self.parse_oauth_challenge: (String challenge_string) -> Array[[String, String]]
+
+    # Returns the result of JSON.parse for "application/json" bodies and a
+    # Hash[String, String] for "application/x-www-form-urlencoded" bodies.
+    # Raises ArgumentError for other content types.
+    def self.parse_credentials: (String body, String content_type) -> untyped
+
+    def self.generate_basic_authorization_header: (String client_id, String client_password) -> String
+
+    def self.generate_bearer_authorization_header: (_ToS access_token, ?(Hash[untyped, untyped] | Array[[untyped, untyped]])? auth_params) -> String
+
+    def self.generate_authorization_uri: (String | Addressable::URI | _ToStr authorization_uri, ?Hash[String | Symbol, untyped] parameters) -> String
+
+    class Client
+      type uri_input = String | Addressable::URI | _ToStr | Hash[Symbol | String, untyped]
+
+      type timestamp_input = String | Integer | Time | DateTime
+
+      type signing_key = String | OpenSSL::PKey::PKey
+
+      # The keys #initialize and #update! read. String keys work too.
+      type options = {
+        ?authorization_uri: uri_input?,
+        ?token_credential_uri: uri_input?,
+        ?client_id: String?,
+        ?client_secret: String?,
+        ?scope: (Array[String] | String)?,
+        ?target_audience: String?,
+        ?state: String?,
+        ?code: String?,
+        ?redirect_uri: (String | Addressable::URI)?,
+        ?username: String?,
+        ?password: String?,
+        ?issuer: String?,
+        ?person: String?,
+        ?sub: String?,
+        ?expiry: _ToI?,
+        ?audience: String?,
+        ?signing_key: signing_key?,
+        ?extension_parameters: Hash[untyped, untyped]?,
+        ?additional_parameters: Hash[untyped, untyped]?,
+        ?access_type: (String | Symbol)?,
+        ?refresh_token: String?,
+        ?access_token: String?,
+        ?id_token: String?,
+        ?expires: _ToI?,
+        ?expires_in: _ToI?,
+        ?expires_at: timestamp_input?,
+        ?issued_at: timestamp_input?,
+        ?granted_scopes: (Array[String] | String)?
+      }
+
+      # The keys #update_token! reads. String keys work too.
+      type token_options = {
+        ?refresh_token: String?,
+        ?access_token: String?,
+        ?id_token: String?,
+        ?expires: _ToI?,
+        ?expires_in: _ToI?,
+        ?expires_at: timestamp_input?,
+        ?issued_at: timestamp_input?,
+        ?granted_scopes: (Array[String] | String)?
+      }
+
+      # The keys #fetch_access_token reads. String keys work too.
+      type fetch_options = {
+        ?connection: Faraday::Connection,
+        ?use_basic_auth: boolish,
+        ?scope: untyped,
+        ?use_configured_scope: boolish,
+        ?additional_parameters: Hash[untyped, untyped]?,
+        ?skew: Numeric
+      }
+
+      # The keys #generate_authenticated_request and #fetch_protected_resource
+      # read. String keys work too.
+      type request_options = {
+        ?request: Faraday::Request | [String | Symbol, String | Addressable::URI, Hash[String, String] | Array[[String, String]], String],
+        ?method: String | Symbol,
+        ?uri: String | Addressable::URI,
+        ?headers: Hash[String, String] | Array[[String, String]],
+        ?body: String,
+        ?realm: String?,
+        ?connection: Faraday::Connection
+      }
+
+      OOB_MODES: Array[String]
+
+      def initialize: (?options options) -> void
+                    | (Hash[Symbol | String, untyped] options) -> void
+
+      def update!: (?options options) -> self
+                 | (Hash[Symbol | String, untyped] options) -> self
+
+      def update_token!: (?token_options options) -> self
+                       | (Hash[Symbol | String, untyped] options) -> self
+
+      # Returns nil when no authorization URI is set. Raises
+      # Signet::UnsafeOperationError when the URI is not https.
+      def authorization_uri: (?Hash[Symbol | String, untyped] options) -> Addressable::URI?
+
+      def authorization_uri=: (uri_input? new_authorization_uri) -> Addressable::URI?
+
+      def token_credential_uri: () -> Addressable::URI?
+
+      def token_credential_uri=: (uri_input? new_token_credential_uri) -> Addressable::URI?
+
+      def access_type: () -> (String | Symbol)?
+
+      def access_type=: ((String | Symbol)? new_access_type) -> (String | Symbol)?
+
+      def client_id: () -> String?
+
+      def client_id=: (String? new_client_id) -> String?
+
+      def client_secret: () -> String?
+
+      def client_secret=: (String? new_client_secret) -> String?
+
+      def scope: () -> Array[String]?
+
+      # Raises ArgumentError when an Array element contains a space.
+      def scope=: ((Array[String] | String)? new_scope) -> Array[String]?
+
+      def target_audience: () -> String?
+
+      def target_audience=: (String? new_target_audience) -> String?
+
+      def state: () -> String?
+
+      def state=: (String? new_state) -> String?
+
+      def code: () -> String?
+
+      def code=: (String? new_code) -> String?
+
+      def redirect_uri: () -> Addressable::URI?
+
+      # Raises ArgumentError for a relative URI other than "postmessage" and
+      # the out-of-band values in OOB_MODES.
+      def redirect_uri=: ((String | Addressable::URI)? new_redirect_uri) -> Addressable::URI?
+
+      def username: () -> String?
+
+      def username=: (String? new_username) -> String?
+
+      def password: () -> String?
+
+      def password=: (String? new_password) -> String?
+
+      def issuer: () -> String?
+
+      def issuer=: (String? new_issuer) -> String?
+
+      def audience: () -> String?
+
+      def audience=: (String? new_audience) -> String?
+
+      def principal: () -> String?
+
+      def principal=: (String? new_person) -> String?
+
+      alias person principal
+
+      alias person= principal=
+
+      attr_accessor sub: String?
+
+      def expiry: () -> Integer?
+
+      def expiry=: (_ToI? new_expiry) -> Integer?
+
+      def signing_key: () -> signing_key?
+
+      def signing_key=: (signing_key? new_key) -> signing_key?
+
+      def signing_algorithm: () -> String
+
+      def extension_parameters: () -> Hash[untyped, untyped]
+
+      def extension_parameters=: (_ToHash[untyped, untyped] new_extension_parameters) -> Hash[untyped, untyped]
+
+      def additional_parameters: () -> Hash[untyped, untyped]
+
+      def additional_parameters=: (_ToHash[untyped, untyped] new_additional_parameters) -> Hash[untyped, untyped]
+
+      def refresh_token: () -> String?
+
+      def refresh_token=: (String? new_refresh_token) -> String?
+
+      def access_token: () -> String?
+
+      def access_token=: (String? new_access_token) -> String?
+
+      def id_token: () -> String?
+
+      def id_token=: (String? new_id_token) -> String?
+
+      # Verifies the token when a public key or a key finder block is given.
+      # Raises Signet::UnsafeOperationError when the audience does not match
+      # client_id.
+      def decoded_id_token: (?untyped public_key, ?Hash[Symbol, untyped] options) ?{ (Hash[String, untyped] header, ?untyped payload) -> untyped } -> Hash[String, untyped]
+
+      def expires_in: () -> Integer?
+
+      def expires_in=: (_ToI? new_expires_in) -> Time?
+
+      def issued_at: () -> Time?
+
+      def issued_at=: (timestamp_input? new_issued_at) -> Time?
+
+      def expires_at: () -> Time?
+
+      def expires_at=: (timestamp_input? new_expires_at) -> Time?
+
+      def granted_scopes: () -> Array[String]?
+
+      def granted_scopes=: ((Array[String] | String)? new_granted_scopes) -> Array[String]?
+
+      def expired?: () -> bool
+
+      def expires_within?: (Numeric sec) -> bool
+
+      def clear_credentials!: () -> nil
+
+      # The grant type set with #grant_type=, or the one inferred from the
+      # client's state; nil when none can be inferred.
+      def grant_type: () -> (String | Addressable::URI)?
+
+      def grant_type=: ((String | Addressable::URI)? new_grant_type) -> (String | Addressable::URI)?
+
+      def to_jwt: (?Hash[Symbol | String, untyped] options) -> String
+
+      def to_json: (*untyped _args) -> String
+
+      # Returns the parsed token response with "scope" renamed to
+      # "granted_scopes"; nil only for a JSON body of null.
+      def fetch_access_token: (?fetch_options options) -> Hash[String, untyped]?
+                            | (Hash[Symbol | String, untyped] options) -> Hash[String, untyped]?
+
+      def fetch_access_token!: (?fetch_options options) -> Hash[String, untyped]?
+                             | (Hash[Symbol | String, untyped] options) -> Hash[String, untyped]?
+
+      def refresh!: (?fetch_options options) -> Hash[String, untyped]?
+                  | (Hash[Symbol | String, untyped] options) -> Hash[String, untyped]?
+
+      # Without a :request, :connection is required to build the request.
+      def generate_authenticated_request: (?request_options options) -> Faraday::Request
+                                        | (Hash[Symbol | String, untyped] options) -> Faraday::Request
+
+      def fetch_protected_resource: (?request_options options) -> Faraday::Response
+                                  | (Hash[Symbol | String, untyped] options) -> Faraday::Response
+    end
+  end
+
+  module OAuth1
+    # A parameter list: a Hash or an Array of [name, value] pairs.
+    type parameters = Hash[untyped, untyped] | Array[[untyped, untyped]]
+
+    type uri_input = String | Addressable::URI | ::URI::Generic | _ToStr
+
+    OUT_OF_BAND: String
+
+    def self.encode: (String | Symbol value) -> String
+                   | (nil value) -> nil
+                   | (String | Symbol | nil value) -> String?
+
+    def self.unencode: (String | _ToStr value) -> String
+                     | (nil value) -> nil
+                     | (String | _ToStr | nil value) -> String?
+
+    def self.generate_timestamp: () -> String
+
+    def self.generate_nonce: () -> String
+
+    def self.extract_credential_key_option: (String | Symbol credential_type, Hash[Symbol | String, untyped] options) -> String?
+
+    def self.extract_credential_secret_option: (String | Symbol credential_type, Hash[Symbol | String, untyped] options) -> String?
+
+    def self.normalize_parameters: (parameters parameters) -> String
+
+    def self.generate_base_string: (String | Symbol method, uri_input uri, parameters parameters) -> String
+
+    def self.generate_authorization_header: (parameters parameters, ?String? realm) -> String
+
+    # Raises Signet::ParseError for schemes other than OAuth.
+    def self.parse_authorization_header: (String field_value) -> Array[[String, String]]
+
+    def self.parse_form_encoded_credentials: (String body) -> Credential
+
+    # Raises NotImplementedError for an unknown "oauth_signature_method".
+    def self.sign_parameters: (String | Symbol method, uri_input uri, parameters parameters, String client_credential_secret, ?String? token_credential_secret) -> String
+
+    def self.unsigned_temporary_credential_parameters: (?Hash[Symbol | String, untyped] options) -> Array[[untyped, untyped]]
+
+    def self.generate_authorization_uri: (uri_input authorization_uri, ?Hash[Symbol | String, untyped] options) -> String
+
+    def self.unsigned_token_credential_parameters: (?Hash[Symbol | String, untyped] options) -> Array[[String, untyped]]
+
+    def self.unsigned_resource_parameters: (?Hash[Symbol | String, untyped] options) -> Array[[String, untyped]]
+
+    module HMACSHA1
+      def self.generate_signature: (String base_string, String? client_credential_secret, String? token_credential_secret) -> String
+    end
+
+    module PLAINTEXT
+      def self.generate_signature: (String base_string, String? client_credential_secret, String? token_credential_secret) -> String
+    end
+
+    module RSASHA1
+      # client_credential_secret is the PEM-encoded RSA private key.
+      def self.generate_signature: (String base_string, String client_credential_secret, String? token_credential_secret) -> String
+    end
+
+    class Credential
+      # The key and the secret, or a Hash or an Array of pairs (or an object
+      # responding to #to_hash or #to_ary) holding "oauth_token" and
+      # "oauth_token_secret" (or "key" and "secret", as String or Symbol keys).
+      def initialize: (_ToStr key, _ToStr secret) -> void
+                    | ([_ToStr, _ToStr] key_and_secret) -> void
+                    | (_ToHash[untyped, untyped] parameters) -> void
+                    | (_ToAry[[untyped, untyped]] parameters) -> void
+
+      attr_accessor key: String
+
+      attr_accessor secret: String
+
+      def to_hash: () -> Hash[String, String]
+
+      alias to_h to_hash
+
+      def ==: (untyped other) -> bool
+    end
+
+    class Client
+      # The keys #initialize and #update! read. String keys work too.
+      type options = {
+        ?temporary_credential_uri: uri_input?,
+        ?authorization_uri: (uri_input | Hash[Symbol, untyped])?,
+        ?token_credential_uri: (uri_input | Hash[Symbol, untyped])?,
+        ?client_credential_key: String?,
+        ?client_credential_secret: String?,
+        ?client_credential: Credential?,
+        ?temporary_credential_key: String?,
+        ?temporary_credential_secret: String?,
+        ?temporary_credential: Credential?,
+        ?token_credential_key: String?,
+        ?token_credential_secret: String?,
+        ?token_credential: Credential?,
+        ?client: Client?,
+        ?callback: _ToStr?,
+        ?two_legged: bool?
+      }
+
+      def initialize: (?options options) -> void
+                    | (Hash[Symbol | String, untyped] options) -> void
+
+      def update!: (?options options) -> self
+                 | (Hash[Symbol | String, untyped] options) -> self
+
+      def temporary_credential_uri: () -> Addressable::URI?
+
+      alias request_token_uri temporary_credential_uri
+
+      def temporary_credential_uri=: (uri_input? new_temporary_credential_uri) -> Addressable::URI?
+
+      alias request_token_uri= temporary_credential_uri=
+
+      # Returns nil when no authorization URI is set.
+      def authorization_uri: (?Hash[Symbol, untyped] options) -> Addressable::URI?
+
+      def authorization_uri=: ((uri_input | Hash[Symbol, untyped])? new_authorization_uri) -> Addressable::URI?
+
+      def token_credential_uri: () -> Addressable::URI?
+
+      alias access_token_uri token_credential_uri
+
+      def token_credential_uri=: ((uri_input | Hash[Symbol, untyped])? new_token_credential_uri) -> Addressable::URI?
+
+      alias access_token_uri= token_credential_uri=
+
+      # Raises ArgumentError when only one of the key and the secret is set.
+      def client_credential: () -> Credential?
+
+      alias consumer_token client_credential
+
+      def client_credential=: (Credential? new_client_credential) -> String?
+
+      alias consumer_token= client_credential=
+
+      def client_credential_key: () -> String?
+
+      alias consumer_key client_credential_key
+
+      def client_credential_key=: (_ToStr? new_client_credential_key) -> String?
+
+      alias consumer_key= client_credential_key=
+
+      def client_credential_secret: () -> String?
+
+      alias consumer_secret client_credential_secret
+
+      def client_credential_secret=: (_ToStr? new_client_credential_secret) -> String?
+
+      alias consumer_secret= client_credential_secret=
+
+      # Raises ArgumentError when only one of the key and the secret is set.
+      def temporary_credential: () -> Credential?
+
+      alias request_token temporary_credential
+
+      def temporary_credential=: (Credential? new_temporary_credential) -> String?
+
+      alias request_token= temporary_credential=
+
+      def temporary_credential_key: () -> String?
+
+      alias request_token_key temporary_credential_key
+
+      def temporary_credential_key=: (_ToStr? new_temporary_credential_key) -> String?
+
+      alias request_token_key= temporary_credential_key=
+
+      def temporary_credential_secret: () -> String?
+
+      alias request_token_secret temporary_credential_secret
+
+      def temporary_credential_secret=: (_ToStr? new_temporary_credential_secret) -> String?
+
+      alias request_token_secret= temporary_credential_secret=
+
+      # Raises ArgumentError when only one of the key and the secret is set.
+      def token_credential: () -> Credential?
+
+      alias access_token token_credential
+
+      def token_credential=: (Credential? new_token_credential) -> String?
+
+      alias access_token= token_credential=
+
+      def token_credential_key: () -> String?
+
+      alias access_token_key token_credential_key
+
+      def token_credential_key=: (_ToStr? new_token_credential_key) -> String?
+
+      alias access_token_key= token_credential_key=
+
+      def token_credential_secret: () -> String?
+
+      alias access_token_secret token_credential_secret
+
+      def token_credential_secret=: (_ToStr? new_token_credential_secret) -> String?
+
+      alias access_token_secret= token_credential_secret=
+
+      # Signet::OAuth1::OUT_OF_BAND when no callback is set.
+      def callback: () -> String
+
+      def callback=: (_ToStr? new_callback) -> String?
+
+      def two_legged: () -> bool
+
+      def two_legged=: (bool new_two_legged) -> bool
+
+      def to_json: (*untyped _args) -> String
+
+      def generate_temporary_credential_request: (?Hash[Symbol, untyped] options) -> Faraday::Request
+
+      alias generate_request_token_request generate_temporary_credential_request
+
+      # Raises Signet::AuthorizationError unless the server answers 200.
+      def fetch_temporary_credential: (?Hash[Symbol, untyped] options) -> Credential
+
+      alias fetch_request_token fetch_temporary_credential
+
+      def fetch_temporary_credential!: (?Hash[Symbol, untyped] options) -> Credential
+
+      alias fetch_request_token! fetch_temporary_credential!
+
+      def generate_token_credential_request: (?Hash[Symbol, untyped] options) -> Faraday::Request
+
+      alias generate_access_token_request generate_token_credential_request
+
+      # Raises Signet::AuthorizationError unless the server answers 200.
+      def fetch_token_credential: (?Hash[Symbol, untyped] options) -> Credential
+
+      alias fetch_access_token fetch_token_credential
+
+      def fetch_token_credential!: (?Hash[Symbol, untyped] options) -> Credential
+
+      alias fetch_access_token! fetch_token_credential!
+
+      def generate_authenticated_request: (?Hash[Symbol, untyped] options) -> Faraday::Request
+
+      # Raises Signet::AuthorizationError for a 401 response.
+      def fetch_protected_resource: (?Hash[Symbol, untyped] options) -> Faraday::Response
+    end
+
+    class Server
+      type credential_result = { client_credential: Credential, temporary_credential: Credential, realm: String? }
+
+      type resource_result = { client_credential: Credential, token_credential: Credential?, realm: String? }
+
+      type request_components = { method: String, uri: untyped, headers: untyped, body: untyped }
+
+      # The lookups are objects that respond to #call (usually lambdas):
+      # nonce_timestamp(nonce, timestamp) and verifier(verifier) return a
+      # truthy value when valid; the credential lookups take a key and return a
+      # Credential, a Hash or an Array of pairs, or nil.
+      attr_accessor nonce_timestamp: untyped
+
+      attr_accessor client_credential: untyped
+
+      attr_accessor token_credential: untyped
+
+      attr_accessor temporary_credential: untyped
+
+      attr_accessor verifier: untyped
+
+      def initialize: (?Hash[Symbol, untyped] options) -> void
+
+      def safe_equals?: (String left, String right) -> bool
+
+      def validate_nonce_timestamp: (String? nonce, String? timestamp) -> bool
+
+      def find_client_credential: (String? key) -> Credential?
+
+      def find_token_credential: (String? key) -> Credential?
+
+      def find_temporary_credential: (String? key) -> Credential?
+
+      def call_credential_lookup: (untyped credential, String? key) -> Credential?
+
+      def find_verifier: (String? verifier) -> bool
+
+      def verify_request_components: (?Hash[Symbol, untyped] options) -> request_components
+
+      # Raises Signet::MalformedAuthorizationError when there is no
+      # Authorization header.
+      def verify_auth_header_components: (Array[[String, String]] | Hash[String, String] headers) -> Hash[String, String]
+
+      def request_realm: (?Hash[Symbol, untyped] options) -> String?
+
+      # Returns the oauth_callback value ("oob" when there is none), or false.
+      def authenticate_temporary_credential_request: (?Hash[Symbol, untyped] options) -> (String | false)
+
+      def authenticate_token_credential_request: (?Hash[Symbol, untyped] options) -> (credential_result | false | nil)
+
+      def authenticate_resource_request: (?Hash[Symbol, untyped] options) -> resource_result?
+    end
+  end
+end
