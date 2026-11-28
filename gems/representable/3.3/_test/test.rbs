@@ -1,0 +1,36 @@
+class Song
+  attr_accessor title: String?
+  attr_accessor track: Integer?
+  attr_accessor composers: Array[String]?
+
+  def initialize: (?String? title, ?Integer? track) -> void
+end
+
+class SongRepresenter < Representable::Decorator
+  include Representable::JSON
+  extend Representable::JSON::ClassMethods
+end
+
+class SongXMLRepresenter < Representable::Decorator
+  include Representable::XML
+  extend Representable::XML::ClassMethods
+end
+
+class SongYAMLRepresenter < Representable::Decorator
+  include Representable::YAML
+  extend Representable::YAML::ClassMethods
+end
+
+module SongHashRepresenter
+  include Representable::Hash
+  extend Representable::Declarative
+  extend Representable::ClassMethods
+  extend Representable::ForCollection
+  extend Representable::Represent
+  extend Representable::Hash::ClassMethods
+end
+
+class SongsRepresenter < Representable::Decorator
+  include Representable::JSON::Collection
+  extend Representable::Hash::Collection::ClassMethods
+end

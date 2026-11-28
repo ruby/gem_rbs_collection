@@ -1,0 +1,524 @@
+# Type signatures for the representable gem.
+#
+# Including a format module (Representable::JSON, ::XML, ::YAML, ::Hash,
+# ::Object) into a class or module runs an `included` hook that also includes
+# Representable and extends the includer with the class-level DSL. Declare
+# those in your own signatures, for example:
+#
+#   class SongRepresenter < Representable::Decorator
+#     include Representable::JSON
+#     extend Representable::JSON::ClassMethods
+#   end
+#
+#   module SongRepresenter
+#     include Representable::JSON
+#     extend Representable::Declarative
+#     extend Representable::ClassMethods
+#     extend Representable::ForCollection
+#     extend Representable::Represent
+#     extend Representable::JSON::ClassMethods
+#   end
+#
+# Representable::Decorator already extends the DSL modules.
+#
+# Nokogiri and multi_json are not dependencies of the gem, so XML nodes and
+# documents are untyped. Psych nodes are untyped too (the stdlib RBS for
+# psych does not declare Psych::Nodes).
+#
+# Left out on purpose:
+#   * Internals: the parse and render pipelines (Pipeline, Collect,
+#     Pipeline::Insert, Function::*, the pipeline function constants such as
+#     Getter or SetValue, Populator.apply!, Binding::Map, Binding::Factories,
+#     Binding#compile_fragment/#uncompile_fragment, Cached#representable_map,
+#     Decorator.map, the nested builders and default_nested_class), and the
+#     public create_representation_with/update_properties_from overrides of
+#     the collection and hash representers.
+#   * Representable::Option (its superclass Trailblazer::Option has no RBS).
+#   * Representable::Debug, the experimental Representable::XML::Namespace and
+#     Representable::Coercion::Coercer.
+#   * Representable::Object::ClassMethods#collection_representer_class, which
+#     raises NameError (there is no Representable::Object::Collection).
+module Representable
+  VERSION: String
+
+  # Wraps `value` in a callable: Procs, Symbols and Uber::Callable objects are
+  # evaluated when called, any other value is returned as is.
+  def self.Option: (untyped value) -> Proc
+
+  attr_writer representable_attrs: Representable::Config
+
+  class DeserializeError < RuntimeError
+  end
+
+  # Class-level DSL (`property`, `collection`, ...), extended into every
+  # class or module that includes Representable.
+  module Declarative
+    include ::Declarative::Schema::DSL
+    include ::Declarative::Schema::Feature
+    include ::Declarative::Heritage::DSL
+
+    # Options are the representable property options (`as:`, `getter:`,
+    # `decorator:`, `class:`, `render_nil:`, `if:`, ...). The block defines
+    # a nested representer.
+    def property: (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+
+    def collection: (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+
+    # Without a name this is Object#hash.
+    def hash: () -> Integer
+            | (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+
+    # Maps the properties in the block to a nested section of the document
+    # while reading and writing them on the represented object itself.
+    def nested: (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+
+    # A Symbol is stored as a String; `true` infers the wrap from the class
+    # name; a Proc is evaluated on the represented object.
+    def representation_wrap=: (String | Symbol | bool | Proc name) -> (String | Symbol | bool | Proc)
+
+    def definitions: () -> Representable::Config
+
+    alias representable_attrs definitions
+  end
+
+  module ClassMethods
+    # Extends `represented` with this representer module.
+    def prepare: [T] (T represented) -> T
+  end
+
+  module ForCollection
+    # The representer for a collection of this representer's objects: a
+    # module, or a Decorator subclass for decorators.
+    def for_collection: () -> Module
+  end
+
+  module Represent
+    # Prepares `represented`, or for an instance of `array_class` uses the
+    # collection representer.
+    def represent: (untyped represented, ?Module array_class) -> untyped
+  end
+
+  module ModuleExtensions
+  end
+
+  module Cached
+    module BuildDefinition
+    end
+  end
+
+  class Decorator
+    include Representable
+    include Representable::Cached
+    extend Uber::InheritableAttr
+    extend Representable::Cached::BuildDefinition
+    extend Representable::Represent
+    extend Representable::ForCollection
+    extend Representable::ClassMethods
+    extend Representable::ModuleExtensions
+    extend ::Declarative::Heritage::Inherited
+    extend ::Declarative::Heritage::Included
+    extend Representable::Declarative
+
+    def self.prepare: (untyped represented) -> instance
+
+    def self.for_collection: () -> singleton(Representable::Decorator)
+
+    # Returns a new subclass.
+    def self.clone: () -> singleton(Representable::Decorator)
+
+    def initialize: (untyped represented) -> void
+
+    attr_reader represented: untyped
+
+    alias decorated represented
+  end
+
+  # Stores the definitions of a representer, keyed by property name.
+  class Config < ::Declarative::Definitions
+    def initialize: (singleton(::Declarative::Definitions::Definition) definition_class) -> void
+
+    def remove: (_ToS name) -> ::Declarative::Definitions::Definition?
+
+    def options: () -> ::Hash[Symbol, untyped]
+
+    def wrap=: (String | Symbol | bool | Proc value) -> Proc
+
+    # nil when no wrap is set; otherwise the evaluated wrap, with `true`
+    # turned into a name inferred from the class of `represented`.
+    def wrap_for: (untyped represented, ?::Hash[Symbol, untyped] options) ?{ (?) -> untyped } -> untyped
+  end
+
+  # The configuration of one property.
+  class Definition < ::Declarative::Definitions::Definition
+    def initialize: (Symbol | String sym, ?::Hash[Symbol, untyped] options) ?{ (::Hash[Symbol, untyped] options) -> void } -> void
+
+    def name: () -> String
+
+    alias getter name
+
+    def merge!: (::Hash[Symbol, untyped] options) ?{ (::Hash[Symbol, untyped] options) -> void } -> self
+
+    def delete!: (Symbol name) -> self
+
+    # The option `name`; dynamic options (`:as`, `:getter`, `:class`, ...)
+    # are returned wrapped in a Proc.
+    def []: (Symbol name) -> untyped
+
+    def setter: () -> Symbol
+
+    def typed?: () -> Proc?
+
+    def representable?: () -> boolish
+
+    def array?: () -> bool?
+
+    def hash?: () -> bool?
+
+    def has_default?: () -> bool
+
+    def representer_module: () -> untyped
+
+    def inspect: () -> String
+  end
+
+  # Reads and writes the fragment of one property.
+  class Binding
+    class FragmentNotFound
+    end
+
+    module Deprecatable
+    end
+
+    module EvaluateOption
+      def evaluate_option: (Symbol name, untyped input, ::Hash[Symbol, untyped] options) -> untyped
+    end
+
+    module Factories
+    end
+
+    module Collection
+      def skipable_empty_value?: (untyped value) -> bool?
+    end
+
+    include Deprecatable
+    include EvaluateOption
+    include Factories
+    extend Uber::Delegates
+
+    # Calls `build_for`, which the format's Binding subclasses define.
+    def self.build: (Representable::Definition definition) -> Representable::Binding
+
+    def initialize: (Representable::Definition definition) -> void
+
+    attr_reader name: String
+
+    attr_reader getter: String
+
+    attr_reader setter: Symbol
+
+    def has_default?: () -> bool
+
+    def representable?: () -> boolish
+
+    def array?: () -> bool?
+
+    def typed?: () -> Proc?
+
+    def []: (Symbol name) -> untyped
+
+    def skipable_empty_value?: (untyped value) -> bool
+
+    # The `:default` option when `value` is skipped, `value` otherwise.
+    def default_for: (untyped value) -> untyped
+  end
+
+  # The generic format: #to_hash and #from_hash.
+  module Hash
+    module ClassMethods
+      def format_engine: () -> singleton(Representable::Hash)
+
+      def collection_representer_class: () -> singleton(Representable::Hash::Collection)
+    end
+
+    # Returns the represented object (self, or the decorated object for a
+    # Decorator).
+    def from_hash: (::Hash[untyped, untyped] | ::Array[untyped] data, ?::Hash[Symbol, untyped] options, ?singleton(Representable::Binding) binding_builder) -> untyped
+
+    # An Array for collection representers.
+    def to_hash: (?(::Hash[Symbol, untyped] | ::JSON::State) options, ?singleton(Representable::Binding) binding_builder) -> (::Hash[untyped, untyped] | ::Array[untyped])
+
+    alias render to_hash
+
+    alias parse from_hash
+
+    class Binding < Representable::Binding
+      def self.build_for: (Representable::Definition definition) -> Representable::Hash::Binding
+
+      def read: (::Hash[untyped, untyped]? hash, untyped as) -> untyped
+
+      def write: [T] (::Hash[untyped, untyped] hash, T fragment, untyped as) -> T
+
+      def serialize_method: () -> Symbol
+
+      def deserialize_method: () -> Symbol
+
+      class Collection < Representable::Hash::Binding
+        include Representable::Binding::Collection
+      end
+    end
+
+    # A representer for an Array ("lonely collection").
+    module Collection
+      include Representable::Hash
+      include Representable
+      extend Representable::Declarative
+      extend Representable::ModuleExtensions
+      extend ::Declarative::Heritage::Inherited
+      extend ::Declarative::Heritage::Included
+      extend Representable::ClassMethods
+      extend Representable::ForCollection
+      extend Representable::Represent
+      extend Representable::Hash::ClassMethods
+
+      module ClassMethods
+        def items: (?::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+      end
+    end
+
+    # Accept Symbol keys in #from_hash.
+    module AllowSymbols
+    end
+
+    module Conversion
+      def self.stringify_keys: (::Hash[untyped, untyped] hash) -> ::Hash[String, untyped]
+    end
+  end
+
+  module HashMethods
+  end
+
+  # #to_json and #from_json on top of Representable::Hash.
+  module JSON
+    include Representable::Hash
+    include Representable
+    # The included hooks of Representable::Hash and Representable also run
+    # on this module.
+    extend Representable::Declarative
+    extend Representable::ModuleExtensions
+    extend ::Declarative::Heritage::Inherited
+    extend ::Declarative::Heritage::Included
+    extend Representable::ClassMethods
+    extend Representable::ForCollection
+    extend Representable::Represent
+    extend Representable::Hash::ClassMethods
+
+    module ClassMethods
+      def format_engine: () -> singleton(Representable::Hash)
+
+      def collection_representer_class: () -> singleton(Representable::JSON::Collection)
+    end
+
+    def from_json: (String data, ?::Hash[Symbol, untyped] options, ?singleton(Representable::Binding) binding_builder) -> untyped
+
+    # Object#to_json is also called with a JSON::State when a representer sits
+    # inside a structure given to JSON.generate.
+    def to_json: (?(::Hash[Symbol, untyped] | ::JSON::State) options, ?singleton(Representable::Binding) binding_builder) -> String
+
+    alias render to_json
+
+    alias parse from_json
+
+    module Collection
+      include Representable::JSON
+      extend Representable::Declarative
+      extend Representable::ModuleExtensions
+      extend ::Declarative::Heritage::Inherited
+      extend ::Declarative::Heritage::Included
+      extend Representable::ClassMethods
+      extend Representable::ForCollection
+      extend Representable::Represent
+      extend Representable::JSON::ClassMethods
+    end
+
+    # A representer for a Hash ("lonely hash").
+    module Hash
+      module ClassMethods
+        def values: (::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+      end
+    end
+  end
+
+  module YAML
+    include Representable::Hash
+    include Representable
+    extend Representable::Declarative
+    extend Representable::ModuleExtensions
+    extend ::Declarative::Heritage::Inherited
+    extend ::Declarative::Heritage::Included
+    extend Representable::ClassMethods
+    extend Representable::ForCollection
+    extend Representable::Represent
+    extend Representable::Hash::ClassMethods
+
+    module ClassMethods
+      def format_engine: () -> singleton(Representable::YAML)
+    end
+
+    def from_yaml: (String doc, ?::Hash[Symbol, untyped] options) -> untyped
+
+    # Returns a Psych::Nodes::Mapping.
+    def to_ast: (?::Hash[Symbol, untyped] options) -> untyped
+
+    def to_yaml: (?::Hash[Symbol, untyped] options) -> String
+
+    alias render to_yaml
+
+    alias parse from_yaml
+
+    class Binding < Representable::Hash::Binding
+      def self.build_for: (Representable::Definition definition) -> Representable::YAML::Binding
+
+      # Appends the key and value nodes to the mapping's children and
+      # returns them.
+      def write: (untyped map, untyped fragment, String as) -> ::Array[untyped]
+
+      class Collection < Representable::YAML::Binding
+        include Representable::Binding::Collection
+      end
+    end
+  end
+
+  # Reads properties from and writes them to another object.
+  module Object
+    def from_object: (untyped data, ?::Hash[Symbol, untyped] options, ?singleton(Representable::Binding) binding_builder) -> untyped
+
+    def to_object: (?::Hash[Symbol, untyped] options, ?singleton(Representable::Binding) binding_builder) -> nil
+
+    class Binding < Representable::Binding
+      def self.build_for: (Representable::Definition definition) -> Representable::Object::Binding
+
+      def read: (untyped hash, interned as) -> untyped
+
+      def write: (untyped hash, untyped fragment, untyped as) -> bool
+
+      def serialize_method: () -> Symbol
+
+      def deserialize_method: () -> Symbol
+
+      class Collection < Representable::Object::Binding
+        include Representable::Binding::Collection
+      end
+    end
+  end
+
+  # #to_xml and #from_xml, using Nokogiri.
+  module XML
+    # Creates an element named `name` in `document`.
+    def self?.Node: (untyped document, _ToS name, ?::Hash[untyped, untyped] attributes) -> untyped
+
+    module ClassMethods
+      def remove_namespaces!: () -> bool
+
+      def format_engine: () -> singleton(Representable::XML)
+
+      def collection_representer_class: () -> singleton(Representable::XML::Collection)
+    end
+
+    def from_xml: (String doc, ?::Hash[Symbol, untyped] options) -> untyped
+
+    def from_node: (untyped node, ?::Hash[Symbol, untyped] options) -> untyped
+
+    # Returns a Nokogiri::XML::Element. Sets `options[:doc]`.
+    def to_node: (?::Hash[Symbol, untyped] options) -> untyped
+
+    def to_xml: (?::Hash[Symbol, untyped] options) -> String
+
+    alias render to_xml
+
+    alias parse from_xml
+
+    class Binding < Representable::Binding
+      def self.build_for: (Representable::Definition definition) -> Representable::XML::Binding
+
+      def write: (untyped parent, untyped fragments, String as) -> untyped
+
+      def read: (untyped node, String as) -> untyped
+
+      def serialize_method: () -> Symbol
+
+      def deserialize_method: () -> Symbol
+
+      class Collection < Representable::XML::Binding
+        include Representable::Binding::Collection
+      end
+
+      class Hash < Representable::XML::Binding::Collection
+      end
+
+      class AttributeHash < Representable::XML::Binding::Collection
+        # Sets the attributes on `parent` and returns it.
+        def write: (untyped parent, ::Hash[untyped, untyped] value, untyped as) -> untyped
+      end
+
+      class Attribute < Representable::XML::Binding
+        def read: (untyped node, String as) -> String?
+
+        def write: (untyped parent, untyped value, String as) -> String
+      end
+
+      class Content < Representable::XML::Binding
+        def read: (untyped node, untyped as) -> String
+
+        def write: (untyped parent, untyped value, untyped as) -> String
+      end
+    end
+
+    module Collection
+    end
+
+    # A representer for a Hash written as the attributes of one element.
+    module AttributeHash
+      include Representable::XML
+      include Representable
+      include Representable::HashMethods
+      extend Representable::Declarative
+      extend Representable::ModuleExtensions
+      extend ::Declarative::Heritage::Inherited
+      extend ::Declarative::Heritage::Included
+      extend Representable::ClassMethods
+      extend Representable::ForCollection
+      extend Representable::Represent
+      extend Representable::XML::ClassMethods
+
+      module ClassMethods
+        def values: (::Hash[Symbol, untyped] options) -> Representable::Definition
+      end
+    end
+
+    # A representer for a Hash written as child elements.
+    module Hash
+      include Representable::XML
+      include Representable
+      include Representable::HashMethods
+      extend Representable::Declarative
+      extend Representable::ModuleExtensions
+      extend ::Declarative::Heritage::Inherited
+      extend ::Declarative::Heritage::Included
+      extend Representable::ClassMethods
+      extend Representable::ForCollection
+      extend Representable::Represent
+      extend Representable::XML::ClassMethods
+
+      module ClassMethods
+        def values: (::Hash[Symbol, untyped] options) -> Representable::Definition
+      end
+    end
+  end
+
+  # Coerces property values with dry-types (`property :n, type: Types::Integer`).
+  module Coercion
+    module ClassMethods
+      def property: (Symbol | String name, ?::Hash[Symbol, untyped] options) ?{ (?) [self: Module & Representable::Declarative] -> void } -> Representable::Definition
+    end
+  end
+end
