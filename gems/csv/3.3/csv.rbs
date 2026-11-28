@@ -1604,9 +1604,18 @@
 # feel free to [report](mailto:james@grayproductions.net) any issues you find
 # with it.
 #
-class CSV < Object
-  include Enumerable[untyped]
+class CSV[out Elem = Array[String?] | CSV::Row, out Rows = Array[Array[String?]] | CSV::Table[CSV::Row]] < Object
+  include Enumerable[Elem]
   extend Forwardable
+
+  # Values of the `headers:` option that make rows CSV::Row
+  type enable_headers = true | :first_row | Array[untyped] | String
+
+  # CSV whose rows are CSV::Row (created with `headers:` option)
+  type with_headers = CSV[CSV::Row, CSV::Table[CSV::Row]]
+
+  # CSV whose rows are Array (created without `headers:` option)
+  type without_headers = CSV[Array[String?], Array[Array[String?]]]
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1695,10 +1704,18 @@ class CSV < Object
   #     would read `UTF-32BE` data from the file but transcode it to `UTF-8`
   #     before parsing.
   #
-  def self.foreach: (String | IO path, ?String mode, headers: true | :first_row | Array[untyped] | String, **untyped options) { (::CSV::Row arg0) -> void } -> void
-                  | (String | IO path, ?String mode, headers: true | :first_row | Array[untyped] | String, **untyped options) -> Enumerator[::CSV::Row, void]
-                  | (String | IO path, ?String mode, **untyped options) { (::Array[String?] arg0) -> void } -> void
-                  | (String | IO path, ?String mode, **untyped options) -> Enumerator[::Array[String?], void]
+  def self.foreach: (String | IO path, ?String mode, headers: enable_headers, **untyped options) { (::CSV::Row arg0) -> void } -> void
+                  | (String | IO path, ?String mode, headers: enable_headers, **untyped options) -> Enumerator[::CSV::Row, void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, converters: untyped, **untyped options) { (::Array[untyped] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, nil_value: untyped, **untyped options) { (::Array[untyped] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, empty_value: untyped, **untyped options) { (::Array[untyped] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, **untyped options) { (::Array[String?] arg0) -> void } -> void
+                  | (String | IO path, ?String mode, ?headers: false | nil, converters: untyped, **untyped options) -> Enumerator[::Array[untyped], void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, nil_value: untyped, **untyped options) -> Enumerator[::Array[untyped], void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, empty_value: untyped, **untyped options) -> Enumerator[::Array[untyped], void]
+                  | (String | IO path, ?String mode, ?headers: false | nil, **untyped options) -> Enumerator[::Array[String?], void]
+                  | (String | IO path, ?String mode, **untyped options) { (untyped arg0) -> void } -> void
+                  | (String | IO path, ?String mode, **untyped options) -> Enumerator[untyped, void]
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1786,14 +1803,118 @@ class CSV < Object
   #   # Raises TypeError (no implicit conversion of Symbol into String)
   #   CSV.open(:foo)
   #
-  def self.open: (String | _ToPath | IO | StringIO filename_or_io,
+  def self.open: [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: enable_headers,
+                      **untyped options) { (with_headers csv) -> T } -> T
+               | (String | _ToPath | IO | StringIO filename_or_io,
                   ?String mode,
                   ?newline: untyped,
                   ?invalid: nil | :replace,
                   ?undef: :replace,
                   ?replace: String,
                   ?encoding: Encoding | String,
-                  **untyped options) ?{ (instance) -> void } -> instance
+                  headers: enable_headers,
+                  **untyped options) -> with_headers
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      converters: untyped,
+                      **untyped options) { (CSV[Array[untyped], Array[Array[untyped]]] csv) -> T } -> T
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      nil_value: untyped,
+                      **untyped options) { (CSV[Array[untyped], Array[Array[untyped]]] csv) -> T } -> T
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      empty_value: untyped,
+                      **untyped options) { (CSV[Array[untyped], Array[Array[untyped]]] csv) -> T } -> T
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      headers: false | nil,
+                      **untyped options) { (without_headers csv) -> T } -> T
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  converters: untyped,
+                  **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  nil_value: untyped,
+                  **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  empty_value: untyped,
+                  **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  headers: false | nil,
+                  **untyped options) -> without_headers
+               | [T] (String | _ToPath | IO | StringIO filename_or_io,
+                      ?String mode,
+                      ?newline: untyped,
+                      ?invalid: nil | :replace,
+                      ?undef: :replace,
+                      ?replace: String,
+                      ?encoding: Encoding | String,
+                      **untyped options) { (CSV[untyped, untyped] csv) -> T } -> T
+               | (String | _ToPath | IO | StringIO filename_or_io,
+                  ?String mode,
+                  ?newline: untyped,
+                  ?invalid: nil | :replace,
+                  ?undef: :replace,
+                  ?replace: String,
+                  ?encoding: Encoding | String,
+                  **untyped options) -> CSV[untyped, untyped]
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1838,7 +1959,14 @@ class CSV < Object
   #     # Raises ArgumentError (Cannot parse nil as CSV):
   #     CSV.new(nil)
   #
-  def initialize: (?String | IO | StringIO io, ?::Hash[Symbol, untyped] options) -> void
+  def self.new: (String | IO | StringIO io, headers: enable_headers, **untyped options) -> with_headers
+              | (String | IO | StringIO io, headers: false | nil, converters: untyped, **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+              | (String | IO | StringIO io, headers: false | nil, nil_value: untyped, **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+              | (String | IO | StringIO io, headers: false | nil, empty_value: untyped, **untyped options) -> CSV[Array[untyped], Array[Array[untyped]]]
+              | (String | IO | StringIO io, headers: false | nil, **untyped options) -> without_headers
+              | (String | IO | StringIO io, **untyped options) -> CSV[untyped, untyped]
+
+  def initialize: (String | IO | StringIO io, ?::Hash[Symbol, untyped] options) -> void
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -1958,7 +2086,18 @@ class CSV < Object
   #     # Raises NoMethodError (undefined method `close' for :foo:Symbol)
   #     CSV.parse(:foo)
   #
-  def self.parse: (String str, ?::Hash[Symbol, untyped] options) ?{ (::Array[String?] arg0) -> void } -> ::Array[::Array[String?]]?
+  def self.parse: (String str, headers: enable_headers, **untyped options) -> ::CSV::Table[::CSV::Row]
+                | (String str, headers: enable_headers, **untyped options) { (::CSV::Row row) -> void } -> void
+                | (String str, ?headers: false | nil, converters: untyped, **untyped options) -> ::Array[::Array[untyped]]
+                | (String str, ?headers: false | nil, nil_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
+                | (String str, ?headers: false | nil, empty_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
+                | (String str, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
+                | (String str, ?headers: false | nil, converters: untyped, **untyped options) { (::Array[untyped] row) -> void } -> void
+                | (String str, ?headers: false | nil, nil_value: untyped, **untyped options) { (::Array[untyped] row) -> void } -> void
+                | (String str, ?headers: false | nil, empty_value: untyped, **untyped options) { (::Array[untyped] row) -> void } -> void
+                | (String str, ?headers: false | nil, **untyped options) { (::Array[String?] row) -> void } -> void
+                | (String str, **untyped options) -> untyped
+                | (String str, **untyped options) { (untyped row) -> void } -> void
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2061,14 +2200,50 @@ class CSV < Object
   #     # Raises IOError (not opened for reading)
   #     csv.read
   #
-  def read: () -> ::Array[::Array[String?]]
+  def read: () -> Rows
+
+  alias readlines read
 
   # <!--
   #   rdoc-file=lib/csv.rb
-  #   - readline()
+  #   - csv.shift -> array, csv_row, or nil
   # -->
+  # Returns the next row of data as:
+  # *   An Array if no headers are used.
+  # *   A CSV::Row object if headers are used.
   #
-  def readline: () -> ::Array[String?]?
+  # The data source must be opened for reading.
+  #
+  # Without headers:
+  #     string = "foo,0\nbar,1\nbaz,2\n"
+  #     csv = CSV.new(string)
+  #     csv.shift # => ["foo", "0"]
+  #     csv.shift # => ["bar", "1"]
+  #     csv.shift # => ["baz", "2"]
+  #     csv.shift # => nil
+  #
+  # With headers:
+  #     string = "Name,Value\nfoo,0\nbar,1\nbaz,2\n"
+  #     csv = CSV.new(string, headers: true)
+  #     csv.shift # => #<CSV::Row "Name":"foo" "Value":"0">
+  #     csv.shift # => #<CSV::Row "Name":"bar" "Value":"1">
+  #     csv.shift # => #<CSV::Row "Name":"baz" "Value":"2">
+  #     csv.shift # => nil
+  #
+  # ---
+  #
+  # Raises an exception if the source is not opened for reading:
+  #     string = "foo,0\nbar,1\nbaz,2\n"
+  #     csv = CSV.new(string)
+  #     csv.close
+  #     # Raises IOError (not opened for reading)
+  #     csv.shift
+  #
+  def shift: () -> Elem?
+
+  alias gets shift
+
+  alias readline shift
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2091,8 +2266,12 @@ class CSV < Object
   #     File.write(path, string)
   #     CSV.read(path, headers: true) # => #<CSV::Table mode:col_or_row row_count:4>
   #
-  def self.read: (String | IO path, headers: true | :first_row | Array[untyped] | String, **untyped options) -> ::CSV::Table[CSV::Row]
-               | (String | IO path, ?::Hash[Symbol, untyped] options) -> ::Array[::Array[String?]]
+  def self.read: (String | IO path, headers: enable_headers, **untyped options) -> ::CSV::Table[CSV::Row]
+               | (String | IO path, ?headers: false | nil, converters: untyped, **untyped options) -> ::Array[::Array[untyped]]
+               | (String | IO path, ?headers: false | nil, nil_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
+               | (String | IO path, ?headers: false | nil, empty_value: untyped, **untyped options) -> ::Array[::Array[untyped]]
+               | (String | IO path, ?headers: false | nil, **untyped options) -> ::Array[::Array[String?]]
+               | (String | IO path, **untyped options) -> untyped
 
   # <!--
   #   rdoc-file=lib/csv.rb
@@ -2252,8 +2431,8 @@ class CSV < Object
   #       p row
   #     end
   #
-  def each: () -> Enumerator[untyped, Integer]
-          | () { (untyped) -> void } -> Integer
+  def each: () -> Enumerator[Elem, Integer]
+          | () { (Elem) -> void } -> Integer
 
   # <!--
   #   rdoc-file=lib/csv.rb
