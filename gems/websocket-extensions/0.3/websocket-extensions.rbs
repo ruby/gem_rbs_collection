@@ -1,0 +1,156 @@
+module WebSocket
+  class Extensions
+    # A parameter value parsed from a Sec-WebSocket-Extensions header: `true`
+    # for a flag, an Integer or Float for a numeric value, a String otherwise.
+    type param_value = true | String | Integer | Float
+
+    # The parameters of one extension offer or response. A parameter given
+    # more than once becomes an Array of its values.
+    type params = Hash[String, param_value | Array[param_value]]
+
+    # A Frame as described in the README. Only `opcode` and the RSV bits are
+    # read by this library.
+    interface _Frame
+      def opcode: () -> Integer
+
+      def rsv1: () -> bool
+
+      def rsv2: () -> bool
+
+      def rsv3: () -> bool
+    end
+
+    # A Message as described in the README, for use by sessions. This library
+    # passes messages to the sessions without reading them, so its own methods
+    # take any object.
+    interface _Message
+      def rsv1: () -> bool
+
+      def rsv2: () -> bool
+
+      def rsv3: () -> bool
+
+      def opcode: () -> Integer
+
+      def data: () -> String
+    end
+
+    # The Session API shared by client and server sessions.
+    interface _Session
+      def process_incoming_message: (untyped message) -> untyped
+
+      def process_outgoing_message: (untyped message) -> untyped
+
+      def close: () -> untyped
+    end
+
+    interface _ClientSession
+      include _Session
+
+      # One set of parameters, several, or nil for no offer.
+      def generate_offer: () -> (Hash[String, untyped] | Array[Hash[String, untyped]])?
+
+      # Must return `true` to accept the server's parameters.
+      def activate: (params params) -> boolish
+    end
+
+    interface _ServerSession
+      include _Session
+
+      def generate_response: () -> Hash[String, untyped]
+    end
+
+    # An extension plugin, such as PermessageDeflate. `add` checks `name`,
+    # `type` (must be "permessage") and the RSV bits (must be true or false).
+    interface _Extension
+      def name: () -> String
+
+      def type: () -> String
+
+      def rsv1: () -> bool
+
+      def rsv2: () -> bool
+
+      def rsv3: () -> bool
+
+      # `options` is the Hash given to WebSocket::Extensions.new. Returns nil
+      # to make no offer. (The gem also calls a method that takes no
+      # arguments, without options; this follows the README's contract.)
+      def create_client_session: (Hash[Symbol, untyped] options) -> _ClientSession?
+
+      # `offers` are the client's offers for this extension. Returns nil to
+      # decline them. (The gem also calls a method that takes one argument,
+      # without options; this follows the README's contract.)
+      def create_server_session: (Array[params] offers, Hash[Symbol, untyped] options) -> _ServerSession?
+    end
+
+    class ExtensionError < ArgumentError
+      # The `type` of the error a session raised, if it had one (e.g. a close
+      # code), otherwise nil.
+      attr_reader type: untyped
+
+      def initialize: (String message, ?untyped type) -> void
+    end
+
+    # Raises ExtensionError for a key not in valid_keys.
+    def self.validate_options: [K, V] (Hash[K, V]? options, Array[K] valid_keys) -> Hash[K, V]
+
+    # Raises ExtensionError for an option other than `max_length`.
+    def initialize: (?max_length: Integer) -> void
+                  | (Hash[Symbol, untyped]? options) -> void
+
+    # Raises TypeError for an invalid or already registered extension.
+    def add: (_Extension ext) -> Array[_Extension]
+
+    # The client's Sec-WebSocket-Extensions header, or nil when no extension
+    # makes an offer.
+    def generate_offer: () -> String?
+
+    # Activates the extensions the server accepted. Raises ExtensionError for
+    # unknown, conflicting or rejected responses, and Parser::ParseError for
+    # an invalid header.
+    def activate: (String? header) -> Array[{ name: String, params: params }]
+
+    # The server's Sec-WebSocket-Extensions header, or nil when no extension
+    # was accepted. Raises Parser::ParseError for an invalid header.
+    def generate_response: (String? header) -> String?
+
+    def valid_frame_rsv: (_Frame frame) -> bool
+    alias valid_frame_rsv? valid_frame_rsv
+
+    # Raises ExtensionError when a session raises.
+    def process_incoming_message: (untyped message) -> untyped
+
+    # Raises ExtensionError when a session raises.
+    def process_outgoing_message: (untyped message) -> untyped
+
+    # Closes every active session, ignoring errors they raise. Returns the
+    # active sessions. Never nil: initialize sets @sessions to an Array, so
+    # the source's early return for a missing @sessions is not reached.
+    def close: () -> Array[[_Extension, _Session]]
+
+    class Parser
+      class ParseError < ArgumentError
+      end
+
+      # An empty Offers for nil or "". Raises ParseError for an invalid header.
+      def self.parse_header: (String? header) -> Offers
+
+      # Values must be true, Numeric, a token String, or an Array of those.
+      # Raises ParseError for a String that is not a token.
+      def self.serialize_params: (String name, Hash[String, untyped] params) -> String
+    end
+
+    class Offers
+      def initialize: () -> void
+
+      def push: (String name, params params) -> Array[{ name: String, params: params }]
+
+      def each_offer: () { (String name, params params) -> void } -> Array[{ name: String, params: params }]
+
+      def by_name: (String name) -> Array[params]
+
+      def to_a: () -> Array[{ name: String, params: params }]
+    end
+  end
+end
