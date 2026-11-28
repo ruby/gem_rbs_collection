@@ -1,0 +1,172 @@
+module Rack
+  module Protection
+    VERSION: String
+
+    # Builds the default middleware stack around `app`. Besides the options of
+    # the individual middlewares, it reads `:use` (protections to add),
+    # `:except` (protections to skip) and `:without_session`.
+    # Returns `app` itself when every protection is skipped.
+    def self.new: (Rack::_Application app, ?Hash[Symbol, untyped] options) -> Rack::_Application
+
+    class Base
+      CROSS_SITE_FETCHES: Array[String]
+      DEFAULT_OPTIONS: Hash[Symbol, untyped]
+
+      # The app is nil for the instance AuthenticityToken.token builds.
+      attr_reader app: Rack::_Application?
+      attr_reader options: Hash[Symbol, untyped]
+
+      def self.default_options: (Hash[Symbol, untyped] options) -> Symbol
+      def self.default_reaction: (interned reaction) -> Symbol
+
+      def initialize: (Rack::_Application? app, ?Hash[Symbol, untyped] options) -> void
+      def default_options: () -> Hash[Symbol, untyped]
+      def safe?: (Rack::env env) -> bool
+
+      # Raises NotImplementedError; every middleware that rejects requests
+      # implements it.
+      def accepts?: (Rack::env env) -> boolish
+
+      def call: (Rack::env env) -> Rack::response
+
+      # The result of the `:reaction` method when it is a three-element Array.
+      def react: (Rack::env env) -> Rack::response?
+
+      def debug: (Rack::env env, untyped message) -> void
+      def warn: (Rack::env env, untyped message) -> void
+      def instrument: (Rack::env env) -> void
+      def deny: (Rack::env env) -> [Integer, Hash[String, String], Array[String]]
+      def report: (Rack::env env) -> true
+      def session?: (Rack::env env) -> bool
+
+      # Raises RuntimeError when there is no session in `env`.
+      def session: (Rack::env env) -> untyped
+
+      def drop_session: (Rack::env env) -> void
+      def referrer: (Rack::env env) -> String?
+      def empty_referrer_allowed?: (Rack::env env) -> boolish
+      def origin: (Rack::env env) -> String?
+      def random_string: (?boolish secure) -> String
+      def encrypt: (_ToS value) -> String
+      def secure_compare: (_ToS a, _ToS b) -> bool
+
+      alias default_reaction deny
+
+      def html?: (Hash[String, untyped] headers) -> bool
+    end
+
+    class AuthenticityToken < Base
+      TOKEN_LENGTH: Integer
+
+      def self.token: (untyped session, ?path: String?, ?method: (String | Symbol)?) -> String
+      def self.random_token: () -> String
+
+      def accepts?: (Rack::env env) -> boolish
+      def mask_authenticity_token: (untyped session, ?path: String?, ?method: (String | Symbol)?) -> String
+    end
+
+    class ContentSecurityPolicy < Base
+      DIRECTIVES: Array[Symbol]
+      NO_ARG_DIRECTIVES: Array[Symbol]
+
+      def csp_policy: () -> String
+      def call: (Rack::env env) -> Rack::response
+    end
+
+    class CookieTossing < Base
+      def call: (Rack::env env) -> Rack::response
+      def accepts?: (Rack::env env) -> bool
+      def remove_bad_cookies: (Rack::Request request, Rack::Response response) -> Array[String]?
+      def redirect: (Rack::env env) -> [Integer, Hash[String, String], Array[String]]
+      def bad_cookies: (Rack::env env) -> Array[String]
+      def cookie_paths: (String? path) -> Array[String]
+      def empty_cookie: (String? host, String path) -> { value: String, domain: String?, path: String, expires: Time }
+      def session_key: () -> String
+    end
+
+    class EscapedParams < Base
+      def self.escape_html: (String string) -> String
+
+      # Raises RuntimeError for `escape: :javascript` without an escaper that
+      # has escape_javascript.
+      def initialize: (Rack::_Application? app, ?Hash[Symbol, untyped] options) -> void
+
+      def call: (Rack::env env) -> Rack::response
+      def handle: [H < Hash[untyped, untyped]] (H hash) -> H
+      def escape: (String object) -> String
+                | [H < Hash[untyped, untyped]] (H object) -> H
+                | (Array[untyped] object) -> Array[untyped]
+                | (Tempfile object) -> Tempfile
+                | (untyped object) -> nil
+      def escape_hash: [H < Hash[untyped, untyped]] (H hash) -> H
+      def escape_string: (String str) -> String
+    end
+
+    class FormToken < AuthenticityToken
+      def accepts?: (Rack::env env) -> boolish
+    end
+
+    class FrameOptions < Base
+      def frame_options: () -> String
+      def call: (Rack::env env) -> Rack::response
+    end
+
+    class HostAuthorization < Base
+      def initialize: (Rack::_Application? app, ?Hash[Symbol, untyped] options) -> void
+      def accepts?: (Rack::env env) -> bool
+    end
+
+    class HttpOrigin < Base
+      DEFAULT_PORTS: Hash[String, Integer]
+
+      def base_url: (Rack::env env) -> String
+      def accepts?: (Rack::env env) -> bool
+    end
+
+    class IPSpoofing < Base
+      def accepts?: (Rack::env env) -> bool
+    end
+
+    class JsonCsrf < Base
+      alias react deny
+
+      def call: (Rack::env env) -> Rack::response
+      def has_vector?: (Rack::Request request, Hash[String, untyped] headers) -> bool
+      def react_and_close: (Rack::env env, untyped body) -> [Integer, Hash[String, String], Array[String]]
+      def close_body: (untyped body) -> void
+    end
+
+    class PathTraversal < Base
+      def call: (Rack::env env) -> Rack::response
+      def cleanup: (String path) -> String
+    end
+
+    class ReferrerPolicy < Base
+      def call: (Rack::env env) -> Rack::response
+    end
+
+    class RemoteReferrer < Base
+      def accepts?: (Rack::env env) -> bool
+    end
+
+    class RemoteToken < AuthenticityToken
+      def accepts?: (Rack::env env) -> boolish
+    end
+
+    class SessionHijacking < Base
+      def accepts?: (Rack::env env) -> boolish
+      def encode: (_ToS value) -> String
+
+      alias default_reaction drop_session
+    end
+
+    class StrictTransport < Base
+      def strict_transport: () -> String
+      def call: (Rack::env env) -> Rack::response
+    end
+
+    class XSSHeader < Base
+      def call: (Rack::env env) -> Rack::response
+    end
+  end
+end
