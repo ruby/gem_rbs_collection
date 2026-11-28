@@ -1,0 +1,123 @@
+module Sprockets
+  module Rails
+    VERSION: String
+
+    def self.deprecator: () -> ActiveSupport::Deprecation
+
+    module Utils
+      def using_sprockets4?: () -> bool
+    end
+
+    # Included into Sprockets' context class, so asset helpers in .erb and
+    # .scss assets resolve through the pipeline.
+    module Context
+      include ActionView::Helpers::AssetUrlHelper
+      include ActionView::Helpers::AssetTagHelper
+
+      def compute_asset_path: (String path, ?Hash[Symbol, untyped] options) -> String
+    end
+
+    # Included into ActionView::Base by the railtie.
+    module Helper
+      class AssetNotFound < StandardError
+      end
+
+      class AssetNotPrecompiled < StandardError
+      end
+
+      class AssetNotPrecompiledError < AssetNotPrecompiled
+        include Sprockets::Rails::Utils
+
+        def initialize: (_ToS source) -> void
+      end
+
+      include ActionView::Helpers::AssetUrlHelper
+      include ActionView::Helpers::AssetTagHelper
+      include Sprockets::Rails::Utils
+
+      VIEW_ACCESSORS: Array[Symbol]
+
+      # Raises AssetNotFound for an unknown asset unless
+      # unknown_asset_fallback is set, and (with check_precompiled_asset)
+      # AssetNotPrecompiledError for an asset that is not precompiled.
+      def compute_asset_path: (String path, ?Hash[Symbol, untyped] options) -> String
+
+      # Returns nil for an asset the resolvers do not know.
+      def resolve_asset_path: (String path, ?boolish allow_non_precompiled) -> String?
+
+      def asset_digest_path: (String path, ?Hash[Symbol, untyped] options) -> String?
+
+      def asset_integrity: (String | Symbol path, ?Hash[Symbol, untyped] options) -> String?
+
+      # Asset names, then optionally a Hash of options (tag attributes,
+      # plus debug and integrity; String or Symbol keys).
+      def javascript_include_tag: (*String | Symbol | Hash[String | Symbol, untyped] sources) -> ActiveSupport::SafeBuffer
+
+      def stylesheet_link_tag: (*String | Symbol | Hash[String | Symbol, untyped] sources) -> ActiveSupport::SafeBuffer
+    end
+
+    class LoggerSilenceError < StandardError
+    end
+
+    # Rack middleware that silences the logger for asset requests.
+    class QuietAssets
+      def initialize: (Rack::_Application app) -> void
+
+      # Raises LoggerSilenceError for an asset request when Rails.logger
+      # does not respond to silence.
+      def call: (Rack::env env) -> Rack::response
+    end
+
+    # Sprockets postprocessor for text/css.
+    class AssetUrlProcessor
+      REGEX: Regexp
+
+      def self.call: (Hash[Symbol, untyped] input) -> Hash[Symbol, untyped]
+    end
+
+    # Sprockets postprocessor for application/javascript.
+    class SourcemappingUrlProcessor
+      REGEX: Regexp
+
+      def self.call: (Hash[Symbol, untyped] input) -> { data: String }
+    end
+  end
+
+  # Defined when Rails::Railtie is loaded (require "sprockets/railtie").
+  class Railtie < ::Rails::Railtie
+    include Sprockets::Rails::Utils
+
+    class ManifestNeededError < StandardError
+      def initialize: () -> void
+    end
+
+    LOOSE_APP_ASSETS: ^(String logical_path, String filename) -> bool
+
+    # The class of config.assets.
+    class OrderedOptions < ActiveSupport::OrderedOptions
+      # Adds a block that build_environment calls with the new
+      # Sprockets::Environment.
+      def configure: () { (Sprockets::Environment env) -> void } -> Array[Proc]
+    end
+
+    # A Sprockets::CachedEnvironment when config.cache_classes is set.
+    def build_environment: (::Rails::Application app, ?boolish initialized) -> (Sprockets::Environment | Sprockets::CachedEnvironment)
+
+    # Rails::Railtie forwards class calls to the instance, as the gem does.
+    def self.build_environment: (::Rails::Application app, ?boolish initialized) -> (Sprockets::Environment | Sprockets::CachedEnvironment)
+
+    def self.build_manifest: (::Rails::Application app) -> Sprockets::Manifest
+  end
+end
+
+module Rails
+  class Application
+    # nil until the railtie's after_initialize sets it. (Rails::Application#assets
+    # is already declared by the railties RBS.)
+    attr_accessor assets_manifest: Sprockets::Manifest?
+
+    def asset_precompiled?: (String logical_path) -> bool
+
+    def precompiled_assets: (?boolish clear_cache) -> Set[String]
+  end
+end
