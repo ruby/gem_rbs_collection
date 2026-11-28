@@ -1,0 +1,40 @@
+class TestMessage
+  @data: String
+  def data: () -> String
+  def rsv1: () -> bool
+  def rsv2: () -> bool
+  def rsv3: () -> bool
+  def opcode: () -> Integer
+
+  def initialize: (String data) -> void
+end
+
+class TestFrame
+  @opcode: Integer
+  @rsv1: bool
+  def opcode: () -> Integer
+  def rsv1: () -> bool
+  def rsv2: () -> bool
+  def rsv3: () -> bool
+
+  def initialize: (Integer opcode, bool rsv1) -> void
+end
+
+class ReverseSession
+  def generate_offer: () -> Hash[String, untyped]
+  def activate: (WebSocket::Extensions::params params) -> bool
+  def generate_response: () -> Hash[String, untyped]
+  def process_incoming_message: (WebSocket::Extensions::_Message message) -> WebSocket::Extensions::_Message
+  def process_outgoing_message: (WebSocket::Extensions::_Message message) -> WebSocket::Extensions::_Message
+  def close: () -> nil
+end
+
+class ReverseExtension
+  def name: () -> String
+  def type: () -> String
+  def rsv1: () -> bool
+  def rsv2: () -> bool
+  def rsv3: () -> bool
+  def create_client_session: (Hash[Symbol, untyped] options) -> ReverseSession
+  def create_server_session: (Array[WebSocket::Extensions::params] offers, Hash[Symbol, untyped] options) -> ReverseSession
+end
