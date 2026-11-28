@@ -1,0 +1,175 @@
+# New I/O for Ruby. On MRI the classes come from the libev C extension; on
+# Windows, or with NIO4R_PURE=true, from the pure Ruby implementation. The
+# signatures hold for both.
+module NIO
+  VERSION: String
+
+  # "libev" (C extension), "ruby" (pure Ruby) or "java" (JRuby).
+  ENGINE: String
+
+  # I/O readiness a monitor is interested in: readable, writable or both.
+  type interest = :r | :w | :rw
+
+  interface _Env
+    def []: (String name) -> String?
+  end
+
+  def self.engine: () -> String
+
+  # Whether the pure Ruby implementation is used (NIO4R_PURE=true in env, or
+  # Windows outside JRuby).
+  def self.pure?: (?_Env env) -> bool
+
+  # Selectors monitor IO objects for events of interest.
+  class Selector
+    # Possible backends; which ones are available depends on the platform.
+    type backend = :ruby | :java | :epoll | :poll | :kqueue | :select | :port | :linuxaio | :io_uring
+
+    # Seconds; the C extension converts it with NUM2DBL.
+    type timeout = Integer | Float | Rational
+
+    def self.backends: () -> Array[backend]
+
+    # Raises ArgumentError for a backend not in Selector.backends. nil picks
+    # the default backend.
+    def initialize: (?backend? backend) -> void
+
+    # Raises IOError when the selector is closed (C extension).
+    def backend: () -> (backend | :unknown)
+
+    # Raises IOError when the selector is closed and ArgumentError when the
+    # IO is already registered.
+    def register: (_ToIO io, interest interest) -> NIO::Monitor
+
+    # Returns the monitor that was registered for the IO, or nil.
+    def deregister: (_ToIO io) -> NIO::Monitor?
+
+    def registered?: (_ToIO io) -> bool
+
+    # Waits for registered IOs to become ready (timeout in seconds, nil waits
+    # forever). Returns nil on timeout; with a block, yields each ready monitor
+    # and returns how many were ready. Raises ArgumentError for a negative
+    # timeout.
+    def select: (?timeout? timeout) -> Array[NIO::Monitor]?
+              | (?timeout? timeout) { (NIO::Monitor monitor) -> void } -> Integer?
+
+    def wakeup: () -> nil
+
+    def close: () -> void
+
+    def closed?: () -> bool
+
+    def empty?: () -> bool
+  end
+
+  # Monitors watch IO objects for specific events. Created by
+  # Selector#register.
+  class Monitor
+    # The object given to Selector#register (the C extension keeps it as is;
+    # the pure Ruby implementation keeps the IO it converts to).
+    def io: () -> _ToIO
+
+    def interests: () -> interest?
+
+    # Raises EOFError when the monitor is closed.
+    def interests=: (interest? interests) -> interest?
+
+    def add_interest: (interest interest) -> interest
+
+    def remove_interest: (interest interest) -> interest?
+
+    # nil after #close with the C extension.
+    def selector: () -> NIO::Selector?
+
+    attr_accessor value: untyped
+
+    # Readiness found by the last Selector#select.
+    def readiness: () -> interest?
+
+    def readable?: () -> bool
+
+    def writable?: () -> bool
+
+    alias writeable? writable?
+
+    def closed?: () -> bool
+
+    # Deactivates the monitor and, unless deregister is false, deregisters
+    # its IO from the selector.
+    def close: (?bool deregister) -> void
+  end
+
+  # Fixed-capacity byte buffer for non-blocking I/O.
+  class ByteBuffer
+    include Enumerable[Integer]
+
+    # Insufficient capacity in buffer
+    class OverflowError < IOError
+    end
+
+    # Not enough data remaining in buffer
+    class UnderflowError < IOError
+    end
+
+    # Mark has not been set
+    class MarkUnsetError < IOError
+    end
+
+    def initialize: (Integer capacity) -> void
+
+    # Zero-fills the buffer, sets the position to 0 and the limit to the
+    # capacity, and clears the mark.
+    def clear: () -> self
+
+    def capacity: () -> Integer
+
+    def position: () -> Integer
+
+    # Raises ArgumentError for a negative position or one past the limit
+    # (past the capacity in the pure Ruby implementation).
+    def position=: (Integer new_position) -> Integer
+
+    def limit: () -> Integer
+
+    # Raises ArgumentError for a negative limit or one past the capacity.
+    def limit=: (Integer new_limit) -> Integer
+
+    def remaining: () -> Integer
+
+    def full?: () -> bool
+
+    # Reads length bytes (all remaining bytes by default) and advances the
+    # position. Raises UnderflowError when fewer bytes remain.
+    def get: (?Integer length) -> String
+
+    # The byte at index (below the limit) as an Integer.
+    def []: (Integer index) -> Integer
+
+    # Raises OverflowError when the string does not fit.
+    def <<: (_ToStr str) -> self
+
+    # Non-blocking read into the buffer; returns the number of bytes read
+    # (0 when none were available).
+    def read_from: (_ToIO io) -> Integer
+
+    # Non-blocking write of the bytes between position and limit; returns the
+    # number of bytes written (0 when the write would block).
+    def write_to: (_ToIO io) -> Integer
+
+    def flip: () -> self
+
+    def rewind: () -> self
+
+    def mark: () -> self
+
+    # Raises MarkUnsetError when no mark is set.
+    def reset: () -> self
+
+    def compact: () -> self
+
+    # Yields the bytes up to the limit. The C extension requires a block.
+    def each: () { (Integer byte) -> void } -> void
+
+    def inspect: () -> String
+  end
+end
