@@ -1,0 +1,27 @@
+module Faraday
+  class Adapter
+    class NetHttpPersistent < Faraday::Adapter
+      # Low-level errors that #call turns into Faraday::ConnectionFailed
+      # (or Faraday::SSLError for OpenSSL::SSL::SSLError).
+      NET_HTTP_EXCEPTIONS: Array[singleton(StandardError)]
+
+      # `app` is ignored. `opts` are the connection options: `:name`
+      # (default "Faraday") and `:pool_size` are passed to
+      # Net::HTTP::Persistent.new. The block is called with the
+      # Net::HTTP::Persistent connection before each request.
+      def initialize: (?untyped app, ?Hash[Symbol, untyped] opts) ?{ (untyped http) -> void } -> void
+
+      # Performs the request with Net::HTTP::Persistent. Raises
+      # Faraday::ConnectionFailed, Faraday::TimeoutError or
+      # Faraday::SSLError for network errors.
+      def call: (Faraday::Env env) -> Faraday::Response
+
+      # Shuts down the persistent connections, if any were opened.
+      def close: () -> void
+    end
+  end
+
+  module NetHttpPersistent
+    VERSION: String
+  end
+end
