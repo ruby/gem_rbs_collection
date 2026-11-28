@@ -1,0 +1,293 @@
+module WebSocket
+  class Driver
+    include EventEmitter
+
+    # What every driver writes the protocol data to.
+    interface _Socket
+      def write: (String data) -> untyped
+    end
+
+    # The socket a client driver needs: the URL to connect to and a writer.
+    interface _ClientSocket
+      def url: () -> String
+
+      def write: (String data) -> untyped
+    end
+
+    # The socket a server-side driver built from a Rack env needs.
+    interface _RackSocket
+      def env: () -> Hash[String, untyped]
+
+      def url: () -> String
+
+      def write: (String data) -> untyped
+    end
+
+    MAX_LENGTH: Integer
+    STATES: Array[:connecting | :open | :closing | :closed]
+
+    class ProtocolError < StandardError
+    end
+
+    class URIError < ArgumentError
+    end
+
+    class ConfigurationError < ArgumentError
+    end
+
+    class ConnectEvent < Struct[untyped]
+      def self.new: () -> instance
+
+      def initialize: () -> void
+    end
+
+    class OpenEvent < Struct[untyped]
+      def self.new: () -> instance
+
+      def initialize: () -> void
+    end
+
+    class MessageEvent < Struct[untyped]
+      def self.new: (String | Array[Integer] data) -> instance
+
+      def initialize: (String | Array[Integer] data) -> void
+
+      # A String (UTF-8 for text, binary for binary messages), or an Array of
+      # bytes for binary messages when `binary_data_format: :array` is set.
+      attr_accessor data: String | Array[Integer]
+    end
+
+    class PingEvent < Struct[untyped]
+      def self.new: (String data) -> instance
+
+      def initialize: (String data) -> void
+
+      attr_accessor data: String
+    end
+
+    class PongEvent < Struct[untyped]
+      def self.new: (String data) -> instance
+
+      def initialize: (String data) -> void
+
+      attr_accessor data: String
+    end
+
+    class CloseEvent < Struct[untyped]
+      def self.new: (Integer? code, String? reason) -> instance
+
+      def initialize: (Integer? code, String? reason) -> void
+
+      # nil for the draft-75/76 drivers, which have no close codes.
+      attr_accessor code: Integer?
+
+      attr_accessor reason: String?
+    end
+
+    module EventEmitter
+      # Anything with `call`: the gem calls it with the event object.
+      interface _Listener
+        def call: (untyped event) -> void
+      end
+
+      def add_listener: [L < _Listener] (String | Symbol event, L callable) -> L
+                      | (String | Symbol event) { (untyped event) -> void } -> ^(untyped event) -> void
+
+      def on: [L < _Listener] (String | Symbol event, L callable) -> L
+            | (String | Symbol event) { (untyped event) -> void } -> ^(untyped event) -> void
+
+      def remove_listener: [L < _Listener] (String | Symbol event, L callable) -> L
+                         | (String | Symbol event) { (untyped event) -> void } -> ^(untyped event) -> void
+
+      def remove_all_listeners: (?(String | Symbol)? event) -> void
+
+      def emit: (String | Symbol event, *untyped args) -> void
+
+      def listener_count: (String | Symbol event) -> Integer
+
+      def listeners: (String | Symbol event) -> Array[_Listener]
+    end
+
+    class Headers
+      def initialize: (?Hash[String, String] received) -> void
+
+      def clear: () -> void
+
+      def []: (String | Symbol name) -> String?
+
+      # A nil value is ignored, and so is a repeated header (except Set-Cookie,
+      # Set-Cookie2, Warning and WWW-Authenticate).
+      def []=: (String name, _ToS value) -> void
+
+      def inspect: () -> String
+
+      def to_h: () -> Hash[String, String]
+
+      def to_s: () -> String
+    end
+
+    def self.client: (_ClientSocket socket, ?max_length: Integer, ?protocols: Array[String] | String, ?binary_data_format: (:array | :string)?, ?allow_drafts: boolish, ?masking: boolish, ?require_masking: boolish) -> Client
+                   | (_ClientSocket socket, Hash[Symbol, untyped] options) -> Client
+
+    def self.server: (_Socket socket, ?max_length: Integer, ?protocols: Array[String] | String, ?binary_data_format: (:array | :string)?, ?allow_drafts: boolish, ?masking: boolish, ?require_masking: boolish) -> Server
+                   | (_Socket socket, Hash[Symbol, untyped] options) -> Server
+
+    # Hybi, unless `allow_drafts: true` is set and the request is a draft-75/76 one.
+    def self.rack: (_RackSocket socket, ?max_length: Integer, ?protocols: Array[String] | String, ?binary_data_format: (:array | :string)?, ?allow_drafts: boolish, ?masking: boolish, ?require_masking: boolish) -> (Hybi | Draft76 | Draft75)
+                 | (_RackSocket socket, Hash[Symbol, untyped] options) -> (Hybi | Draft76 | Draft75)
+
+    def self.encode: (String | Array[Integer] data, ?Encoding? encoding) -> String
+
+    # Raises WebSocket::Extensions::ExtensionError for a key not in valid_keys.
+    def self.validate_options: [K, V] (Hash[K, V]? options, Array[K] valid_keys) -> Hash[K, V]
+
+    def self.websocket?: (Hash[String, untyped] env) -> bool
+
+    def initialize: (_Socket socket, ?max_length: Integer, ?protocols: Array[String] | String, ?binary_data_format: (:array | :string)?, ?allow_drafts: boolish, ?masking: boolish, ?require_masking: boolish) -> void
+                  | (_Socket socket, Hash[Symbol, untyped] options) -> void
+
+    attr_reader protocol: String?
+
+    attr_reader ready_state: Integer
+
+    # nil while a client driver has not started.
+    def state: () -> (:connecting | :open | :closing | :closed)?
+
+    # `extension` is a websocket-extensions extension. Returns false for
+    # drivers without extension support.
+    def add_extension: (untyped extension) -> bool
+
+    def set_header: (String name, _ToS value) -> bool
+
+    def start: () -> bool
+
+    # true when sent or queued, false when the driver can no longer send. A
+    # failing extension makes the driver close, and the result is then not a
+    # bool.
+    def text: (String message) -> boolish
+
+    def binary: (String | Array[Integer] message) -> bool
+
+    # Drivers without ping support (draft-75/76) return false and ignore
+    # the block.
+    def ping: (*untyped) ?{ () -> void } -> bool
+
+    def pong: (*untyped) -> bool
+
+    def close: (?String? reason, ?Integer? code) -> bool
+
+    class Hybi < Driver
+      VERSION: String
+      ERRORS: Hash[Symbol, Integer]
+
+      def self.generate_accept: (String key) -> String
+
+      def version: () -> String
+
+      def add_extension: (untyped extension) -> bool
+
+      def parse: (String chunk) -> void
+
+      def binary: (String | Array[Integer] message) -> boolish
+
+      def ping: (?String message) ?{ () -> void } -> boolish
+
+      def pong: (?String message) -> boolish
+
+      def close: (?String? reason, ?Integer? code) -> bool
+    end
+
+    class Client < Hybi
+      def self.generate_key: () -> String
+
+      # The HTTP status of the handshake response, nil until it arrives.
+      attr_reader status: Integer?
+
+      # The request headers until the handshake response arrives, then the
+      # response headers.
+      attr_reader headers: Headers
+
+      def initialize: (_ClientSocket socket, ?max_length: Integer, ?protocols: Array[String] | String, ?binary_data_format: (:array | :string)?, ?allow_drafts: boolish, ?masking: boolish, ?require_masking: boolish) -> void
+                    | (_ClientSocket socket, Hash[Symbol, untyped] options) -> void
+
+      def version: () -> String
+
+      def proxy: (String origin, ?Hash[untyped, untyped] options) -> Proxy
+
+      def start: () -> bool
+
+      def parse: (String chunk) -> void
+    end
+
+    class Server < Driver
+      # The Rack env of the request, nil until the request has been parsed.
+      def env: () -> Hash[String, untyped]?
+
+      def url: () -> String?
+
+      def write: (String buffer) -> untyped
+
+      def parse: (String chunk) -> void
+
+      def add_extension: (untyped extension) -> bool
+
+      def set_header: (String name, _ToS value) -> bool
+
+      def start: () -> bool
+
+      def text: (String message) -> boolish
+
+      def binary: (String | Array[Integer] message) -> boolish
+
+      def ping: (?String message) ?{ () -> void } -> boolish
+
+      def close: (?String? reason, ?Integer? code) -> bool
+
+      def protocol: () -> String?
+
+      # nil until the request has been parsed.
+      def version: () -> String?
+    end
+
+    class Draft75 < Driver
+      def initialize: (_RackSocket socket, ?max_length: Integer, ?protocols: Array[String] | String, ?binary_data_format: (:array | :string)?, ?allow_drafts: boolish, ?masking: boolish, ?require_masking: boolish) -> void
+                    | (_RackSocket socket, Hash[Symbol, untyped] options) -> void
+
+      def version: () -> String
+
+      def close: (?String? reason, ?Integer? code) -> bool
+
+      def parse: (String chunk) -> void
+    end
+
+    class Draft76 < Draft75
+      def version: () -> String
+
+      def start: () -> bool
+
+      def close: (?String? reason, ?Integer? code) -> bool
+    end
+
+    class Proxy
+      include EventEmitter
+
+      # The HTTP status of the proxy's response, nil until it arrives.
+      attr_reader status: Integer?
+
+      attr_reader headers: Headers
+
+      def initialize: (Client client, String origin, Hash[untyped, untyped] options) -> void
+
+      def set_header: (String name, _ToS value) -> bool
+
+      def start: () -> bool
+
+      def parse: (String chunk) -> void
+    end
+  end
+
+  module Mask
+    # A nil mask returns the payload unchanged.
+    def self.mask: (String payload, String? mask) -> String
+  end
+end
