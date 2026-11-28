@@ -1,0 +1,324 @@
+module Dry
+  # Defined when dry/core (or dry/core/equalizer) is loaded.
+  def self.Equalizer: (*interned keys, ?inspect: bool, ?immutable: bool) -> Core::Equalizer
+
+  module Core
+    include Constants
+
+    VERSION: String
+
+    def self.Equalizer: (*interned keys, ?inspect: bool, ?immutable: bool) -> Equalizer
+
+    # A list of constants you can use to avoid memory allocations or identity checks.
+    # Including the module copies the constants into the includer.
+    module Constants
+      EMPTY_ARRAY: ::Array[untyped]
+      EMPTY_HASH: ::Hash[untyped, untyped]
+      EMPTY_OPTS: ::Hash[untyped, untyped]
+      EMPTY_SET: ::Set[untyped]
+      EMPTY_STRING: ::String
+      IDENTITY: ^(untyped) -> untyped
+
+      # The methods defined on the singleton object `Undefined`.
+      interface _Undefined
+        def to_s: () -> ::String
+        def inspect: () -> ::String
+
+        # Returns `x` unless it is Undefined, otherwise `y` (or the block's
+        # result when `y` is omitted or Undefined as well).
+        def default: [T, U] (T | undefined x, U y) -> (T | U)
+                   | [T, U] (T | undefined x) { () -> U } -> (T | U)
+                   | [T, U, V] (T | undefined x, U | undefined y) { () -> V } -> (T | U | V)
+
+        # Yields `value` unless it is Undefined; returns Undefined otherwise.
+        def map: [T, U] (T | undefined value) { (T) -> U } -> (U | undefined)
+
+        # The first argument that is not Undefined, or Undefined.
+        def coalesce: [T] (*T | undefined args) -> (T | undefined)
+
+        def dup: () -> self
+        def clone: () -> self
+      end
+
+      type undefined = ::Object & _Undefined
+
+      Undefined: undefined
+      Self: ^() -> undefined
+    end
+
+    class InvalidClassAttributeValueError < ::StandardError
+      def initialize: (interned name, untyped value) -> void
+    end
+
+    class BasicObject < ::BasicObject
+      def class: () -> ::Class
+      def inspect: () -> ::String
+      def instance_of?: (::Module klass) -> bool
+      def is_a?: (::Module klass) -> bool
+      def kind_of?: (::Module klass) -> bool
+      def object_id: () -> ::Integer
+
+      interface _PrettyPrinter
+        def text: (::String obj) -> untyped
+      end
+
+      def pretty_print: (_PrettyPrinter printer) -> void
+      def respond_to?: (interned method_name, ?boolish include_all) -> bool
+    end
+
+    # Extend a class with it to get `fetch_or_store` on the class; the
+    # extended hook also includes Cache::Methods into the class.
+    module Cache
+      # The block receives the hash of the arguments, the cache key.
+      def fetch_or_store: [T] (*untyped args) { (::Integer key) -> T } -> T
+                        | (*untyped args) -> untyped
+
+      module Methods
+        def fetch_or_store: [T] (*untyped args) { (::Integer key) -> T } -> T
+                          | (*untyped args) -> untyped
+      end
+    end
+
+    module ClassAttributes
+      include Constants
+
+      interface _CaseEquality
+        def ===: (untyped value) -> boolish
+      end
+
+      interface _Coercer
+        def call: (untyped value) -> untyped
+      end
+
+      # Raises ArgumentError when coerce does not respond to `call`.
+      def defines: (*interned names, ?type: _CaseEquality, ?coerce: _Coercer) -> self
+    end
+
+    class ClassBuilder
+      class ParentClassMismatch < ::TypeError
+      end
+
+      attr_reader name: ::String
+      attr_reader parent: ::Class
+      attr_reader namespace: ::Module?
+
+      def initialize: (name: ::String, ?parent: ::Class?, ?namespace: ::Module?) -> void
+
+      # Raises ParentClassMismatch when the existing constant in the
+      # namespace is not a subclass of parent.
+      def call: () ?{ (::Class klass) -> void } -> ::Class
+    end
+
+    module Deprecations
+      interface _Logger
+        def warn: (::String message) -> untyped
+      end
+
+      def self.warn: (::String msg, ?tag: (::String | ::Symbol)?, ?uplevel: ::Integer?) -> void
+      def self.announce: (_ToS name, ::String msg, ?tag: (::String | ::Symbol)?, ?uplevel: ::Integer?) -> void
+      def self.logger: (?Logger::logdev? | _Logger output) -> _Logger
+      def self.set_logger!: [L < _Logger] (L logger) -> L
+                          | (?Logger::logdev? output) -> ::Logger
+      def self.[]: (::String | ::Symbol tag) -> ::Module
+
+      module Interface : ::Module
+        def deprecation_tag: (?(::String | ::Symbol)? tag) -> (::String | ::Symbol)?
+        def warn: (::String msg) -> void
+        def deprecate: (interned old_name, ?interned? new_name, ?message: ::String?) -> ::Symbol
+        def deprecate_class_method: (interned old_name, ?interned? new_name, ?message: ::String?) -> ::Symbol
+        def deprecate_constant: (::Symbol constant_name, ?message: ::String?) -> self
+      end
+    end
+
+    module DescendantsTracker
+      attr_reader descendants: ::Array[::Class]
+    end
+
+    class Equalizer < ::Module
+      def initialize: (*interned keys, ?inspect: bool, ?immutable: bool) -> void
+
+      module Methods
+        def eql?: (untyped other) -> bool
+        def ==: (untyped other) -> bool
+      end
+    end
+
+    module Extensions
+      def register_extension: (::Symbol name) { () -> void } -> ::Proc
+      def available_extension?: (::Symbol name) -> bool
+
+      # Raises ArgumentError for an unknown extension.
+      def load_extensions: (*::Symbol extensions) -> ::Array[::Symbol]
+    end
+
+    # Thin interface around activesupport, dry-inflector or inflecto,
+    # whichever is installed.
+    module Inflector
+      def self.select_backend: (?(:activesupport | :dry_inflector | :inflecto)? name) -> untyped
+      def self.camelize: (::String input) -> ::String
+      def self.underscore: (::String input) -> ::String
+      def self.singularize: (::String input) -> ::String
+      def self.pluralize: (::String input) -> ::String
+      def self.demodulize: (::String input) -> ::String
+      def self.constantize: (::String input) -> untyped
+      def self.classify: (::String input) -> ::String
+    end
+
+    # Including the module extends the class with ClassInterface::Object
+    # (or ClassInterface::BasicObject for BasicObject subclasses).
+    module Memoizable
+      module ClassInterface
+        module Base : ::Module
+          def memoize: (*interned names) -> self
+        end
+
+        module BasicObject : ::Module
+          include Base
+        end
+
+        module Object : ::Module
+          include Base
+        end
+      end
+    end
+
+    class Container
+      type key = ::String | ::Symbol
+
+      include Constants
+
+      class Error < ::StandardError
+      end
+
+      class KeyError < ::KeyError[untyped, untyped]
+      end
+
+      module Mixin
+        def register: (key key, ?untyped contents, ?::Hash[::Symbol, untyped] options) ?{ (?) -> untyped } -> self
+
+        # Raises Container::KeyError for a missing key unless a block is given.
+        def resolve: (key key) ?{ (key key) -> untyped } -> untyped
+
+        def []: (key key) -> untyped
+
+        def merge: (Mixin other, ?namespace: key?) ?{ (::String key, untyped old_item, untyped new_item) -> untyped } -> self
+
+        def key?: (key key) -> bool
+
+        def keys: () -> ::Array[::String]
+
+        def each_key: () ?{ (::String key) -> void } -> self
+
+        def each: () { ([::String, untyped] pair) -> void } -> ::Array[[::String, untyped]]
+                | () -> ::Enumerator[[::String, untyped], ::Array[[::String, untyped]]]
+
+        interface _Decorator
+          def call: (untyped item) -> untyped
+        end
+
+        def decorate: (key key, with: ::Class | _Decorator) -> self
+                    | (key key) { (untyped item) -> untyped } -> self
+
+        # A block without parameters is evaluated in the NamespaceDSL;
+        # otherwise the DSL is yielded to it.
+        def namespace: (key namespace) { (NamespaceDSL namespace) [self: NamespaceDSL] -> void } -> self
+
+        def import: (Namespace namespace) -> self
+
+        def freeze: () -> self
+
+        def dup: () -> self
+
+        def clone: () -> self
+
+        # Defined by dry/core/container/stub.
+        def enable_stubs!: () -> self
+      end
+
+      include Mixin
+
+      def initialize: () -> void
+
+      class Namespace
+        attr_reader name: key
+        attr_reader block: ::Proc
+
+        def initialize: (key name) { (NamespaceDSL namespace) [self: NamespaceDSL] -> void } -> void
+      end
+
+      # What the block of Mixin#namespace runs in; other methods are
+      # delegated to the container.
+      class NamespaceDSL < ::SimpleDelegator
+        def initialize: (Mixin container, key namespace, ::String namespace_separator) { (NamespaceDSL namespace) [self: NamespaceDSL] -> void } -> void
+
+        def register: (key key, ?untyped contents, ?::Hash[::Symbol, untyped] options) ?{ (?) -> untyped } -> Mixin
+
+        def namespace: (key namespace) { (NamespaceDSL namespace) [self: NamespaceDSL] -> void } -> Mixin
+
+        def import: (Namespace namespace) -> self
+
+        def resolve: (key key) ?{ (::String key) -> untyped } -> untyped
+      end
+
+      # Added to a container by Mixin#enable_stubs!.
+      module Stub : Mixin
+        def resolve: (key key) ?{ (key key) -> untyped } -> untyped
+
+        def stub: (key key, untyped value) ?{ () -> void } -> self
+
+        def unstub: (*key keys) -> ::Array[key]
+
+        def enable_stubs!: () -> nil
+      end
+
+      class Item
+        attr_reader item: untyped
+        attr_reader options: ::Hash[::Symbol, untyped]
+
+        def initialize: (untyped item, ?::Hash[::Symbol, untyped] options) -> void
+
+        # Abstract: raises NotImplementedError; Callable and Memoizable implement it.
+        def call: () -> untyped
+
+        class Callable < Item
+          def call: () -> untyped
+        end
+
+        class Memoizable < Item
+          attr_reader memoize_mutex: ::Thread::Mutex
+
+          def call: () -> untyped
+
+          # Raises Container::Error unless the item is callable.
+          def initialize: (untyped item, ?::Hash[::Symbol, untyped] options) -> void
+        end
+
+        class Factory
+          def call: (untyped item, ?::Hash[::Symbol, untyped] options) -> (Callable | Memoizable)
+        end
+      end
+
+      class Registry
+        def initialize: () -> void
+
+        # Raises Container::KeyError when the key is already registered.
+        def call: (::Hash[untyped, untyped] container, key key, untyped item, ::Hash[::Symbol, untyped] options) -> (Item::Callable | Item::Memoizable)
+      end
+
+      class Resolver
+        # Raises Container::KeyError for a missing key unless a block is given.
+        def call: (::Hash[untyped, untyped] container, key key) ?{ (key key) -> untyped } -> untyped
+
+        def key?: (::Hash[untyped, untyped] container, key key) -> bool
+
+        def keys: (::Hash[untyped, untyped] container) -> ::Array[::String]
+
+        def each_key: (::Hash[untyped, untyped] container) { (::String key) -> void } -> ::Hash[untyped, untyped]
+                    | (::Hash[untyped, untyped] container) -> ::Enumerator[::String, ::Hash[untyped, untyped]]
+
+        def each: (::Hash[untyped, untyped] container) { ([::String, untyped] pair) -> void } -> ::Array[[::String, untyped]]
+                | (::Hash[untyped, untyped] container) -> ::Enumerator[[::String, untyped], ::Array[[::String, untyped]]]
+      end
+    end
+  end
+end
