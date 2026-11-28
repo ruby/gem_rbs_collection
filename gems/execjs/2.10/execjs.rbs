@@ -1,0 +1,209 @@
+# ExecJS runs JavaScript code from Ruby through the best available runtime.
+#
+# Values coming back from JavaScript are untyped: what a JavaScript value
+# becomes in Ruby depends on the runtime (for example a Date is a String
+# with the external runtimes, a Time with mini_racer and an empty Hash with
+# Duktape).
+module ExecJS
+  VERSION: String
+
+  class Error < StandardError
+  end
+
+  class RuntimeError < Error
+  end
+
+  class ProgramError < Error
+  end
+
+  class RuntimeUnavailable < RuntimeError
+  end
+
+  # Raises RuntimeUnavailable when no JavaScript runtime is found.
+  def self.runtime: () -> Runtime
+
+  # Raises RuntimeUnavailable when the runtime is not available.
+  def self.runtime=: (Runtime runtime) -> Runtime
+
+  def self.exec: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+  def self.eval: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+  def self.compile: (String source, ?Hash[Symbol, untyped] options) -> Runtime::Context
+
+  def self.runtimes: () -> Array[Runtime]
+
+  def self.root: () -> String
+
+  # The match position of the platform pattern in the host OS name, or nil.
+  def self.windows?: () -> Integer?
+
+  # The match position of the platform pattern in the host OS name, or nil.
+  def self.cygwin?: () -> Integer?
+
+  # Abstract base class for runtimes
+  class Runtime
+    class Context
+      def initialize: (Runtime runtime, ?String source, ?Hash[Symbol, untyped] options) -> void
+
+      def exec: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def eval: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def call: (String identifier, *untyped args) -> untyped
+    end
+
+    # The built-in runtimes all have a name; an ExternalRuntime built
+    # without :name returns nil.
+    def name: () -> String
+
+    def context_class: () -> singleton(Context)
+
+    def exec: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+    def eval: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+    def compile: (String source, ?Hash[Symbol, untyped] options) -> Context
+
+    def deprecated?: () -> bool
+
+    def available?: () -> bool
+  end
+
+  class DisabledRuntime < Runtime
+    def name: () -> String
+
+    # Always raises ExecJS::Error.
+    def exec: (String source, ?Hash[Symbol, untyped] options) -> bot
+
+    # Always raises ExecJS::Error.
+    def eval: (String source, ?Hash[Symbol, untyped] options) -> bot
+
+    # Always raises ExecJS::Error.
+    def compile: (String source, ?Hash[Symbol, untyped] options) -> bot
+
+    def deprecated?: () -> bool
+
+    def available?: () -> bool
+  end
+
+  class DuktapeRuntime < Runtime
+    class Context < Runtime::Context
+      def initialize: (Runtime runtime, ?String source, ?Hash[Symbol, untyped] options) -> void
+
+      def exec: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def eval: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def call: (String identifier, *untyped args) -> untyped
+    end
+
+    def name: () -> String
+
+    def available?: () -> bool
+  end
+
+  class ExternalRuntime < Runtime
+    class Context < Runtime::Context
+      def initialize: (ExternalRuntime runtime, ?String source, ?Hash[Symbol, untyped] options) -> void
+
+      def exec: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def eval: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def call: (String identifier, *untyped args) -> untyped
+    end
+
+    attr_reader name: String?
+
+    def initialize: (
+      {
+        ?name: String,
+        command: String | Array[String],
+        ?runner_path: String,
+        ?encoding: String | Encoding,
+        ?deprecated: boolish
+      } options
+    ) -> void
+
+    def available?: () -> bool
+
+    def deprecated?: () -> bool
+  end
+
+  class MiniRacerRuntime < Runtime
+    class Context < Runtime::Context
+      def initialize: (Runtime runtime, ?String source, ?Hash[Symbol, untyped] options) -> void
+
+      def exec: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def eval: (String source, ?Hash[Symbol, untyped] options) -> untyped
+
+      def call: (String identifier, *untyped args) -> untyped
+    end
+
+    def name: () -> String
+
+    def available?: () -> bool
+  end
+
+  # therubyrhino runs on JRuby only.
+  class RubyRhinoRuntime < Runtime
+    class Context < Runtime::Context
+    end
+
+    def name: () -> String
+
+    def available?: () -> bool
+  end
+
+  # Graal.js runs on TruffleRuby only.
+  class GraalJSRuntime < Runtime
+    class Context < Runtime::Context
+    end
+
+    def name: () -> String
+
+    def available?: () -> bool
+  end
+
+  module Runtimes
+    Disabled: DisabledRuntime
+
+    Duktape: DuktapeRuntime
+
+    RubyRhino: RubyRhinoRuntime
+
+    GraalJS: GraalJSRuntime
+
+    MiniRacer: MiniRacerRuntime
+
+    Node: ExternalRuntime
+
+    Bun: ExternalRuntime
+
+    JavaScriptCore: ExternalRuntime
+
+    SpiderMonkey: ExternalRuntime
+
+    Spidermonkey: ExternalRuntime
+
+    JScript: ExternalRuntime
+
+    V8: ExternalRuntime
+
+    # Raises RuntimeUnavailable when no JavaScript runtime is found.
+    def self.autodetect: () -> Runtime
+
+    def self.best_available: () -> Runtime?
+
+    # The runtime named by the EXECJS_RUNTIME environment variable, or nil
+    # when it is unset or empty. Raises RuntimeUnavailable when that runtime
+    # is not defined or not available.
+    def self.from_environment: () -> Runtime?
+
+    def self.names: () -> Array[Symbol]
+
+    def self.runtimes: () -> Array[Runtime]
+  end
+end
