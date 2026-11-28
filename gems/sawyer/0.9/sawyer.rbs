@@ -1,0 +1,179 @@
+module Sawyer
+  VERSION: String
+
+  class Error < StandardError
+  end
+
+  # Splits a resource's data into its attributes and its link relations.
+  # The links go to Relation.from_links, so they are a Hash or nil.
+  interface _LinksParser
+    def parse: (Hash[Symbol, untyped] data) -> [Hash[Symbol, untyped], untyped]
+  end
+
+  class Agent
+    def self.serializer: () -> Serializer
+    attr_writer self.serializer: Serializer
+
+    def self.encode: (untyped data) -> String
+    def self.decode: (String? data) -> untyped
+
+    attr_accessor links_parser: _LinksParser
+    attr_accessor allow_undefined_methods: boolish
+
+    # options: :faraday (a Faraday::Connection), :serializer, :links_parser,
+    # :allow_undefined_methods.
+    def initialize: (String endpoint, ?Hash[Symbol, untyped]? options) ?{ (Faraday::Connection conn) -> void } -> void
+
+    def close: () -> void
+    def rels: () -> Relation::Map
+    def root: () -> Response
+    def start: () -> Response
+
+    # For :get and :head, data is used as the options when options is nil.
+    # options: :headers, :query, :uri (template variables for url).
+    def call: (Symbol method, String | Addressable::Template url, ?untyped data, ?Hash[Symbol, untyped]? options) -> Response
+
+    def encode_body: (untyped data) -> String
+    def decode_body: (String? str) -> untyped
+    def parse_links: (Hash[Symbol, untyped] data) -> [Hash[Symbol, untyped], untyped]
+    def expand_url: (String | Addressable::Template url, ?Hash[untyped, untyped]? options) -> String
+    def allow_undefined_methods?: () -> bool
+    def inspect: () -> String
+  end
+
+  class Resource
+    include Enumerable[[Symbol, untyped]]
+    extend Forwardable
+
+    # Defines a reader, a writer and a predicate for each attribute and
+    # returns the arguments.
+    def self.attr_accessor: (*interned attrs) -> Array[interned]
+
+    attr_reader _agent: Agent
+    attr_reader _rels: Relation::Map
+    attr_reader _fields: Set[Symbol]
+    attr_reader attrs: Hash[Symbol, untyped]
+
+    def initialize: (Agent agent, ?Hash[Symbol, untyped] data) -> void
+
+    def key?: (Symbol key) -> bool
+
+    # Calls the attribute's reader; nil when there is no such method.
+    def []: (interned method) -> untyped
+    def []=: (interned method, untyped value) -> untyped
+
+    def dig: (Symbol key, *untyped identifiers) -> untyped
+    def fetch: (Symbol key) -> untyped
+             | (Symbol key, untyped default) -> untyped
+             | (Symbol key) { (Symbol key) -> untyped } -> untyped
+
+    def inspect: () -> String
+
+    def each: () { ([Symbol, untyped]) -> void } -> Hash[Symbol, untyped]
+            | () -> Enumerator[[Symbol, untyped], Hash[Symbol, untyped]]
+
+    def to_attrs: () -> Hash[Symbol, untyped]
+    alias to_hash to_attrs
+    alias to_h to_attrs
+  end
+
+  class Relation
+    class Map
+      def initialize: () -> void
+
+      def <<: (Relation rel) -> Relation
+            | (Relation? rel) -> Relation?
+
+      def []: (interned key) -> Relation?
+      def size: () -> Integer
+      def keys: () -> Array[Symbol]
+      def to_hash: () -> Hash[Symbol, String]
+      alias to_h to_hash
+      def inspect: () -> String
+    end
+
+    attr_reader agent: Agent?
+    attr_reader name: Symbol
+    attr_reader href_template: Addressable::Template
+    attr_reader method: Symbol
+    attr_reader available_methods: Set[Symbol]
+
+    # index maps relation names to a Hash with :href and :method, or to an
+    # href String. An Array raises ArgumentError.
+    def self.from_links: (Agent? agent, Hash[untyped, untyped]? index, ?Map rels) -> Map
+
+    def self.from_link: (Agent? agent, interned name, Hash[Symbol, untyped] | String options) -> Relation
+                      | (Agent? agent, interned name, untyped options) -> Relation?
+
+    # method may list several methods ("get,post"); the first is the default.
+    def initialize: (Agent? agent, interned name, String? href, ?(String | Symbol)? method) -> void
+
+    def head: (?Hash[Symbol, untyped]? options) -> Response
+    def get: (?Hash[Symbol, untyped]? options) -> Response
+    def post: (?untyped data, ?Hash[Symbol, untyped]? options) -> Response
+    def put: (?untyped data, ?Hash[Symbol, untyped]? options) -> Response
+    def patch: (?untyped data, ?Hash[Symbol, untyped]? options) -> Response
+    def delete: (?untyped data, ?Hash[Symbol, untyped]? options) -> Response
+    def options: (?untyped data, ?Hash[Symbol, untyped]? opt) -> Response
+
+    def href: (?Hash[untyped, untyped]? options) -> String
+
+    # Raises ArgumentError when options[:method] is not available.
+    def call: (?untyped data, ?Hash[Symbol, untyped]? options) -> Response
+
+    def inspect: () -> String
+  end
+
+  class Response
+    attr_reader agent: Agent
+    attr_reader status: Integer
+    attr_reader headers: Faraday::Utils::Headers
+    attr_reader env: Faraday::Env
+    attr_reader body: untyped
+    attr_reader rels: Hash[Symbol, Relation]
+
+    # options: :sawyer_started and :sawyer_ended (Times), which Agent#call
+    # always passes.
+    def initialize: (Agent agent, Faraday::Response res, ?Hash[Symbol, untyped] options) -> void
+
+    # The decoded body (Resource, Array, ...) for JSON and msgpack
+    # responses, the raw body otherwise.
+    def data: () -> untyped
+
+    def timing: () -> Float
+
+    # nil when the Response was built without :sawyer_ended.
+    def time: () -> Time?
+
+    def inspect: () -> String
+  end
+
+  class Serializer
+    def self.any_json: () -> Serializer
+    def self.yajl: () -> Serializer?
+    def self.json: () -> Serializer?
+    def self.multi_json: () -> Serializer?
+    def self.message_pack: () -> Serializer?
+
+    # format responds to dump and load, or to the given method names.
+    def initialize: (untyped format, ?interned? dump_method_name, ?interned? load_method_name) -> void
+
+    def encode: (untyped data) -> String
+    alias dump encode
+
+    def decode: (String? data) -> untyped
+    alias load decode
+  end
+
+  module LinkParsers
+    class Hal
+      # Removes :_links from data and returns it as the links.
+      def parse: (Hash[Symbol, untyped] data) -> [Hash[Symbol, untyped], untyped]
+    end
+
+    class Simple
+      # Returns *_url values (url as :self) as the links.
+      def parse: (Hash[Symbol, untyped] data) -> [Hash[Symbol, untyped], Hash[Symbol, untyped]]
+    end
+  end
+end
