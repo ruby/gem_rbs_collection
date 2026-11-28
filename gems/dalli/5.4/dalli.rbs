@@ -1,0 +1,280 @@
+# Classes for Dalli, the memcached client used by Rails' MemCacheStore.
+module Dalli
+  VERSION: String
+
+  MIN_SUPPORTED_MEMCACHED_VERSION: String
+
+  # What Dalli logs to: a Logger, Rails.logger (ActiveSupport::BroadcastLogger
+  # is not a Logger subclass), or anything with these methods.
+  interface _Logger
+    def debug: (?untyped message) ?{ () -> untyped } -> untyped
+
+    def info: (?untyped message) ?{ () -> untyped } -> untyped
+
+    def warn: (?untyped message) ?{ () -> untyped } -> untyped
+
+    def error: (?untyped message) ?{ () -> untyped } -> untyped
+  end
+
+  # Rails.logger when Rails is loaded, else a Logger on $stdout.
+  def self.logger: () -> _Logger
+
+  def self.logger=: (_Logger logger) -> _Logger
+
+  class DalliError < RuntimeError
+  end
+
+  class NetworkError < DalliError
+  end
+
+  class RingError < DalliError
+  end
+
+  class MarshalError < DalliError
+  end
+
+  class UnmarshalError < DalliError
+  end
+
+  class ValueOverMaxSize < DalliError
+  end
+
+  class NotPermittedMultiOpError < DalliError
+  end
+
+  class ServerError < DalliError
+  end
+
+  class RetryableNetworkError < NetworkError
+    def initialize: (?String? message, ?request_sent: bool) -> void
+
+    def request_sent?: () -> bool
+  end
+
+  class UnexpectedReplyKeyError < DalliError
+  end
+
+  class DeadlineExceededError < DalliError
+  end
+
+  # The value Client#get, #gat and #fetch return for a missing key when
+  # cache_nils is on (a stored nil is then returned as nil).
+  class NilObject
+  end
+
+  NOT_FOUND: NilObject
+
+  QUIET: Symbol
+
+  class Client
+    # Keys are converted with to_s (get_multi returns them as Strings); nil
+    # and "" raise ArgumentError.
+    type key = String | Symbol | Integer
+
+    # nil uses the :expires_in option (default 0, no expiry). A String must be
+    # decimal digits; anything else is converted with to_i (Float,
+    # ActiveSupport::Duration).
+    type ttl = _ToI?
+
+    # Per-request options such as raw:, cache_nils:, p_token:, l_token:, and
+    # for #delete invalidate:, tombstone_ttl:, drop_value:.
+    type req_options = Hash[Symbol, untyped]?
+
+    # A CAS value: an Integer or a String of decimal digits, 0 to 2**64 - 1.
+    type cas = Integer | String
+
+    # Returned by #get_with_metadata. hit_before, last_access and
+    # ttl_remaining are present only when requested.
+    type metadata = {
+      value: untyped,
+      cas: Integer,
+      won_recache: bool,
+      stale: bool,
+      lost_recache: bool,
+      miss: bool,
+      ?hit_before: bool?,
+      ?last_access: Integer,
+      ?ttl_remaining: Integer
+    }
+
+    # One entry of the Hash #get_multi_with_metadata returns.
+    type multi_metadata = { value: untyped, cas: Integer, stale: bool, miss: bool }
+
+    def initialize: (?(String | Array[String])? servers, ?Hash[Symbol, untyped] options) -> void
+
+    # nil for a missing key (Dalli::NOT_FOUND with cache_nils: true).
+    def get: (key key, ?(Hash[Symbol, untyped] | false)? req_options) -> untyped
+
+    def gat: (key key, ?ttl ttl, ?req_options req_options) -> untyped
+
+    def touch: (key key, ?ttl ttl) -> true?
+
+    def get_cas: (key key, ?req_options req_options) -> [untyped, Integer]
+               | [T] (key key, ?req_options req_options) { (untyped value, Integer cas) -> T } -> T
+
+    def get_with_metadata: (key key, ?Hash[Symbol, untyped] options) -> metadata
+
+    def get_with_metadata_result: (key key, ?Hash[Symbol, untyped] options) -> CacheResult
+
+    # Missing keys are left out. With a block, yields each key found and
+    # its value.
+    def get_multi: (*(key | Array[key?] | nil) keys, ?req_options: req_options) -> Hash[String, untyped]
+                 | (*(key | Array[key?] | nil) keys, ?req_options: req_options) { (String key, untyped value) -> void } -> void
+
+    def get_multi_with_metadata: (*(key | Array[key?] | nil) keys, ?req_options: req_options) -> Hash[String, multi_metadata]
+                               | (*(key | Array[key?] | nil) keys, ?req_options: req_options) { ([String, multi_metadata] pair) -> void } -> void
+
+    def get_multi_with_metadata_result: (*(key | Array[key?] | nil) keys, ?req_options: req_options) -> Hash[String, CacheResult]
+
+    def get_multi_cas: (*(key | Array[key]) keys, ?req_options: req_options) -> Hash[String, [untyped, Integer]]
+                     | (*(key | Array[key]) keys, ?req_options: req_options) { (String key, [untyped, Integer] value_and_cas) -> void } -> void
+
+    # The value found, or the block's value (written to the cache) on a miss.
+    def fetch: (key key, ?ttl ttl, ?req_options req_options) ?{ () -> untyped } -> untyped
+
+    # The cached (possibly stale) value, or the block's value when this
+    # client won the right to regenerate it. Raises ArgumentError without a block.
+    def fetch_with_lock: (key key, ?ttl: ttl, ?lock_ttl: _ToI, ?recache_threshold: _ToI?, ?req_options: req_options) { () -> untyped } -> untyped
+
+    # nil when the key is missing (the block is not called), false when
+    # another client changed the value, otherwise the new CAS.
+    def cas: (key key, ?ttl ttl, ?req_options req_options) { (untyped value) -> untyped } -> (Integer | false)?
+
+    # Like #cas, but also yields (nil) for a missing key.
+    def cas!: (key key, ?ttl ttl, ?req_options req_options) { (untyped value) -> untyped } -> (Integer | false)
+
+    # Inside the block, set, add, replace, append, prepend, incr, decr,
+    # delete and flush return nil; other operations raise
+    # Dalli::NotPermittedMultiOpError.
+    def quiet: [T] () { () -> T } -> T
+
+    alias multi quiet
+
+    def with_deadline: [T] (Numeric seconds) { (self client) -> T } -> T
+
+    def drain_deferred_responses: () -> nil
+
+    # The new CAS, false when not stored, nil inside a quiet block.
+    def set: (key key, untyped value, ?ttl ttl, ?req_options req_options) -> (Integer | false)?
+
+    def set_multi: (Hash[key, untyped] hash, ?ttl ttl, ?req_options req_options) -> void
+
+    def set_cas: (key key, untyped value, cas? cas, ?ttl ttl, ?req_options req_options) -> (Integer | false)?
+
+    def add: (key key, untyped value, ?ttl ttl, ?req_options req_options) -> (Integer | false)?
+
+    def replace: (key key, untyped value, ?ttl ttl, ?req_options req_options) -> (Integer | false)?
+
+    def replace_cas: (key key, untyped value, cas? cas, ?ttl ttl, ?req_options req_options) -> (Integer | false)?
+
+    def delete_cas: (key key, ?cas? cas, ?req_options req_options) -> bool?
+
+    def delete: (key key, ?req_options req_options) -> bool?
+
+    # The number of keys found and deleted (or invalidated).
+    def delete_multi: (Array[key] keys, ?req_options req_options) -> Integer
+
+    def append: (key key, _ToS value, ?req_options req_options) -> bool?
+
+    def prepend: (key key, _ToS value, ?req_options req_options) -> bool?
+
+    # The new value; nil when the counter is missing and default is nil.
+    def incr: (key key, ?Integer | String amt, ?ttl ttl, ?(Integer | String)? default, ?req_options req_options) -> (Integer | false)?
+
+    def decr: (key key, ?Integer | String amt, ?ttl ttl, ?(Integer | String)? default, ?req_options req_options) -> (Integer | false)?
+
+    # One entry per server: true, or nil inside a quiet block.
+    def flush: (?Integer | String delay) -> Array[bool?]
+
+    alias flush_all flush
+
+    # Server name => stats (nil for a server that is down). Without a type,
+    # the general stats.
+    def stats: (?(:items | :slabs | :settings)? type) -> Hash[String, Hash[String, String]?]
+
+    def reset_stats: () -> Array[bool?]
+
+    def version: () -> Hash[String, String?]
+
+    # Raises Dalli::RingError when no server is alive.
+    def alive!: () -> void
+
+    def close: () -> nil
+
+    alias reset close
+
+    def not_found?: (untyped val) -> bool
+
+    # The :cache_nils option as given.
+    def cache_nils: () -> untyped
+
+    # Yields the client, so it can stand in for a ConnectionPool.
+    def with: [T] (*untyped, **untyped) { (self client) -> T } -> T
+  end
+
+  # The result of Client#get_with_metadata_result and
+  # #get_multi_with_metadata_result.
+  class CacheResult
+    attr_reader value: untyped
+
+    attr_reader cas: Integer?
+
+    attr_reader hit_before: bool?
+
+    attr_reader last_access: Integer?
+
+    attr_reader ttl_remaining: Integer?
+
+    def initialize: (Hash[Symbol, untyped] hash) -> void
+
+    def miss?: () -> bool
+
+    def hit?: () -> bool
+
+    def stale?: () -> bool
+
+    def won_recache?: () -> bool
+
+    def lost_recache?: () -> bool
+  end
+
+  # The default compressor (zlib DEFLATE).
+  class Compressor
+    def self.compress: (String data) -> String
+
+    # Raises Dalli::UnmarshalError when the output would exceed max_bytes.
+    def self.decompress: (String data, ?max_bytes: Integer?) -> String
+  end
+
+  class GzipCompressor
+    def self.compress: (String data) -> String
+
+    def self.decompress: (String data, ?max_bytes: Integer?) -> String
+  end
+
+  # A serializer (serializer: Dalli::JSONSerializer) that reads with JSON.parse.
+  module JSONSerializer
+    def self.dump: (untyped value) -> String
+
+    def self.load: (String data) -> untyped
+  end
+
+  # OpenTelemetry spans for cache operations, when OpenTelemetry is loaded.
+  module Instrumentation
+    DEFAULT_ATTRIBUTES: Hash[String, String]
+
+    # An OpenTelemetry::Trace::Tracer, or nil without OpenTelemetry.
+    def self.tracer: () -> untyped
+
+    attr_writer self.tracer: untyped
+
+    def self.enabled?: () -> bool
+
+    def self.disable!: () -> nil
+
+    def self.trace: [T] (String name, ?Hash[String, untyped] attributes) { () -> T } -> T
+
+    # Yields the span (nil when tracing is off) and, with OpenTelemetry, its context.
+    def self.trace_with_result: [T] (String name, ?Hash[String, untyped] attributes) { (untyped span, ?untyped context) -> T } -> T
+  end
+end
